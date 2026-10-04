@@ -927,9 +927,16 @@ function fireClick(attrName, attrVal) {
   await fireClick('data-py-finish-note', 'К-002');
   let pySkillCelebrationHtml = elementsById['view-root'].innerHTML;
   assert(pySkillCelebrationHtml.includes('sprint-finish-card') && pySkillCelebrationHtml.includes('Минус 1 тема до скрининга!') && pySkillCelebrationHtml.includes('Готовность:'), 'Finishing a K-note must display .sprint-finish-card celebration');
+  assert(pySkillCelebrationHtml.includes('daily-activity-strip') && pySkillCelebrationHtml.includes('stats-grid-2x2'), 'Sprint finish card must include 6-segment .daily-activity-strip and 2x2 metric grid .stats-grid-2x2');
   await fireClick('data-chunk-more', 'py');
   let pySkillAfterDismiss = elementsById['view-root'].innerHTML;
   assert(!pySkillAfterDismiss.includes('sprint-finish-card'), 'Advancing to the next chunk in the next K-note must dismiss .sprint-finish-card');
+
+  // Verify Desktop Split-View in practice hub and skill reader
+  let practiceHubDom = navigate('#/practice');
+  assert(practiceHubDom.includes('practice-desktop-grid') && practiceHubDom.includes('practice-left-pane') && practiceHubDom.includes('practice-right-pane'), '#/practice must render desktop Split-View layout (.practice-desktop-grid, .practice-left-pane, .practice-right-pane)');
+  let skillTheoryDom = navigate('#/python/skill/1.1.1');
+  assert(skillTheoryDom.includes('skill-split-layout') && skillTheoryDom.includes('skill-lab-aside') && skillTheoryDom.includes('tap-chip-card'), '#/python/skill/1.1.1 must render .skill-split-layout with .skill-lab-aside and Tap-to-Fill Chips (.tap-chip-card)');
 
   // Test Progressive Chunk Scroll-Reveal in interactive lesson (#/lesson/py-basics-1, unconditionally on step 0!)
   let lessonChunkHtml = navigate('#/lesson/py-basics-1');
@@ -949,7 +956,13 @@ function fireClick(attrName, attrVal) {
   let lessonCheckDom = elementsById['view-root'].innerHTML;
   assert(getStoredXp() === xpBeforeLessonCheck + 10, 'Advancing from lesson theory to check stage must award +10 XP');
   assert(lessonCheckDom.includes('sprint-focus-topbar') && lessonCheckDom.includes('Мини-проверка 1/'), 'Lesson check stage must include .sprint-focus-topbar with progress bar');
-  console.log('✓ Variant A Cocoon UI Dashboard, Progressive Chunk Scroll-Reveal, Lesson Stage Topbar & Sprint Finish Celebration verified!');
+
+  // Test Bottom Sheet reveal upon checking answer
+  await fireClick('data-lesson-check', '0');
+  let lessonCheckAfterAnswer = elementsById['view-root'].innerHTML;
+  assert(lessonCheckAfterAnswer.includes('academy-bottom-sheet') && lessonCheckAfterAnswer.includes('bs-title-row') && lessonCheckAfterAnswer.includes('bs-explain-text'), 'Answering a lesson check must slide up .academy-bottom-sheet with title, explain text and CTA button');
+  assert(lessonCheckAfterAnswer.includes('btn-sprint-cta') && lessonCheckAfterAnswer.includes('data-lesson-next'), 'Bottom sheet must contain next button [data-lesson-next]');
+  console.log('✓ Variant A Cocoon UI Dashboard, Progressive Chunk Scroll-Reveal, Lesson Stage Topbar, Bottom Sheet & Sprint Finish Celebration verified!');
 
   // 14. Verify Bulletproof Progress Persistence Across App Updates, Schema Migrations, Reloads & Reset Recovery
   assert(typeof sandbox.mergeProgressStates === 'function', 'mergeProgressStates must be exposed on window');

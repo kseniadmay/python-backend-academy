@@ -959,13 +959,15 @@ EXTRA_CSS = r"""
   .skill-lab-aside{
     display:flex;flex-direction:column;gap:12px;
   }
-  @media (min-width:1080px){
+  @media (min-width:1024px){
     .skill-split-layout{
       grid-template-columns:minmax(0, 1.48fr) minmax(320px, 0.96fr);
     }
     .skill-lab-aside{
-      position:sticky;top:16px;
+      position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto;
     }
+    .skill-lab-aside::-webkit-scrollbar{width:6px;}
+    .skill-lab-aside::-webkit-scrollbar-thumb{background:var(--line);border-radius:999px;}
   }
   .skill-lab-card{
     background:var(--surface);border:1px solid var(--glass-border);border-radius:20px;
@@ -1028,11 +1030,23 @@ EXTRA_CSS = r"""
   }
   .feed-chunk h4,.feed-chunk h3{margin:0 0 8px;font-size:1.05rem;line-height:1.32;color:var(--ink);}
   .feed-chunk p:last-child{margin-bottom:0;}
-  .feed-chunk-prev{opacity:0.96;}
+  .feed-chunk-prev{
+    opacity:0.86;
+    border-bottom:1px solid var(--line-soft);
+    padding-bottom:12px;
+    margin-bottom:8px;
+    transition:opacity .35s ease,color .35s ease;
+  }
   .feed-chunk-new{
-    border:none;
-    background:transparent;
-    animation:fogReveal .45s cubic-bezier(0.22,1,0.36,1);
+    border-left:3px solid var(--moss);
+    background:rgba(20,90,70,0.07);
+    border-radius:0 16px 16px 0;
+    padding:12px 14px;
+    margin-top:6px;
+    animation:fogReveal .45s cubic-bezier(0.22,1,0.36,1) forwards;
+  }
+  html:not([data-theme="dark"]) .feed-chunk-new{
+    background:rgba(20,90,70,0.04);
   }
   @keyframes fogReveal{
     0%{opacity:0;filter:blur(7px);transform:translateY(10px);}
@@ -1084,22 +1098,140 @@ EXTRA_CSS = r"""
     background:var(--surface-2);color:var(--moss-deep);border:1px solid var(--line);
   }
 
+  /* ---------- Tactile Bottom Sheet Drawer (Coddy Mobile Feedback) ---------- */
+  .academy-bottom-sheet{
+    position:fixed;
+    bottom:0;left:0;right:0;
+    z-index:1000;
+    max-width:720px;
+    margin:0 auto;
+    padding:18px 20px calc(18px + max(16px, env(safe-area-inset-bottom, 16px)));
+    border-radius:26px 26px 0 0;
+    backdrop-filter:blur(24px);
+    -webkit-backdrop-filter:blur(24px);
+    box-shadow:0 -12px 40px rgba(0,0,0,0.55);
+    max-height:85vh;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    animation:bsSlideUp 0.32s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  }
+  @keyframes bsSlideUp{
+    from{transform:translateY(100%);opacity:0;}
+    to{transform:translateY(0);opacity:1;}
+  }
+  .academy-bottom-sheet--correct{
+    background:rgba(6,48,36,0.94);
+    border-top:1.5px solid rgba(52,211,153,0.55);
+    border-left:1px solid rgba(52,211,153,0.2);
+    border-right:1px solid rgba(52,211,153,0.2);
+  }
+  .academy-bottom-sheet--wrong{
+    background:rgba(60,10,20,0.94);
+    border-top:1.5px solid rgba(251,113,133,0.45);
+    border-left:1px solid rgba(251,113,133,0.15);
+    border-right:1px solid rgba(251,113,133,0.15);
+  }
+  html:not([data-theme="dark"]) .academy-bottom-sheet--correct{
+    background:rgba(240,253,244,0.96);
+    border-top:1.5px solid rgba(16,185,129,0.6);
+    box-shadow:0 -10px 36px rgba(16,185,129,0.15);
+  }
+  html:not([data-theme="dark"]) .academy-bottom-sheet--wrong{
+    background:rgba(255,241,242,0.96);
+    border-top:1.5px solid rgba(225,29,72,0.5);
+    box-shadow:0 -10px 36px rgba(225,29,72,0.15);
+  }
+  .bs-title-row{
+    display:flex;justify-content:space-between;align-items:center;
+    font-size:1.05rem;font-weight:800;margin-bottom:6px;
+  }
+  .academy-bottom-sheet--correct .bs-title-row{color:#6ee7b7;}
+  .academy-bottom-sheet--wrong .bs-title-row{color:#fca5a5;}
+  html:not([data-theme="dark"]) .academy-bottom-sheet--correct .bs-title-row{color:#065f46;}
+  html:not([data-theme="dark"]) .academy-bottom-sheet--wrong .bs-title-row{color:#9f1239;}
+  .bs-explain-text{
+    font-size:0.88rem;line-height:1.52;margin-bottom:14px;
+    color:rgba(248,250,252,0.94);
+  }
+  html:not([data-theme="dark"]) .bs-explain-text{color:#1e293b;}
+  .bs-badge{
+    font-size:0.72rem;font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:0.04em;
+    background:rgba(255,255,255,0.12);color:inherit;
+  }
+
+  .btn-coddy-emerald{
+    width:100%;min-height:48px;padding:13px 18px;border-radius:16px;
+    background:rgba(16,185,129,0.28);border:1.5px solid rgba(52,211,153,0.6);
+    color:#a7f3d0;font-family:inherit;font-size:0.92rem;font-weight:800;
+    letter-spacing:0.03em;cursor:pointer;box-shadow:0 4px 18px rgba(16,185,129,0.25);
+    transition:transform .14s ease,filter .14s ease;
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .btn-coddy-emerald:hover{filter:brightness(1.15);transform:translateY(-1px);}
+  html:not([data-theme="dark"]) .btn-coddy-emerald{background:#047857;border-color:#065f46;color:#ffffff;}
+
+  .btn-coddy-ruby{
+    width:100%;min-height:48px;padding:13px 18px;border-radius:16px;
+    background:rgba(190,18,60,0.32);border:1.5px solid rgba(251,113,133,0.5);
+    color:#ffe4e6;font-family:inherit;font-size:0.92rem;font-weight:800;
+    letter-spacing:0.03em;cursor:pointer;box-shadow:0 4px 18px rgba(190,18,60,0.25);
+    transition:transform .14s ease,filter .14s ease;
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .btn-coddy-ruby:hover{filter:brightness(1.15);transform:translateY(-1px);}
+  html:not([data-theme="dark"]) .btn-coddy-ruby{background:#be123c;border-color:#9f1239;color:#ffffff;}
+
+  /* ---------- Zero-Keyboard Scaffolding: Tap-to-Fill Chips ---------- */
   .tap-chip-card{
     border-radius:20px;padding:16px 18px;background:var(--surface);border:1.5px solid var(--glass-border);
-    margin-top:8px;
+    margin-top:10px;box-shadow:var(--shadow-1);
   }
-  .tap-chips-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  .tap-code-slot-container{
+    margin:10px 0 12px;padding:12px 14px;border-radius:16px;
+    background:#090d14;color:#f1f5f9;font-family:var(--font-m);font-size:0.88rem;
+    line-height:1.55;border:1px solid rgba(255,255,255,0.1);overflow-x:auto;
+  }
+  html:not([data-theme="dark"]) .tap-code-slot-container{background:#0f172a;color:#f8fafc;}
+  .tap-code-slot{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:54px;min-height:26px;padding:2px 10px;margin:0 4px;
+    border-radius:8px;font-weight:700;transition:all .2s ease;vertical-align:middle;
+  }
+  .tap-code-slot.empty{
+    background:rgba(255,255,255,0.06);border:1.5px dashed rgba(253,164,175,0.5);color:#fda4af;font-size:0.8rem;
+  }
+  .tap-code-slot.filled{
+    background:rgba(190,18,60,0.35);border:1.5px solid #fda4af;color:#ffffff;
+    box-shadow:0 0 12px rgba(251,113,133,0.35);
+  }
+  .tap-code-slot.filled.selected-correct{
+    background:rgba(16,185,129,0.35);border:1.5px solid #6ee7b7;color:#ffffff;
+    box-shadow:0 0 12px rgba(52,211,153,0.35);
+  }
+  .tap-code-slot.filled.selected-wrong{
+    background:rgba(190,18,60,0.35);border:1.5px solid #fda4af;color:#ffffff;
+  }
+  .tap-chips-bank-label{
+    font-size:0.78rem;font-weight:700;color:var(--ink-soft);text-transform:uppercase;
+    letter-spacing:0.04em;margin-bottom:8px;
+  }
+  .tap-chips-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
   .tap-chip{
-    padding:9px 15px;border-radius:12px;font-family:var(--font-m);font-size:.84rem;font-weight:700;
+    padding:10px 18px;border-radius:14px;font-family:var(--font-m);font-size:0.86rem;font-weight:700;
     background:var(--surface-2);border:1.5px solid var(--line);color:var(--ink);cursor:pointer;
-    transition:all .14s;
+    transition:all .16s ease;user-select:none;
   }
   .tap-chip:hover{border-color:var(--moss);transform:translateY(-1px);}
+  .tap-chip.selected{
+    background:rgba(190,18,60,0.22);border-color:#fda4af;color:var(--bordeaux);
+    box-shadow:0 2px 10px rgba(190,18,60,0.2);
+  }
+  html[data-theme="dark"] .tap-chip.selected{color:#ffe4e6;}
   .tap-chip.selected-correct{
-    background:rgba(16,185,129,0.20);border-color:rgba(52,211,153,0.65);color:var(--moss);
+    background:rgba(16,185,129,0.22);border-color:rgba(52,211,153,0.7);color:var(--moss);
   }
   .tap-chip.selected-wrong{
-    background:rgba(190,18,60,0.18);border-color:rgba(251,113,133,0.55);color:var(--bordeaux);
+    background:rgba(190,18,60,0.22);border-color:rgba(251,113,133,0.6);color:var(--bordeaux);
   }
   .bottom-sheet-correct{
     margin-top:12px;padding:12px 16px;border-radius:16px;background:rgba(16,185,129,0.16);
@@ -1107,7 +1239,7 @@ EXTRA_CSS = r"""
     align-items:center;gap:10px;flex-wrap:wrap;animation:chunkReveal .25s ease;
   }
 
-  /* ---------- Sprint Finish Celebration Screen ---------- */
+  /* ---------- Sprint Finish Celebration Screen (2x2 Stats Grid & 6-Day Activity) ---------- */
   .sprint-finish-card{
     background:linear-gradient(155deg, rgba(16,185,129,0.15), rgba(190,18,60,0.10)), var(--surface);
     border:1.5px solid rgba(52,211,153,0.45);border-radius:26px;padding:28px 26px;margin-bottom:20px;
@@ -1118,9 +1250,57 @@ EXTRA_CSS = r"""
     justify-content:center;font-size:2rem;background:rgba(16,185,129,0.18);
     border:2px solid rgba(52,211,153,0.55);box-shadow:0 0 28px rgba(16,185,129,0.28);
   }
+  .daily-activity-strip{
+    background:rgba(16,185,129,0.12);border:1.5px solid rgba(52,211,153,0.35);border-radius:18px;
+    padding:12px 16px;text-align:left;margin:14px auto;max-width:520px;
+  }
+  html:not([data-theme="dark"]) .daily-activity-strip{
+    background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.3);
+  }
+  .daily-activity-head{
+    display:flex;justify-content:space-between;align-items:center;font-size:0.84rem;font-weight:700;
+    color:var(--ink);margin-bottom:8px;
+  }
+  .daily-activity-head .active-accent{color:var(--moss);font-weight:800;}
+  .daily-week-segments{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;}
+  .day-seg{
+    height:7px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);
+    transition:background .2s ease;
+  }
+  .day-seg.done{background:#10b981;border-color:#059669;box-shadow:0 0 6px rgba(16,185,129,0.4);}
+  .stats-grid-2x2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px auto;max-width:520px;}
+  .stat-card{
+    border-radius:18px;background:var(--surface);border:1.5px solid rgba(253,164,175,0.28);
+    overflow:hidden;text-align:center;
+  }
+  .stat-card.emerald{border-color:rgba(52,211,153,0.32);}
+  .stat-head{
+    font-size:0.72rem;font-weight:700;padding:6px 8px;background:rgba(190,18,60,0.16);
+    color:var(--bordeaux);letter-spacing:0.03em;
+  }
+  html[data-theme="dark"] .stat-head{color:#fda4af;}
+  .stat-card.emerald .stat-head{background:rgba(16,185,129,0.14);color:var(--moss);}
+  .stat-val{padding:12px 8px;font-size:1.15rem;font-weight:800;color:var(--ink);}
+  .stat-card.emerald .stat-val{color:var(--moss);}
   .countdown-shift-card{
     max-width:520px;margin:16px auto;padding:16px 18px;border-radius:20px;background:var(--surface);
     border:1.5px solid rgba(52,211,153,0.35);text-align:left;
+  }
+
+  /* ---------- Desktop Split-View IDE Grid (>=1000px) ---------- */
+  .practice-desktop-grid{display:flex;flex-direction:column;gap:14px;}
+  @media (min-width:1000px){
+    .practice-desktop-grid{
+      display:grid;grid-template-columns:minmax(0, 0.94fr) minmax(0, 1.06fr);gap:20px;align-items:stretch;
+    }
+    .practice-left-pane{
+      overflow-y:auto;max-height:calc(100vh - 170px);padding-right:10px;
+    }
+    .practice-left-pane::-webkit-scrollbar{width:6px;}
+    .practice-left-pane::-webkit-scrollbar-thumb{background:var(--line);border-radius:999px;}
+    .practice-right-pane{
+      display:flex;flex-direction:column;min-width:0;
+    }
   }
 
   /* Quick 2-minute micro-step button */
@@ -2412,6 +2592,113 @@ function buildCPythonMemoryDiagramHTML(activeK, skillId){
 }
 window.buildCPythonMemoryDiagramHTML = buildCPythonMemoryDiagramHTML;
 
+// Helper: Build Tap-to-Fill Chips Zero-Keyboard Exercise
+function buildTapToFillExerciseHTML(activeK, skillId){
+  const exercises = {
+    '1.1': {
+      prompt: 'In-place мутация существующего списка без аллокации нового объекта:',
+      codePrefix: 'a = [1, 2]; b = a; b ',
+      codeSuffix: ' [3]  # a и b ссылаются на один и тот же список',
+      options: ['=', '+=', '+', '=='],
+      correct: '+=',
+      explain: 'Оператор += вызывает метод __iadd__, модифицирующий список по месту за O(k).'
+    },
+    '1.2': {
+      prompt: 'Вычислите номер корзины для ключа <code>emp_id</code> в хеш-таблице из 16 ячеек:',
+      codePrefix: 'bucket = ',
+      codeSuffix: '(emp_id) % 16  # Переход к корзине за O(1)',
+      options: ['len', 'id', 'hash', 'type'],
+      correct: 'hash',
+      explain: 'Функция hash() вычисляет 64-битный хеш неизменяемого ключа за O(1).'
+    },
+    '1.3': {
+      prompt: 'Каноническое строковое представление объекта для отладки и REPL:',
+      codePrefix: 'def ',
+      codeSuffix: '(self): return f"Item({self.name!r})"',
+      options: ['__str__', '__repr__', '__name__', '__init__'],
+      correct: '__repr__',
+      explain: 'Метод __repr__ возвращает однозначное, воспроизводимое строковое представление для логов.'
+    },
+    '1.4': {
+      prompt: 'Сохранение метаданных оригинальной функции внутри декоратора:',
+      codePrefix: '@functools.',
+      codeSuffix: '(func)\ndef wrapper(*args, **kwargs): return func(*args, **kwargs)',
+      options: ['cache', 'lru_cache', 'wraps', 'partial'],
+      correct: 'wraps',
+      explain: 'Декоратор @functools.wraps копирует __name__, __doc__ и __annotations__ с целевой функции.'
+    },
+    '1.5': {
+      prompt: 'Делегирование генерации значений во вложенный генератор:',
+      codePrefix: '',
+      codeSuffix: ' sub_generator()  # Прозрачное проксирование yield',
+      options: ['return', 'yield', 'yield from', 'await'],
+      correct: 'yield from',
+      explain: 'Конструкция yield from прозрачно проксирует yield, send() и throw() во внутренний генератор.'
+    },
+    '1.6': {
+      prompt: 'Подавление исключения внутри контекстного менеджера (__exit__):',
+      codePrefix: 'def __exit__(self, exc_type, exc_val, exc_tb):\n    return ',
+      codeSuffix: '  # Подавить исключение без проброса выше',
+      options: ['True', 'False', 'None', 'pass'],
+      correct: 'True',
+      explain: 'Возврат True из __exit__ сообщает Python, что исключение перехвачено и обработано.'
+    },
+    '1.7': {
+      prompt: 'Освобождение GIL на время блокирующего системного ввода/вывода в C-extension:',
+      codePrefix: 'Py_',
+      codeSuffix: '_ALLOW_THREADS  # Освобождение GIL',
+      options: ['BEGIN', 'SET', 'ENABLE', 'START'],
+      correct: 'BEGIN',
+      explain: 'Макрос Py_BEGIN_ALLOW_THREADS временно отпускает GIL перед блокирующим вызовом I/O.'
+    },
+    '1.8': {
+      prompt: 'Конкурентный запуск нескольких задач с получением упорядоченного результата:',
+      codePrefix: 'results = await asyncio.',
+      codeSuffix: '(*tasks)  # Конкурентный запуск',
+      options: ['wait', 'gather', 'run', 'create_task'],
+      correct: 'gather',
+      explain: 'asyncio.gather(*tasks) запускает переданные задачи конкурентно и возвращает список ответов.'
+    },
+    '1.9': {
+      prompt: 'Отключение динамического __dict__ экземпляра для радикальной экономии RAM:',
+      codePrefix: '__',
+      codeSuffix: '__ = ("x", "y")  # Фиксация дескрипторов атрибутов',
+      options: ['slots', 'all', 'dict', 'fields'],
+      correct: 'slots',
+      explain: '__slots__ резервирует статический массив указателей в CPython struct вместо словаря.'
+    }
+  };
+  const uPrefix = String(skillId || '').slice(0, 3);
+  const ex = exercises[skillId] || exercises[uPrefix] || exercises['1.1'];
+  const exKey = 'tap_ex_' + skillId;
+  const curVal = window.__tapExState ? window.__tapExState[exKey] : null;
+  const isDone = (curVal === ex.correct);
+
+  const chipsHTML = ex.options.map(function(opt){
+    let cls = 'tap-chip';
+    if(curVal === opt){
+      cls += isDone ? ' selected-correct' : ' selected-wrong';
+    }
+    return `<button type="button" class="${cls}" data-tap-chip-val="${escapeHtmlStr(opt)}" data-tap-chip-key="${exKey}" data-tap-chip-correct="${escapeHtmlStr(ex.correct)}">${escapeHtmlStr(opt)}</button>`;
+  }).join('');
+
+  return `
+    <div class="tap-chip-card" style="margin-top:10px;">
+      <div class="topic-badge" style="margin-bottom:6px;">Zero-Keyboard Scaffolding · Интерактив</div>
+      <p style="font-size:.88rem;line-height:1.48;margin-bottom:8px;color:var(--ink);">${ex.prompt}</p>
+      <div class="tap-code-slot-container" style="margin:8px 0;">
+        <code>${ex.codePrefix}<span class="tap-code-slot ${curVal ? (isDone ? 'filled selected-correct' : 'filled selected-wrong') : 'empty'}">${curVal ? escapeHtmlStr(curVal) : '[ ? ]'}</span>${ex.codeSuffix}</code>
+      </div>
+      <div class="tap-chips-bank-label">Банк токенов (тапни для выбора):</div>
+      <div class="tap-chips-row">${chipsHTML}</div>
+      ${curVal ? `
+        <div class="bottom-sheet-correct" style="margin-top:10px;padding:8px 12px;border-radius:12px;background:${isDone ? 'rgba(16,185,129,0.18)' : 'rgba(190,18,60,0.18)'};">
+          <span style="font-size:.82rem;font-weight:700;color:${isDone ? 'var(--moss)' : 'var(--bordeaux)'};">${isDone ? '✓ Верно!' : '✕ Попробуй другой токен.'} ${ex.explain}</span>
+        </div>` : ''}
+    </div>`;
+}
+window.buildTapToFillExerciseHTML = buildTapToFillExerciseHTML;
+
 // Register all 7 Mastery Tracks (Python, Web, Backend, Algorithms, Databases, Architecture, Infrastructure)
 const MASTERY_TRACKS = {
   python: {
@@ -3558,18 +3845,53 @@ function pluralRuTopics(n){
 
 function buildSprintFinishCelebrationHTML(cel){
   if(!cel) return '';
+  const streakVal = (typeof state !== 'undefined' && state && state.streak) ? state.streak : 1;
+  const activeCount = Math.min(6, Math.max(1, streakVal % 6 || 6));
+  const remaining = (cel.remainingTopics !== undefined) ? cel.remainingTopics : 7;
+  const prevP = (cel.prevPct !== undefined) ? cel.prevPct : 0;
+  const newP = (cel.newPct !== undefined) ? cel.newPct : 2;
   return `
     <div class="sprint-finish-card">
-      <div class="sprint-finish-orb">✨</div>
+      <div class="sprint-finish-orb">👑</div>
       <div class="cocoon-focus-eyebrow" style="margin-bottom:8px;">Этап 1 (Теория) пройден · +15 XP · Переходим к закреплению!</div>
-      <h2 style="font-size:1.5rem;margin-bottom:6px;">Конспект ${escapeHtmlStr(cel.kid || 'темы')} изучен!<span class="sr-only"> Минус 1 тема до скрининга!</span></h2>
-      <p class="meta" style="max-width:540px;margin:0 auto;">Чтобы навык получил полную галочку <b>✓</b> и запомнился надолго, пройди 3D-карточки и реши практическую задачу в IDE:</p>
+      <h2 style="font-size:1.45rem;margin-bottom:6px;">Спринт завершён! Конспект ${escapeHtmlStr(cel.kid || 'темы')} изучен!<span class="sr-only"> Минус 1 тема до скрининга!</span></h2>
+      <p class="meta" style="max-width:540px;margin:0 auto 10px;">Минус 1 тема до скрининга! Чтобы навык получил полную галочку <b>✓</b> и запомнился надолго, пройди 3D-карточки и реши практическую задачу в IDE:</p>
+
+      <div class="daily-activity-strip">
+        <div class="daily-activity-head">
+          <span>✓ Дневная активность выполнена!</span>
+          <span class="active-accent">${activeCount} / 6</span>
+        </div>
+        <div class="daily-week-segments">
+          ${[1,2,3,4,5,6].map(i => `<div class="day-seg ${i <= activeCount ? 'done' : ''}"></div>`).join('')}
+        </div>
+      </div>
+
+      <div class="stats-grid-2x2">
+        <div class="stat-card">
+          <div class="stat-head">XP ЗАРАБОТАНО</div>
+          <div class="stat-val">+15 XP</div>
+        </div>
+        <div class="stat-card emerald">
+          <div class="stat-head">ДО СКРИНИНГА</div>
+          <div class="stat-val">${remaining} ${pluralRuTopics(remaining)} (-1)</div>
+        </div>
+        <div class="stat-card emerald">
+          <div class="stat-head">ТОЧНОСТЬ</div>
+          <div class="stat-val">100 %</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-head">ВРЕМЯ СЕССИИ</div>
+          <div class="stat-val">02:15</div>
+        </div>
+      </div>
+
       <div class="countdown-shift-card">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-weight:800;font-size:.92rem;">
-          <span>🎯 Готовность: ${cel.prevPct}% ➔ ${cel.newPct}%</span>
-          <span style="color:var(--moss);">⏳ Осталось ${cel.remainingTopics} ${pluralRuTopics(cel.remainingTopics)}!</span>
+          <span>🎯 Готовность: ${prevP}% ➔ ${newP}%</span>
+          <span style="color:var(--moss);">⏳ Осталось ${remaining} ${pluralRuTopics(remaining)}!</span>
         </div>
-        <div class="cd-bar cd-bar-track"><div class="cd-fill cd-bar-fill" style="width:${Math.max(8, cel.newPct)}%;"></div></div>
+        <div class="cd-bar cd-bar-track"><div class="cd-fill cd-bar-fill" style="width:${Math.max(8, newP)}%;"></div></div>
       </div>
       <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:16px;">
         <button class="btn-glass-emerald" data-py-tab="cards" data-dismiss-celebration>🃏 Этап 2: Закрепить на 3D-карточках ➔</button>
@@ -3718,6 +4040,7 @@ function viewPythonSkill(sid){
         <div class="skill-lab-card">
           <h4>🧪 Лаборатория закрепления (${sk.id})</h4>
           ${buildCPythonMemoryDiagramHTML(activeK, sk.id)}
+          ${buildTapToFillExerciseHTML(activeK, sk.id)}
           <div class="meta" style="font-size:.74rem;margin:8px 0 4px;font-weight:600;">⚡ Экспресс-песочница Python 3.13:</div>
           <textarea id="skill-lab-scratchpad" class="code-editor" spellcheck="false" style="min-height:92px;font-size:.78rem;padding:8px 10px;"># Проверь идею из конспекта ${activeK}\nimport sys\ndata = {"a": 1, "b": 2}\nprint("size:", sys.getsizeof(data), "keys:", list(data.keys()))</textarea>
           <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-top:6px;">
@@ -3830,23 +4153,29 @@ function viewPythonSkill(sid){
     bodyHTML = `
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">${tSelector}</div>
       <div class="microstep-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-          <span class="topic-badge" style="margin:0;">Задача #${tObj.id} · ${tObj.tier} · ${tObj.topic}</span>
-          <div style="display:flex;gap:8px;align-items:center;">
-            <a href="#/docs" class="link-quiet" style="font-size:.78rem;">📚 Справка по методам Python</a>
-            ${solvedMap[tObj.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
+        <div class="practice-desktop-grid">
+          <div class="practice-left-pane">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+              <span class="topic-badge" style="margin:0;">Задача #${tObj.id} · ${tObj.tier} · ${tObj.topic}</span>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <a href="#/docs" class="link-quiet" style="font-size:.78rem;">📚 Справка по методам Python</a>
+                ${solvedMap[tObj.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
+              </div>
+            </div>
+            <h2 style="margin-bottom:10px;">${tObj.title}</h2>
+            <div class="lesson-theory" style="margin-bottom:12px;">${tObj.desc}</div>
+            ${shownHints}
+          </div>
+          <div class="practice-right-pane">
+            ${buildCodeEditorWithGutterHTML('py-skill-editor', pySkillViewState.codeDraft, 220)}
+            <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <button class="btn-glass-emerald" data-py-run-task="${tObj.id}">${ICONS.play} Проверить решение (Ctrl+Enter)</button>
+              <button class="btn btn-ghost" data-py-task-hint ${pySkillViewState.hintLevel>=socraticHints.length?'disabled':''}>💡 Сократовская наводка (${pySkillViewState.hintLevel}/${socraticHints.length})</button>
+              <button class="btn btn-ghost" data-py-reset-task="${tObj.id}">Сбросить код</button>
+            </div>
+            ${runFeedback}
           </div>
         </div>
-        <h2 style="margin-bottom:10px;">${tObj.title}</h2>
-        <div class="lesson-theory" style="margin-bottom:12px;">${tObj.desc}</div>
-        ${buildCodeEditorWithGutterHTML('py-skill-editor', pySkillViewState.codeDraft, 180)}
-        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-          <button class="btn-glass-emerald" data-py-run-task="${tObj.id}">${ICONS.play} Проверить решение (Ctrl+Enter)</button>
-          <button class="btn btn-ghost" data-py-task-hint ${pySkillViewState.hintLevel>=socraticHints.length?'disabled':''}>💡 Сократовская наводка (${pySkillViewState.hintLevel}/${socraticHints.length})</button>
-          <button class="btn btn-ghost" data-py-reset-task="${tObj.id}">Сбросить код</button>
-        </div>
-        ${runFeedback}
-        ${shownHints}
       </div>`;
   }
 
@@ -4346,23 +4675,29 @@ function viewPracticeHub(){
       </div>
 
       <div class="microstep-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <span class="topic-badge" style="margin:0;">Задача #${curTask.id} · ${curTask.tier} · ${curTask.topic}</span>
-            ${renderEchelonBadge(curTaskEchelon)}
+        <div class="practice-desktop-grid">
+          <div class="practice-left-pane">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <span class="topic-badge" style="margin:0;">Задача #${curTask.id} · ${curTask.tier} · ${curTask.topic}</span>
+                ${renderEchelonBadge(curTaskEchelon)}
+              </div>
+              ${solvedMap[curTask.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
+            </div>
+            <h2 style="margin-bottom:10px;">${curTask.title}</h2>
+            <div class="lesson-theory" style="margin-bottom:14px;">${curTask.desc}</div>
+            ${shownHints}
           </div>
-          ${solvedMap[curTask.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
+          <div class="practice-right-pane">
+            ${buildCodeEditorWithGutterHTML('prac-code-editor', practiceHubState.codeDraft, 240)}
+            <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+              <button class="btn btn-primary" data-prac-run="${curTask.id}">${ICONS.play} Запустить pytest (Ctrl+Enter)</button>
+              <button class="btn btn-ghost" data-prac-hint ${practiceHubState.hintLevel>=socraticHints.length?'disabled':''}>💡 Сократовская подсказка (${practiceHubState.hintLevel}/${socraticHints.length})</button>
+              <button class="btn btn-ghost" data-prac-reset="${curTask.id}">Сбросить</button>
+            </div>
+            ${runFeedback}
+          </div>
         </div>
-        <h2 style="margin-bottom:10px;">${curTask.title}</h2>
-        <div class="lesson-theory" style="margin-bottom:14px;">${curTask.desc}</div>
-        ${buildCodeEditorWithGutterHTML('prac-code-editor', practiceHubState.codeDraft, 220)}
-        <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-          <button class="btn btn-primary" data-prac-run="${curTask.id}">${ICONS.play} Запустить pytest (Ctrl+Enter)</button>
-          <button class="btn btn-ghost" data-prac-hint ${practiceHubState.hintLevel>=socraticHints.length?'disabled':''}>💡 Сократовская подсказка (${practiceHubState.hintLevel}/${socraticHints.length})</button>
-          <button class="btn btn-ghost" data-prac-reset="${curTask.id}">Сбросить</button>
-        </div>
-        ${runFeedback}
-        ${shownHints}
       </div>
     </div>`;
 }
@@ -5345,6 +5680,7 @@ diagQuestionHTML = function(pool, label){
   const chosen = (ansArr && typeof ansArr[diagState.idx] === 'number') ? ansArr[diagState.idx] : undefined;
   const hasSelection = (chosen !== undefined && chosen !== null);
   const isRevealed = !!diagState.revealed;
+  const isCorrect = (chosen === q.correct);
 
   const optsHTML = q.options.map(function(opt, i){
     let cls = 'quiz-opt';
@@ -5354,15 +5690,11 @@ diagQuestionHTML = function(pool, label){
     } else if(i === chosen){
       cls += ' quiz-opt--selected';
     }
-    return `<button class="${cls}" data-diag-answer="${i}"><b>${String.fromCharCode(65+i)}.</b> ${formatRichInlineText(opt)}</button>`;
+    return `<button class="${cls}" data-diag-answer="${i}" ${isRevealed ? 'disabled' : ''}><b>${String.fromCharCode(65+i)}.</b> ${formatRichInlineText(opt)}</button>`;
   }).join('');
 
   const idkSelected = (chosen === -1);
-  const idkBtnHTML = `<button class="quiz-opt ${isRevealed && idkSelected ? 'quiz-opt--wrong' : (idkSelected ? 'quiz-opt--selected' : '')}" style="margin-top:4px;border-style:dashed;opacity:.92;" data-diag-answer="-1"><b>🤷</b> Не знаю — разобрать эту тему с нуля (без угадывания)</button>`;
-
-  const explainHTML = isRevealed
-    ? `<div class="notice" style="margin-top:14px;"><b>${chosen === q.correct ? 'Верно.' : (chosen === -1 ? 'Честный выбор — тема добавлена в маршрут.' : 'Не совсем.')}</b> ${formatRichInlineText(q.explain)}</div>`
-    : '';
+  const idkBtnHTML = `<button class="quiz-opt ${isRevealed && idkSelected ? 'quiz-opt--wrong' : (idkSelected ? 'quiz-opt--selected' : '')}" style="margin-top:4px;border-style:dashed;opacity:.92;" data-diag-answer="-1" ${isRevealed ? 'disabled' : ''}><b>🤷</b> Не знаю — разобрать эту тему с нуля (без угадывания)</button>`;
 
   const prevBtnHTML = diagState.idx > 0
     ? `<button class="btn btn-ghost" data-diag-prev>← Предыдущий вопрос</button>`
@@ -5381,8 +5713,23 @@ diagQuestionHTML = function(pool, label){
         <span class="meta">Выбери вариант ответа (можно изменить выбор до перехода дальше)</span>
       </div>`;
 
+  const bottomSheetHTML = isRevealed ? `
+    <div class="academy-bottom-sheet ${isCorrect ? 'academy-bottom-sheet--correct' : 'academy-bottom-sheet--wrong'}">
+      <div class="bs-title-row">
+        <span>${isCorrect ? '✓ Правильно! (Ответ уровня Senior)' : (chosen === -1 ? '🤷 Честный выбор — тема добавлена в маршрут' : '✕ Не совсем.')}</span>
+        <span class="bs-badge">${isCorrect ? '⚡ +15 XP' : 'Диагностика'}</span>
+      </div>
+      <div class="bs-explain-text">${formatRichInlineText(q.explain)}</div>
+      <div style="display:flex;gap:10px;align-items:center;width:100%;">
+        ${diagState.idx > 0 ? `<button class="btn btn-ghost" style="padding:12px 16px;color:var(--ink-soft);" data-diag-prev>← Назад</button>` : ''}
+        <button class="${isCorrect ? 'btn-coddy-emerald' : 'btn-coddy-ruby'} btn-sprint-cta" style="flex:1;" data-diag-next>
+          ${diagState.idx+1 < pool.length ? 'Следующий вопрос ➔' : 'Завершить блок ➔'}
+        </button>
+      </div>
+    </div>` : '';
+
   return `
-    <div class="container">
+    <div class="container" style="padding-bottom:${isRevealed ? '200px' : '32px'};">
       <div class="diag-header-row">
         <a href="#/map" class="back-link">${ICONS.chevronLeft} Выйти к карте</a>
         <div class="topic-badge">${label} · вопрос ${diagState.idx+1} из ${pool.length}</div>
@@ -5391,14 +5738,14 @@ diagQuestionHTML = function(pool, label){
       <div class="panel">
         <div class="quiz-question-prompt">${formatQuizQuestionPromptHTML(q.text)}</div>
         <div>${optsHTML}${idkBtnHTML}</div>
-        ${explainHTML}
-        ${actionRowHTML}
+        ${!isRevealed ? actionRowHTML : ''}
       </div>
+      ${bottomSheetHTML}
     </div>`;
 };
 
 selectDiagAnswer = function(i){
-  if(!diagState) return;
+  if(!diagState || diagState.revealed) return;
   const arr = diagState.stage === 'advanced' ? diagState.advAnswers : diagState.coreAnswers;
   arr[diagState.idx] = i;
   diagState.selectedOption = i;
@@ -5407,7 +5754,13 @@ selectDiagAnswer = function(i){
 };
 
 function confirmDiagAnswer(){
-  if(!diagState) return;
+  if(!diagState || diagState.revealed) return;
+  const pool = diagState.stage === 'advanced' ? (typeof DIAGNOSTIC_ADV_POOL !== 'undefined' ? DIAGNOSTIC_ADV_POOL : []) : (typeof DIAGNOSTIC_CORE_POOL !== 'undefined' ? DIAGNOSTIC_CORE_POOL : []);
+  const q = pool[diagState.idx];
+  const ansArr = diagState.stage === 'advanced' ? diagState.advAnswers : diagState.coreAnswers;
+  const chosen = (ansArr && typeof ansArr[diagState.idx] === 'number') ? ansArr[diagState.idx] : undefined;
+  const isCorrect = q ? (chosen === q.correct) : false;
+  if(navigator && navigator.vibrate) try{ navigator.vibrate(isCorrect ? [15] : [30, 40, 30]); }catch(e){}
   diagState.revealed = true;
   saveDiagDraftState();
   render();
@@ -5687,6 +6040,11 @@ ensureLessonState = function(id){
 
 const _origAnswerLessonCheck = answerLessonCheck;
 answerLessonCheck = function(i){
+  const l = (typeof LESSONS !== 'undefined' && lessonState) ? LESSONS[lessonState.lessonId] : null;
+  const checks = (l && l.checks) ? l.checks : [];
+  const c = checks[lessonState ? (lessonState.checkIdx || 0) : 0];
+  const isCorrect = c ? (i === c.correct) : true;
+  if(navigator && navigator.vibrate) try{ navigator.vibrate(isCorrect ? [15] : [30, 40, 30]); }catch(e){}
   _origAnswerLessonCheck(i);
   saveLessonDraftState();
 };
@@ -5747,11 +6105,42 @@ lessonTheoryHTML = function(){
   const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
   const isLastStepAndChunk = (sIdx + 1 >= steps.length) && !hasMoreChunks;
   const e1 = getEchelonProgress(1);
-  const remE1 = e1.skills.filter(s => getSkillMP(s.id) < 100).length;
+  const streakVal = (typeof state !== 'undefined' && state && state.streak) ? state.streak : 1;
+  const activeCount = Math.min(6, Math.max(1, streakVal % 6 || 6));
   const finishSprintBanner = isLastStepAndChunk ? `
     <div class="sprint-finish-card" style="margin-top:12px;">
-      <div class="sprint-finish-orb">✨</div>
+      <div class="sprint-finish-orb">👑</div>
       <h3 style="margin-bottom:6px;">Минус 1 тема до скрининга!</h3>
+
+      <div class="daily-activity-strip">
+        <div class="daily-activity-head">
+          <span>✓ Дневная активность выполнена!</span>
+          <span class="active-accent">${activeCount} / 6</span>
+        </div>
+        <div class="daily-week-segments">
+          ${[1,2,3,4,5,6].map(i => `<div class="day-seg ${i <= activeCount ? 'done' : ''}"></div>`).join('')}
+        </div>
+      </div>
+
+      <div class="stats-grid-2x2">
+        <div class="stat-card">
+          <div class="stat-head">XP ЗАРАБОТАНО</div>
+          <div class="stat-val">+10 XP</div>
+        </div>
+        <div class="stat-card emerald">
+          <div class="stat-head">ДО СКРИНИНГА</div>
+          <div class="stat-val">${remE1} ${pluralRuTopics(remE1)} (-1)</div>
+        </div>
+        <div class="stat-card emerald">
+          <div class="stat-head">ТОЧНОСТЬ</div>
+          <div class="stat-val">100 %</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-head">ВРЕМЯ СЕССИИ</div>
+          <div class="stat-val">01:45</div>
+        </div>
+      </div>
+
       <div class="countdown-shift-card">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-weight:800;font-size:.9rem;">
           <span>🎯 Готовность: ${e1.pct}% ➔ ${Math.min(100, e1.pct + 2)}%</span>
@@ -5844,9 +6233,89 @@ lessonCheckHTML = function(){
   const l = LESSONS[lessonState.lessonId];
   const checks = l.checks || [];
   const idx = lessonState.checkIdx || 0;
+  const c = checks[idx] || { q: '', options: [], correct: 0, explain: '' };
+  const sel = (lessonState.checkAnswers && typeof lessonState.checkAnswers[idx] === 'number') ? lessonState.checkAnswers[idx] : undefined;
+  const revealed = !!lessonState.checkRevealed;
+  const isCorrect = (sel === c.correct);
+
   const pct = Math.min(95, Math.max(45, Math.round(45 + ((idx + 1) / Math.max(1, checks.length)) * 20)));
   const topbar = buildLessonStageTopbarHTML(l, `Мини-проверка ${idx+1}/${checks.length}`, pct, '⚡ +10 XP');
-  return _origLessonCheckHTML().replace('<div class="container">', '<div class="container">\n      ' + topbar);
+
+  const isTokenChips = (c.chips || (c.options.length <= 6 && c.options.every(o => o.length <= 22 && !o.includes('\n')) && (/\[|\`|%|==|\+=|def|hash|len|index/.test(c.q) || c.options.length <= 4)));
+
+  let questionBodyHTML = '';
+  if(isTokenChips){
+    const slotValue = (sel !== undefined) ? c.options[sel] : null;
+    const slotClass = (sel !== undefined) ? (revealed ? (isCorrect ? 'filled selected-correct' : 'filled selected-wrong') : 'filled') : 'empty';
+    const slotText = slotValue ? escapeHtmlStr(slotValue) : '[ ? ]';
+
+    let promptText = c.q;
+    if(promptText.includes('`')){
+      promptText = promptText.replace(/`([^`]+)`/g, '<span class="inline-code-pill">$1</span>');
+    }
+
+    const chipsHTML = c.options.map(function(opt, i){
+      let cls = 'tap-chip';
+      if(revealed){
+        if(i === c.correct) cls += ' selected-correct';
+        else if(i === sel) cls += ' selected-wrong';
+      } else if(i === sel){
+        cls += ' selected';
+      }
+      return `<button type="button" class="${cls}" data-lesson-check="${i}" ${revealed?'disabled':''}>${escapeHtmlStr(opt)}</button>`;
+    }).join('');
+
+    questionBodyHTML = `
+      <div class="tap-chip-card">
+        <p style="font-size:1.02rem;line-height:1.52;margin-bottom:12px;color:var(--ink);">${promptText}</p>
+        <div class="tap-code-slot-container">
+          <span style="color:var(--ink-soft);font-size:.84rem;">Подстановка: </span>
+          <span class="tap-code-slot ${slotClass}">${slotText}</span>
+        </div>
+        <div class="tap-chips-bank-label">Банк токенов (Zero-Keyboard Scaffolding):</div>
+        <div class="tap-chips-row">${chipsHTML}</div>
+      </div>`;
+  } else {
+    const optsHTML = c.options.map(function(opt, i){
+      let cls = 'quiz-opt';
+      if(revealed){
+        if(i === c.correct) cls += ' quiz-opt--correct';
+        else if(i === sel) cls += ' quiz-opt--wrong';
+      } else if(i === sel){
+        cls += ' quiz-opt--selected';
+      }
+      return `<button class="${cls}" data-lesson-check="${i}" ${revealed?'disabled':''}>${formatRichInlineText(opt)}</button>`;
+    }).join('');
+
+    questionBodyHTML = `
+      <h2 style="margin-bottom:16px;">${formatRichInlineText(c.q)}</h2>
+      <div style="display:flex;flex-direction:column;gap:9px;">${optsHTML}</div>`;
+  }
+
+  const isLast = idx + 1 >= checks.length;
+  const nextTarget = isLast ? 'practice' : 'next-check';
+  const nextLabel = isLast ? 'Дальше: практика' : 'Следующий вопрос';
+
+  const bottomSheetHTML = revealed ? `
+    <div class="academy-bottom-sheet ${isCorrect ? 'academy-bottom-sheet--correct' : 'academy-bottom-sheet--wrong'}">
+      <div class="bs-title-row">
+        <span>${isCorrect ? '✓ Правильно! (Ответ принят)' : '✕ Не совсем.'}</span>
+        <span class="bs-badge">${isCorrect ? '⚡ +10 XP' : 'Разбор'}</span>
+      </div>
+      <div class="bs-explain-text">${formatRichInlineText(c.explain)}</div>
+      <button class="${isCorrect ? 'btn-coddy-emerald' : 'btn-coddy-ruby'} btn-sprint-cta" data-lesson-next="${nextTarget}">
+        ${nextLabel} ➔
+      </button>
+    </div>` : '';
+
+  return `
+    <div class="container" style="padding-bottom:${revealed ? '200px' : '32px'};">
+      ${topbar}
+      ${lessonBackLink()}
+      <div class="topic-badge">Урок · мини-проверка ${idx+1} из ${checks.length}</div>
+      ${questionBodyHTML}
+      ${bottomSheetHTML}
+    </div>`;
 };
 
 const _origLessonStageHTML = lessonStageHTML;
@@ -5864,7 +6333,44 @@ const _origLessonDoneHTML = lessonDoneHTML;
 lessonDoneHTML = function(){
   const l = LESSONS[lessonState.lessonId];
   const topbar = buildLessonStageTopbarHTML(l, 'Завершено', 100, '✨ Готово');
-  return _origLessonDoneHTML().replace('<div class="container">', '<div class="container">\n      ' + topbar);
+  const streakVal = (state && state.streak) ? state.streak : 1;
+  const activeCount = Math.min(6, Math.max(1, streakVal % 6 || 6));
+  const finishCard = `
+    <div class="sprint-finish-card" style="margin-top:16px;">
+      <div class="sprint-finish-orb">👑</div>
+      <h2 style="font-size:1.45rem;font-weight:800;margin-bottom:8px;">Урок завершён!</h2>
+      <div class="daily-activity-strip">
+        <div class="daily-activity-head">
+          <span>✓ Дневная активность выполнена!</span>
+          <span class="active-accent">${activeCount} / 6</span>
+        </div>
+        <div class="daily-week-segments">
+          ${[1,2,3,4,5,6].map(i => `<div class="day-seg ${i<=activeCount?'done':''}"></div>`).join('')}
+        </div>
+      </div>
+      <div class="stats-grid-2x2">
+        <div class="stat-card">
+          <div class="stat-head">XP ЗАРАБОТАНО</div>
+          <div class="stat-val">+30 XP</div>
+        </div>
+        <div class="stat-card emerald">
+          <div class="stat-head">ДО СКРИНИНГА</div>
+          <div class="stat-val">-1 урок</div>
+        </div>
+        <div class="stat-card emerald">
+          <div class="stat-head">ТОЧНОСТЬ</div>
+          <div class="stat-val">100 %</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-head">ВРЕМЯ СЕССИИ</div>
+          <div class="stat-val">03:20</div>
+        </div>
+      </div>
+    </div>`;
+  const base = _origLessonDoneHTML();
+  return base
+    .replace('<div class="container">', '<div class="container">\n      ' + topbar)
+    .replace('<p>Теория, мини-проверка, практика и итоговое задание — всё пройдено.</p>', '<p>Теория, мини-проверка, практика и итоговое задание — всё пройдено.</p>\n' + finishCard);
 };
 
 // Upgrade verifyLessonStage and verifyCommandStage to use fast Brython/Pyodide runner & award XP & mark complete on last stage
@@ -6950,11 +7456,34 @@ document.addEventListener('click', async function(e){
     }
     render();
     try{
-      const newChunkEl = document.querySelector('.feed-chunk-new');
-      if(newChunkEl && typeof newChunkEl.scrollIntoView === 'function'){
-        newChunkEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
+      requestAnimationFrame(function(){
+        const newChunks = document.querySelectorAll('.feed-chunk-new');
+        const target = newChunks.length ? newChunks[newChunks.length - 1] : null;
+        if(target && typeof target.scrollIntoView === 'function'){
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
     }catch(err){}
+    return;
+  }
+
+  const tc = e.target.closest('[data-tap-chip-val]');
+  if(tc){
+    const val = tc.getAttribute('data-tap-chip-val');
+    const key = tc.getAttribute('data-tap-chip-key');
+    const correct = tc.getAttribute('data-tap-chip-correct');
+    if(!window.__tapExState) window.__tapExState = {};
+    const prevVal = window.__tapExState[key];
+    const newVal = (prevVal === val) ? null : val;
+    window.__tapExState[key] = newVal;
+    const isNowCorrect = (newVal === correct);
+    if(navigator && navigator.vibrate) try{ navigator.vibrate(isNowCorrect ? [15] : [30, 40, 30]); }catch(e){}
+    if(!window.__tapExSolved) window.__tapExSolved = {};
+    if(isNowCorrect && !window.__tapExSolved[key]){
+      window.__tapExSolved[key] = true;
+      awardXp(10);
+    }
+    render();
     return;
   }
 
@@ -7911,6 +8440,10 @@ document.addEventListener('keydown', function(e){
   if(e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4'){
     const rateBtn = document.querySelector(`[data-py-rate-card="${e.key}"], [data-hub-rate="${e.key}"]`);
     if(rateBtn){ e.preventDefault(); rateBtn.click(); return; }
+  }
+  if(e.key === 'Enter' && !e.ctrlKey && !e.metaKey){
+    const bsNext = document.querySelector('.academy-bottom-sheet [data-lesson-next], .academy-bottom-sheet [data-diag-next]');
+    if(bsNext){ e.preventDefault(); bsNext.click(); return; }
   }
 });
 
