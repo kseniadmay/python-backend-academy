@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Механика Coddy в эстетике Обсидиан + Бургунди & Изумруд</title>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #141417;
+    font-family: "Onest", sans-serif;
+    padding: 24px 16px;
+    color: #f8fafc;
+    -webkit-font-smoothing: antialiased;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .header h1 {
+    font-size: 1.38rem; font-weight: 800; color: #f8fafc; margin-bottom: 6px;
+  }
+  .header p {
+    font-size: 0.9rem; color: #94a3b8;
+  }
+  .phones-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 370px);
+    gap: 24px;
+    justify-content: center;
+    margin: 0 auto;
+  }
+
+  .phone {
+    width: 370px;
+    height: 700px;
+    background: #0d1016;
+    border-radius: 42px;
+    padding: 20px 18px 18px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.55), inset 0 0 0 2px rgba(255,255,255,0.1);
+  }
+  .orb-ruby {
+    position: absolute; width: 220px; height: 220px; border-radius: 50%;
+    top: 10px; left: -30px; background: rgba(190, 18, 60, 0.22); filter: blur(48px); pointer-events: none;
+  }
+  .orb-emerald {
+    position: absolute; width: 220px; height: 220px; border-radius: 50%;
+    bottom: 50px; right: -30px; background: rgba(16, 185, 129, 0.18); filter: blur(48px); pointer-events: none;
+  }
+  .z2 { position: relative; z-index: 2; }
+
+  .tag-top {
+    width: 150px; height: 22px; border-radius: 999px;
+    margin: 0 auto 12px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #fda4af;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.66rem; font-weight: 700; letter-spacing: 0.04em;
+  }
+
+  /* Coddy top progress bar */
+  .coddy-top {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+  }
+  .coddy-close {
+    font-size: 1.1rem; color: #94a3b8; font-weight: 500;
+  }
+  .coddy-bar-bg {
+    flex: 1; height: 12px; border-radius: 999px;
+    background: rgba(190, 18, 60, 0.2);
+    border: 1px solid rgba(253, 164, 175, 0.15);
+    overflow: hidden;
+  }
+  .coddy-bar-fill {
+    height: 100%; border-radius: 999px;
+    background: linear-gradient(90deg, #be123c, #fb7185);
+  }
+
+  /* Screen 1: Progressive Scroll-Reveal Feed */
+  .scroll-feed {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: hidden;
+    padding-right: 2px;
+  }
+  .feed-chunk-prev {
+    font-size: 0.9rem; line-height: 1.52; color: #94a3b8;
+    padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .feed-chunk-new {
+    font-size: 0.95rem; line-height: 1.55; color: #f8fafc;
+    background: rgba(255,255,255,0.035);
+    border-left: 3px solid #fda4af;
+    padding: 12px 14px;
+    border-radius: 0 16px 16px 0;
+  }
+  .inline-code-pill {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.82rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.14);
+    padding: 2px 7px; border-radius: 6px; color: #fda4af;
+  }
+  .coddy-table {
+    width: 100%; border-collapse: collapse; font-size: 0.8rem;
+    border-radius: 14px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.03);
+  }
+  .coddy-table th, .coddy-table td {
+    padding: 8px 10px; border: 1px solid rgba(255,255,255,0.07); text-align: left;
+  }
+  .coddy-table th { color: #fda4af; font-weight: 700; background: rgba(190,18,60,0.12); }
+  .coddy-code-block {
+    background: rgba(0,0,0,0.45);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 12px 14px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.8rem; line-height: 1.5; color: #e2e8f0;
+  }
+
+  .btn-coddy-ruby {
+    width: 100%; padding: 15px; border-radius: 18px;
+    background: rgba(190, 18, 60, 0.32);
+    border: 1.5px solid rgba(251, 113, 133, 0.5);
+    color: #ffe4e6; font-family: inherit; font-size: 0.9rem; font-weight: 800;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    box-shadow: 0 6px 20px rgba(190, 18, 60, 0.25);
+  }
+  .btn-coddy-emerald {
+    width: 100%; padding: 15px; border-radius: 18px;
+    background: rgba(16, 185, 129, 0.24);
+    border: 1.5px solid rgba(52, 211, 153, 0.5);
+    color: #a7f3d0; font-family: inherit; font-size: 0.9rem; font-weight: 800;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.2);
+  }
+
+  /* Screen 2: Practice + Bottom Sheet "Правильно!" */
+  .streak-combo {
+    text-align: center; font-size: 0.85rem; font-weight: 800;
+    color: #fda4af; letter-spacing: 0.04em; margin-top: -6px; margin-bottom: 10px;
+  }
+  .bottom-sheet-correct {
+    margin: 0 -18px -18px -18px;
+    background: rgba(6, 48, 36, 0.92);
+    border-top: 1.5px solid rgba(52, 211, 153, 0.4);
+    border-radius: 26px 26px 0 0;
+    padding: 18px 20px 22px;
+    backdrop-filter: blur(24px);
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+  }
+  .bs-header {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 1.05rem; font-weight: 800; color: #6ee7b7; margin-bottom: 8px;
+  }
+  .bs-text {
+    font-size: 0.84rem; line-height: 1.48; color: #d1fae5; margin-bottom: 16px;
+  }
+
+  /* Screen 4: Finish Stats Grid (like 01:02 in video) */
+  .stats-2x2 {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0;
+  }
+  .stat-box {
+    border-radius: 18px;
+    background: rgba(255,255,255,0.04);
+    border: 1.5px solid rgba(253, 164, 175, 0.28);
+    overflow: hidden; text-align: center;
+  }
+  .stat-box.emerald { border-color: rgba(52, 211, 153, 0.32); }
+  .stat-box-head {
+    font-size: 0.72rem; font-weight: 700; padding: 6px;
+    background: rgba(190, 18, 60, 0.22); color: #fda4af;
+  }
+  .stat-box.emerald .stat-box-head {
+    background: rgba(16, 185, 129, 0.18); color: #6ee7b7;
+  }
+  .stat-box-val {
+    padding: 14px 8px; font-size: 1.15rem; font-weight: 800; color: #fff;
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>📱 Механика из твоего видео Coddy + Эстетика «Обсидиан, Бургунди & Изумруд»</h1>
+  <p>Пошаговое подгружение абзацев со скроллом по кнопке «ПРОДОЛЖИТЬ», выезжающая шторка «✓ Правильно!» и финал урока</p>
+</div>
+
+<div class="phones-grid">
+  <!-- ЭКРАН 1: Режим «ЗНАНИЕ» (Плавная подача абзацев со скроллом вниз как на 01:15-01:36) -->
+  <div class="phone">
+    <div class="orb-ruby"></div><div class="orb-emerald"></div>
+    <div class="z2">
+      <div class="tag-top">1. УРОК «ЗНАНИЕ» (СКРОЛЛ)</div>
+      <div class="coddy-top">
+        <span class="coddy-close">✕</span>
+        <div class="coddy-bar-bg"><div class="coddy-bar-fill" style="width:68%;"></div></div>
+        <span style="font-size:0.85rem;color:#94a3b8;">🔊</span>
+      </div>
+    </div>
+
+    <div class="scroll-feed z2">
+      <!-- Предыдущий абзац остаётся сверху! -->
+      <div class="feed-chunk-prev">
+        Словари в Python хранят пары ключ–значение. В отличие от списка, поиск по ключу не перебирает элементы по очереди.
+      </div>
+
+      <div class="feed-chunk-prev">
+        Например, вот как выглядят корзины хеш-таблицы в памяти для словаря <span class="inline-code-pill">users</span>:
+        <table class="coddy-table" style="margin-top:8px;">
+          <tr><th>Корзина</th><th>Хеш</th><th>Ключ : Значение</th></tr>
+          <tr><td>#1</td><td>841921</td><td>"alice" : 28</td></tr>
+          <tr><td>#5</td><td>391045</td><td>"bob" : 34</td></tr>
+        </table>
+      </div>
+
+      <!-- Новый абзац плавно появился снизу после нажатия ПРОДОЛЖИТЬ -->
+      <div class="feed-chunk-new">
+        Но что происходит, когда в словаре миллион ключей? Функция <span class="inline-code-pill">hash()</span> за один шаг вычисляет номер корзины:
+        <div class="coddy-code-block" style="margin-top:10px;">
+          bucket = <span style="color:#fda4af;">hash</span>(<span style="color:#6ee7b7;">"bob"</span>) % 8<br>
+          <span style="color:#94a3b8;"># Мгновенный переход к корзине #5 за O(1)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="z2" style="margin-top:12px;">
+      <button class="btn-coddy-ruby">ПРОДОЛЖИТЬ</button>
+    </div>
+  </div>
+
+  <!-- ЭКРАН 2: Режим «ТЕСТ» (Тап-плашки + выезжающая снизу зелёная шторка как на 00:54-00:59) -->
+  <div class="phone">
+    <div class="orb-ruby"></div><div class="orb-emerald"></div>
+    <div class="z2">
+      <div class="tag-top">2. УРОК «ТЕСТ» (ШТОРКА)</div>
+      <div class="coddy-top">
+        <span class="coddy-close">✕</span>
+        <div class="coddy-bar-bg"><div class="coddy-bar-fill" style="width:85%;"></div></div>
+      </div>
+      <div class="streak-combo">🔥 5 ПОДРЯД!</div>
+
+      <p style="font-size:0.95rem;line-height:1.5;color:#f8fafc;margin-bottom:14px;">
+        Вычислите индекс корзины для ключа <span class="inline-code-pill">emp_id</span> в таблице из 16 ячеек:
+      </p>
+
+      <div class="coddy-code-block" style="margin-bottom:22px;padding:14px;">
+        index = <span style="background:rgba(190,18,60,0.35);border:1px solid #fda4af;padding:2px 8px;border-radius:6px;color:#fff;font-weight:700;">hash</span>(emp_id) % 16
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <div style="padding:10px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);font-family:'JetBrains Mono',monospace;font-size:0.84rem;">len</div>
+        <div style="padding:10px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);font-family:'JetBrains Mono',monospace;font-size:0.84rem;">id</div>
+        <div style="padding:10px 16px;border-radius:12px;border:1.5px solid #fda4af;background:rgba(190,18,60,0.25);font-family:'JetBrains Mono',monospace;font-size:0.84rem;color:#ffe4e6;font-weight:700;">hash</div>
+      </div>
+    </div>
+
+    <!-- Выезжающая снизу шторка как в Coddy -->
+    <div class="bottom-sheet-correct z2">
+      <div class="bs-header">
+        <span>✓ Правильно!</span>
+        <span style="font-size:0.8rem;opacity:0.7;">⚑</span>
+      </div>
+      <p class="bs-text">
+        Функция <span class="inline-code-pill" style="color:#6ee7b7;">hash()</span> преобразует неизменяемый ключ в числовой хеш за константное время O(1).
+      </p>
+      <button class="btn-coddy-emerald">ПРОДОЛЖИТЬ</button>
+    </div>
+  </div>
+
+  <!-- ЭКРАН 3: Вопрос с выбором варианта / Истина-Ложь (как на 00:26 и 00:37) -->
+  <div class="phone">
+    <div class="orb-ruby"></div><div class="orb-emerald"></div>
+    <div class="z2">
+      <div class="tag-top">3. ВОПРОС СОБЕСЕДОВАНИЯ</div>
+      <div class="coddy-top">
+        <span class="coddy-close">✕</span>
+        <div class="coddy-bar-bg"><div class="coddy-bar-fill" style="width:50%;"></div></div>
+      </div>
+      <div class="streak-combo">🔥 4 ПОДРЯД!</div>
+
+      <p style="font-size:0.95rem;line-height:1.5;color:#f8fafc;margin-bottom:16px;">
+        Почему изменяемый список <span class="inline-code-pill">[1, 2]</span> нельзя сделать ключом словаря?
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="padding:13px 14px;border-radius:14px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);font-size:0.84rem;color:#cbd5e1;">
+          Потому что список занимает слишком много памяти в RAM
+        </div>
+        <div style="padding:13px 14px;border-radius:14px;border:2px solid #fda4af;background:rgba(190,18,60,0.18);font-size:0.84rem;color:#fff;font-weight:600;">
+          При изменении списка изменится его хеш, и элемент потеряется в старой корзине
+        </div>
+        <div style="padding:13px 14px;border-radius:14px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);font-size:0.84rem;color:#cbd5e1;">
+          В словаре ключами могут быть только строки str
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-sheet-correct z2">
+      <div class="bs-header">
+        <span>✓ Правильно! (Ответ уровня Senior)</span>
+        <span style="font-size:0.8rem;opacity:0.7;">⚑</span>
+      </div>
+      <p class="bs-text">
+        Именно этот ответ ждут на техническом скрининге: мутация ключа ломает инвариант хеш-таблицы.
+      </p>
+      <button class="btn-coddy-emerald">ПРОДОЛЖИТЬ</button>
+    </div>
+  </div>
+
+  <!-- ЭКРАН 4: Финал урока (как на 01:02 в видео, но со счётчиком готовности!) -->
+  <div class="phone">
+    <div class="orb-ruby"></div><div class="orb-emerald"></div>
+    <div class="z2">
+      <div class="tag-top">4. УРОК ЗАВЕРШЁН</div>
+    </div>
+
+    <div class="z2" style="text-align:center;my:auto;">
+      <div style="width:74px;height:74px;border-radius:24px;background:rgba(16,185,129,0.14);border:1.5px solid rgba(52,211,153,0.4);display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 14px;box-shadow:0 0 32px rgba(16,185,129,0.25);">
+        👑
+      </div>
+      <h2 style="font-size:1.45rem;font-weight:800;margin-bottom:14px;">Урок завершён!</h2>
+
+      <!-- Плашка дневной активности как в Coddy 01:02 -->
+      <div style="background:rgba(16,185,129,0.12);border:1.5px solid rgba(52,211,153,0.35);border-radius:18px;padding:14px 16px;text-align:left;margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.84rem;font-weight:700;color:#d1fae5;margin-bottom:10px;">
+          <span>✓ Дневная активность выполнена!</span>
+          <span style="color:#6ee7b7;">3 / 3</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;">
+          <div style="height:7px;border-radius:999px;background:#10b981;"></div>
+          <div style="height:7px;border-radius:999px;background:#10b981;"></div>
+          <div style="height:7px;border-radius:999px;background:#10b981;"></div>
+          <div style="height:7px;border-radius:999px;background:#10b981;"></div>
+          <div style="height:7px;border-radius:999px;background:#10b981;"></div>
+          <div style="height:7px;border-radius:999px;background:#10b981;"></div>
+        </div>
+      </div>
+
+      <!-- 4 плашки статистики как на 01:02 + сдвиг обратного счётчика -->
+      <div class="stats-2x2">
+        <div class="stat-box">
+          <div class="stat-box-head">XP заработано</div>
+          <div class="stat-box-val">+25 XP</div>
+        </div>
+        <div class="stat-box emerald">
+          <div class="stat-box-head">До скрининга</div>
+          <div class="stat-box-val" style="color:#6ee7b7;">7 тем (-1)</div>
+        </div>
+        <div class="stat-box emerald">
+          <div class="stat-box-head">Безупречно!</div>
+          <div class="stat-box-val">100 %</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-head">Молниеносно!</div>
+          <div class="stat-box-val">01:45</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="z2">
+      <button class="btn-coddy-ruby">ПРОДОЛЖИТЬ</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

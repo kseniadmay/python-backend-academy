@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Наклейки на кисти — печать (А4 Альбомная)</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 5mm 7mm 5mm 7mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: Verdana, "Segoe UI", Tahoma, sans-serif;
+      background-color: #eef1f5;
+      padding: 14px;
+      color: #000000;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .no-print {
+      max-width: 297mm;
+      margin: 0 auto 10px auto;
+    }
+    .panel {
+      background: #fff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .btn-print {
+      background: #0066cc;
+      color: #fff;
+      border: none;
+      padding: 9px 24px;
+      font-size: 13px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,102,204,0.3);
+      flex-shrink: 0;
+    }
+    .btn-print:hover { background: #0052a3; }
+
+    .sheet {
+      width: 297mm;
+      background: #fff;
+      padding: 5mm 7mm;
+      margin: 0 auto;
+      box-shadow: 0 0 14px rgba(0,0,0,0.12);
+    }
+
+    .sec-header {
+      font-size: 7.5pt;
+      font-weight: 700;
+      color: #003366;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1pt solid #003366;
+      padding-bottom: 0.8mm;
+      margin-top: 3mm;
+      margin-bottom: 1.5mm;
+      break-after: avoid;
+    }
+    .sec-header:first-child { margin-top: 0; }
+
+    /* 2 колонки в альбомном А4 (ширина 137 мм каждая) */
+    .grid-landscape {
+      display: grid;
+      grid-template-columns: 137mm 137mm;
+      column-gap: 6mm;
+      row-gap: 1.3mm;
+    }
+
+    /* Базовая узкая наклейка-полоска для удобной поклейки скотчем */
+    .st {
+      border: 0.35pt dashed #888888;
+      padding: 0.4mm 2mm;
+      background: #ffffff;
+      line-height: 1.18;
+      color: #000000;
+      overflow-wrap: break-word;
+      break-inside: avoid;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .st-content {
+      width: 100%;
+      text-align: center;
+    }
+    .st b {
+      font-weight: 700;
+    }
+    .sep {
+      font-weight: 700;
+      margin: 0 1mm;
+      color: #555555;
+    }
+
+    /* Кисти для лица 1-6: компактный кегль, полоска 4.2 мм */
+    .st.face {
+      min-height: 4.2mm;
+      font-size: 5.2pt;
+      font-weight: 400;
+    }
+    .st.face b { font-size: 5.7pt; }
+
+    /* Тонкие кисти 7-21, 25 и дубликаты: ультраузкая полоска 3.6 мм под тонкие ручки кистей */
+    .st.eye {
+      min-height: 3.6mm;
+      font-size: 4.7pt;
+      font-weight: 400;
+    }
+    .st.eye b { font-size: 5.2pt; }
+
+    /* Двусторонние кисти 22-24: симметричная сетка 5 колонок, компактная высота 4.4 мм */
+    .st.dual {
+      min-height: 4.4mm;
+      background: #ffffff;
+      border: 0.4pt dashed #003366;
+      font-size: 4.7pt;
+      font-weight: 400;
+      display: grid;
+      grid-template-columns: auto 1fr auto 1fr auto;
+      align-items: center;
+      padding: 0.4mm 2mm;
+      line-height: 1.15;
+    }
+    .st.dual .side-text {
+      text-align: center;
+      padding: 0 1.2mm;
+      overflow-wrap: break-word;
+    }
+    .st.dual .arrow {
+      color: #003366;
+      font-weight: 700;
+      font-size: 6pt;
+      flex-shrink: 0;
+    }
+    .st.dual b { font-size: 5.2pt; }
+    .st.dual .sep {
+      color: #003366;
+      margin: 0 1.2mm;
+    }
+
+    @media print {
+      body { background: none; padding: 0; }
+      .no-print { display: none !important; }
+      .sheet {
+        box-shadow: none;
+        padding: 4mm 5mm;
+        margin: 0;
+        width: 100%;
+      }
+      .st {
+        border-color: #888888 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .st.dual {
+        border-color: #003366 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="no-print">
+  <div class="panel">
+    <div>
+      <strong style="font-size: 13px; color: #111;">Детализированные наклейки на кисти — печать на А4</strong><br>
+      <span style="font-size: 11px; color: #555;">Полный набор из 25 кистей с богатым описанием. Узкие полоски (3.6–4.2 мм) идеально ложатся под скотч.</span>
+    </div>
+    <button class="btn-print" onclick="window.print()">Распечатать (Ctrl + P)</button>
+  </div>
+</div>
+
+<div class="sheet">
+
+  <!-- СЕКЦИЯ 1: КИСТИ ДЛЯ ЛИЦА 1-6 -->
+  <div class="sec-header">СЕКЦИЯ 1: КИСТИ ДЛЯ ЛИЦА (6 ШТ, ОДНОСТОРОННИЕ)</div>
+  <div class="grid-landscape" style="margin-bottom: 1.5mm;">
+    <div class="st face"><div class="st-content"><b>1. ПУДРА</b><span class="sep">|</span>Нанесение рассыпчатой или компактной пудры на всё лицо и зону декольте тонкой вуалью</div></div>
+    <div class="st face"><div class="st-content"><b>2. СКОШЕННЫЕ РУМЯНА</b><span class="sep">|</span>Нанесение сухих румян на яблочки щёк и мягкая диагональная растушёвка бронзера</div></div>
+    <div class="st face"><div class="st-content"><b>3. ПУДРА / БРОНЗЕР</b><span class="sep">|</span>Рассеянное нанесение пудры или бронзера на крупные зоны лица и мягкая полировка</div></div>
+    <div class="st face"><div class="st-content"><b>4. ХАЙЛАЙТЕР / РУМЯНА</b><span class="sep">|</span>Точечное нанесение хайлайтера на скулы, фиксация зоны под глазами и сухие румяна</div></div>
+    <div class="st face"><div class="st-content"><b>5. ТОН / КУШОН (БУФФЕР)</b><span class="sep">|</span>Плотная растушёвка и вбивание жидкого и кремового тона, bb-крема или кушона без полос</div></div>
+    <div class="st face"><div class="st-content"><b>6. КОНТУРИНГ / СКУЛЬПТОР</b><span class="sep">|</span>Моделирование формы лица: нанесение и тушёвка сухого или кремового скульптора под скулы</div></div>
+  </div>
+
+  <!-- СЕКЦИЯ 2: ОДНОСТОРОННИЕ КИСТИ ДЛЯ ГЛАЗ И ДЕТАЛЕЙ (16 ШТ) -->
+  <div class="sec-header">СЕКЦИЯ 2: КИСТИ ДЛЯ ГЛАЗ, ГУБ И ДЕТАЛЕЙ (16 ШТ, ОДНОСТОРОННИЕ)</div>
+  <div class="grid-landscape" style="margin-bottom: 1.5mm;">
+    <div class="st eye"><div class="st-content"><b>7. ДЫМКА / БЛЕНДЕР</b><span class="sep">|</span>Нанесение базового светлого/транзитного оттенка и создание широкой воздушной дымки в складке века</div></div>
+    <div class="st eye"><div class="st-content"><b>8. СКЛАДКА / CREASE</b><span class="sep">|</span>Контролируемая проработка и углубление складки века средними и тёмными тонами</div></div>
+    <div class="st eye"><div class="st-content"><b>9. КИСТЬ-КАРАНДАШ</b><span class="sep">|</span>Точечное затемнение складки/уголка и короткая контролируемая растушёвка теней</div></div>
+    <div class="st eye"><div class="st-content"><b>10. НАБИВКА ТЕНЕЙ</b><span class="sep">|</span>Плотное набивание и распределение сухих теней на всё подвижное веко</div></div>
+    <div class="st eye"><div class="st-content"><b>11. ПЛОСКИЙ ШЕЙДЕР</b><span class="sep">|</span>Плотное нанесение сияющих теней, сатинов, шиммеров, пигментов и кремовых подложек</div></div>
+    <div class="st eye"><div class="st-content"><b>12. МАЛЫЙ БЛЕНДЕР</b><span class="sep">|</span>Точечное нанесение цвета на небольшие зоны века и мягкое сглаживание границ теней</div></div>
+    <div class="st eye"><div class="st-content"><b>13. CUT CREASE</b><span class="sep">|</span>Нанесение базы под тени, вырезание чёткой формы cut crease и нанесение консилера</div></div>
+    <div class="st eye"><div class="st-content"><b>14. РЕСНИЧНЫЙ КРАЙ</b><span class="sep">|</span>Плотная набивка тёмных теней вдоль ресничного края и растушёвка карандаша (смаджер)</div></div>
+    <div class="st eye"><div class="st-content"><b>15. V-УГОЛОК</b><span class="sep">|</span>Построение формы внешнего уголка глаза, затемнение и диагональная вытяжка в V-форму к виску</div></div>
+    <div class="st eye"><div class="st-content"><b>16. МИНИ-ШЕЙДЕР</b><span class="sep">|</span>Компактное точечное нанесение теней на небольшие участки и во внешний уголок</div></div>
+    <div class="st eye"><div class="st-content"><b>17. АКЦЕНТЫ / НИЗ</b><span class="sep">|</span>Расстановка световых акцентов (внутренний уголок, под бровь) и тушёвка нижнего века</div></div>
+    <div class="st eye"><div class="st-content"><b>18. МИНИ-ПЕНСИЛЬ</b><span class="sep">|</span>Микро-акценты, ультраточечное затемнение и локальная растушёвка мелких зон</div></div>
+    <div class="st eye"><div class="st-content"><b>19. ПОМАДА / КОНТУР</b><span class="sep">|</span>Нанесение помады, прорисовка чёткого контура губ и точечная маскировка консилером</div></div>
+    <div class="st eye"><div class="st-content"><b>20. СКОШЕННАЯ ДЛЯ БРОВЕЙ</b><span class="sep">|</span>Оформление формы бровей помадкой или тенями, может использоваться для гелевой подводки</div></div>
+    <div class="st eye"><div class="st-content"><b>21. ЛАЙНЕР / СТРЕЛКИ</b><span class="sep">|</span>Выведение ультратонких графичных стрелок, линий и прорисовка микро-шипов в уголке</div></div>
+    <div class="st eye"><div class="st-content"><b>25. ВЕЕРНАЯ КИСТЬ</b><span class="sep">|</span>Деликатная полировка хайлайтером выступающих зон и смахивание осыпавшихся сухих текстур</div></div>
+  </div>
+
+  <!-- СЕКЦИЯ 3: ДВУСТОРОННИЕ КИСТИ 22-24 (3 ШТ + ДУБЛИКАТ) -->
+  <div class="sec-header">СЕКЦИЯ 3: ДВУСТОРОННИЕ КИСТИ (3 ШТ — СТРЕЛКИ К КОНЧИКАМ ◄ ►)</div>
+  <div class="grid-landscape">
+    <div class="st dual">
+      <span class="arrow">◄</span>
+      <div class="side-text"><b>22. ЩЁТОЧКА:</b> расчёсывание/укладка бровей, ресницы, прочёсывание карандаша</div>
+      <span class="sep">|</span>
+      <div class="side-text"><b>СКОШЕННАЯ КИСТЬ:</b> прорисовка волосков, помадка/тени для бровей, тонкие штрихи</div>
+      <span class="arrow">►</span>
+    </div>
+    <div class="st dual">
+      <span class="arrow">◄</span>
+      <div class="side-text"><b>23. МИНИ-ШЕЙДЕР:</b> точечное нанесение теней, набивка на небольшие зоны века</div>
+      <span class="sep">|</span>
+      <div class="side-text"><b>КИСТЬ-КАРАНДАШ:</b> точечные акценты, работа под нижними ресницами и в уголке</div>
+      <span class="arrow">►</span>
+    </div>
+    <div class="st dual">
+      <span class="arrow">◄</span>
+      <div class="side-text"><b>24. МИНИ-БЛЕНДЕР:</b> локальная растушёвка цвета, смягчение краёв на веке</div>
+      <span class="sep">|</span>
+      <div class="side-text"><b>МИНИ-ДЕТАЛИ:</b> нанесение цвета на маленькие участки, мелкая графика и детали</div>
+      <span class="arrow">►</span>
+    </div>
+    <div class="st dual" style="opacity: 0.85;">
+      <span class="arrow">◄</span>
+      <div class="side-text"><b>ДУБЛИКАТ:</b> запасная наклейка на двустороннюю кисть</div>
+      <span class="sep">|</span>
+      <div class="side-text"><b>ЗАПАС:</b> на случай ошибки при нарезке скотча</div>
+      <span class="arrow">►</span>
+    </div>
+  </div>
+
+  <!-- ЗАПАСНОЙ БЛОК НА ТОМ ЖЕ ЛИСТЕ -->
+  <div class="sec-header" style="margin-top: 3mm;">ЗАПАСНЫЕ ДУБЛИКАТЫ ДЛЯ ТОНКИХ КИСТЕЙ (16 ШТ)</div>
+  <div class="grid-landscape">
+    <div class="st eye"><div class="st-content"><b>7. ДЫМКА / БЛЕНДЕР</b><span class="sep">|</span>Нанесение базового светлого/транзитного оттенка и создание широкой воздушной дымки в складке века</div></div>
+    <div class="st eye"><div class="st-content"><b>8. СКЛАДКА / CREASE</b><span class="sep">|</span>Контролируемая проработка и углубление складки века средними и тёмными тонами</div></div>
+    <div class="st eye"><div class="st-content"><b>9. КИСТЬ-КАРАНДАШ</b><span class="sep">|</span>Точечное затемнение складки/уголка и короткая контролируемая растушёвка теней</div></div>
+    <div class="st eye"><div class="st-content"><b>10. НАБИВКА ТЕНЕЙ</b><span class="sep">|</span>Плотное набивание и распределение сухих теней на всё подвижное веко</div></div>
+    <div class="st eye"><div class="st-content"><b>11. ПЛОСКИЙ ШЕЙДЕР</b><span class="sep">|</span>Плотное нанесение сияющих теней, сатинов, шиммеров, пигментов и кремовых подложек</div></div>
+    <div class="st eye"><div class="st-content"><b>12. МАЛЫЙ БЛЕНДЕР</b><span class="sep">|</span>Точечное нанесение цвета на небольшие зоны века и мягкое сглаживание границ теней</div></div>
+    <div class="st eye"><div class="st-content"><b>13. CUT CREASE</b><span class="sep">|</span>Нанесение базы под тени, вырезание чёткой формы cut crease и нанесение консилера</div></div>
+    <div class="st eye"><div class="st-content"><b>14. РЕСНИЧНЫЙ КРАЙ</b><span class="sep">|</span>Плотная набивка тёмных теней вдоль ресничного края и растушёвка карандаша (смаджер)</div></div>
+    <div class="st eye"><div class="st-content"><b>15. V-УГОЛОК</b><span class="sep">|</span>Построение формы внешнего уголка глаза, затемнение и диагональная вытяжка в V-форму к виску</div></div>
+    <div class="st eye"><div class="st-content"><b>16. МИНИ-ШЕЙДЕР</b><span class="sep">|</span>Компактное точечное нанесение теней на небольшие участки и во внешний уголок</div></div>
+    <div class="st eye"><div class="st-content"><b>17. АКЦЕНТЫ / НИЗ</b><span class="sep">|</span>Расстановка световых акцентов (внутренний уголок, под бровь) и тушёвка нижнего века</div></div>
+    <div class="st eye"><div class="st-content"><b>18. МИНИ-ПЕНСИЛЬ</b><span class="sep">|</span>Микро-акценты, ультраточечное затемнение и локальная растушёвка мелких зон</div></div>
+    <div class="st eye"><div class="st-content"><b>19. ПОМАДА / КОНТУР</b><span class="sep">|</span>Нанесение помады, прорисовка чёткого контура губ и точечная маскировка консилером</div></div>
+    <div class="st eye"><div class="st-content"><b>20. СКОШЕННАЯ ДЛЯ БРОВЕЙ</b><span class="sep">|</span>Оформление формы бровей помадкой или тенями, может использоваться для гелевой подводки</div></div>
+    <div class="st eye"><div class="st-content"><b>21. ЛАЙНЕР / СТРЕЛКИ</b><span class="sep">|</span>Выведение ультратонких графичных стрелок, линий и прорисовка микро-шипов в уголке</div></div>
+    <div class="st eye"><div class="st-content"><b>25. ВЕЕРНАЯ КИСТЬ</b><span class="sep">|</span>Деликатная полировка хайлайтером выступающих зон и смахивание осыпавшихся сухих текстур</div></div>
+  </div>
+
+</div>
+
+</body>
+</html>

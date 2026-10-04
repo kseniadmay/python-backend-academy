@@ -1,0 +1,75 @@
+﻿const http = require('http');
+
+function evalCDP(jsCode) {
+  return new Promise((resolve, reject) => {
+    const req = http.request('http://127.0.0.1:9999/eval', {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          resolve(JSON.parse(data));
+        } catch (e) {
+          resolve(data);
+        }
+      });
+    });
+    req.on('error', reject);
+    req.write(jsCode);
+    req.end();
+  });
+}
+
+async function main() {
+  const code = `(async () => {
+    const el = document.querySelector('[data-rem-id]');
+    const fiberKey = Object.keys(el || {}).find(k => k.startsWith('__reactFiber') || k.startsWith('__reactInternalInstance'));
+    let curr = el ? el[fiberKey] : null;
+    let rem = null;
+    while (curr) {
+      if (curr.memoizedProps && curr.memoizedProps.rem && curr.memoizedProps.rem.getTinyGraph) {
+        rem = curr.memoizedProps.rem;
+        break;
+      }
+      curr = curr.return;
+    }
+    const tg = rem.getTinyGraph();
+    const rc = tg.getRemCollection();
+    const all = await rc.DatabaseStore.fetchAllImpl();
+    const doc = all.find(r => r._id === 'GwREY4bq5eQvPyeAB');
+    
+    const weeks = all.filter(r => r.parent === doc._id)
+      .filter(w => {
+        const t = (w.key || []).map(k => typeof k === 'string' ? k : (k.text || '')).join('');
+        return t.includes('Неделя');
+      })
+      .sort((a, b) => (a.f || '').localeCompare(b.f || ''));
+
+    const report = [];
+    for (const w of weeks.slice(0, 2)) {
+      const days = all.filter(r => r.parent === w._id).sort((a, b) => (a.f || '').localeCompare(b.f || ''));
+      for (const d of days) {
+        const dKids = all.filter(r => r.parent === d._id).sort((a, b) => (a.f || '').localeCompare(b.f || ''));
+        const dayTitle = (d.key || []).map(k => typeof k === 'string' ? k : (k.text || '')).join('');
+        const firstKid = dKids[0];
+        const firstKidText = firstKid ? (firstKid.key || []).map(k => typeof k === 'string' ? k : (k.text || '')).join('') : 'EMPTY';
+        report.push({
+          dayId: d._id,
+          dayTitle,
+          firstKidId: firstKid ? firstKid._id : null,
+          firstKidText,
+          kidsCount: dKids.length
+        });
+      }
+    }
+    return JSON.stringify(report);
+  })()`;
+
+  const res = await evalCDP(code);
+  const data = JSON.parse(res.value);
+  console.log(JSON.stringify(data, null, 2));
+}
+
+main();

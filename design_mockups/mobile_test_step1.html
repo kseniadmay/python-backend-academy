@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Мобильный тест · Шаг 1: Атмосфера и Цвет</title>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #dcdad3;
+    font-family: "Onest", sans-serif;
+    padding: 24px 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .header h1 {
+    font-size: 1.4rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;
+  }
+  .header p {
+    font-size: 0.92rem; color: #475569;
+  }
+  .phones-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 370px);
+    gap: 24px;
+    justify-content: center;
+    margin: 0 auto;
+  }
+
+  /* Phone Frame (370 x 680) */
+  .phone {
+    width: 370px;
+    height: 670px;
+    border-radius: 42px;
+    padding: 22px 18px 18px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.18), inset 0 0 0 6px rgba(15,23,42,0.12);
+  }
+  .notch {
+    width: 96px; height: 22px; border-radius: 999px;
+    margin: 0 auto 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em;
+    position: relative; z-index: 3;
+  }
+  .orb {
+    position: absolute; border-radius: 50%; filter: blur(44px); pointer-events: none; z-index: 0;
+  }
+
+  /* Top status row */
+  .m-top {
+    position: relative; z-index: 2;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px;
+  }
+  .m-streak {
+    font-size: 0.78rem; font-weight: 700;
+    padding: 5px 11px; border-radius: 999px;
+  }
+  .m-goal {
+    font-size: 0.76rem; font-weight: 600;
+    padding: 5px 11px; border-radius: 999px;
+  }
+
+  /* Countdown widget */
+  .m-countdown {
+    position: relative; z-index: 2;
+    border-radius: 20px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    backdrop-filter: blur(18px);
+  }
+  .m-cd-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.78rem; font-weight: 700; margin-bottom: 8px;
+  }
+  .m-bar {
+    height: 6px; border-radius: 999px; overflow: hidden; margin-bottom: 6px;
+  }
+  .m-fill { height: 100%; width: 42%; border-radius: 999px; }
+  .m-cd-sub { font-size: 0.73rem; opacity: 0.8; }
+
+  /* Main Focus Card on Phone */
+  .m-card {
+    position: relative; z-index: 2;
+    border-radius: 28px;
+    padding: 22px 20px;
+    backdrop-filter: blur(22px);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .m-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.72rem; font-weight: 700;
+    padding: 5px 12px; border-radius: 999px;
+    margin-bottom: 12px; width: fit-content;
+  }
+  .m-title {
+    font-size: 1.28rem; font-weight: 800; line-height: 1.25;
+    margin-bottom: 10px; letter-spacing: -0.015em;
+  }
+  .m-desc {
+    font-size: 0.88rem; line-height: 1.5; margin-bottom: 14px;
+  }
+  .m-code-preview {
+    border-radius: 16px;
+    padding: 12px 14px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.76rem;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+  .m-btn {
+    width: 100%;
+    padding: 15px;
+    border-radius: 20px;
+    font-family: "Onest", sans-serif;
+    font-size: 0.94rem;
+    font-weight: 700;
+    border: none;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+
+  /* Bottom thumb tabbar */
+  .m-tabbar {
+    position: relative; z-index: 2;
+    display: flex; justify-content: space-around; align-items: center;
+    padding: 10px 8px;
+    border-radius: 22px;
+    font-size: 0.7rem; font-weight: 600;
+    backdrop-filter: blur(16px);
+  }
+  .m-tab { display: flex; flex-direction: column; align-items: center; gap: 3px; opacity: 0.55; }
+  .m-tab.active { opacity: 1; font-weight: 700; }
+
+  /* =========================================================
+     ЭКРАН 1: Доработанный №4 (Вечерний Обсидиан + Бургунди/Изумруд как свет)
+     ========================================================= */
+  .p1 { background: #0c1015; color: #f8fafc; }
+  .p1 .notch { background: rgba(255,255,255,0.12); color: #fda4af; }
+  .p1 .orb-1 { width: 200px; height: 200px; top: 30px; left: -30px; background: rgba(190, 18, 60, 0.28); }
+  .p1 .orb-2 { width: 220px; height: 220px; bottom: 60px; right: -40px; background: rgba(16, 185, 129, 0.22); }
+  .p1 .m-streak { background: rgba(217, 119, 6, 0.15); color: #fbbf24; border: 1px solid rgba(217, 119, 6, 0.28); }
+  .p1 .m-goal { background: rgba(255, 255, 255, 0.06); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.08); }
+  .p1 .m-countdown { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); }
+  .p1 .m-bar { background: rgba(255,255,255,0.08); }
+  .p1 .m-fill { background: linear-gradient(90deg, #be123c, #10b981); }
+  .p1 .m-cd-sub { color: #94a3b8; }
+  .p1 .m-card {
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+  }
+  .p1 .m-badge { background: rgba(190, 18, 60, 0.2); color: #fda4af; border: 1px solid rgba(253, 164, 175, 0.25); }
+  .p1 .m-title { color: #ffffff; }
+  .p1 .m-desc { color: #cbd5e1; } /* Чистый светлый жемчужный текст! */
+  .p1 .m-code-preview { background: rgba(0, 0, 0, 0.38); border: 1px solid rgba(255,255,255,0.07); color: #e2e8f0; }
+  .p1 .m-btn {
+    background: rgba(16, 185, 129, 0.18);
+    color: #6ee7b7;
+    border: 1.5px solid rgba(52, 211, 153, 0.4);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.18);
+  }
+  .p1 .m-tabbar { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); color: #f8fafc; }
+  .p1 .m-tab.active { color: #34d399; }
+
+  /* =========================================================
+     ЭКРАН 2: Светлый Эфемерный Пергамент (#faf8f5 + Воздушное стекло)
+     ========================================================= */
+  .p2 { background: #faf8f5; color: #0f172a; }
+  .p2 .notch { background: rgba(107, 29, 47, 0.1); color: #6b1d2f; }
+  .p2 .orb-1 { width: 200px; height: 200px; top: 40px; right: -30px; background: rgba(107, 29, 47, 0.11); }
+  .p2 .orb-2 { width: 220px; height: 220px; bottom: 60px; left: -30px; background: rgba(20, 90, 70, 0.11); }
+  .p2 .m-streak { background: rgba(217, 119, 6, 0.1); color: #b45309; border: 1px solid rgba(217, 119, 6, 0.2); }
+  .p2 .m-goal { background: rgba(255,255,255,0.8); color: #334155; border: 1px solid rgba(0,0,0,0.07); }
+  .p2 .m-countdown { background: rgba(255, 255, 255, 0.78); border: 1px solid rgba(0, 0, 0, 0.07); }
+  .p2 .m-bar { background: rgba(0,0,0,0.06); }
+  .p2 .m-fill { background: #145a46; }
+  .p2 .m-cd-sub { color: #64748b; }
+  .p2 .m-card {
+    background: rgba(255, 255, 255, 0.84);
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04);
+  }
+  .p2 .m-badge { background: rgba(107, 29, 47, 0.08); color: #6b1d2f; border: 1px solid rgba(107, 29, 47, 0.16); }
+  .p2 .m-title { color: #0f172a; }
+  .p2 .m-desc { color: #475569; }
+  .p2 .m-code-preview { background: #f4f2ed; border: 1px solid rgba(0,0,0,0.06); color: #1e293b; }
+  .p2 .m-btn {
+    background: rgba(20, 90, 70, 0.11);
+    color: #145a46;
+    border: 1.5px solid rgba(20, 90, 70, 0.3);
+  }
+  .p2 .m-tabbar { background: rgba(255,255,255,0.85); border: 1px solid rgba(0,0,0,0.07); color: #0f172a; }
+  .p2 .m-tab.active { color: #6b1d2f; }
+
+  /* =========================================================
+     ЭКРАН 3: Контрастный (Светлый пергамент + Тёмная карточка №4)
+     ========================================================= */
+  .p3 { background: #faf8f5; color: #0f172a; }
+  .p3 .notch { background: #0f172a; color: #fff; }
+  .p3 .m-streak { background: rgba(107, 29, 47, 0.09); color: #6b1d2f; border: 1px solid rgba(107, 29, 47, 0.18); }
+  .p3 .m-goal { background: #ffffff; color: #334155; border: 1px solid rgba(0,0,0,0.07); }
+  .p3 .m-countdown { background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.07); }
+  .p3 .m-bar { background: rgba(0,0,0,0.07); }
+  .p3 .m-fill { background: #6b1d2f; }
+  .p3 .m-cd-sub { color: #64748b; }
+  .p3 .m-card {
+    background: #10161d;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.14);
+  }
+  .p3 .m-badge { background: rgba(190, 18, 60, 0.24); color: #fda4af; border: 1px solid rgba(253, 164, 175, 0.25); }
+  .p3 .m-title { color: #ffffff; }
+  .p3 .m-desc { color: #cbd5e1; }
+  .p3 .m-code-preview { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.08); color: #a7f3d0; }
+  .p3 .m-btn {
+    background: #10b981;
+    color: #06281e;
+    box-shadow: 0 6px 18px rgba(16, 185, 129, 0.28);
+  }
+  .p3 .m-tabbar { background: #ffffff; border: 1px solid rgba(0,0,0,0.07); color: #0f172a; }
+  .p3 .m-tab.active { color: #145a46; }
+
+  /* =========================================================
+     ЭКРАН 4: Тёплый Вечерний Эспрессо / Рубиновый Шёлк
+     ========================================================= */
+  .p4 { background: #161215; color: #faf8f5; }
+  .p4 .notch { background: rgba(253, 164, 175, 0.14); color: #fda4af; }
+  .p4 .orb-1 { width: 220px; height: 220px; top: 20px; right: -20px; background: rgba(159, 18, 57, 0.26); }
+  .p4 .orb-2 { width: 200px; height: 200px; bottom: 80px; left: -20px; background: rgba(20, 90, 70, 0.24); }
+  .p4 .m-streak { background: rgba(217, 119, 6, 0.16); color: #fcd34d; border: 1px solid rgba(217, 119, 6, 0.28); }
+  .p4 .m-goal { background: rgba(255, 255, 255, 0.06); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.08); }
+  .p4 .m-countdown { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); }
+  .p4 .m-bar { background: rgba(255,255,255,0.09); }
+  .p4 .m-fill { background: #34d399; }
+  .p4 .m-cd-sub { color: #a8a29e; }
+  .p4 .m-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(253, 164, 175, 0.14);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  }
+  .p4 .m-badge { background: rgba(52, 211, 153, 0.14); color: #6ee7b7; border: 1px solid rgba(52, 211, 153, 0.25); }
+  .p4 .m-title { color: #faf8f5; }
+  .p4 .m-desc { color: #d6d3d1; }
+  .p4 .m-code-preview { background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255,255,255,0.07); color: #fda4af; }
+  .p4 .m-btn {
+    background: rgba(190, 18, 60, 0.28);
+    color: #ffe4e6;
+    border: 1.5px solid rgba(251, 113, 133, 0.45);
+    box-shadow: 0 6px 20px rgba(190, 18, 60, 0.22);
+  }
+  .p4 .m-tabbar { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); color: #faf8f5; }
+  .p4 .m-tab.active { color: #fda4af; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>📱 МОБИЛЬНЫЙ ТЕСТ (ШАГ 1 из 4): Световая атмосфера на экране телефона</h1>
+  <p>Исправлены недостатки карточки №4: убран зелёный текст описания, кнопки стали полупрозрачными («цвет как свет»)</p>
+</div>
+
+<div class="phones-grid">
+  <!-- ЭКРАН 1 -->
+  <div class="phone p1">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div>
+      <div class="notch">ВАРИАНТ 1</div>
+      <div class="m-top">
+        <span class="m-streak">🔥 4 дня</span>
+        <span class="m-goal">●●○ 2/3 сегодня</span>
+      </div>
+      <div class="m-countdown">
+        <div class="m-cd-row">
+          <span>🎯 До скрининга: 42%</span>
+          <span style="color:#fda4af;">⏳ Осталось 8 тем</span>
+        </div>
+        <div class="m-bar"><div class="m-fill"></div></div>
+        <div class="m-cd-sub">Каждый спринт даёт +7% к готовности</div>
+      </div>
+    </div>
+
+    <div class="m-card">
+      <div>
+        <span class="m-badge">✨ Спринт #12 · 4 минуты</span>
+        <h2 class="m-title">Словари: почему dict всегда O(1)?</h2>
+        <p class="m-desc">Вместо перебора всех ключей Python вычисляет адрес корзины за один шаг через хеш-функцию.</p>
+        <div class="m-code-preview">
+          key = "user_id"<br>
+          bucket = hash(key) % 8<br>
+          print(f"Корзина #{bucket}")
+        </div>
+      </div>
+      <button class="m-btn">▶ Начать спринт (4 мин) ➔</button>
+    </div>
+
+    <div class="m-tabbar">
+      <div class="m-tab active"><span>⚡</span><span>Спринт</span></div>
+      <div class="m-tab"><span>🗺️</span><span>Путь</span></div>
+      <div class="m-tab"><span>🃏</span><span>Карточки</span></div>
+      <div class="m-tab"><span>💻</span><span>Код</span></div>
+    </div>
+  </div>
+
+  <!-- ЭКРАН 2 -->
+  <div class="phone p2">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div>
+      <div class="notch">ВАРИАНТ 2</div>
+      <div class="m-top">
+        <span class="m-streak">🔥 4 дня</span>
+        <span class="m-goal">●●○ 2/3 сегодня</span>
+      </div>
+      <div class="m-countdown">
+        <div class="m-cd-row">
+          <span>🎯 До скрининга: 42%</span>
+          <span style="color:#6b1d2f;">⏳ Осталось 8 тем</span>
+        </div>
+        <div class="m-bar"><div class="m-fill"></div></div>
+        <div class="m-cd-sub">Каждый спринт даёт +7% к готовности</div>
+      </div>
+    </div>
+
+    <div class="m-card">
+      <div>
+        <span class="m-badge">🍷 Спринт #12 · 4 минуты</span>
+        <h2 class="m-title">Словари: почему dict всегда O(1)?</h2>
+        <p class="m-desc">Вместо перебора всех ключей Python вычисляет адрес корзины за один шаг через хеш-функцию.</p>
+        <div class="m-code-preview">
+          key = "user_id"<br>
+          bucket = hash(key) % 8<br>
+          print(f"Корзина #{bucket}")
+        </div>
+      </div>
+      <button class="m-btn">▶ Начать спринт (4 мин) ➔</button>
+    </div>
+
+    <div class="m-tabbar">
+      <div class="m-tab active"><span>⚡</span><span>Спринт</span></div>
+      <div class="m-tab"><span>🗺️</span><span>Путь</span></div>
+      <div class="m-tab"><span>🃏</span><span>Карточки</span></div>
+      <div class="m-tab"><span>💻</span><span>Код</span></div>
+    </div>
+  </div>
+
+  <!-- ЭКРАН 3 -->
+  <div class="phone p3">
+    <div>
+      <div class="notch">ВАРИАНТ 3</div>
+      <div class="m-top">
+        <span class="m-streak">🔥 4 дня</span>
+        <span class="m-goal">●●○ 2/3 сегодня</span>
+      </div>
+      <div class="m-countdown">
+        <div class="m-cd-row">
+          <span>🎯 До скрининга: 42%</span>
+          <span style="color:#6b1d2f;">⏳ Осталось 8 тем</span>
+        </div>
+        <div class="m-bar"><div class="m-fill"></div></div>
+        <div class="m-cd-sub">Каждый спринт даёт +7% к готовности</div>
+      </div>
+    </div>
+
+    <div class="m-card">
+      <div>
+        <span class="m-badge">✨ Спринт #12 · 4 минуты</span>
+        <h2 class="m-title">Словари: почему dict всегда O(1)?</h2>
+        <p class="m-desc">Вместо перебора всех ключей Python вычисляет адрес корзины за один шаг через хеш-функцию.</p>
+        <div class="m-code-preview">
+          key = "user_id"<br>
+          bucket = hash(key) % 8<br>
+          print(f"Корзина #{bucket}")
+        </div>
+      </div>
+      <button class="m-btn">▶ Начать спринт (4 мин) ➔</button>
+    </div>
+
+    <div class="m-tabbar">
+      <div class="m-tab active"><span>⚡</span><span>Спринт</span></div>
+      <div class="m-tab"><span>🗺️</span><span>Путь</span></div>
+      <div class="m-tab"><span>🃏</span><span>Карточки</span></div>
+      <div class="m-tab"><span>💻</span><span>Код</span></div>
+    </div>
+  </div>
+
+  <!-- ЭКРАН 4 -->
+  <div class="phone p4">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div>
+      <div class="notch">ВАРИАНТ 4</div>
+      <div class="m-top">
+        <span class="m-streak">🔥 4 дня</span>
+        <span class="m-goal">●●○ 2/3 сегодня</span>
+      </div>
+      <div class="m-countdown">
+        <div class="m-cd-row">
+          <span>🎯 До скрининга: 42%</span>
+          <span style="color:#6ee7b7;">⏳ Осталось 8 тем</span>
+        </div>
+        <div class="m-bar"><div class="m-fill"></div></div>
+        <div class="m-cd-sub">Каждый спринт даёт +7% к готовности</div>
+      </div>
+    </div>
+
+    <div class="m-card">
+      <div>
+        <span class="m-badge">🌿 Спринт #12 · 4 минуты</span>
+        <h2 class="m-title">Словари: почему dict всегда O(1)?</h2>
+        <p class="m-desc">Вместо перебора всех ключей Python вычисляет адрес корзины за один шаг через хеш-функцию.</p>
+        <div class="m-code-preview">
+          key = "user_id"<br>
+          bucket = hash(key) % 8<br>
+          print(f"Корзина #{bucket}")
+        </div>
+      </div>
+      <button class="m-btn">▶ Начать спринт (4 мин) ➔</button>
+    </div>
+
+    <div class="m-tabbar">
+      <div class="m-tab active"><span>⚡</span><span>Спринт</span></div>
+      <div class="m-tab"><span>🗺️</span><span>Путь</span></div>
+      <div class="m-tab"><span>🃏</span><span>Карточки</span></div>
+      <div class="m-tab"><span>💻</span><span>Код</span></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

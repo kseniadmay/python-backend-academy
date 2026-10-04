@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Мобильный тест · Шаг 2: Компоновка главного экрана</title>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #18181b;
+    font-family: "Onest", sans-serif;
+    padding: 24px 16px;
+    color: #f8fafc;
+    -webkit-font-smoothing: antialiased;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .header h1 {
+    font-size: 1.38rem; font-weight: 800; color: #f8fafc; margin-bottom: 6px;
+  }
+  .header p {
+    font-size: 0.9rem; color: #94a3b8;
+  }
+  .phones-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 370px);
+    gap: 24px;
+    justify-content: center;
+    margin: 0 auto;
+  }
+
+  /* Phone Frame */
+  .phone {
+    width: 370px;
+    height: 690px;
+    background: #0d1016;
+    border-radius: 42px;
+    padding: 20px 16px 16px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 2px rgba(255,255,255,0.1);
+  }
+  .orb-ruby {
+    position: absolute; width: 220px; height: 220px; border-radius: 50%;
+    top: 10px; left: -30px; background: rgba(190, 18, 60, 0.25); filter: blur(48px); pointer-events: none;
+  }
+  .orb-emerald {
+    position: absolute; width: 220px; height: 220px; border-radius: 50%;
+    bottom: 50px; right: -30px; background: rgba(16, 185, 129, 0.20); filter: blur(48px); pointer-events: none;
+  }
+  .z2 { position: relative; z-index: 2; }
+
+  .notch {
+    width: 110px; height: 22px; border-radius: 999px;
+    margin: 0 auto 10px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #fda4af;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em;
+  }
+
+  .m-top {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
+  }
+  .pill {
+    font-size: 0.74rem; font-weight: 600;
+    padding: 4px 10px; border-radius: 999px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.09);
+    color: #e2e8f0;
+  }
+  .pill.ruby {
+    background: rgba(190, 18, 60, 0.18);
+    border-color: rgba(253, 164, 175, 0.25);
+    color: #fda4af;
+  }
+
+  /* Countdown bar */
+  .cd-box {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    padding: 11px 14px;
+    margin-bottom: 10px;
+    backdrop-filter: blur(16px);
+  }
+  .cd-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.75rem; font-weight: 700; margin-bottom: 6px;
+  }
+  .bar-bg { height: 5px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; }
+  .bar-fill { height: 100%; width: 42%; background: linear-gradient(90deg, #be123c, #10b981); border-radius: 999px; }
+
+  /* Glass Buttons */
+  .btn-glass-emerald {
+    width: 100%; padding: 13px; border-radius: 18px;
+    background: rgba(16, 185, 129, 0.18);
+    border: 1.5px solid rgba(52, 211, 153, 0.42);
+    color: #6ee7b7; font-family: inherit; font-size: 0.88rem; font-weight: 700;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.15);
+  }
+  .btn-glass-ruby {
+    width: 100%; padding: 13px; border-radius: 18px;
+    background: rgba(190, 18, 60, 0.24);
+    border: 1.5px solid rgba(251, 113, 133, 0.42);
+    color: #ffe4e6; font-family: inherit; font-size: 0.88rem; font-weight: 700;
+    box-shadow: 0 4px 16px rgba(190, 18, 60, 0.2);
+  }
+
+  /* Bottom Tabbar */
+  .tabbar {
+    display: flex; justify-content: space-around; align-items: center;
+    padding: 9px 6px; border-radius: 20px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.68rem; font-weight: 600;
+    backdrop-filter: blur(16px);
+  }
+  .tab { display: flex; flex-direction: column; align-items: center; gap: 2px; color: #64748b; }
+  .tab.active { color: #6ee7b7; font-weight: 700; }
+
+  /* Specific layouts */
+  .glass-card {
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 24px;
+    padding: 18px;
+    backdrop-filter: blur(20px);
+  }
+  .badge-sm {
+    display: inline-block; font-size: 0.68rem; font-weight: 700;
+    padding: 4px 10px; border-radius: 999px; margin-bottom: 8px;
+    background: rgba(190, 18, 60, 0.2); color: #fda4af; border: 1px solid rgba(253, 164, 175, 0.24);
+  }
+  .h-title { font-size: 1.12rem; font-weight: 800; line-height: 1.25; margin-bottom: 6px; color: #fff; }
+  .p-desc { font-size: 0.82rem; color: #cbd5e1; line-height: 1.45; margin-bottom: 12px; }
+
+  /* Mini checklist items */
+  .mini-list {
+    display: flex; flex-direction: column; gap: 6px; margin-top: 8px;
+  }
+  .mini-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 12px; border-radius: 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    font-size: 0.76rem; color: #cbd5e1;
+  }
+  .mini-item.done { color: #94a3b8; border-color: rgba(16, 185, 129, 0.2); }
+  .mini-item.active { background: rgba(190, 18, 60, 0.12); border-color: rgba(253, 164, 175, 0.3); color: #fff; font-weight: 600; }
+
+  /* Timeline nodes for Screen B */
+  .timeline {
+    display: flex; flex-direction: column; gap: 8px; position: relative; padding-left: 18px;
+  }
+  .timeline::before {
+    content: ""; position: absolute; left: 6px; top: 10px; bottom: 10px; width: 2px;
+    background: linear-gradient(180deg, #10b981 0%, #be123c 55%, rgba(255,255,255,0.08) 100%);
+  }
+  .t-node {
+    position: relative;
+    padding: 9px 12px; border-radius: 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    font-size: 0.76rem; display: flex; justify-content: space-between; align-items: center;
+  }
+  .t-node::before {
+    content: ""; position: absolute; left: -16px; top: 50%; transform: translateY(-50%);
+    width: 10px; height: 10px; border-radius: 50%; background: #10b981;
+  }
+  .t-node.wait::before { background: #334155; }
+  .t-active-card {
+    position: relative;
+    background: rgba(255,255,255,0.055);
+    border: 1px solid rgba(253, 164, 175, 0.3);
+    border-radius: 20px; padding: 14px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+  .t-active-card::before {
+    content: ""; position: absolute; left: -17px; top: 24px;
+    width: 12px; height: 12px; border-radius: 50%; background: #fda4af;
+    box-shadow: 0 0 0 4px rgba(190, 18, 60, 0.35);
+  }
+
+  /* Stage pills */
+  .stage-pills {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 10px;
+  }
+  .s-pill {
+    text-align: center; font-size: 0.65rem; font-weight: 700; padding: 6px 4px;
+    border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); color: #64748b;
+  }
+  .s-pill.active {
+    background: rgba(16, 185, 129, 0.14); border-color: rgba(52, 211, 153, 0.35); color: #6ee7b7;
+  }
+
+  /* Action bite cards for Screen D */
+  .bite-slot {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 13px 14px; border-radius: 18px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 8px;
+  }
+  .bite-left { display: flex; align-items: center; gap: 11px; }
+  .bite-icon {
+    width: 36px; height: 36px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 1rem;
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>📱 МОБИЛЬНЫЙ ТЕСТ (ШАГ 2 из 4): Как устроен главный экран телефона?</h1>
+  <p>Все 4 варианта выполнены в выбранной эстетике (Обсидиановое стекло + Бургунди & Изумруд)</p>
+</div>
+
+<div class="phones-grid">
+  <!-- ЭКРАН A: Фокус-карта + 3 темы снизу -->
+  <div class="phone">
+    <div class="orb-ruby"></div><div class="orb-emerald"></div>
+    <div class="z2">
+      <div class="notch">ВАРИАНТ A</div>
+      <div class="m-top">
+        <span class="pill ruby">🔥 4 дня подряд</span>
+        <span class="pill">🎯 2/3 сегодня</span>
+      </div>
+      <div class="cd-box">
+        <div class="cd-row">
+          <span>До 1-го скрининга: 42%</span>
+          <span style="color:#fda4af;">⏳ Осталось 8 тем</span>
+        </div>
+        <div class="bar-bg"><div class="bar-fill"></div></div>
+      </div>
+
+      <div class="glass-card" style="margin-bottom:10px;">
+        <span class="badge-sm">✨ Фокус сейчас · 4 минуты</span>
+        <div class="h-title">Словари: почему dict всегда O(1)?</div>
+        <p class="p-desc">Как хеш-функция вычисляет корзину за 1 шаг и почему ключи сохраняют порядок.</p>
+        <button class="btn-glass-emerald">▶ Начать спринт (4 мин) ➔</button>
+      </div>
+
+      <div style="font-size:0.72rem;font-weight:700;color:#94a3b8;margin:6px 0 4px 4px;">ОЧЕРЕДЬ ЭТАПА 1 (СКРИНИНГ):</div>
+      <div class="mini-list">
+        <div class="mini-item done"><span>✓ 1.2 Списки и срезы</span><span style="color:#34d399;">Готово</span></div>
+        <div class="mini-item active"><span>● 1.3 Словари и хеш-память</span><span style="color:#fda4af;">Сейчас</span></div>
+        <div class="mini-item"><span>○ 1.4 Замыкания и декораторы</span><span>Далее</span></div>
+      </div>
+    </div>
+
+    <div class="tabbar z2">
+      <div class="tab active"><span>⚡</span><span>Спринт</span></div>
+      <div class="tab"><span>🗺️</span><span>Путь</span></div>
+      <div class="tab"><span>🃏</span><span>Карточки</span></div>
+      <div class="tab"><span>💻</span><span>Код</span></div>
+    </div>
+  </div>
+
+  <!-- ЭКРАН B: Вертикальная Стеклянная Нить (Взрослый Duolingo/Linear) -->
+  <div class="phone">
+    <div class="orb-ruby"></div><div class="orb-emerald"></div>
+    <div class="z2">
+      <div class="notch">ВАРИАНТ B</div>
+      <div class="m-top">
+        <span class="pill ruby">🔥 4 дня подряд</span>
+        <span class="pill">⏳ Осталось 8 тем</span>
+      </div>
+      <div class="stage-pills">
+        <div class="s-pill active">1. Скрининг</div>
+        <div class="s-pill">2. Стек</div>
+        <div class="s-pill">3. Прод</div>
+        <div class="s-pill">4. Оффер</div>
+      </div>
+
+      <div class="timeline">
+        <div class="t-node"><span style="color:#94a3b8;">1.1 Память и ссылки</span><span style="color:#34d399;font-size:0.7rem;">✓ +25 XP</span></div>
+        <div class="t-node"><span style="color:#94a3b8;">1.2 Списки и срезы</span><span style="color:#34d399;font-size:0.7rem;">✓ +25 XP</span></div>
+
+        <div class="t-active-card">
+          <span class="badge-sm" style="margin-bottom:6px;">✨ Текущая станция · 4 мин</span>
+          <div class="h-title" style="font-size:1.02rem;">1.3 Словари и хеш-память</div>
+          <p class="p-desc" style="font-size:0.78rem;margin-bottom:10px;">Открытая адресация, коллизии и O(1) поиск по ключу.</p>
+          <button class="btn-glass-ruby" style="padding:10px;">▶ Запустить станцию ➔</button>
+        </div>
+
+        <div class="t-node wait"><span style="color:#64748b;">1.4 Замыкания и декораторы</span><span style="color:#475569;font-size:0.7rem;">Далее</span></div>
+        <div class="t-node wait"><span style="color:#64748b;">2.2 HTTP-протокол и REST</span><span style="color:#475569;font-size:0.7rem;">Далее</span></div>
+        <div class="t-node wait"><span style="color:#64748b;">👑 Рубежный блиц этапа 1</span><span style="color:#475569;font-size:0.7rem;">Финал</span></div>
+      </div>
+    </div>
+
+    <div class="tabbar z2">
+      <div class="tab active"><span>🗺️</span><span>Путь</span></div>
+      <div class="tab"><span>⚡</span><span>Спринт</span></div>
+      <div class="tab"><span>🃏</span><span>Карточки</span></div>
+      <div class="tab"><span>💻</span><span>Код</span></div>
+    </div>
+  </div>
+
+  <!-- ЭКРАН C: 100% Дзен-Фокус (Только 1 карточка на весь экран без списков) -->
+  <div class="phone">
+    <div class="orb-ruby"></div><div class="orb-emerald"></div>
+    <div class="z2">
+      <div class="notch">ВАРИАНТ C</div>
+      <div class="m-top">
+        <span class="pill ruby">🔥 4 дня</span>
+        <span class="pill">⏳ Осталось 8 тем (42%)</span>
+      </div>
+    </div>
+
+    <div class="glass-card z2" style="padding:24px 20px;margin:auto 0;">
+      <span class="badge-sm">🌿 Только один шаг сейчас</span>
+      <div class="h-title" style="font-size:1.32rem;margin-bottom:10px;">Словари: почему dict всегда O(1)?</div>
+      <p class="p-desc" style="font-size:0.88rem;margin-bottom:16px;">Никаких длинных списков тем. Сделай один короткий 4-минутный разбор с интерактивным кодом и закрой цель дня.</p>
+      <div style="background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:0.76rem;color:#fda4af;margin-bottom:18px;">
+        bucket = hash("user_id") % 8<br>
+        print(f"Корзина в RAM: #{bucket}")
+      </div>
+      <button class="btn-glass-emerald" style="padding:15px;font-size:0.94rem;">▶ Начать 4-минутный фокус ➔</button>
+    </div>
+
+    <div class="tabbar z2">
+      <div class="tab active"><span>⚡</span><span>Фокус</span></div>
+      <div class="tab"><span>🗺️</span><span>Все темы</span></div>
+      <div class="tab"><span>🃏</span><span>Карточки</span></div>
+      <div class="tab"><span>💻</span><span>Код</span></div>
+    </div>
+  </div>
+
+  <!-- ЭКРАН D: Набор дня из 3 микро-шагов (Теория 2м + Код 2м + Карточки 1м) -->
+  <div class="phone">
+    <div class="orb-ruby"></div><div class="orb-emerald"></div>
+    <div class="z2">
+      <div class="notch">ВАРИАНТ D</div>
+      <div class="m-top">
+        <span class="pill ruby">🔥 4 дня подряд</span>
+        <span class="pill">🎯 1 из 3 шагов</span>
+      </div>
+      <div class="cd-box" style="margin-bottom:14px;">
+        <div class="cd-row">
+          <span>🎯 Готовность к скринингу: 42%</span>
+          <span style="color:#6ee7b7;">⏳ Осталось 8 тем</span>
+        </div>
+        <div class="bar-bg"><div class="bar-fill"></div></div>
+      </div>
+
+      <div style="font-size:0.8rem;font-weight:700;color:#f8fafc;margin-bottom:10px;">ТЕМА ДНЯ: 1.3 Словари и хеш-память</div>
+
+      <div class="bite-slot" style="border-color:rgba(52,211,153,0.3);background:rgba(16,185,129,0.08);">
+        <div class="bite-left">
+          <div class="bite-icon" style="background:rgba(16,185,129,0.2);color:#6ee7b7;">✓</div>
+          <div>
+            <div style="font-size:0.86rem;font-weight:700;">1. Микро-инсайт (Чтение)</div>
+            <div style="font-size:0.73rem;color:#94a3b8;">Хеш-функция и O(1) · Пройдено</div>
+          </div>
+        </div>
+        <span style="font-size:0.74rem;color:#34d399;font-weight:700;">+10 XP</span>
+      </div>
+
+      <div class="bite-slot" style="border-color:rgba(253,164,175,0.38);background:rgba(190,18,60,0.14);">
+        <div class="bite-left">
+          <div class="bite-icon" style="background:rgba(190,18,60,0.28);color:#fda4af;">💻</div>
+          <div>
+            <div style="font-size:0.86rem;font-weight:700;">2. Интерактивный код</div>
+            <div style="font-size:0.73rem;color:#fda4af;">Проверить коллизию · 2 мин</div>
+          </div>
+        </div>
+        <span style="font-size:0.76rem;color:#ffe4e6;font-weight:700;">Старт ➔</span>
+      </div>
+
+      <div class="bite-slot">
+        <div class="bite-left">
+          <div class="bite-icon" style="background:rgba(255,255,255,0.06);color:#94a3b8;">🃏</div>
+          <div>
+            <div style="font-size:0.86rem;font-weight:700;color:#cbd5e1;">3. Блиц-память</div>
+            <div style="font-size:0.73rem;color:#64748b;">5 флеш-карточек · 1 мин</div>
+          </div>
+        </div>
+        <span style="font-size:0.74rem;color:#64748b;">Ждёт</span>
+      </div>
+
+      <button class="btn-glass-ruby" style="margin-top:8px;">▶ Продолжить шаг 2 (2 мин) ➔</button>
+    </div>
+
+    <div class="tabbar z2">
+      <div class="tab active"><span>⚡</span><span>Сегодня</span></div>
+      <div class="tab"><span>🗺️</span><span>Путь</span></div>
+      <div class="tab"><span>🃏</span><span>Карточки</span></div>
+      <div class="tab"><span>💻</span><span>Код</span></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

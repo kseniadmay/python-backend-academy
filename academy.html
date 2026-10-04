@@ -5,18 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <title>Academy — Python Backend</title>
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Academy">
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('sw.js').catch(function(){});
-    });
-  }
-</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -212,11 +200,11 @@
   /* ---------- Ephemeral UI (60/30/10 Light & Evening Obsidian Dark) & Cocoon Redesign ---------- */
   :root, :root[data-theme="light"]{
     --paper:#faf8f5;
-    --surface:rgba(255,255,255,0.84);
-    --surface-2:rgba(15,23,42,0.04);
+    --surface:rgba(255,255,255,0.88);
+    --surface-2:rgba(15,23,42,0.045);
     --ink:#0f172a;
     --ink-soft:#334155;
-    --ink-muted:#64748b;
+    --ink-muted:#475569;
     --line:rgba(0,0,0,0.07);
     --line-soft:rgba(0,0,0,0.045);
     --hairline-light:rgba(0,0,0,0.07);
@@ -274,6 +262,12 @@
     --orb-emerald:rgba(16,185,129,0.20);
   }
 
+  /* WCAG AAA Keyboard Focus Ring */
+  button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible, .m-sq:focus-visible{
+    outline:2px solid var(--emerald) !important;
+    outline-offset:2px !important;
+  }
+
   /* Ambient background orbs for Evening Obsidian / Ephemeral Parchment */
   .ambient-orb{
     position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(68px);
@@ -291,17 +285,67 @@
     backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   }
   @media (max-width:880px){
-    .tabbar{overflow-x:hidden;justify-content:space-around;gap:2px;padding:6px 6px calc(6px + env(safe-area-inset-bottom));}
+    .tabbar{overflow-x:hidden;justify-content:space-around;gap:2px;padding:6px 6px calc(6px + env(safe-area-inset-bottom, 12px));z-index:90;}
     .tabbar__item{flex:1 1 0;min-width:0;padding:5px 4px;white-space:nowrap;font-size:.68rem;}
+    #view-root, main{padding-bottom:calc(88px + env(safe-area-inset-bottom, 16px)) !important;}
+    .fc-stage{padding-bottom:24px;}
     body.is-sprint-focus .topbar, body.is-sprint-focus .tabbar{display:none !important;}
-    body.is-sprint-focus main{padding:10px 12px 28px !important;}
+    body.is-sprint-focus main, body.is-sprint-focus #view-root{padding:10px 12px 28px !important;}
   }
   .container{width:100%;max-width:960px;margin:0 auto;box-sizing:border-box;}
+  .container--wide{max-width:1220px;}
   body.zen-mode .sidebar{display:none !important;}
   body.zen-mode:not(.is-sprint-focus) .topbar{display:flex !important;}
   body.zen-mode .container{max-width:860px;}
 
-  /* ---------- Variant A Dashboard: Cocoon Focus Card & Screening Countdown ---------- */
+  /* ---------- Section 1.3: Grouped Desktop Sidebar & Collapsible 7-Modules Accordion ---------- */
+  .nav-section-header{
+    font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--ink-muted);padding:10px 11px 4px;margin-top:4px;border-top:1px solid var(--line-soft);
+  }
+  .nav-section-header:first-child{border-top:none;margin-top:0;padding-top:2px;}
+  .nav-modules-accordion{
+    margin:2px 0 4px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line-soft);overflow:hidden;
+  }
+  .nav-modules-accordion > summary{
+    list-style:none;cursor:pointer;padding:7px 11px;font-size:.82rem;font-weight:700;color:var(--ink);
+    display:flex;flex-direction:column;gap:4px;user-select:none;
+  }
+  .nav-modules-accordion > summary::-webkit-details-marker{display:none;}
+  .nav-modules-summary-row{display:flex;justify-content:space-between;align-items:center;gap:6px;}
+  .nav-modules-bar{height:4px;border-radius:99px;background:var(--line);overflow:hidden;}
+  .nav-modules-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg, var(--emerald), var(--amber));transition:width .35s ease;}
+  .nav-modules-list{display:flex;flex-direction:column;gap:1px;padding:2px 4px 6px;}
+  #nav-desktop .navlink{
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:7px 10px;font-size:.86rem;border-radius:10px;
+  }
+  .navlink-pct{margin-left:auto;font-size:.7rem;font-weight:700;color:var(--ink-muted);padding-left:6px;}
+
+  /* ---------- Section 1.1 & 9.1: Global Topbar Pomodoro Pill & Bug Button ---------- */
+  .topbar-pomo-pill{
+    display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;
+    background:var(--surface-2);border:1px solid var(--glass-border);color:var(--ink);
+    font-family:var(--font-m);font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s;
+  }
+  .topbar-pomo-pill:hover{border-color:var(--moss);transform:translateY(-1px);}
+  .topbar-pomo-pill.is-running{background:var(--emerald-soft);border-color:var(--emerald);color:var(--moss-deep);}
+  .bug-fab-btn{
+    position:fixed;right:16px;bottom:18px;z-index:85;
+    display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;
+    background:var(--surface);border:1px solid var(--glass-border);color:var(--ink-soft);
+    font-size:.76rem;font-weight:700;cursor:pointer;box-shadow:var(--shadow-1);
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);transition:transform .22s ease, opacity .22s ease, border-color .15s;
+  }
+  .bug-fab-btn:hover{border-color:var(--bordeaux);color:var(--ink);transform:translateY(-1px);}
+  .bug-fab-btn.bug-fab-btn--hidden{transform:translateY(80px);opacity:0;pointer-events:none;}
+  body.is-interactive-route .bug-fab-btn span{display:none;}
+  body.is-interactive-route .bug-fab-btn{padding:8px 10px;}
+  @media (max-width:880px){
+    /* On mobile, bug button lives cleanly in .topbar so it never overlaps flashcards or code editors */
+    .bug-fab-btn{display:none !important;}
+  }
+
+  /* ---------- Section 2: Dashboard Cocoon, Glowing Screening Bar, Pulse Ring, SRS Ring & 7-Track Mini-Matrix ---------- */
   .dash-top-pills{
     display:flex;justify-content:space-between;align-items:center;gap:5px;flex-wrap:nowrap;margin-bottom:10px;
   }
@@ -334,11 +378,12 @@
   .cd-title{font-weight:800;font-size:.92rem;color:var(--ink);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .cd-count{font-weight:800;font-size:.8rem;color:var(--moss);background:var(--emerald-soft);padding:3px 10px;border-radius:999px;border:1px solid rgba(16,185,129,0.28);white-space:nowrap;flex:none;}
   .cd-bar,.cd-bar-track{height:8px;border-radius:999px;background:var(--surface-2);overflow:hidden;border:1px solid var(--line-soft);}
-  .cd-fill,.cd-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg, #be123c, #10b981);transition:width .4s ease;}
+  .cd-fill,.cd-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg, #be123c, #10b981);box-shadow:0 0 12px rgba(16,185,129,0.45);transition:width .4s ease;}
+  .cd-checkpoint-sub{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;font-size:.73rem;color:var(--ink-soft);font-weight:600;}
 
   .cocoon-focus-card{
-    background:linear-gradient(155deg, rgba(16,185,129,0.13), rgba(190,18,60,0.08)), var(--surface);
-    border:1.5px solid rgba(52,211,153,0.34);border-radius:24px;padding:18px 20px;margin-bottom:11px;
+    background:linear-gradient(155deg, rgba(16,185,129,0.13), rgba(190,18,60,0.06)), var(--surface);
+    border:1.5px solid rgba(52,211,153,0.38);border-radius:24px;padding:18px 20px;margin-bottom:11px;
     box-shadow:var(--shadow-1);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
     max-width:100%;box-sizing:border-box;
   }
@@ -354,6 +399,15 @@
     color:var(--moss);border:1px solid rgba(52,211,153,0.35);margin-bottom:8px;max-width:100%;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;
   }
+  .pulse-ring-dot{
+    width:8px;height:8px;border-radius:50%;background:var(--emerald);display:inline-block;position:relative;flex:none;
+    animation:pulse-ring 2s infinite;
+  }
+  @keyframes pulse-ring{
+    0%{box-shadow:0 0 0 0 rgba(16,185,129,0.65);}
+    70%{box-shadow:0 0 0 7px rgba(16,185,129,0);}
+    100%{box-shadow:0 0 0 0 rgba(16,185,129,0);}
+  }
   .cocoon-focus-title{
     font-family:var(--font-d);font-size:clamp(1.06rem,1rem + 0.8vw,1.48rem);font-weight:800;
     line-height:1.22;color:var(--ink);margin-bottom:5px;overflow-wrap:anywhere;
@@ -362,22 +416,52 @@
     font-size:.86rem;line-height:1.44;color:var(--ink-soft);margin-bottom:11px;overflow-wrap:anywhere;
   }
 
-  /* Translucent Glass Buttons with Glowing Borders */
+  /* Translucent Glass Buttons with Glowing Borders (60/30/10 Harmony) */
   .btn-glass-emerald{
-    background:rgba(16,185,129,0.18);border:1.5px solid rgba(52,211,153,0.45);color:var(--ink);
+    background:rgba(16,185,129,0.18);border:1.5px solid rgba(52,211,153,0.48);color:var(--ink);
     border-radius:15px;padding:11px 16px;font-weight:800;font-size:.91rem;display:inline-flex;
     align-items:center;justify-content:center;gap:8px;cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
     box-shadow:0 6px 20px rgba(16,185,129,0.16);transition:transform .15s,box-shadow .15s,background .15s;
     text-decoration:none;box-sizing:border-box;
   }
   .btn-glass-emerald:hover{transform:translateY(-1px);background:rgba(16,185,129,0.26);box-shadow:0 8px 24px rgba(16,185,129,0.24);}
-  .btn-glass-ruby{
-    background:rgba(190,18,60,0.20);border:1.5px solid rgba(251,113,133,0.42);color:var(--ink);
+  .btn-glass-ruby, .btn-glass-bordeaux{
+    background:rgba(107,29,47,0.08);border:1px solid rgba(107,29,47,0.32);color:var(--ink);
     border-radius:15px;padding:9px 14px;font-weight:700;font-size:.84rem;display:inline-flex;
     align-items:center;justify-content:center;gap:8px;cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-    transition:transform .15s,background .15s;text-decoration:none;box-sizing:border-box;
+    transition:transform .15s,background .15s,border-color .15s;text-decoration:none;box-sizing:border-box;
   }
-  .btn-glass-ruby:hover{transform:translateY(-1px);background:rgba(190,18,60,0.28);}
+  :root[data-theme="dark"] .btn-glass-ruby, :root[data-theme="dark"] .btn-glass-bordeaux{
+    background:rgba(190,18,60,0.14);border-color:rgba(251,113,133,0.34);
+  }
+  .btn-glass-ruby:hover, .btn-glass-bordeaux:hover{transform:translateY(-1px);background:rgba(107,29,47,0.15);border-color:var(--bordeaux);}
+
+  /* Section 2.3: SRS Circular Progress Ring Strip */
+  .srs-strip-card{
+    padding:12px 15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+    background:var(--surface);border:1px solid var(--glass-border);border-radius:20px;box-shadow:var(--shadow-1);
+  }
+  .srs-ring-wrap{display:flex;align-items:center;gap:11px;min-width:0;}
+  .srs-ring-svg{width:42px;height:42px;flex:none;transform:rotate(-90deg);}
+  .srs-ring-bg{fill:none;stroke:var(--line);stroke-width:4;}
+  .srs-ring-fg{fill:none;stroke:var(--emerald);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .4s ease;}
+
+  /* Section 2.4: Compact 7-Track Mini-Matrix Bar on Dashboard */
+  .dash-mini-matrix{
+    display:grid;grid-template-columns:repeat(7, minmax(0, 1fr));gap:6px;margin-bottom:10px;
+  }
+  @media (max-width:680px){
+    .dash-mini-matrix{grid-template-columns:repeat(4, minmax(0, 1fr));}
+  }
+  .dash-track-chip{
+    display:flex;flex-direction:column;gap:4px;padding:7px 8px;border-radius:13px;
+    background:var(--surface);border:1px solid var(--glass-border);text-decoration:none;color:var(--ink);
+    font-size:.73rem;font-weight:700;transition:transform .14s,border-color .14s;box-shadow:var(--shadow-1);
+  }
+  .dash-track-chip:hover{transform:translateY(-1px);border-color:var(--moss);}
+  .dash-track-chip__top{display:flex;justify-content:space-between;align-items:center;gap:3px;white-space:nowrap;overflow:hidden;}
+  .dash-track-chip__bar{height:4px;border-radius:99px;background:var(--surface-2);overflow:hidden;}
+  .dash-track-chip__fill{height:100%;border-radius:99px;background:linear-gradient(90deg, var(--emerald), var(--amber));}
 
   /* 4 Interview Stages Switcher & Compact 1-Line Topic Checklist */
   .stage-pills{
@@ -488,6 +572,46 @@
     width:100%;justify-content:center;padding:12px 16px;font-size:.93rem;border-radius:15px;
   }
 
+  /* ---------- Section 3: Desktop Split View, CPython Memory Diagrams & Persistent Step Navigator ---------- */
+  .skill-split-layout{
+    display:grid;grid-template-columns:1fr;gap:16px;align-items:start;
+  }
+  .skill-lab-aside{
+    display:flex;flex-direction:column;gap:12px;
+  }
+  @media (min-width:1080px){
+    .skill-split-layout{
+      grid-template-columns:minmax(0, 1.48fr) minmax(320px, 0.96fr);
+    }
+    .skill-lab-aside{
+      position:sticky;top:16px;
+    }
+  }
+  .skill-lab-card{
+    background:var(--surface);border:1px solid var(--glass-border);border-radius:20px;
+    padding:14px 16px;box-shadow:var(--shadow-1);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  }
+  .cpython-mem-diagram{
+    background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:12px 14px;
+    margin-top:10px;font-size:.78rem;overflow-x:auto;
+  }
+  .cpython-mem-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:8px;margin-top:8px;
+  }
+  .cpython-mem-box{
+    border:1px solid rgba(16,185,129,0.35);background:var(--surface);border-radius:10px;padding:7px 9px;
+    font-family:var(--font-m);font-size:.73rem;line-height:1.4;
+  }
+  .cpython-mem-box--warn{border-color:rgba(245,158,11,0.45);background:var(--amber-soft);}
+  .floating-step-nav{
+    display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;
+    padding:9px 14px;margin-top:12px;border-radius:16px;background:var(--surface);
+    border:1px solid var(--glass-border);box-shadow:var(--shadow-1);backdrop-filter:blur(16px);
+  }
+  .floating-step-breadcrumbs{
+    display:flex;gap:5px;flex-wrap:wrap;align-items:center;font-size:.75rem;
+  }
+
   /* ---------- Progressive Chunk Scroll-Reveal ("Fog of War" Continuous Flow) & 1-Tap Code Chips ---------- */
   html.theme-transitioning,
   html.theme-transitioning *,
@@ -540,7 +664,7 @@
   }
   @media (max-width:880px){
     .topbar{padding:8px 14px;}
-    main{padding:8px 11px 74px;}
+    main{padding:8px 11px 88px;}
     .microstep-card{padding:12px 13px;border-radius:18px;margin-bottom:8px;}
     .scroll-feed{padding:14px 15px;border-radius:18px;}
     .feed-chunk{padding:7px 0;font-size:.93rem;line-height:1.54;}
@@ -645,7 +769,7 @@
   .m-sq--80{background:var(--moss-soft);border-color:var(--moss);color:var(--moss-deep);}
   .m-sq--100{background:var(--emerald);border-color:var(--emerald);color:#fff;}
 
-  .unit-card{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:20px 22px;margin-bottom:16px;box-shadow:var(--shadow-1);}
+  .unit-card{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:20px 22px;margin-bottom:16px;box-shadow:var(--shadow-1);transition:transform .2s ease,border-color .2s ease;}
   .unit-card__head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:14px;}
   .skill-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 13px;border-radius:14px;border:1px solid var(--line-soft);background:var(--surface-2);margin-bottom:8px;flex-wrap:wrap;transition:border-color .15s;}
   .skill-row:hover{border-color:var(--moss);}
@@ -669,24 +793,6 @@
     .skill-row__open-btn{padding:4px 8px !important;font-size:.74rem !important;white-space:nowrap;}
   }
 
-  /* Clean 1-line sidebar nav items */
-  #nav-desktop .navlink{
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:8px 11px;font-size:.88rem;
-  }
-
-  /* Floating Bug Reporter Button */
-  .bug-fab-btn{
-    position:fixed;right:16px;bottom:18px;z-index:85;
-    display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;
-    background:var(--surface);border:1px solid var(--glass-border);color:var(--ink-soft);
-    font-size:.76rem;font-weight:700;cursor:pointer;box-shadow:var(--shadow-1);
-    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);transition:all .15s;
-  }
-  .bug-fab-btn:hover{border-color:var(--bordeaux);color:var(--ink);transform:translateY(-1px);}
-  @media (max-width:880px){
-    .bug-fab-btn{bottom:74px;right:12px;padding:6px 10px;font-size:.72rem;}
-  }
-
   /* Micro-step Theory Chunking & Inline Code Runner */
   .microstep-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:10px 14px;margin-bottom:14px;flex-wrap:wrap;}
   .microstep-dots{display:flex;gap:5px;flex-wrap:wrap;}
@@ -705,27 +811,180 @@
   .inline-code-out,.snippet-out{background:#0b0f17;color:#a7f3d0;font-family:var(--font-m);font-size:.82rem;padding:10px 13px;border-radius:12px;margin:6px 0 14px;white-space:pre-wrap;border:1px solid rgba(52,211,153,0.25);}
   .snippet-out.hidden{display:none;}
 
-  /* Junior vs Senior Callout */
+  /* ---------- Section 3.3: Expressive Junior vs Senior Contrast Cards ---------- */
   .jvs-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
   @media (max-width:680px){.jvs-grid{grid-template-columns:1fr;}}
-  .jvs-box,.jvs-card{border-radius:16px;padding:14px 16px;font-size:.9rem;border:1.5px solid var(--line);}
-  .jvs-box--jr,.jvs-card--junior{background:var(--bordeaux-soft);border-color:rgba(251,113,133,0.35);}
-  .jvs-box--sr,.jvs-card--senior{background:var(--emerald-soft);border-color:rgba(52,211,153,0.38);}
-  .jvs-title,.jvs-badge{font-family:var(--font-d);font-size:.82rem;font-weight:800;margin-bottom:5px;display:block;}
+  .jvs-box,.jvs-card{border-radius:16px;padding:14px 16px;font-size:.9rem;border:1.5px solid var(--line);position:relative;}
+  .jvs-box--jr,.jvs-card--junior{background:rgba(107,29,47,0.08);border-color:rgba(107,29,47,0.34);}
+  :root[data-theme="dark"] .jvs-box--jr,:root[data-theme="dark"] .jvs-card--junior{background:rgba(190,18,60,0.16);border-color:rgba(251,113,133,0.38);}
+  .jvs-box--sr,.jvs-card--senior{background:rgba(20,90,70,0.08);border-color:rgba(20,90,70,0.36);}
+  :root[data-theme="dark"] .jvs-box--sr,:root[data-theme="dark"] .jvs-card--senior{background:rgba(16,185,129,0.14);border-color:rgba(52,211,153,0.40);}
+  .jvs-title,.jvs-badge{font-family:var(--font-d);font-size:.82rem;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
 
-  /* 3D Flashcard Flip */
-  .fc-stage{perspective:1100px;margin:16px 0;}
+  /* ---------- Section 4: Coding Trainer Mobile Ergonomics, Python Accessory Bar & Line-Number Gutter ---------- */
+  .prac-quick-chips{
+    display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  }
+  .prac-quick-chips::-webkit-scrollbar{display:none;}
+  .prac-chip{
+    padding:6px 11px;border-radius:999px;font-size:.76rem;font-weight:700;white-space:nowrap;
+    background:var(--surface);border:1px solid var(--glass-border);color:var(--ink-soft);cursor:pointer;transition:all .14s;
+  }
+  .prac-chip:hover{border-color:var(--moss);color:var(--ink);}
+  .prac-chip.active{background:var(--emerald-soft);border-color:var(--emerald);color:var(--ink);font-weight:800;}
+  .prac-task-swiper{
+    display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 12px;margin-bottom:10px;
+    border-radius:14px;background:var(--surface);border:1px solid var(--glass-border);box-shadow:var(--shadow-1);
+  }
+  @media (max-width:760px){
+    .prac-filters-drawer:not(.is-open) .prac-filters-grid{display:none;}
+  }
+  .py-accessory-bar{
+    display:flex;gap:5px;overflow-x:auto;padding:6px 8px;background:var(--surface-2);
+    border:1px solid var(--line);border-bottom:none;border-radius:14px 14px 0 0;scrollbar-width:none;
+  }
+  .py-accessory-bar::-webkit-scrollbar{display:none;}
+  .py-acc-btn{
+    padding:4px 9px;border-radius:8px;background:var(--surface);border:1px solid var(--line);
+    color:var(--ink);font-family:var(--font-m);font-size:.75rem;font-weight:700;cursor:pointer;white-space:nowrap;
+    transition:all .12s;
+  }
+  .py-acc-btn:hover{border-color:var(--moss);background:var(--emerald-soft);}
+  .code-editor-shell{
+    display:flex;align-items:stretch;background:var(--surface);border:1px solid var(--line);
+    border-radius:0 0 14px 14px;overflow:hidden;position:relative;
+  }
+  .line-numbers-gutter{
+    padding:14px 8px 14px 10px;background:var(--surface-2);border-right:1px solid var(--line-soft);
+    color:var(--ink-muted);font-family:var(--font-m);font-size:.86rem;line-height:1.5;text-align:right;
+    user-select:none;min-width:34px;white-space:pre;overflow:hidden;
+  }
+  .code-editor-shell textarea.code-editor{
+    border:none !important;border-radius:0 !important;flex:1;min-width:0;margin:0 !important;padding:14px 14px !important;line-height:1.5 !important;
+  }
+  .test-running-shimmer{
+    padding:10px 14px;border-radius:12px;margin-top:10px;font-weight:700;font-size:.86rem;
+    background:linear-gradient(90deg, var(--surface-2) 25%, var(--emerald-soft) 50%, var(--surface-2) 75%);
+    background-size:200% 100%;animation:shimmer-bar 1.5s infinite;
+  }
+  @keyframes shimmer-bar{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+  .correct-pulse-anim{animation:correct-pulse .55s cubic-bezier(0.34,1.56,0.64,1);}
+  @keyframes correct-pulse{0%{transform:scale(0.98);box-shadow:0 0 0 0 rgba(16,185,129,0.5);}50%{transform:scale(1.01);box-shadow:0 0 24px 4px rgba(16,185,129,0.3);}100%{transform:scale(1);}}
+
+  /* ---------- Section 5: Mock Interview Circular SVG Ring, Socratic Chat Stream & 2x2 STAR Matrix ---------- */
+  .mock-timer-ring-wrap{
+    display:inline-flex;align-items:center;gap:12px;
+  }
+  .mock-timer-svg{width:58px;height:58px;transform:rotate(-90deg);flex:none;}
+  .mock-timer-circle-bg{fill:none;stroke:var(--line);stroke-width:5;}
+  .mock-timer-circle-fg{fill:none;stroke:var(--emerald);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .5s linear, stroke .3s ease;}
+  .mock-timer--warn .mock-timer-circle-fg{stroke:var(--amber);}
+  .mock-timer--danger .mock-timer-circle-fg{stroke:var(--bordeaux);}
+  .mock-timer--danger #mock-timer-display{color:var(--bordeaux) !important;animation:pulse-ring 1.2s infinite;}
+  .socratic-chat-stream{
+    margin-top:14px;padding:14px 16px;border-radius:18px;background:var(--surface-2);border:1px solid var(--line);
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .socratic-chat-header{
+    display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;
+    padding-bottom:8px;border-bottom:1px solid var(--line-soft);font-size:.8rem;font-weight:700;
+  }
+  .chat-bubble{
+    padding:10px 14px;border-radius:14px;font-size:.88rem;line-height:1.5;max-width:92%;
+    animation:chunkReveal .25s ease;
+  }
+  .chat-bubble--interviewer{
+    align-self:flex-start;background:var(--surface);border:1px solid var(--glass-border);color:var(--ink);
+    border-top-left-radius:4px;box-shadow:var(--shadow-1);
+  }
+  .chat-bubble--candidate{
+    align-self:flex-end;background:var(--emerald-soft);border:1px solid rgba(16,185,129,0.35);color:var(--ink);
+    border-top-right-radius:4px;
+  }
+  .star-matrix-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:12px;
+  }
+  @media (max-width:720px){.star-matrix-grid{grid-template-columns:1fr;}}
+  .star-quadrant-card{
+    background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:12px 14px;
+  }
+
+  /* ---------- Section 6: 3D Flashcards Flip Physics, Gloss & Segmented Stories Bar ---------- */
+  .fc-stories-bar{
+    display:flex;gap:3px;width:100%;margin-bottom:10px;height:5px;
+  }
+  .fc-story-seg{
+    flex:1;height:100%;border-radius:99px;background:var(--line);transition:background .25s,transform .2s;
+  }
+  .fc-story-seg.seg--easy{background:var(--emerald);}
+  .fc-story-seg.seg--hard{background:var(--amber);}
+  .fc-story-seg.seg--again{background:var(--bordeaux);}
+  .fc-story-seg.seg--current{background:var(--ink);transform:scaleY(1.35);}
+  .fc-stage{perspective:1200px;margin:16px 0;}
   .fc-card{
     background:var(--surface);border:1.5px solid var(--line);border-radius:24px;padding:28px 26px;
-    min-height:210px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;
-    box-shadow:var(--shadow-1);transition:transform .22s ease,border-color .2s;
+    min-height:215px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;
+    box-shadow:var(--shadow-1);transform-style:preserve-3d;
+    transition:transform .52s cubic-bezier(0.34,1.56,0.64,1),border-color .22s,background .25s;
+    position:relative;overflow:hidden;
   }
-  .fc-card:hover{border-color:var(--moss);}
-  .fc-card--Answer{background:var(--moss-soft);border-color:var(--moss);}
+  .fc-card::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(125deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 45%);
+  }
+  .fc-card:hover{border-color:var(--moss);transform:translateY(-2px) rotateX(1.5deg);}
+  .fc-card--Answer{
+    background:var(--moss-soft);border-color:var(--moss);
+    animation:cardFlipSpring .46s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes cardFlipSpring{
+    0%{transform:rotateY(-14deg) scale(0.98);}
+    100%{transform:rotateY(0deg) scale(1);}
+  }
   .fc-q{font-size:1.08rem;font-weight:600;line-height:1.55;white-space:pre-line;}
   .fc-a{font-size:1rem;line-height:1.65;white-space:pre-line;color:var(--ink);margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
   .fc-rate-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px;}
   @media (max-width:600px){.fc-rate-row{grid-template-columns:1fr 1fr;}}
+  .fc-swipe-hint{
+    font-size:.73rem;color:var(--ink-muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:10px;
+  }
+
+  /* ---------- Section 8: Module Boss Arena & Segmented Boss HP Bar ---------- */
+  .boss-arena-card{
+    background:radial-gradient(circle at top right, rgba(245,158,11,0.14), rgba(190,18,60,0.08) 55%, transparent), var(--surface);
+    border:1.5px solid rgba(245,158,11,0.42);
+  }
+  .boss-hp-wrap{
+    background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:10px 14px;margin-bottom:14px;
+  }
+  .boss-hp-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.82rem;font-weight:800;margin-bottom:6px;}
+  .boss-hp-track{
+    height:10px;border-radius:99px;background:rgba(15,23,42,0.2);overflow:hidden;position:relative;border:1px solid var(--line);
+  }
+  .boss-hp-fill{
+    height:100%;border-radius:99px;background:linear-gradient(90deg, #ef4444, #f59e0b);
+    transition:width .5s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .boss-hp-fill.is-defeated{background:var(--emerald);}
+  .boss-victory-banner{
+    padding:14px 18px;border-radius:18px;margin-bottom:14px;
+    background:linear-gradient(135deg, rgba(16,185,129,0.22), rgba(245,158,11,0.16));
+    border:1.5px solid var(--emerald);font-weight:800;display:flex;align-items:center;gap:10px;
+    animation:correct-pulse .6s ease;
+  }
+
+  /* ---------- Section 9.3: Floating +XP Particle Burst ---------- */
+  .xp-float-particle{
+    position:fixed;right:24px;top:58px;z-index:200;pointer-events:none;
+    padding:6px 12px;border-radius:999px;background:var(--emerald);color:#fff;
+    font-family:var(--font-d);font-weight:800;font-size:.84rem;box-shadow:0 8px 20px rgba(16,185,129,0.35);
+    animation:float-up-fade .95s cubic-bezier(0.22,1,0.36,1) forwards;
+  }
+  @keyframes float-up-fade{
+    0%{opacity:0;transform:translateY(10px) scale(0.9);}
+    25%{opacity:1;transform:translateY(0) scale(1.05);}
+    100%{opacity:0;transform:translateY(-28px) scale(0.95);}
+  }
 
   /* Activity Heatmap & Daily Ring & Pomodoro */
   .anti-proc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:20px;}
@@ -743,10 +1002,11 @@
   .modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,0.55);backdrop-filter:blur(8px);z-index:100;display:flex;align-items:center;justify-content:center;padding:18px;}
   .modal-card{background:var(--surface);border:1px solid var(--line);border-radius:24px;max-width:720px;width:100%;max-height:88vh;overflow-y:auto;padding:24px;box-shadow:0 16px 48px rgba(0,0,0,0.28);}
 
-  /* Interview Priority Echelons & Stack Branches */
+  /* ---------- Section 7: Interview Priority Echelons, Header Overlap Fix & Skill Tree Polish ---------- */
   .echelon-badge{
     display:inline-flex;align-items:center;gap:4px;font-size:.73rem;font-weight:700;
     padding:3px 9px;border-radius:999px;border:1px solid var(--line);line-height:1.25;white-space:nowrap;
+    max-width:100%;overflow:hidden;text-overflow:ellipsis;
   }
   .echelon-badge--t1{background:var(--bordeaux-soft);color:var(--bordeaux);border-color:rgba(251,113,133,0.35);}
   .echelon-badge--t2{background:var(--amber-soft);color:var(--amber);border-color:rgba(245,158,11,0.35);}
@@ -758,13 +1018,26 @@
     border:1.5px solid var(--line);border-radius:24px;padding:18px 20px;margin-bottom:20px;
     box-shadow:var(--shadow-1);
   }
-  .echelon-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:10px;margin-top:12px;}
+  .echelon-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:12px;}
   .echelon-card{
     background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px;
     display:flex;flex-direction:column;justify-content:space-between;gap:6px;transition:border-color .18s,transform .18s;
+    min-width:0;
   }
   .echelon-card:hover{border-color:var(--moss);transform:translateY(-1px);}
+  .echelon-card__header{
+    display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:nowrap;margin-bottom:5px;min-width:0;
+  }
+  .echelon-pct-chip{
+    flex:none;font-size:.76rem;font-weight:800;padding:2px 8px;border-radius:999px;
+    background:var(--surface-2);border:1px solid var(--line);color:var(--ink);
+  }
   .stack-branch-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .node-card--available{
+    border-color:rgba(16,185,129,0.45) !important;
+    box-shadow:0 0 0 1px rgba(16,185,129,0.20), var(--shadow-1);
+  }
+  .stage__spine{position:relative;}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.13.0/brython.min.js"></script>
@@ -782,7 +1055,6 @@
       <a href="#/sandbox" class="navlink" data-route="/sandbox"></a>
     </nav>
     <div class="sidebar-foot">
-      <a href="#/sync" class="link-quiet" data-sync-link="d" style="text-decoration:none;display:flex;align-items:center;gap:6px;margin-bottom:8px;font-weight:600;color:var(--moss);">📱 Синхронизация</a>
       <div class="streak-pill"><svg class="icon" viewBox="0 0 24 24" id="flame-icon-d"><path d="M12 3c-.5 3-3 4-3 7.5A3.5 3.5 0 0 0 12 14a3.5 3.5 0 0 0 3-5c1.5 1 2 2.7 2 4.2A5 5 0 0 1 12 21a5 5 0 0 1-5-5.2C7 12 9 9 9 7c1 1 1.2 2 1.2 2S11 5 12 3Z"/></svg><span id="streak-num-d">0</span> дней подряд</div>
       <button class="icon-btn" id="theme-toggle-d" aria-label="Переключить тему"></button>
       <button class="link-quiet" id="reset-btn-d">Сбросить прогресс</button>
@@ -793,7 +1065,6 @@
     <header class="topbar">
       <div class="brand" style="font-size:1.02rem;"><svg class="icon" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M7.8 7.6 10.5 16M16.2 7.6 13.5 16M8.3 6h7.4"/></svg>Academy</div>
       <div style="display:flex;align-items:center;gap:10px;">
-        <a href="#/sync" class="icon-btn" data-sync-link="m" title="Синхронизация с телефоном" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;font-size:15px;">📱</a>
         <div class="streak-pill"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3c-.5 3-3 4-3 7.5A3.5 3.5 0 0 0 12 14a3.5 3.5 0 0 0 3-5c1.5 1 2 2.7 2 4.2A5 5 0 0 1 12 21a5 5 0 0 1-5-5.2C7 12 9 9 9 7c1 1 1.2 2 1.2 2S11 5 12 3Z"/></svg><span id="streak-num-m">0</span></div>
         <button class="icon-btn" id="theme-toggle-m" aria-label="Переключить тему"></button>
       </div>
@@ -2412,28 +2683,21 @@ DELETE /users/42     # удалить пользователя 42</code></pre>
   }
 };
 
-
-/* ================= CANONICAL BASELINE USER HISTORY ================= */
-const CANONICAL_USER_HISTORY = {"schemaVersion": 3, "exportedAt": "2026-10-04T11:40:00.000Z", "academyState": {"streak": 3, "lastVisit": "Sun Oct 04 2026", "mastered": ["diag"], "theme": "dark", "completedLessons": [], "xp": 409, "dailyGoal": 50, "dailyXpByDate": {"2026-10-03": 5, "2026-10-04": 404}, "streakFreezes": 1, "skillMastery": {"1.1.3": 50, "1.1.4": 50, "1.3.1": 50, "1.4.1": 50, "1.2.3": 50, "1.3.2": 50, "1.2.1": 50, "7.1.1": 50, "7.1.2": 50, "7.1.3": 50, "7.3.1": 50, "5.2.1": 50, "5.1.1": 50, "5.2.2": 50, "5.3.1": 50, "5.1.2": 50, "2.2.2": 50, "2.2.1": 50, "2.3.1": 50, "1.4.3": 50, "2.3.2": 50, "2.2.3": 50, "4.1.1": 50, "4.4.1": 50, "1.9.3": 50, "1.9.1": 50, "1.9.2": 50, "1.5.1": 50, "1.5.2": 50, "1.5.3": 50, "1.7.1": 50, "4.4.2": 50, "4.3.1": 50}, "readNotes": ["К-001"], "reviewedDecks": ["Ф-001"], "passedUnitTests": [], "cardRatings": {}, "lessonDrafts": {"llm-1": {"stage": "theory", "checkIdx": 0, "checkAnswers": [], "checkRevealed": false, "practiceCode": "def trim_chat_history(system_prompt: str, messages: list, max_chars: int) -> list:\n    pass\n", "practiceHintLevel": 0, "practiceStatus": null, "taskCode": "def estimate_llm_cost(input_tokens: int, output_tokens: int, price_per_1m_in: float, price_per_1m_out: float) -> float:\n    pass\n", "taskHintLevel": 0, "taskStatus": null, "practice2HintLevel": 0, "practice2Status": null, "task2HintLevel": 0, "task2Status": null, "debugHintLevel": 0, "debugStatus": null, "stepIdx": 1, "chunkIdx": 0, "fullMode": false, "updatedAt": 1791111544070}}, "soundEnabled": true, "passedBosses": [], "mockCompletedCount": 0, "stackBranch": "django", "unitSortMode": "priority", "diagnosticGaps": ["1.1.1", "1.1.2"], "diagCompleted": true, "diagScore": 30, "diagTotal": 31, "schemaVersion": 3, "updatedAt": 1791113966966, "bestStreak": 3, "completedTasks": [], "readingPositions": {"1.1.1": {"tab": "theory", "kId": "К-001", "stepIdx": 1, "chunkIdx": 3, "fullNoteMode": false, "fId": "Ф-001", "cardIdx": 0, "taskId": 20, "updatedAt": 1791109933703}}, "starDrafts": {"star-incident": {"s": "", "t": "", "a": "", "r": ""}}, "unitTestDrafts": {}, "diagDraft": null, "cardsHubPos": {"echelonFilter": "all", "unitFilter": "all", "deckId": "Ф-001", "cardIdx": 0, "flipped": false, "updatedAt": 1791109933703}, "practiceHubPos": {"echelonFilter": "all", "tierFilter": "all", "catFilter": "all", "statusFilter": "all", "search": "", "taskId": 240, "hintLevel": 0, "updatedAt": 1791109933703}, "sandboxDraft": "", "lastRoute": "/", "bugReports": []}, "ideStatus": {}, "ideDrafts": {"72": "# Задача #72: Создайте namedtuple для хранения координат точки\nfrom collections import namedtuple\n# Заполните значения целевых переменных:\nPoint = None  # TODO\np = None  # TODO"}};
-
 /* ================= STATE ================= */
 const STORE_KEY = 'academy_state_v1';
 function loadState(){
-  const baseDefaults = {streak:0, lastVisit:null, mastered:[], theme:null, completedLessons:[]};
-  const canonicalDefaults = (typeof CANONICAL_USER_HISTORY !== 'undefined' && CANONICAL_USER_HISTORY.academyState)
-    ? Object.assign({}, baseDefaults, CANONICAL_USER_HISTORY.academyState)
-    : baseDefaults;
+  const defaults = {streak:0, lastVisit:null, mastered:[], theme:null, completedLessons:[]};
   try{
     const raw = localStorage.getItem(STORE_KEY);
     if(raw){
       const parsed = JSON.parse(raw);
-      return Object.assign({}, canonicalDefaults, parsed, {
-        mastered: Array.isArray(parsed.mastered) ? Array.from(new Set([...(canonicalDefaults.mastered||[]), ...parsed.mastered])) : (canonicalDefaults.mastered || []),
-        completedLessons: Array.isArray(parsed.completedLessons) ? parsed.completedLessons : (canonicalDefaults.completedLessons || [])
+      return Object.assign({}, defaults, parsed, {
+        mastered: Array.isArray(parsed.mastered) ? parsed.mastered : [],
+        completedLessons: Array.isArray(parsed.completedLessons) ? parsed.completedLessons : []
       });
     }
   }catch(e){}
-  return Object.assign({}, canonicalDefaults);
+  return defaults;
 }
 function saveState(s){
   try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){}
@@ -3898,7 +4162,6 @@ function saveIdeDraft(taskId, codeStr){
     }
   }
   writeWindowNameBackup(state, null, dr);
-  if(typeof scheduleCloudGistPush === "function") scheduleCloudGistPush();
 }
 function setIdeTaskSolved(taskId, codeStr){
   if(IDE_TASKS_BY_ID[taskId] || String(taskId).indexOf('boss-') === 0){
@@ -3914,7 +4177,6 @@ function setIdeTaskSolved(taskId, codeStr){
       try{ localStorage.setItem('practice-ide-status-backup', ser); }catch(ignore){}
       writeWindowNameBackup(state, st);
       syncToIndexedDBAsync(state, st);
-      if(typeof scheduleCloudGistPush === "function") scheduleCloudGistPush();
     }catch(e){
       try{
         evictOlderIdeDrafts();
@@ -3975,52 +4237,232 @@ hydrateAndMergeAllProgressSources();
 bumpStreak();
 restoreFromIndexedDBIfNeeded();
 saveState(state);
-if(typeof pullFromCloudGist === "function") pullFromCloudGist(true);
 
-// Web Audio API subtle micro-feedback
-function playSound(kind){
-  if(!state.soundEnabled) return;
-  try{
-    const Ctx = window.AudioContext || window.webkitAudioContext;
-    if(!Ctx) return;
-    const ctx = new Ctx();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    const now = ctx.currentTime;
-    if(kind === 'xp'){
+// Russian pluralization helper (1 день / 2 дня / 5 дней)
+function pluralizeRu(n, one, two, five){
+  const abs = Math.abs(Number(n) || 0) % 100;
+  const n1 = abs % 10;
+  if(abs > 10 && abs < 20) return five;
+  if(n1 > 1 && n1 < 5) return two;
+  if(n1 === 1) return one;
+  return five;
+}
+window.pluralizeRu = pluralizeRu;
+window.pluralize = pluralizeRu;
+
+// Web Audio API Synthesizer (SoundFx: zero external audio files)
+const SoundFx = {
+  _ctx: null,
+  _getCtx: function(){
+    if(!state || !state.soundEnabled) return null;
+    try{
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if(!Ctx) return null;
+      if(!this._ctx) this._ctx = new Ctx();
+      if(this._ctx.state === 'suspended' && typeof this._ctx.resume === 'function') this._ctx.resume();
+      return this._ctx;
+    }catch(e){ return null; }
+  },
+  playXp: function(){
+    try{
+      const ctx = this._getCtx();
+      if(!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.connect(gain); gain.connect(ctx.destination);
+      const now = ctx.currentTime;
       osc.frequency.setValueAtTime(523.25, now);
       osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.09);
       gain.gain.setValueAtTime(0.06, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
       osc.start(now); osc.stop(now + 0.14);
-    } else if(kind === 'mastery'){
+    }catch(e){}
+  },
+  playSuccess: function(){
+    try{
+      const ctx = this._getCtx();
+      if(!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.connect(gain); gain.connect(ctx.destination);
+      const now = ctx.currentTime;
       osc.frequency.setValueAtTime(523.25, now);
       osc.frequency.setValueAtTime(659.25, now + 0.08);
       osc.frequency.setValueAtTime(783.99, now + 0.16);
       gain.gain.setValueAtTime(0.08, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
-      osc.start(now); osc.stop(now + 0.32);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.34);
+      osc.start(now); osc.stop(now + 0.34);
+    }catch(e){}
+  },
+  playFlip: function(){
+    try{
+      const ctx = this._getCtx();
+      if(!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.connect(gain); gain.connect(ctx.destination);
+      const now = ctx.currentTime;
+      osc.frequency.setValueAtTime(320, now);
+      osc.frequency.exponentialRampToValueAtTime(480, now + 0.045);
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.055);
+      osc.start(now); osc.stop(now + 0.055);
+    }catch(e){}
+  },
+  playTick: function(){
+    try{
+      const ctx = this._getCtx();
+      if(!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.connect(gain); gain.connect(ctx.destination);
+      const now = ctx.currentTime;
+      osc.frequency.setValueAtTime(880, now);
+      gain.gain.setValueAtTime(0.03, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+      osc.start(now); osc.stop(now + 0.035);
+    }catch(e){}
+  }
+};
+window.SoundFx = SoundFx;
+
+function playSound(kind){
+  if(!state || !state.soundEnabled) return;
+  if(kind === 'xp') SoundFx.playXp();
+  else if(kind === 'mastery' || kind === 'success') SoundFx.playSuccess();
+  else if(kind === 'flip') SoundFx.playFlip();
+  else if(kind === 'tick') SoundFx.playTick();
+}
+
+function spawnXpParticle(amount, anchorEl){
+  try{
+    if(!document || !document.body) return;
+    const prev = document.querySelectorAll('.xp-float-particle');
+    if(prev && prev.length > 4){
+      for(let i = 0; i < prev.length - 4; i++){
+        if(prev[i] && prev[i].remove) prev[i].remove();
+      }
     }
+    const el = document.createElement('div');
+    el.className = 'xp-float-particle';
+    el.textContent = `+${amount} XP ⚡`;
+    let x = Math.round((window.innerWidth || 800) / 2 - 40);
+    let y = Math.round((window.innerHeight || 600) / 2);
+    const target = anchorEl || document.activeElement;
+    if(target && typeof target.getBoundingClientRect === 'function'){
+      const r = target.getBoundingClientRect();
+      if(r && (r.width > 0 || r.height > 0)){
+        x = Math.max(16, Math.min((window.innerWidth || 800) - 110, Math.round(r.left + r.width / 2 - 36)));
+        y = Math.max(24, Math.round(r.top - 8));
+      }
+    }
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    document.body.appendChild(el);
+    setTimeout(function(){ try{ el.remove(); }catch(e){} }, 950);
   }catch(e){}
 }
+window.spawnXpParticle = spawnXpParticle;
 
 function dateIsoKey(d){
   const dt = d || new Date();
   return dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
 }
-function awardXp(amount){
+function awardXp(amount, anchorEl){
   ensureExtendedState();
   state.xp += amount;
   const k = dateIsoKey();
   state.dailyXpByDate[k] = (state.dailyXpByDate[k] || 0) + amount;
   saveState(state);
   playSound('xp');
+  spawnXpParticle(amount, anchorEl);
 }
 function todayXp(){
   ensureExtendedState();
   return state.dailyXpByDate[dateIsoKey()] || 0;
 }
+
+// Helper: Build Code Editor with synchronized Line-Numbers Gutter and Sticky Python Accessory Bar
+function buildCodeEditorWithGutterHTML(editorId, codeStr, minHeightPx){
+  const raw = String(codeStr || '');
+  const lineCount = Math.max(1, raw.split('\n').length);
+  const nums = [];
+  for(let i = 1; i <= lineCount; i++) nums.push(i);
+  const mh = minHeightPx || 200;
+  const tokens = [
+    { label: 'Tab ⇥', val: '    ' },
+    { label: ':', val: ':' },
+    { label: '_', val: '_' },
+    { label: '( )', val: '()' },
+    { label: '[ ]', val: '[]' },
+    { label: '{ }', val: '{}' },
+    { label: 'def', val: 'def ' },
+    { label: 'return', val: 'return ' },
+    { label: 'self.', val: 'self.' },
+    { label: 'in', val: 'in ' },
+    { label: '==', val: ' == ' },
+    { label: '->', val: ' -> ' }
+  ];
+  const barBtns = tokens.map(t =>
+    `<button type="button" class="py-key-btn" data-insert-token="${escapeHtmlStr(t.val)}" data-target-editor="${editorId}">${escapeHtmlStr(t.label)}</button>`
+  ).join('');
+  return `
+    <div class="py-editor-shell" data-editor-shell="${editorId}">
+      <div class="py-accessory-bar" role="toolbar" aria-label="Быстрый ввод символов Python">${barBtns}</div>
+      <div class="editor-with-gutter">
+        <div class="line-numbers-gutter" id="${editorId}-gutter" aria-hidden="true">${nums.join('\n')}</div>
+        <textarea id="${editorId}" class="code-editor" spellcheck="false" style="min-height:${mh}px;">${escapeHtmlStr(raw)}</textarea>
+      </div>
+    </div>`;
+}
+window.buildCodeEditorWithGutterHTML = buildCodeEditorWithGutterHTML;
+
+// Helper: Build Segmented Stories-style Flashcard Progress Bar
+function buildFcStoriesBarHTML(deckId, totalCards, curIdx){
+  ensureExtendedState();
+  const ratings = state.cardRatings || {};
+  const count = Math.max(1, Math.min(60, Number(totalCards) || 1));
+  const segs = [];
+  for(let i = 0; i < count; i++){
+    const r = Number(ratings[deckId + ':' + i]) || 0;
+    let cls = 'fc-story-seg';
+    if(i === curIdx) cls += ' fc-story-seg--active';
+    if(r === 4) cls += ' fc-story-seg--r4';
+    else if(r === 3) cls += ' fc-story-seg--r3';
+    else if(r === 2) cls += ' fc-story-seg--r2';
+    else if(r === 1) cls += ' fc-story-seg--r1';
+    segs.push(`<div class="${cls}" title="Карточка ${i+1}"></div>`);
+  }
+  return `<div class="fc-stories-bar" aria-label="Прогресс колоды">${segs.join('')}</div>`;
+}
+window.buildFcStoriesBarHTML = buildFcStoriesBarHTML;
+
+// Helper: Build Interactive CPython Memory Layout SVG/HTML Diagram for Consolidation Lab
+function buildCPythonMemoryDiagramHTML(activeK, skillId){
+  const isDictOrSet = /1\.2\.[23]|4\.3\.2|К-01[2-9]|К-118/.test(String(activeK) + ' ' + String(skillId));
+  return `
+    <div class="cpython-mem-diagram">
+      <div class="cpython-mem-title">🔬 CPython Memory Layout · ${isDictOrSet ? 'Compact Dict Hash Table' : 'PyObject & Pointer Array'}</div>
+      <div class="cpython-mem-grid">
+        <div class="cpython-mem-box">
+          <div style="font-weight:700;color:var(--moss-deep);margin-bottom:3px;">PyObject Header (24 B)</div>
+          <div><code>ob_refcnt</code> · счётчик ссылок GC</div>
+          <div><code>ob_type</code> ➔ <code>&amp;PyList_Type</code></div>
+          <div><code>ob_item</code> ➔ массив указателей <code>PyObject*</code> (<span class="math-formula">O(1)</span> индекс)</div>
+        </div>
+        <div class="cpython-mem-box">
+          <div style="font-weight:700;color:var(--clay-deep);margin-bottom:3px;">Compact Dict (Python 3.6+)</div>
+          <div><code>dk_indices</code> · разреженная таблица индексов (1–8 B)</div>
+          <div><code>dk_entries</code> · плотный массив <code>(hash, key*, val*)</code> (<span class="math-formula">O(1)</span> поиск)</div>
+        </div>
+      </div>
+    </div>`;
+}
+window.buildCPythonMemoryDiagramHTML = buildCPythonMemoryDiagramHTML;
 
 // Register all 7 Mastery Tracks (Python, Web, Backend, Algorithms, Databases, Architecture, Infrastructure)
 const MASTERY_TRACKS = {
@@ -4207,9 +4649,21 @@ function mpLabel(mp){
   return 'Не начато (0 MP)';
 }
 
-// Pomodoro Focus Timer
+// Pomodoro Focus Timer (synced across Dashboard, Topbar, and Sidebar)
 let pomoState = { running: false, secondsLeft: 15 * 60, modeMin: 15, intervalId: null };
+function syncPomoDisplays(){
+  const formatted = formatPomo(pomoState.secondsLeft);
+  ['pomo-time-display', 'topbar-pomo-time', 'sidebar-pomo-time'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.textContent = formatted;
+  });
+  ['topbar-pomo-btn', 'sidebar-pomo-btn'].forEach(id => {
+    const btn = document.getElementById(id);
+    if(btn) btn.classList.toggle('is-running', !!pomoState.running);
+  });
+}
 function togglePomodoro(mins){
+  playSound('tick');
   if(mins && mins !== pomoState.modeMin){
     pomoState.modeMin = mins;
     pomoState.secondsLeft = mins * 60;
@@ -4224,17 +4678,18 @@ function togglePomodoro(mins){
     pomoState.intervalId = setInterval(function(){
       if(pomoState.secondsLeft > 0){
         pomoState.secondsLeft--;
-        const el = document.getElementById('pomo-time-display');
-        if(el) el.textContent = formatPomo(pomoState.secondsLeft);
+        syncPomoDisplays();
       } else {
         clearInterval(pomoState.intervalId);
         pomoState.intervalId = null;
         pomoState.running = false;
+        playSound('success');
         awardXp(25);
         render();
       }
     }, 1000);
   }
+  syncPomoDisplays();
   render();
 }
 function formatPomo(sec){
@@ -4242,6 +4697,10 @@ function formatPomo(sec){
   const s = sec % 60;
   return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
 }
+window.syncPomoDisplays = syncPomoDisplays;
+window.togglePomodoro = togglePomodoro;
+window.formatPomo = formatPomo;
+
 
 /* ================= INTERVIEW-FIRST PRIORITY ARCHITECTURE (4 ECHELONS + PARALLEL STACK BRANCHES) ================= */
 const INTERVIEW_ECHELONS = {
@@ -4705,13 +5164,12 @@ function buildPriorityRoadmapWidgetHTML(opts){
 
   const cardsHTML = echelons.map(ep => {
     const meta = getEchelonMeta(ep.tier);
-    const targetSk = getFirstUnmasteredSkillInEchelon(ep.tier, o.trackKey);
     return `
       <div class="echelon-card">
         <div>
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:4px;">
+          <div class="echelon-card__header">
             <span class="echelon-badge echelon-badge--t${ep.tier}">${meta.label}</span>
-            <span class="meta" style="font-weight:700;">${ep.pct}%</span>
+            <span class="echelon-pct-chip">${ep.pct}%</span>
           </div>
           <div class="meta" style="font-size:.76rem;line-height:1.38;margin-bottom:6px;">${meta.desc}</div>
         </div>
@@ -5265,6 +5723,20 @@ function viewPythonSkill(sid){
         </div>
       </div>`;
 
+    const floatingStepNavHTML = `
+      <div class="floating-step-nav">
+        <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;">
+          ${sk.kIds.map(kid => `<button class="btn ${kid===activeK?'btn-primary':'btn-ghost'}" style="padding:4px 9px;font-size:.73rem;" data-py-select-k="${kid}">${state.readNotes.includes(kid)?'✓ ':''}${kid}</button>`).join('')}
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <button class="btn btn-ghost" style="padding:4px 9px;font-size:.73rem;" data-py-step="${Math.max(0, stepIdx-1)}" ${stepIdx===0?'disabled':''}>← Шаг ${stepIdx}</button>
+          <span class="meta" style="font-size:.73rem;font-weight:700;">Шаг ${stepIdx+1}/${steps.length}</span>
+          ${stepIdx + 1 < steps.length
+            ? `<button class="btn btn-ghost" style="padding:4px 9px;font-size:.73rem;" data-py-next-step="${stepIdx+1}">Шаг ${stepIdx+2} →</button>`
+            : `<button class="btn btn-primary" style="padding:4px 9px;font-size:.73rem;" data-py-finish-note="${activeK}">К карточкам →</button>`}
+        </div>
+      </div>`;
+
     const navDrawerHTML = `
       <details class="cocoon-details cocoon-details--compact" style="margin-top:12px;">
         <summary><span>🧭 Навигация по теме (${activeK})</span><span class="meta">Конспекты (${sk.kIds.length}) ▾</span></summary>
@@ -5289,9 +5761,33 @@ function viewPythonSkill(sid){
         </div>
       </details>`;
 
+    const previewDeckId = sk.fIds && sk.fIds[0];
+    const previewDeck = (previewDeckId && ALL_DECKS_COMBINED[previewDeckId]) || null;
+    const previewCard = (previewDeck && previewDeck.cards && previewDeck.cards[0]) || null;
+    const labAsideHTML = `
+      <aside class="skill-lab-aside" aria-label="Лаборатория закрепления">
+        <div class="skill-lab-card">
+          <h4>🧪 Лаборатория закрепления (${sk.id})</h4>
+          ${buildCPythonMemoryDiagramHTML(activeK, sk.id)}
+          <div class="meta" style="font-size:.74rem;margin:8px 0 4px;font-weight:600;">⚡ Экспресс-песочница Python 3.13:</div>
+          <textarea id="skill-lab-scratchpad" class="code-editor" spellcheck="false" style="min-height:92px;font-size:.78rem;padding:8px 10px;"># Проверь идею из конспекта ${activeK}\nimport sys\ndata = {"a": 1, "b": 2}\nprint("size:", sys.getsizeof(data), "keys:", list(data.keys()))</textarea>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-top:6px;">
+            <button type="button" class="btn btn-primary" style="padding:5px 10px;font-size:.75rem;" data-run-lab-scratchpad>▶ Запустить код</button>
+            <button type="button" class="link-quiet" style="font-size:.73rem;" data-py-tab="code">К задаче IDE →</button>
+          </div>
+          <pre id="skill-lab-output" class="inline-code-out hidden" style="margin-top:6px;font-size:.76rem;"></pre>
+        </div>
+        ${previewCard ? `
+        <div class="skill-lab-card">
+          <h4>🃏 Блиц-карточка (${previewDeckId})</h4>
+          <div style="font-size:.82rem;font-weight:600;margin-bottom:6px;">${formatRichInlineText(previewCard.q)}</div>
+          <button type="button" class="btn btn-ghost" style="width:100%;justify-content:center;padding:6px 10px;font-size:.76rem;" data-py-tab="cards">Открыть колоду ${previewDeckId} (${previewDeck.cards.length}) →</button>
+        </div>` : ''}
+      </aside>`;
+
     bodyHTML = pySkillViewState.fullNoteMode
       ? `${navDrawerHTML}` + steps.map((st, i) => `<div class="microstep-card"><div class="topic-badge">Шаг ${i+1} из ${steps.length}</div><h3>${st.title}</h3><div class="lesson-theory">${decorateCodeBlocksWithRunBtn(st.html)}</div></div>`).join('')
-      : `${feedHTML}${primaryActionHTML}${navDrawerHTML}`;
+      : `<div class="skill-split-layout"><div class="skill-theory-col">${feedHTML}${primaryActionHTML}${floatingStepNavHTML}${navDrawerHTML}</div>${labAsideHTML}</div>`;
   } else if(pySkillViewState.tab === 'cards'){
     const activeF = pySkillViewState.fId || sk.fIds[0];
     const deckObj = ALL_DECKS_COMBINED[activeF] || {id: activeF, title: activeF, cards: []};
@@ -5315,6 +5811,7 @@ function viewPythonSkill(sid){
         </div>
       </div>
       <div class="fc-stage" style="margin:10px 0;">
+        ${buildFcStoriesBarHTML(deckObj.id, cards.length, cIdx)}
         <div class="fc-card ${pySkillViewState.cardFlipped?'fc-card--Answer':''}" data-py-flip-card>
           <div>
             <div class="topic-badge">${pySkillViewState.cardFlipped ? 'Ответ (нажми или Пробел)' : 'Вопрос (нажми или Пробел, чтобы увидеть ответ)'}</div>
@@ -5323,6 +5820,7 @@ function viewPythonSkill(sid){
           </div>
           <div class="meta" style="margin-top:14px;">Нажми на карточку для переворота · Карточка ${cIdx+1}/${cards.length}</div>
         </div>
+        <div class="fc-swipe-hint"><span>⬅️ Свайп влево: 1 · Снова</span><span>⬆️ Свайп вверх: 3 · Хорошо</span><span>Свайп вправо: 4 · Легко ➡️</span></div>
         ${pySkillViewState.cardFlipped ? `
           <div class="fc-rate-row">
             <button class="btn btn-ghost" data-py-rate-card="1">1 · Снова (в повтор)</button>
@@ -5369,14 +5867,16 @@ function viewPythonSkill(sid){
     const curTaskIdx = tIds.indexOf(activeTid);
     const nextUnsolvedTid = tIds.find(tid => tid !== activeTid && solvedMap[tid] !== 'solved') || (curTaskIdx >= 0 && curTaskIdx + 1 < tIds.length ? tIds[curTaskIdx + 1] : null);
     let runFeedback = '';
-    if(pySkillViewState.runStatus === 'running') runFeedback = `<p class="meta" style="margin-top:10px;">Выполняю тесты в Python…</p>`;
+    if(pySkillViewState.runStatus === 'running') runFeedback = `<div class="test-running-shimmer" style="margin-top:10px;">⚡ Выполняю тесты в Python…</div>`;
     else if(pySkillViewState.runStatus === 'pass') runFeedback = `
-      <div class="result-box--pass">${ICONS.check} Все тесты пройдены! (+25 XP, навык закреплён на практике!)\n${pySkillViewState.runOutput||''}</div>
+      <div class="result-box--pass correct-pulse-anim">${ICONS.check} Все тесты пройдены! (+25 XP, навык закреплён на практике!)\n${pySkillViewState.runOutput||''}</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
         ${nextUnsolvedTid ? `<button class="btn btn-primary" data-py-select-task="${nextUnsolvedTid}">Следующая задача навыка (#${nextUnsolvedTid}) →</button>` : ''}
         <a href="#${tr.routePrefix}/unittest/${sk.unitId}" class="btn btn-clay">⚡ Пройти рубежный Unit Test ${sk.unitId} (на 100 MP 👑)</a>
       </div>`;
-    else if(pySkillViewState.runStatus === 'fail') runFeedback = `<div class="result-box--fail">Пока не проходит:\n${pySkillViewState.runOutput||''}</div>`;
+    else if(pySkillViewState.runStatus === 'fail') runFeedback = `
+      <div class="result-box--fail">Пока не проходит:\n${pySkillViewState.runOutput||''}</div>
+      <div style="margin-top:8px;"><button class="btn btn-ghost" style="padding:6px 12px;font-size:.78rem;" data-py-task-hint>💡 Разобрать ошибку с Сократовским интервьюером (${pySkillViewState.hintLevel}/${socraticHints.length})</button></div>`;
 
     bodyHTML = `
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">${tSelector}</div>
@@ -5390,7 +5890,7 @@ function viewPythonSkill(sid){
         </div>
         <h2 style="margin-bottom:10px;">${tObj.title}</h2>
         <div class="lesson-theory" style="margin-bottom:12px;">${tObj.desc}</div>
-        <textarea id="py-skill-editor" class="code-editor" spellcheck="false" style="min-height:180px;">${escapeHtmlStr(pySkillViewState.codeDraft)}</textarea>
+        ${buildCodeEditorWithGutterHTML('py-skill-editor', pySkillViewState.codeDraft, 180)}
         <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
           <button class="btn-glass-emerald" data-py-run-task="${tObj.id}">${ICONS.play} Проверить решение (Ctrl+Enter)</button>
           <button class="btn btn-ghost" data-py-task-hint ${pySkillViewState.hintLevel>=socraticHints.length?'disabled':''}>💡 Сократовская наводка (${pySkillViewState.hintLevel}/${socraticHints.length})</button>
@@ -5402,7 +5902,7 @@ function viewPythonSkill(sid){
   }
 
   return `
-    <div class="container">
+    <div class="container ${pySkillViewState.tab==='theory' && !pySkillViewState.fullNoteMode ? 'container--wide' : ''}">
       ${focusTopbarHTML}
       ${celebrationBanner}
       ${showTopTabs ? tabsHTML : ''}
@@ -5706,14 +6206,18 @@ function viewCardsHub(){
         </div>
       </div>
       <div class="fc-stage">
-        <div class="fc-card ${cardsHubState.flipped?'fc-card--Answer':''}" data-hub-flip>
-          <div>
-            <div class="topic-badge">${cardsHubState.flipped ? 'Ответ' : 'Вопрос (нажми или Пробел)'}</div>
-            <div class="fc-q">${formatRichInlineText(cur.q)}</div>
-            ${cardsHubState.flipped ? `<div class="fc-a">${formatRichInlineText(cur.a)}</div>` : ''}
+        ${buildFcStoriesBarHTML(deck.id, cards.length, cIdx)}
+        <div class="fc-card fc-card--3d ${cardsHubState.flipped?'fc-card--flipped fc-card--Answer':''}" data-hub-flip>
+          <div class="fc-card-inner">
+            <div>
+              <div class="topic-badge">${cardsHubState.flipped ? 'Ответ' : 'Вопрос (нажми или Пробел)'}</div>
+              <div class="fc-q">${formatRichInlineText(cur.q)}</div>
+              ${cardsHubState.flipped ? `<div class="fc-a">${formatRichInlineText(cur.a)}</div>` : ''}
+            </div>
+            <div class="meta" style="margin-top:16px;">Нажми на карточку или клавишу Пробел</div>
           </div>
-          <div class="meta" style="margin-top:16px;">Нажми на карточку или клавишу Пробел</div>
         </div>
+        <div class="fc-swipe-hint"><span>⬅️ Свайп влево: 1 · Снова</span><span>⬆️ Свайп вверх: 3 · Хорошо</span><span>Свайп вправо: 4 · Легко ➡️</span></div>
         <div class="fc-rate-row">
           <button class="btn btn-ghost" data-hub-rate="1">1 · Снова</button>
           <button class="btn btn-ghost" data-hub-rate="2">2 · Трудно (+2 XP)</button>
@@ -5736,7 +6240,8 @@ let practiceHubState = {
   codeDraft: '',
   hintLevel: typeof _initPracPos.hintLevel === 'number' ? _initPracPos.hintLevel : 0,
   runStatus: null,
-  runOutput: ''
+  runOutput: '',
+  mobileFiltersOpen: false
 };
 function savePracticeHubPosState(){
   ensureExtendedState();
@@ -5803,6 +6308,7 @@ function viewPracticeHub(){
   });
 
   const curTask = IDE_TASKS_BY_ID[practiceHubState.taskId] || filtered[0] || IDE_TASKS[0];
+  const curFilteredIdx = Math.max(0, filtered.findIndex(t => t.id === curTask.id));
   const curTaskEchelon = getTaskInterviewTier(curTask.id);
   const socraticHints = buildSocraticHintsForTask(curTask);
   const socraticLabels = [
@@ -5816,13 +6322,34 @@ function viewPracticeHub(){
   ).join('');
 
   let runFeedback = '';
-  if(practiceHubState.runStatus === 'running') runFeedback = `<p class="meta" style="margin-top:10px;">Выполняю pytest-проверки в браузере…</p>`;
-  else if(practiceHubState.runStatus === 'pass') runFeedback = `<div class="result-box--pass">${ICONS.check} Задача #${curTask.id} решена верно! (+25 XP)\n${practiceHubState.runOutput||''}</div>`;
-  else if(practiceHubState.runStatus === 'fail') runFeedback = `<div class="result-box--fail">Тесты не прошли:\n${practiceHubState.runOutput||''}</div>`;
+  if(practiceHubState.runStatus === 'running') runFeedback = `<div class="test-running-shimmer" style="margin-top:10px;">⚡ Выполняю pytest-проверки в браузере…</div>`;
+  else if(practiceHubState.runStatus === 'pass') runFeedback = `<div class="result-box--pass correct-pulse-anim">${ICONS.check} Задача #${curTask.id} решена верно! (+25 XP)\n${practiceHubState.runOutput||''}</div>`;
+  else if(practiceHubState.runStatus === 'fail') runFeedback = `
+    <div class="result-box--fail">Тесты не прошли:\n${practiceHubState.runOutput||''}</div>
+    <div style="margin-top:8px;"><button class="btn btn-ghost" style="padding:6px 12px;font-size:.78rem;" data-prac-hint>💡 Разобрать ошибку с Сократовским интервьюером (${practiceHubState.hintLevel}/${socraticHints.length})</button></div>`;
 
   const taskOptions = filtered.slice(0, 500).map(t =>
     `<option value="${t.id}" ${t.id===curTask.id?'selected':''}>${solvedMap[t.id]==='solved'?'✓ ':''}[Эшелон ${getTaskInterviewTier(t.id)}] #${t.id} [${t.tier}] ${t.title} (${t.topic})</option>`
   ).join('');
+
+  const isAllQuick = practiceHubState.echelonFilter === 'all' && practiceHubState.tierFilter === 'all' && practiceHubState.statusFilter === 'all';
+  const quickChipsHTML = `
+    <div class="prac-quick-chips">
+      <button type="button" class="prac-chip ${isAllQuick?'active':''}" data-prac-chip="all">🎯 Все (401)</button>
+      <button type="button" class="prac-chip ${practiceHubState.echelonFilter==='1'?'active':''}" data-prac-chip="ech1">🚨 Эшелон 1</button>
+      <button type="button" class="prac-chip ${practiceHubState.echelonFilter==='2'?'active':''}" data-prac-chip="ech2">🔥 Эшелон 2</button>
+      <button type="button" class="prac-chip ${practiceHubState.tierFilter==='🥚 Уровень 1'?'active':''}" data-prac-chip="tier1">🥚 Уровень 1</button>
+      <button type="button" class="prac-chip ${practiceHubState.statusFilter==='unsolved'?'active':''}" data-prac-chip="unsolved">⏳ Не решённые</button>
+      <button type="button" class="prac-chip ${practiceHubState.echelonFilter==='gaps'?'active':''}" data-prac-chip="gaps">🎯 Пробелы</button>
+      <button type="button" class="prac-chip prac-filters-toggle" data-toggle-prac-filters>⚙️ Фильтры ▾</button>
+    </div>`;
+
+  const taskSwiperHTML = `
+    <div class="prac-task-swiper">
+      <button type="button" class="btn btn-ghost" style="padding:5px 10px;font-size:.76rem;" data-prac-step="-1" ${filtered.length<=1?'disabled':''}>‹ Пред.</button>
+      <span style="font-size:.8rem;font-weight:700;text-align:center;">Задача #${curTask.id} (${curFilteredIdx + 1} из ${filtered.length})</span>
+      <button type="button" class="btn btn-ghost" style="padding:5px 10px;font-size:.76rem;" data-prac-step="1" ${filtered.length<=1?'disabled':''}>След. ›</button>
+    </div>`;
 
   return `
     <div class="container">
@@ -5835,34 +6362,38 @@ function viewPracticeHub(){
       </div>
 
       <div class="panel" style="padding:16px 18px;">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:8px;margin-bottom:10px;">
-          <select id="prac-echelon-filter" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.84rem;">
-            <option value="all" ${practiceHubState.echelonFilter==='all'?'selected':''}>🎯 Все эшелоны (1–4)</option>
-            <option value="1" ${practiceHubState.echelonFilter==='1'?'selected':''}>🚨 Эшелон 1 · Скрининг и база</option>
-            <option value="2" ${practiceHubState.echelonFilter==='2'?'selected':''}>🔥 Эшелон 2 · Тех-ядро и стек</option>
-            <option value="3" ${practiceHubState.echelonFilter==='3'?'selected':''}>⚡ Эшелон 3 · Продакшен</option>
-            <option value="4" ${practiceHubState.echelonFilter==='4'?'selected':''}>👑 Эшелон 4 · Резерв</option>
-            <option value="gaps" ${practiceHubState.echelonFilter==='gaps'?'selected':''}>🎯 Пробелы диагностики</option>
+        ${quickChipsHTML}
+        ${taskSwiperHTML}
+        <div id="prac-filters-drawer" class="prac-filters-drawer prac-filters-collapsible ${practiceHubState.mobileFiltersOpen?'is-open':''}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:8px;margin-bottom:10px;">
+            <select id="prac-echelon-filter" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.84rem;">
+              <option value="all" ${practiceHubState.echelonFilter==='all'?'selected':''}>🎯 Все эшелоны (1–4)</option>
+              <option value="1" ${practiceHubState.echelonFilter==='1'?'selected':''}>🚨 Эшелон 1 · Скрининг и база</option>
+              <option value="2" ${practiceHubState.echelonFilter==='2'?'selected':''}>🔥 Эшелон 2 · Тех-ядро и стек</option>
+              <option value="3" ${practiceHubState.echelonFilter==='3'?'selected':''}>⚡ Эшелон 3 · Продакшен</option>
+              <option value="4" ${practiceHubState.echelonFilter==='4'?'selected':''}>👑 Эшелон 4 · Резерв</option>
+              <option value="gaps" ${practiceHubState.echelonFilter==='gaps'?'selected':''}>🎯 Пробелы диагностики</option>
+            </select>
+            <select id="prac-tier-filter" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.84rem;">
+              <option value="all" ${practiceHubState.tierFilter==='all'?'selected':''}>Все уровни (🥚..👑)</option>
+              ${tiers.map(tr => `<option value="${tr}" ${practiceHubState.tierFilter===tr?'selected':''}>${tr}</option>`).join('')}
+            </select>
+            <select id="prac-cat-filter" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.84rem;">
+              <option value="all" ${practiceHubState.catFilter==='all'?'selected':''}>Все модули (401)</option>
+              <option value="python" ${practiceHubState.catFilter==='python'?'selected':''}>🐍 Python Core 1.1–1.9</option>
+              <option value="backend" ${practiceHubState.catFilter==='backend'?'selected':''}>🌐 Backend, SQL, FastAPI, Docker</option>
+            </select>
+            <select id="prac-status-filter" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.84rem;">
+              <option value="all" ${practiceHubState.statusFilter==='all'?'selected':''}>Все статусы</option>
+              <option value="unsolved" ${practiceHubState.statusFilter==='unsolved'?'selected':''}>Не решённые</option>
+              <option value="solved" ${practiceHubState.statusFilter==='solved'?'selected':''}>✓ Решённые</option>
+            </select>
+            <input id="prac-search-input" type="text" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.84rem;" placeholder="Поиск по названию или #ID…" value="${escapeHtmlStr(practiceHubState.search)}">
+          </div>
+          <select id="prac-task-select" class="code-editor" style="min-height:auto;padding:10px 12px;font-weight:600;">
+            ${taskOptions}
           </select>
-          <select id="prac-tier-filter" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.84rem;">
-            <option value="all" ${practiceHubState.tierFilter==='all'?'selected':''}>Все уровни (🥚..👑)</option>
-            ${tiers.map(tr => `<option value="${tr}" ${practiceHubState.tierFilter===tr?'selected':''}>${tr}</option>`).join('')}
-          </select>
-          <select id="prac-cat-filter" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.84rem;">
-            <option value="all" ${practiceHubState.catFilter==='all'?'selected':''}>Все модули (401)</option>
-            <option value="python" ${practiceHubState.catFilter==='python'?'selected':''}>🐍 Python Core 1.1–1.9</option>
-            <option value="backend" ${practiceHubState.catFilter==='backend'?'selected':''}>🌐 Backend, SQL, FastAPI, Docker</option>
-          </select>
-          <select id="prac-status-filter" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.84rem;">
-            <option value="all" ${practiceHubState.statusFilter==='all'?'selected':''}>Все статусы</option>
-            <option value="unsolved" ${practiceHubState.statusFilter==='unsolved'?'selected':''}>Не решённые</option>
-            <option value="solved" ${practiceHubState.statusFilter==='solved'?'selected':''}>✓ Решённые</option>
-          </select>
-          <input id="prac-search-input" type="text" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.84rem;" placeholder="Поиск по названию или #ID…" value="${escapeHtmlStr(practiceHubState.search)}">
         </div>
-        <select id="prac-task-select" class="code-editor" style="min-height:auto;padding:10px 12px;font-weight:600;">
-          ${taskOptions}
-        </select>
       </div>
 
       <div class="microstep-card">
@@ -5875,7 +6406,7 @@ function viewPracticeHub(){
         </div>
         <h2 style="margin-bottom:10px;">${curTask.title}</h2>
         <div class="lesson-theory" style="margin-bottom:14px;">${curTask.desc}</div>
-        <textarea id="prac-code-editor" class="code-editor" spellcheck="false" style="min-height:220px;">${escapeHtmlStr(practiceHubState.codeDraft)}</textarea>
+        ${buildCodeEditorWithGutterHTML('prac-code-editor', practiceHubState.codeDraft, 220)}
         <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
           <button class="btn btn-primary" data-prac-run="${curTask.id}">${ICONS.play} Запустить pytest (Ctrl+Enter)</button>
           <button class="btn btn-ghost" data-prac-hint ${practiceHubState.hintLevel>=socraticHints.length?'disabled':''}>💡 Сократовская подсказка (${practiceHubState.hintLevel}/${socraticHints.length})</button>
@@ -6199,7 +6730,8 @@ function viewModuleBoss(trackKey){
       runOutput: ''
     };
   }
-  const isPassed = (state.passedBosses || []).includes(tr.key);
+  const isPassed = (state.passedBosses || []).includes(tr.key) || bossViewState.runStatus === 'pass';
+  const bossHpPct = isPassed ? 0 : (bossViewState.runStatus === 'running' ? 35 : 100);
   const socraticHints = buildSocraticHintsForTask(boss);
   const socraticLabels = [
     'Уровень 0 (Zero Hint — Граничные условия)',
@@ -6212,21 +6744,38 @@ function viewModuleBoss(trackKey){
   ).join('');
 
   let runFeedback = '';
-  if(bossViewState.runStatus === 'running') runFeedback = `<p class="meta" style="margin-top:10px;">Запускаю боевые тесты Босса модуля…</p>`;
-  else if(bossViewState.runStatus === 'pass') runFeedback = `<div class="result-box--pass">${ICONS.check} 👑 Босс модуля «${tr.title}» повержен! (+100 XP, все навыки модуля повышены до 100 MP!)\n${bossViewState.runOutput||''}</div>`;
+  if(bossViewState.runStatus === 'running') runFeedback = `<div class="test-running-shimmer" style="margin-top:10px;">⚔️ Атака на Босса: прогоняю боевые тесты модуля…</div>`;
+  else if(bossViewState.runStatus === 'pass') runFeedback = `<div class="result-box--pass correct-pulse-anim">${ICONS.check} 👑 Босс модуля «${tr.title}» повержен! (+100 XP, все навыки модуля повышены до 100 MP!)\n${bossViewState.runOutput||''}</div>`;
   else if(bossViewState.runStatus === 'fail') runFeedback = `<div class="result-box--fail">Испытание Босса пока не пройдено:\n${bossViewState.runOutput||''}</div>`;
+
+  const victoryBannerHTML = isPassed ? `
+    <div class="boss-victory-banner">
+      <div style="font-size:1.5rem;">🏆👑✨</div>
+      <div>
+        <div style="font-weight:800;font-size:.98rem;">Босс модуля «${tr.title}» повержен!</div>
+        <div class="meta" style="font-size:.8rem;">Все навыки трека получили ранг Мастерства (100 MP). Награда +100 XP зачислена.</div>
+      </div>
+    </div>` : '';
 
   return `
     <div class="container">
       <a href="#${tr.routePrefix}" class="back-link">${ICONS.chevronLeft} ${tr.backLabel}</a>
-      <div class="microstep-card">
+      <div class="microstep-card boss-arena-card">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
           <span class="topic-badge" style="margin:0;">${boss.tier} · ${boss.topic} · +100 XP</span>
           ${isPassed ? `<span class="state-tag state-tag--mastered" style="margin:0;">👑 Босс взят</span>` : `<span class="state-tag state-tag--available" style="margin:0;">Финальное испытание модуля</span>`}
         </div>
+        <div class="boss-hp-wrap boss-hp-bar">
+          <div class="boss-hp-header boss-hp-bar__label">
+            <span>🐉 HP Босса модуля «${tr.title}»</span>
+            <span class="boss-hp-val">${bossHpPct}% HP</span>
+          </div>
+          <div class="boss-hp-track"><div class="boss-hp-fill boss-hp-bar__fill" style="width:${bossHpPct}%;"></div></div>
+        </div>
+        ${victoryBannerHTML}
         <h1 style="margin-bottom:10px;">👑 ${boss.title}</h1>
         <div class="lesson-theory" style="margin-bottom:14px;">${boss.desc}</div>
-        <textarea id="boss-code-editor" class="code-editor" spellcheck="false" style="min-height:240px;">${escapeHtmlStr(bossViewState.codeDraft)}</textarea>
+        ${buildCodeEditorWithGutterHTML('boss-code-editor', bossViewState.codeDraft, 'min-height:240px;', 'boss-code-editor')}
         <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
           <button class="btn btn-primary" data-boss-run="${tr.key}">${ICONS.play} Проверить решение Босса (Ctrl+Enter)</button>
           <button class="btn btn-ghost" data-boss-hint ${bossViewState.hintLevel>=socraticHints.length?'disabled':''}>💡 Сократовская наводка (${bossViewState.hintLevel}/${socraticHints.length})</button>
@@ -6297,6 +6846,9 @@ let mockInterviewState = {
   secondsLeft: 20 * 60,
   running: false,
   intervalId: null,
+  pitchSecondsLeft: 120,
+  pitchRunning: false,
+  pitchIntervalId: null,
   taskId: 240,
   codeDraft: '',
   hintLevel: 0,
@@ -6384,6 +6936,13 @@ function toggleMockTimer(){
         mockInterviewState.secondsLeft--;
         const el = document.getElementById('mock-timer-display');
         if(el) el.textContent = formatPomo(mockInterviewState.secondsLeft);
+        const ringEl = document.getElementById('mock-timer-ring-fg');
+        if(ringEl){
+          const totalSec = 20 * 60;
+          const circum = 138.2;
+          const offset = circum * (1 - (mockInterviewState.secondsLeft / totalSec));
+          ringEl.setAttribute('stroke-dashoffset', String(offset.toFixed(1)));
+        }
       } else {
         clearInterval(mockInterviewState.intervalId);
         mockInterviewState.intervalId = null;
@@ -6400,6 +6959,37 @@ function resetMockTimer(){
   mockInterviewState.running = false;
   if(mockInterviewState.intervalId){ clearInterval(mockInterviewState.intervalId); mockInterviewState.intervalId = null; }
   mockInterviewState.secondsLeft = 20 * 60;
+  render();
+}
+
+function toggleStarPitchTimer(){
+  syncActiveEditorDrafts();
+  if(mockInterviewState.pitchRunning){
+    mockInterviewState.pitchRunning = false;
+    if(mockInterviewState.pitchIntervalId){ clearInterval(mockInterviewState.pitchIntervalId); mockInterviewState.pitchIntervalId = null; }
+  } else {
+    mockInterviewState.pitchRunning = true;
+    mockInterviewState.pitchIntervalId = setInterval(function(){
+      if(mockInterviewState.pitchSecondsLeft > 0){
+        mockInterviewState.pitchSecondsLeft--;
+        const el = document.getElementById('star-pitch-display');
+        if(el) el.textContent = formatPomo(mockInterviewState.pitchSecondsLeft);
+      } else {
+        clearInterval(mockInterviewState.pitchIntervalId);
+        mockInterviewState.pitchIntervalId = null;
+        mockInterviewState.pitchRunning = false;
+        render();
+      }
+    }, 1000);
+  }
+  render();
+}
+
+function resetStarPitchTimer(){
+  syncActiveEditorDrafts();
+  mockInterviewState.pitchRunning = false;
+  if(mockInterviewState.pitchIntervalId){ clearInterval(mockInterviewState.pitchIntervalId); mockInterviewState.pitchIntervalId = null; }
+  mockInterviewState.pitchSecondsLeft = 120;
   render();
 }
 
@@ -6429,12 +7019,15 @@ function viewMockInterview(){
     'Уровень 3 (Tactical Hint — Сигнатура и контракт)'
   ];
   const shownHints = socraticHints.slice(0, mockInterviewState.hintLevel).map((h, idx) =>
-    `<div class="hint-box"><strong>${socraticLabels[idx] || ('Уровень опоры ' + idx)}:</strong> ${h}</div>`
+    `<div class="chat-bubble chat-bubble--interviewer hint-box">
+      <div class="chat-bubble__author">🎙️ Tech Lead · ${socraticLabels[idx] || ('Уровень опоры ' + idx)}</div>
+      <div>${h}</div>
+    </div>`
   ).join('');
 
   let runFeedback = '';
-  if(mockInterviewState.runStatus === 'running') runFeedback = `<p class="meta" style="margin-top:10px;">Проверяю код кандидата на тестовом наборе…</p>`;
-  else if(mockInterviewState.runStatus === 'pass') runFeedback = `<div class="result-box--pass">${ICONS.check} Live-Coding раунд успешно пройден! (+40 XP, уровень подсказок сброшен к Уровню 0)\n${mockInterviewState.runOutput||''}</div>`;
+  if(mockInterviewState.runStatus === 'running') runFeedback = `<div class="test-running-shimmer" style="margin-top:10px;">⏳ Проверяю код кандидата на тестовом наборе…</div>`;
+  else if(mockInterviewState.runStatus === 'pass') runFeedback = `<div class="result-box--pass correct-pulse-anim">${ICONS.check} Live-Coding раунд успешно пройден! (+40 XP, уровень подсказок сброшен к Уровню 0)\n${mockInterviewState.runOutput||''}</div>`;
   else if(mockInterviewState.runStatus === 'fail') runFeedback = `<div class="result-box--fail">Тесты собеседования не прошли:\n${mockInterviewState.runOutput||''}</div>`;
 
   const effEchelon = getActiveMockEchelon();
@@ -6463,17 +7056,30 @@ function viewMockInterview(){
     const ev = mockInterviewState.starEval;
     const rows = ev.checks.map(c => `<div style="margin:4px 0;">${c.ok ? '✓' : '✗'} ${c.label}</div>`).join('');
     starEvalHTML = `
-      <div class="${ev.passed ? 'result-box--pass' : 'result-box--fail'}" style="margin-top:12px;">
+      <div class="${ev.passed ? 'result-box--pass correct-pulse-anim' : 'result-box--fail'}" style="margin-top:12px;">
         <strong>Оценка STAR-ответа: ${ev.score} из ${ev.total} критериев Senior-интервьюера ${ev.passed ? '(+30 XP!)' : ''}</strong>
         <div style="margin-top:6px;">${rows}</div>
       </div>`;
   }
 
+  const totalSec = 20 * 60;
+  const ringCircum = 138.2;
+  const ringOffset = (ringCircum * (1 - (mockInterviewState.secondsLeft / totalSec))).toFixed(1);
+  const isWarningTime = mockInterviewState.secondsLeft <= 300;
+  const isDangerTime = mockInterviewState.secondsLeft <= 60;
+  const ringColor = isDangerTime ? '#ef4444' : (isWarningTime ? '#d97706' : 'var(--moss)');
+
   const bodyHTML = mockInterviewState.tab === 'live' ? `
     <div class="panel" style="padding:14px 18px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
-      <div>
-        <div class="meta">Таймер Live-Coding секции (регламент 20 минут)</div>
-        <div id="mock-timer-display" style="font-family:var(--font-d);font-size:2rem;font-weight:700;color:var(--moss-deep);">${formatPomo(mockInterviewState.secondsLeft)}</div>
+      <div class="mock-timer-ring-wrap mock-timer-wrap">
+        <svg class="mock-timer-svg circular-progress-ring" width="54" height="54" viewBox="0 0 54 54" aria-hidden="true">
+          <circle class="mock-timer-ring-bg" cx="27" cy="27" r="22" fill="none" stroke-width="4"></circle>
+          <circle id="mock-timer-ring-fg" class="mock-timer-ring-fg" cx="27" cy="27" r="22" fill="none" stroke="${ringColor}" stroke-width="4" stroke-dasharray="${ringCircum}" stroke-dashoffset="${ringOffset}" transform="rotate(-90 27 27)"></circle>
+        </svg>
+        <div>
+          <div class="meta">Таймер Live-Coding секции (регламент 20 минут)</div>
+          <div id="mock-timer-display" style="font-family:var(--font-d);font-size:1.85rem;font-weight:700;color:${ringColor};">${formatPomo(mockInterviewState.secondsLeft)}</div>
+        </div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
         <select id="mock-echelon-select" class="code-editor" style="min-height:auto;padding:8px 10px;width:auto;">
@@ -6500,37 +7106,51 @@ function viewMockInterview(){
       </div>
       <h2 style="margin-bottom:10px;">${curTask.title}</h2>
       <div class="lesson-theory" style="margin-bottom:14px;">${curTask.desc}</div>
-      <textarea id="mock-code-editor" class="code-editor" spellcheck="false" style="min-height:220px;">${escapeHtmlStr(mockInterviewState.codeDraft)}</textarea>
+      ${buildCodeEditorWithGutterHTML('mock-code-editor', mockInterviewState.codeDraft, 'min-height:220px;', 'mock-code-editor')}
       <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
         <button class="btn btn-primary" data-mock-run="${curTask.id}">${ICONS.play} Запустить решение (Ctrl+Enter)</button>
         <button class="btn btn-ghost" data-mock-hint ${mockInterviewState.hintLevel>=socraticHints.length?'disabled':''}>💡 Запросить наводку интервьюера (${mockInterviewState.hintLevel}/${socraticHints.length})</button>
         <button class="btn btn-ghost" data-mock-reset="${curTask.id}">Сбросить код</button>
       </div>
       ${runFeedback}
-      ${shownHints}
+      <div class="socratic-chat-stream" style="margin-top:12px;">
+        <div class="chat-bubble chat-bubble--interviewer">
+          <div class="chat-bubble__author">🎙️ Tech Lead · Сократический интервьюер</div>
+          <div>Прочитай контракт функции, оцени граничные случаи и асимптотику <span class="math-formula">O(n)</span> перед написанием кода. Если застрянешь — запроси сократовскую наводку (до 4 уровней).</div>
+        </div>
+        ${shownHints}
+      </div>
     </div>
   ` : `
     <div class="microstep-card">
-      <div class="topic-badge">Поведенческое интервью · Методика STAR (Situation · Task · Action · Result)</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+        <div class="topic-badge" style="margin:0;">Поведенческое интервью · Методика STAR (Situation · Task · Action · Result)</div>
+        <div class="star-pitch-bar">
+          <span class="meta">🎤 Таймер устного питча (2 мин):</span>
+          <strong id="star-pitch-display" class="pitch-timer-display" style="font-family:var(--font-m);color:var(--moss-deep);">${formatPomo(mockInterviewState.pitchSecondsLeft || 120)}</strong>
+          <button class="btn btn-ghost" style="padding:4px 10px;font-size:.76rem;" data-star-pitch-toggle>${mockInterviewState.pitchRunning ? '⏸ Пауза' : '▶ Репетиция 02:00'}</button>
+          <button class="btn btn-ghost" style="padding:4px 8px;font-size:.75rem;" data-star-pitch-reset>↺</button>
+        </div>
+      </div>
       <h2 style="margin-bottom:10px;">Выбери сценарий и собери сильный инженерный ответ</h2>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">${starOpts}</div>
       <div class="notice" style="margin-bottom:14px;"><strong>Вопрос интервьюера:</strong> ${curScen.prompt}</div>
-      <div style="display:grid;gap:10px;">
-        <div>
-          <label class="meta" style="font-weight:600;display:block;margin-bottom:4px;">S — Situation (Контекст системы, трафик, стек):</label>
-          <textarea id="star-s-input" class="code-editor" style="min-height:68px;" placeholder="Например: В сервисе заказов на FastAPI + PostgreSQL при пиковой нагрузке 300 RPS время ответа выросло до 4 секунд…">${escapeHtmlStr(mockInterviewState.starS)}</textarea>
+      <div class="star-matrix-grid">
+        <div class="star-quadrant-card">
+          <label class="meta" style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:4px;"><span>S — Situation (Контекст, трафик, стек)</span><span>${String(mockInterviewState.starS||'').trim().length >= 25 ? '✓' : '≥25 симв.'}</span></label>
+          <textarea id="star-s-input" class="code-editor" style="min-height:76px;" placeholder="Например: В сервисе заказов на FastAPI + PostgreSQL при пиковой нагрузке 300 RPS время ответа выросло до 4 секунд…">${escapeHtmlStr(mockInterviewState.starS)}</textarea>
         </div>
-        <div>
-          <label class="meta" style="font-weight:600;display:block;margin-bottom:4px;">T — Task (Инженерная задача и целевой SLA):</label>
-          <textarea id="star-t-input" class="code-editor" style="min-height:68px;" placeholder="Например: Нужно было снизить p95 латентность ниже 150 мс без остановки приёма платежей…">${escapeHtmlStr(mockInterviewState.starT)}</textarea>
+        <div class="star-quadrant-card">
+          <label class="meta" style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:4px;"><span>T — Task (Инженерная цель и SLA)</span><span>${String(mockInterviewState.starT||'').trim().length >= 20 ? '✓' : '≥20 симв.'}</span></label>
+          <textarea id="star-t-input" class="code-editor" style="min-height:76px;" placeholder="Например: Нужно было снизить p95 латентность ниже 150 мс без остановки приёма платежей…">${escapeHtmlStr(mockInterviewState.starT)}</textarea>
         </div>
-        <div>
-          <label class="meta" style="font-weight:600;display:block;margin-bottom:4px;">A — Action (Что конкретно сделал ТЫ: диагностика, код, индексы, тесты):</label>
-          <textarea id="star-a-input" class="code-editor" style="min-height:80px;" placeholder="Например: Я снял план через EXPLAIN ANALYZE, обнаружил Seq Scan и N+1, добавил составной индекс и selectinload…">${escapeHtmlStr(mockInterviewState.starA)}</textarea>
+        <div class="star-quadrant-card">
+          <label class="meta" style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:4px;"><span>A — Action (Личный вклад: «Я диагностировал…»)</span><span>${String(mockInterviewState.starA||'').trim().length >= 35 ? '✓' : 'глагол «Я»'}</span></label>
+          <textarea id="star-a-input" class="code-editor" style="min-height:84px;" placeholder="Например: Я снял план через EXPLAIN ANALYZE, обнаружил Seq Scan и N+1, добавил составной индекс и selectinload…">${escapeHtmlStr(mockInterviewState.starA)}</textarea>
         </div>
-        <div>
-          <label class="meta" style="font-weight:600;display:block;margin-bottom:4px;">R — Result (Измеримый результат в цифрах и выводы):</label>
-          <textarea id="star-r-input" class="code-editor" style="min-height:68px;" placeholder="Например: Время ответа упало с 4000 мс до 45 мс (в 88 раз), нагрузка на CPU БД снизилась на 65%…">${escapeHtmlStr(mockInterviewState.starR)}</textarea>
+        <div class="star-quadrant-card">
+          <label class="meta" style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:4px;"><span>R — Result (Метрики: мс, %, RPS, 0 ошибок)</span><span>${/(\d+|%|мс|ms|сек|раз|x)/i.test(String(mockInterviewState.starR||'')) ? '✓' : 'числа/%'}</span></label>
+          <textarea id="star-r-input" class="code-editor" style="min-height:76px;" placeholder="Например: Время ответа упало с 4000 мс до 45 мс (в 88 раз), нагрузка на CPU БД снизилась на 65%…">${escapeHtmlStr(mockInterviewState.starR)}</textarea>
         </div>
       </div>
       <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
@@ -6950,6 +7570,7 @@ nodeCardHTML = function(n){
     minTier = 1;
   }
   const eMeta = INTERVIEW_ECHELONS[minTier] || INTERVIEW_ECHELONS[2];
+  const parallelBadge = (n.stage === 1) ? `<span class="node-parallel-badge">🔀 Параллельная ветка</span>` : '';
   return `
     <button class="node-card node-card--${st}" data-open="${n.id}">
       <div class="node-card__top">
@@ -6959,6 +7580,7 @@ nodeCardHTML = function(n){
       </div>
       <h3 class="node-card__title">${n.title}</h3>
       <p class="node-card__summary">${n.summary}</p>
+      ${parallelBadge}
       ${unitIds.length ? `<p class="node-card__prereq" style="color:var(--moss-deep);font-weight:600;">Связанные юниты: ${unitIds.join(', ')}</p>` : ''}
       ${prereqNames.length ? `<p class="node-card__prereq">Требует: ${prereqNames.join(', ')}</p>` : ''}
     </button>`;
@@ -7190,16 +7812,19 @@ lessonTheoryHTML = function(){
     </div>` : '';
 
   const primaryLessonActionHTML = hasMoreChunks ? `
-    <div style="margin-top:14px;">
-      <button class="btn-glass-emerald btn-sprint-cta" data-chunk-more="lesson">Понятно, дальше (+10 XP) ➔</button>
+    <div class="floating-step-nav" style="margin-top:14px;">
+      <button class="btn btn-ghost" style="padding:8px 12px;" data-lstep-jump="${Math.max(0, sIdx-1)}" ${sIdx===0?'disabled':''}>← Шаг назад</button>
+      <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-chunk-more="lesson">Понятно, дальше (+10 XP) ➔</button>
       <span class="sr-only">Кусочек ${curChunkIdx + 1} из ${totalChunks} · <button class="link-quiet" data-chunk-reveal-step="lesson">Открыть шаг целиком</button></span>
     </div>` : `
     <div style="margin-top:14px;">
-      ${sIdx + 1 < steps.length
-        ? `<button class="btn-glass-emerald btn-sprint-cta" data-lstep-jump="${sIdx+1}">Следующий шаг (${sIdx+2}/${steps.length}) (+10 XP) ➔</button>`
-        : `<button class="btn-glass-emerald btn-sprint-cta" data-lesson-next="check">Дальше: мини-проверка (+10 XP) ${ICONS.arrowRight}</button>`}
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;">
-        <button class="link-quiet" data-lstep-jump="${Math.max(0, sIdx-1)}" ${sIdx===0?'disabled':''}>← Предыдущий шаг</button>
+      <div class="floating-step-nav">
+        <button class="btn btn-ghost" style="padding:8px 12px;" data-lstep-jump="${Math.max(0, sIdx-1)}" ${sIdx===0?'disabled':''}>← Предыдущий шаг</button>
+        ${sIdx + 1 < steps.length
+          ? `<button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-lstep-jump="${sIdx+1}">Следующий шаг (${sIdx+2}/${steps.length}) (+10 XP) ➔</button>`
+          : `<button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-lesson-next="check">Дальше: мини-проверка (+10 XP) ${ICONS.arrowRight}</button>`}
+      </div>
+      <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:6px;">
         <button class="link-quiet" data-lesson-next="check">К практике урока →</button>
       </div>
     </div>`;
@@ -7450,7 +8075,7 @@ function viewDocsHub(){
     </div>`;
 }
 
-// Override Dashboard with Variant A Mobile-First Cocoon Focus Screen + Trajectory Countdown + Spaced Repetition + Collapsible Modules Drawer
+// Override Dashboard with Variant A Mobile-First Cocoon Focus Screen + Trajectory Countdown + Spaced Repetition + 7-Track Mini-Matrix + Collapsible Modules Drawer
 viewDashboard = function(){
   const p = stageProgress();
   const curMp = totalPythonMP();
@@ -7474,6 +8099,7 @@ viewDashboard = function(){
   const e3 = getEchelonProgress(3);
   const e4 = getEchelonProgress(4);
   const e1Remaining = e1.skills.filter(s => getSkillMP(s.id) < 100).length;
+  const e1DoneUnits = Math.min(14, Math.max(1, 14 - Math.floor((e1Remaining / Math.max(1, e1.skills.length)) * 14)));
 
   // Determine the next priority skill for the 4-minute Cocoon Focus Card
   const openGaps = (state.diagnosticGaps || []).filter(sid => PY_SKILLS_BY_ID[sid] && getSkillMP(sid) < 100);
@@ -7510,6 +8136,25 @@ viewDashboard = function(){
     if(!dObj) return '';
     return `<a href="#/cards" class="btn btn-ghost" style="padding:5px 10px;font-size:.76rem;" data-srs-open-deck="${did}">🃏 ${did} (${(dObj.cards||[]).length})</a>`;
   }).join('');
+  const srsTotalDecks = Math.max(1, Object.keys(ALL_DECKS_COMBINED).length);
+  const srsRingCircum = 94.2;
+  const srsPct = Math.min(100, Math.max(8, Math.round((srs.reviewedDecksCount / srsTotalDecks) * 100)));
+  const srsRingOffset = (srsRingCircum * (1 - srsPct / 100)).toFixed(1);
+
+  const miniMatrixItems = [
+    { route: '/python', icon: '🐍', name: 'Python', pct: Math.round(curMp / maxMp * 100) },
+    { route: '/web', icon: '🌐', name: 'Web', pct: Math.round(webMp / 1000 * 100) },
+    { route: '/backend', icon: '⚙️', name: 'Backend', pct: Math.round(backendMp / 2400 * 100) },
+    { route: '/algorithms', icon: '⚡', name: 'Алго', pct: Math.round(algoMp / 1200 * 100) },
+    { route: '/databases', icon: '🗄️', name: 'БД', pct: Math.round(dbMp / 1700 * 100) },
+    { route: '/architecture', icon: '🏛️', name: 'Архит.', pct: Math.round(archMp / 1400 * 100) },
+    { route: '/infra', icon: '🚀', name: 'Инфра', pct: Math.round(infraMp / 2100 * 100) }
+  ].map(m => `
+    <a href="#${m.route}" class="dash-mini-track" title="${m.name}: ${m.pct}%">
+      <span class="dash-mini-track__icon">${m.icon}</span>
+      <span class="dash-mini-track__name">${m.name}</span>
+      <span class="dash-mini-track__pct">${m.pct}%</span>
+    </a>`).join('');
 
   return `
     <div class="container">
@@ -7527,27 +8172,34 @@ viewDashboard = function(){
           <span class="cd-count">⏳ Осталось ${e1Remaining} ${pluralRuTopics(e1Remaining)}</span>
         </div>
         <div class="cd-bar cd-bar-track"><div class="cd-fill cd-bar-fill" style="width:${Math.max(6, e1.pct)}%;"></div></div>
+        <div class="cd-checkpoint-sub">Шаг ${e1DoneUnits} из 14 юнитов Эшелона 1 · Открывает готовность к тех-скринингу</div>
       </div>
 
       <!-- Active 4-Minute Sprint Focus Card -->
       <div class="cocoon-focus-card">
-        <div class="cocoon-focus-eyebrow">✨ Фокус сейчас · 4 минуты<span class="sr-only"> · Правило 2 минут: Быстрый микро-шаг</span></div>
+        <div class="cocoon-focus-eyebrow"><span class="pulse-ring-dot"></span>✨ Фокус сейчас · 4 минуты<span class="sr-only"> · Правило 2 минут: Быстрый микро-шаг</span></div>
         <div class="cocoon-focus-title">${focusSk.id} · ${focusSk.title}</div>
         <div class="cocoon-focus-desc">Конспект <b>${focusKId}: ${focusNoteObj.title}</b> (${focusStepsCount} ${(focusStepsCount % 10 === 1 && focusStepsCount % 100 !== 11) ? 'короткий микро-шаг' : (focusStepsCount % 10 >= 2 && focusStepsCount % 10 <= 4 && (focusStepsCount % 100 < 10 || focusStepsCount % 100 >= 20) ? 'коротких микро-шага' : 'коротких микро-шагов')} с живым кодом и разбором Junior vs Senior).</div>
         <div style="display:flex;flex-direction:column;gap:7px;">
           <button class="btn-glass-emerald btn-sprint-cta" data-quick-microstep="">▶ Начать спринт (4 мин) ➔</button>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <a href="#/mock" class="btn-glass-ruby" style="flex:1;padding:7px 12px;font-size:.81rem;text-align:center;">🎙️ Собеседование</a>
+            <a href="#/mock" class="btn-glass-ruby btn-glass-bordeaux" style="flex:1;padding:7px 12px;font-size:.81rem;text-align:center;">🎙️ Собеседование</a>
             <a href="#/docs" class="btn btn-ghost" style="padding:7px 12px;font-size:.81rem;">📚 Справочник</a>
           </div>
         </div>
       </div>
 
       <!-- Spaced Repetition (SRS) Quick Review Strip -->
-      <div class="panel" style="padding:11px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
-        <div>
-          <div style="font-weight:700;font-size:.86rem;">🔁 Интервальное повторение (SRS)</div>
-          <div class="meta" style="font-size:.76rem;">Повторено колод: <b>${srs.reviewedDecksCount}</b> · Сложных карточек на закрепление: <b>${srs.weakCardsCount}</b></div>
+      <div class="panel srs-strip-card" style="padding:11px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <svg class="srs-ring-svg" width="38" height="38" viewBox="0 0 38 38" aria-hidden="true">
+            <circle cx="19" cy="19" r="15" fill="none" stroke="rgba(148,163,184,0.2)" stroke-width="3.5"></circle>
+            <circle cx="19" cy="19" r="15" fill="none" stroke="var(--moss)" stroke-width="3.5" stroke-dasharray="${srsRingCircum}" stroke-dashoffset="${srsRingOffset}" transform="rotate(-90 19 19)"></circle>
+          </svg>
+          <div>
+            <div style="font-weight:700;font-size:.86rem;">🔁 Интервальное повторение (SRS)</div>
+            <div class="meta" style="font-size:.76rem;">Повторено колод: <b>${srs.reviewedDecksCount}</b> · Сложных карточек на закрепление: <b>${srs.weakCardsCount}</b></div>
+          </div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">${srsDeckButtons}</div>
       </div>
@@ -7561,6 +8213,11 @@ viewDashboard = function(){
       </div>
       <div class="mini-list">
         ${miniListHTML}
+      </div>
+
+      <!-- 7-Track Mini-Matrix Bar directly on Dashboard -->
+      <div class="dash-mini-matrix">
+        ${miniMatrixItems}
       </div>
 
       <!-- Collapsible Drawer for All Modules, Echelons, Pomodoro & Global Stats -->
@@ -7694,28 +8351,58 @@ viewDashboard = function(){
 
 // Update Navigation items cleanly (1-line labels without redundant parenthetical numbers or duplicate emojis)
 NAV_ITEMS.splice(0, NAV_ITEMS.length,
-  {route:'/', icon:'home', label:'Дашборд', shortLabel:'Дашборд', mobileTab:true},
-  {route:'/python', icon:'python', label:'Python', shortLabel:'Python', mobileTab:true},
-  {route:'/web', icon:'globe', label:'Web и HTTP', shortLabel:'Web'},
-  {route:'/backend', icon:'server', label:'Backend', shortLabel:'Backend'},
-  {route:'/algorithms', icon:'bolt', label:'Алгоритмы', shortLabel:'Алгоритмы'},
-  {route:'/databases', icon:'database', label:'Базы данных', shortLabel:'БД'},
-  {route:'/architecture', icon:'arch', label:'Архитектура', shortLabel:'Архит.'},
-  {route:'/infra', icon:'rocket', label:'Инфраструктура', shortLabel:'Инфра'},
-  {route:'/mock', icon:'crown', label:'Собеседование', shortLabel:'Собес', mobileTab:true},
-  {route:'/map', icon:'map', label:'Карта навыков', shortLabel:'Карта'},
-  {route:'/practice', icon:'code', label:'Практика IDE', shortLabel:'IDE', mobileTab:true},
-  {route:'/cards', icon:'cards', label:'Карточки', shortLabel:'Карточки', mobileTab:true},
-  {route:'/docs', icon:'map', label:'Справочник', shortLabel:'Справочник'},
-  {route:'/sandbox', icon:'terminal', label:'Песочница', shortLabel:'Песочница'}
+  {route:'/', icon:'home', label:'Дашборд', shortLabel:'Дашборд', mobileTab:true, group:'learn'},
+  {route:'/python', icon:'python', label:'Python', shortLabel:'Python', mobileTab:true, group:'module'},
+  {route:'/web', icon:'globe', label:'Web и HTTP', shortLabel:'Web', group:'module'},
+  {route:'/backend', icon:'server', label:'Backend', shortLabel:'Backend', group:'module'},
+  {route:'/algorithms', icon:'bolt', label:'Алгоритмы', shortLabel:'Алгоритмы', group:'module'},
+  {route:'/databases', icon:'database', label:'Базы данных', shortLabel:'БД', group:'module'},
+  {route:'/architecture', icon:'arch', label:'Архитектура', shortLabel:'Архит.', group:'module'},
+  {route:'/infra', icon:'rocket', label:'Инфраструктура', shortLabel:'Инфра', group:'module'},
+  {route:'/mock', icon:'crown', label:'Собеседование', shortLabel:'Собес', mobileTab:true, group:'trainer'},
+  {route:'/map', icon:'map', label:'Карта навыков', shortLabel:'Карта', group:'learn'},
+  {route:'/practice', icon:'code', label:'Практика IDE', shortLabel:'IDE', mobileTab:true, group:'trainer'},
+  {route:'/cards', icon:'cards', label:'Карточки', shortLabel:'Карточки', mobileTab:true, group:'trainer'},
+  {route:'/docs', icon:'map', label:'Справочник', shortLabel:'Справочник', group:'tool'},
+  {route:'/sandbox', icon:'terminal', label:'Песочница', shortLabel:'Песочница', group:'tool'}
 );
 
 renderNav = function(){
   const desk = document.getElementById('nav-desktop');
   if(desk){
-    desk.innerHTML = NAV_ITEMS.map(it=>
-      `<a href="#${it.route}" class="navlink" data-route="${it.route}">${ICONS[it.icon] || ICONS.dot}<span>${it.label}</span></a>`
-    ).join('');
+    const modPctMap = {
+      '/python': Math.round(totalPythonMP() / maxPythonMP() * 100),
+      '/web': Math.round(totalWebMP() / 1000 * 100),
+      '/backend': Math.round(totalBackendMP() / 2400 * 100),
+      '/algorithms': Math.round(totalAlgoMP() / 1200 * 100),
+      '/databases': Math.round(totalDbMP() / 1700 * 100),
+      '/architecture': Math.round(totalArchMP() / 1400 * 100),
+      '/infra': Math.round(totalInfraMP() / 2100 * 100)
+    };
+    const totalAllMp = totalPythonMP() + totalWebMP() + totalBackendMP() + totalAlgoMP() + totalDbMP() + totalArchMP() + totalInfraMP();
+    const overallPct = Math.round(totalAllMp / 12600 * 100);
+    const renderLink = function(it){
+      const pctBadge = (modPctMap[it.route] !== undefined)
+        ? `<span class="navlink__pct">${modPctMap[it.route]}%</span>`
+        : '';
+      return `<a href="#${it.route}" class="navlink" data-route="${it.route}">${ICONS[it.icon] || ICONS.dot}<span>${it.label}</span>${pctBadge}</a>`;
+    };
+    const learnLinks = NAV_ITEMS.filter(it => it.group === 'learn').map(renderLink).join('');
+    const modLinks = NAV_ITEMS.filter(it => it.group === 'module').map(renderLink).join('');
+    const trainerLinks = NAV_ITEMS.filter(it => it.group === 'trainer').map(renderLink).join('');
+    const toolLinks = NAV_ITEMS.filter(it => it.group === 'tool').map(renderLink).join('');
+    desk.innerHTML = `
+      <div class="nav-group-label">Обучение</div>
+      ${learnLinks}
+      <details class="nav-modules-accordion" open>
+        <summary class="nav-modules-summary"><span>📚 Модули 01–07</span><span class="navlink__pct">${overallPct}%</span></summary>
+        <div class="nav-modules-list">${modLinks}</div>
+      </details>
+      <div class="nav-group-label">Тренажёры</div>
+      ${trainerLinks}
+      <div class="nav-group-label">Инструменты</div>
+      ${toolLinks}
+    `;
   }
   const mobItems = NAV_ITEMS.filter(it => it.mobileTab);
   document.querySelectorAll('.tabbar').forEach(tb=>{
@@ -7799,7 +8486,7 @@ function openBugReportModal(){
 }
 window.openBugReportModal = openBugReportModal;
 
-// Inject Ambient Background Orbs (.ambient-orb--burgundy & .ambient-orb--emerald), Onest Font, Bug Logger FAB & Sidebar Footer Quick Start
+// Inject Ambient Background Orbs (.ambient-orb--burgundy & .ambient-orb--emerald), Onest Font, Bug Logger FAB, Global Pomodoro Pill & Sidebar Footer Quick Start
 (function initCocoonAtmosphereAndSidebar(){
   try{
     if(!localStorage.getItem('academy-obsidian-v2')){
@@ -7837,6 +8524,21 @@ window.openBugReportModal = openBugReportModal;
       bugFab.innerHTML = '🐞 <span>Замечание</span>';
       document.body.appendChild(bugFab);
     }
+    let lastScrollY = 0;
+    window.addEventListener('scroll', function(){
+      try{
+        const curY = window.scrollY || document.documentElement.scrollTop || 0;
+        const fab = document.getElementById('bug-fab-trigger');
+        if(fab){
+          if(curY > lastScrollY + 18 && curY > 120){
+            fab.classList.add('bug-fab--scroll-hidden');
+          } else if(curY < lastScrollY - 10 || curY <= 80){
+            fab.classList.remove('bug-fab--scroll-hidden');
+          }
+        }
+        lastScrollY = curY;
+      }catch(ignore){}
+    }, { passive: true });
   }catch(e){}
   const foot = document.querySelector('.sidebar-foot');
   if(!foot) return;
@@ -7845,6 +8547,13 @@ window.openBugReportModal = openBugReportModal;
   quickBtn.setAttribute('data-quick-microstep', '');
   quickBtn.innerHTML = '⚡ Микро-шаг (2 мин)';
   foot.insertBefore(quickBtn, foot.firstChild);
+
+  const pomoPill = document.createElement('button');
+  pomoPill.className = 'topbar-pomo-pill';
+  pomoPill.setAttribute('data-pomo-toggle', '');
+  pomoPill.setAttribute('title', 'Старт / Пауза Помодоро-таймера (25 мин)');
+  pomoPill.innerHTML = '🍅 <span id="sidebar-pomo-time">' + formatPomo(pomoState.secondsLeft) + '</span>';
+  foot.insertBefore(pomoPill, quickBtn.nextSibling);
 
   const hoBtn = document.createElement('button');
   hoBtn.className = 'link-quiet';
@@ -7993,596 +8702,6 @@ function openHandoverModal(){
   document.body.appendChild(modal);
 }
 
-
-/* ================= OFFLINE QR GENERATOR ================= */
-/**
- * Offline Pure JavaScript QR Code Generator (SVG output)
- * Zero external dependencies, runs 100% locally and offline.
- */
-(function (global) {
-    // Galois Field Math & Reed-Solomon for QR Code
-    var GF256_EXP = new Array(512);
-    var GF256_LOG = new Array(256);
-    (function () {
-        var x = 1;
-        for (var i = 0; i < 255; i++) {
-            GF256_EXP[i] = x;
-            GF256_EXP[i + 255] = x;
-            GF256_LOG[x] = i;
-            x = (x << 1) ^ (x >= 128 ? 0x11d : 0);
-        }
-    })();
-
-    function gfMul(x, y) {
-        if (x === 0 || y === 0) return 0;
-        return GF256_EXP[GF256_LOG[x] + GF256_LOG[y]];
-    }
-
-    function rsPolyMultiply(p1, p2) {
-        var res = new Array(p1.length + p2.length - 1);
-        for (var i = 0; i < res.length; i++) res[i] = 0;
-        for (var i = 0; i < p1.length; i++) {
-            for (var j = 0; j < p2.length; j++) {
-                res[i + j] ^= gfMul(p1[i], p2[j]);
-            }
-        }
-        return res;
-    }
-
-    function rsGeneratorPoly(degree) {
-        var poly = [1];
-        for (var i = 0; i < degree; i++) {
-            poly = rsPolyMultiply(poly, [1, GF256_EXP[i]]);
-        }
-        return poly;
-    }
-
-    function rsEncode(data, ecCount) {
-        var gen = rsGeneratorPoly(ecCount);
-        var msg = new Array(data.length + ecCount);
-        for (var i = 0; i < data.length; i++) msg[i] = data[i];
-        for (var i = data.length; i < msg.length; i++) msg[i] = 0;
-
-        for (var i = 0; i < data.length; i++) {
-            var coef = msg[i];
-            if (coef !== 0) {
-                for (var j = 0; j < gen.length; j++) {
-                    msg[i + j] ^= gfMul(gen[j], coef);
-                }
-            }
-        }
-        return msg.slice(data.length);
-    }
-
-    // QR Code Specifications for Versions 1..6 (Auto Version Picker)
-    // Capacity for EC Level M (8-bit Byte mode)
-    var VERSION_SPECS = {
-        1: { size: 21, totalBytes: 26, dataBytes: 16, ecBytes: 10, align: [] },
-        2: { size: 25, totalBytes: 44, dataBytes: 28, ecBytes: 16, align: [6, 18] },
-        3: { size: 29, totalBytes: 70, dataBytes: 44, ecBytes: 26, align: [6, 22] },
-        4: { size: 33, totalBytes: 100, dataBytes: 64, ecBytes: 36, align: [6, 26] },
-        5: { size: 37, totalBytes: 134, dataBytes: 86, ecBytes: 48, align: [6, 30] },
-        6: { size: 41, totalBytes: 172, dataBytes: 108, ecBytes: 64, align: [6, 34] }
-    };
-
-    function encodeByteData(str, targetDataBytes) {
-        var utf8Bytes = [];
-        for (var i = 0; i < str.length; i++) {
-            var code = str.charCodeAt(i);
-            if (code < 0x80) utf8Bytes.push(code);
-            else if (code < 0x800) {
-                utf8Bytes.push(0xc0 | (code >> 6));
-                utf8Bytes.push(0x80 | (code & 0x3f));
-            } else {
-                utf8Bytes.push(0xe0 | (code >> 12));
-                utf8Bytes.push(0x80 | ((code >> 6) & 0x3f));
-                utf8Bytes.push(0x80 | (code & 0x3f));
-            }
-        }
-
-        // Bit stream: Mode indicator (0100 for Byte mode)
-        var bitLen = 4 + 8 + (utf8Bytes.length * 8);
-        var bits = [];
-        function pushBits(val, len) {
-            for (var b = len - 1; b >= 0; b--) {
-                bits.push((val >> b) & 1);
-            }
-        }
-
-        pushBits(4, 4); // 0100: Byte mode
-        pushBits(utf8Bytes.length, 8); // Character count (8 bits for v1-9)
-        for (var i = 0; i < utf8Bytes.length; i++) {
-            pushBits(utf8Bytes[i], 8);
-        }
-
-        // Terminator: up to 4 zero bits
-        var maxBits = targetDataBytes * 8;
-        var termLen = Math.min(4, maxBits - bits.length);
-        pushBits(0, termLen);
-
-        // Pad to byte boundary
-        while (bits.length % 8 !== 0) bits.push(0);
-
-        // Convert to bytes
-        var bytes = [];
-        for (var i = 0; i < bits.length; i += 8) {
-            var b = 0;
-            for (var k = 0; k < 8; k++) b = (b << 1) | bits[i + k];
-            bytes.push(b);
-        }
-
-        // Pad with alternating 0xEC and 0x11
-        var padToggle = false;
-        while (bytes.length < targetDataBytes) {
-            bytes.push(padToggle ? 0x11 : 0xec);
-            padToggle = !padToggle;
-        }
-
-        return bytes;
-    }
-
-    function createMatrix(version, dataBytes, ecBytes) {
-        var spec = VERSION_SPECS[version];
-        var size = spec.size;
-        var matrix = [];
-        var isReserved = [];
-        for (var r = 0; r < size; r++) {
-            matrix[r] = [];
-            isReserved[r] = [];
-            for (var c = 0; c < size; c++) {
-                matrix[r][c] = false;
-                isReserved[r][c] = false;
-            }
-        }
-
-        // Finder patterns (top-left, top-right, bottom-left)
-        function addFinder(row, col) {
-            for (var r = -1; r <= 7; r++) {
-                for (var c = -1; c <= 7; c++) {
-                    var tr = row + r;
-                    var tc = col + c;
-                    if (tr >= 0 && tr < size && tc >= 0 && tc < size) {
-                        isReserved[tr][tc] = true;
-                        var isBlack = (r >= 0 && r <= 6 && c >= 0 && c <= 6) &&
-                            (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4));
-                        matrix[tr][tc] = isBlack;
-                    }
-                }
-            }
-        }
-        addFinder(0, 0);
-        addFinder(0, size - 7);
-        addFinder(size - 7, 0);
-
-        // Timing patterns
-        for (var i = 8; i < size - 8; i++) {
-            matrix[6][i] = (i % 2 === 0);
-            isReserved[6][i] = true;
-            matrix[i][6] = (i % 2 === 0);
-            isReserved[i][6] = true;
-        }
-
-        // Alignment patterns
-        var align = spec.align;
-        if (align && align.length > 0) {
-            for (var i = 0; i < align.length; i++) {
-                for (var j = 0; j < align.length; j++) {
-                    var ar = align[i];
-                    var ac = align[j];
-                    if (isReserved[ar][ac]) continue;
-                    for (var r = -2; r <= 2; r++) {
-                        for (var c = -2; c <= 2; c++) {
-                            isReserved[ar + r][ac + c] = true;
-                            matrix[ar + r][ac + c] = (r === -2 || r === 2 || c === -2 || c === 2 || (r === 0 && c === 0));
-                        }
-                    }
-                }
-            }
-        }
-
-        // Dark module
-        matrix[size - 8][8] = true;
-        isReserved[size - 8][8] = true;
-
-        // Reserve format info areas
-        for (var i = 0; i < 9; i++) {
-            isReserved[8][i] = true;
-            isReserved[i][8] = true;
-            isReserved[8][size - 1 - i] = true;
-            isReserved[size - 1 - i][8] = true;
-        }
-
-        // Interleave Data + EC
-        var allCodewords = dataBytes.concat(ecBytes);
-        var bitStream = [];
-        for (var i = 0; i < allCodewords.length; i++) {
-            for (var b = 7; b >= 0; b--) {
-                bitStream.push((allCodewords[i] >> b) & 1);
-            }
-        }
-
-        // Place data bits in 2-column zigzag
-        var bitIdx = 0;
-        var dir = -1; // upwards
-        for (var c = size - 1; c > 0; c -= 2) {
-            if (c === 6) c--; // Skip vertical timing pattern
-            for (var step = 0; step < size; step++) {
-                var r = (dir === -1) ? (size - 1 - step) : step;
-                for (var colOffset = 0; colOffset < 2; colOffset++) {
-                    var col = c - colOffset;
-                    if (!isReserved[r][col]) {
-                        var bit = (bitIdx < bitStream.length) ? bitStream[bitIdx++] : 0;
-                        // Apply Mask 0: (row + col) % 2 == 0
-                        var mask = ((r + col) % 2 === 0);
-                        matrix[r][col] = (bit === 1) ? !mask : mask;
-                    }
-                }
-            }
-            dir = -dir;
-        }
-
-        // Format info bits: EC Level M (00), Mask 0 (000) => 00000 => BCH => masked with 0x5412 => 0x5412
-        // Format bits for Level M, Mask 0: 101010000010010
-        var formatBits = [1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0];
-        // Around top-left
-        var fIdx = 0;
-        for (var c = 0; c <= 8; c++) {
-            if (c !== 6) matrix[8][c] = (formatBits[fIdx++] === 1);
-        }
-        for (var r = 7; r >= 0; r--) {
-            if (r !== 6) matrix[r][8] = (formatBits[fIdx++] === 1);
-        }
-        // Bottom-left and Top-right
-        fIdx = 0;
-        for (var r = size - 1; r >= size - 7; r--) {
-            matrix[r][8] = (formatBits[fIdx++] === 1);
-        }
-        matrix[size - 8][8] = (formatBits[fIdx++] === 1);
-        for (var c = size - 8; c < size; c++) {
-            matrix[8][c] = (formatBits[fIdx++] === 1);
-        }
-
-        return matrix;
-    }
-
-    function generateMatrix(text) {
-        var utf8Len = encodeURIComponent(text).replace(/%[A-F\d]{2}/g, 'U').length;
-        var selectedVersion = 3;
-        for (var v = 1; v <= 6; v++) {
-            if (VERSION_SPECS[v].dataBytes >= utf8Len + 3) {
-                selectedVersion = v;
-                break;
-            }
-        }
-        var spec = VERSION_SPECS[selectedVersion];
-        var dataBytes = encodeByteData(text, spec.dataBytes);
-        var ecBytes = rsEncode(dataBytes, spec.ecBytes);
-        return createMatrix(selectedVersion, dataBytes, ecBytes);
-    }
-
-    function generateSVG(text, sizePx) {
-        sizePx = sizePx || 220;
-        var matrix = generateMatrix(text);
-        var modCount = matrix.length;
-        var quietZone = 4;
-        var totalModules = modCount + quietZone * 2;
-        var moduleSize = sizePx / totalModules;
-
-        var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + sizePx + ' ' + sizePx + '" width="' + sizePx + '" height="' + sizePx + '" style="border-radius:12px; display:block; background:#ffffff; box-shadow:0 4px 16px rgba(0,0,0,0.15);">';
-        svg += '<rect width="100%" height="100%" fill="#ffffff"/>';
-
-        for (var r = 0; r < modCount; r++) {
-            for (var c = 0; c < modCount; c++) {
-                if (matrix[r][c]) {
-                    var x = (c + quietZone) * moduleSize;
-                    var y = (r + quietZone) * moduleSize;
-                    // Slightly rounded squares for modern luxury feel
-                    svg += '<rect x="' + x.toFixed(2) + '" y="' + y.toFixed(2) + '" width="' + (moduleSize + 0.2).toFixed(2) + '" height="' + (moduleSize + 0.2).toFixed(2) + '" fill="#002b36" rx="1.5"/>';
-                }
-            }
-        }
-        svg += '</svg>';
-        return svg;
-    }
-
-    // Export to global window
-    global.OfflineQR = {
-        generateMatrix: generateMatrix,
-        generateSVG: generateSVG,
-        renderToElement: function (elementId, text, sizePx) {
-            var el = document.getElementById(elementId);
-            if (el) {
-                el.innerHTML = generateSVG(text, sizePx);
-            }
-        }
-    };
-})(typeof window !== 'undefined' ? window : this);
-
-
-/* ================= CLOUD & MULTI-DEVICE PROGRESS SYNC ================= */
-const DEFAULT_SYNC_GIST_ID = '4c4e711b5132a5b55ec9bcc5e7880caf';
-const DEFAULT_SYNC_TOKEN = [46,33,38,22,51,38,29,44,3,57,43,59,126,121,4,25,56,36,40,14,7,60,63,57,8,8,62,62,27,43,127,30,14,59,123,58,4,113,40,12].map(function(x){ return String.fromCharCode(x ^ 73); }).join('');
-let cloudSyncTimer = null;
-let isSyncingCloud = false;
-
-function getSyncCredentials(){
-  let g = null, k = null;
-  try {
-    g = localStorage.getItem('academy_cloud_sync_gist');
-    k = localStorage.getItem('academy_cloud_sync_token');
-  } catch(e){}
-  return {
-    gistId: g || DEFAULT_SYNC_GIST_ID,
-    token: k || DEFAULT_SYNC_TOKEN
-  };
-}
-
-function getProgressFingerprint(s, ideMap, draftsMap){
-  if(!s) return '';
-  return JSON.stringify({
-    xp: s.xp || 0,
-    st: s.streak || 0,
-    cl: (s.completedLessons || []).length,
-    rn: (s.readNotes || []).length,
-    rd: (s.reviewedDecks || []).length,
-    ut: (s.passedUnitTests || []).length,
-    pb: (s.passedBosses || []).length,
-    mc: s.mockCompletedCount || 0,
-    sm: Object.keys(s.skillMastery || {}).length,
-    id: Object.keys(ideMap || {}).length,
-    dr: Object.keys(draftsMap || {}).length
-  });
-}
-
-async function pullFromCloudGist(silent){
-  const creds = getSyncCredentials();
-  if(!creds.gistId || !creds.token || isSyncingCloud) return;
-  isSyncingCloud = true;
-  let needPushBack = false;
-  try {
-    const res = await fetch('https://api.github.com/gists/' + creds.gistId, {
-      method: 'GET',
-      cache: 'no-store',
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        'Authorization': 'token ' + creds.token
-      }
-    });
-    if(res.ok){
-      const data = await res.json();
-      const file = data.files && (data.files['academy_sync.json'] || Object.values(data.files)[0]);
-      if(file && file.content){
-        const parsed = JSON.parse(file.content);
-        const incState = parsed.academyState || parsed;
-        const curIde = getIdeSolvedMap();
-        const curDr = safeParseJsonObj(localStorage.getItem(IDE_DRAFTS_KEY)) || {};
-        const localBeforeFp = getProgressFingerprint(state, curIde, curDr);
-        const cloudBeforeFp = getProgressFingerprint(incState, parsed.ideStatus || {}, parsed.ideDrafts || {});
-        const prevXp = state.xp || 0;
-
-        state = mergeProgressStates(state, incState);
-        let mergedIde = curIde;
-        if(parsed.ideStatus && typeof parsed.ideStatus === 'object'){
-          mergedIde = mergeIdeStatusMaps(curIde, parsed.ideStatus);
-          const ideSer = JSON.stringify(mergedIde);
-          try{ localStorage.setItem('practice-ide-status', ideSer); }catch(e){}
-          try{ localStorage.setItem('practice-ide-status-backup', ideSer); }catch(e){}
-        }
-        let mergedDr = curDr;
-        if(parsed.ideDrafts && typeof parsed.ideDrafts === 'object'){
-          mergedDr = mergeIdeDraftMaps(curDr, parsed.ideDrafts);
-          try{ localStorage.setItem(IDE_DRAFTS_KEY, JSON.stringify(mergedDr)); }catch(e){}
-        }
-
-        const mergedFp = getProgressFingerprint(state, mergedIde, mergedDr);
-        saveState(state);
-
-        if(mergedFp !== cloudBeforeFp){
-          needPushBack = true;
-        }
-        const localChanged = (mergedFp !== localBeforeFp);
-        if(localChanged || !silent){
-          const gained = (state.xp || 0) - prevXp;
-          if(gained > 0 || !silent){
-            const msg = gained > 0 ? ('☁️ Облачная синхронизация: +' + gained + ' XP!') : '☁️ Прогресс синхронизирован с облаком!';
-            showToast(msg);
-          }
-          const activeTag = document.activeElement ? document.activeElement.tagName : '';
-          if(typeof render === 'function' && activeTag !== 'TEXTAREA' && activeTag !== 'INPUT'){
-            render();
-          }
-        }
-      }
-    }
-  } catch(err){
-    console.warn('Cloud pull error:', err);
-  } finally {
-    isSyncingCloud = false;
-    if(needPushBack) scheduleCloudGistPush();
-  }
-}
-
-async function pushToCloudGist(){
-  const creds = getSyncCredentials();
-  if(!creds.gistId || !creds.token || isSyncingCloud) return;
-  try {
-    const payload = {
-      description: 'Python Backend Academy - Live Progress Sync',
-      files: {
-        'academy_sync.json': {
-          content: JSON.stringify({
-            schemaVersion: ACADEMY_SCHEMA_VERSION,
-            exportedAt: new Date().toISOString(),
-            academyState: state,
-            ideStatus: getIdeSolvedMap(),
-            ideDrafts: safeParseJsonObj(localStorage.getItem(IDE_DRAFTS_KEY)) || {}
-          })
-        }
-      }
-    };
-    await fetch('https://api.github.com/gists/' + creds.gistId, {
-      method: 'PATCH',
-      cache: 'no-store',
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        'Authorization': 'token ' + creds.token,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-    console.log('☁️ Progress saved to Cloud Gist');
-  } catch(err){
-    console.warn('Cloud push error:', err);
-  }
-}
-
-function scheduleCloudGistPush(){
-  if(isSyncingCloud) return;
-  clearTimeout(cloudSyncTimer);
-  cloudSyncTimer = setTimeout(pushToCloudGist, 1200);
-}
-
-window.addEventListener('focus', function(){ pullFromCloudGist(true); });
-document.addEventListener('visibilitychange', function(){
-  if(document.visibilityState === 'visible') pullFromCloudGist(true);
-  else pushToCloudGist();
-});
-
-function handleSyncRoute(){
-  const hash = window.location.hash || '';
-  const qIdx = hash.indexOf('?');
-  if(qIdx !== -1){
-    const params = new URLSearchParams(hash.slice(qIdx + 1));
-    const g = params.get('g');
-    const k = params.get('k');
-    const d = params.get('d');
-    if(g && k){
-      try {
-        localStorage.setItem('academy_cloud_sync_gist', g);
-        localStorage.setItem('academy_cloud_sync_token', k);
-      } catch(e){}
-      window.location.hash = '#/';
-      pullFromCloudGist(false);
-      showToast('📱 Устройства успешно связаны!');
-      return;
-    } else if(d){
-      try {
-        const jsonStr = decodeURIComponent(escape(atob(d)));
-        importAndMergeBackupJsonString(jsonStr);
-        window.location.hash = '#/';
-        showToast('📱 Прогресс перенесён через QR-код!');
-        return;
-      } catch(e){
-        showToast('❌ Ошибка чтения данных QR-кода');
-      }
-    }
-  }
-  renderSyncHub();
-}
-
-function renderSyncHub(){
-  const root = document.getElementById('view-root');
-  if(!root) return;
-  const sD = document.getElementById('streak-num-d');
-  const sM = document.getElementById('streak-num-m');
-  if(sD) sD.textContent = state.streak || 0;
-  if(sM) sM.textContent = state.streak || 0;
-  const creds = getSyncCredentials();
-  const origin = window.location.origin;
-  const basePath = window.location.pathname.replace(/[^\/]*$/, '');
-  const appBaseUrl = origin.startsWith('http') ? (origin + basePath + 'academy.html') : 'https://kseniadmay.github.io/python-backend-academy/academy.html';
-  const pairingUrl = appBaseUrl + '#/sync?g=' + encodeURIComponent(creds.gistId) + '&k=' + encodeURIComponent(creds.token);
-  
-  let qrSvg = '';
-  try {
-    if(window.OfflineQR && typeof window.OfflineQR.generateSVG === 'function'){
-      qrSvg = window.OfflineQR.generateSVG(pairingUrl, 260);
-    }
-  } catch(e){
-    console.error('QR Gen error:', e);
-  }
-
-  const skillCount = Object.keys(state.skillMastery || {}).length || 33;
-  root.innerHTML = `
-    <div style="max-width:760px;margin:24px auto;padding:0 16px;">
-      <div style="background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px 24px;box-shadow:var(--shadow-1);">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
-          <div>
-            <h1 style="font-family:var(--font-d);font-size:1.45rem;font-weight:700;margin:0 0 6px;color:var(--ink);">📱 Синхронизация с телефоном</h1>
-            <p style="margin:0;font-size:0.92rem;color:var(--ink-muted);">Учитесь на любом устройстве 24/7 — прогресс сохраняется в облаке автоматически</p>
-          </div>
-          <span style="display:inline-flex;align-items:center;gap:6px;background:var(--moss-soft);color:var(--moss);padding:6px 14px;border-radius:20px;font-size:0.85rem;font-weight:600;">
-            <span style="width:8px;height:8px;border-radius:50%;background:var(--moss);display:inline-block;"></span> Облако активно
-          </span>
-        </div>
-
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:12px;margin-bottom:24px;">
-          <div style="background:var(--surface-2);padding:14px;border-radius:12px;border:1px solid var(--line-soft);text-align:center;">
-            <div style="font-size:0.8rem;color:var(--ink-muted);margin-bottom:4px;">Текущий XP</div>
-            <div style="font-family:var(--font-d);font-size:1.4rem;font-weight:700;color:var(--moss);">${state.xp || 0}</div>
-          </div>
-          <div style="background:var(--surface-2);padding:14px;border-radius:12px;border:1px solid var(--line-soft);text-align:center;">
-            <div style="font-size:0.8rem;color:var(--ink-muted);margin-bottom:4px;">Стрик дней</div>
-            <div style="font-family:var(--font-d);font-size:1.4rem;font-weight:700;color:var(--clay);">${state.streak || 0} дн.</div>
-          </div>
-          <div style="background:var(--surface-2);padding:14px;border-radius:12px;border:1px solid var(--line-soft);text-align:center;">
-            <div style="font-size:0.8rem;color:var(--ink-muted);margin-bottom:4px;">Диагностика</div>
-            <div style="font-family:var(--font-d);font-size:1.4rem;font-weight:700;color:var(--ink);">${state.diagScore || 30} / ${state.diagTotal || 31}</div>
-          </div>
-          <div style="background:var(--surface-2);padding:14px;border-radius:12px;border:1px solid var(--line-soft);text-align:center;">
-            <div style="font-size:0.8rem;color:var(--ink-muted);margin-bottom:4px;">Освоено тем</div>
-            <div style="font-family:var(--font-d);font-size:1.4rem;font-weight:700;color:var(--ink);">${skillCount}</div>
-          </div>
-        </div>
-
-        <div style="background:var(--surface-2);border:1px solid var(--line-soft);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:24px;">
-          <h2 style="font-size:1.1rem;font-weight:700;margin:0 0 8px;color:var(--ink);">Подключение телефона по QR-коду</h2>
-          <p style="font-size:0.88rem;color:var(--ink-muted);max-width:480px;margin:0 0 18px;">
-            Наведите камеру смартфона на QR-код ниже. Академия откроется с полной вашей историей и свяжет устройства для автоматической синхронизации.
-          </p>
-          <div style="background:#FFFFFF;padding:16px;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,0.12);margin-bottom:18px;display:inline-block;">
-            ${qrSvg}
-          </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
-            <button id="copy-sync-url-btn" style="background:var(--moss);color:#FFFFFF;border:none;border-radius:10px;padding:10px 18px;font-weight:600;font-size:0.9rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
-              📋 Скопировать ссылку для телефона
-            </button>
-            <button id="pull-cloud-btn" style="background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 18px;font-weight:600;font-size:0.9rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
-              🔄 Синхронизировать сейчас
-            </button>
-          </div>
-        </div>
-
-        <div style="border-top:1px solid var(--line-soft);padding-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
-          <div style="font-size:0.85rem;color:var(--ink-muted);">
-            Резервное копирование: <span style="font-family:var(--font-m);font-size:0.8rem;">Gist ID: ${creds.gistId.slice(0, 8)}...</span>
-          </div>
-          <div style="display:flex;gap:10px;">
-            <button onclick="downloadBackupFile()" style="background:transparent;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:0.82rem;cursor:pointer;">
-              💾 Скачать файл бэкапа
-            </button>
-            <a href="#/" style="background:var(--surface-2);color:var(--ink);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:6px 14px;font-size:0.82rem;font-weight:600;">
-              ← Вернуться к занятиям
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-  const copyBtn = document.getElementById('copy-sync-url-btn');
-  if(copyBtn){
-    copyBtn.onclick = function(){
-      navigator.clipboard.writeText(pairingUrl).then(() => showToast('📋 Ссылка скопирована в буфер!'));
-    };
-  }
-  const pullBtn = document.getElementById('pull-cloud-btn');
-  if(pullBtn){
-    pullBtn.onclick = function(){ pullFromCloudGist(false); };
-  }
-  markActiveNav('');
-  window.scrollTo(0, 0);
-}
-
 // Override render() to handle all routes (#/python, #/web, #/backend, #/algorithms, #/databases, #/architecture, #/infra, #/<track>/boss, #/mock, #/cards, #/practice, #/docs, #/map, #/sandbox, #/diagnostic)
 render = function(){
   ensureExtendedState();
@@ -8594,11 +8713,12 @@ render = function(){
   const root = document.getElementById('view-root');
   let navRoute = route;
   const isSprintFocus = route.indexOf('/skill/') !== -1 || route.indexOf('/lesson/') === 0;
-  try{ document.body.classList.toggle('is-sprint-focus', isSprintFocus); }catch(e){}
-  if(route.indexOf('/sync') === 0){
-    handleSyncRoute();
-    return;
-  } else if(route === '/'){
+  const isInteractiveRoute = ['/cards', '/practice', '/mock', '/interview-sim', '/sandbox'].includes(route) || route.indexOf('/boss') !== -1;
+  try{
+    document.body.classList.toggle('is-sprint-focus', isSprintFocus);
+    document.body.classList.toggle('is-interactive-route', isInteractiveRoute);
+  }catch(e){}
+  if(route === '/'){
     root.innerHTML = viewDashboard();
   } else if(route === '/python'){
     root.innerHTML = viewPythonMastery('python');
@@ -8730,6 +8850,16 @@ render = function(){
   markActiveNav(navRoute);
   document.getElementById('streak-num-d').textContent = state.streak;
   document.getElementById('streak-num-m').textContent = state.streak;
+  const swEl = document.getElementById('streak-word-d');
+  if(swEl && typeof pluralizeRu === 'function'){
+    swEl.textContent = pluralizeRu(state.streak, 'день', 'дня', 'дней') + ' подряд';
+  }
+  const tpEl = document.getElementById('topbar-pomo-time');
+  if(tpEl) tpEl.textContent = formatPomo(pomoState.secondsLeft);
+  const spEl = document.getElementById('sidebar-pomo-time');
+  if(spEl) spEl.textContent = formatPomo(pomoState.secondsLeft);
+  const tsBtn = document.getElementById('topbar-sound-btn');
+  if(tsBtn) tsBtn.textContent = state.soundEnabled ? '🔊' : '🔇';
 };
 
 viewSandbox = function(){
@@ -8741,7 +8871,7 @@ viewSandbox = function(){
       <p class="meta" style="margin-bottom:18px;">Настоящий Python прямо в браузере, без установки — на этом будет держаться вся практика с кодом. Удобнее за компьютером, но можно и с телефона.</p>
       <div class="sandbox-grid">
         <div>
-          <textarea id="code-input" spellcheck="false">${escapeHtmlStr(savedCode)}</textarea>
+          ${buildCodeEditorWithGutterHTML('code-input', savedCode, 'min-height:240px;', '')}
           <div style="margin-top:10px;display:flex;gap:10px;align-items:center;">
             <button class="btn btn-primary" id="run-btn">${ICONS.play} Запустить</button>
             <span class="meta" id="run-status"></span>
