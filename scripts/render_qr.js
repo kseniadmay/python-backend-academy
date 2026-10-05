@@ -19,7 +19,7 @@ const html = `<!DOCTYPE html>
   body {
     margin: 0;
     padding: 24px;
-    background: #14160F;
+    background: #0d1016;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     display: flex;
     flex-direction: column;

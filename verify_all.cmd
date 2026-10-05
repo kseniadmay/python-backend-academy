@@ -1,33 +1,13 @@
 @echo off
 chcp 65001 >nul
-echo [1/5] Running RemNote Platinum 525-file Package and Card Verification...
-python "%~dp0scripts\verify_platinum.py"
-if errorlevel 1 goto :fail
+rem [1/5] RemNote Platinum 525-file Package and Card Verification (verify_platinum.py)
+rem [2/5] E2E DOM and Invariant tests (test_e2e_dom.js)
+rem [3/5] PWA Offline, Manifest and Service Worker Verification (test_pwa_offline.js)
+rem [4/5] Headless Chrome and JS syntax verification (verify_academy.py)
+rem [5/5] 401 IDE tasks and Python snippets tests (test_all_401_tasks.py)
 
-echo.
-echo [2/5] Running E2E DOM and Invariant tests...
-node "%~dp0scripts\test_e2e_dom.js"
+python "%~dp0verify_all.py" %*
 if errorlevel 1 goto :fail
-
-echo.
-echo [3/5] Running PWA Offline, Manifest and Service Worker Verification...
-node "%~dp0scripts\test_pwa_offline.js"
-if errorlevel 1 goto :fail
-
-echo.
-echo [4/5] Running Headless Chrome and JS syntax verification...
-python "%~dp0scripts\verify_academy.py"
-if errorlevel 1 goto :fail
-
-echo.
-echo [5/5] Running 401 IDE tasks and Python snippets tests...
-python "%~dp0scripts\test_all_401_tasks.py"
-if errorlevel 1 goto :fail
-
-echo.
-echo ========================================================
-echo   All verifications passed successfully! (100%% PASS)
-echo ========================================================
 goto :end
 
 :fail
@@ -38,3 +18,4 @@ echo ========================================================
 exit /b 1
 
 :end
+exit /b 0

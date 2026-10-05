@@ -53,7 +53,7 @@ python .\verify_all.py
 python .\verify_all.py --quick
 ```
 
-### 2. Сквозной аудит всех тестовых скриптов (86/86 PASS)
+### 2. Сквозной аудит всех тестовых скриптов (87/87 PASS)
 Параллельный запуск всех тестовых, проверочных и аудиторских скриптов:
 ```powershell
 python .\scripts\audit_pipeline.py

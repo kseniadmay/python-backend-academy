@@ -92,10 +92,13 @@ class MockCache {
     }
   }
   async match(req) {
-    const key = typeof req === 'string' ? req : (req.url || '');
-    // matching relative and absolute
+    const rawKey = typeof req === 'string' ? req : (req.url || '');
+    let decodedKey = rawKey;
+    try { decodedKey = decodeURI(rawKey); } catch (e) {}
     for (const [k, v] of this.store.entries()) {
-      if (k === key || key.endsWith('/' + k) || (k === './' && key.endsWith('/'))) {
+      if (k === rawKey || rawKey.endsWith('/' + k) || (k === './' && rawKey.endsWith('/')) ||
+          k === decodedKey || decodedKey.endsWith('/' + k) ||
+          encodeURI(k) === rawKey || rawKey.endsWith('/' + encodeURI(k))) {
         return v;
       }
     }
@@ -146,11 +149,17 @@ const swContext = {
   self: mockSelf,
   caches: mockCaches,
   URL: URL,
+  decodeURI: decodeURI,
+  encodeURI: encodeURI,
   console: console,
   setTimeout: setTimeout
 };
 vm.createContext(swContext);
 vm.runInContext(swContent, swContext);
+
+const activeCacheMatch = swContent.match(/CACHE_NAME\s*=\s*['"]([^'"]+)['"]/);
+assert(activeCacheMatch, 'sw.js: не удалось определить CACHE_NAME');
+const ACTIVE_CACHE_NAME = activeCacheMatch[1];
 
 (async () => {
   // 4.1. Проверка install
@@ -161,21 +170,22 @@ vm.runInContext(swContent, swContext);
   });
   await installPromise;
   assert(skippedWaiting, 'Install должен вызывать self.skipWaiting()');
-  const cacheV3 = mockCacheStorage.get('academy-pwa-v3');
-  assert(cacheV3, 'Кэш academy-pwa-v3 должен быть создан при установке');
-  assert(cacheV3.store.size >= 4, `В кэш должно быть записано >= 4 ассетов, записано: ${cacheV3.store.size}`);
-  console.log('✓ 4.1. Install событие отработало: кэш инициализирован, skipWaiting() выполнен');
+  const cacheActive = mockCacheStorage.get(ACTIVE_CACHE_NAME);
+  assert(cacheActive, `Кэш ${ACTIVE_CACHE_NAME} должен быть создан при установке`);
+  assert(cacheActive.store.size >= 5, `В кэш должно быть записано >= 5 ассетов, записано: ${cacheActive.store.size}`);
+  console.log(`✓ 4.1. Install событие отработало: кэш ${ACTIVE_CACHE_NAME} инициализирован, skipWaiting() выполнен`);
 
   // 4.2. Проверка activate и ротации старых кэшей
-  mockCacheStorage.set('academy-pwa-v1-obsolete', new MockCache('academy-pwa-v1-obsolete'));
-  assert(mockCacheStorage.has('academy-pwa-v1-obsolete'), 'Предусловие: старый кэш присутствует');
+  const obsoleteCacheName = 'academy-pwa-v1-obsolete';
+  mockCacheStorage.set(obsoleteCacheName, new MockCache(obsoleteCacheName));
+  assert(mockCacheStorage.has(obsoleteCacheName), 'Предусловие: старый кэш присутствует');
   let activatePromise = null;
   swEvents['activate']({
     waitUntil: (p) => { activatePromise = p; }
   });
   await activatePromise;
-  assert(!mockCacheStorage.has('academy-pwa-v1-obsolete'), 'Activate должен удалять устаревшие версии кэша');
-  assert(mockCacheStorage.has('academy-pwa-v3'), 'Актуальный кэш academy-pwa-v3 должен быть сохранён');
+  assert(!mockCacheStorage.has(obsoleteCacheName), 'Activate должен удалять устаревшие версии кэша');
+  assert(mockCacheStorage.has(ACTIVE_CACHE_NAME), `Актуальный кэш ${ACTIVE_CACHE_NAME} должен быть сохранён`);
   assert(claimedClients, 'Activate должен вызывать self.clients.claim()');
   console.log('✓ 4.2. Activate событие отработало: устаревшие кэши очищены, clients.claim() вызван');
 
@@ -209,13 +219,16 @@ vm.runInContext(swContent, swContext);
   const offAcademy = await testFetchOffline('https://pwa-offline-test.local/academy.html');
   assert(offAcademy.url.includes('academy.html'), 'Оффлайн-запрос academy.html вернул кэш');
 
+  const offIdeTrainer = await testFetchOffline('https://pwa-offline-test.local/' + encodeURI('Практика кода — тренажёр с IDE.html'));
+  assert(offIdeTrainer.url.includes('Практика кода') || decodeURI(offIdeTrainer.url).includes('Практика кода'), 'Оффлайн-запрос тренажёра с IDE вернул кэш');
+
   const offManifest = await testFetchOffline('https://pwa-offline-test.local/manifest.json');
   assert(offManifest.url.includes('manifest.json'), 'Оффлайн-запрос manifest.json вернул кэш');
 
   const offIcon = await testFetchOffline('https://pwa-offline-test.local/icon.svg');
   assert(offIcon.url.includes('icon.svg'), 'Оффлайн-запрос icon.svg вернул кэш');
 
-  console.log('✓ 4.3. Оффлайн-режим (авиарежим) полностью подтверждён: все ключевые ассеты отдаются из кэша Service Worker при сбое сети!');
+  console.log('✓ 4.3. Оффлайн-режим (авиарежим) полностью подтверждён: все ключевые ассеты (включая тренажёр IDE) отдаются из кэша Service Worker при сбое сети!');
 
   // 4.4. Проверка фильтрации: POST и сторонние домены не перехватываются
   let postIntercepted = false;

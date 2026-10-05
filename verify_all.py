@@ -24,6 +24,11 @@ import time
 import argparse
 import subprocess
 
+try:
+    sys.stdout.reconfigure(line_buffering=True)
+except Exception:
+    pass
+
 _ROOT = os.path.dirname(os.path.abspath(__file__))
 _SCRIPTS = os.path.join(_ROOT, 'scripts')
 
@@ -62,26 +67,26 @@ STAGES = [
 
 
 def run_stage(stage):
-    print(f"\n[{stage['num']}] Running {stage['title']}...")
+    print(f"\n[{stage['num']}] Running {stage['title']}...", flush=True)
     start_t = time.time()
     res = subprocess.run(stage['cmd'], cwd=_ROOT, text=True, encoding='utf-8', errors='ignore')
     elapsed = time.time() - start_t
     if res.returncode != 0:
-        print(f"\n[FAIL] Stage [{stage['num']}] FAILED with exit code {res.returncode} ({elapsed:.2f}s)!")
+        print(f"\n[FAIL] Stage [{stage['num']}] FAILED with exit code {res.returncode} ({elapsed:.2f}s)!", flush=True)
         return False, elapsed
-    print(f"[OK] Stage [{stage['num']}] PASSED in {elapsed:.2f}s")
+    print(f"[OK] Stage [{stage['num']}] PASSED in {elapsed:.2f}s", flush=True)
     return True, elapsed
 
 
 def main():
     parser = argparse.ArgumentParser(description='Мастер-конвейер верификации Python Backend Academy')
-    parser.add_argument('--full', action='store_true', help='Запустить полный аудит всех 86+ скриптов конвейера')
-    parser.add_argument('--quick', action='store_true', help='Быстрый прогон без этапа 5 (401 задача IDE)')
+    parser.add_argument('--full', '-f', action='store_true', help='Запустить полный аудит всех 87 скриптов конвейера')
+    parser.add_argument('--quick', '-q', action='store_true', help='Быстрый прогон без этапа 5 (401 задача IDE)')
     args = parser.parse_args()
 
-    print('========================================================')
-    print('  PYTHON BACKEND ACADEMY — ПРОВЕРКА КОНВЕЙЕРА (100% PASS)')
-    print('========================================================')
+    print('========================================================', flush=True)
+    print('  PYTHON BACKEND ACADEMY — ПРОВЕРКА КОНВЕЙЕРА (100% PASS)', flush=True)
+    print('========================================================', flush=True)
 
     total_start = time.time()
     timings = []

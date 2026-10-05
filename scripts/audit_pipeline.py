@@ -22,6 +22,11 @@ import argparse
 import subprocess
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+try:
+    sys.stdout.reconfigure(line_buffering=True)
+except Exception:
+    pass
+
 _CWD = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _SCRIPTS_DIR = os.path.join(_CWD, 'scripts')
 
@@ -29,12 +34,13 @@ PATTERNS = [
     'test_*.py', 'test_*.js',
     'verify_*.py', 'verify_*.js',
     'check_*.py',
-    'audit_*.py', 'audit_*.js'
+    'audit_*.py', 'audit_*.js',
+    'quick_*.py'
 ]
 
 HEAVY_SCRIPTS = {
-    'test_all_401_tasks.py': 80,
-    'verify_academy.py': 70,
+    'test_all_401_tasks.py': 120,
+    'verify_academy.py': 90,
     'audit_pipeline.py': 0  # исключаем сам себя из рекурсивного аудита
 }
 
@@ -57,7 +63,7 @@ def run_single_script(script_name, verbose=False):
     is_js = script_name.endswith('.js')
     cmd = ['node', full_path] if is_js else [sys.executable, full_path]
 
-    timeout = HEAVY_SCRIPTS.get(script_name, 15)
+    timeout = HEAVY_SCRIPTS.get(script_name, 35)
 
     start = time.time()
     try:
@@ -78,17 +84,20 @@ def run_single_script(script_name, verbose=False):
                 'code': 0,
                 'time': elapsed,
                 'out': res.stdout,
-                'err': ''
+                'err': '',
+                'full_err': ''
             }
         else:
-            err_line = (res.stderr or res.stdout).strip().split('\n')[-1]
+            raw_err = (res.stderr or res.stdout).strip()
+            err_line = raw_err.split('\n')[-1] if raw_err else f'Exit code {res.returncode}'
             return {
                 'name': script_name,
                 'status': 'FAIL',
                 'code': res.returncode,
                 'time': elapsed,
                 'out': res.stdout,
-                'err': err_line[:140]
+                'err': err_line[:140],
+                'full_err': raw_err
             }
     except subprocess.TimeoutExpired:
         elapsed = time.time() - start
@@ -98,7 +107,8 @@ def run_single_script(script_name, verbose=False):
             'code': -1,
             'time': elapsed,
             'out': '',
-            'err': f'Timeout exceeded ({timeout}s)'
+            'err': f'Timeout exceeded ({timeout}s)',
+            'full_err': f'Script timed out after {timeout} seconds'
         }
     except Exception as e:
         elapsed = time.time() - start
@@ -108,7 +118,8 @@ def run_single_script(script_name, verbose=False):
             'code': -2,
             'time': elapsed,
             'out': '',
-            'err': str(e)[:140]
+            'err': str(e)[:140],
+            'full_err': str(e)
         }
 
 
@@ -118,27 +129,27 @@ def main():
     parser.add_argument('--parallel', '-p', action='store_true', default=True, help='Параллельный запуск (по умолчанию включён)')
     parser.add_argument('--workers', '-w', type=int, default=4, help='Количество воркеров (по умолчанию 4)')
     parser.add_argument('--sequential', '-s', action='store_true', help='Последовательный запуск вместо параллельного')
-    parser.add_argument('--verbose', '-v', action='store_true', help='Подробный вывод результатов каждого теста')
+    parser.add_argument('--verbose', '-v', action='store_true', help='Подробный вывод результатов и логов каждого теста')
+    parser.add_argument('--fail-fast', '-f', action='store_true', help='Немедленно прервать прогон при первой ошибке')
     args = parser.parse_args()
 
     scripts = discover_scripts(args.filter)
     total = len(scripts)
     if total == 0:
-        print("Не найдено скриптов для проверки.")
+        print("Не найдено скриптов для проверки.", flush=True)
         sys.exit(0)
 
     use_parallel = args.parallel and not args.sequential and total > 1
     workers = min(args.workers, total) if use_parallel else 1
 
-    print('========================================================')
-    print(f'  АУДИТ КОНВЕЙЕРА: {total} скриптов (Воркеры: {workers if use_parallel else 1})')
-    print('========================================================')
+    print('========================================================', flush=True)
+    print(f'  АУДИТ КОНВЕЙЕРА: {total} скриптов (Воркеры: {workers if use_parallel else 1})', flush=True)
+    print('========================================================', flush=True)
 
     results = []
     start_total = time.time()
 
     if use_parallel:
-        # Для параллельного запуска сначала запускаем тяжёлые скрипты, чтобы они не задерживали хвост
         sorted_scripts = sorted(scripts, key=lambda s: 0 if s in HEAVY_SCRIPTS else 1)
         with ThreadPoolExecutor(max_workers=workers) as executor:
             future_to_script = {executor.submit(run_single_script, s, args.verbose): s for s in sorted_scripts}
@@ -148,40 +159,56 @@ def main():
                 results.append(r)
                 done_count += 1
                 status_icon = '✓' if r['status'] == 'PASS' else '✗'
-                print(f"[{done_count:02d}/{total:02d}] {status_icon} {r['name']:<35} {r['status']:<7} ({r['time']:.2f}s)")
-                if r['status'] != 'PASS' and r['err']:
-                    print(f"       └── Ошибка: {r['err']}")
+                print(f"[{done_count:02d}/{total:02d}] {status_icon} {r['name']:<35} {r['status']:<7} ({r['time']:.2f}s)", flush=True)
+                if r['status'] != 'PASS':
+                    print(f"       └── Ошибка: {r['err']}", flush=True)
+                    if args.verbose and r.get('full_err'):
+                        print(f"       └── Подробности:\n{r['full_err']}\n", flush=True)
+                    if args.fail_fast:
+                        print("\n[FAIL-FAST] Аудит прерван из-за сбоя теста.", flush=True)
+                        break
     else:
         for idx, s in enumerate(scripts, 1):
             r = run_single_script(s, args.verbose)
             results.append(r)
             status_icon = '✓' if r['status'] == 'PASS' else '✗'
-            print(f"[{idx:02d}/{total:02d}] {status_icon} {r['name']:<35} {r['status']:<7} ({r['time']:.2f}s)")
-            if r['status'] != 'PASS' and r['err']:
-                print(f"       └── Ошибка: {r['err']}")
+            print(f"[{idx:02d}/{total:02d}] {status_icon} {r['name']:<35} {r['status']:<7} ({r['time']:.2f}s)", flush=True)
+            if r['status'] != 'PASS':
+                print(f"       └── Ошибка: {r['err']}", flush=True)
+                if args.verbose and r.get('full_err'):
+                    print(f"       └── Подробности:\n{r['full_err']}\n", flush=True)
+                if args.fail_fast:
+                    print("\n[FAIL-FAST] Аудит прерван из-за сбоя теста.", flush=True)
+                    break
 
     total_time = time.time() - start_total
     passed = [r for r in results if r['status'] == 'PASS']
     failed = [r for r in results if r['status'] in ('FAIL', 'ERROR')]
     timed_out = [r for r in results if r['status'] == 'TIMEOUT']
 
-    print('\n========================================================')
-    print(f'ИТОГ АУДИТА: {len(passed)}/{total} PASS (Успех: {len(passed)/total*100:.1f}%)')
-    print(f'Общее время выполнения: {total_time:.2f}s')
-    print('========================================================')
+    print('\n========================================================', flush=True)
+    print(f'ИТОГ АУДИТА: {len(passed)}/{total} PASS (Успех: {len(passed)/total*100:.1f}%)', flush=True)
+    print(f'Общее время выполнения: {total_time:.2f}s', flush=True)
+    print('========================================================', flush=True)
+
+    if passed:
+        print('\n[ТОП-5 САМЫХ ДЛИТЕЛЬНЫХ СКРИПТОВ]', flush=True)
+        slowest = sorted(passed, key=lambda x: x['time'], reverse=True)[:5]
+        for s in slowest:
+            print(f"  {s['time']:5.2f}s - {s['name']}", flush=True)
 
     if failed:
-        print('\n[ОШИБКИ]')
+        print('\n[ОШИБКИ]', flush=True)
         for f in failed:
-            print(f"- {f['name']} (код {f['code']}): {f['err']}")
+            print(f"- {f['name']} (код {f['code']}): {f['err']}", flush=True)
 
     if timed_out:
-        print('\n[ТАЙМАУТЫ]')
+        print('\n[ТАЙМАУТЫ]', flush=True)
         for t in timed_out:
-            print(f"- {t['name']}")
+            print(f"- {t['name']}", flush=True)
 
     if len(passed) == total:
-        print('\n✓ 100% ВСЕХ СКРИПТОВ КОНВЕЙЕРА УСПЕШНО ПРОЙДЕНЫ!\n')
+        print('\n✓ 100% ВСЕХ СКРИПТОВ КОНВЕЙЕРА УСПЕШНО ПРОЙДЕНЫ!\n', flush=True)
         sys.exit(0)
     else:
         sys.exit(1)

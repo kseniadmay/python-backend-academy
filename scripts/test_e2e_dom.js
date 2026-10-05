@@ -1229,7 +1229,7 @@ function fireClick(attrName, attrVal) {
   if (fs.existsSync(academyHtmlPath)) {
     const academyHtmlRaw = fs.readFileSync(academyHtmlPath, 'utf-8');
     assert(academyHtmlRaw.includes('rel="manifest"') && academyHtmlRaw.includes('manifest.json'), 'academy.html must link manifest.json');
-    assert(academyHtmlRaw.includes('name="theme-color"') && academyHtmlRaw.includes('#14160F'), 'academy.html must set theme-color');
+    assert(academyHtmlRaw.includes('name="theme-color"') && (academyHtmlRaw.includes('#0d1016') || academyHtmlRaw.includes('#14160F')), 'academy.html must set theme-color');
     assert(academyHtmlRaw.includes('rel="apple-touch-icon"'), 'academy.html must set apple-touch-icon');
     assert(academyHtmlRaw.includes('navigator.serviceWorker.register'), 'academy.html must register ServiceWorker');
   }

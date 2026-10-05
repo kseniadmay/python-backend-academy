@@ -242,9 +242,10 @@
      - `[3/5]` PWA Offline, манифест и Service Worker (`test_pwa_offline.js`) — PASS;
      - `[4/5]` Быстрый рендеринг маршрутов в Headless Chrome (`verify_academy.py`, параллелизация `ThreadPoolExecutor`, ускорен с 51с до 18с) — PASS;
      - `[5/5]` Комплексный прогон 401 задачи IDE и 459 сниппетов конспектов (`test_all_401_tasks.py`) — PASS.
-   - `audit_pipeline.py` — параллельный аудит всех тестовых скриптов конвейера: **ровно 86 из 86 скриптов конвейера проходят успешно (86/86 PASS, 0 FAIL, 0 TIMEOUT)**.
-   - `install_hooks.py` + `quick_precommit_check.py` — легковесный Git Pre-commit хук (<0.5с), предотвращающий коммит синтаксических ошибок в JS, Python и JSON.
-   - `index.html` обновлён метатегами PWA, темой, иконкой и автоматической регистрацией Service Worker.
+   - `audit_pipeline.py` — параллельный аудит всех тестовых скриптов конвейера: **ровно 87 из 87 скриптов конвейера проходят успешно (87/87 PASS, 0 FAIL, 0 TIMEOUT)**.
+   - `sw.js` и `test_pwa_offline.js` — Service Worker v4 с оффлайн-кэшированием автономного тренажёра «Практика кода — тренажёр с IDE.html» (401 задача).
+   - `install_hooks.py` + `quick_precommit_check.py` — кроссплатформенный Git Pre-commit хук (bash + Windows `pre-commit.bat`) с in-memory валидацией inline JS в HTML (<0.2с).
+   - `index.html` обновлён метатегами PWA, темой «Вечерний Обсидиан» (`#0d1016`), шрифтом `Onest` и автоматической регистрацией Service Worker.
 
 ---
 
@@ -254,15 +255,15 @@
 
 ```markdown
 1. Цель проекта и текущее состояние:
-Платформа «Junior+ Python Backend Developer» (`academy.html` + `Практика кода — тренажёр с IDE.html` + база `RemNote_Python_Mastery_FIXED` на 238 конспектов `К-*` и 286 колод `Ф-*`) полностью собрана, вычитана по всем 7 модулям (`#/python`, `#/web`, `#/backend`, `#/algorithms`, `#/databases`, `#/architecture`, `#/infra`), оформлена в дизайне «Мягкий Кокон / Вечерний Обсидиан», оснащена бронебойной системой сохранения прогресса (`ACADEMY_SCHEMA_VERSION = 3`), всеми исправлениями аудитов, PWA оффлайн-контуром и усиленным 5-этапным конвейером верификации.
+Платформа «Junior+ Python Backend Developer» (`academy.html` + `Практика кода — тренажёр с IDE.html` + база `RemNote_Python_Mastery_FIXED` на 238 конспектов `К-*` и 286 колод `Ф-*`) полностью собрана, вычитана по всем 7 модулям (`#/python`, `#/web`, `#/backend`, `#/algorithms`, `#/databases`, `#/architecture`, `#/infra`), оформлена в дизайне «Мягкий Кокон / Вечерний Обсидиан», оснащена бронебойной системой сохранения прогресса (`ACADEMY_SCHEMA_VERSION = 3`), всеми исправлениями аудитов, PWA оффлайн-контуром (v4 с IDE) и усиленным 5-этапным конвейером верификации.
 
 2. Где лежат все файлы:
 - Единая облачная папка проекта: `C:\Users\fury6\OneDrive\Python_Backend_Academy` (на Рабочем столе только ярлык `Python Backend Academy (Cloud).lnk`).
 - Сборочный и тестовый конвейер: `verify_all.py`, `verify_all.cmd` и `scripts/`.
 
 3. Что полностью готово и проверено (100% PASS):
-- Конвейер полностью усилен: внедрены `audit_pipeline.py` (86/86 PASS с параллелизацией), кроссплатформенный `verify_all.py` (5 этапов с таймингами и режимом `--quick`), автоматизированный E2E-тест PWA `test_pwa_offline.js`, ускорен `verify_academy.py` (параллельный рендеринг Chrome), установлен pre-commit хук `install_hooks.py`.
-- Сплошной аудит тестового конвейера: ровно 86 из 86 скриптов в `scripts/` проходят на 100% PASS (0 failures, 0 timeouts).
+- Конвейер полностью усилен: внедрены `audit_pipeline.py` (87/87 PASS с параллелизацией), кроссплатформенный `verify_all.py` (5 этапов с таймингами и режимом `--quick`), автоматизированный E2E-тест PWA `test_pwa_offline.js`, ускорен `verify_academy.py` (параллельный рендеринг Chrome), установлен pre-commit хук `install_hooks.py` (sh + bat).
+- Сплошной аудит тестового конвейера: ровно 87 из 87 скриптов в `scripts/` проходят на 100% PASS (0 failures, 0 timeouts).
 - Единый 5-этапный конвейер `verify_all.cmd` и `verify_all.py` отрабатывает на 100% PERFECT.
 ```
 
@@ -274,7 +275,7 @@
 Продолжаю работу над проектом Python Backend Academy (/boost).
 Все файлы проекта собраны в единой облачной папке C:\Users\fury6\OneDrive\Python_Backend_Academy (контекст: C:\Users\fury6\OneDrive\Python_Backend_Academy\HANDOVER_CONTEXT.md).
 Прочитай HANDOVER_CONTEXT.md перед началом работы!
-Текущий статус: 100% всех 86 тестов пройдены (86/86 PASS, 5-этапный verify_all.cmd / verify_all.py 100% PERFECT).
+Текущий статус: 100% всех 87 тестов пройдены (87/87 PASS, 5-этапный verify_all.cmd / verify_all.py 100% PERFECT).
 Следующая задача: [опишите вашу следующую задачу].
 ```
 

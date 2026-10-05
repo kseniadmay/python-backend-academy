@@ -1,34 +1,60 @@
-import re, subprocess, json, os
+import re, subprocess, json, os, sys, shutil, tempfile
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+
+try:
+    sys.stdout.reconfigure(line_buffering=True)
+except Exception:
+    pass
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 HTML_PATH = os.path.normpath(os.path.join(_HERE, '..', 'academy.html'))
+IDE_PATH = os.path.normpath(os.path.join(_HERE, '..', 'Практика кода — тренажёр с IDE.html'))
+INDEX_PATH = os.path.normpath(os.path.join(_HERE, '..', 'index.html'))
 assert os.path.isfile(HTML_PATH), f"academy.html missing: {HTML_PATH}"
 
-with open(HTML_PATH, encoding='utf-8') as f:
-    html = f.read()
+# 1. Syntax check with node --check (in-memory, 0 disk artifacts) across all entry points
+def check_html_inline_scripts(html_file, label):
+    with open(html_file, encoding='utf-8') as f:
+        content = f.read()
+    checked = 0
+    for m in re.finditer(r'<script(?:\s+([^>]*))?>([\s\S]*?)</script>', content, re.IGNORECASE):
+        attrs = m.group(1) or ''
+        code = m.group(2)
+        if not code.strip():
+            continue
+        if 'type=' in attrs and not any(t in attrs for t in ['javascript', 'module']):
+            continue
+        res = subprocess.run(['node', '--check'], input=code, text=True, capture_output=True)
+        assert res.returncode == 0, f"JS syntax error in {label}:\n{res.stderr}"
+        checked += 1
+    assert checked > 0, f"No inline scripts found in {label}"
+    return checked
 
-# 1. Extract main inline <script> and check syntax with node --check
-scripts = re.findall(r'<script>([\s\S]*?)</script>', html)
-assert len(scripts) == 1, f"Expected 1 inline script, found {len(scripts)}"
-js_code = scripts[0]
+c_acad = check_html_inline_scripts(HTML_PATH, 'academy.html')
+c_ide = check_html_inline_scripts(IDE_PATH, 'Практика кода — тренажёр с IDE.html') if os.path.isfile(IDE_PATH) else 0
+c_idx = check_html_inline_scripts(INDEX_PATH, 'index.html') if os.path.isfile(INDEX_PATH) else 0
+print(f"1. [PASS] node --check passed with 0 syntax errors across {c_acad + c_ide + c_idx} scripts (academy: {c_acad}, IDE: {c_ide}, index: {c_idx})!", flush=True)
 
-js_tmp = os.path.join(_HERE, 'extracted_academy.js')
-with open(js_tmp, 'w', encoding='utf-8') as f:
-    f.write(js_code)
+# 2. Discover Chrome executable across standard installation paths and PATH
+def get_chrome_executable():
+    candidates = [
+        r'C:\Program Files\Google\Chrome\Application\chrome.exe',
+        r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe',
+        os.path.expandvars(r'%LOCALAPPDATA%\Google\Chrome\Application\chrome.exe'),
+        os.path.expandvars(r'%PROGRAMFILES%\Google\Chrome\Application\chrome.exe'),
+        os.path.expandvars(r'%PROGRAMFILES(X86)%\Google\Chrome\Application\chrome.exe'),
+    ]
+    for c in candidates:
+        if os.path.isfile(c):
+            return c
+    for cmd in ('chrome', 'google-chrome', 'chromium'):
+        p = shutil.which(cmd)
+        if p:
+            return p
+    return candidates[0]
 
-res = subprocess.run(['node', '--check', js_tmp], capture_output=True, text=True)
-if os.path.exists(js_tmp):
-    try: os.remove(js_tmp)
-    except Exception: pass
-assert res.returncode == 0, f"JS syntax error:\n{res.stderr}"
-print("1. [PASS] node --check passed with 0 syntax errors!")
-
-# 2. Verify real Headless Chrome renders <main id="view-root"> across routes and produces 0 console errors
-import tempfile
-from concurrent.futures import ThreadPoolExecutor
-
-chrome_exe = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
+chrome_exe = get_chrome_executable()
 base_uri = Path(HTML_PATH).as_uri()
 chrome_flags = [
     chrome_exe, '--headless', '--no-sandbox', '--disable-gpu',
@@ -55,7 +81,7 @@ routes = [
 
 def verify_single_route(item):
     route, expected_sub = item
-    with tempfile.TemporaryDirectory() as td:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
         c_res = subprocess.run(
             chrome_flags + [f'--user-data-dir={td}', route],
             capture_output=True, text=True, encoding='utf-8', errors='ignore'
@@ -74,21 +100,21 @@ with ThreadPoolExecutor(max_workers=5) as executor:
         print(msg)
 
 # 3. Verify real Headless Chrome renders standalone IDE trainer (Практика кода — тренажёр с IDE.html)
-ide_path = os.path.normpath(os.path.join(_HERE, '..', 'Практика кода — тренажёр с IDE.html'))
-if os.path.isfile(ide_path):
-    ide_uri = Path(ide_path).as_uri()
-    ide_res = subprocess.run(
-        chrome_flags + [ide_uri],
-        capture_output=True, text=True, encoding='utf-8', errors='ignore'
-    )
-    assert ide_res.returncode == 0, f"Chrome failed on standalone IDE with code {ide_res.returncode}"
-    ide_c_errors = [line for line in ide_res.stderr.splitlines() if 'ERROR:CONSOLE' in line or 'Uncaught ' in line]
-    assert not ide_c_errors, f"Console error in Chrome for standalone IDE:\n" + "\n".join(ide_c_errors)
-    ide_out = ide_res.stdout
-    assert 'Все уровни' in ide_out and '401' in ide_out, f"Missing 'Все уровни' or '401' in IDE HTML render"
-    assert 'task-grid' in ide_out or 'task-card' in ide_out, "Missing task grid/cards in IDE HTML render"
-    assert 'editorHost' in ide_out or 'CodeMirror' in ide_out, "Missing editor container in IDE HTML render"
-    print(f"3. [PASS] Real Headless Chrome rendered standalone IDE trainer (0 console errors, {len(ide_out)} chars)")
+if os.path.isfile(IDE_PATH):
+    ide_uri = Path(IDE_PATH).as_uri()
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td_ide:
+        ide_res = subprocess.run(
+            chrome_flags + [f'--user-data-dir={td_ide}', ide_uri],
+            capture_output=True, text=True, encoding='utf-8', errors='ignore'
+        )
+        assert ide_res.returncode == 0, f"Chrome failed on standalone IDE with code {ide_res.returncode}"
+        ide_c_errors = [line for line in ide_res.stderr.splitlines() if 'ERROR:CONSOLE' in line or 'Uncaught ' in line]
+        assert not ide_c_errors, f"Console error in Chrome for standalone IDE:\n" + "\n".join(ide_c_errors)
+        ide_out = ide_res.stdout
+        assert 'Все уровни' in ide_out and '401' in ide_out, f"Missing 'Все уровни' or '401' in IDE HTML render"
+        assert 'task-grid' in ide_out or 'task-card' in ide_out, "Missing task grid/cards in IDE HTML render"
+        assert 'editorHost' in ide_out or 'CodeMirror' in ide_out, "Missing editor container in IDE HTML render"
+        print(f"3. [PASS] Real Headless Chrome rendered standalone IDE trainer (0 console errors, {len(ide_out)} chars)")
 
 # 4. Verify Python_Backend_Academy_Project.zip structure and integrity
 import zipfile

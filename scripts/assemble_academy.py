@@ -8905,7 +8905,9 @@ html_out = orig_html
 
 # 1. Inject PWA meta, Brython 3.13.0 CDN scripts and EXTRA_CSS before </head>
 pwa_meta = """<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#14160F">
+<meta name="theme-color" content="#0d1016" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#faf8f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1016">
 <link rel="apple-touch-icon" href="icon.svg">"""
 brython_scripts = """<script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.13.0/brython.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.13.0/brython_stdlib.js"></script>"""
@@ -9078,7 +9080,6 @@ PIPELINE_FILES = [
     'audit_pipeline.py',
     'install_hooks.py',
     'quick_precommit_check.py',
-    'extracted_academy.js',
     'PROJECT_CONTEXT.md',
     'HANDOVER_CONTEXT.md',
 ]
