@@ -1,4 +1,4 @@
-﻿const http = require('http');
+const http = require('http');
 
 function evalCDP(jsCode) {
   return new Promise((resolve, reject) => {
@@ -60,7 +60,7 @@ async function auditAll() {
           for (const k of dKids) {
             const kTitle = (k.key || []).map(x => typeof x === 'string' ? x : (x.text || '')).join('');
             if (kTitle.includes('**')) issues.push({ type: 'kid_bold', id: k._id, day: dTitle, text: kTitle });
-            if (kTitle.includes('_' + '`' + '_' + '`' + '_')) issues.push({ type: 'kid_glitch', id: k._id, day: dTitle, text: kTitle });
+            if (kTitle.includes('_' + String.fromCharCode(96) + '_' + String.fromCharCode(96) + '_')) issues.push({ type: 'kid_glitch', id: k._id, day: dTitle, text: kTitle });
           }
         }
       }

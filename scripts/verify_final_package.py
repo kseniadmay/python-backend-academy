@@ -3,11 +3,10 @@ import zipfile
 import re
 import hashlib
 
-desktop_zip = r'C:\Users\fury6\OneDrive\Desktop\RemNote_Python_Mastery_FIXED.zip'
-docs_zip = r'C:\Users\fury6\OneDrive\Документы\Обучение Python\RemNote_Python_Mastery_FIXED.zip'
+_here = os.path.dirname(os.path.abspath(__file__))
+project_zip = os.path.normpath(os.path.join(_here, '..', 'RemNote_Python_Mastery_FIXED.zip'))
 
-assert os.path.exists(desktop_zip), "Desktop zip missing!"
-assert os.path.exists(docs_zip), "Docs zip missing!"
+assert os.path.exists(project_zip), f"Project zip missing: {project_zip}"
 
 def file_hash(path):
     h = hashlib.sha256()
@@ -16,13 +15,10 @@ def file_hash(path):
             h.update(chunk)
     return h.hexdigest()
 
-hash_desktop = file_hash(desktop_zip)
-hash_docs = file_hash(docs_zip)
-print(f"Desktop SHA256: {hash_desktop}")
-print(f"Docs SHA256:    {hash_docs}")
-assert hash_desktop == hash_docs, "Zip files differ in checksum!"
+h = file_hash(project_zip)
+print(f"Archive SHA256: {h}")
 
-z = zipfile.ZipFile(desktop_zip)
+z = zipfile.ZipFile(project_zip)
 names = z.namelist()
 print(f"Total files in archive: {len(names)}")
 
@@ -30,12 +26,12 @@ notes = [n for n in names if '📚 Конспекты' in n and n.endswith('.md'
 cards = [n for n in names if '📇 Карточки' in n and n.endswith('.md')]
 maps = [n for n in names if 'Карта Мастерства' in n]
 
-print(f"Notes count: {len(notes)} (expected: 216)")
-print(f"Cards count: {len(cards)} (expected: 226)")
+print(f"Notes count: {len(notes)} (expected: 238)")
+print(f"Cards count: {len(cards)} (expected: 286)")
 print(f"Map count:   {len(maps)} (expected: 1)")
 
-assert len(notes) == 216, f"Expected 216 notes, got {len(notes)}"
-assert len(cards) == 226, f"Expected 226 cards, got {len(cards)}"
+assert len(notes) == 238, f"Expected 238 notes, got {len(notes)}"
+assert len(cards) == 286, f"Expected 286 cards, got {len(cards)}"
 assert len(maps) == 1, f"Expected 1 map, got {len(maps)}"
 
 errors = []

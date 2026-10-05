@@ -2,7 +2,17 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-const jsCode = fs.readFileSync(path.join(__dirname, 'extracted_academy.js'), 'utf-8');
+let jsCode = '';
+const extractedPath = path.join(__dirname, 'extracted_academy.js');
+if (fs.existsSync(extractedPath)) {
+  jsCode = fs.readFileSync(extractedPath, 'utf-8');
+} else {
+  const academyHtmlPath = path.join(__dirname, '..', 'academy.html');
+  const academyHtml = fs.readFileSync(academyHtmlPath, 'utf-8');
+  const m = academyHtml.match(/<script>([\s\S]*?)<\/script>/);
+  if (!m) throw new Error('Could not find inline <script> in academy.html');
+  jsCode = m[1];
+}
 
 // Build a lightweight DOM mock to verify all routes, event handlers, and state transitions synchronously
 const elementsById = {};
@@ -1153,15 +1163,33 @@ function fireClick(attrName, attrVal) {
   if (fs.existsSync(ideHtmlPath)) {
     const ideHtmlContent = fs.readFileSync(ideHtmlPath, 'utf-8');
     assert(ideHtmlContent.includes('__ACADEMY_SYNC_V1__:') && ideHtmlContent.includes("window.addEventListener('storage'"), 'Standalone IDE trainer must support window.name (__ACADEMY_SYNC_V1__:) and cross-tab storage event sync');
+    assert(ideHtmlContent.includes('id="practiceDesc"') && ideHtmlContent.includes('t.initialCode') && ideHtmlContent.includes('t.solution'), 'Standalone IDE trainer must display task description and use initialCode/solution');
+    const startMarker = 'const TASKS = ';
+    const endMarker = '];\n</script>';
+    const pStart = ideHtmlContent.indexOf(startMarker);
+    assert(pStart !== -1, 'Standalone IDE trainer must define const TASKS');
+    const pEnd = ideHtmlContent.indexOf(endMarker, pStart);
+    assert(pEnd !== -1, 'Standalone IDE trainer must define valid closing of TASKS array');
+    assert(ideHtmlContent.includes('const TIERS = ['), 'Standalone IDE trainer must define const TIERS');
+    const jsonStr = ideHtmlContent.slice(pStart + startMarker.length, pEnd + 1).trim();
+    const parsedTasks = JSON.parse(jsonStr);
+    assert(parsedTasks.length === 401, `Standalone IDE trainer must contain exactly 401 tasks, found ${parsedTasks.length}`);
+    const reqKeys = ['id', 'level', 'tier', 'topic', 'title', 'desc', 'initialCode', 'hint', 'code', 'solution', 'tests'];
+    parsedTasks.forEach(t => {
+      reqKeys.forEach(k => assert(t[k] !== undefined && t[k] !== null && String(t[k]).trim().length > 0, `Task #${t.id} missing or empty field: ${k}`));
+    });
+    const t20 = parsedTasks.find(t => t.id === 20);
+    assert(t20 && t20.title.includes('Разворот списка срезом [::-1]'), 'Task #20 must have title "Разворот списка срезом [::-1]"');
   }
   console.log('✓ Bulletproof Progress Persistence (Chronological lastVisit, Legacy Schema Migration, Streak Freeze Hydration, UnitTest/Diag/Cards/Practice/Sandbox Continuity, Live Draft Auto-Save, Cross-Tab Sync, Standalone IDE Sync & Pre-Reset Recovery) verified!');
 
-  // 15. Verify all 27 Human Review Audit Fixes (Человеческая проверка.docx)
+  // 15. Verify all 28 Human Review Audit Fixes (Человеческая проверка.docx)
   const docsHtml = navigate('#/docs');
   assert(docsHtml.includes('Справочник Python Backend') && docsHtml.includes('Операции над множествами'), '#/docs Reference Hub failed to render');
   assert(typeof sandbox.formatRichInlineText === 'function' && sandbox.formatRichInlineText('Поиск за O(1) и O(n^2)').includes('math-formula'), 'formatRichInlineText must format Big-O notation with .math-formula');
   assert(typeof sandbox.formatQuizQuestionPromptHTML === 'function' && sandbox.formatQuizQuestionPromptHTML('Что выведет код:\n\nx = [1, 2]\nprint(x)').includes('quiz-question-code'), 'formatQuizQuestionPromptHTML must format multiline code prompts with .quiz-question-code');
-  navigate('#/diagnostic');
+  diagIntro = navigate('#/diagnostic');
+  assert(diagIntro.includes('diag-header-row') && diagIntro.includes('class="back-link"'), 'Diagnostic intro must wrap back-link and topic-badge in .diag-header-row (Point 2)');
   await fireClick('data-diag-start', '');
   const diagQ0Html = elementsById['view-root'].innerHTML;
   assert(diagQ0Html.includes('diag-header-row') && diagQ0Html.includes('data-diag-answer="-1"') && diagQ0Html.includes('Не знаю — разобрать эту тему с нуля'), 'Diagnostic question must include single-line .diag-header-row and "Не знаю" option');
@@ -1177,7 +1205,26 @@ function fireClick(attrName, attrVal) {
   const k001StepsHtml = sandbox.PY_MASTERY.notes['К-001'].steps.map(s => s.html).join('\n');
   assert(k001StepsHtml.includes('Компромисс времени и памяти (Time-Space Tradeoff)') && k001StepsHtml.includes('has_duplicate_fast(sample)'), 'К-001 must include runnable print demo and Time-Space Tradeoff breakdown');
   assert(typeof sandbox.openBugReportModal === 'function', 'openBugReportModal must be exposed on window');
-  console.log('✓ All 27 Human Review Audit Fixes (Человеческая проверка.docx) verified!');
+
+  // Verify Cards Hub Deck Completion Screen (Человеческая проверка.docx, Point 28)
+  navigate('#/cards');
+  sandbox.cardsHubState.completed = true;
+  (winListeners['hashchange'] || []).forEach(fn => fn());
+  const deckCompleteHtml = elementsById['view-root'].innerHTML;
+  assert(deckCompleteHtml.includes('🎉 Колода изучена!') && deckCompleteHtml.includes('Перейти к практике темы') && deckCompleteHtml.includes('data-hub-restart-deck'), 'Cards Hub must display completion screen with direct link to topic practice and restart button (Point 28)');
+  await fireClick('data-hub-restart-deck', '');
+  assert(!sandbox.cardsHubState.completed && sandbox.cardsHubState.cardIdx === 0, 'Clicking data-hub-restart-deck must restart the deck from card 0');
+
+  // Verify PWA manifest, theme-color, apple-touch-icon, and service worker registration
+  const academyHtmlPath = path.join(__dirname, '..', 'academy.html');
+  if (fs.existsSync(academyHtmlPath)) {
+    const academyHtmlRaw = fs.readFileSync(academyHtmlPath, 'utf-8');
+    assert(academyHtmlRaw.includes('rel="manifest"') && academyHtmlRaw.includes('manifest.json'), 'academy.html must link manifest.json');
+    assert(academyHtmlRaw.includes('name="theme-color"') && academyHtmlRaw.includes('#14160F'), 'academy.html must set theme-color');
+    assert(academyHtmlRaw.includes('rel="apple-touch-icon"'), 'academy.html must set apple-touch-icon');
+    assert(academyHtmlRaw.includes('navigator.serviceWorker.register'), 'academy.html must register ServiceWorker');
+  }
+  console.log('✓ All 28 Human Review Audit Fixes (Человеческая проверка.docx) & PWA readiness verified!');
 
   // 16. Verify UI & Visualization Catalog Improvements (UI_VISUALIZATION_IMPROVEMENTS_CATALOG.md)
   // 16.1. Russian pluralization helper
@@ -1214,6 +1261,33 @@ function fireClick(attrName, attrVal) {
   // 16.7. Mobile-Friendly Practice Filters in Practice Hub (#/practice)
   const practiceHtml = navigate('#/practice');
   assert(practiceHtml.includes('prac-filters-toggle') && practiceHtml.includes('prac-filters-collapsible'), 'Practice Hub must support collapsible accordion filters on mobile');
+  assert(practiceHtml.includes('prac-chips-bar') && practiceHtml.includes('prac-chip--echelon') && practiceHtml.includes('prac-chip--cat'), 'Practice Hub must render horizontal chips bar with echelon and category chips');
+
+  // Verify that changing echelon filter dynamically updates active task to match filter
+  const echSelect = elementsById['prac-echelon-filter'] || { value: '2' };
+  echSelect.value = '2';
+  if (docListeners['change']) {
+    for (const fn of docListeners['change']) {
+      fn({ target: { id: 'prac-echelon-filter', value: '2' } });
+    }
+  }
+  const practiceHtmlEch2 = elementsById['view-root'].innerHTML;
+  assert(sandbox.practiceHubState.echelonFilter === '2', 'practiceHubState.echelonFilter must be updated to 2');
+  assert(sandbox.getTaskInterviewTier(sandbox.practiceHubState.taskId) === 2, `Active practice task after selecting Echelon 2 must be an Echelon 2 task, got taskId=${sandbox.practiceHubState.taskId}`);
+  assert(!practiceHtmlEch2.includes('Задача #240:'), 'After selecting Echelon 2, Echelon 1 Task #240 must not remain active');
+
+  // Verify next task button navigates within Echelon 2
+  const prevTaskId = sandbox.practiceHubState.taskId;
+  await fireClick('data-prac-step', '1');
+  assert(sandbox.practiceHubState.taskId !== prevTaskId, 'Next task button in practice hub must change task');
+  assert(sandbox.getTaskInterviewTier(sandbox.practiceHubState.taskId) === 2, 'Next task in practice hub must still be in Echelon 2');
+
+  // Restore filter to all for subsequent tests
+  if (docListeners['change']) {
+    for (const fn of docListeners['change']) {
+      fn({ target: { id: 'prac-echelon-filter', value: 'all' } });
+    }
+  }
 
   // 16.8. STAR Matrix & Pitch Timer in Mock Interview (#/mock)
   const mockSec16Html = navigate('#/mock');
@@ -1226,6 +1300,60 @@ function fireClick(attrName, attrVal) {
   assert(typeof sandbox.togglePomodoro === 'function' && typeof sandbox.syncPomoDisplays === 'function', 'Pomodoro timer must support global toggling and multi-display synchronization');
 
   console.log('✓ All 8 UI & Visualization Catalog Improvements (UI_VISUALIZATION_IMPROVEMENTS_CATALOG.md) verified!');
+
+  /* ================= 17. MOBILE FEEDBACK BACKLOG (REV-001 TO REV-005) & TRANSPORT VERIFICATION ================= */
+  // 17.1. REV-001: K-001 step 6 split into clean micro-steps (naive vs fast set lookup)
+  const k001 = sandbox.PY_MASTERY.notes['К-001'];
+  assert(k001 && k001.steps.length >= 8, `K-001 must have >= 8 steps after splitting step 6, got ${k001 ? k001.steps.length : 0}`);
+  const hasNaiveStep = k001.steps.some(s => s.title.includes('наивный') || s.title.includes('O(n²)'));
+  const hasFastStep = k001.steps.some(s => s.title.includes('Быстрый поиск через set') || s.title.includes('Tradeoff'));
+  assert(hasNaiveStep && hasFastStep, 'K-001 must contain separate steps for naive O(n²) and fast set O(n) lookups');
+
+  // 17.2. REV-002: XP Exploit Prevention and Progress Visibility in Skill Focus Topbar
+  navigate('#/python/skill/1.1.1');
+  await fireClick('data-py-tab', 'cards');
+  const xpBeforeCard = JSON.parse(store['academy_state_v1']).xp || 0;
+  await fireClick('data-py-rate-card', '4'); // rates card 0 -> advances to card 1
+  const xpAfterCard0 = JSON.parse(store['academy_state_v1']).xp || 0;
+  assert(xpAfterCard0 > xpBeforeCard, 'First card rating must award XP');
+  await fireClick('data-py-prev-card', ''); // go back to already rated card 0
+  await fireClick('data-py-rate-card', '4'); // re-rating card 0 must not award XP again
+  const xpAfterReRateCard0 = JSON.parse(store['academy_state_v1']).xp || 0;
+  assert(xpAfterReRateCard0 === xpAfterCard0, 'Re-rating already studied card must NOT award repeated XP (anti-exploit REV-002)');
+
+  // Test skill focus topbar updates for cards and code tabs
+  assert(elementsById['view-root'].innerHTML.includes('Карточка '), 'Skill cards tab must show card progress in topbar (REV-002)');
+  await fireClick('data-py-tab', 'code');
+  assert(elementsById['view-root'].innerHTML.includes('Задача #'), 'Skill code tab must show task progress in topbar (REV-002)');
+
+  // 17.3. REV-003: Task selector without repeated egg emojis
+  const skillCodeHtml = elementsById['view-root'].innerHTML;
+  assert(!skillCodeHtml.includes('· 🥚'), 'Task selector buttons must not contain repeated egg emoji (REV-003)');
+  assert(skillCodeHtml.includes('#20 · Разворот списка срезом') || skillCodeHtml.includes('#20 · '), 'Task selector buttons must display clean #20 · Task Title format');
+
+  // 17.4. REV-004: Task #20 text deduplication
+  const t20 = sandbox.IDE_TASKS_BY_ID[20];
+  assert(t20, 'Task #20 must exist');
+  assert(t20.title !== t20.desc, 'Task #20 title and description must not be identical');
+  assert(!t20.initialCode.includes(t20.desc), 'Task #20 initial code must not duplicate description text');
+  assert(t20.desc.includes('<code>original</code>') && t20.desc.includes('<code>reversed_list</code>'), 'Task #20 description must clearly specify variables');
+
+  // 17.5. REV-005: Mobile Cards Hub compact controls
+  const cardsHubCheckHtml = navigate('#/cards');
+  assert(cardsHubCheckHtml.includes('cards-hub-controls') && cardsHubCheckHtml.includes('cards-hub-subfilters'), 'Cards hub must feature compact responsive .cards-hub-controls and .cards-hub-subfilters layout');
+  assert(cardsHubCheckHtml.includes('id="cards-echelon-filter"') && cardsHubCheckHtml.includes('id="cards-unit-select"') && cardsHubCheckHtml.includes('id="cards-deck-select"'), 'All 3 card filters must remain accessible and functional');
+
+  // 17.6. Bug Report Transport
+  await fireClick('data-open-bug-modal', '');
+  const bugInp = sandbox.document.getElementById('bug-report-input');
+  bugInp.value = 'Тестовое замечание мобильного UX';
+  const initialBugCount = (JSON.parse(store['academy_state_v1']).bugReports || []).length;
+  await fireClick('data-save-bug-report', '');
+  const stateAfterBug = JSON.parse(store['academy_state_v1']);
+  assert(stateAfterBug.bugReports && stateAfterBug.bugReports.length === initialBugCount + 1, 'Saving bug report must append to state.bugReports immediately');
+  const lastReport = stateAfterBug.bugReports[stateAfterBug.bugReports.length - 1];
+  assert(lastReport.text === 'Тестовое замечание мобильного UX' && lastReport.context, 'Saved report must contain text and route context');
+  console.log('✓ All 5 Mobile Feedback Items (REV-001 to REV-005) & Bug Report Transport verified!');
 })();
 
 

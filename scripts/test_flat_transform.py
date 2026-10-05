@@ -108,10 +108,14 @@ def transform_note_to_flat_level(raw_text):
     return '\n'.join(out) + '\n'
 
 # Протестируем на К-001 и графах
-z = zipfile.ZipFile(r'C:\Users\fury6\OneDrive\Документы\Обучение Python\RemNote_Python.zip')
+import os
+_here = os.path.dirname(os.path.abspath(__file__))
+zip_path = os.path.normpath(os.path.join(_here, '..', 'RemNote_Python_Mastery_FIXED.zip'))
+z = zipfile.ZipFile(zip_path)
 
 print("=== SAMPLE 1: K-001 ===")
-raw1 = z.read('RemNote_Python/01 · 🐍 Python/Юнит 1.1 · Базовый синтаксис/📚 Конспекты/01. Структуры данных Python_ list, dict, set.md').decode('utf-8')
+k001_name = [n for n in z.namelist() if 'К-001' in n][0]
+raw1 = z.read(k001_name).decode('utf-8')
 res1 = transform_note_to_flat_level(raw1)
 for i, l in enumerate(res1.splitlines()[:30]):
     print(f"{i+1:2d}: {l}")
@@ -119,7 +123,7 @@ for i, l in enumerate(res1.splitlines()[:30]):
 print("\n=== SAMPLE 2: Графы (была лесенка с точками) ===")
 # найдем файл графов
 for n in z.namelist():
-    if 'Структуры данных графа' in n:
+    if 'графа' in n.lower():
         raw2 = z.read(n).decode('utf-8')
         res2 = transform_note_to_flat_level(raw2)
         for i, l in enumerate(res2.splitlines()[:30]):

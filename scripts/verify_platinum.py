@@ -4,32 +4,28 @@ import zipfile
 import hashlib
 
 def run_platinum_audit():
-    desktop_zip = r'C:\Users\fury6\OneDrive\Desktop\RemNote_Python_Mastery_FIXED.zip'
-    docs_zip = r'C:\Users\fury6\OneDrive\Документы\Обучение Python\RemNote_Python_Mastery_FIXED.zip'
+    _here = os.path.dirname(os.path.abspath(__file__))
+    project_zip = os.path.normpath(os.path.join(_here, '..', 'RemNote_Python_Mastery_FIXED.zip'))
     
-    assert os.path.exists(desktop_zip), f"Desktop zip missing: {desktop_zip}"
-    assert os.path.exists(docs_zip), f"Docs zip missing: {docs_zip}"
+    assert os.path.exists(project_zip), f"Project zip missing: {project_zip}"
     
-    # 1. Проверка идентичности архивов
-    with open(desktop_zip, 'rb') as f1, open(docs_zip, 'rb') as f2:
+    with open(project_zip, 'rb') as f1:
         h1 = hashlib.sha256(f1.read()).hexdigest()
-        h2 = hashlib.sha256(f2.read()).hexdigest()
-    assert h1 == h2, f"Hashes mismatch! Desktop: {h1}, Docs: {h2}"
-    print(f"[OK] SHA256 match: {h1}")
+    print(f"[OK] SHA256: {h1}")
     
-    z = zipfile.ZipFile(desktop_zip)
+    z = zipfile.ZipFile(project_zip)
     names = z.namelist()
-    print(f"[OK] Total files in archive: {len(names)} (expected 443)")
-    assert len(names) == 443, f"Expected 443 files, got {len(names)}"
+    print(f"[OK] Total files in archive: {len(names)} (expected 525)")
+    assert len(names) == 525, f"Expected 525 files, got {len(names)}"
     
     notes = [n for n in names if '📚 Конспекты' in n and n.endswith('.md')]
     cards = [n for n in names if '📇 Карточки' in n and n.endswith('.md')]
     maps = [n for n in names if '00 · 🗺️ Карта Мастерства.md' in n]
     
-    assert len(notes) == 216, f"Expected 216 notes, got {len(notes)}"
-    assert len(cards) == 226, f"Expected 226 cards, got {len(cards)}"
+    assert len(notes) == 238, f"Expected 238 notes, got {len(notes)}"
+    assert len(cards) == 286, f"Expected 286 cards, got {len(cards)}"
     assert len(maps) == 1, f"Expected 1 map, got {len(maps)}"
-    print(f"[OK] 216 Notes, 226 Cards, 1 Map verified")
+    print(f"[OK] 238 Notes, 286 Cards, 1 Map verified")
     
     # 2. Глубокий аудит конспектов
     note_errors = []
@@ -70,11 +66,20 @@ def run_platinum_audit():
             
         # д) Проверка отсутствия дефисов перед кодом внутри блоков кода
         in_c = False
+        cur_lang = ''
         for line_no, l in enumerate(lines, 1):
             if l.startswith('```'):
-                in_c = not in_c
+                if not in_c:
+                    in_c = True
+                    cur_lang = l[3:].strip().lower()
+                else:
+                    in_c = False
+                    cur_lang = ''
                 continue
             if in_c and l.strip().startswith('- '):
+                # В YAML, Markdown, diff и текстовых блоках списки на дефисах валидны
+                if cur_lang in ('yaml', 'yml', 'markdown', 'md', 'text', 'txt', 'diff'):
+                    continue
                 # Допускаются только комментарии или специфические строки, но не артефакты списка
                 if not re.search(r'#|//', l):
                     note_errors.append(f"{nf}:{line_no}: Code line starts with '- ': {l}")

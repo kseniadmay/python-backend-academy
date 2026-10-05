@@ -1,7 +1,9 @@
 import zipfile
 import re
 
-zip_path = r'C:\Users\fury6\OneDrive\Desktop\RemNote_Python_Mastery_FIXED.zip'
+import os
+_here = os.path.dirname(os.path.abspath(__file__))
+zip_path = os.path.normpath(os.path.join(_here, '..', 'RemNote_Python_Mastery_FIXED.zip'))
 
 with zipfile.ZipFile(zip_path) as z:
     map_text = z.read('00 · 🗺️ Карта Мастерства.md').decode('utf-8')

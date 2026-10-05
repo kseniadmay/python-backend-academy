@@ -18,12 +18,20 @@ with open(js_tmp, 'w', encoding='utf-8') as f:
     f.write(js_code)
 
 res = subprocess.run(['node', '--check', js_tmp], capture_output=True, text=True)
+if os.path.exists(js_tmp):
+    try: os.remove(js_tmp)
+    except Exception: pass
 assert res.returncode == 0, f"JS syntax error:\n{res.stderr}"
 print("1. [PASS] node --check passed with 0 syntax errors!")
 
 # 2. Verify real Headless Chrome renders <main id="view-root"> across routes
 chrome_exe = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
 base_uri = Path(HTML_PATH).as_uri()
+chrome_flags = [
+    chrome_exe, '--headless', '--no-sandbox', '--disable-gpu',
+    '--disable-background-networking', '--disable-sync', '--disable-default-apps',
+    '--log-level=3', '--dump-dom'
+]
 for route, expected_sub in [
     (base_uri, 'Правило 2 минут: Быстрый микро-шаг'),
     (base_uri + '#/python', 'Матрица Мастерства Python'),
@@ -40,11 +48,54 @@ for route, expected_sub in [
     (base_uri + '#/cards', 'Центр 3D Флеш-карточек'),
 ]:
     out = subprocess.check_output(
-        [chrome_exe, '--headless', '--no-sandbox', '--disable-gpu', '--dump-dom', route],
+        chrome_flags + [route],
         text=True, encoding='utf-8', errors='ignore'
     )
     m = re.search(r'<main id="view-root">([\s\S]*?)</main>', out)
     assert m and len(m.group(1).strip()) > 200, f"Empty <main id='view-root'> in Chrome for {route}"
     assert expected_sub in m.group(1), f"Missing {expected_sub!r} in Chrome DOM for {route}"
     print(f"2. [PASS] Real Headless Chrome rendered {route} ({len(m.group(1))} chars in #view-root)")
+
+# 3. Verify real Headless Chrome renders standalone IDE trainer (Практика кода — тренажёр с IDE.html)
+ide_path = os.path.normpath(os.path.join(_HERE, '..', 'Практика кода — тренажёр с IDE.html'))
+if os.path.isfile(ide_path):
+    ide_uri = Path(ide_path).as_uri()
+    ide_out = subprocess.check_output(
+        chrome_flags + [ide_uri],
+        text=True, encoding='utf-8', errors='ignore'
+    )
+    assert 'Все уровни' in ide_out and '401' in ide_out, f"Missing 'Все уровни' or '401' in IDE HTML render"
+    assert 'task-grid' in ide_out or 'task-card' in ide_out, "Missing task grid/cards in IDE HTML render"
+    assert 'editorHost' in ide_out or 'CodeMirror' in ide_out, "Missing editor container in IDE HTML render"
+    print(f"3. [PASS] Real Headless Chrome rendered standalone IDE trainer ({len(ide_out)} chars)")
+
+# 4. Verify Python_Backend_Academy_Project.zip structure and integrity
+import zipfile
+zip_path = os.path.normpath(os.path.join(_HERE, '..', 'Python_Backend_Academy_Project.zip'))
+if os.path.isfile(zip_path):
+    with zipfile.ZipFile(zip_path, 'r') as zf:
+        namelist = zf.namelist()
+        assert len(namelist) >= 545, f"Expected >= 545 files in project zip, got {len(namelist)}"
+        required_in_zip = [
+            'academy.html',
+            'Практика кода — тренажёр с IDE.html',
+            'manifest.json',
+            'icon.svg',
+            'sw.js',
+            'RemNote_Python_Mastery_FIXED.zip',
+            'README.md',
+            'scripts/assemble_academy.py',
+            'scripts/test_e2e_dom.js',
+            'scripts/test_all_401_tasks.py'
+        ]
+        for req in required_in_zip:
+            assert req in namelist, f"Missing required file '{req}' inside Python_Backend_Academy_Project.zip"
+        # Validate nested RemNote zip integrity
+        rem_bytes = zf.read('RemNote_Python_Mastery_FIXED.zip')
+        import io
+        with zipfile.ZipFile(io.BytesIO(rem_bytes)) as rzf:
+            r_names = rzf.namelist()
+            assert len(r_names) == 525, f"Expected 525 files inside nested RemNote zip, got {len(r_names)}"
+    print(f"4. [PASS] Project archive Python_Backend_Academy_Project.zip verified ({len(namelist)} items, nested RemNote 525 items)!")
+
 

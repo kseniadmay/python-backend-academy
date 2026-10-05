@@ -310,21 +310,43 @@ def build_starter_for_task(t):
 
     return '\n'.join(lines)
 
+_TASK_OVERRIDES = {
+    20: {
+        'title': 'Разворот списка срезом [::-1]',
+        'desc': '<p><strong>Задание:</strong> Создайте исходный список чисел <code>original</code> и получите его инвертированную копию <code>reversed_list</code> с помощью шага среза <code>[::-1]</code>.</p>',
+        'starter_header': '# Задача #20: Разворот списка срезом',
+    }
+}
+
 with open(IDE_HTML_PATH, encoding='utf-8') as f:
-    ide_lines = f.read().split('\n')
-TASKS_381 = json.loads(ide_lines[317].strip()[len('const TASKS = '):-1])
+    ide_content = f.read()
+tasks_match = re.search(r'const TASKS = (\[[\s\S]*?\]);\n', ide_content)
+if tasks_match:
+    TASKS_381 = json.loads(tasks_match.group(1))
+else:
+    ide_lines = ide_content.split('\n')
+    TASKS_381 = json.loads(ide_lines[317].strip()[len('const TASKS = '):-1])
 for _t in TASKS_381:
     _lvl = _t.get('level', 1)
     _t['tier'] = TIER_MAP.get(_lvl, f'🥚 Уровень {_lvl}')
     _t['topic'] = '🐍 Python Core' if 240 <= _t['id'] <= 381 else '🌐 Backend & SQL'
+    if _t['id'] in _TASK_OVERRIDES:
+        _ov = _TASK_OVERRIDES[_t['id']]
+        if 'title' in _ov: _t['title'] = _ov['title']
     _code = clean_ref_code(_t['id'], _t.get('code', ''))
     _t['code'] = _code
     _t['solution'] = _code
     _t['initialCode'] = build_starter_for_task(_t)
+    if _t['id'] in _TASK_OVERRIDES and 'starter_header' in _TASK_OVERRIDES[_t['id']]:
+        _hdr = _TASK_OVERRIDES[_t['id']]['starter_header']
+        _t['initialCode'] = re.sub(r'^# Задача #\d+:.*', _hdr, _t['initialCode'])
     _doc_m = re.search(r'"""(.*?)"""', _code, re.S)
-    _t['desc'] = f"<p><strong>Задание:</strong> {html.escape(_t['title'])}.</p>" + (
-        f"<p class='meta'>{html.escape(_doc_m.group(1).strip())}</p>" if _doc_m else ""
-    )
+    if _t['id'] in _TASK_OVERRIDES and 'desc' in _TASK_OVERRIDES[_t['id']]:
+        _t['desc'] = _TASK_OVERRIDES[_t['id']]['desc']
+    else:
+        _t['desc'] = f"<p><strong>Задание:</strong> {html.escape(_t['title'])}.</p>" + (
+            f"<p class='meta'>{html.escape(_doc_m.group(1).strip())}</p>" if _doc_m else ""
+        )
     _t['hint'] = f"Обрати внимание на сигнатуру и инварианты задачи «{_t['title']}» ({_t['tier']})."
     _t['tests'] = build_test_for_task(_t)
 

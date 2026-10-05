@@ -1,7 +1,9 @@
 import zipfile
 import re
 
-zip_path = r'C:\Users\fury6\OneDrive\Desktop\RemNote_Python_Mastery_FIXED.zip'
+import os
+_here = os.path.dirname(os.path.abspath(__file__))
+zip_path = os.path.normpath(os.path.join(_here, '..', 'RemNote_Python_Mastery_FIXED.zip'))
 z = zipfile.ZipFile(zip_path, 'r')
 
 print("=== 1. VERIFYING K-001 ===")

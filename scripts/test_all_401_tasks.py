@@ -1806,5 +1806,33 @@ assert r2 == {"issues": [], "probes_healthy": True, "ready": True}, r2
                     exec(b_test, ns2)
                 _sys.modules['sqlite3'] = _real_sq_restore
         print("✓ All 7/7 Module Boss Challenges (live initialCode negative checks + canonical solutions) passed in CPython and Brython fallback shim!")
+
+        # 4) Verify standalone IDE trainer file on disk
+        import json as _json_disk
+        _ide_path = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'Практика кода — тренажёр с IDE.html'))
+        if os.path.isfile(_ide_path):
+            with open(_ide_path, 'r', encoding='utf-8') as _f:
+                _ide_content = _f.read()
+            assert '__ACADEMY_SYNC_V1__:' in _ide_content, "Missing __ACADEMY_SYNC_V1__: in standalone IDE"
+            assert "window.addEventListener('storage'" in _ide_content, "Missing storage listener in standalone IDE"
+            assert "readWindowNameSync" in _ide_content, "Missing readWindowNameSync in standalone IDE"
+            assert "writeWindowNameSync" in _ide_content, "Missing writeWindowNameSync in standalone IDE"
+            assert "practiceDesc" in _ide_content, "Missing #practiceDesc in standalone IDE"
+            _idx_tasks = _ide_content.find('const TASKS =')
+            assert _idx_tasks != -1, "Could not find const TASKS in standalone IDE"
+            _start_bracket = _ide_content.find('[', _idx_tasks)
+            _raw_tasks, _ = _json_disk.JSONDecoder().raw_decode(_ide_content, _start_bracket)
+            assert len(_raw_tasks) == 401, f"Expected 401 tasks in standalone IDE, got {len(_raw_tasks)}"
+            _req_keys = {'id', 'level', 'tier', 'topic', 'title', 'desc', 'initialCode', 'hint', 'code', 'solution', 'tests'}
+            for _t in _raw_tasks:
+                assert _req_keys.issubset(_t.keys()), f"Task #{_t.get('id')} missing keys: {_req_keys - set(_t.keys())}"
+                assert _t['title'] and str(_t['title']).strip(), f"Task #{_t['id']} has empty title"
+                assert _t['desc'] and str(_t['desc']).strip(), f"Task #{_t['id']} has empty desc"
+                assert _t['initialCode'] and str(_t['initialCode']).strip(), f"Task #{_t['id']} has empty initialCode"
+                assert _t['solution'] and str(_t['solution']).strip(), f"Task #{_t['id']} has empty solution"
+                assert _t['tests'] and str(_t['tests']).strip(), f"Task #{_t['id']} has empty tests"
+            _t20 = next(_t for _t in _raw_tasks if _t['id'] == 20)
+            assert "Разворот списка срезом [::-1]" in _t20['title'], f"Task 20 title mismatch: {_t20['title']}"
+            print("✓ Standalone IDE trainer (Практика кода — тренажёр с IDE.html): 401 tasks, 11-field schema, safe limits & sync verified!")
     _run_suite()
 

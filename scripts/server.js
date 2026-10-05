@@ -58,7 +58,75 @@ const MIME_TYPES = {
 };
 
 const server = http.createServer((req, res) => {
+    // CORS headers for local LAN & mobile access
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    if (req.method === 'OPTIONS') {
+        res.writeHead(204);
+        res.end();
+        return;
+    }
+
     let reqUrl = decodeURI(req.url.split('?')[0].split('#')[0]);
+
+    // REST API: Bug Reports / Mobile Feedback Queue
+    if (reqUrl === '/api/bug-report' || reqUrl === '/api/bug-report/') {
+        const dataDir = path.join(ROOT_DIR, 'data');
+        const queueFile = path.join(dataDir, 'user_feedback_queue.json');
+
+        if (req.method === 'POST') {
+            let body = '';
+            req.on('data', chunk => {
+                body += chunk;
+                if (body.length > 5 * 1024 * 1024) req.destroy();
+            });
+            req.on('end', () => {
+                try {
+                    const report = JSON.parse(body || '{}');
+                    if (!fs.existsSync(dataDir)) {
+                        fs.mkdirSync(dataDir, { recursive: true });
+                    }
+                    let queue = [];
+                    if (fs.existsSync(queueFile)) {
+                        try {
+                            const parsed = JSON.parse(fs.readFileSync(queueFile, 'utf8'));
+                            if (Array.isArray(parsed)) queue = parsed;
+                        } catch(e) {
+                            queue = [];
+                        }
+                    }
+                    if (!report.timestamp) report.timestamp = new Date().toISOString();
+                    if (!report.createdAt) report.createdAt = new Date().toLocaleString('ru-RU');
+                    queue.push(report);
+                    fs.writeFileSync(queueFile, JSON.stringify(queue, null, 2), 'utf8');
+                    console.log(`[+] [Feedback Queue] Получено новое замечание: [${report.context || 'unknown'}] (${queue.length} в очереди)`);
+                    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ ok: true, count: queue.length, id: queue.length }));
+                } catch(err) {
+                    res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ ok: false, error: err.message }));
+                }
+            });
+            return;
+        }
+
+        if (req.method === 'GET') {
+            let queue = [];
+            if (fs.existsSync(queueFile)) {
+                try {
+                    const parsed = JSON.parse(fs.readFileSync(queueFile, 'utf8'));
+                    if (Array.isArray(parsed)) queue = parsed;
+                } catch(e) {
+                    queue = [];
+                }
+            }
+            res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+            res.end(JSON.stringify({ ok: true, count: queue.length, reports: queue }));
+            return;
+        }
+    }
 
     if (reqUrl === '/' || reqUrl === '' || reqUrl === '/index.html') {
         reqUrl = '/academy.html';

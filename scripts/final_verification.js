@@ -3,6 +3,11 @@ const fs = require('fs');
 
 console.log('=== VERIFYING REMNOTE SQLITE DB ===');
 const dbPath = 'C:/Users/fury6/remnote/remnote-6a7345f0a3f205110d2692d2/remnote.db';
+if (!fs.existsSync(dbPath)) {
+  console.log(`[SKIP] Local desktop RemNote database not found at ${dbPath}.`);
+  console.log('[INFO] RemNote invariant: desktop client is not used; verification proceeds via web/json.');
+  process.exit(0);
+}
 const db = new DatabaseSync(dbPath, { open: true });
 
 const rootRow = db.prepare("SELECT doc FROM quanta WHERE _id = 'HKILo3FLoxkwXggHD'").get();

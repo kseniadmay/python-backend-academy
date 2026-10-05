@@ -1,7 +1,12 @@
 import sqlite3
 import json
 
+import os, sys
 db_path = r'C:\Users\fury6\.gemini\antigravity\scratch\remnote-69d8425df107d8b00ed6ddb9\remnote.db'
+if not os.path.exists(db_path):
+    print("RemNote SQLite DB not found, skipping check_flat_headers.py")
+    sys.exit(0)
+
 con = sqlite3.connect(db_path)
 cur = con.cursor()
 
@@ -10,17 +15,17 @@ cur.execute("SELECT _id, doc FROM quanta WHERE doc LIKE '%\"s\":\"H2\"%' OR doc 
 rows = cur.fetchall()
 print(f"Total H2/H3 rems in DB: {len(rows)}")
 
+# Collect all parents once
+cur.execute("SELECT json_extract(doc, '$.parent') FROM quanta WHERE json_extract(doc, '$.parent') IS NOT NULL")
+parent_set = set(r[0] for r in cur.fetchall())
+
 headers_with_kids = 0
 headers_without_kids = 0
 
 for rid, d_str in rows:
     d = json.loads(d_str)
-    # Проверим, есть ли у этого заголовка дети (через children или WHERE parent = rid)
     kids_arr = d.get('children', [])
-    cur.execute("SELECT count(*) FROM quanta WHERE json_extract(doc, '$.parent') = ?", (rid,))
-    parent_kids = cur.fetchone()[0]
-    
-    if len(kids_arr) > 0 or parent_kids > 0:
+    if len(kids_arr) > 0 or rid in parent_set:
         headers_with_kids += 1
     else:
         headers_without_kids += 1

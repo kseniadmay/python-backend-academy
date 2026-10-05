@@ -709,20 +709,89 @@ EXTRA_CSS = r"""
   }
   .topbar-pomo-pill:hover{border-color:var(--moss);transform:translateY(-1px);}
   .topbar-pomo-pill.is-running{background:var(--emerald-soft);border-color:var(--emerald);color:var(--moss-deep);}
-  .bug-fab-btn{
-    position:fixed;right:16px;bottom:18px;z-index:85;
-    display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;
-    background:var(--surface);border:1px solid var(--glass-border);color:var(--ink-soft);
-    font-size:.76rem;font-weight:700;cursor:pointer;box-shadow:var(--shadow-1);
-    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);transition:transform .22s ease, opacity .22s ease, border-color .15s;
+  .bug-fab-btn{display:none !important;}
+  .bug-topbar-btn, #bug-report-btn-m, #bug-report-btn-d{
+    font-size:1.05rem;line-height:1;width:34px;height:34px;padding:0;
+    display:inline-flex;align-items:center;justify-content:center;
+    border-radius:10px;border:1.5px solid rgba(107,29,47,0.38) !important;
+    background:rgba(107,29,47,0.07) !important;
+    box-shadow:0 1px 3px rgba(107,29,47,0.08);
+    color:var(--ink-soft);cursor:pointer;transition:all .15s ease;
+    flex-shrink:0;
   }
-  .bug-fab-btn:hover{border-color:var(--bordeaux);color:var(--ink);transform:translateY(-1px);}
-  .bug-fab-btn.bug-fab-btn--hidden{transform:translateY(80px);opacity:0;pointer-events:none;}
-  body.is-interactive-route .bug-fab-btn span{display:none;}
-  body.is-interactive-route .bug-fab-btn{padding:8px 10px;}
-  @media (max-width:880px){
-    /* On mobile, bug button lives cleanly in .topbar so it never overlaps flashcards or code editors */
-    .bug-fab-btn{display:none !important;}
+  .bug-topbar-btn:hover, #bug-report-btn-m:hover, #bug-report-btn-d:hover{
+    background:rgba(107,29,47,0.14) !important;border-color:#6b1d2f !important;
+    box-shadow:0 2px 8px rgba(107,29,47,0.20);transform:translateY(-1px);
+  }
+  :root[data-theme="dark"] .bug-topbar-btn,
+  :root[data-theme="dark"] #bug-report-btn-m,
+  :root[data-theme="dark"] #bug-report-btn-d{
+    background:rgba(190,18,60,0.20) !important;
+    border:1.5px solid rgba(251,113,133,0.65) !important;
+    box-shadow:0 0 12px rgba(225,29,72,0.26), inset 0 0 4px rgba(244,63,94,0.15) !important;
+  }
+  :root[data-theme="dark"] .bug-topbar-btn:hover,
+  :root[data-theme="dark"] #bug-report-btn-m:hover,
+  :root[data-theme="dark"] #bug-report-btn-d:hover{
+    background:rgba(190,18,60,0.32) !important;
+    border-color:rgba(251,113,133,0.95) !important;
+    box-shadow:0 0 16px rgba(244,63,94,0.45), inset 0 0 6px rgba(244,63,94,0.24) !important;
+    transform:translateY(-1px);
+  }
+  @media (max-width: 600px){
+    .topbar{padding:8px 10px !important;}
+    .topbar > div:last-child{gap:6px !important;}
+    .topbar .streak-pill{padding:5px 8px !important;font-size:.80rem !important;}
+  }
+  .prac-chip--echelon{border-color:rgba(107,29,47,0.20);transition:all .15s ease;}
+  .prac-chip--echelon:hover{border-color:#6b1d2f !important;transform:translateY(-1px);}
+  .prac-chip--echelon.is-active, .prac-chip--echelon.active,
+  .prac-chip-select-pill.prac-chip--echelon.is-active, .prac-chip-select-pill.prac-chip--echelon.active{
+    background:rgba(107,29,47,0.09) !important;border:1.5px solid rgba(107,29,47,0.55) !important;
+    box-shadow:0 1px 4px rgba(107,29,47,0.12) !important;
+  }
+  .prac-chip--echelon.is-active .prac-chip-display, .prac-chip--echelon.active .prac-chip-display{
+    color:#6b1d2f !important;font-weight:700 !important;
+  }
+  :root[data-theme="dark"] .prac-chip--echelon{border-color:rgba(251,113,133,0.25);}
+  :root[data-theme="dark"] .prac-chip--echelon:hover{border-color:rgba(251,113,133,0.75) !important;transform:translateY(-1px);}
+  :root[data-theme="dark"] .prac-chip--echelon.is-active, :root[data-theme="dark"] .prac-chip--echelon.active,
+  :root[data-theme="dark"] .prac-chip-select-pill.prac-chip--echelon.is-active, :root[data-theme="dark"] .prac-chip-select-pill.prac-chip--echelon.active{
+    background:rgba(190,18,60,0.22) !important;border:1.5px solid rgba(251,113,133,0.75) !important;
+    box-shadow:0 0 12px rgba(190,18,60,0.30), inset 0 0 4px rgba(244,63,94,0.15) !important;
+  }
+  :root[data-theme="dark"] .prac-chip--echelon.is-active .prac-chip-display, :root[data-theme="dark"] .prac-chip--echelon.active .prac-chip-display{
+    color:#fecdd3 !important;font-weight:700 !important;
+  }
+  .prac-chip--cat.is-active, .prac-chip--cat.active,
+  .prac-chip-select-pill.prac-chip--cat.is-active, .prac-chip-select-pill.prac-chip--cat.active{
+    background:rgba(20,90,70,0.08) !important;border:1.5px solid rgba(20,90,70,0.48) !important;
+  }
+  .prac-chip--cat.is-active .prac-chip-display, .prac-chip--cat.active .prac-chip-display{
+    color:#145a46 !important;font-weight:700 !important;
+  }
+  :root[data-theme="dark"] .prac-chip--cat.is-active, :root[data-theme="dark"] .prac-chip--cat.active,
+  :root[data-theme="dark"] .prac-chip-select-pill.prac-chip--cat.is-active, :root[data-theme="dark"] .prac-chip-select-pill.prac-chip--cat.active{
+    background:rgba(16,185,129,0.18) !important;border:1.5px solid rgba(52,211,153,0.68) !important;
+    box-shadow:0 0 10px rgba(16,185,129,0.22) !important;
+  }
+  :root[data-theme="dark"] .prac-chip--cat.is-active .prac-chip-display, :root[data-theme="dark"] .prac-chip--cat.active .prac-chip-display{
+    color:#a7f3d0 !important;font-weight:700 !important;
+  }
+  .prac-chip--tier.is-active, .prac-chip--tier.active,
+  .prac-chip-select-pill.prac-chip--tier.is-active, .prac-chip-select-pill.prac-chip--tier.active{
+    background:rgba(217,119,6,0.08) !important;border:1.5px solid rgba(217,119,6,0.48) !important;
+  }
+  .prac-chip--tier.is-active .prac-chip-display, .prac-chip--tier.active .prac-chip-display{
+    color:#b45309 !important;font-weight:700 !important;
+  }
+  :root[data-theme="dark"] .prac-chip--tier.is-active, :root[data-theme="dark"] .prac-chip--tier.active,
+  :root[data-theme="dark"] .prac-chip-select-pill.prac-chip--tier.is-active, :root[data-theme="dark"] .prac-chip-select-pill.prac-chip--tier.active{
+    background:rgba(245,158,11,0.18) !important;border:1.5px solid rgba(251,191,36,0.68) !important;
+    box-shadow:0 0 10px rgba(245,158,11,0.22) !important;
+  }
+  :root[data-theme="dark"] .prac-chip--tier.is-active .prac-chip-display, :root[data-theme="dark"] .prac-chip--tier.active .prac-chip-display{
+    color:#fde68a !important;font-weight:700 !important;
   }
 
   /* ---------- Section 2: Dashboard Cocoon, Glowing Screening Bar, Pulse Ring, SRS Ring & 7-Track Mini-Matrix ---------- */
@@ -1381,20 +1450,92 @@ EXTRA_CSS = r"""
   :root[data-theme="dark"] .jvs-box--sr,:root[data-theme="dark"] .jvs-card--senior{background:rgba(16,185,129,0.14);border-color:rgba(52,211,153,0.40);}
   .jvs-title,.jvs-badge{font-family:var(--font-d);font-size:.82rem;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
 
-  /* ---------- Section 4: Coding Trainer Mobile Ergonomics, Python Accessory Bar & Line-Number Gutter ---------- */
-  .prac-quick-chips{
-    display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  /* ---------- Section 4: Coding Trainer Mobile Ergonomics, Chips Bar & Line-Number Gutter ---------- */
+  .prac-hero-header{
+    display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px;
   }
-  .prac-quick-chips::-webkit-scrollbar{display:none;}
+  @media (max-width:768px){
+    .prac-hero-header{display:none !important;}
+  }
+  .prac-chips-bar{
+    display:flex;align-items:center;gap:8px;overflow-x:auto;white-space:nowrap;
+    padding:6px 2px 10px;margin-bottom:10px;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  }
+  .prac-chips-bar::-webkit-scrollbar{display:none;}
+  .prac-chip-select-pill{
+    position:relative;display:inline-flex;align-items:center;border-radius:999px;
+    background:var(--surface);border:1px solid var(--glass-border);padding:6px 14px;
+    cursor:pointer;transition:border-color .15s ease, background .15s ease, transform .12s ease;
+    box-shadow:var(--shadow-1);flex-shrink:0;user-select:none;
+  }
+  .prac-chip-select-pill:hover{border-color:var(--moss);transform:translateY(-1px);}
+  .prac-chip-select-pill.is-active,.prac-chip-select-pill.active{background:var(--emerald-soft);border-color:var(--emerald);}
+  .prac-chip-select{
+    position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2;
+    -webkit-appearance:none;appearance:none;font-size:16px;
+  }
+  .prac-chip-display{
+    font-size:.82rem;font-weight:700;color:var(--ink);white-space:nowrap;pointer-events:none;
+    display:inline-flex;align-items:center;gap:4px;
+  }
+  .prac-chip-btn{
+    display:inline-flex;align-items:center;justify-content:center;border-radius:999px;
+    background:var(--surface);border:1px solid var(--glass-border);padding:6px 13px;
+    font-size:.82rem;font-weight:700;color:var(--ink);cursor:pointer;
+    transition:border-color .15s ease, background .15s ease, transform .12s ease;
+    box-shadow:var(--shadow-1);flex-shrink:0;white-space:nowrap;
+  }
+  .prac-chip-btn:hover{border-color:var(--moss);transform:translateY(-1px);}
+  .prac-chip-btn.is-active,.prac-chip-btn.active{background:var(--emerald-soft);border-color:var(--emerald);color:var(--ink);}
   .prac-chip{
     padding:6px 11px;border-radius:999px;font-size:.76rem;font-weight:700;white-space:nowrap;
     background:var(--surface);border:1px solid var(--glass-border);color:var(--ink-soft);cursor:pointer;transition:all .14s;
   }
   .prac-chip:hover{border-color:var(--moss);color:var(--ink);}
   .prac-chip.active{background:var(--emerald-soft);border-color:var(--emerald);color:var(--ink);font-weight:800;}
+  .prac-chip--echelon{border-color:rgba(107,29,47,0.22) !important;}
+  .prac-chip--echelon:hover{border-color:#6b1d2f !important;transform:translateY(-1px);}
+  .prac-chip--echelon.is-active, .prac-chip--echelon.active,
+  .prac-chip-select-pill.prac-chip--echelon.is-active, .prac-chip-select-pill.prac-chip--echelon.active{
+    background:rgba(107,29,47,0.09) !important;border:1.5px solid rgba(107,29,47,0.55) !important;
+    box-shadow:0 1px 4px rgba(107,29,47,0.12) !important;
+  }
+  .prac-chip--echelon.is-active .prac-chip-display, .prac-chip--echelon.active .prac-chip-display{
+    color:#6b1d2f !important;font-weight:700 !important;
+  }
+  :root[data-theme="dark"] .prac-chip--echelon{border-color:rgba(251,113,133,0.28) !important;}
+  :root[data-theme="dark"] .prac-chip--echelon:hover{border-color:rgba(251,113,133,0.75) !important;transform:translateY(-1px);}
+  :root[data-theme="dark"] .prac-chip--echelon.is-active, :root[data-theme="dark"] .prac-chip--echelon.active,
+  :root[data-theme="dark"] .prac-chip-select-pill.prac-chip--echelon.is-active, :root[data-theme="dark"] .prac-chip-select-pill.prac-chip--echelon.active{
+    background:rgba(190,18,60,0.22) !important;border:1.5px solid rgba(251,113,133,0.75) !important;
+    box-shadow:0 0 12px rgba(190,18,60,0.30), inset 0 0 4px rgba(244,63,94,0.15) !important;
+  }
+  :root[data-theme="dark"] .prac-chip--echelon.is-active .prac-chip-display, :root[data-theme="dark"] .prac-chip--echelon.active .prac-chip-display{
+    color:#fecdd3 !important;font-weight:700 !important;
+  }
   .prac-task-swiper{
     display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 12px;margin-bottom:10px;
     border-radius:14px;background:var(--surface);border:1px solid var(--glass-border);box-shadow:var(--shadow-1);
+  }
+  .prac-search-bar-row{
+    display:flex;align-items:center;gap:8px;margin-bottom:10px;
+  }
+  .prac-search-field{
+    flex:1;min-height:auto !important;padding:8px 12px !important;font-size:.84rem !important;border-radius:12px !important;
+  }
+  .prac-task-title{
+    font-size:1.22rem;font-weight:800;line-height:1.35;margin:0 0 10px;color:var(--ink);
+  }
+  @media (max-width:768px){
+    .prac-task-title{font-size:1.12rem;margin-bottom:8px;}
+    .practice-desktop-grid{gap:10px;}
+    .microstep-card{padding:14px 14px;}
+  }
+  .prac-run-btn{
+    padding:12px 20px;font-size:.92rem;font-weight:700;
+  }
+  @media (max-width:768px){
+    .prac-run-btn{width:100%;justify-content:center;}
   }
   @media (max-width:760px){
     .prac-filters-drawer:not(.is-open) .prac-filters-grid{display:none;}
@@ -1598,6 +1739,29 @@ EXTRA_CSS = r"""
     box-shadow:0 0 0 1px rgba(16,185,129,0.20), var(--shadow-1);
   }
   .stage__spine{position:relative;}
+  /* Compact cards hub filter styling for mobile viewports (REV-005) */
+  .cards-hub-controls{
+    display:grid;
+    grid-template-columns:1fr 1fr 1.6fr;
+    gap:8px;
+    margin-bottom:12px;
+  }
+  .cards-hub-subfilters{
+    display:contents;
+  }
+  @media(max-width:640px){
+    .cards-hub-header{margin-bottom:8px !important;}
+    .cards-hub-header h1{font-size:1.25rem !important;}
+    .cards-hub-controls{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
+    .cards-hub-subfilters{display:grid !important;grid-template-columns:1fr 1fr;gap:6px;}
+    .cards-hub-subfilters select{font-size:.75rem !important;padding:6px 8px !important;}
+    .cards-hub-controls #cards-deck-select{font-size:.82rem !important;padding:7px 10px !important;}
+    .fc-stage{margin:6px 0 !important;}
+    .microstep-bar{padding:6px 10px !important;font-size:.82rem !important;margin-bottom:6px !important;}
+    .fc-card{min-height:220px !important;padding:16px 18px !important;}
+    .fc-rate-row{margin-top:8px !important;gap:6px !important;}
+    .fc-rate-row .btn{padding:8px 6px !important;font-size:.78rem !important;}
+  }
 """
 
 # Let's define the injected JS upgrade block that extends the existing app cleanly
@@ -1795,6 +1959,9 @@ function ensureExtendedState(target){
   if(!s.practiceHubPos || typeof s.practiceHubPos !== 'object' || Array.isArray(s.practiceHubPos)) s.practiceHubPos = null;
   if(typeof s.sandboxDraft !== 'string') s.sandboxDraft = '';
   if(typeof s.lastRoute !== 'string') s.lastRoute = '/';
+  if(!s.completedLessonSteps || typeof s.completedLessonSteps !== 'object') s.completedLessonSteps = {};
+  if(!s.completedNoteSteps || typeof s.completedNoteSteps !== 'object') s.completedNoteSteps = {};
+  if(!s.unlockedChunks || typeof s.unlockedChunks !== 'object') s.unlockedChunks = {};
   if(typeof s.soundEnabled !== 'boolean') s.soundEnabled = true;
   if(!s.stackBranch || !['fastapi','django','both'].includes(s.stackBranch)) s.stackBranch = 'fastapi';
   if(!s.unitSortMode || !['priority','number'].includes(s.unitSortMode)) s.unitSortMode = 'priority';
@@ -3921,15 +4088,35 @@ function viewPythonSkill(sid){
   }
   const totalChunks = chunks.length;
   const curChunkIdx = Math.min(pySkillViewState.chunkIdx || 0, Math.max(0, totalChunks - 1));
-  const sprintPct = Math.min(100, Math.max(10, Math.round(((stepIdx + (curChunkIdx + 1) / Math.max(1, totalChunks)) / Math.max(1, steps.length)) * 100)));
+
+  let topbarMetaLeft = `${activeK} · Навык ${sk.id}`;
+  let topbarMetaRight = `Шаг ${stepIdx+1}/${steps.length}`;
+  let sprintPct = Math.min(100, Math.max(10, Math.round(((stepIdx + (curChunkIdx + 1) / Math.max(1, totalChunks)) / Math.max(1, steps.length)) * 100)));
+
+  if(pySkillViewState.tab === 'cards'){
+    const activeF = pySkillViewState.fId || sk.fIds[0];
+    const deckObj = ALL_DECKS_COMBINED[activeF] || {id: activeF, cards: []};
+    const cIdx = Math.min(pySkillViewState.cardIdx, Math.max(0, (deckObj.cards||[]).length - 1));
+    topbarMetaLeft = `🃏 ${activeF || 'Колода'} · Навык ${sk.id}`;
+    topbarMetaRight = `Карточка ${cIdx+1}/${Math.max(1, (deckObj.cards||[]).length)}`;
+    sprintPct = Math.min(100, Math.max(10, Math.round(((cIdx + 1) / Math.max(1, (deckObj.cards||[]).length)) * 100)));
+  } else if(pySkillViewState.tab === 'code'){
+    const tIds = (sk.taskIds && sk.taskIds.length) ? sk.taskIds : [240, 241, 242];
+    const activeTid = tIds.includes(pySkillViewState.taskId) ? pySkillViewState.taskId : tIds[0];
+    const tObj = IDE_TASKS_BY_ID[activeTid] || IDE_TASKS[0];
+    const curTaskIdx = Math.max(0, tIds.indexOf(activeTid));
+    topbarMetaLeft = `💻 Задача #${tObj.id} · <span style="font-weight:700;color:var(--amber);">${tObj.tier}</span> · Навык ${sk.id}`;
+    topbarMetaRight = `Задача ${curTaskIdx+1}/${tIds.length}`;
+    sprintPct = Math.min(100, Math.max(10, Math.round(((curTaskIdx + 1) / Math.max(1, tIds.length)) * 100)));
+  }
 
   const focusTopbarHTML = `
     <div class="sprint-focus-topbar sprint-topbar">
       <a href="#${tr.routePrefix}" class="sprint-close-btn" title="${tr.backLabel}">✕<span class="sr-only"> ${tr.backLabel}</span></a>
       <div class="sprint-progress-wrap">
         <div class="sprint-progress-meta">
-          <span>${activeK} · Навык ${sk.id}</span>
-          <span>Шаг ${stepIdx+1}/${steps.length}<span class="sr-only"> Микро-шаг ${stepIdx+1} из ${steps.length}</span></span>
+          <span>${topbarMetaLeft}</span>
+          <span>${topbarMetaRight}<span class="sr-only"> Прогресс</span></span>
         </div>
         <div class="sprint-progress-track"><div class="sprint-progress-fill" style="width:${sprintPct}%;"></div></div>
       </div>
@@ -4122,7 +4309,7 @@ function viewPythonSkill(sid){
       const t = IDE_TASKS_BY_ID[tid];
       if(!t) return '';
       const solved = solvedMap[tid] === 'solved';
-      return `<button class="btn ${tid===activeTid?'btn-primary':'btn-ghost'}" style="padding:6px 11px;font-size:.78rem;" data-py-select-task="${tid}">${solved?'✓ ':''}#${tid} · ${t.tier.split(' ')[0]} ${t.title}</button>`;
+      return `<button class="btn ${tid===activeTid?'btn-primary':'btn-ghost'}" style="padding:6px 11px;font-size:.78rem;" data-py-select-task="${tid}">${solved?'✓ ':''}#${tid} · ${t.title}</button>`;
     }).join('');
 
     const socraticHints = buildSocraticHintsForTask(tObj);
@@ -4156,7 +4343,7 @@ function viewPythonSkill(sid){
         <div class="practice-desktop-grid">
           <div class="practice-left-pane">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-              <span class="topic-badge" style="margin:0;">Задача #${tObj.id} · ${tObj.tier} · ${tObj.topic}</span>
+              <span class="topic-badge" style="margin:0;display:inline-flex;align-items:center;gap:6px;">Задача #${tObj.id} · <span class="badge" style="background:rgba(217,119,6,0.18);color:var(--amber);padding:1px 7px;border-radius:10px;font-weight:700;">${tObj.tier}</span> · ${tObj.topic}</span>
               <div style="display:flex;gap:8px;align-items:center;">
                 <a href="#/docs" class="link-quiet" style="font-size:.78rem;">📚 Справка по методам Python</a>
                 ${solvedMap[tObj.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
@@ -4390,8 +4577,10 @@ let cardsHubState = {
   unitFilter: _initCardsPos.unitFilter || 'all',
   deckId: _initCardsPos.deckId || 'Ф-001',
   cardIdx: typeof _initCardsPos.cardIdx === 'number' ? _initCardsPos.cardIdx : 0,
-  flipped: !!_initCardsPos.flipped
+  flipped: !!_initCardsPos.flipped,
+  completed: !!_initCardsPos.completed
 };
+window.cardsHubState = cardsHubState;
 function saveCardsHubPosState(){
   ensureExtendedState();
   state.cardsHubPos = {
@@ -4400,6 +4589,7 @@ function saveCardsHubPosState(){
     deckId: cardsHubState.deckId || 'Ф-001',
     cardIdx: cardsHubState.cardIdx || 0,
     flipped: !!cardsHubState.flipped,
+    completed: !!cardsHubState.completed,
     updatedAt: Date.now()
   };
   saveState(state);
@@ -4459,9 +4649,45 @@ function viewCardsHub(){
     return `<option value="${fid}" ${fid===cardsHubState.deckId?'selected':''}>${done?'✓ ':''}[Эшелон ${dt}] ${fid}: ${d.title} (${(d.cards||[]).length})</option>`;
   }).join('');
 
+  if(cardsHubState.completed && cards.length > 0){
+    const curDeckIdx = filteredDecks.indexOf(cardsHubState.deckId);
+    const nextDeckId = (curDeckIdx >= 0 && curDeckIdx + 1 < filteredDecks.length) ? filteredDecks[curDeckIdx + 1] : null;
+    const nextDeck = nextDeckId ? ALL_DECKS_COMBINED[nextDeckId] : null;
+    return `
+    <div class="container">
+      <div class="cards-hub-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+        <div>
+          <span class="sr-only">Интервальное повторение RemNote · 286 колод · 6 051 карточка</span>
+          <h1 style="margin:0;">🎉 Колода изучена!</h1>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span class="cocoon-pill">Изучено колод: <b>${state.reviewedDecks.length} / ${allDeckIds.length}</b></span>
+          ${primarySkill ? `<a href="#${primarySkill.routePrefix}/skill/${primarySkill.id}" class="btn btn-ghost" style="padding:6px 11px;font-size:.78rem;">💻 К практике темы (${primarySkill.id}) →</a>` : ''}
+        </div>
+      </div>
+      <div class="cards-hub-controls">
+        <div class="cards-hub-subfilters">
+          <select id="cards-echelon-filter" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.82rem;">${echelonOpts}</select>
+          <select id="cards-unit-select" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.82rem;">${unitOpts}</select>
+        </div>
+        <select id="cards-deck-select" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.85rem;font-weight:600;">${deckOpts}</select>
+      </div>
+      <div class="panel" style="padding:32px 24px;text-align:center;margin-top:20px;">
+        <div style="font-size:3rem;margin-bottom:12px;">🏆</div>
+        <h2 style="margin:0 0 10px;">Все ${cards.length} карточек колоды «${deck.title}» пройдены!</h2>
+        <p class="meta" style="max-width:540px;margin:0 auto 24px;line-height:1.55;">Колода успешно добавлена в интервальное повторение. Теперь закрепите теорию практическим написанием кода в тренажёре или переходите к следующей теме.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+          ${primarySkill ? `<a href="#${primarySkill.routePrefix}/skill/${primarySkill.id}" class="btn btn-primary btn-lg">💻 Перейти к практике темы (${primarySkill.id})</a>` : ''}
+          ${nextDeckId ? `<button class="btn btn-clay btn-lg" data-hub-next-deck="${nextDeckId}">Следующая колода (${nextDeckId}: ${nextDeck.title}) →</button>` : ''}
+          <button class="btn btn-ghost btn-lg" data-hub-restart-deck>🔄 Повторить колоду сначала</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
   return `
     <div class="container">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+      <div class="cards-hub-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
         <div>
           <span class="sr-only">Интервальное повторение RemNote · 286 колод · 6 051 карточка (126 колод Python + 25 колод Web + 43 колоды Backend + 16 колод Алгоритмы + 32 колоды Базы данных + 17 колод Архитектура + 45 колод Инфраструктура)</span>
           <h1 style="margin:0;">🃏 Центр 3D Флеш-карточек</h1>
@@ -4471,10 +4697,12 @@ function viewCardsHub(){
           ${primarySkill ? `<a href="#${primarySkill.routePrefix}/skill/${primarySkill.id}" class="btn btn-ghost" style="padding:6px 11px;font-size:.78rem;">💻 К практике темы (${primarySkill.id}) →</a>` : ''}
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:14px;">
-        <select id="cards-echelon-filter" class="code-editor" style="min-height:auto;padding:10px 12px;">${echelonOpts}</select>
-        <select id="cards-unit-select" class="code-editor" style="min-height:auto;padding:10px 12px;">${unitOpts}</select>
-        <select id="cards-deck-select" class="code-editor" style="min-height:auto;padding:10px 12px;">${deckOpts}</select>
+      <div class="cards-hub-controls">
+        <div class="cards-hub-subfilters">
+          <select id="cards-echelon-filter" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.82rem;">${echelonOpts}</select>
+          <select id="cards-unit-select" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.82rem;">${unitOpts}</select>
+        </div>
+        <select id="cards-deck-select" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.85rem;font-weight:600;">${deckOpts}</select>
       </div>
       <div class="microstep-bar">
         <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><strong>${deck.id}: ${deck.title}</strong> ${renderEchelonBadge(curDeckTier)} · Карточка ${cIdx+1} из ${cards.length}</span>
@@ -4521,6 +4749,7 @@ let practiceHubState = {
   runOutput: '',
   mobileFiltersOpen: false
 };
+window.practiceHubState = practiceHubState;
 function savePracticeHubPosState(){
   ensureExtendedState();
   state.practiceHubPos = {
@@ -4585,8 +4814,17 @@ function viewPracticeHub(){
     return true;
   });
 
-  const curTask = IDE_TASKS_BY_ID[practiceHubState.taskId] || filtered[0] || IDE_TASKS[0];
-  const curFilteredIdx = Math.max(0, filtered.findIndex(t => t.id === curTask.id));
+  const taskInFiltered = filtered.find(t => t.id === practiceHubState.taskId);
+  const curTask = taskInFiltered || filtered[0] || IDE_TASKS_BY_ID[practiceHubState.taskId] || IDE_TASKS[0];
+  if(!taskInFiltered && filtered.length > 0 && curTask && curTask.id !== practiceHubState.taskId){
+    practiceHubState.taskId = curTask.id;
+    practiceHubState.codeDraft = getIdeDraft(curTask.id, curTask.initialCode);
+    practiceHubState.hintLevel = 0;
+    practiceHubState.runStatus = null;
+    practiceHubState.runOutput = '';
+    savePracticeHubPosState();
+  }
+  const curFilteredIdx = filtered.length > 0 ? Math.max(0, filtered.findIndex(t => t.id === curTask.id)) : 0;
   const curTaskEchelon = getTaskInterviewTier(curTask.id);
   const socraticHints = buildSocraticHintsForTask(curTask);
   const socraticLabels = [
@@ -4606,32 +4844,104 @@ function viewPracticeHub(){
     <div class="result-box--fail">Тесты не прошли:\n${practiceHubState.runOutput||''}</div>
     <div style="margin-top:8px;"><button class="btn btn-ghost" style="padding:6px 12px;font-size:.78rem;" data-prac-hint>💡 Разобрать ошибку с Сократовским интервьюером (${practiceHubState.hintLevel}/${socraticHints.length})</button></div>`;
 
-  const taskOptions = filtered.slice(0, 500).map(t =>
-    `<option value="${t.id}" ${t.id===curTask.id?'selected':''}>${solvedMap[t.id]==='solved'?'✓ ':''}[Эшелон ${getTaskInterviewTier(t.id)}] #${t.id} [${t.tier}] ${t.title} (${t.topic})</option>`
-  ).join('');
+  const taskOptions = filtered.length > 0
+    ? filtered.slice(0, 500).map(t =>
+        `<option value="${t.id}" ${t.id===curTask.id?'selected':''}>${solvedMap[t.id]==='solved'?'✓ ':''}[Эшелон ${getTaskInterviewTier(t.id)}] #${t.id} [${t.tier}] ${t.title} (${t.topic})</option>`
+      ).join('')
+    : '<option disabled selected>Нет задач по выбранным фильтрам</option>';
 
-  const isAllQuick = practiceHubState.echelonFilter === 'all' && practiceHubState.tierFilter === 'all' && practiceHubState.statusFilter === 'all';
-  const quickChipsHTML = `
-    <div class="prac-quick-chips">
-      <button type="button" class="prac-chip ${isAllQuick?'active':''}" data-prac-chip="all">🎯 Все (401)</button>
-      <button type="button" class="prac-chip ${practiceHubState.echelonFilter==='1'?'active':''}" data-prac-chip="ech1">🚨 Эшелон 1</button>
-      <button type="button" class="prac-chip ${practiceHubState.echelonFilter==='2'?'active':''}" data-prac-chip="ech2">🔥 Эшелон 2</button>
-      <button type="button" class="prac-chip ${practiceHubState.tierFilter==='🥚 Уровень 1'?'active':''}" data-prac-chip="tier1">🥚 Уровень 1</button>
-      <button type="button" class="prac-chip ${practiceHubState.statusFilter==='unsolved'?'active':''}" data-prac-chip="unsolved">⏳ Не решённые</button>
-      <button type="button" class="prac-chip ${practiceHubState.echelonFilter==='gaps'?'active':''}" data-prac-chip="gaps">🎯 Пробелы</button>
-      <button type="button" class="prac-chip prac-filters-toggle" data-toggle-prac-filters>⚙️ Фильтры ▾</button>
+  let echelonLabel = '🎯 Все эшелоны';
+  if(practiceHubState.echelonFilter === '1') echelonLabel = '🎯 Эшелон 1';
+  else if(practiceHubState.echelonFilter === '2') echelonLabel = '🔥 Эшелон 2';
+  else if(practiceHubState.echelonFilter === '3') echelonLabel = '⚡ Эшелон 3';
+  else if(practiceHubState.echelonFilter === '4') echelonLabel = '👑 Эшелон 4';
+  else if(practiceHubState.echelonFilter === 'gaps') echelonLabel = '🎯 Пробелы';
+
+  let catLabel = '🌐 Все модули';
+  if(practiceHubState.catFilter === 'python') catLabel = '🐍 Python';
+  else if(practiceHubState.catFilter === 'backend') catLabel = '⚙️ Backend';
+
+  let tierLabel = 'Все уровни';
+  if(practiceHubState.tierFilter !== 'all'){
+    tierLabel = practiceHubState.tierFilter.replace('Уровень ', 'Ур. ');
+  }
+
+  let statusLabel = 'Все статусы';
+  if(practiceHubState.statusFilter === 'unsolved') statusLabel = '⏳ Не решено';
+  else if(practiceHubState.statusFilter === 'solved') statusLabel = '✓ Решено';
+
+  const chipsBarHTML = `
+    <div class="prac-chips-bar prac-quick-chips">
+      <label class="prac-chip-select-pill prac-chip prac-chip--echelon ${practiceHubState.echelonFilter!=='all'?'is-active active':''}" title="Фильтр по эшелону собеседования">
+        <select id="prac-echelon-filter" class="prac-chip-select">
+          <option value="all" ${practiceHubState.echelonFilter==='all'?'selected':''}>🎯 Все эшелоны (1–4)</option>
+          <option value="1" ${practiceHubState.echelonFilter==='1'?'selected':''}>🎯 Эшелон 1 · Скрининг</option>
+          <option value="2" ${practiceHubState.echelonFilter==='2'?'selected':''}>🔥 Эшелон 2 · Тех-ядро</option>
+          <option value="3" ${practiceHubState.echelonFilter==='3'?'selected':''}>⚡ Эшелон 3 · Продакшен</option>
+          <option value="4" ${practiceHubState.echelonFilter==='4'?'selected':''}>👑 Эшелон 4 · Резерв</option>
+          <option value="gaps" ${practiceHubState.echelonFilter==='gaps'?'selected':''}>🎯 Пробелы диагностики</option>
+        </select>
+        <span class="prac-chip-display">${echelonLabel} ▾</span>
+      </label>
+
+      <label class="prac-chip-select-pill prac-chip prac-chip--cat ${practiceHubState.catFilter!=='all'?'is-active active':''}" title="Фильтр по стеку">
+        <select id="prac-cat-filter" class="prac-chip-select">
+          <option value="all" ${practiceHubState.catFilter==='all'?'selected':''}>🌐 Все модули (401)</option>
+          <option value="python" ${practiceHubState.catFilter==='python'?'selected':''}>🐍 Python Core 1.1–1.9</option>
+          <option value="backend" ${practiceHubState.catFilter==='backend'?'selected':''}>⚙️ Backend, SQL, FastAPI, Docker</option>
+        </select>
+        <span class="prac-chip-display">${catLabel} ▾</span>
+      </label>
+
+      <label class="prac-chip-select-pill prac-chip prac-chip--tier ${practiceHubState.tierFilter!=='all'?'is-active active':''}" title="Фильтр по уровню сложности">
+        <select id="prac-tier-filter" class="prac-chip-select">
+          <option value="all" ${practiceHubState.tierFilter==='all'?'selected':''}>Все уровни (🥚..👑)</option>
+          ${tiers.map(tr => `<option value="${tr}" ${practiceHubState.tierFilter===tr?'selected':''}>${tr.replace('Уровень ', 'Ур. ')}</option>`).join('')}
+        </select>
+        <span class="prac-chip-display">${tierLabel} ▾</span>
+      </label>
+
+      <button type="button" class="prac-chip-btn prac-chip prac-search-toggle ${practiceHubState.searchOpen || practiceHubState.search?'is-active active':''}" data-toggle-prac-search title="Поиск задачи">🔍</button>
+
+      <label class="prac-chip-select-pill prac-chip prac-chip--status ${practiceHubState.statusFilter!=='all'?'is-active active':''}" title="Фильтр по статусу решения">
+        <select id="prac-status-filter" class="prac-chip-select">
+          <option value="all" ${practiceHubState.statusFilter==='all'?'selected':''}>Все статусы</option>
+          <option value="unsolved" ${practiceHubState.statusFilter==='unsolved'?'selected':''}>⏳ Не решённые</option>
+          <option value="solved" ${practiceHubState.statusFilter==='solved'?'selected':''}>✓ Решённые</option>
+        </select>
+        <span class="prac-chip-display">${statusLabel} ▾</span>
+      </label>
+
+      <button type="button" class="prac-chip-btn prac-chip prac-filters-toggle ${practiceHubState.mobileFiltersOpen?'is-active active':''}" data-toggle-prac-filters title="Все фильтры и выбор задачи">⚙️ Фильтры ▾</button>
     </div>`;
+
+  const searchBarHTML = (practiceHubState.searchOpen || practiceHubState.search) ? `
+    <div class="prac-search-bar-row">
+      <input id="prac-search-input" type="text" class="code-editor prac-search-field" placeholder="Поиск по названию или #ID…" value="${escapeHtmlStr(practiceHubState.search)}">
+      ${practiceHubState.search ? `<button type="button" class="btn btn-ghost" style="padding:4px 9px;font-size:.78rem;" data-clear-prac-search>✕ Очистить</button>` : ''}
+    </div>` : '';
 
   const taskSwiperHTML = `
     <div class="prac-task-swiper">
-      <button type="button" class="btn btn-ghost" style="padding:5px 10px;font-size:.76rem;" data-prac-step="-1" ${filtered.length<=1?'disabled':''}>‹ Пред.</button>
-      <span style="font-size:.8rem;font-weight:700;text-align:center;">Задача #${curTask.id} (${curFilteredIdx + 1} из ${filtered.length})</span>
-      <button type="button" class="btn btn-ghost" style="padding:5px 10px;font-size:.76rem;" data-prac-step="1" ${filtered.length<=1?'disabled':''}>След. ›</button>
+      <button type="button" class="btn btn-ghost" style="padding:5px 12px;font-size:.76rem;" data-prac-step="-1" ${filtered.length<=1?'disabled':''}>‹ Пред.</button>
+      <span style="font-size:.8rem;font-weight:700;text-align:center;">${filtered.length>0 ? `Задача #${curTask.id} (${curFilteredIdx + 1} из ${filtered.length})` : 'Нет задач по фильтру'}</span>
+      <button type="button" class="btn btn-ghost" style="padding:5px 12px;font-size:.76rem;" data-prac-step="1" ${filtered.length<=1?'disabled':''}>След. ›</button>
+    </div>`;
+
+  const filtersDrawerHTML = `
+    <div id="prac-filters-drawer" class="prac-filters-drawer prac-filters-collapsible ${practiceHubState.mobileFiltersOpen?'is-open':''}">
+      <div class="panel" style="padding:14px 16px;margin-bottom:12px;">
+        <div style="font-size:.82rem;font-weight:700;margin-bottom:8px;color:var(--ink-soft);">Полный список задач (${filtered.length} доступно):</div>
+        <select id="prac-task-select" class="code-editor" style="min-height:auto;padding:10px 12px;font-weight:600;font-size:.85rem;width:100%;margin-bottom:10px;">
+          ${taskOptions}
+        </select>
+        ${taskSwiperHTML}
+      </div>
     </div>`;
 
   return `
     <div class="container">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+      <div class="prac-hero-header">
         <div>
           <div class="topic-badge">Интегрированный тренажёр с IDE · 401 задача · 7 уровней (🥚 → 👑)</div>
           <h1>💻 Практика кода (${totalSolved} / 401 решено)</h1>
@@ -4639,59 +4949,33 @@ function viewPracticeHub(){
         <a href="Практика кода — тренажёр с IDE.html" target="_blank" class="btn btn-ghost" style="padding:8px 13px;font-size:.82rem;">Открыть полноэкранный IDE-тренажёр ↗</a>
       </div>
 
-      <div class="panel" style="padding:16px 18px;">
-        ${quickChipsHTML}
-        ${taskSwiperHTML}
-        <div id="prac-filters-drawer" class="prac-filters-drawer prac-filters-collapsible ${practiceHubState.mobileFiltersOpen?'is-open':''}">
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:8px;margin-bottom:10px;">
-            <select id="prac-echelon-filter" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.84rem;">
-              <option value="all" ${practiceHubState.echelonFilter==='all'?'selected':''}>🎯 Все эшелоны (1–4)</option>
-              <option value="1" ${practiceHubState.echelonFilter==='1'?'selected':''}>🚨 Эшелон 1 · Скрининг и база</option>
-              <option value="2" ${practiceHubState.echelonFilter==='2'?'selected':''}>🔥 Эшелон 2 · Тех-ядро и стек</option>
-              <option value="3" ${practiceHubState.echelonFilter==='3'?'selected':''}>⚡ Эшелон 3 · Продакшен</option>
-              <option value="4" ${practiceHubState.echelonFilter==='4'?'selected':''}>👑 Эшелон 4 · Резерв</option>
-              <option value="gaps" ${practiceHubState.echelonFilter==='gaps'?'selected':''}>🎯 Пробелы диагностики</option>
-            </select>
-            <select id="prac-tier-filter" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.84rem;">
-              <option value="all" ${practiceHubState.tierFilter==='all'?'selected':''}>Все уровни (🥚..👑)</option>
-              ${tiers.map(tr => `<option value="${tr}" ${practiceHubState.tierFilter===tr?'selected':''}>${tr}</option>`).join('')}
-            </select>
-            <select id="prac-cat-filter" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.84rem;">
-              <option value="all" ${practiceHubState.catFilter==='all'?'selected':''}>Все модули (401)</option>
-              <option value="python" ${practiceHubState.catFilter==='python'?'selected':''}>🐍 Python Core 1.1–1.9</option>
-              <option value="backend" ${practiceHubState.catFilter==='backend'?'selected':''}>🌐 Backend, SQL, FastAPI, Docker</option>
-            </select>
-            <select id="prac-status-filter" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.84rem;">
-              <option value="all" ${practiceHubState.statusFilter==='all'?'selected':''}>Все статусы</option>
-              <option value="unsolved" ${practiceHubState.statusFilter==='unsolved'?'selected':''}>Не решённые</option>
-              <option value="solved" ${practiceHubState.statusFilter==='solved'?'selected':''}>✓ Решённые</option>
-            </select>
-            <input id="prac-search-input" type="text" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.84rem;" placeholder="Поиск по названию или #ID…" value="${escapeHtmlStr(practiceHubState.search)}">
-          </div>
-          <select id="prac-task-select" class="code-editor" style="min-height:auto;padding:10px 12px;font-weight:600;">
-            ${taskOptions}
-          </select>
-        </div>
-      </div>
+      ${chipsBarHTML}
+      ${searchBarHTML}
+      ${filtersDrawerHTML}
 
       <div class="microstep-card">
         <div class="practice-desktop-grid">
           <div class="practice-left-pane">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
                 <span class="topic-badge" style="margin:0;">Задача #${curTask.id} · ${curTask.tier} · ${curTask.topic}</span>
                 ${renderEchelonBadge(curTaskEchelon)}
+                ${solvedMap[curTask.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
               </div>
-              ${solvedMap[curTask.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
+              <div style="display:inline-flex;gap:4px;align-items:center;">
+                <button type="button" class="btn btn-ghost" style="padding:3px 8px;font-size:.74rem;" data-prac-step="-1" ${filtered.length<=1?'disabled':''} title="Предыдущая задача">‹</button>
+                <span style="font-size:.75rem;font-weight:700;color:var(--ink-muted);">${filtered.length>0 ? `${curFilteredIdx + 1}/${filtered.length}` : '0/0'}</span>
+                <button type="button" class="btn btn-ghost" style="padding:3px 8px;font-size:.74rem;" data-prac-step="1" ${filtered.length<=1?'disabled':''} title="Следующая задача">›</button>
+              </div>
             </div>
-            <h2 style="margin-bottom:10px;">${curTask.title}</h2>
+            <h2 class="prac-task-title">Задача #${curTask.id}: ${curTask.title}</h2>
             <div class="lesson-theory" style="margin-bottom:14px;">${curTask.desc}</div>
             ${shownHints}
           </div>
           <div class="practice-right-pane">
             ${buildCodeEditorWithGutterHTML('prac-code-editor', practiceHubState.codeDraft, 240)}
             <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-              <button class="btn btn-primary" data-prac-run="${curTask.id}">${ICONS.play} Запустить pytest (Ctrl+Enter)</button>
+              <button class="btn btn-primary prac-run-btn" data-prac-run="${curTask.id}">▶ Запустить тесты</button>
               <button class="btn btn-ghost" data-prac-hint ${practiceHubState.hintLevel>=socraticHints.length?'disabled':''}>💡 Сократовская подсказка (${practiceHubState.hintLevel}/${socraticHints.length})</button>
               <button class="btn btn-ghost" data-prac-reset="${curTask.id}">Сбросить</button>
             </div>
@@ -5610,8 +5894,10 @@ diagIntroHTML = function(){
   const branch = state.stackBranch || 'fastapi';
   return `
     <div class="container">
-      <a href="#/map" class="back-link">${ICONS.chevronLeft} К карте навыков</a>
-      <div class="topic-badge">Этап 0 · Калибровочная диагностика Эшелона 1 (Скрининг)</div>
+      <div class="diag-header-row">
+        <a href="#/map" class="back-link">${ICONS.chevronLeft} К карте навыков</a>
+        <div class="topic-badge">Этап 0 · Калибровочная диагностика Эшелона 1 (Скрининг)</div>
+      </div>
       <h1 style="margin-bottom:10px;">Калибровка приоритетов перед стартом</h1>
       <p>${CORE_QUESTIONS.length} вопросов по темам <b>🚨 Эшелона 1 (Скрининг и база)</b> — Python Core, словари/хеширование, типизация/GIL, Git, базовый SQL/JOIN, HTTP/REST и Big-O. Это не экзамен, а умная калибровка твоего маршрута:</p>
       <ul style="margin:8px 0 16px 20px;line-height:1.55;">
@@ -6971,30 +7257,19 @@ window.openBugReportModal = openBugReportModal;
       orb2.className = 'ambient-orb ambient-orb--emerald';
       document.body.insertBefore(orb2, document.body.firstChild);
     }
-    if(document.body && !document.getElementById('bug-fab-trigger')){
-      const bugFab = document.createElement('button');
-      bugFab.id = 'bug-fab-trigger';
-      bugFab.className = 'bug-fab-btn';
-      bugFab.setAttribute('data-open-bug-modal', '');
-      bugFab.setAttribute('title', 'Зафиксировать ошибку или замечание на текущем экране');
-      bugFab.innerHTML = '🐞 <span>Замечание</span>';
-      document.body.appendChild(bugFab);
+    const themeToggleM = document.getElementById('theme-toggle-m');
+    if(themeToggleM && !document.getElementById('bug-report-btn-m')){
+      const bugTopBtn = document.createElement('button');
+      bugTopBtn.id = 'bug-report-btn-m';
+      bugTopBtn.className = 'icon-btn bug-topbar-btn';
+      bugTopBtn.setAttribute('data-open-bug-modal', '');
+      bugTopBtn.setAttribute('aria-label', 'Зафиксировать ошибку или замечание');
+      bugTopBtn.setAttribute('title', 'Зафиксировать ошибку или замечание');
+      bugTopBtn.innerHTML = '🐞';
+      if(themeToggleM.parentNode){
+        themeToggleM.parentNode.insertBefore(bugTopBtn, themeToggleM.nextSibling);
+      }
     }
-    let lastScrollY = 0;
-    window.addEventListener('scroll', function(){
-      try{
-        const curY = window.scrollY || document.documentElement.scrollTop || 0;
-        const fab = document.getElementById('bug-fab-trigger');
-        if(fab){
-          if(curY > lastScrollY + 18 && curY > 120){
-            fab.classList.add('bug-fab--scroll-hidden');
-          } else if(curY < lastScrollY - 10 || curY <= 80){
-            fab.classList.remove('bug-fab--scroll-hidden');
-          }
-        }
-        lastScrollY = curY;
-      }catch(ignore){}
-    }, { passive: true });
   }catch(e){}
   const foot = document.querySelector('.sidebar-foot');
   if(!foot) return;
@@ -7404,12 +7679,49 @@ document.addEventListener('click', async function(e){
     if(txt){
       ensureExtendedState();
       if(!Array.isArray(state.bugReports)) state.bugReports = [];
-      state.bugReports.push({
+      const reportItem = {
         context: getCurrentBugContextString(),
         text: txt,
-        createdAt: new Date().toLocaleString('ru-RU')
-      });
+        createdAt: new Date().toLocaleString('ru-RU'),
+        timestamp: new Date().toISOString()
+      };
+      state.bugReports.push(reportItem);
       saveState(state);
+
+      // Submit immediately to local server API queue if reachable
+      try {
+        fetch('/api/bug-report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(reportItem)
+        }).catch(function(err){
+          console.warn('[BugReport] Local server offline, saved in localStorage:', err);
+        });
+      } catch(err){}
+
+      // Submit to GitHub Gist if credentials present
+      try {
+        const gistToken = state.gistToken || localStorage.getItem('academy_gist_token');
+        const gistId = state.gistId || localStorage.getItem('academy_gist_id');
+        if(gistToken && gistId){
+          fetch(`https://api.github.com/gists/${gistId}`, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${gistToken}`,
+              'Content-Type': 'application/json',
+              'Accept': 'application/vnd.github+json'
+            },
+            body: JSON.stringify({
+              files: {
+                'user_feedback_queue.json': {
+                  content: JSON.stringify(state.bugReports, null, 2)
+                }
+              }
+            })
+          }).catch(function(){});
+        }
+      } catch(err){}
+
       openBugReportModal();
     }
     return;
@@ -7445,13 +7757,30 @@ document.addEventListener('click', async function(e){
   const chunkMoreBtn = e.target.closest('[data-chunk-more]');
   if(chunkMoreBtn){
     const mode = chunkMoreBtn.getAttribute('data-chunk-more');
-    awardXp(10);
+    ensureExtendedState();
+    if(!state.unlockedChunks) state.unlockedChunks = {};
     if(mode === 'lesson'){
-      lessonMicroState.chunkIdx = (lessonMicroState.chunkIdx || 0) + 1;
+      const curLid = lessonMicroState.lessonId || (lessonState ? lessonState.lessonId : 'unknown');
+      const curSIdx = lessonMicroState.stepIdx || 0;
+      const nextCIdx = (lessonMicroState.chunkIdx || 0) + 1;
+      const chunkKey = `lesson:${curLid}:${curSIdx}:${nextCIdx}`;
+      if(!state.unlockedChunks[chunkKey]){
+        state.unlockedChunks[chunkKey] = true;
+        awardXp(10);
+      }
+      lessonMicroState.chunkIdx = nextCIdx;
       saveLessonDraftState();
     } else {
       pySkillViewState.sprintCelebration = null;
-      pySkillViewState.chunkIdx = (pySkillViewState.chunkIdx || 0) + 1;
+      const activeK = pySkillViewState.kId || 'unknown';
+      const curSIdx = pySkillViewState.stepIdx || 0;
+      const nextCIdx = (pySkillViewState.chunkIdx || 0) + 1;
+      const chunkKey = `skill:${activeK}:${curSIdx}:${nextCIdx}`;
+      if(!state.unlockedChunks[chunkKey]){
+        state.unlockedChunks[chunkKey] = true;
+        awardXp(10);
+      }
+      pySkillViewState.chunkIdx = nextCIdx;
       saveReadingPosition();
     }
     render();
@@ -7663,7 +7992,14 @@ document.addEventListener('click', async function(e){
   const lj = e.target.closest('[data-lstep-jump]');
   if(lj){
     const nextIdx = parseInt(lj.getAttribute('data-lstep-jump'), 10);
-    if(nextIdx > lessonMicroState.stepIdx) awardXp(10);
+    ensureExtendedState();
+    if(!state.completedLessonSteps) state.completedLessonSteps = {};
+    const curLid = lessonMicroState.lessonId || (lessonState ? lessonState.lessonId : 'unknown');
+    const stepKey = `${curLid}:${nextIdx}`;
+    if(nextIdx > lessonMicroState.stepIdx && !state.completedLessonSteps[stepKey]){
+      state.completedLessonSteps[stepKey] = true;
+      awardXp(10);
+    }
     lessonMicroState.stepIdx = nextIdx;
     lessonMicroState.chunkIdx = 0;
     saveLessonDraftState();
@@ -7736,10 +8072,18 @@ document.addEventListener('click', async function(e){
   }
   const pns = e.target.closest('[data-py-next-step]');
   if(pns){
-    pySkillViewState.stepIdx = parseInt(pns.getAttribute('data-py-next-step'), 10);
+    const nextStepIdx = parseInt(pns.getAttribute('data-py-next-step'), 10);
+    ensureExtendedState();
+    if(!state.completedNoteSteps) state.completedNoteSteps = {};
+    const activeK = pySkillViewState.kId || 'unknown';
+    const stepKey = `${activeK}:${nextStepIdx}`;
+    if(!state.completedNoteSteps[stepKey]){
+      state.completedNoteSteps[stepKey] = true;
+      awardXp(10);
+    }
+    pySkillViewState.stepIdx = nextStepIdx;
     pySkillViewState.chunkIdx = 0;
     pySkillViewState.sprintCelebration = null;
-    awardXp(10);
     saveReadingPosition();
     render();
     return;
@@ -7755,8 +8099,11 @@ document.addEventListener('click', async function(e){
   if(pfn){
     const kid = pfn.getAttribute('data-py-finish-note');
     const prevE1 = getEchelonProgress(1);
-    if(!state.readNotes.includes(kid)) state.readNotes.push(kid);
-    awardXp(15);
+    const wasAlreadyRead = state.readNotes.includes(kid);
+    if(!wasAlreadyRead){
+      state.readNotes.push(kid);
+      awardXp(15);
+    }
     if(pySkillViewState.sid) setSkillMP(pySkillViewState.sid, 50);
     const newE1 = getEchelonProgress(1);
     const remE1 = newE1.skills.filter(s => getSkillMP(s.id) < 100).length;
@@ -7817,12 +8164,16 @@ document.addEventListener('click', async function(e){
     const fid = pySkillViewState.fId;
     const deck = ALL_DECKS_COMBINED[fid] || {cards:[]};
     ensureExtendedState();
+    let wasStudied = false;
     if(fid){
       const ck = fid + ':' + (pySkillViewState.cardIdx || 0);
+      wasStudied = (state.cardRatings[ck] !== undefined && state.cardRatings[ck] > 0);
       state.cardRatings[ck] = Math.max(Number(state.cardRatings[ck]) || 0, rating || 0);
     }
-    if(rating >= 3) awardXp(rating === 4 ? 10 : 5);
-    else if(rating === 2) awardXp(2);
+    if(!wasStudied){
+      if(rating >= 3) awardXp(rating === 4 ? 10 : 5);
+      else if(rating === 2) awardXp(2);
+    }
     if(pySkillViewState.cardIdx + 1 < (deck.cards || []).length){
       pySkillViewState.cardIdx++;
       pySkillViewState.cardFlipped = false;
@@ -8198,23 +8549,48 @@ document.addEventListener('click', async function(e){
   if(hRate){
     const r = parseInt(hRate.getAttribute('data-hub-rate'), 10);
     ensureExtendedState();
+    let wasStudied = false;
     if(cardsHubState.deckId){
       const ck = cardsHubState.deckId + ':' + (cardsHubState.cardIdx || 0);
+      wasStudied = (state.cardRatings[ck] !== undefined && state.cardRatings[ck] > 0);
       state.cardRatings[ck] = Math.max(Number(state.cardRatings[ck]) || 0, r || 0);
     }
-    if(r >= 3) awardXp(r === 4 ? 10 : 5);
-    else if(r === 2) awardXp(2);
+    if(!wasStudied){
+      if(r >= 3) awardXp(r === 4 ? 10 : 5);
+      else if(r === 2) awardXp(2);
+    }
     const d = ALL_DECKS_COMBINED[cardsHubState.deckId] || {cards:[]};
     if(cardsHubState.cardIdx + 1 < (d.cards || []).length){
       cardsHubState.cardIdx++;
       cardsHubState.flipped = false;
     } else {
       if(!state.reviewedDecks.includes(cardsHubState.deckId)) state.reviewedDecks.push(cardsHubState.deckId);
-      cardsHubState.cardIdx = 0;
+      cardsHubState.completed = true;
       cardsHubState.flipped = false;
     }
     saveCardsHubPosState();
     render();
+    return;
+  }
+  if(e.target.closest('[data-hub-restart-deck]')){
+    cardsHubState.completed = false;
+    cardsHubState.cardIdx = 0;
+    cardsHubState.flipped = false;
+    saveCardsHubPosState();
+    render();
+    return;
+  }
+  const nextDeckBtn = e.target.closest('[data-hub-next-deck]');
+  if(nextDeckBtn){
+    const nd = nextDeckBtn.getAttribute('data-hub-next-deck');
+    if(nd && ALL_DECKS_COMBINED[nd]){
+      cardsHubState.deckId = nd;
+      cardsHubState.completed = false;
+      cardsHubState.cardIdx = 0;
+      cardsHubState.flipped = false;
+      saveCardsHubPosState();
+      render();
+    }
     return;
   }
 
@@ -8265,6 +8641,67 @@ document.addEventListener('click', async function(e){
     render();
     return;
   }
+  if(e.target.closest('[data-toggle-prac-filters]')){
+    practiceHubState.mobileFiltersOpen = !practiceHubState.mobileFiltersOpen;
+    savePracticeHubPosState();
+    render();
+    return;
+  }
+  if(e.target.closest('[data-toggle-prac-search]')){
+    practiceHubState.searchOpen = !practiceHubState.searchOpen;
+    savePracticeHubPosState();
+    render();
+    if(practiceHubState.searchOpen){
+      const inp = document.getElementById('prac-search-input');
+      if(inp){ inp.focus(); }
+    }
+    return;
+  }
+  if(e.target.closest('[data-clear-prac-search]')){
+    practiceHubState.search = '';
+    practiceHubState.searchOpen = false;
+    savePracticeHubPosState();
+    render();
+    return;
+  }
+  const pStep = e.target.closest('[data-prac-step]');
+  if(pStep){
+    const delta = parseInt(pStep.getAttribute('data-prac-step'), 10) || 0;
+    const gapTaskIds = new Set();
+    (state.diagnosticGaps || []).forEach(sid => {
+      const sk = PY_SKILLS_BY_ID[sid];
+      if(sk) (sk.taskIds || []).forEach(tid => gapTaskIds.add(tid));
+    });
+    const curFiltered = IDE_TASKS.filter(t => {
+      if(practiceHubState.echelonFilter === 'gaps'){
+        if(gapTaskIds.size > 0 && !gapTaskIds.has(t.id)) return false;
+        if(gapTaskIds.size === 0 && getTaskInterviewTier(t.id) !== 1) return false;
+      } else if(practiceHubState.echelonFilter !== 'all'){
+        if(getTaskInterviewTier(t.id) !== parseInt(practiceHubState.echelonFilter, 10)) return false;
+      }
+      if(practiceHubState.tierFilter !== 'all' && t.tier !== practiceHubState.tierFilter) return false;
+      const isPyCore = (t.id >= 240 && t.id <= 381) || String(t.topic).includes('Python Core');
+      if(practiceHubState.catFilter === 'python' && !isPyCore) return false;
+      if(practiceHubState.catFilter === 'backend' && isPyCore) return false;
+      const sm = getIdeSolvedMap();
+      if(practiceHubState.statusFilter === 'solved' && sm[t.id] !== 'solved') return false;
+      if(practiceHubState.statusFilter === 'unsolved' && sm[t.id] === 'solved') return false;
+      if(practiceHubState.search){
+        const q = practiceHubState.search.toLowerCase();
+        if(!String(t.id).includes(q) && !t.title.toLowerCase().includes(q) && !t.topic.toLowerCase().includes(q)) return false;
+      }
+      return true;
+    });
+    if(curFiltered.length > 0){
+      const curIdx = curFiltered.findIndex(t => t.id === practiceHubState.taskId);
+      let nextIdx = (curIdx >= 0 ? curIdx : 0) + delta;
+      if(nextIdx < 0) nextIdx = curFiltered.length - 1;
+      if(nextIdx >= curFiltered.length) nextIdx = 0;
+      selectPracticeTask(curFiltered[nextIdx].id);
+      render();
+    }
+    return;
+  }
 });
 
 // Change & Input events for selectors, file backup upload, and live code auto-save
@@ -8298,18 +8735,21 @@ document.addEventListener('change', function(e){
     cardsHubState.echelonFilter = e.target.value;
     cardsHubState.cardIdx = 0;
     cardsHubState.flipped = false;
+    cardsHubState.completed = false;
     saveCardsHubPosState();
     render();
   } else if(e.target.id === 'cards-unit-select'){
     cardsHubState.unitFilter = e.target.value;
     cardsHubState.cardIdx = 0;
     cardsHubState.flipped = false;
+    cardsHubState.completed = false;
     saveCardsHubPosState();
     render();
   } else if(e.target.id === 'cards-deck-select'){
     cardsHubState.deckId = e.target.value;
     cardsHubState.cardIdx = 0;
     cardsHubState.flipped = false;
+    cardsHubState.completed = false;
     saveCardsHubPosState();
     render();
   } else if(e.target.id === 'prac-echelon-filter'){
@@ -8447,6 +8887,13 @@ document.addEventListener('keydown', function(e){
   }
 });
 
+// Register PWA Service Worker (HTTP/HTTPS only to prevent file:// SecurityError)
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
+
 // Re-render navigation & current view with all upgrades active!
 renderNav();
 applyThemeIcon();
@@ -8456,10 +8903,27 @@ render();
 # Perform assembly on orig_html
 html_out = orig_html
 
-# 1. Inject Brython 3.13.0 CDN scripts and EXTRA_CSS before </head>
+# 1. Inject PWA meta, Brython 3.13.0 CDN scripts and EXTRA_CSS before </head>
+pwa_meta = """<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#14160F">
+<link rel="apple-touch-icon" href="icon.svg">"""
 brython_scripts = """<script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.13.0/brython.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.13.0/brython_stdlib.js"></script>"""
-html_out = html_out.replace('</style>\n</head>', EXTRA_CSS + '\n</style>\n' + brython_scripts + '\n</head>', 1)
+html_out = html_out.replace('</style>\n</head>', EXTRA_CSS + '\n</style>\n' + pwa_meta + '\n' + brython_scripts + '\n</head>', 1)
+
+# 1b. Inject bug report button in mobile topbar next to #theme-toggle-m and desktop sidebar foot
+if '<button class="icon-btn" id="theme-toggle-m"' in html_out:
+    html_out = html_out.replace(
+        '<button class="icon-btn" id="theme-toggle-m" aria-label="Переключить тему"></button>',
+        '<button class="icon-btn" id="theme-toggle-m" aria-label="Переключить тему"></button>\n        <button class="icon-btn bug-topbar-btn" id="bug-report-btn-m" data-open-bug-modal aria-label="Зафиксировать ошибку или замечание" title="Зафиксировать ошибку или замечание">🐞</button>',
+        1
+    )
+if '<button class="icon-btn" id="theme-toggle-d"' in html_out:
+    html_out = html_out.replace(
+        '<button class="icon-btn" id="theme-toggle-d" aria-label="Переключить тему"></button>',
+        '<button class="icon-btn" id="theme-toggle-d" aria-label="Переключить тему"></button>\n      <button class="icon-btn bug-topbar-btn" id="bug-report-btn-d" data-open-bug-modal aria-label="Зафиксировать ошибку или замечание" title="Зафиксировать ошибку или замечание">🐞</button>',
+        1
+    )
 
 # 2. Replace NODES definition with UPDATED_NODES
 nodes_pattern = re.compile(r'const NODES = \[[\s\S]*?\];\nconst NODES_BY_ID = Object\.fromEntries\(NODES\.map\(n=>\[n\.id,n\]\)\);')
@@ -8609,7 +9073,7 @@ PIPELINE_FILES = [
     'HANDOVER_CONTEXT.md',
 ]
 
-if not _IS_UNPACKED_ARCHIVE and os.path.isdir(_CLOUD_DIR) and os.path.isdir(BASE_REMNOTE) and os.path.isfile(IDE_HTML_PATH):
+if os.path.isdir(_CLOUD_DIR) and os.path.isdir(BASE_REMNOTE) and os.path.isfile(IDE_HTML_PATH):
     cloud_scripts_dir = os.path.join(_CLOUD_DIR, 'scripts')
     os.makedirs(cloud_scripts_dir, exist_ok=True)
     for pf in PIPELINE_FILES:
@@ -8634,10 +9098,31 @@ if not _IS_UNPACKED_ARCHIVE and os.path.isdir(_CLOUD_DIR) and os.path.isdir(BASE
 
     tmp_zip_path = ARCHIVE_ZIP_PATH + '.tmp'
     with zipfile.ZipFile(tmp_zip_path, 'w', compression=zipfile.ZIP_DEFLATED) as zf:
-        zf.write(SCRATCH_HANDOVER_PATH, 'HANDOVER_CONTEXT.md')
-        zf.write(SCRATCH_CONTEXT_PATH, 'PROJECT_CONTEXT.md')
-        zf.write(OUT_HTML_PATH, 'academy.html')
+        handover_src = SCRATCH_HANDOVER_PATH if os.path.isfile(SCRATCH_HANDOVER_PATH) else CLOUD_HANDOVER_PATH
+        context_src = SCRATCH_CONTEXT_PATH if os.path.isfile(SCRATCH_CONTEXT_PATH) else CLOUD_CONTEXT_PATH
+        html_src = CLOUD_HTML_PATH if os.path.isfile(CLOUD_HTML_PATH) else OUT_HTML_PATH
+        if os.path.isfile(handover_src):
+            zf.write(handover_src, 'HANDOVER_CONTEXT.md')
+        if os.path.isfile(context_src):
+            zf.write(context_src, 'PROJECT_CONTEXT.md')
+        zf.write(html_src, 'academy.html')
         zf.write(IDE_HTML_PATH, 'Практика кода — тренажёр с IDE.html')
+        extra_root_files = [
+            'manifest.json',
+            'icon.svg',
+            'sw.js',
+            'index.html',
+            'README.md',
+            'FEEDBACK_BACKLOG.md',
+            'UI_VISUALIZATION_IMPROVEMENTS_CATALOG.md',
+            'Запустить_с_Телефона.bat',
+            'verify_all.cmd',
+            'RemNote_Python_Mastery_FIXED.zip'
+        ]
+        for erf in extra_root_files:
+            erf_full = os.path.join(_CLOUD_DIR, erf)
+            if os.path.isfile(erf_full):
+                zf.write(erf_full, erf)
         for root, dirs, files in os.walk(BASE_REMNOTE):
             dirs.sort()
             for fn in sorted(files):
@@ -8649,6 +9134,7 @@ if not _IS_UNPACKED_ARCHIVE and os.path.isdir(_CLOUD_DIR) and os.path.isdir(BASE
             pf_full = os.path.join(_HERE, pf)
             if os.path.isfile(pf_full):
                 zf.write(pf_full, f'build_pipeline/{pf}')
+                zf.write(pf_full, f'scripts/{pf}')
     os.replace(tmp_zip_path, ARCHIVE_ZIP_PATH)
     print(f"Successfully rebuilt {ARCHIVE_ZIP_PATH} ({os.path.getsize(ARCHIVE_ZIP_PATH):,} bytes)")
 
