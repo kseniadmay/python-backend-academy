@@ -2036,24 +2036,41 @@ EXTRA_CSS = r"""
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(22, 27, 36, 0.88);
-    border: 1px solid rgba(255, 255, 255, 0.09);
+    background: rgba(22, 27, 36, 0.90);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-radius: 18px;
+    border-radius: 16px;
     padding: 12px 18px;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
   }
   html:not([data-theme="dark"]) .path-chapter-banner {
-    background: rgba(255, 255, 255, 0.88);
+    background: rgba(255, 255, 255, 0.92);
     border: 1px solid rgba(0, 0, 0, 0.07);
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
   }
+  .path-chapter-banner-left {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+  .path-chapter-breadcrumb {
+    font-size: 0.70rem;
+    font-weight: 800;
+    color: #f59e0b;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
   .path-chapter-title {
-    font-size: 0.95rem;
+    font-size: 0.96rem;
     font-weight: 800;
     color: #f8fafc;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   html:not([data-theme="dark"]) .path-chapter-title {
     color: #0f172a;
@@ -2061,6 +2078,15 @@ EXTRA_CSS = r"""
   .path-chapter-sub {
     font-size: 0.78rem;
     color: #94a3b8;
+  }
+  .path-chapter-progress-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .path-chapter-target-icon {
+    font-size: 0.92rem;
+    line-height: 1;
   }
   .path-chapter-segments {
     display: flex;
@@ -2082,46 +2108,56 @@ EXTRA_CSS = r"""
   .path-seg-bar.active {
     background: #f59e0b;
   }
-  .path-chapter-streak {
-    font-size: 0.84rem;
+  .path-chapter-count {
+    font-size: 0.78rem;
     font-weight: 800;
-    color: #fb7185;
+    color: #94a3b8;
     white-space: nowrap;
-    margin-left: 10px;
+    margin-left: 4px;
   }
 
-  /* Floating Jump-to-Active Button */
+  /* Floating Jump-to-Active Button (Coddy dark rounded square with amber arrow) */
   .path-jump-btn {
     position: fixed;
-    bottom: calc(24px + env(safe-area-inset-bottom, 16px));
-    right: 20px;
+    bottom: 24px;
+    right: 28px;
     z-index: 850;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: #f59e0b;
-    color: #ffffff;
-    border: none;
-    box-shadow: 0 6px 0 #b45309, 0 12px 28px rgba(245, 158, 11, 0.5);
-    font-size: 1.5rem;
-    font-weight: 900;
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+    background: rgba(22, 27, 36, 0.92);
+    border: 1.5px solid rgba(255, 255, 255, 0.12);
+    color: #f59e0b;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, color 0.16s ease;
+  }
+  html:not([data-theme="dark"]) .path-jump-btn {
+    background: rgba(255, 255, 255, 0.94);
+    border: 1.5px solid rgba(0, 0, 0, 0.10);
+    color: #d97706;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.15);
+  }
+  .path-jump-btn:hover {
+    transform: translateY(-2px);
+    border-color: rgba(245, 158, 11, 0.5);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55), 0 0 16px rgba(245, 158, 11, 0.25);
+    color: #fbbf24;
   }
   .path-jump-btn:active {
-    transform: translateY(4px);
-    box-shadow: 0 2px 0 #b45309, 0 4px 12px rgba(245, 158, 11, 0.3);
+    transform: translateY(1px);
   }
   @media (max-width: 768px) {
     .path-jump-btn {
       bottom: calc(84px + env(safe-area-inset-bottom, 16px));
       right: 16px;
-      width: 46px;
-      height: 46px;
-      font-size: 1.3rem;
+      width: 42px;
+      height: 42px;
     }
   }
 
@@ -2142,43 +2178,87 @@ EXTRA_CSS = r"""
     top: 80px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
     padding-top: 16px;
   }
   @media (max-width: 1040px) {
     .coddy-right-rail { display: none !important; }
     .coddy-path-layout { display: block; padding: 0; }
   }
+  .coddy-rail-stats-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: rgba(22, 27, 36, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 14px;
+    backdrop-filter: blur(16px);
+  }
+  html:not([data-theme="dark"]) .coddy-rail-stats-row {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+  }
+  .coddy-rail-stat {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
   .coddy-rail-card {
-    padding: 18px 20px;
-    border-radius: 18px;
+    padding: 16px 18px;
+    border-radius: 16px;
     margin: 0;
+    background: rgba(22, 27, 36, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  html:not([data-theme="dark"]) .coddy-rail-card {
+    background: rgba(255, 255, 255, 0.80);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+  }
+  .coddy-rail-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .coddy-rail-link {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #f59e0b;
+    text-decoration: none;
+    transition: opacity 0.15s ease;
+  }
+  .coddy-rail-link:hover {
+    opacity: 0.8;
   }
   .coddy-rail-badge {
-    font-size: 0.72rem;
+    font-size: 0.70rem;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--amber);
-    margin-bottom: 6px;
+    letter-spacing: 0.04em;
+    color: #94a3b8;
   }
   .coddy-rail-title {
-    font-size: 0.98rem;
-    font-weight: 800;
-    margin: 0 0 6px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0 0 4px;
+    color: #f8fafc;
+  }
+  html:not([data-theme="dark"]) .coddy-rail-title {
+    color: #0f172a;
   }
   .coddy-rail-desc {
-    font-size: 0.82rem;
-    color: var(--ink-soft);
-    margin: 0 0 14px;
+    font-size: 0.80rem;
+    color: #94a3b8;
     line-height: 1.45;
+    margin: 0;
   }
-  .coddy-rail-btn {
-    width: 100%;
-    padding: 10px 14px;
-    font-size: 0.82rem;
-    text-align: center;
-    justify-content: center;
+
+  @media (max-width: 640px) {
+    .cards-kb-hint { display: none !important; }
   }
 
   /* ================= 4-TAB MOBILE IDE (#/practice) ================= */
@@ -5454,7 +5534,7 @@ function viewCardsHub(){
         <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><strong>${deck.id}: ${deck.title}</strong> ${renderEchelonBadge(curDeckTier)} · Карточка ${cIdx+1} из ${cards.length}</span>
         <div style="display:flex;gap:8px;align-items:center;">
           <button class="btn btn-ghost" style="padding:4px 10px;font-size:.76rem;" data-hub-prev ${cIdx===0?'disabled':''}>← Предыдущая</button>
-          <span class="meta">Пробел — переворот · 1–4 — оценка</span>
+          <span class="meta cards-kb-hint">Пробел — переворот · 1–4 — оценка</span>
         </div>
       </div>
       <div class="fc-stage">
@@ -5462,11 +5542,11 @@ function viewCardsHub(){
         <div class="fc-card fc-card--3d ${cardsHubState.flipped?'fc-card--flipped fc-card--Answer':''}" data-hub-flip>
           <div class="fc-card-inner">
             <div>
-              <div class="topic-badge">${cardsHubState.flipped ? 'Ответ' : 'Вопрос (нажми или Пробел)'}</div>
+              <div class="topic-badge">${cardsHubState.flipped ? 'Ответ' : 'Вопрос'}</div>
               <div class="fc-q">${formatRichInlineText(cur.q)}</div>
               ${cardsHubState.flipped ? `<div class="fc-a">${formatRichInlineText(cur.a)}</div>` : ''}
             </div>
-            <div class="meta" style="margin-top:16px;">Нажми на карточку или клавишу Пробел</div>
+            <div class="meta cards-flip-prompt" style="margin-top:16px;">${cardsHubState.flipped ? 'Оцени лёгкость ответа 1–4' : 'Нажми на карточку для переворота'}</div>
           </div>
         </div>
         <div class="fc-swipe-hint"><span>⬅️ Свайп влево: 1 · Снова</span><span>⬆️ Свайп вверх: 3 · Хорошо</span><span>Свайп вправо: 4 · Легко ➡️</span></div>
@@ -7078,11 +7158,19 @@ function viewPathSerpentine(options){
   if(activeUnitIndex === -1) activeUnitIndex = allUnits.length - 1;
 
   // Track coordinates for each of the 45 nodes
-  // 45 nodes spaced by 115px vertically, S-curve horizontally
+  // Account for chapter spacing: Chapter 1 starts at y=130 (with Chapter 1 ribbon at y=48)
+  // Each chapter transition adds +90px of breathing room for chapter ribbon markers!
+  const chapterStartSet = new Set([9, 13, 21, 27, 33, 39]);
+  let curY = 130;
   const coords = allUnits.map((u, i) => {
-    const y = 90 + i * 115;
+    if(i > 0){
+      curY += 115;
+      if(chapterStartSet.has(i)){
+        curY += 90; // Dedicated gap for chapter ribbon marker
+      }
+    }
     const x = Math.round(210 + 110 * Math.sin((i * Math.PI) / 2.2));
-    return { x, y };
+    return { x, y: curY };
   });
 
   const totalH = coords[coords.length - 1].y + 120;
@@ -7112,6 +7200,8 @@ function viewPathSerpentine(options){
   const curActiveUnit = allUnits[activeUnitIndex] || allUnits[0];
   const activeTrack = getTrackForUnit(curActiveUnit.id);
   const chapterUnits = allUnits.filter(u => getTrackForUnit(u.id).routePrefix === activeTrack.routePrefix);
+  const totalInChapter = chapterUnits.length;
+  const completedInChapter = chapterUnits.filter(u => (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80))).length;
   const chapterSegmentsHTML = chapterUnits.map(u => {
     const isPassed = (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80));
     const isActive = u.id === curActiveUnit.id;
@@ -7132,7 +7222,7 @@ function viewPathSerpentine(options){
   let markersSVG = '';
   chapterBreakpoints.forEach(cb => {
     if(coords[cb.startIdx]){
-      const cy = coords[cb.startIdx].y - 50;
+      const cy = (cb.startIdx === 0) ? 48 : (coords[cb.startIdx].y - 65);
       markersSVG += `
         <g class="path-chapter-ribbon" transform="translate(210, ${cy})">
           <line x1="-190" y1="0" x2="-130" y2="0" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="4 4"/>
@@ -7171,11 +7261,11 @@ function viewPathSerpentine(options){
       pulseHalo = `<circle class="hex-pulse-halo" cx="${x}" cy="${y}" r="40" fill="none" stroke="rgba(245, 158, 11, 0.6)"/>`;
       centerIcon = `<text x="${x}" y="${y+7}" text-anchor="middle" font-size="22">🏆</text>`;
       activeBubble = `
-        <g class="hex-active-tooltip" transform="translate(${x}, ${y - 48})">
+        <g class="hex-active-tooltip" transform="translate(${x}, ${y - 44})">
           <g class="hex-active-tooltip__inner">
-            <rect x="-38" y="-18" width="76" height="24" rx="12" fill="#ff7a00" filter="drop-shadow(0 4px 10px rgba(255,122,0,0.5))"/>
-            <polygon points="-6,6 6,6 0,12" fill="#ff7a00"/>
-            <text x="0" y="-2" text-anchor="middle" font-size="11" font-weight="900" fill="#ffffff" letter-spacing="0.08em">НАЧАТЬ</text>
+            <rect x="-36" y="-16" width="72" height="22" rx="11" fill="#ff7a00" filter="drop-shadow(0 4px 10px rgba(255,122,0,0.45))"/>
+            <polygon points="-5,6 5,6 0,11" fill="#ff7a00"/>
+            <text x="0" y="-1" text-anchor="middle" font-size="10.5" font-weight="900" fill="#ffffff" letter-spacing="0.08em">НАЧАТЬ</text>
           </g>
         </g>`;
     } else {
@@ -7204,20 +7294,26 @@ function viewPathSerpentine(options){
     return String(title).replace(new RegExp(`^(?:Юнит\\s*)?${String(id).replace('.', '\\.')}\\s*[:·\\-–—]?\\s*`, 'i'), '').trim();
   };
 
+  const totalCompletedUnits = allUnits.filter(u => (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80))).length;
+  const streakText = (typeof pluralizeRu === 'function') ? pluralizeRu(state.streak || 0, 'день', 'дня', 'дней') : 'дн.';
+
   return `
     <div class="coddy-path-layout">
       <div class="container path-serpentine-wrap">
         <!-- Top Chapter Banner -->
         <div class="path-chapter-banner">
           <div class="path-chapter-banner-left">
-            <div class="path-chapter-title">🎯 ${escapeHtmlStr(activeTrack.title)}</div>
-            <div class="path-chapter-sub">Юнит ${curActiveUnit.id}: ${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</div>
+            <div class="path-chapter-breadcrumb">${escapeHtmlStr(activeTrack.title.replace(/^[^a-zA-Zа-яА-Я0-9]+/, '').toUpperCase())}</div>
+            <div class="path-chapter-title">Юнит ${curActiveUnit.id} · ${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</div>
           </div>
           <div class="path-chapter-banner-right">
-            <div class="path-chapter-segments">
-              ${chapterSegmentsHTML}
+            <div class="path-chapter-progress-row">
+              <span class="path-chapter-target-icon">🎯</span>
+              <div class="path-chapter-segments">
+                ${chapterSegmentsHTML}
+              </div>
+              <span class="path-chapter-count">${completedInChapter} / ${totalInChapter}</span>
             </div>
-            <div class="path-chapter-streak">🔥 ${state.streak} дн.</div>
           </div>
         </div>
 
@@ -7276,36 +7372,56 @@ function viewPathSerpentine(options){
 
         <!-- Floating Jump Button to active lesson -->
         <button type="button" class="path-jump-btn" id="path-jump-btn" title="Перейти к текущему уроку" aria-label="Перейти к текущему уроку">
-          ↓
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
         </button>
       </div>
 
       <aside class="coddy-right-rail">
+        <!-- Top Stats Row (Coddy style) -->
+        <div class="coddy-rail-stats-row">
+          <div class="coddy-rail-stat" title="Пройдено юнитов">
+            <span class="coddy-rail-stat-icon">📘</span>
+            <span class="coddy-rail-stat-val">${totalCompletedUnits}/45</span>
+          </div>
+          <div class="coddy-rail-stat" title="Стрик активности">
+            <span class="coddy-rail-stat-icon">🔥</span>
+            <span class="coddy-rail-stat-val">${state.streak || 0} ${streakText}</span>
+          </div>
+          <div class="coddy-rail-stat" title="Накопленный опыт">
+            <span class="coddy-rail-stat-icon">💎</span>
+            <span class="coddy-rail-stat-val">${state.xp || 0} XP</span>
+          </div>
+        </div>
+
         <!-- Widget 1: SRS Cards Review -->
         <div class="panel coddy-rail-card">
-          <div class="coddy-rail-badge">🃏 SRS-Повторение</div>
+          <div class="coddy-rail-card-head">
+            <div class="coddy-rail-badge">🃏 SRS-Повторение</div>
+            <a href="#/cards" class="coddy-rail-link">Повторить →</a>
+          </div>
           <h4 class="coddy-rail-title">Карточка дня</h4>
           <p class="coddy-rail-desc">Интервальное повторение RemNote: закрепи память перед практикой.</p>
-          <a href="#/cards" class="btn btn-primary coddy-rail-btn">Повторить карточки →</a>
         </div>
         <!-- Widget 2: Streak & Level XP -->
         <div class="panel coddy-rail-card">
           <div class="coddy-rail-badge">🔥 Стрик и цель дня</div>
           <div style="display:flex;align-items:baseline;gap:8px;margin:6px 0 8px;">
-            <span style="font-size:1.8rem;font-weight:900;color:#f43f5e;">🔥 ${state.streak || 0}</span>
-            <span class="meta">дней подряд</span>
+            <span style="font-size:1.6rem;font-weight:900;color:#f43f5e;">🔥 ${state.streak || 0}</span>
+            <span class="meta">${streakText} подряд</span>
           </div>
-          <div class="progress-bar-wrap" style="height:8px;margin-bottom:8px;">
+          <div class="progress-bar-wrap" style="height:6px;margin-bottom:8px;">
             <div class="progress-bar-fill" style="width:${Math.min(100, Math.round(((state.xp||0) % 100) / 100 * 100))}%;background:linear-gradient(90deg,#fbbf24,#f59e0b);"></div>
           </div>
-          <div class="meta" style="font-size:0.78rem;">Всего опыта: <strong>${state.xp || 0} XP</strong></div>
+          <div class="meta" style="font-size:0.75rem;">Цель: <strong>50 XP в день</strong> · Всего: <strong>${state.xp || 0} XP</strong></div>
         </div>
         <!-- Widget 3: Screening Readiness -->
         <div class="panel coddy-rail-card">
-          <div class="coddy-rail-badge">🎯 Собеседование</div>
+          <div class="coddy-rail-card-head">
+            <div class="coddy-rail-badge">🎯 Собеседование</div>
+            <a href="#/mock" class="coddy-rail-link">Симулятор →</a>
+          </div>
           <h4 class="coddy-rail-title">Готовность к скринингу</h4>
           <p class="coddy-rail-desc">Симулятор технического скрининга: лайв-кодинг и STAR-вопросы.</p>
-          <a href="#/mock" class="btn btn-ghost coddy-rail-btn">Симулятор собеседования →</a>
         </div>
       </aside>
     </div>`;
@@ -10448,11 +10564,11 @@ brython_scripts = """<script src="https://cdnjs.cloudflare.com/ajax/libs/brython
 <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.13.0/brython_stdlib.js"></script>"""
 html_out = html_out.replace('</style>\n</head>', EXTRA_CSS + '\n</style>\n' + pwa_meta + '\n' + brython_scripts + '\n</head>', 1)
 
-# 1b. Inject bug report button in desktop sidebar foot
-if '<button class="icon-btn" id="theme-toggle-d"' in html_out:
+# 1b. Wrap desktop sidebar streak word for Russian pluralization (avoid "1 дней подряд")
+if '<span id="streak-num-d">0</span> дней подряд' in html_out:
     html_out = html_out.replace(
-        '<button class="icon-btn" id="theme-toggle-d" aria-label="Переключить тему"></button>',
-        '<button class="icon-btn" id="theme-toggle-d" aria-label="Переключить тему"></button>\n      <button class="icon-btn bug-topbar-btn" id="bug-report-btn-d" data-open-bug-modal aria-label="Зафиксировать ошибку или замечание" title="Зафиксировать ошибку или замечание">🐞</button>',
+        '<span id="streak-num-d">0</span> дней подряд',
+        '<span id="streak-num-d">0</span> <span id="streak-word-d">дней подряд</span>',
         1
     )
 
