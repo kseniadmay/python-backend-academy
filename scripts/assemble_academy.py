@@ -2128,19 +2128,21 @@ EXTRA_CSS = r"""
     align-items: center;
   }
   .path-seg-bar {
-    width: 14px;
-    height: 6px;
+    width: 22px;
+    height: 8px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(190, 18, 60, 0.30);
+    transition: background 0.2s ease, box-shadow 0.2s ease;
   }
   html:not([data-theme="dark"]) .path-seg-bar {
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(107, 29, 47, 0.16);
   }
   .path-seg-bar.done {
-    background: #10b981;
+    background: linear-gradient(180deg, #fcd34d, #f59e0b);
   }
   .path-seg-bar.active {
-    background: #f59e0b;
+    background: linear-gradient(180deg, #fb923c, #ea580c);
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.55);
   }
   .path-chapter-count {
     font-size: 0.78rem;
@@ -2148,6 +2150,88 @@ EXTRA_CSS = r"""
     color: #94a3b8;
     white-space: nowrap;
     margin-left: 4px;
+  }
+
+  /* Coddy-style ПРОДОЛЖИТЬ CTA in the game-mode chapter banner */
+  .path-chapter-banner {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+  .path-chapter-banner-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  .path-chapter-banner-right {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  .path-banner-cta {
+    padding: 10px 18px;
+    font-size: 0.8rem;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+  .path-chapter-banner .path-chapter-progress-row {
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  html:not([data-theme="dark"]) .path-chapter-banner .path-chapter-progress-row {
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+  }
+  @media (max-width: 768px) {
+    .path-chapter-banner-main {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+    }
+    .path-banner-cta {
+      width: 100%;
+    }
+  }
+
+  /* Mobile compact stats strip (Coddy/SoloLearn top bar) — replaces the hidden right rail on <=1040px */
+  .path-mobile-stats {
+    display: none;
+  }
+  @media (max-width: 1040px) {
+    .path-mobile-stats {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin: 0 auto 14px;
+      padding: 9px 14px;
+      width: fit-content;
+      max-width: 100%;
+      background: rgba(22, 27, 36, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 999px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    }
+    html:not([data-theme="dark"]) .path-mobile-stats {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+    }
+  }
+  .path-mobile-stats .pms-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--ink-soft, #cbd5e1);
+    white-space: nowrap;
+  }
+  .path-mobile-stats .pms-item b {
+    color: var(--ink, #f8fafc);
+    font-weight: 800;
   }
 
   /* Floating Jump-to-Active Button (Coddy dark rounded square with amber arrow) */
@@ -2289,6 +2373,98 @@ EXTRA_CSS = r"""
     color: #94a3b8;
     line-height: 1.45;
     margin: 0;
+  }
+  /* Widget: course chapters with mini progress bars (Coddy right-rail unit cards) */
+  .coddy-rail-chapters-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 4px;
+  }
+  .crc-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 8px;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: background 0.15s ease;
+  }
+  .crc-row:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  html:not([data-theme="dark"]) .crc-row:hover {
+    background: rgba(15, 23, 42, 0.05);
+  }
+  .crc-row--current {
+    background: rgba(245, 158, 11, 0.10);
+    box-shadow: inset 2.5px 0 0 #f59e0b;
+  }
+  html:not([data-theme="dark"]) .crc-row--current {
+    background: rgba(217, 119, 6, 0.08);
+  }
+  .crc-num {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 900;
+    background: rgba(16, 185, 129, 0.14);
+    color: #34d399;
+  }
+  html:not([data-theme="dark"]) .crc-num {
+    background: rgba(20, 90, 70, 0.12);
+    color: #145a46;
+  }
+  .crc-row--current .crc-num {
+    background: rgba(245, 158, 11, 0.18);
+    color: #fbbf24;
+  }
+  html:not([data-theme="dark"]) .crc-row--current .crc-num {
+    color: #b45309;
+  }
+  .crc-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .crc-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--ink, #f1f5f9);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .crc-bar {
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+  html:not([data-theme="dark"]) .crc-bar {
+    background: rgba(0, 0, 0, 0.08);
+  }
+  .crc-bar-fill {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #10b981, #34d399);
+    transition: width 0.35s ease;
+  }
+  .crc-pct {
+    flex-shrink: 0;
+    font-size: 0.70rem;
+    font-weight: 800;
+    color: #94a3b8;
+    min-width: 34px;
+    text-align: right;
   }
 
   @media (max-width: 640px) {
@@ -7625,7 +7801,49 @@ function renderPathModeSwitcherHTML(){
   `;
 }
 
-function renderCoddyRightRail(totalCompletedUnits, streakText){
+function getPathChaptersMeta(allUnits){
+  return [
+    { num: 1, title: 'Python Core', units: allUnits.slice(0, 9) },
+    { num: 2, title: 'Web & HTTP', units: allUnits.slice(9, 13) },
+    { num: 3, title: 'Backend & Архитектура', units: allUnits.slice(13, 21) },
+    { num: 4, title: 'Алгоритмы и структуры данных', units: allUnits.slice(21, 27) },
+    { num: 5, title: 'Базы данных и SQL', units: allUnits.slice(27, 33) },
+    { num: 6, title: 'Системный дизайн', units: allUnits.slice(33, 39) },
+    { num: 7, title: 'Инфраструктура и DevOps', units: allUnits.slice(39, 45) }
+  ];
+}
+
+function isUnitCompleted(u){
+  return (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80));
+}
+
+function renderPathMobileStatsHTML(totalCompletedUnits, streakText){
+  return `
+    <div class="path-mobile-stats" role="status" aria-label="Статистика обучения">
+      <span class="pms-item" title="Пройдено юнитов">📘 <b>${totalCompletedUnits}/45</b></span>
+      <span class="pms-item" title="Стрик активности">🔥 <b>${state.streak || 0}</b> ${streakText}</span>
+      <span class="pms-item" title="Накопленный опыт">💎 <b>${state.xp || 0} XP</b></span>
+    </div>`;
+}
+
+function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum){
+  const chaptersMeta = getPathChaptersMeta(ALL_UNITS_COMBINED);
+  const chaptersListHTML = chaptersMeta.map(ch => {
+    const chCompleted = ch.units.filter(isUnitCompleted).length;
+    const chPct = Math.round(chCompleted / ch.units.length * 100);
+    const route = (typeof getTrackForUnit === 'function' && ch.units[0]) ? getTrackForUnit(ch.units[0].id).routePrefix : 'python';
+    const isCurrent = (ch.num === activeChapterNum);
+    return `
+      <a class="crc-row ${isCurrent ? 'crc-row--current' : ''}" href="#/${route}" title="Глава ${ch.num}: ${escapeHtmlStr(ch.title)} — перейти к модулю">
+        <span class="crc-num">${ch.num}</span>
+        <span class="crc-body">
+          <span class="crc-title">${escapeHtmlStr(ch.title)}</span>
+          <span class="crc-bar"><span class="crc-bar-fill" style="width:${chPct}%;"></span></span>
+        </span>
+        <span class="crc-pct">${chCompleted}/${ch.units.length}</span>
+      </a>`;
+  }).join('');
+
   return `
     <aside class="coddy-right-rail">
       <!-- Top Stats Row (Coddy style) -->
@@ -7641,6 +7859,17 @@ function renderCoddyRightRail(totalCompletedUnits, streakText){
         <div class="coddy-rail-stat" title="Накопленный опыт">
           <span class="coddy-rail-stat-icon">💎</span>
           <span class="coddy-rail-stat-val">${state.xp || 0} XP</span>
+        </div>
+      </div>
+
+      <!-- Widget 0: Course chapters progress (Coddy right-rail unit cards) -->
+      <div class="panel coddy-rail-card">
+        <div class="coddy-rail-card-head">
+          <div class="coddy-rail-badge">📚 Главы курса</div>
+          <span class="coddy-rail-link">${totalCompletedUnits}/45</span>
+        </div>
+        <div class="coddy-rail-chapters-list">
+          ${chaptersListHTML}
         </div>
       </div>
 
@@ -7826,8 +8055,9 @@ function viewPathSerpentine(options){
       </g>`;
   });
 
-  const totalCompletedUnits = allUnits.filter(u => (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80))).length;
+  const totalCompletedUnits = allUnits.filter(isUnitCompleted).length;
   const streakText = (typeof pluralizeRu === 'function') ? pluralizeRu(state.streak || 0, 'день', 'дня', 'дней') : 'дн.';
+  const activeChapterNum = (getPathChaptersMeta(allUnits).find(c => c.units.some(u => u.id === curActiveUnit.id)) || { num: 1 }).num;
 
   return `
     <div class="coddy-path-layout">
@@ -7837,11 +8067,17 @@ function viewPathSerpentine(options){
           ${renderPathModeSwitcherHTML()}
         </div>
 
+        <!-- Mobile compact stats strip (visible when the right rail is hidden) -->
+        ${renderPathMobileStatsHTML(totalCompletedUnits, streakText)}
+
         <!-- Top Chapter Banner -->
         <div class="path-chapter-banner">
-          <div class="path-chapter-banner-left">
-            <div class="path-chapter-breadcrumb">${escapeHtmlStr(activeTrack.title.replace(/^[^a-zA-Zа-яА-Я0-9]+/, '').toUpperCase())}</div>
-            <div class="path-chapter-title">Юнит ${curActiveUnit.id} · ${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</div>
+          <div class="path-chapter-banner-main">
+            <div class="path-chapter-banner-left">
+              <div class="path-chapter-breadcrumb">${escapeHtmlStr(activeTrack.title.replace(/^[^a-zA-Zа-яА-Я0-9]+/, '').toUpperCase())}</div>
+              <div class="path-chapter-title">Юнит ${curActiveUnit.id} · ${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</div>
+            </div>
+            <button type="button" class="btn-3d-orange path-banner-cta" data-pro-start="${curActiveUnit.id}">ПРОДОЛЖИТЬ ➔</button>
           </div>
           <div class="path-chapter-banner-right">
             <div class="path-chapter-progress-row">
@@ -7913,7 +8149,7 @@ function viewPathSerpentine(options){
         </button>
       </div>
 
-      ${renderCoddyRightRail(totalCompletedUnits, streakText)}
+      ${renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)}
     </div>`;
 }
 
@@ -7938,19 +8174,11 @@ function viewProPath(options){
 
   const curActiveUnit = allUnits[activeUnitIndex] || allUnits[0];
   const activeTrack = getTrackForUnit(curActiveUnit.id);
-  const totalCompletedUnits = allUnits.filter(u => (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80))).length;
+  const totalCompletedUnits = allUnits.filter(isUnitCompleted).length;
   const streakText = (typeof pluralizeRu === 'function') ? pluralizeRu(state.streak || 0, 'день', 'дня', 'дней') : 'дн.';
 
   // 7 Chapters
-  const chapters = [
-    { num: 1, title: 'Python Core', units: allUnits.slice(0, 9) },
-    { num: 2, title: 'Web & HTTP', units: allUnits.slice(9, 13) },
-    { num: 3, title: 'Backend & Архитектура', units: allUnits.slice(13, 21) },
-    { num: 4, title: 'Алгоритмы и структуры данных', units: allUnits.slice(21, 27) },
-    { num: 5, title: 'Базы данных и SQL', units: allUnits.slice(27, 33) },
-    { num: 6, title: 'Системный дизайн', units: allUnits.slice(33, 39) },
-    { num: 7, title: 'Инфраструктура и DevOps', units: allUnits.slice(39, 45) }
-  ];
+  const chapters = getPathChaptersMeta(allUnits);
 
   const activeChap = chapters.find(c => c.units.some(u => u.id === curActiveUnit.id)) || chapters[0];
   const activeChapCompleted = activeChap.units.filter(u => (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80))).length;
@@ -8061,6 +8289,9 @@ function viewProPath(options){
           ${renderPathModeSwitcherHTML()}
         </div>
 
+        <!-- Mobile compact stats strip (visible when the right rail is hidden) -->
+        ${renderPathMobileStatsHTML(totalCompletedUnits, streakText)}
+
         <!-- Top Hero Card of Current Lesson -->
         ${heroCardHTML}
 
@@ -8068,7 +8299,7 @@ function viewProPath(options){
         ${chaptersHTML}
       </div>
 
-      ${renderCoddyRightRail(totalCompletedUnits, streakText)}
+      ${renderCoddyRightRail(totalCompletedUnits, streakText, activeChap.num)}
     </div>
   `;
 }
