@@ -24,6 +24,7 @@ function makeEl(id = '', tag = 'div') {
     textContent: '',
     value: '',
     className: '',
+    style: {},
     attributes: {},
     classList: {
       _set: new Set(),
@@ -97,6 +98,15 @@ const sandbox = {
 };
 sandbox.window = sandbox;
 sandbox.window.scrollTo = () => {};
+sandbox.window.speechSynthesis = {
+  speak: () => {},
+  cancel: () => {},
+  pause: () => {},
+  resume: () => {}
+};
+sandbox.SpeechSynthesisUtterance = function(text) {
+  this.text = text;
+};
 sandbox.window.addEventListener = (ev, fn) => {
   if (!winListeners[ev]) winListeners[ev] = [];
   winListeners[ev].push(fn);
@@ -543,13 +553,50 @@ for (const lid of allLessonIds) {
 console.log(`✓ All ${allLessonIds.length} interactive lessons (#/lesson/...) verified!`);
 
 // 10. Test interactive Khan Mastery progression: 0 MP -> 50 MP (Familiar) -> 80 MP (Proficient) -> 100 MP (Mastered 👑) & Scaffold Fading
-function fireClick(attrName, attrVal) {
+function fireClick(attrName, attrVal, extraAttrs = {}) {
   const target = {
-    id: '',
+    id: (extraAttrs && extraAttrs.id) || '',
     closest(sel) {
-      if (sel.includes(`[${attrName}]`)) {
+      if (attrName && sel.includes(`[${attrName}]`)) {
         return {
-          getAttribute(k) { return k === attrName ? attrVal : null; },
+          id: (extraAttrs && extraAttrs.id) || '',
+          getAttribute(k) {
+            if (k === attrName) return attrVal;
+            if (extraAttrs && k in extraAttrs) return extraAttrs[k];
+            return null;
+          },
+          setAttribute() {},
+          removeAttribute() {},
+          textContent: '',
+          closest() { return null; },
+          getBoundingClientRect() { return { left: 100, right: 140, top: 200, bottom: 240, width: 40, height: 40 }; }
+        };
+      }
+      if (extraAttrs && extraAttrs.className && sel.includes('.') && extraAttrs.className.includes(sel.replace(/^\./, ''))) {
+        return {
+          id: (extraAttrs && extraAttrs.id) || '',
+          className: extraAttrs.className,
+          getAttribute(k) {
+            if (k === attrName) return attrVal;
+            if (extraAttrs && k in extraAttrs) return extraAttrs[k];
+            return null;
+          },
+          setAttribute() {},
+          removeAttribute() {},
+          textContent: '',
+          closest() { return null; },
+          getBoundingClientRect() { return { left: 100, right: 140, top: 200, bottom: 240, width: 40, height: 40 }; }
+        };
+      }
+      if (extraAttrs && extraAttrs.id && sel.includes('#' + extraAttrs.id)) {
+        return {
+          id: extraAttrs.id,
+          getAttribute(k) {
+            if (extraAttrs && k in extraAttrs) return extraAttrs[k];
+            return null;
+          },
+          setAttribute() {},
+          removeAttribute() {},
           textContent: '',
           closest() { return null; }
         };
@@ -1248,20 +1295,67 @@ function fireClick(attrName, attrVal) {
   assert(typeof sandbox.SoundFx === 'object' && typeof sandbox.SoundFx.playXp === 'function', 'SoundFx must provide zero-dependency Web Audio synthesizers');
   assert(typeof sandbox.spawnXpParticle === 'function', 'spawnXpParticle must be available for tactile XP micro-feedback');
 
-  // 16.3. Code Editor Gutter & Quick Tokens Bar
+  // 16.3. Code Editor Gutter & Quick Tokens Bar (HTML + Interactive Insertion)
   assert(typeof sandbox.buildCodeEditorWithGutterHTML === 'function', 'buildCodeEditorWithGutterHTML must be exposed');
-  const sampleEditorHtml = sandbox.buildCodeEditorWithGutterHTML('test-ed', 'x = 1\ny = 2\n', 200);
+  const sampleEditorHtml = sandbox.buildCodeEditorWithGutterHTML('test-ed', 'x = 1\ny = 2\n', 'min-height:240px;');
   assert(sampleEditorHtml.includes('py-editor-shell') && sampleEditorHtml.includes('editor-with-gutter') && sampleEditorHtml.includes('line-numbers-gutter') && sampleEditorHtml.includes('py-accessory-bar') && sampleEditorHtml.includes('data-insert-token'), 'buildCodeEditorWithGutterHTML must include gutter, editor shell, and quick token shortcuts');
+  assert(sampleEditorHtml.includes('style="min-height:240px;"') && !sampleEditorHtml.includes('px;px;'), 'buildCodeEditorWithGutterHTML must normalize string minHeightPx without double px');
+  const pracEd = sandbox.document.getElementById('prac-code-editor');
+  const pracGut = sandbox.document.getElementById('prac-code-editor-gutter');
+  pracEd.value = 'def f():\n';
+  pracEd.selectionStart = pracEd.value.length;
+  pracEd.selectionEnd = pracEd.value.length;
+  await fireClick('data-insert-token', 'return ', { 'data-target-editor': 'prac-code-editor' });
+  assert(pracEd.value === 'def f():\nreturn ', `Expected [data-insert-token] to insert 'return ', got ${JSON.stringify(pracEd.value)}`);
+  assert(pracGut.textContent === '1\n2', `Expected gutter to update to '1\\n2', got ${JSON.stringify(pracGut.textContent)}`);
+
+  // Verify paired bracket wrapping around selection
+  pracEd.value = 'items';
+  pracEd.selectionStart = 0;
+  pracEd.selectionEnd = 5;
+  await fireClick('data-insert-token', '()', { 'data-target-editor': 'prac-code-editor' });
+  assert(pracEd.value === '(items)', `Expected paired bracket to wrap selected text into '(items)', got ${JSON.stringify(pracEd.value)}`);
 
   // 16.4. Split-View Reader & Consolidation Lab in Skill Theory (#/python/skill/1.1.1)
   const skillTheoryHtml = navigate('#/python/skill/1.1.1');
   assert(skillTheoryHtml.includes('skill-split-layout') && skillTheoryHtml.includes('skill-theory-col') && skillTheoryHtml.includes('skill-lab-aside'), 'Skill theory reader must provide desktop Split-View layout');
-  assert(skillTheoryHtml.includes('skill-lab-card') && skillTheoryHtml.includes('cpython-mem-diagram'), 'Skill theory reader must contain Consolidation Lab and interactive CPython memory diagram');
+  assert(skillTheoryHtml.includes('skill-lab-card') && skillTheoryHtml.includes('cpython-mem-diagram') && skillTheoryHtml.includes('cpython-mem-svg'), 'Skill theory reader must contain Consolidation Lab and interactive CPython memory SVG diagram');
   assert(skillTheoryHtml.includes('floating-step-nav'), 'Skill theory reader must provide floating micro-step bottom navigation');
+  const labTa = sandbox.document.getElementById('skill-lab-scratchpad');
+  const labOut = sandbox.document.getElementById('skill-lab-output');
+  labTa.value = 'print(42)';
+  await fireClick('data-run-lab-scratchpad', '');
+  assert(labOut.textContent.includes('Python 3.13 OK'), `Consolidation Lab scratchpad run should populate #skill-lab-output, got: ${labOut.textContent}`);
 
-  // 16.5. Stories Bar & 3D Cards in Cards Hub (#/cards)
+  // 16.5. Stories Bar & 3D Cards in Cards Hub (#/cards) + Touch Swipe Gestures
   const cardsHubHtml = navigate('#/cards');
   assert(cardsHubHtml.includes('fc-stories-bar') && cardsHubHtml.includes('fc-card--3d') && cardsHubHtml.includes('fc-card-inner'), 'Cards Hub must feature Instagram-style Stories bar and 3D flip card structure');
+  const prevDeckId = sandbox.cardsHubState.deckId || 'Ф-001';
+  sandbox.cardsHubState.deckId = 'Ф-050';
+  sandbox.cardsHubState.cardIdx = 0;
+  sandbox.cardsHubState.completed = false;
+  const origQuerySel = sandbox.document.querySelector;
+  sandbox.document.querySelector = (sel) => {
+    if (sel.includes('data-hub-rate="4"')) {
+      return { click() { fireClick('data-hub-rate', '4'); } };
+    }
+    return origQuerySel(sel);
+  };
+  // 16.5.1 Swipe over code blocks must be ignored
+  const codeTarget = { tagName: 'CODE', closest(s) { return s.includes('.fc-card') ? {} : null; } };
+  (docListeners['touchstart'] || []).forEach(fn => fn({ target: codeTarget, changedTouches: [{ clientX: 100, clientY: 200 }] }));
+  (docListeners['touchend'] || []).forEach(fn => fn({ target: codeTarget, changedTouches: [{ clientX: 180, clientY: 205 }] }));
+  assert(sandbox.cardsHubState.cardIdx === 0, 'Swiping over code block inside card must NOT advance flashcard');
+
+  // 16.5.2 Regular swipe on card advances flashcard
+  const fakeCardTarget = { tagName: 'DIV', closest(s) { return s.includes('.fc-card') ? {} : null; } };
+  (docListeners['touchstart'] || []).forEach(fn => fn({ target: fakeCardTarget, changedTouches: [{ clientX: 100, clientY: 200 }] }));
+  (docListeners['touchend'] || []).forEach(fn => fn({ target: fakeCardTarget, changedTouches: [{ clientX: 180, clientY: 205 }] }));
+  sandbox.document.querySelector = origQuerySel;
+  assert((sandbox.cardsHubState.cardIdx || 0) === 1 || sandbox.cardsHubState.completed, 'Swiping right on .fc-card must rate and advance the flashcard');
+  sandbox.cardsHubState.deckId = prevDeckId;
+  sandbox.cardsHubState.cardIdx = 0;
+  sandbox.cardsHubState.completed = false;
 
   // 16.6. Boss HP Bar & Arena Card in Module Boss (#/python/boss)
   const bossHtml = navigate('#/python/boss');
@@ -1301,12 +1395,20 @@ function fireClick(attrName, attrVal) {
   // 16.8. STAR Matrix & Pitch Timer in Mock Interview (#/mock)
   const mockSec16Html = navigate('#/mock');
   assert((mockSec16Html.includes('mock-timer-ring-wrap') || mockSec16Html.includes('mock-timer-wrap')) && (mockSec16Html.includes('mock-timer-svg') || mockSec16Html.includes('circular-progress-ring')), 'Mock interview live-coding tab must feature circular countdown timer');
+  assert(mockSec16Html.includes('socratic-chat-header'), 'Mock interview live-coding tab must include .socratic-chat-header');
   await fireClick('data-mock-tab', 'star');
   const mockStarHtml = elementsById['view-root'].innerHTML;
   assert(mockStarHtml.includes('star-matrix-grid') && mockStarHtml.includes('star-quadrant-card') && (mockStarHtml.includes('pitch-timer-display') || mockStarHtml.includes('star-pitch-display')), 'Mock interview STAR tab must feature 2x2 matrix grid and 2-minute pitch timer');
+  await fireClick('data-star-pitch-toggle', '');
+  assert(sandbox.mockInterviewState.pitchRunning === true, 'Clicking [data-star-pitch-toggle] must start STAR pitch timer');
+  await fireClick('data-star-pitch-reset', '');
+  assert(sandbox.mockInterviewState.pitchRunning === false && sandbox.mockInterviewState.pitchSecondsLeft === 120, 'Clicking [data-star-pitch-reset] must stop and reset STAR pitch timer to 120s');
+  await fireClick('data-mock-tab', 'live');
 
-  // 16.9. Pomodoro Timer Synchronized Displays in Topbar and Sidebar
+  // 16.9. Pomodoro Timer Synchronized Displays & Dashboard 7-Track Mini Progress Bars
   assert(typeof sandbox.togglePomodoro === 'function' && typeof sandbox.syncPomoDisplays === 'function', 'Pomodoro timer must support global toggling and multi-display synchronization');
+  const dashSec16Html = navigate('#/');
+  assert(dashSec16Html.includes('dash-track-chip__bar') && dashSec16Html.includes('dash-track-chip__fill'), 'Dashboard 7-track mini-matrix must render .dash-track-chip__bar and .dash-track-chip__fill');
 
   console.log('✓ All 8 UI & Visualization Catalog Improvements (UI_VISUALIZATION_IMPROVEMENTS_CATALOG.md) verified!');
 
@@ -1387,6 +1489,152 @@ function fireClick(attrName, attrVal) {
   assert(verifyAllCmdContent.includes('[1/5]') && verifyAllCmdContent.includes('[5/5]') && verifyAllCmdContent.includes('test_pwa_offline.js'), 'verify_all.cmd must define all 5 verification stages including test_pwa_offline.js');
 
   console.log('✓ All Pipeline Enhancements (audit_pipeline.py, verify_all.py, install_hooks.py, test_pwa_offline.js) verified!');
+
+  /* ================= 19. CODDY PROPOSALS E2E: 3D SERPENTINE PATH, LESSON RUNNER, 4-TAB IDE & AUDIO COMPANION ================= */
+  // 19.1. Interactive 3D Serpentine S-Curve Path (#/path)
+  const pathHtml = navigate('#/path');
+  assert(pathHtml.includes('path-serpentine-wrap'), '#/path must contain .path-serpentine-wrap');
+  assert(pathHtml.includes('path-chapter-banner'), '#/path must contain top chapter banner');
+  assert(pathHtml.includes('path-serpentine-svg'), '#/path must contain SVG S-curve canvas');
+  assert(pathHtml.includes('path-jump-btn'), '#/path must contain floating jump button');
+  assert(pathHtml.includes('path-anchored-popover'), '#/path must contain anchored popover container');
+
+  // Verify all 45 nodes are present in SVG
+  const hexNodeCount = (pathHtml.match(/class="hex-3d-node/g) || []).length;
+  assert(hexNodeCount === 45, `#/path must render exactly 45 3D hexagonal nodes, found ${hexNodeCount}`);
+  assert(pathHtml.includes('data-unit-id="1.1"') && pathHtml.includes('data-unit-id="7.6"'), '#/path must cover units 1.1 to 7.6');
+
+  function fireKeydown(key, opts = {}) {
+    const e = Object.assign({ key, preventDefault: () => {} }, opts);
+    (docListeners['keydown'] || []).forEach(fn => fn(e));
+  }
+
+  // 19.2. Serpentine Node Click & Anchored Popover interaction
+  const popoverEl = sandbox.document.getElementById('path-anchored-popover');
+  popoverEl.style = {};
+  await fireClick('data-unit-id', '1.1', { className: 'hex-3d-node' });
+  const popoverTitle = sandbox.document.getElementById('popover-title');
+  const popoverBadge = sandbox.document.getElementById('popover-badge');
+  assert(popoverTitle && popoverTitle.textContent.includes('Юнит 1.1'), 'Clicking hex node 1.1 must populate popover title with Юнит 1.1');
+  assert(popoverBadge && popoverBadge.textContent.includes('Python'), 'Clicking hex node 1.1 must populate popover badge with module track');
+
+  // Popover Escape key dismissal
+  fireKeydown('Escape');
+  assert(popoverEl.style.display === 'none', 'Escape key must dismiss the anchored popover');
+
+  // Re-open and close via close button
+  await fireClick('data-unit-id', '1.1', { className: 'hex-3d-node' });
+  await fireClick('id', 'popover-close-btn', { id: 'popover-close-btn' });
+  assert(popoverEl.style.display === 'none', 'Clicking popover close button must hide the popover');
+
+  // 19.3. #/map Mode Switching (Serpentine vs Tree)
+  const mapInitialHtml = navigate('#/map');
+  assert(mapInitialHtml.includes('data-map-mode="path"') && mapInitialHtml.includes('data-map-mode="tree"'), '#/map must feature mode switcher');
+  // Switch to Serpentine mode
+  await fireClick('data-map-mode', 'path');
+  const mapPathModeHtml = elementsById['view-root'].innerHTML;
+  assert(mapPathModeHtml.includes('path-serpentine') && mapPathModeHtml.includes('hex-3d-node'), '#/map in path mode must render 3D serpentine trail');
+  // Switch back to Tree mode
+  await fireClick('data-map-mode', 'tree');
+  const mapTreeModeHtml = elementsById['view-root'].innerHTML;
+  assert(mapTreeModeHtml.includes('Приоритетная архитектура подготовки к собеседованию'), '#/map in tree mode must render priority tree');
+
+  // 19.4. Duolingo-style Bite-Sized Lesson Runner elements
+  const lessonTheoryHtml = navigate('#/lesson/testing-1');
+  assert(lessonTheoryHtml.includes('sprint-audio-btn') || lessonTheoryHtml.includes('data-toggle-audio'), 'Lesson runner topbar must feature speech button 🔊');
+  assert(lessonTheoryHtml.includes('sprint-progress-track') || lessonTheoryHtml.includes('sprint-progress-fill'), 'Lesson runner topbar must feature thick sprint progress bar');
+  await fireClick('data-lesson-next', 'check');
+  const lessonCheckHtml = elementsById['view-root'].innerHTML;
+  assert(lessonCheckHtml.includes('tap-chip-card') || lessonCheckHtml.includes('quiz-opt') || lessonCheckHtml.includes('data-lesson-check'), 'Lesson check stage must display tokens or quiz options');
+
+  // Verify answerLessonCheck awards +15 XP and renders 3D ПРОДОЛЖИТЬ button in bottom drawer
+  const curStateBeforeCheck = JSON.parse(store['academy_state_v1'] || '{}');
+  const startXp = curStateBeforeCheck.xp || 0;
+  const curLessonObj = sandbox.LESSONS['testing-1'];
+  const curCheckObj = curLessonObj.checks[0];
+  await fireClick('data-lesson-check', String(curCheckObj.correct));
+  const curStateAfterCheck = JSON.parse(store['academy_state_v1'] || '{}');
+  assert(curStateAfterCheck.xp === startXp + 15, `Answering lesson check correctly must credit +15 XP, expected ${startXp + 15}, got ${curStateAfterCheck.xp}`);
+  const drawerRevealedHtml = elementsById['view-root'].innerHTML;
+  assert(drawerRevealedHtml.includes('lesson-drawer') && drawerRevealedHtml.includes('ПРОДОЛЖИТЬ'), 'Revealed bottom drawer must feature tactile 3D ПРОДОЛЖИТЬ button');
+
+  // 19.5. 4-Tab Mobile IDE on #/practice
+  const pracHtml = navigate('#/practice');
+  assert(pracHtml.includes('prac-mobile-tabs'), '#/practice must feature .prac-mobile-tabs');
+  assert(pracHtml.includes('data-prac-mob-tab="docs"') && pracHtml.includes('data-prac-mob-tab="task"') && pracHtml.includes('data-prac-mob-tab="code"') && pracHtml.includes('data-prac-mob-tab="solution"'), '#/practice must contain 4 mobile tabs: Docs, Task, Code, Solution');
+  assert(pracHtml.includes('prac-signature-box'), '#/practice must feature signature box');
+  assert(pracHtml.includes('prac-testcases-table'), '#/practice must feature test cases table preview');
+  assert(pracHtml.includes('btn-3d-orange') || pracHtml.includes('prac-run-btn'), '#/practice must feature 3D tactile run button');
+
+  // Verify zero duplicate IDs for code editor
+  const editorMatches = (pracHtml.match(/id="prac-code-editor"/g) || []).length;
+  assert(editorMatches === 1, `Code editor textarea must have exactly 1 instance in DOM (0 duplicate IDs), found: ${editorMatches}`);
+
+  // Mobile Tab switching: Docs tab
+  await fireClick('data-prac-mob-tab', 'docs');
+  const pracDocsHtml = elementsById['view-root'].innerHTML;
+  assert(pracDocsHtml.includes('prac-docs-pane') && pracDocsHtml.includes('prac-docs-search-input'), 'Switching to docs tab must render syntax quick reference pane');
+
+  // Mobile Tab switching: Solution tab and unlock gate
+  await fireClick('data-prac-mob-tab', 'solution');
+  const pracSolLockedHtml = elementsById['view-root'].innerHTML;
+  assert(pracSolLockedHtml.includes('prac-solution-locked') || pracSolLockedHtml.includes('data-prac-unlock-solution'), 'Solution tab must display unlock gate initially');
+  await fireClick('data-prac-unlock-solution', '');
+  const pracSolUnlockedHtml = elementsById['view-root'].innerHTML;
+  assert(pracSolUnlockedHtml.includes('prac-solution-pane') || pracSolUnlockedHtml.includes('Эталонное авторское решение'), 'Unlocking solution must reveal solution pane');
+
+  // Mobile Tab switching: Code tab toggles responsive visibility classes
+  await fireClick('data-prac-mob-tab', 'code');
+  const pracCodeHtml = elementsById['view-root'].innerHTML;
+  assert(pracCodeHtml.includes('practice-desktop-grid') && pracCodeHtml.includes('prac-pane--hidden-mobile'), 'Code tab must toggle responsive mobile pane classes');
+
+  // Explanation toggle
+  await fireClick('data-prac-mob-tab', 'task');
+  await fireClick('data-prac-toggle-explain', '');
+  const pracExplainHtml = elementsById['view-root'].innerHTML;
+  assert(pracExplainHtml.includes('Суть задания простыми словами:'), 'Toggling plain explanation must display beginner-friendly breakdown');
+
+  // 19.6. Theory Audio Companion (window.theoryAudioPlayer)
+  assert(sandbox.window.theoryAudioPlayer, 'window.theoryAudioPlayer must exist');
+  const player = sandbox.window.theoryAudioPlayer;
+  assert(typeof player.normalizePythonTerms === 'function', 'theoryAudioPlayer must provide normalizePythonTerms');
+  const rawTerms = 'CPython и asyncio в __init__, сложность O(1), модель FastAPI и def test(): pass';
+  const cleanTerms = player.normalizePythonTerms(rawTerms);
+  assert(cleanTerms.includes('Си-Пайтон'), `Expected 'Си-Пайтон' in normalized terms, got: ${cleanTerms}`);
+  assert(cleanTerms.includes('асинк-и-о'), `Expected 'асинк-и-о' in normalized terms, got: ${cleanTerms}`);
+  assert(cleanTerms.includes('дандер инит'), `Expected 'дандер инит' in normalized terms, got: ${cleanTerms}`);
+  assert(cleanTerms.includes('О от одного'), `Expected 'О от одного' in normalized terms, got: ${cleanTerms}`);
+  assert(cleanTerms.includes('Фаст-А-Пи-Ай'), `Expected 'Фаст-А-Пи-Ай' in normalized terms, got: ${cleanTerms}`);
+
+  // Enriched dictionary terms verification
+  const extTerms = player.normalizePythonTerms('JSON, await asyncio, lambda x: x, self, __getitem__, __setitem__');
+  assert(extTerms.includes('Джейсон'), `Expected 'Джейсон' in normalized terms, got: ${extTerms}`);
+  assert(extTerms.includes('эвейт'), `Expected 'эвейт' in normalized terms, got: ${extTerms}`);
+  assert(extTerms.includes('дандер гет-айтем'), `Expected 'дандер гет-айтем' in normalized terms, got: ${extTerms}`);
+
+  // Audio player rate and play controls
+  player.toggleRate();
+  assert(player.rate === 1.25, `Toggling rate once must advance rate to 1.25, got ${player.rate}`);
+  player.toggleRate();
+  assert(player.rate === 1.5, `Toggling rate again must advance rate to 1.5, got ${player.rate}`);
+  player.toggleRate();
+  assert(player.rate === 1.0, `Toggling rate third time must wrap around to 1.0, got ${player.rate}`);
+  player.play('Тестовый текст для озвучивания');
+  assert(player.isPlaying === true, 'Player should be in playing state');
+  player.pause();
+  assert(player.isPaused === true, 'Player should be paused');
+  player.resume();
+  assert(player.isPaused === false, 'Player should resume playback');
+  player.stop();
+  assert(player.isPlaying === false, 'Player should stop playback');
+
+  // Route transition stops audio playback
+  player.play('Тестовый текст теории');
+  assert(player.isPlaying === true, 'Player should be playing');
+  navigate('#/cards');
+  assert(player.isPlaying === false, 'Navigating route must automatically stop theory audio playback');
+
+  console.log('✓ All Coddy Proposals (3D Serpentine Path, Lesson Runner, 4-Tab IDE, Audio Companion) verified!');
 })();
 
 

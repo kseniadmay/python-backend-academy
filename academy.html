@@ -1157,31 +1157,42 @@
   @media (max-width:768px){
     .prac-run-btn{width:100%;justify-content:center;}
   }
-  @media (max-width:760px){
+  @media (max-width:768px){
+    .prac-filters-drawer:not(.is-open){display:none;}
     .prac-filters-drawer:not(.is-open) .prac-filters-grid{display:none;}
   }
+  .py-editor-shell{display:flex;flex-direction:column;width:100%;}
   .py-accessory-bar{
+    position:sticky;top:0;z-index:6;
     display:flex;gap:5px;overflow-x:auto;padding:6px 8px;background:var(--surface-2);
     border:1px solid var(--line);border-bottom:none;border-radius:14px 14px 0 0;scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
   }
   .py-accessory-bar::-webkit-scrollbar{display:none;}
-  .py-acc-btn{
-    padding:4px 9px;border-radius:8px;background:var(--surface);border:1px solid var(--line);
-    color:var(--ink);font-family:var(--font-m);font-size:.75rem;font-weight:700;cursor:pointer;white-space:nowrap;
-    transition:all .12s;
+  .py-acc-btn, .py-key-btn{
+    padding:5px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--line);
+    color:var(--ink);font-family:var(--font-m);font-size:.76rem;font-weight:700;cursor:pointer;white-space:nowrap;
+    transition:all .12s;flex-shrink:0;user-select:none;
   }
-  .py-acc-btn:hover{border-color:var(--moss);background:var(--emerald-soft);}
-  .code-editor-shell{
+  .py-acc-btn:hover, .py-key-btn:hover{border-color:var(--moss);background:var(--emerald-soft);}
+  .py-acc-btn:active, .py-key-btn:active{transform:scale(0.95);}
+  .code-editor-shell, .editor-with-gutter{
     display:flex;align-items:stretch;background:var(--surface);border:1px solid var(--line);
     border-radius:0 0 14px 14px;overflow:hidden;position:relative;
   }
   .line-numbers-gutter{
     padding:14px 8px 14px 10px;background:var(--surface-2);border-right:1px solid var(--line-soft);
     color:var(--ink-muted);font-family:var(--font-m);font-size:.86rem;line-height:1.5;text-align:right;
-    user-select:none;min-width:34px;white-space:pre;overflow:hidden;
+    user-select:none;min-width:36px;white-space:pre;overflow:hidden;
   }
-  .code-editor-shell textarea.code-editor{
+  .code-editor-shell textarea.code-editor, .editor-with-gutter textarea.code-editor{
     border:none !important;border-radius:0 !important;flex:1;min-width:0;margin:0 !important;padding:14px 14px !important;line-height:1.5 !important;
+    white-space:pre !important;overflow-x:auto !important;word-wrap:normal !important;overflow-wrap:normal !important;
+  }
+  @media (max-width:768px){
+    .code-editor-shell textarea.code-editor, .editor-with-gutter textarea.code-editor{
+      min-height:155px !important;max-height:38vh;
+    }
   }
   .test-running-shimmer{
     padding:10px 14px;border-radius:12px;margin-top:10px;font-weight:700;font-size:.86rem;
@@ -1197,10 +1208,10 @@
     display:inline-flex;align-items:center;gap:12px;
   }
   .mock-timer-svg{width:58px;height:58px;transform:rotate(-90deg);flex:none;}
-  .mock-timer-circle-bg{fill:none;stroke:var(--line);stroke-width:5;}
-  .mock-timer-circle-fg{fill:none;stroke:var(--emerald);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .5s linear, stroke .3s ease;}
-  .mock-timer--warn .mock-timer-circle-fg{stroke:var(--amber);}
-  .mock-timer--danger .mock-timer-circle-fg{stroke:var(--bordeaux);}
+  .mock-timer-circle-bg, .mock-timer-ring-bg{fill:none;stroke:var(--line);stroke-width:5;}
+  .mock-timer-circle-fg, .mock-timer-ring-fg{fill:none;stroke:var(--emerald);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .5s linear, stroke .3s ease;}
+  .mock-timer--warn .mock-timer-circle-fg, .mock-timer--warn .mock-timer-ring-fg{stroke:var(--amber) !important;}
+  .mock-timer--danger .mock-timer-circle-fg, .mock-timer--danger .mock-timer-ring-fg{stroke:var(--bordeaux) !important;}
   .mock-timer--danger #mock-timer-display{color:var(--bordeaux) !important;animation:pulse-ring 1.2s infinite;}
   .socratic-chat-stream{
     margin-top:14px;padding:14px 16px;border-radius:18px;background:var(--surface-2);border:1px solid var(--line);
@@ -1214,6 +1225,7 @@
     padding:10px 14px;border-radius:14px;font-size:.88rem;line-height:1.5;max-width:92%;
     animation:chunkReveal .25s ease;
   }
+  .chat-bubble__author{font-size:.75rem;font-weight:800;color:var(--moss-deep);margin-bottom:4px;}
   .chat-bubble--interviewer{
     align-self:flex-start;background:var(--surface);border:1px solid var(--glass-border);color:var(--ink);
     border-top-left-radius:4px;box-shadow:var(--shadow-1);
@@ -1229,6 +1241,10 @@
   .star-quadrant-card{
     background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:12px 14px;
   }
+  .star-pitch-bar{
+    display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;padding:4px 10px;border-radius:999px;
+    background:var(--surface-2);border:1px solid var(--line);
+  }
 
   /* ---------- Section 6: 3D Flashcards Flip Physics, Gloss & Segmented Stories Bar ---------- */
   .fc-stories-bar{
@@ -1237,17 +1253,17 @@
   .fc-story-seg{
     flex:1;height:100%;border-radius:99px;background:var(--line);transition:background .25s,transform .2s;
   }
-  .fc-story-seg.seg--easy{background:var(--emerald);}
-  .fc-story-seg.seg--hard{background:var(--amber);}
-  .fc-story-seg.seg--again{background:var(--bordeaux);}
-  .fc-story-seg.seg--current{background:var(--ink);transform:scaleY(1.35);}
+  .fc-story-seg.seg--easy, .fc-story-seg.fc-story-seg--r4, .fc-story-seg.fc-story-seg--r3{background:var(--emerald);}
+  .fc-story-seg.seg--hard, .fc-story-seg.fc-story-seg--r2{background:var(--amber);}
+  .fc-story-seg.seg--again, .fc-story-seg.fc-story-seg--r1{background:var(--bordeaux);}
+  .fc-story-seg.seg--current, .fc-story-seg.fc-story-seg--active{background:var(--ink);transform:scaleY(1.35);}
   .fc-stage{perspective:1200px;margin:16px 0;}
   .fc-card{
     background:var(--surface);border:1.5px solid var(--line);border-radius:24px;padding:28px 26px;
     min-height:215px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;
     box-shadow:var(--shadow-1);transform-style:preserve-3d;
     transition:transform .52s cubic-bezier(0.34,1.56,0.64,1),border-color .22s,background .25s;
-    position:relative;overflow:hidden;
+    position:relative;overflow:hidden;touch-action:pan-y;
   }
   .fc-card::after{
     content:"";position:absolute;inset:0;pointer-events:none;
@@ -1278,7 +1294,7 @@
   .boss-hp-wrap{
     background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:10px 14px;margin-bottom:14px;
   }
-  .boss-hp-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.82rem;font-weight:800;margin-bottom:6px;}
+  .boss-hp-top, .boss-hp-header, .boss-hp-bar__label{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.82rem;font-weight:800;margin-bottom:6px;}
   .boss-hp-track{
     height:10px;border-radius:99px;background:rgba(15,23,42,0.2);overflow:hidden;position:relative;border:1px solid var(--line);
   }
@@ -1358,7 +1374,17 @@
     border-color:rgba(16,185,129,0.45) !important;
     box-shadow:0 0 0 1px rgba(16,185,129,0.20), var(--shadow-1);
   }
+  .node-parallel-badge{
+    display:inline-flex;align-items:center;gap:4px;font-size:.71rem;font-weight:700;
+    padding:2px 8px;border-radius:999px;background:var(--emerald-soft);color:var(--moss-deep);
+    border:1px solid rgba(16,185,129,0.3);margin-top:4px;
+  }
   .stage__spine{position:relative;}
+  .stage:not(:last-child) .stage__spine::after{
+    content:"";position:absolute;top:36px;bottom:-22px;left:50%;transform:translateX(-50%);
+    width:2px;background:linear-gradient(180deg, var(--emerald), rgba(217,119,6,0.35));
+    border-radius:99px;opacity:0.65;pointer-events:none;
+  }
   /* Compact cards hub filter styling for mobile viewports (REV-005) */
   .cards-hub-controls{
     display:grid;
@@ -1381,6 +1407,564 @@
     .fc-card{min-height:220px !important;padding:16px 18px !important;}
     .fc-rate-row{margin-top:8px !important;gap:6px !important;}
     .fc-rate-row .btn{padding:8px 6px !important;font-size:.78rem !important;}
+  }
+
+  /* ================= 3D TACTILE BUTTONS & CODDY AESTHETICS ================= */
+  .btn-3d-orange {
+    background: #ff5722;
+    color: #ffffff !important;
+    font-weight: 800;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 22px;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    box-shadow: 0 6px 0 #d84315, 0 10px 20px rgba(255, 87, 34, 0.4);
+    cursor: pointer;
+    transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-3d-orange:hover {
+    background: #ff6e40;
+    box-shadow: 0 7px 0 #d84315, 0 12px 24px rgba(255, 87, 34, 0.5);
+  }
+  .btn-3d-orange:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #d84315, 0 4px 10px rgba(255, 87, 34, 0.3);
+  }
+  .btn-3d-emerald {
+    background: #10b981;
+    color: #ffffff !important;
+    font-weight: 800;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 22px;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    box-shadow: 0 6px 0 #059669, 0 10px 20px rgba(16, 185, 129, 0.35);
+    cursor: pointer;
+    transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-3d-emerald:hover {
+    background: #34d399;
+    box-shadow: 0 7px 0 #059669, 0 12px 24px rgba(16, 185, 129, 0.45);
+  }
+  .btn-3d-emerald:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #059669, 0 4px 10px rgba(16, 185, 129, 0.25);
+  }
+  .btn-3d-ruby {
+    background: #e11d48;
+    color: #ffffff !important;
+    font-weight: 800;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 22px;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    box-shadow: 0 6px 0 #9f1239, 0 10px 20px rgba(225, 29, 72, 0.35);
+    cursor: pointer;
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+  .btn-3d-ruby:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #9f1239, 0 4px 10px rgba(225, 29, 72, 0.25);
+  }
+  .btn-3d-locked {
+    background: #334155;
+    color: #94a3b8 !important;
+    font-weight: 800;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 22px;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    box-shadow: 0 4px 0 #1e293b;
+    cursor: not-allowed;
+    opacity: 0.65;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  /* ================= 3D SERPENTINE S-CURVE TRAIL (#/path) ================= */
+  .path-serpentine-wrap {
+    position: relative;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 16px 12px 140px;
+    user-select: none;
+  }
+  .path-serpentine-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .hex-3d-node {
+    cursor: pointer;
+    outline: none;
+    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .hex-3d-node:hover {
+    transform: scale(1.08);
+  }
+  .hex-3d-node:active {
+    transform: scale(0.96);
+  }
+  .hex-node-label {
+    display: none !important;
+  }
+  .hex-active-tooltip {
+    pointer-events: none;
+  }
+  .hex-active-tooltip__inner {
+    animation: hexBubbleBounce 1.8s ease-in-out infinite alternate;
+  }
+  @keyframes hexBubbleBounce {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-4px); }
+  }
+  @keyframes hexPulse {
+    0%, 100% { r: 38px; opacity: 0.85; stroke-width: 2.5px; }
+    50% { r: 48px; opacity: 0.2; stroke-width: 5px; }
+  }
+  .hex-pulse-halo {
+    animation: hexPulse 2.2s infinite ease-in-out;
+    pointer-events: none;
+  }
+
+  /* Anchored Popover */
+  .path-popover {
+    position: absolute;
+    z-index: 1000;
+    width: 280px;
+    background: rgba(22, 27, 36, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    padding: 18px 18px 16px;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    transform: translateX(-50%);
+    animation: popoverFadeIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    color: #f8fafc;
+  }
+  html:not([data-theme="dark"]) .path-popover {
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    box-shadow: 0 18px 48px rgba(15, 23, 42, 0.18);
+    color: #0f172a;
+  }
+  @keyframes popoverFadeIn {
+    from { opacity: 0; transform: translateX(-50%) scale(0.9); }
+    to { opacity: 1; transform: translateX(-50%) scale(1); }
+  }
+  .path-popover-arrow {
+    position: absolute;
+    width: 0; height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .path-popover-arrow--down {
+    bottom: -10px;
+    border-top: 10px solid rgba(22, 27, 36, 0.96);
+  }
+  html:not([data-theme="dark"]) .path-popover-arrow--down {
+    border-top: 10px solid rgba(255, 255, 255, 0.96);
+  }
+  .path-popover-arrow--up {
+    top: -10px;
+    border-bottom: 10px solid rgba(22, 27, 36, 0.96);
+  }
+  html:not([data-theme="dark"]) .path-popover-arrow--up {
+    border-bottom: 10px solid rgba(255, 255, 255, 0.96);
+  }
+  .path-popover-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .path-popover-badge {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(245, 158, 11, 0.18);
+    color: #fbbf24;
+  }
+  .path-popover-close {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+  }
+  .path-popover-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    line-height: 1.35;
+    margin-bottom: 6px;
+  }
+  .path-popover-status {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: 14px;
+  }
+  .path-popover-cta {
+    width: 100%;
+    padding: 12px;
+    font-size: 0.88rem;
+  }
+
+  /* Top Chapter Banner */
+  .path-chapter-banner {
+    position: sticky;
+    top: 56px;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(22, 27, 36, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 18px;
+    padding: 12px 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+  html:not([data-theme="dark"]) .path-chapter-banner {
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  }
+  .path-chapter-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #f8fafc;
+  }
+  html:not([data-theme="dark"]) .path-chapter-title {
+    color: #0f172a;
+  }
+  .path-chapter-sub {
+    font-size: 0.78rem;
+    color: #94a3b8;
+  }
+  .path-chapter-segments {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .path-seg-bar {
+    width: 14px;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+  }
+  html:not([data-theme="dark"]) .path-seg-bar {
+    background: rgba(0, 0, 0, 0.1);
+  }
+  .path-seg-bar.done {
+    background: #10b981;
+  }
+  .path-seg-bar.active {
+    background: #f59e0b;
+  }
+  .path-chapter-streak {
+    font-size: 0.84rem;
+    font-weight: 800;
+    color: #fb7185;
+    white-space: nowrap;
+    margin-left: 10px;
+  }
+
+  /* Floating Jump-to-Active Button */
+  .path-jump-btn {
+    position: fixed;
+    bottom: calc(24px + env(safe-area-inset-bottom, 16px));
+    right: 20px;
+    z-index: 850;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #f59e0b;
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 6px 0 #b45309, 0 12px 28px rgba(245, 158, 11, 0.5);
+    font-size: 1.5rem;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+  .path-jump-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #b45309, 0 4px 12px rgba(245, 158, 11, 0.3);
+  }
+  @media (max-width: 768px) {
+    .path-jump-btn {
+      bottom: calc(84px + env(safe-area-inset-bottom, 16px));
+      right: 16px;
+      width: 46px;
+      height: 46px;
+      font-size: 1.3rem;
+    }
+  }
+
+  /* Desktop 3-column Layout & Coddy Right Rail */
+  .coddy-path-layout {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 32px;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+  .coddy-right-rail {
+    width: 300px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 16px;
+  }
+  @media (max-width: 1040px) {
+    .coddy-right-rail { display: none !important; }
+    .coddy-path-layout { display: block; padding: 0; }
+  }
+  .coddy-rail-card {
+    padding: 18px 20px;
+    border-radius: 18px;
+    margin: 0;
+  }
+  .coddy-rail-badge {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--amber);
+    margin-bottom: 6px;
+  }
+  .coddy-rail-title {
+    font-size: 0.98rem;
+    font-weight: 800;
+    margin: 0 0 6px;
+  }
+  .coddy-rail-desc {
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    margin: 0 0 14px;
+    line-height: 1.45;
+  }
+  .coddy-rail-btn {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 0.82rem;
+    text-align: center;
+    justify-content: center;
+  }
+
+  /* ================= 4-TAB MOBILE IDE (#/practice) ================= */
+  .prac-mobile-tabs {
+    display: flex;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 4px;
+    gap: 4px;
+    margin-bottom: 14px;
+  }
+  .prac-mob-tab {
+    flex: 1;
+    padding: 10px 6px;
+    text-align: center;
+    font-size: 0.84rem;
+    font-weight: 700;
+    border-radius: 12px;
+    border: none;
+    background: transparent;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .prac-mob-tab.active {
+    background: var(--surface-2);
+    color: var(--ink);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  .prac-signature-box {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-family: var(--font-m);
+    font-size: 0.84rem;
+    color: #e2e8f0;
+  }
+  html:not([data-theme="dark"]) .prac-signature-box {
+    background: rgba(15, 23, 42, 0.05);
+    color: #0f172a;
+  }
+  .sig-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 4px;
+    letter-spacing: 0.04em;
+  }
+  .prac-testcases-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .prac-testcases-table th, .prac-testcases-table td {
+    padding: 8px 10px;
+    border: 1px solid var(--line-soft);
+    text-align: left;
+  }
+  .prac-testcases-table th {
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    font-weight: 700;
+  }
+  .prac-solution-locked {
+    text-align: center;
+    padding: 28px 20px;
+    background: var(--surface);
+    border: 1.5px dashed var(--line);
+    border-radius: 20px;
+    margin: 12px 0;
+  }
+  .prac-solution-locked .lock-orb {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+  }
+  .prac-solution-locked h3 {
+    margin-bottom: 8px;
+    font-size: 1.15rem;
+  }
+  .prac-solution-locked p {
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    max-width: 440px;
+    margin: 0 auto 16px;
+    line-height: 1.5;
+  }
+
+  /* Mobile vs Desktop responsive controls for 4-Tab IDE */
+  @media (max-width: 768px) {
+    .prac-mobile-tabs {
+      display: flex !important;
+    }
+    .practice-desktop-grid {
+      display: flex !important;
+      flex-direction: column !important;
+    }
+    .prac-pane--hidden-mobile {
+      display: none !important;
+    }
+  }
+  @media (min-width: 769px) {
+    .prac-mobile-tabs {
+      display: none !important;
+    }
+    .prac-pane--hidden-mobile {
+      display: block !important;
+    }
+  }
+
+  /* ================= THEORY AUDIO COMPANION ================= */
+  .theory-audio-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(22, 27, 36, 0.94);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    padding: 8px 14px;
+    margin: 10px 0 14px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+  }
+  html:not([data-theme="dark"]) .theory-audio-bar {
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.08);
+  }
+  .theory-audio-btn {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .theory-audio-btn:hover {
+    background: var(--line);
+  }
+  .audio-status-text {
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+  .sprint-audio-btn {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 4px 6px;
+    color: var(--ink-soft);
+    border-radius: 8px;
+  }
+  .sprint-audio-btn:hover {
+    color: var(--ink);
+  }
+  .lesson-drawer {
+    /* alias for academy-bottom-sheet */
   }
 
 </style>
@@ -1417,7 +2001,6 @@
       <div style="display:flex;align-items:center;gap:10px;">
         <div class="streak-pill"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3c-.5 3-3 4-3 7.5A3.5 3.5 0 0 0 12 14a3.5 3.5 0 0 0 3-5c1.5 1 2 2.7 2 4.2A5 5 0 0 1 12 21a5 5 0 0 1-5-5.2C7 12 9 9 9 7c1 1 1.2 2 1.2 2S11 5 12 3Z"/></svg><span id="streak-num-m">0</span></div>
         <button class="icon-btn" id="theme-toggle-m" aria-label="Переключить тему"></button>
-        <button class="icon-btn bug-topbar-btn" id="bug-report-btn-m" data-open-bug-modal aria-label="Зафиксировать ошибку или замечание" title="Зафиксировать ошибку или замечание">🐞</button>
       </div>
     </header>
 
@@ -3846,6 +4429,155 @@ window.ARCH_MASTERY = ARCH_MASTERY;
 window.INFRA_MASTERY = INFRA_MASTERY;
 window.IDE_TASKS = IDE_TASKS;
 window.IDE_TASKS_BY_ID = IDE_TASKS_BY_ID;
+window.LESSONS = LESSONS;
+
+/* ================= THEORY AUDIO COMPANION (WEB SPEECH API) ================= */
+window.theoryAudioPlayer = {
+  isPlaying: false,
+  isPaused: false,
+  rate: 1.0,
+  currentText: '',
+  utterance: null,
+  normalizePythonTerms: function(text) {
+    if(!text) return '';
+    let t = String(text);
+    t = t.replace(/<[^>]*>/g, ' ');
+    t = t.replace(/`([^`]+)`/g, '$1');
+    t = t.replace(/\*\*([^*]+)\*\*/g, '$1');
+    t = t.replace(/\*([^*]+)\*/g, '$1');
+    const dict = [
+      [/\bCPython\b/gi, 'Си-Пайтон'],
+      [/\bPython\b/gi, 'Пайтон'],
+      [/\basyncio\b/gi, 'асинк-и-о'],
+      [/\basync\s+def\b/gi, 'асинк дэф'],
+      [/\bdef\b/g, 'дэф'],
+      [/\bGIL\b/g, 'Гил'],
+      [/\b__init__\b/g, 'дандер инит'],
+      [/\b__enter__\b/g, 'дандер энтер'],
+      [/\b__exit__\b/g, 'дандер экзит'],
+      [/\b__slots__\b/g, 'дандер слотс'],
+      [/\b__dict__\b/g, 'дандер дикт'],
+      [/\b__repr__\b/g, 'дандер репре'],
+      [/\b__len__\b/g, 'дандер лен'],
+      [/\bkwargs\b/gi, 'кварги'],
+      [/\bargs\b/gi, 'арги'],
+      [/\bO\(1\)/g, 'О от одного'],
+      [/\bO\(n\)/g, 'О от эн'],
+      [/\bO\(log\s*n\)/gi, 'О от лог эн'],
+      [/\bO\(n\s*log\s*n\)/gi, 'О от эн лог эн'],
+      [/\bdict\b/g, 'дикт'],
+      [/\blist\b/g, 'лист'],
+      [/\btuple\b/g, 'тюпл'],
+      [/\bset\b/g, 'сет'],
+      [/\bdeque\b/gi, 'дэк'],
+      [/\bNone\b/g, 'Нан'],
+      [/\bTrue\b/g, 'Тру'],
+      [/\bFalse\b/g, 'Фолс'],
+      [/\byield\b/g, 'йилд'],
+      [/\bFastAPI\b/gi, 'Фаст-А-Пи-Ай'],
+      [/\bPydantic\b/gi, 'Пайдантик'],
+      [/\bDocker\b/gi, 'Докер'],
+      [/\bPostgreSQL\b/gi, 'Постгрес'],
+      [/\bRedis\b/gi, 'Редис'],
+      [/\bpytest\b/gi, 'пайтест'],
+      [/\bSQL\b/g, 'Эс-Кью-Эль'],
+      [/\bAPI\b/g, 'А-Пи-Ай'],
+      [/\bHTTP\b/gi, 'Эйч-Ти-Ти-Пи'],
+      [/\bJSON\b/gi, 'Джейсон'],
+      [/\bawait\b/g, 'эвейт'],
+      [/\blambda\b/g, 'лямбда'],
+      [/\bself\b/g, 'селф'],
+      [/\bcls\b/g, 'класс'],
+      [/\b__str__\b/g, 'дандер стр'],
+      [/\b__getitem__\b/g, 'дандер гет-айтем'],
+      [/\b__setitem__\b/g, 'дандер сет-айтем'],
+      [/\b__call__\b/g, 'дандер колл'],
+      [/\b__iter__\b/g, 'дандер итер'],
+      [/\b__next__\b/g, 'дандер некст']
+    ];
+    for(const [pat, repl] of dict){
+      t = t.replace(pat, repl);
+    }
+    return t.replace(/\s+/g, ' ').trim();
+  },
+  play: function(text) {
+    if(typeof window === 'undefined' || !window.speechSynthesis) return;
+    try{ window.speechSynthesis.cancel(); }catch(e){}
+    const cleanText = this.normalizePythonTerms(text || this.currentText);
+    if(!cleanText) return;
+    this.currentText = cleanText;
+    try {
+      const utt = (typeof SpeechSynthesisUtterance !== 'undefined') ? new SpeechSynthesisUtterance(cleanText) : { text: cleanText };
+      utt.lang = 'ru-RU';
+      utt.rate = this.rate;
+      utt.onend = () => { this.isPlaying = false; this.isPaused = false; this.updateUI(); };
+      utt.onerror = () => { this.isPlaying = false; this.isPaused = false; this.updateUI(); };
+      this.utterance = utt;
+      window.speechSynthesis.speak(utt);
+    }catch(e){}
+    this.isPlaying = true;
+    this.isPaused = false;
+    this.updateUI();
+  },
+  pause: function() {
+    if(typeof window === 'undefined' || !window.speechSynthesis) return;
+    if(this.isPlaying && !this.isPaused){
+      try{ window.speechSynthesis.pause(); }catch(e){}
+      this.isPaused = true;
+      this.updateUI();
+    }
+  },
+  resume: function() {
+    if(typeof window === 'undefined' || !window.speechSynthesis) return;
+    if(this.isPlaying && this.isPaused){
+      try{ window.speechSynthesis.resume(); }catch(e){}
+      this.isPaused = false;
+      this.updateUI();
+    }
+  },
+  togglePlay: function(text) {
+    if(this.isPlaying){
+      if(this.isPaused) this.resume();
+      else this.pause();
+    } else {
+      this.play(text);
+    }
+  },
+  stop: function() {
+    if(typeof window === 'undefined' || !window.speechSynthesis) return;
+    try{ window.speechSynthesis.cancel(); }catch(e){}
+    this.isPlaying = false;
+    this.isPaused = false;
+    this.updateUI();
+  },
+  rewind10: function() {
+    if(this.currentText){ this.stop(); this.play(this.currentText); }
+  },
+  forward10: function() {
+    if(this.currentText){ this.stop(); }
+  },
+  toggleRate: function() {
+    const rates = [1.0, 1.25, 1.5];
+    const curIdx = rates.indexOf(this.rate);
+    this.rate = rates[(curIdx + 1) % rates.length];
+    if(this.isPlaying && !this.isPaused){
+      this.play(this.currentText);
+    } else {
+      this.updateUI();
+    }
+  },
+  updateUI: function() {
+    const bar = document.getElementById('theory-audio-bar');
+    if(!bar) return;
+    const playBtn = bar.querySelector('[data-audio-play]');
+    const rateBtn = bar.querySelector('[data-audio-rate]');
+    const statusText = bar.querySelector('.audio-status-text');
+    if(playBtn) playBtn.innerHTML = (this.isPlaying && !this.isPaused) ? '⏸' : '▶';
+    if(rateBtn) rateBtn.textContent = `${this.rate}x`;
+    if(statusText) statusText.textContent = (this.isPlaying && !this.isPaused) ? 'Озвучивание…' : (this.isPaused ? 'Пауза' : 'Аудио-компаньон');
+  }
+};
+
 
 // Add icons for new sections
 ICONS.python = '<svg class="icon" viewBox="0 0 24 24"><path d="M12 2c-4 0-4 2-4 4v2h4v1H6c-2.5 0-4 1.8-4 4.5S3.5 18 6 18h2v-2.5c0-1.7 1.3-3 3-3h5c1.4 0 2.5-1.1 2.5-2.5V6c0-2-1.5-4-6.5-4z"/><path d="M12 22c4 0 4-2 4-4v-2h-4v-1h6c2.5 0 4-1.8 4-4.5S20.5 6 18 6h-2v2.5c0 1.7-1.3 3-3 3H8c-1.4 0-2.5 1.1-2.5 2.5V18c0 2 1.5 4 6.5 4z"/></svg>';
@@ -4746,7 +5478,9 @@ function buildCodeEditorWithGutterHTML(editorId, codeStr, minHeightPx){
   const lineCount = Math.max(1, raw.split('\n').length);
   const nums = [];
   for(let i = 1; i <= lineCount; i++) nums.push(i);
-  const mh = minHeightPx || 200;
+  const mh = typeof minHeightPx === 'number'
+    ? minHeightPx
+    : (parseInt(String(minHeightPx || '').replace(/\D+/g, ''), 10) || 200);
   const tokens = [
     { label: 'Tab ⇥', val: '    ' },
     { label: ':', val: ':' },
@@ -4762,12 +5496,12 @@ function buildCodeEditorWithGutterHTML(editorId, codeStr, minHeightPx){
     { label: '->', val: ' -> ' }
   ];
   const barBtns = tokens.map(t =>
-    `<button type="button" class="py-key-btn" data-insert-token="${escapeHtmlStr(t.val)}" data-target-editor="${editorId}">${escapeHtmlStr(t.label)}</button>`
+    `<button type="button" class="py-key-btn py-acc-btn" data-insert-token="${escapeHtmlStr(t.val)}" data-target-editor="${editorId}">${escapeHtmlStr(t.label)}</button>`
   ).join('');
   return `
     <div class="py-editor-shell" data-editor-shell="${editorId}">
       <div class="py-accessory-bar" role="toolbar" aria-label="Быстрый ввод символов Python">${barBtns}</div>
-      <div class="editor-with-gutter">
+      <div class="editor-with-gutter code-editor-shell">
         <div class="line-numbers-gutter" id="${editorId}-gutter" aria-hidden="true">${nums.join('\n')}</div>
         <textarea id="${editorId}" class="code-editor" spellcheck="false" style="min-height:${mh}px;">${escapeHtmlStr(raw)}</textarea>
       </div>
@@ -4784,11 +5518,11 @@ function buildFcStoriesBarHTML(deckId, totalCards, curIdx){
   for(let i = 0; i < count; i++){
     const r = Number(ratings[deckId + ':' + i]) || 0;
     let cls = 'fc-story-seg';
-    if(i === curIdx) cls += ' fc-story-seg--active';
-    if(r === 4) cls += ' fc-story-seg--r4';
-    else if(r === 3) cls += ' fc-story-seg--r3';
-    else if(r === 2) cls += ' fc-story-seg--r2';
-    else if(r === 1) cls += ' fc-story-seg--r1';
+    if(i === curIdx) cls += ' fc-story-seg--active seg--current';
+    if(r === 4) cls += ' fc-story-seg--r4 seg--easy';
+    else if(r === 3) cls += ' fc-story-seg--r3 seg--easy';
+    else if(r === 2) cls += ' fc-story-seg--r2 seg--hard';
+    else if(r === 1) cls += ' fc-story-seg--r1 seg--again';
     segs.push(`<div class="${cls}" title="Карточка ${i+1}"></div>`);
   }
   return `<div class="fc-stories-bar" aria-label="Прогресс колоды">${segs.join('')}</div>`;
@@ -4801,6 +5535,16 @@ function buildCPythonMemoryDiagramHTML(activeK, skillId){
   return `
     <div class="cpython-mem-diagram">
       <div class="cpython-mem-title">🔬 CPython Memory Layout · ${isDictOrSet ? 'Compact Dict Hash Table' : 'PyObject & Pointer Array'}</div>
+      <svg class="cpython-mem-svg" viewBox="0 0 380 54" width="100%" height="54" role="img" aria-label="Схема ссылок в памяти CPython" style="display:block;margin-bottom:6px;">
+        <rect x="2" y="6" width="102" height="42" rx="6" fill="rgba(16,185,129,0.12)" stroke="rgba(16,185,129,0.45)" stroke-width="1.2"/>
+        <text x="10" y="22" font-size="9.5" font-weight="700" fill="currentColor">Stack Frame</text>
+        <text x="10" y="37" font-size="8.5" font-family="monospace" fill="currentColor">data ➔ 0x7f8a10</text>
+        <path d="M106 27 L138 27" stroke="#10b981" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <polygon points="138,23 145,27 138,31" fill="#10b981"/>
+        <rect x="147" y="6" width="230" height="42" rx="6" fill="rgba(245,158,11,0.10)" stroke="rgba(245,158,11,0.42)" stroke-width="1.2"/>
+        <text x="156" y="22" font-size="9.5" font-weight="700" fill="currentColor">PyObject @ 0x7f8a10 (Heap)</text>
+        <text x="156" y="37" font-size="8.5" font-family="monospace" fill="currentColor">${isDictOrSet ? 'ob_refcnt:1 | dk_indices | dk_entries' : 'ob_refcnt:1 | ob_type | ob_item[0..n]'}</text>
+      </svg>
       <div class="cpython-mem-grid">
         <div class="cpython-mem-box">
           <div style="font-weight:700;color:var(--moss-deep);margin-bottom:3px;">PyObject Header (24 B)</div>
@@ -6178,8 +6922,16 @@ function viewPythonSkill(sid){
         </div>
         <div class="sprint-progress-track"><div class="sprint-progress-fill" style="width:${sprintPct}%;"></div></div>
       </div>
+      <button type="button" class="sprint-audio-btn" data-toggle-audio title="Озвучить конспект (Web Speech API)" aria-label="Озвучить конспект">🔊</button>
       <a href="#/docs" class="sprint-xp-pill" style="text-decoration:none;" title="Справочник синтаксиса и методов Python">📚 Справка</a>
       <span class="sprint-xp-pill">⚡ +10 XP<span class="sr-only"> ${mpLabel(mp)}</span></span>
+    </div>
+    <div id="theory-audio-bar" class="theory-audio-bar" style="display:${state.audioBarOpen ? 'flex' : 'none'};">
+      <button type="button" class="theory-audio-btn" data-audio-play title="Воспроизвести / Пауза">▶</button>
+      <button type="button" class="theory-audio-btn" data-audio-rewind title="Перемотка назад на 10 сек">⏪ -10с</button>
+      <button type="button" class="theory-audio-btn" data-audio-rate title="Скорость чтения">1.0x</button>
+      <span class="audio-status-text">Аудио-компаньон</span>
+      <button type="button" class="theory-audio-btn" data-audio-close style="margin-left:auto;" title="Скрыть аудио-бар">✕</button>
     </div>`;
 
   // Sequential 3-stage pipeline Sub-tabs: 1. Theory (К-xxx) -> 2. Flashcards (Ф-xxx) -> 3. Code Practice (IDE Tasks)
@@ -6218,23 +6970,16 @@ function viewPythonSkill(sid){
     const primaryActionHTML = hasMoreChunks ? `
       <div style="margin-top:12px;">
         <button class="btn-glass-emerald btn-sprint-cta" data-chunk-more="py">Понятно, дальше (+10 XP) ➔</button>
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;">
+        <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:6px;">
           <span class="sr-only">Кусочек ${curChunkIdx + 1} из ${totalChunks} · <button class="link-quiet" data-chunk-reveal-step="py">Открыть шаг целиком</button></span>
-          ${stepIdx > 0 ? `<button class="link-quiet" data-py-step="${stepIdx-1}">← Предыдущий шаг</button>` : `<span></span>`}
-          <div style="display:flex;gap:10px;align-items:center;">
-            <button class="link-quiet" data-chunk-reveal-step="py">Весь шаг сразу</button>
-            ${stepIdx + 1 < steps.length
-              ? `<button class="link-quiet" data-py-next-step="${stepIdx+1}">След. шаг →</button>`
-              : `<button class="link-quiet" data-py-finish-note="${activeK}">К карточкам Ф-xxx →</button>`}
-          </div>
+          <button class="link-quiet" data-chunk-reveal-step="py">Весь шаг сразу</button>
         </div>
       </div>` : `
       <div style="margin-top:12px;">
         ${stepIdx + 1 < steps.length
           ? `<button class="btn-glass-emerald btn-sprint-cta" data-py-next-step="${stepIdx+1}">Понятно, дальше (+10 XP) ➔</button>`
           : `<button class="btn-glass-emerald btn-sprint-cta" data-py-finish-note="${activeK}">✓ Конспект изучен — перейти к карточкам (+15 XP) ${ICONS.arrowRight}</button>`}
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;">
-          <button class="link-quiet" data-py-step="${Math.max(0, stepIdx-1)}" ${stepIdx===0?'disabled':''}>← Предыдущий шаг</button>
+        <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:6px;">
           <span class="meta">${isRead ? '✓ Теория прочитана (закрепи карточками и кодом!)' : 'Этап 1 из 3: Теория → Карточки → Код'}</span>
         </div>
       </div>`;
@@ -6997,6 +7742,145 @@ function viewPracticeHub(){
       </div>
     </div>`;
 
+  practiceHubState.mobileTab = practiceHubState.mobileTab || 'task';
+  const curMobTab = practiceHubState.mobileTab;
+  const mobileTabsHTML = `
+    <div class="prac-mobile-tabs" role="tablist">
+      <button type="button" class="prac-mob-tab ${curMobTab==='docs'?'active':''}" data-prac-mob-tab="docs" role="tab">📖 Справка</button>
+      <button type="button" class="prac-mob-tab ${curMobTab==='task'?'active':''}" data-prac-mob-tab="task" role="tab">🎯 Задача</button>
+      <button type="button" class="prac-mob-tab ${curMobTab==='code'?'active':''}" data-prac-mob-tab="code" role="tab">💻 Код</button>
+      <button type="button" class="prac-mob-tab ${curMobTab==='solution'?'active':''}" data-prac-mob-tab="solution" role="tab">💡 Решение</button>
+    </div>`;
+
+  let sigCode = 'def solution():';
+  const sigMatch = (curTask.initialCode || '').match(/def\s+[a-zA-Z0-9_]+\s*\([^)]*\)(?:\s*->\s*[^:]+)?:/);
+  if(sigMatch) sigCode = sigMatch[0];
+  const signatureBoxHTML = `<div class="prac-signature-box"><div class="sig-badge">Сигнатура функции:</div><code>${escapeHtmlStr(sigCode)}</code></div>`;
+
+  const plainExplainBtnHTML = `
+    <div style="margin:8px 0 10px;">
+      <button type="button" class="btn btn-ghost" style="padding:6px 12px;font-size:.78rem;" data-prac-toggle-explain>
+        🤖 ${practiceHubState.showPlainExplain ? 'Скрыть пояснение' : 'Объяснить задание'}
+      </button>
+    </div>`;
+  const plainExplainBoxHTML = practiceHubState.showPlainExplain ? `
+    <div class="panel" style="padding:12px 14px;margin-bottom:12px;border-left:3px solid var(--amber);">
+      <div style="font-size:0.8rem;font-weight:700;color:var(--amber);margin-bottom:4px;">Суть задания простыми словами:</div>
+      <p style="font-size:0.86rem;line-height:1.5;margin:0;">${escapeHtmlStr(curTask.hint || curTask.title)}</p>
+    </div>` : '';
+
+  let testCasesRowsHTML = '';
+  if(curTask.tests && curTask.tests.includes('assert ')){
+    const assertLines = curTask.tests.split('\n').filter(l => l.trim().startsWith('assert ')).slice(0, 4);
+    testCasesRowsHTML = assertLines.map((al, idx) => {
+      let clean = al.trim().replace(/^assert\s+/, '');
+      let parts = clean.split('==');
+      let inp = parts[0] ? parts[0].trim() : `Тест #${idx+1}`;
+      let exp = parts[1] ? parts[1].split(',')[0].trim() : 'True';
+      return `<tr><td><code>${escapeHtmlStr(inp.slice(0, 36))}</code></td><td><code>${escapeHtmlStr(exp.slice(0, 24))}</code></td><td><span style="color:var(--ink-muted);">Ожидает</span></td></tr>`;
+    }).join('');
+  }
+  if(!testCasesRowsHTML){
+    testCasesRowsHTML = `
+      <tr><td><code>solution(sample_input)</code></td><td><code>expected_result</code></td><td><span style="color:var(--ink-muted);">Ожидает</span></td></tr>
+      <tr><td><code>solution(edge_case)</code></td><td><code>expected_edge</code></td><td><span style="color:var(--ink-muted);">Ожидает</span></td></tr>`;
+  }
+  const testCasesTableHTML = `
+    <div class="prac-testcases-wrapper" style="margin-bottom:12px;">
+      <div style="font-size:0.76rem;font-weight:700;color:var(--ink-soft);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">Тестовые случаи:</div>
+      <table class="prac-testcases-table">
+        <thead><tr><th>Входные данные</th><th>Ожидаемый результат</th><th>Статус</th></tr></thead>
+        <tbody>${testCasesRowsHTML}</tbody>
+      </table>
+    </div>`;
+
+  const isSolved = (solvedMap[curTask.id] === 'solved') || !!practiceHubState.solutionUnlocked;
+  const solutionPaneHTML = isSolved ? `
+    <div class="prac-solution-pane">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span class="state-tag state-tag--mastered">✓ Эталонное авторское решение</span>
+        <span class="topic-badge" style="margin:0;">Сложность: O(n) / O(1)</span>
+      </div>
+      <h3 style="margin-bottom:8px;">Код решения:</h3>
+      <div class="coddy-code-block" style="margin-bottom:12px;white-space:pre-wrap;font-family:var(--font-m);font-size:0.84rem;">${escapeHtmlStr(curTask.solution || '# Эталонное решение принято!')}</div>
+      <p class="meta"><strong>Разбор инварианта:</strong> ${escapeHtmlStr(curTask.hint || 'Решение оптимизировано под технический скрининг.')}</p>
+    </div>` : `
+    <div class="prac-solution-locked">
+      <div class="lock-orb">🔒</div>
+      <h3>Эталонное решение защищено</h3>
+      <p>По Сократовскому регламенту решение открывается после успешной сдачи тестов. Если вы застряли — используйте подсказки во вкладке «Задача».</p>
+      <button type="button" class="btn btn-ghost" data-prac-unlock-solution>🔓 Всё равно открыть эталонное решение</button>
+    </div>`;
+
+  const docsSearchVal = (practiceHubState.docsSearch || '').toLowerCase();
+  const docsCards = [
+    { title: 'Функции & Сигнатуры', code: 'def func(arg, *args, default=0, **kwargs) -> int:\n    return default + arg', desc: 'Позиционные и именованные аргументы, дефолтные параметры.' },
+    { title: 'Словари dict (O(1))', code: 'val = d.get(key, "default")\nfor k, v in d.items(): pass', desc: 'Хеш-таблица. Поиск, вставка, удаление в среднем O(1).' },
+    { title: 'Списки list & Срезы', code: 'rev = lst[::-1]  # разворот срезом\nlst.append(x)    # O(1) амортизированно\nlst.pop()        # O(1) с конца', desc: 'Динамический массив. Вставка в начало O(n).' },
+    { title: 'Множества set (O(1))', code: 'union = s1 | s2      # объединение\nintersect = s1 & s2  # пересечение', desc: 'Уникальные неизменяемые элементы. Проверка in за O(1).' },
+    { title: 'Очередь collections.deque', code: 'from collections import deque\nq = deque([1, 2, 3])\nq.appendleft(0)  # O(1)', desc: 'Двусвязный список блоков, O(1) с обоих концов.' },
+    { title: 'Исключения try..except', code: 'try:\n    risky_operation()\nexcept ValueError as err:\n    pass', desc: 'Перехват конкретных подклассов Exception, raise from.' },
+    { title: 'Контекстный менеджер with', code: 'with open("file.txt") as f:\n    content = f.read()', desc: 'Гарантированное освобождение ресурсов.' },
+    { title: 'Датаклассы dataclass', code: 'from dataclasses import dataclass\n\n@dataclass\nclass Item:\n    id: int; title: str', desc: 'Автогенерация __init__, __repr__, __eq__.' }
+  ].filter(c => !docsSearchVal || c.title.toLowerCase().includes(docsSearchVal) || c.desc.toLowerCase().includes(docsSearchVal) || c.code.toLowerCase().includes(docsSearchVal));
+
+  const docsPaneHTML = `
+    <div class="prac-docs-pane">
+      <div style="margin-bottom:12px;">
+        <input id="prac-docs-search-input" type="text" class="code-editor" style="min-height:auto;padding:8px 12px;font-size:0.84rem;width:100%;" placeholder="Поиск по синтаксису (def, dict, list, deque, with)…" value="${escapeHtmlStr(practiceHubState.docsSearch || '')}">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${docsCards.map(c => `
+          <div class="panel" style="padding:12px 14px;">
+            <div style="font-weight:700;font-size:0.88rem;margin-bottom:4px;color:var(--emerald);">${escapeHtmlStr(c.title)}</div>
+            <p style="font-size:0.78rem;color:var(--ink-soft);margin-bottom:6px;">${escapeHtmlStr(c.desc)}</p>
+            <pre class="coddy-code-block" style="padding:8px 10px;font-size:0.78rem;margin:0;"><code>${escapeHtmlStr(c.code)}</code></pre>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+
+  const cleanDescText = (curTask.desc || '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/^[\s\r\n]*(?:Задание|Задача)\s*[:·\-–—]?\s*/i, '')
+    .trim()
+    .replace(/\s+/g, ' ');
+  const cleanTitleText = (curTask.title || '').trim().replace(/\s+/g, ' ');
+  const isDescRedundant = !cleanDescText || cleanDescText === cleanTitleText || cleanDescText === (cleanTitleText + '.');
+
+  const taskConditionHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+        <span class="topic-badge" style="margin:0;">Задача #${curTask.id} · ${curTask.tier} · ${curTask.topic}</span>
+        ${renderEchelonBadge(curTaskEchelon)}
+        ${solvedMap[curTask.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
+      </div>
+      <div style="display:inline-flex;gap:4px;align-items:center;">
+        <button type="button" class="btn btn-ghost" style="padding:3px 8px;font-size:.74rem;" data-prac-step="-1" ${filtered.length<=1?'disabled':''} title="Предыдущая задача">‹</button>
+        <span style="font-size:.75rem;font-weight:700;color:var(--ink-muted);">${filtered.length>0 ? `${curFilteredIdx + 1}/${filtered.length}` : '0/0'}</span>
+        <button type="button" class="btn btn-ghost" style="padding:3px 8px;font-size:.74rem;" data-prac-step="1" ${filtered.length<=1?'disabled':''} title="Следующая задача">›</button>
+      </div>
+    </div>
+    <h2 class="prac-task-title">${escapeHtmlStr(curTask.title)}</h2>
+    ${signatureBoxHTML}
+    ${(!isDescRedundant && curTask.desc) ? `<div class="lesson-theory" style="margin-bottom:10px;">${curTask.desc}</div>` : ''}
+    ${plainExplainBtnHTML}
+    ${plainExplainBoxHTML}
+    <div style="margin-top:10px;">
+      <button class="btn btn-ghost" style="padding:6px 12px;font-size:.78rem;" data-prac-hint ${practiceHubState.hintLevel>=socraticHints.length?'disabled':''}>💡 Сократовская подсказка (${practiceHubState.hintLevel}/${socraticHints.length})</button>
+    </div>
+    ${shownHints}`;
+
+  const codePaneHTML = `
+    ${testCasesTableHTML}
+    ${buildCodeEditorWithGutterHTML('prac-code-editor', practiceHubState.codeDraft, 240)}
+    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-3d-orange btn-primary prac-run-btn" data-prac-run="${curTask.id}">▶ Запустить код</button>
+      <button class="btn btn-ghost" data-prac-ask-ai>🤖 Спросить ИИ</button>
+      <button class="btn btn-ghost" data-prac-reset="${curTask.id}">Сбросить</button>
+    </div>
+    ${runFeedback}`;
+
   return `
     <div class="container">
       <div class="prac-hero-header">
@@ -7012,32 +7896,14 @@ function viewPracticeHub(){
       ${filtersDrawerHTML}
 
       <div class="microstep-card">
+        ${mobileTabsHTML}
+        <!-- Practice IDE Grid: 4-Tab on Mobile (<768px), 2-Column Split on Desktop (>=769px) -->
         <div class="practice-desktop-grid">
-          <div class="practice-left-pane">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-                <span class="topic-badge" style="margin:0;">Задача #${curTask.id} · ${curTask.tier} · ${curTask.topic}</span>
-                ${renderEchelonBadge(curTaskEchelon)}
-                ${solvedMap[curTask.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
-              </div>
-              <div style="display:inline-flex;gap:4px;align-items:center;">
-                <button type="button" class="btn btn-ghost" style="padding:3px 8px;font-size:.74rem;" data-prac-step="-1" ${filtered.length<=1?'disabled':''} title="Предыдущая задача">‹</button>
-                <span style="font-size:.75rem;font-weight:700;color:var(--ink-muted);">${filtered.length>0 ? `${curFilteredIdx + 1}/${filtered.length}` : '0/0'}</span>
-                <button type="button" class="btn btn-ghost" style="padding:3px 8px;font-size:.74rem;" data-prac-step="1" ${filtered.length<=1?'disabled':''} title="Следующая задача">›</button>
-              </div>
-            </div>
-            <h2 class="prac-task-title">Задача #${curTask.id}: ${curTask.title}</h2>
-            <div class="lesson-theory" style="margin-bottom:14px;">${curTask.desc}</div>
-            ${shownHints}
+          <div class="practice-left-pane ${curMobTab === 'code' ? 'prac-pane--hidden-mobile' : ''}">
+            ${curMobTab === 'docs' ? docsPaneHTML : (curMobTab === 'solution' ? solutionPaneHTML : taskConditionHTML)}
           </div>
-          <div class="practice-right-pane">
-            ${buildCodeEditorWithGutterHTML('prac-code-editor', practiceHubState.codeDraft, 240)}
-            <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-              <button class="btn btn-primary prac-run-btn" data-prac-run="${curTask.id}">▶ Запустить тесты</button>
-              <button class="btn btn-ghost" data-prac-hint ${practiceHubState.hintLevel>=socraticHints.length?'disabled':''}>💡 Сократовская подсказка (${practiceHubState.hintLevel}/${socraticHints.length})</button>
-              <button class="btn btn-ghost" data-prac-reset="${curTask.id}">Сбросить</button>
-            </div>
-            ${runFeedback}
+          <div class="practice-right-pane ${curMobTab !== 'code' ? 'prac-pane--hidden-mobile' : ''}">
+            ${codePaneHTML}
           </div>
         </div>
       </div>
@@ -7560,14 +8426,26 @@ function toggleMockTimer(){
     mockInterviewState.intervalId = setInterval(function(){
       if(mockInterviewState.secondsLeft > 0){
         mockInterviewState.secondsLeft--;
+        const isWarn = mockInterviewState.secondsLeft <= 600;
+        const isDang = mockInterviewState.secondsLeft <= 180;
+        const rCol = isDang ? '#ef4444' : (isWarn ? '#d97706' : 'var(--moss)');
         const el = document.getElementById('mock-timer-display');
-        if(el) el.textContent = formatPomo(mockInterviewState.secondsLeft);
+        if(el){
+          el.textContent = formatPomo(mockInterviewState.secondsLeft);
+          el.style.color = rCol;
+        }
+        const wrapEl = document.querySelector('.mock-timer-ring-wrap');
+        if(wrapEl){
+          wrapEl.classList.toggle('mock-timer--warn', isWarn && !isDang);
+          wrapEl.classList.toggle('mock-timer--danger', isDang);
+        }
         const ringEl = document.getElementById('mock-timer-ring-fg');
         if(ringEl){
           const totalSec = 20 * 60;
           const circum = 138.2;
           const offset = circum * (1 - (mockInterviewState.secondsLeft / totalSec));
           ringEl.setAttribute('stroke-dashoffset', String(offset.toFixed(1)));
+          ringEl.setAttribute('stroke', rCol);
         }
       } else {
         clearInterval(mockInterviewState.intervalId);
@@ -7691,16 +8569,17 @@ function viewMockInterview(){
   const totalSec = 20 * 60;
   const ringCircum = 138.2;
   const ringOffset = (ringCircum * (1 - (mockInterviewState.secondsLeft / totalSec))).toFixed(1);
-  const isWarningTime = mockInterviewState.secondsLeft <= 300;
-  const isDangerTime = mockInterviewState.secondsLeft <= 60;
+  const isWarningTime = mockInterviewState.secondsLeft <= 600;
+  const isDangerTime = mockInterviewState.secondsLeft <= 180;
   const ringColor = isDangerTime ? '#ef4444' : (isWarningTime ? '#d97706' : 'var(--moss)');
+  const timerStateCls = isDangerTime ? ' mock-timer--danger' : (isWarningTime ? ' mock-timer--warn' : '');
 
   const bodyHTML = mockInterviewState.tab === 'live' ? `
     <div class="panel" style="padding:14px 18px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
-      <div class="mock-timer-ring-wrap mock-timer-wrap">
+      <div class="mock-timer-ring-wrap mock-timer-wrap${timerStateCls}">
         <svg class="mock-timer-svg circular-progress-ring" width="54" height="54" viewBox="0 0 54 54" aria-hidden="true">
-          <circle class="mock-timer-ring-bg" cx="27" cy="27" r="22" fill="none" stroke-width="4"></circle>
-          <circle id="mock-timer-ring-fg" class="mock-timer-ring-fg" cx="27" cy="27" r="22" fill="none" stroke="${ringColor}" stroke-width="4" stroke-dasharray="${ringCircum}" stroke-dashoffset="${ringOffset}" transform="rotate(-90 27 27)"></circle>
+          <circle class="mock-timer-ring-bg mock-timer-circle-bg" cx="27" cy="27" r="22" fill="none" stroke-width="4"></circle>
+          <circle id="mock-timer-ring-fg" class="mock-timer-ring-fg mock-timer-circle-fg" cx="27" cy="27" r="22" fill="none" stroke="${ringColor}" stroke-width="4" stroke-dasharray="${ringCircum}" stroke-dashoffset="${ringOffset}"></circle>
         </svg>
         <div>
           <div class="meta">Таймер Live-Coding секции (регламент 20 минут)</div>
@@ -7732,7 +8611,7 @@ function viewMockInterview(){
       </div>
       <h2 style="margin-bottom:10px;">${curTask.title}</h2>
       <div class="lesson-theory" style="margin-bottom:14px;">${curTask.desc}</div>
-      ${buildCodeEditorWithGutterHTML('mock-code-editor', mockInterviewState.codeDraft, 'min-height:220px;', 'mock-code-editor')}
+      ${buildCodeEditorWithGutterHTML('mock-code-editor', mockInterviewState.codeDraft, 220)}
       <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
         <button class="btn btn-primary" data-mock-run="${curTask.id}">${ICONS.play} Запустить решение (Ctrl+Enter)</button>
         <button class="btn btn-ghost" data-mock-hint ${mockInterviewState.hintLevel>=socraticHints.length?'disabled':''}>💡 Запросить наводку интервьюера (${mockInterviewState.hintLevel}/${socraticHints.length})</button>
@@ -7740,6 +8619,10 @@ function viewMockInterview(){
       </div>
       ${runFeedback}
       <div class="socratic-chat-stream" style="margin-top:12px;">
+        <div class="socratic-chat-header">
+          <span>💬 Лента Сократического диалога</span>
+          <span class="meta" style="font-size:.73rem;">Использовано опор: ${mockInterviewState.hintLevel}/${socraticHints.length}</span>
+        </div>
         <div class="chat-bubble chat-bubble--interviewer">
           <div class="chat-bubble__author">🎙️ Tech Lead · Сократический интервьюер</div>
           <div>Прочитай контракт функции, оцени граничные случаи и асимптотику <span class="math-formula">O(n)</span> перед написанием кода. Если застрянешь — запроси сократовскую наводку (до 4 уровней).</div>
@@ -8232,6 +9115,259 @@ nodeCardHTML = function(n){
     </button>`;
 };
 
+let mapViewState = { mode: 'tree' };
+
+function viewPathSerpentine(options){
+  options = options || {};
+  ensureExtendedState();
+  const allUnits = ALL_UNITS_COMBINED;
+  
+  // Find which units are completed vs active vs locked
+  let activeUnitIndex = -1;
+  allUnits.forEach((u, idx) => {
+    const isUnitTestPassed = (state.passedUnitTests || []).includes(u.id);
+    const allSkillsMastered = (u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80);
+    const isCompleted = isUnitTestPassed || allSkillsMastered;
+    if(!isCompleted && activeUnitIndex === -1){
+      activeUnitIndex = idx;
+    }
+  });
+  if(activeUnitIndex === -1) activeUnitIndex = allUnits.length - 1;
+
+  // Track coordinates for each of the 45 nodes
+  // 45 nodes spaced by 115px vertically, S-curve horizontally
+  const coords = allUnits.map((u, i) => {
+    const y = 90 + i * 115;
+    const x = Math.round(210 + 110 * Math.sin((i * Math.PI) / 2.2));
+    return { x, y };
+  });
+
+  const totalH = coords[coords.length - 1].y + 120;
+
+  // Build smooth Bezier path
+  let dPath = `M ${coords[0].x} ${coords[0].y}`;
+  for(let i = 0; i < coords.length - 1; i++){
+    const p1 = coords[i];
+    const p2 = coords[i+1];
+    const midY = (p1.y + p2.y) / 2;
+    dPath += ` C ${p1.x} ${midY}, ${p2.x} ${midY}, ${p2.x} ${p2.y}`;
+  }
+
+  // Build progress sub-path up to active unit
+  let dProgress = '';
+  if(activeUnitIndex > 0){
+    dProgress = `M ${coords[0].x} ${coords[0].y}`;
+    for(let i = 0; i < Math.min(activeUnitIndex, coords.length - 1); i++){
+      const p1 = coords[i];
+      const p2 = coords[i+1];
+      const midY = (p1.y + p2.y) / 2;
+      dProgress += ` C ${p1.x} ${midY}, ${p2.x} ${midY}, ${p2.x} ${p2.y}`;
+    }
+  }
+
+  // Active unit metadata for top chapter banner
+  const curActiveUnit = allUnits[activeUnitIndex] || allUnits[0];
+  const activeTrack = getTrackForUnit(curActiveUnit.id);
+  const chapterUnits = allUnits.filter(u => getTrackForUnit(u.id).routePrefix === activeTrack.routePrefix);
+  const chapterSegmentsHTML = chapterUnits.map(u => {
+    const isPassed = (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80));
+    const isActive = u.id === curActiveUnit.id;
+    return `<div class="path-seg-bar ${isPassed ? 'done' : (isActive ? 'active' : '')}" title="Юнит ${u.id}: ${escapeHtmlStr(u.title)}"></div>`;
+  }).join('');
+
+  // Chapter ribbon markers between modules
+  const chapterBreakpoints = [
+    { startIdx: 0, title: 'Глава 1: Python Core' },
+    { startIdx: 9, title: 'Глава 2: Web & HTTP' },
+    { startIdx: 13, title: 'Глава 3: Backend & Архитектура' },
+    { startIdx: 21, title: 'Глава 4: Алгоритмы и структуры данных' },
+    { startIdx: 27, title: 'Глава 5: Базы данных и SQL' },
+    { startIdx: 33, title: 'Глава 6: Системный дизайн' },
+    { startIdx: 39, title: 'Глава 7: Инфраструктура и DevOps' }
+  ];
+
+  let markersSVG = '';
+  chapterBreakpoints.forEach(cb => {
+    if(coords[cb.startIdx]){
+      const cy = coords[cb.startIdx].y - 50;
+      markersSVG += `
+        <g class="path-chapter-ribbon" transform="translate(210, ${cy})">
+          <line x1="-190" y1="0" x2="-130" y2="0" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <line x1="130" y1="0" x2="190" y2="0" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <rect x="-120" y="-14" width="240" height="28" rx="14" fill="rgba(22, 27, 36, 0.88)" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1"/>
+          <text x="0" y="4" text-anchor="middle" font-size="11" font-weight="800" fill="#fbbf24" letter-spacing="0.04em">${escapeHtmlStr(cb.title)}</text>
+        </g>`;
+    }
+  });
+
+  // Flat-topped hexagon SVG points calculation
+  let nodesSVG = '';
+  allUnits.forEach((u, i) => {
+    const { x, y } = coords[i];
+    let status = 'locked';
+    if(i < activeUnitIndex || (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80))){
+      status = 'completed';
+    } else if(i === activeUnitIndex){
+      status = 'active';
+    }
+
+    const isCompleted = (status === 'completed');
+    const isActive = (status === 'active');
+
+    const bevelColor = isCompleted ? '#047857' : (isActive ? '#b45309' : '#020617');
+    const topGrad = isCompleted ? 'url(#hexGradCompleted)' : (isActive ? 'url(#hexGradActive)' : 'url(#hexGradLocked)');
+    const strokeColor = isCompleted ? 'rgba(255,255,255,0.3)' : (isActive ? '#fef08a' : 'rgba(255,255,255,0.08)');
+    const strokeWidth = isActive ? 2.5 : 1.5;
+
+    let centerIcon = '';
+    let pulseHalo = '';
+    let activeBubble = '';
+    if(isCompleted){
+      centerIcon = `<text x="${x}" y="${y+7}" text-anchor="middle" font-size="22" font-weight="900" fill="#ffffff">✓</text>`;
+    } else if(isActive){
+      pulseHalo = `<circle class="hex-pulse-halo" cx="${x}" cy="${y}" r="40" fill="none" stroke="rgba(245, 158, 11, 0.6)"/>`;
+      centerIcon = `<text x="${x}" y="${y+7}" text-anchor="middle" font-size="22">🏆</text>`;
+      activeBubble = `
+        <g class="hex-active-tooltip" transform="translate(${x}, ${y - 48})">
+          <g class="hex-active-tooltip__inner">
+            <rect x="-38" y="-18" width="76" height="24" rx="12" fill="#ff7a00" filter="drop-shadow(0 4px 10px rgba(255,122,0,0.5))"/>
+            <polygon points="-6,6 6,6 0,12" fill="#ff7a00"/>
+            <text x="0" y="-2" text-anchor="middle" font-size="11" font-weight="900" fill="#ffffff" letter-spacing="0.08em">НАЧАТЬ</text>
+          </g>
+        </g>`;
+    } else {
+      centerIcon = `<text x="${x}" y="${y+6}" text-anchor="middle" font-size="16" fill="#64748b">🔒</text>`;
+    }
+
+    const labelX = (x < 210) ? (x + 46) : (x - 46);
+    const labelAnchor = (x < 210) ? 'start' : 'end';
+    const shortTitle = (u.title.length > 22) ? u.title.slice(0, 20) + '…' : u.title;
+
+    nodesSVG += `
+      <g class="hex-3d-node hex-node--${status}" data-unit-id="${u.id}" data-node-idx="${i}" data-cx="${x}" data-cy="${y}" role="button" tabindex="0">
+        ${pulseHalo}
+        <!-- 3D Bevel Extrusion -->
+        <polygon points="${x-34},${y} ${x-17},${y+29.5} ${x+17},${y+29.5} ${x+34},${y} ${x+34},${y+8} ${x+17},${y+37.5} ${x-17},${y+37.5} ${x-34},${y+8}" fill="${bevelColor}"/>
+        <!-- Hexagon Top Face -->
+        <polygon points="${x+34},${y} ${x+17},${y+29.5} ${x-17},${y+29.5} ${x-34},${y} ${x-17},${y-29.5} ${x+17},${y-29.5}" fill="${topGrad}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+        ${centerIcon}
+        <text class="hex-node-label" x="${labelX}" y="${y+4}" text-anchor="${labelAnchor}">${u.id} ${escapeHtmlStr(shortTitle)}</text>
+        ${activeBubble}
+      </g>`;
+  });
+
+  const cleanUnitTitle = function(id, title){
+    if(!title) return '';
+    return String(title).replace(new RegExp(`^(?:Юнит\\s*)?${String(id).replace('.', '\\.')}\\s*[:·\\-–—]?\\s*`, 'i'), '').trim();
+  };
+
+  return `
+    <div class="coddy-path-layout">
+      <div class="container path-serpentine-wrap">
+        <!-- Top Chapter Banner -->
+        <div class="path-chapter-banner">
+          <div class="path-chapter-banner-left">
+            <div class="path-chapter-title">🎯 ${escapeHtmlStr(activeTrack.title)}</div>
+            <div class="path-chapter-sub">Юнит ${curActiveUnit.id}: ${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</div>
+          </div>
+          <div class="path-chapter-banner-right">
+            <div class="path-chapter-segments">
+              ${chapterSegmentsHTML}
+            </div>
+            <div class="path-chapter-streak">🔥 ${state.streak} дн.</div>
+          </div>
+        </div>
+
+        <!-- S-Curve SVG Trail -->
+        <div class="path-serpentine" style="position:relative;">
+          <svg class="path-serpentine-svg" viewBox="0 0 420 ${totalH}" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="hexGradCompleted" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#34d399"/>
+                <stop offset="100%" stop-color="#059669"/>
+              </linearGradient>
+              <linearGradient id="hexGradActive" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#fbbf24"/>
+                <stop offset="100%" stop-color="#d97706"/>
+              </linearGradient>
+              <linearGradient id="hexGradLocked" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#1e293b"/>
+                <stop offset="100%" stop-color="#0f172a"/>
+              </linearGradient>
+              <linearGradient id="pathProgressGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#10b981"/>
+                <stop offset="100%" stop-color="#f59e0b"/>
+              </linearGradient>
+            </defs>
+
+            <!-- Outer trail shadow -->
+            <path d="${dPath}" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="22" stroke-linecap="round"/>
+            <!-- Background trail -->
+            <path class="path-track-bg" d="${dPath}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="14" stroke-linecap="round"/>
+            ${dProgress ? `<path class="path-track-progress" d="${dProgress}" fill="none" stroke="url(#pathProgressGrad)" stroke-width="8" stroke-linecap="round"/>` : ''}
+
+            <!-- Chapter ribbons -->
+            ${markersSVG}
+
+            <!-- 45 3D Hexagonal Nodes -->
+            ${nodesSVG}
+          </svg>
+
+          <!-- Anchored Popover Modal -->
+          <div id="path-anchored-popover" class="path-popover" style="display:none;" role="dialog" aria-modal="true">
+            <div class="path-popover-arrow path-popover-arrow--down" id="popover-arrow"></div>
+            <div class="path-popover-content">
+              <div class="path-popover-header">
+                <div class="path-popover-badge" id="popover-badge">🎯 Модуль 1 · Python</div>
+                <button type="button" class="path-popover-close" id="popover-close-btn" aria-label="Закрыть">✕</button>
+              </div>
+              <h3 class="path-popover-title" id="popover-title">Юнит 1.1: Переменные и память</h3>
+              <div class="path-popover-status" id="popover-status">В процессе изучения</div>
+              <div class="path-popover-skills" id="popover-skills" style="font-size:0.8rem;color:var(--ink-soft);margin-bottom:14px;line-height:1.45;"></div>
+              <div class="path-popover-actions">
+                <button type="button" class="btn-3d-orange path-popover-cta" id="popover-cta-btn">НАЧАТЬ ➔</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating Jump Button to active lesson -->
+        <button type="button" class="path-jump-btn" id="path-jump-btn" title="Перейти к текущему уроку" aria-label="Перейти к текущему уроку">
+          ↓
+        </button>
+      </div>
+
+      <aside class="coddy-right-rail">
+        <!-- Widget 1: SRS Cards Review -->
+        <div class="panel coddy-rail-card">
+          <div class="coddy-rail-badge">🃏 SRS-Повторение</div>
+          <h4 class="coddy-rail-title">Карточка дня</h4>
+          <p class="coddy-rail-desc">Интервальное повторение RemNote: закрепи память перед практикой.</p>
+          <a href="#/cards" class="btn btn-primary coddy-rail-btn">Повторить карточки →</a>
+        </div>
+        <!-- Widget 2: Streak & Level XP -->
+        <div class="panel coddy-rail-card">
+          <div class="coddy-rail-badge">🔥 Стрик и цель дня</div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin:6px 0 8px;">
+            <span style="font-size:1.8rem;font-weight:900;color:#f43f5e;">🔥 ${state.streak || 0}</span>
+            <span class="meta">дней подряд</span>
+          </div>
+          <div class="progress-bar-wrap" style="height:8px;margin-bottom:8px;">
+            <div class="progress-bar-fill" style="width:${Math.min(100, Math.round(((state.xp||0) % 100) / 100 * 100))}%;background:linear-gradient(90deg,#fbbf24,#f59e0b);"></div>
+          </div>
+          <div class="meta" style="font-size:0.78rem;">Всего опыта: <strong>${state.xp || 0} XP</strong></div>
+        </div>
+        <!-- Widget 3: Screening Readiness -->
+        <div class="panel coddy-rail-card">
+          <div class="coddy-rail-badge">🎯 Собеседование</div>
+          <h4 class="coddy-rail-title">Готовность к скринингу</h4>
+          <p class="coddy-rail-desc">Симулятор технического скрининга: лайв-кодинг и STAR-вопросы.</p>
+          <a href="#/mock" class="btn btn-ghost coddy-rail-btn">Симулятор собеседования →</a>
+        </div>
+      </aside>
+    </div>`;
+}
+
 viewMap = function(){
   const stagesHTML = STAGES.map((s,i)=>{
     const nodes = NODES.filter(n=>n.stage===i);
@@ -8248,10 +9384,30 @@ viewMap = function(){
         </div>
       </div>`;
   }).join('');
+
+  const mode = (mapViewState && mapViewState.mode) ? mapViewState.mode : 'tree';
+
+  const modeSwitcherHTML = `
+    <div class="subtabs subtabs--compact" style="margin-bottom:16px;">
+      <button class="subtab ${mode==='path'?'active':''}" data-map-mode="path">🏔 3D-Тропа курса (Serpentine)</button>
+      <button class="subtab ${mode==='tree'?'active':''}" data-map-mode="tree">🗺 Дерево и Эшелоны собеседования</button>
+    </div>`;
+
+  if(mode === 'path'){
+    return `
+      <div class="container" style="padding-bottom:10px;">
+        <h1 style="margin-bottom:6px;">Карта навыков: Интерактивная 3D-Тропа обучения</h1>
+        <p class="meta" style="margin-bottom:14px;">Математическая извилистая S-трасса соединяет все 45 юнитов курса в единое непрерывное приключение.</p>
+        ${modeSwitcherHTML}
+      </div>
+      ${viewPathSerpentine()}`;
+  }
+
   return `
     <div class="container">
       <h1 style="margin-bottom:6px;">Карта навыков и Эшелоны собеседования</h1>
-      <p class="meta" style="margin-bottom:18px;">Единая архитектура: 4 сквозных эшелона приоритета (от 100% обязательного тех-скрининга до архитектурного резерва) синхронизированы с 18 узлами дерева навыков и 45 юнитами в 7 модулях.</p>
+      <p class="meta" style="margin-bottom:14px;">Единая архитектура: 4 сквозных эшелона приоритета (от 100% обязательного тех-скрининга до архитектурного резерва) синхронизированы с 18 узлами дерева навыков и 45 юнитами в 7 модулях.</p>
+      ${modeSwitcherHTML}
       ${buildPriorityRoadmapWidgetHTML({ compact: false })}
       ${stagesHTML}
     </div>`;
@@ -8386,9 +9542,12 @@ answerLessonCheck = function(i){
   const l = (typeof LESSONS !== 'undefined' && lessonState) ? LESSONS[lessonState.lessonId] : null;
   const checks = (l && l.checks) ? l.checks : [];
   const c = checks[lessonState ? (lessonState.checkIdx || 0) : 0];
-  const isCorrect = c ? (i === c.correct) : true;
+  const isCorrect = c ? (i === c.correct) : false;
   if(navigator && navigator.vibrate) try{ navigator.vibrate(isCorrect ? [15] : [30, 40, 30]); }catch(e){}
   _origAnswerLessonCheck(i);
+  if(isCorrect){
+    awardXp(15);
+  }
   saveLessonDraftState();
 };
 
@@ -8448,6 +9607,7 @@ lessonTheoryHTML = function(){
   const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
   const isLastStepAndChunk = (sIdx + 1 >= steps.length) && !hasMoreChunks;
   const e1 = getEchelonProgress(1);
+  const remE1 = e1.skills.filter(s => getSkillMP(s.id) < 100).length;
   const streakVal = (typeof state !== 'undefined' && state && state.streak) ? state.streak : 1;
   const activeCount = Math.min(6, Math.max(1, streakVal % 6 || 6));
   const finishSprintBanner = isLastStepAndChunk ? `
@@ -8541,7 +9701,15 @@ lessonTheoryHTML = function(){
           </div>
           <div class="sprint-progress-track"><div class="sprint-progress-fill" style="width:${sprintPct}%;"></div></div>
         </div>
+        <button type="button" class="sprint-audio-btn" data-toggle-audio title="Озвучить конспект (Web Speech API)" aria-label="Озвучить конспект">🔊</button>
         <span class="sprint-xp-pill">⚡ +10 XP</span>
+      </div>
+      <div id="theory-audio-bar" class="theory-audio-bar" style="display:${state.audioBarOpen ? 'flex' : 'none'};">
+        <button type="button" class="theory-audio-btn" data-audio-play title="Воспроизвести / Пауза">▶</button>
+        <button type="button" class="theory-audio-btn" data-audio-rewind title="Перемотка назад на 10 сек">⏪ -10с</button>
+        <button type="button" class="theory-audio-btn" data-audio-rate title="Скорость чтения">1.0x</button>
+        <span class="audio-status-text">Аудио-компаньон</span>
+        <button type="button" class="theory-audio-btn" data-audio-close style="margin-left:auto;" title="Скрыть аудио-бар">✕</button>
       </div>
       ${body}
     </div>`;
@@ -8567,7 +9735,15 @@ function buildLessonStageTopbarHTML(l, rightLabel, pct, xpLabel){
         </div>
         <div class="sprint-progress-track"><div class="sprint-progress-fill" style="width:${pct}%;"></div></div>
       </div>
+      <button type="button" class="sprint-audio-btn" data-toggle-audio title="Озвучить конспект (Web Speech API)" aria-label="Озвучить конспект">🔊</button>
       <span class="sprint-xp-pill">${xpLabel}</span>
+    </div>
+    <div id="theory-audio-bar" class="theory-audio-bar" style="display:${state.audioBarOpen ? 'flex' : 'none'};">
+      <button type="button" class="theory-audio-btn" data-audio-play title="Воспроизвести / Пауза">▶</button>
+      <button type="button" class="theory-audio-btn" data-audio-rewind title="Перемотка назад на 10 сек">⏪ -10с</button>
+      <button type="button" class="theory-audio-btn" data-audio-rate title="Скорость чтения">1.0x</button>
+      <span class="audio-status-text">Аудио-компаньон</span>
+      <button type="button" class="theory-audio-btn" data-audio-close style="margin-left:auto;" title="Скрыть аудио-бар">✕</button>
     </div>`;
 }
 
@@ -8640,14 +9816,14 @@ lessonCheckHTML = function(){
   const nextLabel = isLast ? 'Дальше: практика' : 'Следующий вопрос';
 
   const bottomSheetHTML = revealed ? `
-    <div class="academy-bottom-sheet ${isCorrect ? 'academy-bottom-sheet--correct' : 'academy-bottom-sheet--wrong'}">
+    <div class="academy-bottom-sheet lesson-drawer ${isCorrect ? 'academy-bottom-sheet--correct' : 'academy-bottom-sheet--wrong'}">
       <div class="bs-title-row">
-        <span>${isCorrect ? '✓ Правильно! (Ответ принят)' : '✕ Не совсем.'}</span>
-        <span class="bs-badge">${isCorrect ? '⚡ +10 XP' : 'Разбор'}</span>
+        <span>${isCorrect ? '✓ Правильно! +15 XP' : '✕ Не совсем.'}</span>
+        <span class="bs-badge">${isCorrect ? '⚡ +15 XP' : 'Разбор'}</span>
       </div>
       <div class="bs-explain-text">${formatRichInlineText(c.explain)}</div>
-      <button class="${isCorrect ? 'btn-coddy-emerald' : 'btn-coddy-ruby'} btn-sprint-cta" data-lesson-next="${nextTarget}">
-        ${nextLabel} ➔
+      <button class="${isCorrect ? 'btn-3d-emerald btn-coddy-emerald' : 'btn-3d-ruby btn-coddy-ruby'} btn-sprint-cta" data-lesson-next="${nextTarget}">
+        ${isCorrect ? 'ПРОДОЛЖИТЬ ➔' : (isLast ? 'ПРОДОЛЖИТЬ (ПРАКТИКА) ➔' : 'ПРОДОЛЖИТЬ ➔')}
       </button>
     </div>` : '';
 
@@ -8669,7 +9845,12 @@ lessonStageHTML = function(stage){
   const pct = Math.min(98, Math.round(70 + ((seqIdx + 1) / Math.max(1, seq.length)) * 25));
   const labels = {practice:'Практика', task:'Задание', practice2:'Практика 2', task2:'Задание 2', debug:'Отладка'};
   const topbar = buildLessonStageTopbarHTML(l, labels[stage] || 'Практика', pct, '⚡ +20 XP');
-  return _origLessonStageHTML(stage).replace('<div class="container">', '<div class="container">\n      ' + topbar);
+  let raw = _origLessonStageHTML(stage).replace('<div class="container">', '<div class="container">\n      ' + topbar);
+  raw = raw.replace(/<textarea id="lesson-code"[^>]*>([\s\S]*?)<\/textarea>/, function(_, inner){
+    const unesc = inner.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,'&');
+    return buildCodeEditorWithGutterHTML('lesson-code', unesc, 200);
+  });
+  return raw;
 };
 
 const _origLessonDoneHTML = lessonDoneHTML;
@@ -8949,10 +10130,13 @@ viewDashboard = function(){
     { route: '/architecture', icon: '🏛️', name: 'Архит.', pct: Math.round(archMp / 1400 * 100) },
     { route: '/infra', icon: '🚀', name: 'Инфра', pct: Math.round(infraMp / 2100 * 100) }
   ].map(m => `
-    <a href="#${m.route}" class="dash-mini-track" title="${m.name}: ${m.pct}%">
-      <span class="dash-mini-track__icon">${m.icon}</span>
-      <span class="dash-mini-track__name">${m.name}</span>
-      <span class="dash-mini-track__pct">${m.pct}%</span>
+    <a href="#${m.route}" class="dash-mini-track dash-track-chip" title="${m.name}: ${m.pct}%" style="flex-direction:column;align-items:stretch;gap:4px;">
+      <div class="dash-track-chip__top" style="display:flex;align-items:center;justify-content:space-between;gap:5px;">
+        <span class="dash-mini-track__icon">${m.icon}</span>
+        <span class="dash-mini-track__name">${m.name}</span>
+        <span class="dash-mini-track__pct">${m.pct}%</span>
+      </div>
+      <div class="dash-track-chip__bar"><div class="dash-track-chip__fill" style="width:${Math.max(4, Math.min(100, m.pct))}%;"></div></div>
     </a>`).join('');
 
   return `
@@ -9150,18 +10334,19 @@ viewDashboard = function(){
 
 // Update Navigation items cleanly (1-line labels without redundant parenthetical numbers or duplicate emojis)
 NAV_ITEMS.splice(0, NAV_ITEMS.length,
+  {route:'/path', icon:'map', label:'3D-Тропа', shortLabel:'Тропа', mobileTab:true, group:'learn'},
+  {route:'/practice', icon:'code', label:'Практика IDE', shortLabel:'IDE', mobileTab:true, group:'trainer'},
+  {route:'/cards', icon:'cards', label:'Карточки', shortLabel:'Карточки', mobileTab:true, group:'trainer'},
+  {route:'/mock', icon:'crown', label:'Собеседование', shortLabel:'Собес', mobileTab:true, group:'trainer'},
   {route:'/', icon:'home', label:'Дашборд', shortLabel:'Дашборд', mobileTab:true, group:'learn'},
-  {route:'/python', icon:'python', label:'Python', shortLabel:'Python', mobileTab:true, group:'module'},
+  {route:'/python', icon:'python', label:'Python Core', shortLabel:'Python', group:'module'},
   {route:'/web', icon:'globe', label:'Web и HTTP', shortLabel:'Web', group:'module'},
   {route:'/backend', icon:'server', label:'Backend', shortLabel:'Backend', group:'module'},
   {route:'/algorithms', icon:'bolt', label:'Алгоритмы', shortLabel:'Алгоритмы', group:'module'},
   {route:'/databases', icon:'database', label:'Базы данных', shortLabel:'БД', group:'module'},
   {route:'/architecture', icon:'arch', label:'Архитектура', shortLabel:'Архит.', group:'module'},
   {route:'/infra', icon:'rocket', label:'Инфраструктура', shortLabel:'Инфра', group:'module'},
-  {route:'/mock', icon:'crown', label:'Собеседование', shortLabel:'Собес', mobileTab:true, group:'trainer'},
   {route:'/map', icon:'map', label:'Карта навыков', shortLabel:'Карта', group:'learn'},
-  {route:'/practice', icon:'code', label:'Практика IDE', shortLabel:'IDE', mobileTab:true, group:'trainer'},
-  {route:'/cards', icon:'cards', label:'Карточки', shortLabel:'Карточки', mobileTab:true, group:'trainer'},
   {route:'/docs', icon:'map', label:'Справочник', shortLabel:'Справочник', group:'tool'},
   {route:'/sandbox', icon:'terminal', label:'Песочница', shortLabel:'Песочница', group:'tool'}
 );
@@ -9193,7 +10378,7 @@ renderNav = function(){
     desk.innerHTML = `
       <div class="nav-group-label">Обучение</div>
       ${learnLinks}
-      <details class="nav-modules-accordion" open>
+      <details class="nav-modules-accordion">
         <summary class="nav-modules-summary"><span>📚 Модули 01–07</span><span class="navlink__pct">${overallPct}%</span></summary>
         <div class="nav-modules-list">${modLinks}</div>
       </details>
@@ -9313,19 +10498,6 @@ window.openBugReportModal = openBugReportModal;
       orb2.id = 'ambient-orb-emerald';
       orb2.className = 'ambient-orb ambient-orb--emerald';
       document.body.insertBefore(orb2, document.body.firstChild);
-    }
-    const themeToggleM = document.getElementById('theme-toggle-m');
-    if(themeToggleM && !document.getElementById('bug-report-btn-m')){
-      const bugTopBtn = document.createElement('button');
-      bugTopBtn.id = 'bug-report-btn-m';
-      bugTopBtn.className = 'icon-btn bug-topbar-btn';
-      bugTopBtn.setAttribute('data-open-bug-modal', '');
-      bugTopBtn.setAttribute('aria-label', 'Зафиксировать ошибку или замечание');
-      bugTopBtn.setAttribute('title', 'Зафиксировать ошибку или замечание');
-      bugTopBtn.innerHTML = '🐞';
-      if(themeToggleM.parentNode){
-        themeToggleM.parentNode.insertBefore(bugTopBtn, themeToggleM.nextSibling);
-      }
     }
   }catch(e){}
   const foot = document.querySelector('.sidebar-foot');
@@ -9492,6 +10664,9 @@ function openHandoverModal(){
 
 // Override render() to handle all routes (#/python, #/web, #/backend, #/algorithms, #/databases, #/architecture, #/infra, #/<track>/boss, #/mock, #/cards, #/practice, #/docs, #/map, #/sandbox, #/diagnostic)
 render = function(){
+  if(window.theoryAudioPlayer && window.theoryAudioPlayer.isPlaying){
+    window.theoryAudioPlayer.stop();
+  }
   ensureExtendedState();
   const route = currentRoute();
   if(route && state.lastRoute !== route){
@@ -9618,8 +10793,12 @@ render = function(){
   } else if(route === '/docs' || route === '/reference'){
     root.innerHTML = viewDocsHub();
     navRoute = '/docs';
+  } else if(route === '/path'){
+    root.innerHTML = viewPathSerpentine();
+    navRoute = '/path';
   } else if(route === '/map'){
     root.innerHTML = viewMap();
+    navRoute = '/map';
   } else if(route === '/sandbox'){
     root.innerHTML = viewSandbox();
   } else if(route === '/diagnostic' || route === '/lesson/quiz'){
@@ -10373,6 +11552,77 @@ document.addEventListener('click', async function(e){
     return;
   }
 
+  // Sticky Python Accessory Bar token insertion & Consolidation Lab scratchpad runner
+  const tokBtn = e.target.closest('[data-insert-token]');
+  if(tokBtn){
+    const token = tokBtn.getAttribute('data-insert-token') || '';
+    const targetId = tokBtn.getAttribute('data-target-editor') || '';
+    const ta = targetId ? document.getElementById(targetId) : document.querySelector('textarea.code-editor');
+    if(ta){
+      const start = typeof ta.selectionStart === 'number' ? ta.selectionStart : ta.value.length;
+      const end = typeof ta.selectionEnd === 'number' ? ta.selectionEnd : ta.value.length;
+      const before = ta.value.slice(0, start);
+      const after = ta.value.slice(end);
+      const isPair = (token === '()' || token === '[]' || token === '{}');
+      const hasSelection = start !== end;
+      let nextPos;
+      if(isPair && hasSelection){
+        const selected = ta.value.slice(start, end);
+        ta.value = before + token[0] + selected + token[1] + after;
+        nextPos = start + 1 + selected.length + 1;
+      } else {
+        ta.value = before + token + after;
+        nextPos = start + (isPair ? 1 : token.length);
+      }
+      try{
+        ta.focus();
+        ta.setSelectionRange(nextPos, nextPos);
+      }catch(err){}
+      const gutter = document.getElementById(ta.id + '-gutter');
+      if(gutter){
+        const lc = Math.max(1, ta.value.split('\n').length);
+        const nums = [];
+        for(let i = 1; i <= lc; i++) nums.push(i);
+        gutter.textContent = nums.join('\n');
+      }
+      try{
+        if(typeof Event === 'function' && typeof ta.dispatchEvent === 'function'){
+          ta.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }catch(err){}
+      syncActiveEditorDrafts();
+    }
+    return;
+  }
+
+  const labRunBtn = e.target.closest('[data-run-lab-scratchpad]');
+  if(labRunBtn){
+    const ta = document.getElementById('skill-lab-scratchpad');
+    const out = document.getElementById('skill-lab-output');
+    if(ta && out){
+      out.classList.remove('hidden');
+      out.textContent = '⏳ Выполняю в Python 3.13…';
+      labRunBtn.setAttribute('disabled', 'disabled');
+      try{
+        const runner = await getFastPythonRunner();
+        let buf = '';
+        runner.setStdout({ batched: function(s){ buf += s + '\n'; } });
+        runner.setStderr({ batched: function(s){ buf += s + '\n'; } });
+        try{
+          runner.runPython(ta.value);
+        }catch(err){
+          buf += String(err);
+        }
+        out.textContent = buf.trim() || '(программа ничего не вывела)';
+        awardXp(5);
+      }catch(err){
+        out.textContent = 'Ошибка запуска: ' + String(err);
+      }
+      labRunBtn.removeAttribute('disabled');
+    }
+    return;
+  }
+
   // Mock Interview Simulator actions
   const mTab = e.target.closest('[data-mock-tab]');
   if(mTab){
@@ -10383,6 +11633,8 @@ document.addEventListener('click', async function(e){
   }
   if(e.target.closest('[data-mock-timer-toggle]')){ toggleMockTimer(); return; }
   if(e.target.closest('[data-mock-timer-reset]')){ resetMockTimer(); return; }
+  if(e.target.closest('[data-star-pitch-toggle]')){ toggleStarPitchTimer(); return; }
+  if(e.target.closest('[data-star-pitch-reset]')){ resetStarPitchTimer(); return; }
   if(e.target.closest('[data-mock-random-task]')){
     const pool = getMockCandidateTasks();
     const rTask = pool[Math.floor(Math.random() * pool.length)] || IDE_TASKS[0];
@@ -10759,6 +12011,215 @@ document.addEventListener('click', async function(e){
     }
     return;
   }
+
+  // Map view mode toggle (Serpentine vs Tree)
+  const mapModeBtn = e.target.closest('[data-map-mode]');
+  if(mapModeBtn){
+    const mode = mapModeBtn.getAttribute('data-map-mode');
+    if(typeof mapViewState !== 'undefined'){
+      mapViewState.mode = mode;
+      render();
+    }
+    return;
+  }
+
+  // 4-Tab Mobile IDE tabs
+  const pracMobTab = e.target.closest('[data-prac-mob-tab]');
+  if(pracMobTab){
+    const tab = pracMobTab.getAttribute('data-prac-mob-tab');
+    if(typeof practiceHubState !== 'undefined'){
+      practiceHubState.mobileTab = tab;
+      savePracticeHubPosState();
+      render();
+    }
+    return;
+  }
+
+  // Practice plain explanation toggle
+  if(e.target.closest('[data-prac-toggle-explain]')){
+    if(typeof practiceHubState !== 'undefined'){
+      practiceHubState.showPlainExplain = !practiceHubState.showPlainExplain;
+      savePracticeHubPosState();
+      render();
+    }
+    return;
+  }
+
+  // Practice solution unlock gate
+  if(e.target.closest('[data-prac-unlock-solution]')){
+    if(typeof practiceHubState !== 'undefined'){
+      practiceHubState.solutionUnlocked = true;
+      savePracticeHubPosState();
+      render();
+    }
+    return;
+  }
+
+  // Practice Socratic hint advance
+  if(e.target.closest('[data-prac-ask-ai]')){
+    if(typeof practiceHubState !== 'undefined'){
+      practiceHubState.hintLevel = Math.min(4, (practiceHubState.hintLevel || 0) + 1);
+      savePracticeHubPosState();
+      render();
+    }
+    return;
+  }
+
+  // 3D Serpentine Path node click (Open anchored popover)
+  const hexNode = e.target.closest('.hex-3d-node');
+  if(hexNode){
+    const uid = hexNode.getAttribute('data-unit-id');
+    const popover = document.getElementById('path-anchored-popover');
+    if(popover && uid && typeof ALL_UNITS_COMBINED !== 'undefined'){
+      const u = ALL_UNITS_COMBINED.find(x => x.id === uid);
+      if(u){
+        const track = getTrackForUnit(uid);
+        const pBadge = document.getElementById('popover-badge');
+        const pTitle = document.getElementById('popover-title');
+        const pStatus = document.getElementById('popover-status');
+        const pSkills = document.getElementById('popover-skills');
+        const pCta = document.getElementById('popover-cta-btn');
+
+        if(pBadge) pBadge.textContent = `🎯 ${track.title}`;
+        if(pTitle) pTitle.textContent = `Юнит ${u.id}: ${u.title}`;
+
+        const isPassed = (state.passedUnitTests || []).includes(u.id) || ((u.skills||[]).length > 0 && (u.skills||[]).every(s => getSkillMP(s.id) >= 80));
+        const uIdx = ALL_UNITS_COMBINED.findIndex(x => x.id === uid);
+        let activeIdx = ALL_UNITS_COMBINED.findIndex(x => {
+          const pass = (state.passedUnitTests || []).includes(x.id) || ((x.skills||[]).length > 0 && (x.skills||[]).every(s => getSkillMP(s.id) >= 80));
+          return !pass;
+        });
+        if(activeIdx === -1) activeIdx = ALL_UNITS_COMBINED.length - 1;
+        const isActive = (uIdx === activeIdx);
+        const isLocked = (uIdx > activeIdx && !isPassed);
+
+        if(pStatus){
+          if(isPassed) pStatus.textContent = '✅ Юнит завершён (освоен на 100%)';
+          else if(isActive) pStatus.textContent = '🏆 Текущая цель курса';
+          else if(isLocked) pStatus.textContent = '🔒 Доступ откроется после предыдущих юнитов';
+          else pStatus.textContent = '📖 Доступен для изучения';
+        }
+
+        if(pSkills){
+          const skList = (u.skills || []).map(s => s.title).slice(0, 3).join(' • ');
+          pSkills.textContent = skList ? `Навыки: ${skList}` : '';
+        }
+
+        if(pCta){
+          pCta.className = isPassed ? 'btn-3d-emerald path-popover-cta' : (isLocked ? 'btn-3d-locked path-popover-cta' : 'btn-3d-orange path-popover-cta');
+          pCta.textContent = isPassed ? 'ОБЗОР ➔' : (isLocked ? 'ЗАБЛОКИРОВАНО' : 'НАЧАТЬ ➔');
+          pCta.disabled = isLocked;
+          pCta.setAttribute('data-target-route', `#${track.routePrefix}/skill/${(u.skills && u.skills[0]) ? u.skills[0].id : ''}`);
+        }
+
+        const parent = popover.offsetParent || popover.parentElement;
+        if(parent){
+          const pRect = (parent.getBoundingClientRect && parent.getBoundingClientRect()) || { left: 0, top: 0, width: 420 };
+          const nRect = (hexNode.getBoundingClientRect && hexNode.getBoundingClientRect()) || { left: 210, right: 210, top: 100, bottom: 160 };
+          const pWidth = pRect.width || 420;
+          let cx = (nRect.left + nRect.right) / 2 - pRect.left;
+          let cy = nRect.top - pRect.top;
+          if(!cx || isNaN(cx)){
+            cx = parseFloat(hexNode.getAttribute('data-cx')) || 210;
+            cy = parseFloat(hexNode.getAttribute('data-cy')) || 100;
+          }
+          const clampedCx = Math.max(148, Math.min(pWidth - 148, cx));
+          popover.style.left = `${Math.round(clampedCx)}px`;
+          const arrow = document.getElementById('popover-arrow');
+          if(arrow){
+            const arrowX = Math.max(24, Math.min(256, 140 + (cx - clampedCx)));
+            arrow.style.left = `${Math.round(arrowX)}px`;
+          }
+          if(cy > 240){
+            popover.style.top = `${Math.round(cy - 220)}px`;
+            if(arrow) arrow.className = 'path-popover-arrow path-popover-arrow--down';
+          } else {
+            popover.style.top = `${Math.round((nRect.bottom || (cy + 60)) - pRect.top + 16)}px`;
+            if(arrow) arrow.className = 'path-popover-arrow path-popover-arrow--up';
+          }
+        }
+        popover.style.display = 'block';
+        return;
+      }
+    }
+  }
+
+  // Popover close and CTA button
+  if(e.target.closest('#popover-close-btn')){
+    const popover = document.getElementById('path-anchored-popover');
+    if(popover) popover.style.display = 'none';
+    return;
+  }
+  const popCta = e.target.closest('#popover-cta-btn');
+  if(popCta){
+    const tr = popCta.getAttribute('data-target-route');
+    const popover = document.getElementById('path-anchored-popover');
+    if(popover) popover.style.display = 'none';
+    if(tr && !popCta.disabled){
+      location.hash = tr;
+    }
+    return;
+  }
+  if(!e.target.closest('#path-anchored-popover') && !e.target.closest('.hex-3d-node')){
+    const popover = document.getElementById('path-anchored-popover');
+    if(popover && popover.style && popover.style.display !== 'none'){
+      popover.style.display = 'none';
+    }
+  }
+
+  // Jump to active unit button
+  if(e.target.closest('#path-jump-btn')){
+    const targetNode = document.querySelector('.hex-node--active') || document.querySelector('.hex-3d-node');
+    if(targetNode){
+      targetNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      try{ targetNode.focus(); }catch(err){}
+    }
+    return;
+  }
+
+  // Theory audio companion controls
+  if(e.target.closest('[data-toggle-audio]')){
+    state.audioBarOpen = !state.audioBarOpen;
+    saveState(state);
+    const bar = document.getElementById('theory-audio-bar');
+    if(bar) bar.style.display = state.audioBarOpen ? 'flex' : 'none';
+    if(state.audioBarOpen && window.theoryAudioPlayer && !window.theoryAudioPlayer.isPlaying){
+      const theoryElem = document.getElementById('py-theory-container') || document.getElementById('lesson-theory-content') || document.querySelector('.lesson-theory') || document.querySelector('.k-note-card');
+      const textToRead = theoryElem ? (theoryElem.innerText || theoryElem.textContent || '') : '';
+      if(textToRead) window.theoryAudioPlayer.play(textToRead);
+    } else if(!state.audioBarOpen && window.theoryAudioPlayer){
+      window.theoryAudioPlayer.stop();
+    }
+    return;
+  }
+  if(e.target.closest('[data-audio-play]')){
+    if(window.theoryAudioPlayer){
+      if(!window.theoryAudioPlayer.isPlaying && !window.theoryAudioPlayer.currentText){
+        const theoryElem = document.getElementById('py-theory-container') || document.getElementById('lesson-theory-content') || document.querySelector('.lesson-theory') || document.querySelector('.k-note-card');
+        const textToRead = theoryElem ? (theoryElem.innerText || theoryElem.textContent || '') : '';
+        window.theoryAudioPlayer.play(textToRead);
+      } else {
+        window.theoryAudioPlayer.togglePlay();
+      }
+    }
+    return;
+  }
+  if(e.target.closest('[data-audio-rewind]')){
+    if(window.theoryAudioPlayer) window.theoryAudioPlayer.rewind10();
+    return;
+  }
+  if(e.target.closest('[data-audio-rate]')){
+    if(window.theoryAudioPlayer) window.theoryAudioPlayer.toggleRate();
+    return;
+  }
+  if(e.target.closest('[data-audio-close]')){
+    state.audioBarOpen = false;
+    saveState(state);
+    if(window.theoryAudioPlayer) window.theoryAudioPlayer.stop();
+    const bar = document.getElementById('theory-audio-bar');
+    if(bar) bar.style.display = 'none';
+    return;
+  }
 });
 
 // Change & Input events for selectors, file backup upload, and live code auto-save
@@ -10862,11 +12323,26 @@ document.addEventListener('change', function(e){
 });
 
 document.addEventListener('input', function(e){
+  if(e.target && e.target.id){
+    const gut = document.getElementById(e.target.id + '-gutter');
+    if(gut){
+      const lc = Math.max(1, String(e.target.value || '').split('\n').length);
+      const nums = [];
+      for(let i = 1; i <= lc; i++) nums.push(i);
+      gut.textContent = nums.join('\n');
+    }
+  }
   if(e.target.id === 'prac-search-input'){
     practiceHubState.search = e.target.value;
     savePracticeHubPosState();
     render();
     const inp = document.getElementById('prac-search-input');
+    if(inp){ inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+  } else if(e.target.id === 'prac-docs-search-input'){
+    practiceHubState.docsSearch = e.target.value;
+    savePracticeHubPosState();
+    render();
+    const inp = document.getElementById('prac-docs-search-input');
     if(inp){ inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
   } else if(e.target.id === 'code-input'){
     ensureExtendedState();
@@ -10910,6 +12386,52 @@ document.addEventListener('input', function(e){
   }
 });
 
+// Synchronize line-number gutter scroll position with textarea scroll
+document.addEventListener('scroll', function(e){
+  if(e.target && e.target.id && e.target.classList && e.target.classList.contains('code-editor')){
+    const gut = document.getElementById(e.target.id + '-gutter');
+    if(gut) gut.scrollTop = e.target.scrollTop;
+  }
+}, true);
+
+// Touch swipe gestures for 3D Flashcards (swipe left -> rate 1, swipe right -> rate 4, swipe up -> rate 3)
+let _fcTouchStartX = null;
+let _fcTouchStartY = null;
+document.addEventListener('touchstart', function(e){
+  const card = e.target && e.target.closest ? e.target.closest('.fc-card, .fc-scene') : null;
+  if(!card || !e.changedTouches || !e.changedTouches[0]) return;
+  // Prevent false swipes when scrolling code blocks or selecting text
+  const tag = e.target.tagName;
+  if(tag === 'PRE' || tag === 'CODE' || tag === 'TEXTAREA' || tag === 'INPUT') return;
+  if(e.target.closest && e.target.closest('pre, code, textarea, input, .code-editor-shell')) return;
+  _fcTouchStartX = e.changedTouches[0].clientX;
+  _fcTouchStartY = e.changedTouches[0].clientY;
+}, { passive: true });
+
+document.addEventListener('touchend', function(e){
+  if(_fcTouchStartX === null || _fcTouchStartY === null) return;
+  const card = e.target && e.target.closest ? e.target.closest('.fc-card, .fc-scene') : null;
+  if(!card || !e.changedTouches || !e.changedTouches[0]){
+    _fcTouchStartX = null;
+    _fcTouchStartY = null;
+    return;
+  }
+  const dx = e.changedTouches[0].clientX - _fcTouchStartX;
+  const dy = e.changedTouches[0].clientY - _fcTouchStartY;
+  _fcTouchStartX = null;
+  _fcTouchStartY = null;
+  let rateVal = null;
+  if(Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)){
+    rateVal = dx < 0 ? 1 : 4;
+  } else if(dy < -45 && Math.abs(dy) > Math.abs(dx)){
+    rateVal = 3;
+  }
+  if(rateVal !== null){
+    const btn = document.querySelector(`[data-hub-rate="${rateVal}"], [data-py-rate-card="${rateVal}"]`);
+    if(btn) btn.click();
+  }
+}, { passive: true });
+
 // Keyboard shortcuts: Ctrl+Enter to run/verify code, Space to flip card, 1..4 to rate card
 document.addEventListener('keydown', function(e){
   if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
@@ -10930,6 +12452,18 @@ document.addEventListener('keydown', function(e){
   }
   const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
   if(tag === 'textarea' || tag === 'input' || tag === 'select') return;
+  if(e.key === 'Escape'){
+    const popover = document.getElementById('path-anchored-popover');
+    if(popover && popover.style && popover.style.display !== 'none'){
+      popover.style.display = 'none';
+      return;
+    }
+  }
+  if((e.key === 'Enter' || e.code === 'Space') && e.target && e.target.closest && e.target.closest('.hex-3d-node')){
+    e.preventDefault();
+    e.target.closest('.hex-3d-node').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    return;
+  }
   if(e.code === 'Space'){
     const flipBtn = document.querySelector('[data-py-flip-card], [data-hub-flip]');
     if(flipBtn){ e.preventDefault(); flipBtn.click(); return; }
