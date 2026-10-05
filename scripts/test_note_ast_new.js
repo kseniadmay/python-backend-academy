@@ -1,4 +1,11 @@
-const marked = require('marked');
+let marked;
+try {
+  marked = require('marked');
+} catch (e) {
+  console.log('[SKIP] Optional module "marked" not installed. Scratch test skipped.');
+  process.exit(0);
+}
+
 
 const md = `📖 Перечитать конспект: frozenset_ неизменяемое множество >> Конспект перечитан и усвоен.
 

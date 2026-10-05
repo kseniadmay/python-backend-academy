@@ -1,5 +1,9 @@
-﻿const fs = require('fs');
-const allRems = JSON.parse(fs.readFileSync('all_rems_dump.json', 'utf8'));
+const fs = require('fs');
+const path = require('path');
+const dumpPath = fs.existsSync(path.join(__dirname, 'all_rems_dump.json'))
+  ? path.join(__dirname, 'all_rems_dump.json')
+  : path.join(__dirname, '..', 'all_rems_dump.json');
+const allRems = JSON.parse(fs.readFileSync(dumpPath, 'utf8'));
 
 const remById = new Map();
 allRems.forEach(r => remById.set(r._id, r));

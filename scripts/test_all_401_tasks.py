@@ -98,6 +98,28 @@ class ThreadSafeSingleton:
             cls._instance = super().__new__(cls)
         return cls._instance
 
+if "multiprocessing" not in _sys.modules:
+    _mp_mod = _types.ModuleType("multiprocessing")
+    class _FakeProcess:
+        def __init__(self, target=None, args=(), kwargs=None):
+            self.target = target; self.args = args or (); self.kwargs = kwargs or {}
+        def start(self):
+            if callable(self.target): self.target(*self.args, **self.kwargs)
+        def join(self): pass
+    _mp_mod.Process = _FakeProcess
+    _sys.modules["multiprocessing"] = _mp_mod
+
+if "cProfile" not in _sys.modules:
+    _cp_mod = _types.ModuleType("cProfile")
+    def _fake_cprofile_run(statement, filename=None, sort=-1):
+        try:
+            exec(statement, globals())
+            print("   ncalls  tottime  percall  cumtime  percall filename:lineno")
+            print("        1    0.001    0.001    0.001    0.001 <string>:1")
+        except Exception: pass
+    _cp_mod.run = _fake_cprofile_run
+    _sys.modules["cProfile"] = _cp_mod
+
 class Command(ABC):
     @abstractmethod
     def execute(self): pass
@@ -1833,6 +1855,12 @@ assert r2 == {"issues": [], "probes_healthy": True, "ready": True}, r2
                 assert _t['tests'] and str(_t['tests']).strip(), f"Task #{_t['id']} has empty tests"
             _t20 = next(_t for _t in _raw_tasks if _t['id'] == 20)
             assert "Разворот списка срезом [::-1]" in _t20['title'], f"Task 20 title mismatch: {_t20['title']}"
-            print("✓ Standalone IDE trainer (Практика кода — тренажёр с IDE.html): 401 tasks, 11-field schema, safe limits & sync verified!")
+            assert '_time.sleep = lambda' in _ide_content or '_time.sleep=lambda' in _ide_content, "Missing _time.sleep patch in standalone IDE"
+            assert '_VIRTUAL_FS' in _ide_content, "Missing _VIRTUAL_FS virtual filesystem in standalone IDE"
+            assert 'class ListNode' in _ide_content, "Missing ListNode helper in standalone IDE"
+            assert 'class TreeNode' in _ide_content, "Missing TreeNode helper in standalone IDE"
+            assert 'multiprocessing' in _ide_content, "Missing multiprocessing shim in standalone IDE"
+            assert 'cProfile' in _ide_content, "Missing cProfile shim in standalone IDE"
+            print("✓ Standalone IDE trainer (Практика кода — тренажёр с IDE.html): 401 tasks, 11-field schema, safe limits, browser shims & sync verified!")
     _run_suite()
 

@@ -16,7 +16,13 @@ function evalCDP(jsCode) {
         }
       });
     });
-    req.on('error', reject);
+    req.on('error', (err) => {
+      if (err.code === 'ECONNREFUSED') {
+        console.log('[SKIP] Chrome CDP server on port 9999 is not active. (Live browser audit skipped)');
+        process.exit(0);
+      }
+      reject(err);
+    });
     req.write(jsCode);
     req.end();
   });

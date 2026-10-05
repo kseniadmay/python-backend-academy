@@ -1,5 +1,9 @@
 const fs = require('fs');
 const filePath = 'C:\\Users\\fury6\\Downloads\\Расписание подготовки Junior+ Python Backend Developer.md';
+if (!fs.existsSync(filePath)) {
+  console.log('[SKIP] Downloaded schedule markdown not found. Scratch test skipped.');
+  process.exit(0);
+}
 const content = fs.readFileSync(filePath, 'utf8');
 const lines = content.split('\n');
 

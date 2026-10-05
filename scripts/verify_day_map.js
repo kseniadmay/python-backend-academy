@@ -28,9 +28,9 @@ function resolveFullText(key, depth = 0) {
 const dayMap = {};
 for (const r of allRems) {
   const t = resolveFullText(r.key);
-  const m = t.match(/День\s*0?(\d+)/);
+  const m = t.match(/^(?:📌\s*|-+\s*)?День\s*0?(\d+)\b/);
   if (m) {
-    const dNum = parseInt(m[1]);
+    const dNum = parseInt(m[1], 10);
     if (dNum >= 1 && dNum <= 42) {
       if (t.length < 120 && !t.includes('\n')) {
         dayMap[dNum] = { id: r._id, parent: r.parent, text: t.trim() };
@@ -39,8 +39,26 @@ for (const r of allRems) {
   }
 }
 
+console.log(`Found ${Object.keys(dayMap).length} / 42 days in RemNote schedule.`);
 for (let i = 1; i <= 42; i++) {
   const d = dayMap[i];
   const dStr = i < 10 ? '0' + i : i;
-  console.log(`Day ${dStr}: id=${d ? d.id : 'MISSING'} text="${d ? d.text.slice(0, 50) : ''}"`);
+  if (!d) {
+    console.error(`[ERROR] Day ${dStr} is MISSING from dayMap!`);
+    process.exit(1);
+  }
+  console.log(`Day ${dStr}: id=${d.id} parent=${d.parent} text="${d.text.slice(0, 50)}"`);
 }
+
+if (Object.keys(dayMap).length !== 42) {
+  console.error(`[ERROR] Expected exactly 42 days, found ${Object.keys(dayMap).length}`);
+  process.exit(1);
+}
+
+if (dayMap[35].id !== 'Sa2NV96RJQCer4jVy') {
+  console.error(`[ERROR] Day 35 mapped to wrong Rem ${dayMap[35].id} (${dayMap[35].text}), expected Sa2NV96RJQCer4jVy`);
+  process.exit(1);
+}
+
+console.log('✓ All 42 RemNote schedule days strictly verified with valid IDs and parents!');
+

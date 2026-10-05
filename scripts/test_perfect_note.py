@@ -1,7 +1,11 @@
+import os, sys
 import zipfile
 import re
 
 zip_path = r'C:\Users\fury6\OneDrive\Документы\Обучение Python\RemNote_Python.zip'
+if not os.path.exists(zip_path):
+    print('[SKIP] Historical archive ' + str(zip_path) + ' not found. Scratch test skipped.')
+    import sys; sys.exit(0)
 
 def build_perfect_note(raw_text):
     text = raw_text.replace('—', '–')
@@ -86,8 +90,11 @@ def build_perfect_note(raw_text):
         
     return '\n'.join(cleaned) + '\n'
 
-with zipfile.ZipFile(zip_path) as z:
-    raw_k1 = z.read('RemNote_Python/01 · 🐍 Python/Юнит 1.1 · Базовый синтаксис/📚 Конспекты/01. Структуры данных Python_ list, dict, set.md').decode('utf-8')
-    perfect_k1 = build_perfect_note(raw_k1)
-    print('=== PERFECT NOTE K-001 PREVIEW ===\n')
-    print(perfect_k1[:1500])
+try:
+    with zipfile.ZipFile(zip_path) as z:
+        raw_k1 = z.read('RemNote_Python/01 · 🐍 Python/Юнит 1.1 · Базовый синтаксис/📚 Конспекты/01. Структуры данных Python_ list, dict, set.md').decode('utf-8')
+        perfect_k1 = build_perfect_note(raw_k1)
+        print('=== PERFECT NOTE K-001 PREVIEW ===\n')
+        print(perfect_k1[:1500])
+except KeyError:
+    print('[SKIP] Legacy note path not found in historical archive. Scratch test skipped.')

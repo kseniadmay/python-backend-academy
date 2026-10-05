@@ -1,4 +1,11 @@
-const marked = require('marked');
+let marked;
+try {
+  marked = require('marked');
+} catch (e) {
+  console.log('[SKIP] Optional module "marked" not installed. Scratch test skipped.');
+  process.exit(0);
+}
+
 
 const tests = [
     "Test 1: Normal List\n- Skill 1\n  - Criteria 1\n- Skill 2",

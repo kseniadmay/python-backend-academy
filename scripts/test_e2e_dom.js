@@ -1159,11 +1159,14 @@ function fireClick(attrName, attrVal) {
   store['academy_state_v1'] = JSON.stringify(freezeTestState);
   (winListeners['storage'] || []).forEach(fn => fn({ key: 'academy_state_v1', newValue: store['academy_state_v1'] }));
   // Force lastVisit to 2 days ago in active state via importAndMergeBackupJsonString or direct state test
-  const ideHtmlPath = path.join('C:\\Users\\fury6\\OneDrive\\Python_Backend_Academy', 'Практика кода — тренажёр с IDE.html');
+  const ideHtmlPath = path.join(__dirname, '..', 'Практика кода — тренажёр с IDE.html');
   if (fs.existsSync(ideHtmlPath)) {
     const ideHtmlContent = fs.readFileSync(ideHtmlPath, 'utf-8');
     assert(ideHtmlContent.includes('__ACADEMY_SYNC_V1__:') && ideHtmlContent.includes("window.addEventListener('storage'"), 'Standalone IDE trainer must support window.name (__ACADEMY_SYNC_V1__:) and cross-tab storage event sync');
     assert(ideHtmlContent.includes('id="practiceDesc"') && ideHtmlContent.includes('t.initialCode') && ideHtmlContent.includes('t.solution'), 'Standalone IDE trainer must display task description and use initialCode/solution');
+    assert(ideHtmlContent.includes('_VIRTUAL_FS') && ideHtmlContent.includes('_patched_open'), 'Standalone IDE trainer must define in-memory virtual filesystem _VIRTUAL_FS & _patched_open');
+    assert(ideHtmlContent.includes('class ListNode') && ideHtmlContent.includes('class TreeNode'), 'Standalone IDE trainer must include ListNode and TreeNode helper classes in prelude');
+    assert(ideHtmlContent.includes('multiprocessing') && ideHtmlContent.includes('cProfile'), 'Standalone IDE trainer must include browser shims for multiprocessing and cProfile');
     const startMarker = 'const TASKS = ';
     const endMarker = '];\n</script>';
     const pStart = ideHtmlContent.indexOf(startMarker);
@@ -1208,8 +1211,14 @@ function fireClick(attrName, attrVal) {
 
   // Verify Cards Hub Deck Completion Screen (Человеческая проверка.docx, Point 28)
   navigate('#/cards');
-  sandbox.cardsHubState.completed = true;
-  (winListeners['hashchange'] || []).forEach(fn => fn());
+  const curDeckId = sandbox.cardsHubState.deckId || 'Ф-001';
+  const allDecksCombined = { ...sandbox.PY_MASTERY.decks, ...sandbox.WEB_MASTERY.decks, ...sandbox.BACKEND_MASTERY.decks, ...sandbox.ALGO_MASTERY.decks, ...sandbox.DB_MASTERY.decks, ...sandbox.ARCH_MASTERY.decks, ...sandbox.INFRA_MASTERY.decks };
+  const curDeck = allDecksCombined[curDeckId];
+  assert(curDeck && curDeck.cards && curDeck.cards.length > 0, 'Active deck in Cards Hub must contain cards');
+  sandbox.cardsHubState.cardIdx = curDeck.cards.length - 1;
+  sandbox.cardsHubState.flipped = true;
+  await fireClick('data-hub-rate', '4');
+  assert(sandbox.cardsHubState.completed === true, 'Rating the last card in deck must naturally trigger cardsHubState.completed = true');
   const deckCompleteHtml = elementsById['view-root'].innerHTML;
   assert(deckCompleteHtml.includes('🎉 Колода изучена!') && deckCompleteHtml.includes('Перейти к практике темы') && deckCompleteHtml.includes('data-hub-restart-deck'), 'Cards Hub must display completion screen with direct link to topic practice and restart button (Point 28)');
   await fireClick('data-hub-restart-deck', '');

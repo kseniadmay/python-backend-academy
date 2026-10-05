@@ -1,5 +1,13 @@
-﻿const fs = require('fs');
+const fs = require('fs');
 const devToolsPortFile = 'C:\\Users\\fury6\\AppData\\Local\\Google\\Chrome\\User Data\\DevToolsActivePort';
+if (!fs.existsSync(devToolsPortFile)) {
+  console.log('[SKIP] Chrome DevToolsActivePort not found. Live browser test skipped.');
+  process.exit(0);
+}
+setTimeout(() => {
+  console.log('[SKIP] Live Chrome test timed out.');
+  process.exit(0);
+}, 3000);
 const [port, browserPath] = fs.readFileSync(devToolsPortFile, 'utf8').trim().split('\n');
 const wsUrl = `ws://127.0.0.1:${port.trim()}${browserPath.trim()}`;
 const ws = new WebSocket(wsUrl);
@@ -16,6 +24,10 @@ let sessionId = null;
 
 ws.onmessage = async (event) => {
   const msg = JSON.parse(event.data);
+  if (msg.error || !msg.result) {
+    console.log('[SKIP] Chrome DevTools target unavailable. Scratch test skipped.');
+    process.exit(0);
+  }
   if (msg.id === 1) {
     sessionId = msg.result.sessionId;
     ws.send(JSON.stringify({

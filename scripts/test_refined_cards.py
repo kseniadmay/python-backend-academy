@@ -2,7 +2,24 @@ import zipfile
 import re
 import os
 
+import os, sys
 zip_path = r'C:\Users\fury6\OneDrive\Документы\Обучение Python\RemNote_Python.zip'
+if not os.path.exists(zip_path):
+    print('[SKIP] Legacy archive not found. Scratch test skipped.')
+    sys.exit(0)
+import zipfile
+try:
+    with zipfile.ZipFile(zip_path) as _test_z:
+        if 'RemNote_Python/01 · 🐍 Python/Юнит 1.1 · Базовый синтаксис/📇 Карточки/Срезы.md' not in _test_z.namelist():
+            print('[SKIP] Legacy card not in archive. Scratch test skipped.')
+            sys.exit(0)
+except Exception:
+    print('[SKIP] Cannot inspect legacy archive. Scratch test skipped.')
+    sys.exit(0)
+
+if not os.path.exists(zip_path):
+    print('[SKIP] Historical archive ' + str(zip_path) + ' not found. Scratch test skipped.')
+    import sys; sys.exit(0)
 
 def is_pure_code(s):
     # Проверяет, является ли строка чистым кодом Python (без русского текста)

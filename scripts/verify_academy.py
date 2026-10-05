@@ -2,8 +2,8 @@ import re, subprocess, json, os
 from pathlib import Path
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-_UNPACKED_HTML = os.path.normpath(os.path.join(_HERE, '..', 'academy.html'))
-HTML_PATH = _UNPACKED_HTML if os.path.isfile(_UNPACKED_HTML) else r'C:\Users\fury6\Downloads\Telegram Desktop\academy.html'
+HTML_PATH = os.path.normpath(os.path.join(_HERE, '..', 'academy.html'))
+assert os.path.isfile(HTML_PATH), f"academy.html missing: {HTML_PATH}"
 
 with open(HTML_PATH, encoding='utf-8') as f:
     html = f.read()
@@ -24,13 +24,14 @@ if os.path.exists(js_tmp):
 assert res.returncode == 0, f"JS syntax error:\n{res.stderr}"
 print("1. [PASS] node --check passed with 0 syntax errors!")
 
-# 2. Verify real Headless Chrome renders <main id="view-root"> across routes
+# 2. Verify real Headless Chrome renders <main id="view-root"> across routes and produces 0 console errors
 chrome_exe = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
 base_uri = Path(HTML_PATH).as_uri()
 chrome_flags = [
     chrome_exe, '--headless', '--no-sandbox', '--disable-gpu',
     '--disable-background-networking', '--disable-sync', '--disable-default-apps',
-    '--log-level=3', '--dump-dom'
+    '--allow-file-access-from-files',
+    '--enable-logging=stderr', '--dump-dom'
 ]
 for route, expected_sub in [
     (base_uri, 'Правило 2 минут: Быстрый микро-шаг'),
@@ -47,27 +48,35 @@ for route, expected_sub in [
     (base_uri + '#/practice', 'Практика кода'),
     (base_uri + '#/cards', 'Центр 3D Флеш-карточек'),
 ]:
-    out = subprocess.check_output(
+    c_res = subprocess.run(
         chrome_flags + [route],
-        text=True, encoding='utf-8', errors='ignore'
+        capture_output=True, text=True, encoding='utf-8', errors='ignore'
     )
+    assert c_res.returncode == 0, f"Chrome failed with code {c_res.returncode} on {route}"
+    c_errors = [line for line in c_res.stderr.splitlines() if 'ERROR:CONSOLE' in line or 'Uncaught ' in line]
+    assert not c_errors, f"Console error in Chrome for {route}:\n" + "\n".join(c_errors)
+    out = c_res.stdout
     m = re.search(r'<main id="view-root">([\s\S]*?)</main>', out)
     assert m and len(m.group(1).strip()) > 200, f"Empty <main id='view-root'> in Chrome for {route}"
     assert expected_sub in m.group(1), f"Missing {expected_sub!r} in Chrome DOM for {route}"
-    print(f"2. [PASS] Real Headless Chrome rendered {route} ({len(m.group(1))} chars in #view-root)")
+    print(f"2. [PASS] Real Headless Chrome rendered {route} (0 console errors, {len(m.group(1))} chars in #view-root)")
 
 # 3. Verify real Headless Chrome renders standalone IDE trainer (Практика кода — тренажёр с IDE.html)
 ide_path = os.path.normpath(os.path.join(_HERE, '..', 'Практика кода — тренажёр с IDE.html'))
 if os.path.isfile(ide_path):
     ide_uri = Path(ide_path).as_uri()
-    ide_out = subprocess.check_output(
+    ide_res = subprocess.run(
         chrome_flags + [ide_uri],
-        text=True, encoding='utf-8', errors='ignore'
+        capture_output=True, text=True, encoding='utf-8', errors='ignore'
     )
+    assert ide_res.returncode == 0, f"Chrome failed on standalone IDE with code {ide_res.returncode}"
+    ide_c_errors = [line for line in ide_res.stderr.splitlines() if 'ERROR:CONSOLE' in line or 'Uncaught ' in line]
+    assert not ide_c_errors, f"Console error in Chrome for standalone IDE:\n" + "\n".join(ide_c_errors)
+    ide_out = ide_res.stdout
     assert 'Все уровни' in ide_out and '401' in ide_out, f"Missing 'Все уровни' or '401' in IDE HTML render"
     assert 'task-grid' in ide_out or 'task-card' in ide_out, "Missing task grid/cards in IDE HTML render"
     assert 'editorHost' in ide_out or 'CodeMirror' in ide_out, "Missing editor container in IDE HTML render"
-    print(f"3. [PASS] Real Headless Chrome rendered standalone IDE trainer ({len(ide_out)} chars)")
+    print(f"3. [PASS] Real Headless Chrome rendered standalone IDE trainer (0 console errors, {len(ide_out)} chars)")
 
 # 4. Verify Python_Backend_Academy_Project.zip structure and integrity
 import zipfile
