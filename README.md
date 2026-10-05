@@ -39,30 +39,44 @@ Python_Backend_Academy/
 
 ---
 
-## 🚀 Быстрый запуск
+## 🚀 Быстрый запуск и верификация
 
-### 1. Открытие платформы в браузере
+### 1. Единый 5-этапный конвейер верификации (Рекомендуется)
+Запуск полного цикла проверки проекта (RemNote Platinum, E2E DOM, PWA Offline, Headless Chrome, 401 задача IDE):
+```powershell
+python .\verify_all.py
+# или в Windows CMD:
+.\verify_all.cmd
+```
+Для быстрого прогона без длительного тестирования 401 задачи IDE:
+```powershell
+python .\verify_all.py --quick
+```
+
+### 2. Сквозной аудит всех тестовых скриптов (86/86 PASS)
+Параллельный запуск всех тестовых, проверочных и аудиторских скриптов:
+```powershell
+python .\scripts\audit_pipeline.py
+```
+
+### 3. Установка Git Pre-Commit хука
+Защита от случайных синтаксических ошибок в JS, Python и JSON перед коммитом:
+```powershell
+python .\scripts\install_hooks.py
+```
+
+### 4. Открытие платформы в браузере
 Дважды кликните по файлу `academy.html` или откройте его в Google Chrome:
 ```powershell
 Start-Process "chrome.exe" (Resolve-Path ".\academy.html")
 ```
 
-### 2. Запуск E2E DOM-тестов
+### 5. Автоматизированная проверка PWA и оффлайн-режима
 ```powershell
-node .\scripts\test_e2e_dom.js
+node .\scripts\test_pwa_offline.js
 ```
 
-### 3. Запуск верификатора Headless Chrome и JS
-```powershell
-python .\scripts\verify_academy.py
-```
-
-### 4. Комплексная проверка 401 задачи IDE и сниппетов
-```powershell
-python .\scripts\test_all_401_tasks.py
-```
-
-### 5. Пересборка проекта
+### 6. Пересборка проекта и синхронизация облака
 ```powershell
 python .\scripts\assemble_academy.py
 ```

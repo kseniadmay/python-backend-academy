@@ -1363,6 +1363,30 @@ function fireClick(attrName, attrVal) {
   const lastReport = stateAfterBug.bugReports[stateAfterBug.bugReports.length - 1];
   assert(lastReport.text === 'Тестовое замечание мобильного UX' && lastReport.context, 'Saved report must contain text and route context');
   console.log('✓ All 5 Mobile Feedback Items (REV-001 to REV-005) & Bug Report Transport verified!');
+
+  /* ================= 18. PIPELINE ENHANCEMENTS & VERIFICATION SUITE INVARIANTS ================= */
+  const rootDir = path.join(__dirname, '..');
+  const testPwaPath = path.join(__dirname, 'test_pwa_offline.js');
+  const auditPipelinePath = path.join(__dirname, 'audit_pipeline.py');
+  const installHooksPath = path.join(__dirname, 'install_hooks.py');
+  const quickPrecommitPath = path.join(__dirname, 'quick_precommit_check.py');
+  const verifyAllPyPath = path.join(rootDir, 'verify_all.py');
+  const verifyAllCmdPath = path.join(rootDir, 'verify_all.cmd');
+
+  assert(fs.existsSync(testPwaPath), 'test_pwa_offline.js must exist in scripts/');
+  assert(fs.existsSync(auditPipelinePath), 'audit_pipeline.py must exist in scripts/');
+  assert(fs.existsSync(installHooksPath), 'install_hooks.py must exist in scripts/');
+  assert(fs.existsSync(quickPrecommitPath), 'quick_precommit_check.py must exist in scripts/');
+  assert(fs.existsSync(verifyAllPyPath), 'verify_all.py must exist in root directory');
+  assert(fs.existsSync(verifyAllCmdPath), 'verify_all.cmd must exist in root directory');
+
+  const verifyAllPyContent = fs.readFileSync(verifyAllPyPath, 'utf-8');
+  assert(verifyAllPyContent.includes("'1/5'") && verifyAllPyContent.includes("'5/5'") && verifyAllPyContent.includes('test_pwa_offline.js'), 'verify_all.py must define all 5 verification stages including test_pwa_offline.js');
+
+  const verifyAllCmdContent = fs.readFileSync(verifyAllCmdPath, 'utf-8');
+  assert(verifyAllCmdContent.includes('[1/5]') && verifyAllCmdContent.includes('[5/5]') && verifyAllCmdContent.includes('test_pwa_offline.js'), 'verify_all.cmd must define all 5 verification stages including test_pwa_offline.js');
+
+  console.log('✓ All Pipeline Enhancements (audit_pipeline.py, verify_all.py, install_hooks.py, test_pwa_offline.js) verified!');
 })();
 
 

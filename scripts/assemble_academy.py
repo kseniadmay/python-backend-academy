@@ -9074,6 +9074,10 @@ PIPELINE_FILES = [
     'test_rem_links.py',
     'test_rems_dump.py',
     'test_e2e_dom.js',
+    'test_pwa_offline.js',
+    'audit_pipeline.py',
+    'install_hooks.py',
+    'quick_precommit_check.py',
     'extracted_academy.js',
     'PROJECT_CONTEXT.md',
     'HANDOVER_CONTEXT.md',
@@ -9123,6 +9127,7 @@ if os.path.isdir(_CLOUD_DIR) and os.path.isdir(BASE_REMNOTE) and os.path.isfile(
             'UI_VISUALIZATION_IMPROVEMENTS_CATALOG.md',
             'Запустить_с_Телефона.bat',
             'verify_all.cmd',
+            'verify_all.py',
             'RemNote_Python_Mastery_FIXED.zip'
         ]
         for erf in extra_root_files:

@@ -25,6 +25,9 @@ assert res.returncode == 0, f"JS syntax error:\n{res.stderr}"
 print("1. [PASS] node --check passed with 0 syntax errors!")
 
 # 2. Verify real Headless Chrome renders <main id="view-root"> across routes and produces 0 console errors
+import tempfile
+from concurrent.futures import ThreadPoolExecutor
+
 chrome_exe = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
 base_uri = Path(HTML_PATH).as_uri()
 chrome_flags = [
@@ -33,7 +36,8 @@ chrome_flags = [
     '--allow-file-access-from-files',
     '--enable-logging=stderr', '--dump-dom'
 ]
-for route, expected_sub in [
+
+routes = [
     (base_uri, 'Правило 2 минут: Быстрый микро-шаг'),
     (base_uri + '#/python', 'Матрица Мастерства Python'),
     (base_uri + '#/web', 'Матрица Мастерства Web'),
@@ -47,19 +51,27 @@ for route, expected_sub in [
     (base_uri + '#/map', 'Карта навыков'),
     (base_uri + '#/practice', 'Практика кода'),
     (base_uri + '#/cards', 'Центр 3D Флеш-карточек'),
-]:
-    c_res = subprocess.run(
-        chrome_flags + [route],
-        capture_output=True, text=True, encoding='utf-8', errors='ignore'
-    )
-    assert c_res.returncode == 0, f"Chrome failed with code {c_res.returncode} on {route}"
-    c_errors = [line for line in c_res.stderr.splitlines() if 'ERROR:CONSOLE' in line or 'Uncaught ' in line]
-    assert not c_errors, f"Console error in Chrome for {route}:\n" + "\n".join(c_errors)
-    out = c_res.stdout
-    m = re.search(r'<main id="view-root">([\s\S]*?)</main>', out)
-    assert m and len(m.group(1).strip()) > 200, f"Empty <main id='view-root'> in Chrome for {route}"
-    assert expected_sub in m.group(1), f"Missing {expected_sub!r} in Chrome DOM for {route}"
-    print(f"2. [PASS] Real Headless Chrome rendered {route} (0 console errors, {len(m.group(1))} chars in #view-root)")
+]
+
+def verify_single_route(item):
+    route, expected_sub = item
+    with tempfile.TemporaryDirectory() as td:
+        c_res = subprocess.run(
+            chrome_flags + [f'--user-data-dir={td}', route],
+            capture_output=True, text=True, encoding='utf-8', errors='ignore'
+        )
+        assert c_res.returncode == 0, f"Chrome failed with code {c_res.returncode} on {route}"
+        c_errors = [line for line in c_res.stderr.splitlines() if 'ERROR:CONSOLE' in line or 'Uncaught ' in line]
+        assert not c_errors, f"Console error in Chrome for {route}:\n" + "\n".join(c_errors)
+        out = c_res.stdout
+        m = re.search(r'<main id="view-root">([\s\S]*?)</main>', out)
+        assert m and len(m.group(1).strip()) > 200, f"Empty <main id='view-root'> in Chrome for {route}"
+        assert expected_sub in m.group(1), f"Missing {expected_sub!r} in Chrome DOM for {route}"
+        return f"2. [PASS] Real Headless Chrome rendered {route} (0 console errors, {len(m.group(1))} chars in #view-root)"
+
+with ThreadPoolExecutor(max_workers=5) as executor:
+    for msg in executor.map(verify_single_route, routes):
+        print(msg)
 
 # 3. Verify real Headless Chrome renders standalone IDE trainer (Практика кода — тренажёр с IDE.html)
 ide_path = os.path.normpath(os.path.join(_HERE, '..', 'Практика кода — тренажёр с IDE.html'))
