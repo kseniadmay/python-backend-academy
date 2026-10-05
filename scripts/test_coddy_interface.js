@@ -530,7 +530,69 @@ async function main() {
   check(pathHtml.includes('href="#/cards"'), 'Right rail must provide SRS flashcards link');
   check(pathHtml.includes('href="#/mock"'), 'Right rail must provide mock interview link');
 
-  console.log('✓ [2/6] 3D-Тропа обучения Coddy (#/path) полностью проверена (100% PASS)\n');
+  // 2.10. Переключатель режима («🎮 Игровой» / «💼 Профессиональный») в тулбаре
+  check(pathHtml.includes('path-mode-switcher'), '#/path must include .path-mode-switcher in toolbar');
+  check(pathHtml.includes('data-set-path-mode="game"') && pathHtml.includes('🎮 Игровой'), 'Switcher must feature 🎮 Игровой button');
+  check(pathHtml.includes('data-set-path-mode="pro"') && pathHtml.includes('💼 Профессиональный'), 'Switcher must feature 💼 Профессиональный button');
+
+  // 2.11. Переключение в Профессиональный режим ('pro') и сохранение в state / localStorage
+  await fireClick('data-set-path-mode', 'pro');
+  const savedStatePro = JSON.parse(store['academy_state_v1'] || '{}');
+  check(savedStatePro.pathViewMode === 'pro', 'Clicking data-set-path-mode="pro" must persist pathViewMode="pro" in localStorage');
+  const proPathHtml = elementsById['view-root'].innerHTML;
+  check(proPathHtml.includes('path-pro-wrap'), 'Pro mode must render .path-pro-wrap');
+  check(!proPathHtml.includes('path-serpentine-svg'), 'Pro mode must NOT render 3D serpentine SVG');
+
+  // 2.12. Структура Профессионального режима (Hero-карточка, главы, уроки, бейджи, Right Rail)
+  check(proPathHtml.includes('pro-hero-card'), 'Pro mode must render top Hero focus card .pro-hero-card');
+  check(proPathHtml.includes('pro-hero-breadcrumb') && proPathHtml.includes('ПРОГРАММА'), 'Hero card must display breadcrumb ПРОГРАММА › РАЗДЕЛ');
+  check(proPathHtml.includes('pro-hero-title'), 'Hero card must display current lesson title');
+  check(proPathHtml.includes('pro-hero-cta') && proPathHtml.includes('ПРОДОЛЖИТЬ'), 'Hero card must feature orange ПРОДОЛЖИТЬ button');
+  check(proPathHtml.includes('pro-hero-progress-track') && proPathHtml.includes('pro-hero-progress-fill'), 'Hero card must feature smooth progress bar');
+  check(proPathHtml.includes('pro-chapter-box') && proPathHtml.includes('ГЛАВА 1'), 'Pro mode must render structured chapter boxes');
+  check(proPathHtml.includes('pro-lesson-row'), 'Pro mode must render lesson rows');
+  check(proPathHtml.includes('pro-icon-play') && proPathHtml.includes('▶'), 'Active lesson row must feature orange play icon ▶');
+  check(proPathHtml.includes('pro-icon-locked') && proPathHtml.includes('🔒'), 'Locked lesson rows must feature lock icon 🔒');
+  check(proPathHtml.includes('Теория + Практика'), 'Lesson rows must feature badge Теория + Практика');
+  check(proPathHtml.includes('Испытание'), 'Challenge rows must feature badge Испытание');
+  check(proPathHtml.includes('coddy-right-rail'), 'Pro mode must retain identical .coddy-right-rail on desktop');
+
+  // 2.13. Интерактивность Профессионального режима (переход по ПРОДОЛЖИТЬ, клик по уроку, сворачивание глав)
+  await fireClick('data-toggle-chapter', '2');
+  const proExpandedChap2 = elementsById['view-root'].innerHTML;
+  check(proExpandedChap2.includes('Юнит 2.1'), 'Clicking chapter 2 header must expand chapter 2 lessons');
+  await fireClick('data-toggle-chapter', '2'); // свернуть обратно
+
+  await fireClick('data-pro-start', '1.1');
+  check(sandbox.location.hash.includes('1.1'), 'Clicking ПРОДОЛЖИТЬ on Hero card must navigate to active unit skill');
+
+  navigate('#/path');
+  await fireClick('data-unit-id', '1.1', { className: 'pro-lesson-row pro-lesson-row--active' });
+  check(sandbox.location.hash.includes('1.1'), 'Clicking active lesson row in Pro mode must navigate to unit skill');
+
+  // Заблокированный урок не переключает маршрут
+  navigate('#/path');
+  await fireClick('data-unit-id', '7.6', { className: 'pro-lesson-row pro-lesson-row--locked' });
+  check(sandbox.location.hash === '#/path', 'Clicking locked lesson row in Pro mode must NOT navigate away');
+
+  // 2.14. Модалка настроек (#settings-modal) и переключение режима из настроек
+  await fireClick('data-open-settings-modal', '');
+  const settingsModalEl = elementsById['settings-modal'];
+  check(settingsModalEl && settingsModalEl.innerHTML.includes('Настройки платформы'), 'Clicking [data-open-settings-modal] must open #settings-modal');
+  check(settingsModalEl.innerHTML.includes('Игровой режим') && settingsModalEl.innerHTML.includes('Профессиональный'), 'Settings modal must offer both Game and Pro modes');
+
+  // Переключение обратно в Игровой режим ('game')
+  await fireClick('data-set-path-mode', 'game');
+  const savedStateGame = JSON.parse(store['academy_state_v1'] || '{}');
+  check(savedStateGame.pathViewMode === 'game', 'Selecting Game mode must persist pathViewMode="game" in localStorage');
+  const restoredGameHtml = elementsById['view-root'].innerHTML;
+  check(restoredGameHtml.includes('path-serpentine-wrap') && restoredGameHtml.includes('path-serpentine-svg'), 'Switching back to Game mode must restore 3D serpentine trail');
+
+  // Закрытие модалки настроек по Escape
+  fireKeydown('Escape');
+  check(!elementsById['settings-modal'], 'Pressing Escape must close and remove #settings-modal');
+
+  console.log('✓ [2/6] 3D-Тропа и Профессиональный режим Coddy (#/path) полностью проверены (100% PASS)\n');
 
   // =========================================================================
   // [3/6] Адаптивная 4-вкладочная мобильная IDE (#/practice)

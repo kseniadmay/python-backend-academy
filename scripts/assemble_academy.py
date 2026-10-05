@@ -2295,6 +2295,441 @@ EXTRA_CSS = r"""
     .cards-kb-hint { display: none !important; }
   }
 
+  /* ================= CODDY PATH MODE SWITCHER ================= */
+  .path-mode-switcher-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 50;
+  }
+  .path-mode-switcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    background: rgba(22, 27, 36, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  html:not([data-theme="dark"]) .path-mode-switcher {
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+  }
+  .path-mode-btn {
+    border: none;
+    background: transparent;
+    color: #94a3b8;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 7px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    user-select: none;
+  }
+  html:not([data-theme="dark"]) .path-mode-btn {
+    color: #64748b;
+  }
+  .path-mode-btn:hover:not(.active) {
+    color: #f8fafc;
+    background: rgba(255, 255, 255, 0.06);
+  }
+  html:not([data-theme="dark"]) .path-mode-btn:hover:not(.active) {
+    color: #0f172a;
+    background: rgba(0, 0, 0, 0.05);
+  }
+  .path-mode-btn.active {
+    background: linear-gradient(135deg, #ff7a00, #ea580c);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(255, 122, 0, 0.45);
+    transform: scale(1.02);
+  }
+
+  /* ================= PRO MODE (#/path - 'pro') ================= */
+  .path-pro-wrap {
+    width: 100%;
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 16px 12px 140px;
+  }
+  .pro-hero-card {
+    background: rgba(22, 27, 36, 0.94);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 20px;
+    padding: 22px 24px;
+    margin-bottom: 22px;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    position: relative;
+    overflow: hidden;
+  }
+  html:not([data-theme="dark"]) .pro-hero-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 12px 36px rgba(15, 23, 42, 0.07);
+  }
+  .pro-hero-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .pro-hero-card-left {
+    min-width: 0;
+    flex: 1;
+  }
+  .pro-hero-breadcrumb {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #f59e0b;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+  .pro-hero-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    line-height: 1.32;
+    color: #f8fafc;
+    margin: 0 0 4px;
+  }
+  html:not([data-theme="dark"]) .pro-hero-title {
+    color: #0f172a;
+  }
+  .pro-hero-meta {
+    font-size: 0.80rem;
+    color: #94a3b8;
+    margin-bottom: 12px;
+  }
+  .pro-hero-cta {
+    flex-shrink: 0;
+    padding: 10px 22px;
+    font-size: 0.88rem;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+  }
+  .pro-hero-progress-track {
+    width: 100%;
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.10);
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  html:not([data-theme="dark"]) .pro-hero-progress-track {
+    background: rgba(0, 0, 0, 0.08);
+  }
+  .pro-hero-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #ff7a00, #f59e0b);
+    transition: width 0.3s ease;
+  }
+  .pro-chapter-box {
+    background: rgba(22, 27, 36, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    margin-bottom: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  html:not([data-theme="dark"]) .pro-chapter-box {
+    background: rgba(255, 255, 255, 0.90);
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+  }
+  .pro-chapter-box--active {
+    border-color: rgba(245, 158, 11, 0.45);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(245, 158, 11, 0.25);
+  }
+  .pro-chapter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.02);
+  }
+  html:not([data-theme="dark"]) .pro-chapter-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background: rgba(0, 0, 0, 0.01);
+  }
+  .pro-chapter-header:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
+  html:not([data-theme="dark"]) .pro-chapter-header:hover {
+    background: rgba(0, 0, 0, 0.03);
+  }
+  .pro-chapter-num {
+    font-size: 0.70rem;
+    font-weight: 800;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .pro-chapter-title {
+    font-size: 1.18rem;
+    font-weight: 800;
+    color: #f8fafc;
+    margin-top: 2px;
+  }
+  html:not([data-theme="dark"]) .pro-chapter-title {
+    color: #0f172a;
+  }
+  .pro-chapter-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #94a3b8;
+  }
+  .pro-chapter-chevron {
+    font-size: 0.70rem;
+    transition: transform 0.2s ease;
+  }
+  .pro-lesson-list {
+    display: flex;
+    flex-direction: column;
+  }
+  .pro-lesson-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    transition: background 0.15s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+  }
+  html:not([data-theme="dark"]) .pro-lesson-row {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  }
+  .pro-lesson-row:last-child {
+    border-bottom: none;
+  }
+  .pro-lesson-row:hover:not(.pro-lesson-row--locked) {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  html:not([data-theme="dark"]) .pro-lesson-row:hover:not(.pro-lesson-row--locked) {
+    background: rgba(0, 0, 0, 0.03);
+  }
+  .pro-lesson-row--active {
+    background: rgba(245, 158, 11, 0.08);
+    box-shadow: inset 3px 0 0 #f59e0b;
+  }
+  html:not([data-theme="dark"]) .pro-lesson-row--active {
+    background: rgba(245, 158, 11, 0.07);
+    box-shadow: inset 3px 0 0 #d97706;
+  }
+  .pro-lesson-row--locked {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .pro-lesson-status-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pro-icon-play {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff7a00, #ea580c);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    padding-left: 2px;
+    box-shadow: 0 4px 12px rgba(255, 122, 0, 0.45);
+    animation: proPlayPulse 2s infinite ease-in-out;
+  }
+  @keyframes proPlayPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 4px 12px rgba(255, 122, 0, 0.45); }
+    50% { transform: scale(1.06); box-shadow: 0 6px 18px rgba(255, 122, 0, 0.65); }
+  }
+  .pro-icon-done {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #059669;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 900;
+    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.35);
+  }
+  .pro-icon-locked {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+  html:not([data-theme="dark"]) .pro-icon-locked {
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+  }
+  .pro-lesson-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .pro-lesson-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #f8fafc;
+    line-height: 1.35;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  html:not([data-theme="dark"]) .pro-lesson-title {
+    color: #0f172a;
+  }
+  .pro-lesson-tags {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pro-lesson-badge {
+    font-size: 0.70rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.07);
+    color: #94a3b8;
+  }
+  html:not([data-theme="dark"]) .pro-lesson-badge {
+    background: rgba(0, 0, 0, 0.06);
+    color: #64748b;
+  }
+  .pro-lesson-badge--challenge {
+    background: rgba(244, 63, 94, 0.15);
+    color: #fb7185;
+  }
+  .pro-lesson-tail {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+  }
+  .pro-arrow {
+    color: #f59e0b;
+    font-weight: 800;
+    font-size: 1.15rem;
+  }
+  .pro-done-check {
+    color: #10b981;
+    font-weight: 800;
+    font-size: 0.95rem;
+  }
+
+  /* ================= SETTINGS MODAL ================= */
+  .settings-modal-card {
+    max-width: 560px;
+  }
+  .settings-section-title {
+    font-size: 0.88rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #f59e0b;
+    margin-bottom: 8px;
+  }
+  .settings-mode-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 520px) {
+    .settings-mode-grid { grid-template-columns: 1fr; }
+  }
+  .settings-mode-card {
+    border: 1.5px solid rgba(255, 255, 255, 0.10);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 14px 16px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    color: inherit;
+  }
+  html:not([data-theme="dark"]) .settings-mode-card {
+    border: 1.5px solid rgba(0, 0, 0, 0.08);
+    background: rgba(0, 0, 0, 0.02);
+  }
+  .settings-mode-card:hover {
+    border-color: rgba(245, 158, 11, 0.4);
+    background: rgba(255, 255, 255, 0.05);
+  }
+  html:not([data-theme="dark"]) .settings-mode-card:hover {
+    background: rgba(0, 0, 0, 0.04);
+  }
+  .settings-mode-card.active {
+    border-color: #f59e0b;
+    background: rgba(245, 158, 11, 0.10);
+    box-shadow: 0 0 0 1px #f59e0b, 0 4px 14px rgba(245, 158, 11, 0.2);
+  }
+  .settings-mode-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .settings-mode-icon {
+    font-size: 1.2rem;
+  }
+  .settings-mode-name {
+    font-size: 0.94rem;
+    font-weight: 800;
+    color: #f8fafc;
+  }
+  html:not([data-theme="dark"]) .settings-mode-name {
+    color: #0f172a;
+  }
+  .settings-mode-badge {
+    margin-left: auto;
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: #f59e0b;
+    color: #000;
+  }
+  .settings-mode-desc {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    line-height: 1.4;
+  }
+
   /* ================= 4-TAB MOBILE IDE (#/practice) ================= */
   .prac-mobile-tabs {
     display: flex;
@@ -2812,6 +3247,7 @@ function ensureExtendedState(target){
   if(typeof s.soundEnabled !== 'boolean') s.soundEnabled = true;
   if(!s.stackBranch || !['fastapi','django','both'].includes(s.stackBranch)) s.stackBranch = 'fastapi';
   if(!s.unitSortMode || !['priority','number'].includes(s.unitSortMode)) s.unitSortMode = 'priority';
+  if(!s.pathViewMode || !['game','pro'].includes(s.pathViewMode)) s.pathViewMode = 'game';
   if(!s.diagnosticGaps || !Array.isArray(s.diagnosticGaps)) s.diagnosticGaps = [];
   if(typeof s.diagCompleted !== 'boolean') s.diagCompleted = false;
   if(typeof s.diagScore !== 'number') s.diagScore = 0;
@@ -7174,6 +7610,73 @@ nodeCardHTML = function(n){
 
 let mapViewState = { mode: 'tree' };
 
+const cleanUnitTitle = function(id, title){
+  if(!title) return '';
+  return String(title).replace(new RegExp(`^(?:Юнит\\s*)?${String(id).replace('.', '\\.')}\\s*[:·\\-–—]?\\s*`, 'i'), '').trim();
+};
+
+function renderPathModeSwitcherHTML(){
+  const mode = (state && state.pathViewMode === 'pro') ? 'pro' : 'game';
+  return `
+    <div class="path-mode-switcher" role="radiogroup" aria-label="Режим плана обучения">
+      <button type="button" class="path-mode-btn ${mode==='game'?'active':''}" data-set-path-mode="game" role="radio" aria-checked="${mode==='game'}" title="Игровой режим с 3D-тропой">🎮 Игровой</button>
+      <button type="button" class="path-mode-btn ${mode==='pro'?'active':''}" data-set-path-mode="pro" role="radio" aria-checked="${mode==='pro'}" title="Профессиональный режим со списком глав">💼 Профессиональный</button>
+    </div>
+  `;
+}
+
+function renderCoddyRightRail(totalCompletedUnits, streakText){
+  return `
+    <aside class="coddy-right-rail">
+      <!-- Top Stats Row (Coddy style) -->
+      <div class="coddy-rail-stats-row">
+        <div class="coddy-rail-stat" title="Пройдено юнитов">
+          <span class="coddy-rail-stat-icon">📘</span>
+          <span class="coddy-rail-stat-val">${totalCompletedUnits}/45</span>
+        </div>
+        <div class="coddy-rail-stat" title="Стрик активности">
+          <span class="coddy-rail-stat-icon">🔥</span>
+          <span class="coddy-rail-stat-val">${state.streak || 0} ${streakText}</span>
+        </div>
+        <div class="coddy-rail-stat" title="Накопленный опыт">
+          <span class="coddy-rail-stat-icon">💎</span>
+          <span class="coddy-rail-stat-val">${state.xp || 0} XP</span>
+        </div>
+      </div>
+
+      <!-- Widget 1: SRS Cards Review -->
+      <div class="panel coddy-rail-card">
+        <div class="coddy-rail-card-head">
+          <div class="coddy-rail-badge">🃏 SRS-Повторение</div>
+          <a href="#/cards" class="coddy-rail-link">Повторить →</a>
+        </div>
+        <h4 class="coddy-rail-title">Карточка дня</h4>
+        <p class="coddy-rail-desc">Интервальное повторение RemNote: закрепи память перед практикой.</p>
+      </div>
+      <!-- Widget 2: Streak & Level XP -->
+      <div class="panel coddy-rail-card">
+        <div class="coddy-rail-badge">🔥 Стрик и цель дня</div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin:6px 0 8px;">
+          <span style="font-size:1.6rem;font-weight:900;color:#f43f5e;">🔥 ${state.streak || 0}</span>
+          <span class="meta">${streakText} подряд</span>
+        </div>
+        <div class="progress-bar-wrap" style="height:6px;margin-bottom:8px;">
+          <div class="progress-bar-fill" style="width:${Math.min(100, Math.round(((state.xp||0) % 100) / 100 * 100))}%;background:linear-gradient(90deg,#fbbf24,#f59e0b);"></div>
+        </div>
+        <div class="meta" style="font-size:0.75rem;">Цель: <strong>50 XP в день</strong> · Всего: <strong>${state.xp || 0} XP</strong></div>
+      </div>
+      <!-- Widget 3: Screening Readiness -->
+      <div class="panel coddy-rail-card">
+        <div class="coddy-rail-card-head">
+          <div class="coddy-rail-badge">🎯 Собеседование</div>
+          <a href="#/mock" class="coddy-rail-link">Симулятор →</a>
+        </div>
+        <h4 class="coddy-rail-title">Готовность к скринингу</h4>
+        <p class="coddy-rail-desc">Симулятор технического скрининга: лайв-кодинг и STAR-вопросы.</p>
+      </div>
+    </aside>`;
+}
+
 function viewPathSerpentine(options){
   options = options || {};
   ensureExtendedState();
@@ -7323,17 +7826,17 @@ function viewPathSerpentine(options){
       </g>`;
   });
 
-  const cleanUnitTitle = function(id, title){
-    if(!title) return '';
-    return String(title).replace(new RegExp(`^(?:Юнит\\s*)?${String(id).replace('.', '\\.')}\\s*[:·\\-–—]?\\s*`, 'i'), '').trim();
-  };
-
   const totalCompletedUnits = allUnits.filter(u => (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80))).length;
   const streakText = (typeof pluralizeRu === 'function') ? pluralizeRu(state.streak || 0, 'день', 'дня', 'дней') : 'дн.';
 
   return `
     <div class="coddy-path-layout">
       <div class="container path-serpentine-wrap">
+        <!-- Mode Switcher in top toolbar -->
+        <div class="path-mode-switcher-wrap">
+          ${renderPathModeSwitcherHTML()}
+        </div>
+
         <!-- Top Chapter Banner -->
         <div class="path-chapter-banner">
           <div class="path-chapter-banner-left">
@@ -7410,56 +7913,167 @@ function viewPathSerpentine(options){
         </button>
       </div>
 
-      <aside class="coddy-right-rail">
-        <!-- Top Stats Row (Coddy style) -->
-        <div class="coddy-rail-stats-row">
-          <div class="coddy-rail-stat" title="Пройдено юнитов">
-            <span class="coddy-rail-stat-icon">📘</span>
-            <span class="coddy-rail-stat-val">${totalCompletedUnits}/45</span>
-          </div>
-          <div class="coddy-rail-stat" title="Стрик активности">
-            <span class="coddy-rail-stat-icon">🔥</span>
-            <span class="coddy-rail-stat-val">${state.streak || 0} ${streakText}</span>
-          </div>
-          <div class="coddy-rail-stat" title="Накопленный опыт">
-            <span class="coddy-rail-stat-icon">💎</span>
-            <span class="coddy-rail-stat-val">${state.xp || 0} XP</span>
-          </div>
-        </div>
-
-        <!-- Widget 1: SRS Cards Review -->
-        <div class="panel coddy-rail-card">
-          <div class="coddy-rail-card-head">
-            <div class="coddy-rail-badge">🃏 SRS-Повторение</div>
-            <a href="#/cards" class="coddy-rail-link">Повторить →</a>
-          </div>
-          <h4 class="coddy-rail-title">Карточка дня</h4>
-          <p class="coddy-rail-desc">Интервальное повторение RemNote: закрепи память перед практикой.</p>
-        </div>
-        <!-- Widget 2: Streak & Level XP -->
-        <div class="panel coddy-rail-card">
-          <div class="coddy-rail-badge">🔥 Стрик и цель дня</div>
-          <div style="display:flex;align-items:baseline;gap:8px;margin:6px 0 8px;">
-            <span style="font-size:1.6rem;font-weight:900;color:#f43f5e;">🔥 ${state.streak || 0}</span>
-            <span class="meta">${streakText} подряд</span>
-          </div>
-          <div class="progress-bar-wrap" style="height:6px;margin-bottom:8px;">
-            <div class="progress-bar-fill" style="width:${Math.min(100, Math.round(((state.xp||0) % 100) / 100 * 100))}%;background:linear-gradient(90deg,#fbbf24,#f59e0b);"></div>
-          </div>
-          <div class="meta" style="font-size:0.75rem;">Цель: <strong>50 XP в день</strong> · Всего: <strong>${state.xp || 0} XP</strong></div>
-        </div>
-        <!-- Widget 3: Screening Readiness -->
-        <div class="panel coddy-rail-card">
-          <div class="coddy-rail-card-head">
-            <div class="coddy-rail-badge">🎯 Собеседование</div>
-            <a href="#/mock" class="coddy-rail-link">Симулятор →</a>
-          </div>
-          <h4 class="coddy-rail-title">Готовность к скринингу</h4>
-          <p class="coddy-rail-desc">Симулятор технического скрининга: лайв-кодинг и STAR-вопросы.</p>
-        </div>
-      </aside>
+      ${renderCoddyRightRail(totalCompletedUnits, streakText)}
     </div>`;
 }
+
+let proCollapsedChapters = new Set();
+
+function viewProPath(options){
+  options = options || {};
+  ensureExtendedState();
+  const allUnits = ALL_UNITS_COMBINED;
+
+  // Find active unit
+  let activeUnitIndex = -1;
+  allUnits.forEach((u, idx) => {
+    const isUnitTestPassed = (state.passedUnitTests || []).includes(u.id);
+    const allSkillsMastered = (u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80);
+    const isCompleted = isUnitTestPassed || allSkillsMastered;
+    if(!isCompleted && activeUnitIndex === -1){
+      activeUnitIndex = idx;
+    }
+  });
+  if(activeUnitIndex === -1) activeUnitIndex = allUnits.length - 1;
+
+  const curActiveUnit = allUnits[activeUnitIndex] || allUnits[0];
+  const activeTrack = getTrackForUnit(curActiveUnit.id);
+  const totalCompletedUnits = allUnits.filter(u => (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80))).length;
+  const streakText = (typeof pluralizeRu === 'function') ? pluralizeRu(state.streak || 0, 'день', 'дня', 'дней') : 'дн.';
+
+  // 7 Chapters
+  const chapters = [
+    { num: 1, title: 'Python Core', units: allUnits.slice(0, 9) },
+    { num: 2, title: 'Web & HTTP', units: allUnits.slice(9, 13) },
+    { num: 3, title: 'Backend & Архитектура', units: allUnits.slice(13, 21) },
+    { num: 4, title: 'Алгоритмы и структуры данных', units: allUnits.slice(21, 27) },
+    { num: 5, title: 'Базы данных и SQL', units: allUnits.slice(27, 33) },
+    { num: 6, title: 'Системный дизайн', units: allUnits.slice(33, 39) },
+    { num: 7, title: 'Инфраструктура и DevOps', units: allUnits.slice(39, 45) }
+  ];
+
+  const activeChap = chapters.find(c => c.units.some(u => u.id === curActiveUnit.id)) || chapters[0];
+  const activeChapCompleted = activeChap.units.filter(u => (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80))).length;
+  const activeChapTotal = activeChap.units.length;
+  const activeChapPct = Math.round(activeChapCompleted / activeChapTotal * 100);
+
+  // Segments for active chapter
+  const activeChapSegmentsHTML = activeChap.units.map(u => {
+    const isPassed = (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80));
+    const isActive = u.id === curActiveUnit.id;
+    return `<div class="path-seg-bar ${isPassed ? 'done' : (isActive ? 'active' : '')}" title="Юнит ${u.id}: ${escapeHtmlStr(u.title)}"></div>`;
+  }).join('');
+
+  // Hero Card HTML (exactly matching Coddy screenshot #2)
+  const heroCardHTML = `
+    <div class="pro-hero-card">
+      <div class="pro-hero-card-head">
+        <div class="pro-hero-card-left">
+          <div class="pro-hero-breadcrumb">ПРОГРАММА › РАЗДЕЛ ${activeChap.num} · ГЛАВА ${activeChap.num}</div>
+          <h2 class="pro-hero-title">Юнит ${curActiveUnit.id} · ${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</h2>
+          <div class="pro-hero-meta">Глава ${activeChap.num}: ${escapeHtmlStr(activeChap.title)} · ${activeChapCompleted}/${activeChapTotal} уроков · ${activeChapPct}%</div>
+        </div>
+        <button type="button" class="btn-3d-orange pro-hero-cta" data-pro-start="${curActiveUnit.id}">ПРОДОЛЖИТЬ</button>
+      </div>
+
+      <div class="pro-hero-progress-track">
+        <div class="pro-hero-progress-fill" style="width:${Math.max(6, activeChapPct)}%;"></div>
+      </div>
+
+      <div class="path-chapter-progress-row" style="margin-top:4px;">
+        <span class="path-chapter-target-icon">🎯</span>
+        <div class="path-chapter-segments">
+          ${activeChapSegmentsHTML}
+        </div>
+        <span class="path-chapter-count">${activeChapCompleted} / ${activeChapTotal}</span>
+      </div>
+    </div>
+  `;
+
+  // Chapters list HTML (structured chapter box and lesson rows with icons and badges)
+  const chaptersHTML = chapters.map(ch => {
+    const isCurChap = (ch.num === activeChap.num);
+    const chCompleted = ch.units.filter(u => (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80))).length;
+    const chTotal = ch.units.length;
+    const chPct = Math.round(chCompleted / chTotal * 100);
+    const isExpanded = isCurChap ? !proCollapsedChapters.has(ch.num) : proCollapsedChapters.has(ch.num);
+
+    const lessonsListHTML = ch.units.map(u => {
+      const isUnitTestPassed = (state.passedUnitTests || []).includes(u.id);
+      const allSkillsMastered = (u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80);
+      const isCompleted = isUnitTestPassed || allSkillsMastered;
+      const globalIdx = allUnits.findIndex(x => x.id === u.id);
+      const isActive = (globalIdx === activeUnitIndex);
+      const isLocked = (globalIdx > activeUnitIndex && !isCompleted);
+
+      let statusClass = isCompleted ? 'pro-lesson-row--completed' : (isActive ? 'pro-lesson-row--active' : 'pro-lesson-row--locked');
+      let iconHtml = '';
+      if(isActive){
+        iconHtml = '<div class="pro-icon-play" aria-label="Текущий урок">▶</div>';
+      } else if(isCompleted){
+        iconHtml = '<div class="pro-icon-done" aria-label="Пройден">✓</div>';
+      } else {
+        iconHtml = '<div class="pro-icon-locked" aria-label="Заблокирован">🔒</div>';
+      }
+
+      const isChallenge = u.id.endsWith('.9') || u.id.endsWith('.6') || u.id.endsWith('.8');
+      const badgeClass = isChallenge ? 'pro-lesson-badge pro-lesson-badge--challenge' : 'pro-lesson-badge';
+      const badgeText = isChallenge ? 'Испытание' : 'Теория + Практика';
+
+      return `
+        <div class="pro-lesson-row ${statusClass}" data-unit-id="${u.id}" role="button" tabindex="${isLocked ? '-1' : '0'}">
+          <div class="pro-lesson-status-icon">${iconHtml}</div>
+          <div class="pro-lesson-info">
+            <div class="pro-lesson-title">Юнит ${u.id}: ${escapeHtmlStr(cleanUnitTitle(u.id, u.title))}</div>
+            <div class="pro-lesson-tags">
+              <span class="${badgeClass}">${badgeText}</span>
+            </div>
+          </div>
+          <div class="pro-lesson-tail">
+            ${isActive ? '<span class="pro-arrow">→</span>' : (isCompleted ? '<span class="pro-done-check">✓</span>' : '')}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="pro-chapter-box ${isCurChap ? 'pro-chapter-box--active' : ''}">
+        <div class="pro-chapter-header" data-toggle-chapter="${ch.num}">
+          <div class="pro-chapter-header-left">
+            <div class="pro-chapter-num">ГЛАВА ${ch.num}</div>
+            <div class="pro-chapter-title">${escapeHtmlStr(ch.title)}</div>
+          </div>
+          <div class="pro-chapter-header-right">
+            <span class="pro-chapter-stat">${chCompleted}/${chTotal} · ${chPct}%</span>
+            <span class="pro-chapter-chevron" style="transform:${isExpanded ? 'rotate(180deg)' : 'none'};">▼</span>
+          </div>
+        </div>
+        ${isExpanded ? `<div class="pro-lesson-list">${lessonsListHTML}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="coddy-path-layout">
+      <div class="container path-pro-wrap">
+        <!-- Mode Switcher in top toolbar -->
+        <div class="path-mode-switcher-wrap">
+          ${renderPathModeSwitcherHTML()}
+        </div>
+
+        <!-- Top Hero Card of Current Lesson -->
+        ${heroCardHTML}
+
+        <!-- Structured Chapters List -->
+        ${chaptersHTML}
+      </div>
+
+      ${renderCoddyRightRail(totalCompletedUnits, streakText)}
+    </div>
+  `;
+}
+window.viewPathSerpentine = viewPathSerpentine;
+window.viewProPath = viewProPath;
 
 viewMap = function(){
   const stagesHTML = STAGES.map((s,i)=>{
@@ -7493,7 +8107,7 @@ viewMap = function(){
         <p class="meta" style="margin-bottom:14px;">Математическая извилистая S-трасса соединяет все 45 юнитов курса в единое непрерывное приключение.</p>
         ${modeSwitcherHTML}
       </div>
-      ${viewPathSerpentine()}`;
+      ${(state.pathViewMode === 'pro') ? viewProPath() : viewPathSerpentine()}`;
   }
 
   return `
@@ -8565,6 +9179,98 @@ function openBugReportModal(){
 }
 window.openBugReportModal = openBugReportModal;
 
+let isSettingsModalOpen = false;
+
+function openSettingsModal(){
+  ensureExtendedState();
+  isSettingsModalOpen = true;
+  const existing = document.getElementById('settings-modal');
+  if(existing) existing.remove();
+
+  const isGame = (state.pathViewMode !== 'pro');
+  const isPro = (state.pathViewMode === 'pro');
+
+  const modal = document.createElement('div');
+  modal.id = 'settings-modal';
+  modal.className = 'modal-backdrop';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.innerHTML = `
+    <div class="modal-card settings-modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+        <h2 style="margin:0;font-size:1.35rem;display:flex;align-items:center;gap:10px;">
+          <span>⚙️</span> Настройки платформы
+        </h2>
+        <button class="btn btn-ghost" style="padding:6px 12px;" data-close-settings-modal aria-label="Закрыть">✕ Закрыть</button>
+      </div>
+
+      <!-- Режим экрана обучения -->
+      <div class="settings-section">
+        <div class="settings-section-title">🎓 Режим экрана «Путь»</div>
+        <p class="meta" style="margin-bottom:12px;font-size:0.82rem;">Выберите предпочтительный стиль отображения программы обучения:</p>
+        <div class="settings-mode-grid">
+          <button type="button" class="settings-mode-card ${isGame ? 'active' : ''}" data-set-path-mode="game">
+            <div class="settings-mode-card-header">
+              <span class="settings-mode-icon">🎮</span>
+              <span class="settings-mode-name">Игровой режим</span>
+              ${isGame ? '<span class="settings-mode-badge">Активен</span>' : ''}
+            </div>
+            <div class="settings-mode-desc">Извилистая 3D-тропа с гексагональными нодами, всплывающими карточками и игровой атмосферой Coddy.</div>
+          </button>
+
+          <button type="button" class="settings-mode-card ${isPro ? 'active' : ''}" data-set-path-mode="pro">
+            <div class="settings-mode-card-header">
+              <span class="settings-mode-icon">💼</span>
+              <span class="settings-mode-name">Профессиональный</span>
+              ${isPro ? '<span class="settings-mode-badge">Активен</span>' : ''}
+            </div>
+            <div class="settings-mode-desc">Структурированный список уроков по главам с верхней Hero-карточкой фокуса и бейджами «Теория + Практика».</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Тема и звук -->
+      <div class="settings-section" style="margin-top:20px;">
+        <div class="settings-section-title">🎨 Интерфейс и звук</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+          <button type="button" class="btn btn-ghost" id="settings-theme-toggle" style="flex:1;min-width:140px;">
+            🌓 Тема: ${document.documentElement.getAttribute('data-theme') === 'light' ? 'Пергамент (Светлая)' : 'Обсидиан (Тёмная)'}
+          </button>
+          <button type="button" class="btn btn-ghost" id="settings-sound-toggle" style="flex:1;min-width:140px;">
+            ${state.soundEnabled ? '🔊 Звук: Включён' : '🔇 Звук: Выключен'}
+          </button>
+        </div>
+      </div>
+
+      <!-- Данные и сброс -->
+      <div class="settings-section" style="margin-top:20px;border-top:1px solid var(--line);padding-top:16px;">
+        <div class="settings-section-title">💾 Управление данными</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+          <button type="button" class="btn btn-ghost" data-open-handover style="font-size:0.85rem;">
+            🔄 Перенос контекста
+          </button>
+          <button type="button" class="btn btn-ghost" data-open-bug-modal style="font-size:0.85rem;">
+            🐞 Журнал замечаний
+          </button>
+          <button type="button" class="btn btn-ghost" id="settings-reset-btn" style="font-size:0.85rem;color:var(--burgundy-bright);">
+            ⚠️ Сбросить прогресс
+          </button>
+        </div>
+      </div>
+    </div>`;
+
+  document.body.appendChild(modal);
+}
+
+function closeSettingsModal(){
+  isSettingsModalOpen = false;
+  const m = document.getElementById('settings-modal');
+  if(m) m.remove();
+}
+window.openSettingsModal = openSettingsModal;
+window.closeSettingsModal = closeSettingsModal;
+
+
 // Inject Ambient Background Orbs (.ambient-orb--burgundy & .ambient-orb--emerald), Onest Font, Bug Logger FAB, Global Pomodoro Pill & Sidebar Footer Quick Start
 (function initCocoonAtmosphereAndSidebar(){
   try{
@@ -8621,6 +9327,26 @@ window.openBugReportModal = openBugReportModal;
   bugBtn.setAttribute('data-open-bug-modal', '');
   bugBtn.textContent = '🐞 Журнал замечаний';
   foot.appendChild(bugBtn);
+
+  const setBtn = document.createElement('button');
+  setBtn.className = 'link-quiet';
+  setBtn.setAttribute('data-open-settings-modal', '');
+  setBtn.innerHTML = '⚙️ Настройки';
+  foot.appendChild(setBtn);
+
+  const topbar = document.querySelector('.topbar');
+  if(topbar && !topbar.querySelector('[data-open-settings-modal]')){
+    const topSettingsBtn = document.createElement('button');
+    topSettingsBtn.className = 'icon-btn';
+    topSettingsBtn.setAttribute('data-open-settings-modal', '');
+    topSettingsBtn.setAttribute('title', 'Настройки');
+    topSettingsBtn.setAttribute('aria-label', 'Настройки');
+    topSettingsBtn.innerHTML = '⚙️';
+    const rightContainer = topbar.querySelector('div[style*="display:flex"]');
+    if(rightContainer){
+      rightContainer.insertBefore(topSettingsBtn, rightContainer.firstChild);
+    }
+  }
 })();
 
 // Context Handover Modal ("Контекст для переноса в новый чат")
@@ -8889,7 +9615,7 @@ render = function(){
     root.innerHTML = viewDocsHub();
     navRoute = '/docs';
   } else if(route === '/path'){
-    root.innerHTML = viewPathSerpentine();
+    root.innerHTML = (state.pathViewMode === 'pro') ? viewProPath() : viewPathSerpentine();
     navRoute = '/path';
   } else if(route === '/map'){
     root.innerHTML = viewMap();
@@ -8996,6 +9722,90 @@ document.addEventListener('click', async function(e){
       render();
       return;
     }
+  }
+
+  if(e.target.closest('[data-open-settings-modal]')){ openSettingsModal(); return; }
+  if(e.target.closest('[data-close-settings-modal]') || e.target.id === 'settings-modal'){ closeSettingsModal(); return; }
+  if(e.target.closest('#settings-theme-toggle')){
+    toggleTheme();
+    openSettingsModal();
+    return;
+  }
+  if(e.target.closest('#settings-sound-toggle')){
+    state.soundEnabled = !state.soundEnabled;
+    saveState(state);
+    openSettingsModal();
+    return;
+  }
+  if(e.target.closest('#settings-reset-btn')){
+    closeSettingsModal();
+    const rBtn = document.getElementById('reset-btn-d');
+    if(rBtn) rBtn.click();
+    return;
+  }
+
+  // Path Mode Switcher ('game' | 'pro')
+  const modeBtn = e.target.closest('[data-set-path-mode]');
+  if(modeBtn){
+    const targetMode = modeBtn.getAttribute('data-set-path-mode');
+    if(targetMode === 'game' || targetMode === 'pro'){
+      ensureExtendedState();
+      state.pathViewMode = targetMode;
+      saveState(state);
+      if(typeof isSettingsModalOpen !== 'undefined' && isSettingsModalOpen){
+        openSettingsModal();
+      }
+      render();
+      if(typeof showTactileToast === 'function'){
+        showTactileToast(targetMode === 'pro' ? '💼 Включён профессиональный режим' : '🎮 Включён игровой режим 3D-тропы');
+      }
+    }
+    return;
+  }
+
+  // Pro Mode CTA start
+  const proStartBtn = e.target.closest('[data-pro-start]');
+  if(proStartBtn){
+    const uid = proStartBtn.getAttribute('data-pro-start');
+    const u = ALL_UNITS_COMBINED.find(x => x.id === uid);
+    if(u){
+      const track = getTrackForUnit(uid);
+      const firstSkillId = (u.skills && u.skills[0]) ? u.skills[0].id : '';
+      location.hash = `#${track.routePrefix}/skill/${firstSkillId}`;
+    }
+    return;
+  }
+
+  // Pro Mode lesson row click
+  const proRow = e.target.closest('.pro-lesson-row');
+  if(proRow){
+    if((proRow.className && proRow.className.includes('pro-lesson-row--locked')) || (proRow.classList && proRow.classList.contains('pro-lesson-row--locked'))){
+      if(typeof showTactileToast === 'function'){
+        showTactileToast('🔒 Завершите предыдущие уроки для открытия');
+      }
+      return;
+    }
+    const uid = proRow.getAttribute('data-unit-id');
+    const u = ALL_UNITS_COMBINED.find(x => x.id === uid);
+    if(u){
+      const track = getTrackForUnit(uid);
+      const firstSkillId = (u.skills && u.skills[0]) ? u.skills[0].id : '';
+      location.hash = `#${track.routePrefix}/skill/${firstSkillId}`;
+    }
+    return;
+  }
+
+  // Pro Mode chapter expand/collapse toggle
+  const togChap = e.target.closest('[data-toggle-chapter]');
+  if(togChap){
+    const cNum = parseInt(togChap.getAttribute('data-toggle-chapter'), 10);
+    if(proCollapsedChapters.has(cNum)){
+      proCollapsedChapters.delete(cNum);
+    } else {
+      proCollapsedChapters.add(cNum);
+    }
+    render();
+    return;
   }
 
   if(e.target.closest('[data-open-bug-modal]')){ openBugReportModal(); return; }
@@ -10548,6 +11358,10 @@ document.addEventListener('keydown', function(e){
   const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
   if(tag === 'textarea' || tag === 'input' || tag === 'select') return;
   if(e.key === 'Escape'){
+    if(typeof isSettingsModalOpen !== 'undefined' && isSettingsModalOpen){
+      closeSettingsModal();
+      return;
+    }
     const popover = document.getElementById('path-anchored-popover');
     if(popover && popover.style && popover.style.display !== 'none'){
       popover.style.display = 'none';
