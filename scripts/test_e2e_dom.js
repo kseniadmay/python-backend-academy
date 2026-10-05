@@ -1475,6 +1475,8 @@ function fireClick(attrName, attrVal, extraAttrs = {}) {
   const verifyAllPyPath = path.join(rootDir, 'verify_all.py');
   const verifyAllCmdPath = path.join(rootDir, 'verify_all.cmd');
 
+  const testCoddyPath = path.join(__dirname, 'test_coddy_interface.js');
+  assert(fs.existsSync(testCoddyPath), 'test_coddy_interface.js must exist in scripts/');
   assert(fs.existsSync(testPwaPath), 'test_pwa_offline.js must exist in scripts/');
   assert(fs.existsSync(auditPipelinePath), 'audit_pipeline.py must exist in scripts/');
   assert(fs.existsSync(installHooksPath), 'install_hooks.py must exist in scripts/');
@@ -1633,6 +1635,10 @@ function fireClick(attrName, attrVal, extraAttrs = {}) {
   assert(player.isPlaying === true, 'Player should be playing');
   navigate('#/cards');
   assert(player.isPlaying === false, 'Navigating route must automatically stop theory audio playback');
+
+  // Full verification of dedicated Coddy Philosophy & Visualization test suite (test_coddy_interface.js)
+  const coddyRes = require('child_process').spawnSync(process.execPath, [path.join(__dirname, 'test_coddy_interface.js')], { stdio: 'inherit' });
+  assert(coddyRes.status === 0, 'test_coddy_interface.js must pass with 100% success');
 
   console.log('✓ All Coddy Proposals (3D Serpentine Path, Lesson Runner, 4-Tab IDE, Audio Companion) verified!');
 })();

@@ -870,6 +870,40 @@
   .btn-coddy-ruby:hover{filter:brightness(1.15);transform:translateY(-1px);}
   html:not([data-theme="dark"]) .btn-coddy-ruby{background:#be123c;border-color:#9f1239;color:#ffffff;}
 
+  .coddy-code-block{
+    background:rgba(0,0,0,0.45);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:16px;
+    padding:12px 14px;
+    font-family:var(--font-m);
+    font-size:0.82rem;
+    line-height:1.5;
+    color:#e2e8f0;
+  }
+  html:not([data-theme="dark"]) .coddy-code-block{background:#f1f5f9;border-color:#cbd5e1;color:#0f172a;}
+
+  .coddy-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.8rem;
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.03);
+  }
+  .coddy-table th, .coddy-table td{
+    padding:8px 10px;
+    border:1px solid rgba(255,255,255,0.07);
+    text-align:left;
+  }
+  .coddy-table th{
+    color:#fda4af;
+    font-weight:700;
+    background:rgba(190,18,60,0.12);
+  }
+  html:not([data-theme="dark"]) .coddy-table th{color:#9f1239;background:rgba(190,18,60,0.08);}
+  html:not([data-theme="dark"]) .coddy-table td{border-color:#e2e8f0;}
+
   /* ---------- Zero-Keyboard Scaffolding: Tap-to-Fill Chips ---------- */
   .tap-chip-card{
     border-radius:20px;padding:16px 18px;background:var(--surface);border:1.5px solid var(--glass-border);
@@ -9654,6 +9688,7 @@ ensureLessonState = function(id){
 
 const _origAnswerLessonCheck = answerLessonCheck;
 answerLessonCheck = function(i){
+  if(!lessonState || lessonState.checkRevealed) return;
   const l = (typeof LESSONS !== 'undefined' && lessonState) ? LESSONS[lessonState.lessonId] : null;
   const checks = (l && l.checks) ? l.checks : [];
   const c = checks[lessonState ? (lessonState.checkIdx || 0) : 0];
@@ -12576,7 +12611,8 @@ document.addEventListener('keydown', function(e){
   }
   if((e.key === 'Enter' || e.code === 'Space') && e.target && e.target.closest && e.target.closest('.hex-3d-node')){
     e.preventDefault();
-    e.target.closest('.hex-3d-node').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    const clickEv = (typeof MouseEvent !== 'undefined') ? new MouseEvent('click', { bubbles: true, cancelable: true }) : { type: 'click', bubbles: true };
+    e.target.closest('.hex-3d-node').dispatchEvent(clickEv);
     return;
   }
   if(e.code === 'Space'){
