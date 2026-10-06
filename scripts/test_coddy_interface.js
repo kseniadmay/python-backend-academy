@@ -444,6 +444,12 @@ async function main() {
   check(pathHtml.includes('data-unit-id="1.1"'), 'Trail must start with Unit 1.1');
   check(pathHtml.includes('data-unit-id="7.6"'), 'Trail must end with Unit 7.6');
 
+  // 2.2b. «Челлендж мастерства»: ровно 7 боковых ветвей-гексагонов (по одной на главу)
+  const chMatches = pathHtml.match(/class="[^"]*hex-challenge-node[^"]*"/g) || [];
+  check(chMatches.length === 7, `#/path must render exactly 7 mastery challenge branch nodes (found ${chMatches.length})`);
+  check((pathHtml.match(/data-challenge-route="[^"]*\/unittest\//g) || []).length === 7, 'Every challenge branch must link to a /unittest/ route');
+  check(pathHtml.includes('ЧЕЛЛЕНДЖ МАСТЕРСТВА'), 'Challenge branches must carry the mastery challenge label');
+
   // 2.3. Расположение и отсутствие коллизий координат нод
   const cyMatches = [...pathHtml.matchAll(/data-unit-id="([^"]+)"[\s\S]*?cy="([^"]+)"/g)];
   if (cyMatches.length >= 2) {

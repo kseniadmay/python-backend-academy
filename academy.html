@@ -1605,6 +1605,43 @@
     animation: hexPulse 2.2s infinite ease-in-out;
     pointer-events: none;
   }
+  /* «Челлендж мастерства» — боковые ветви-гексагоны (по референсу Coddy) */
+  .hex-challenge-node {
+    cursor: pointer;
+    outline: none;
+    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .hex-challenge-node:hover {
+    transform: scale(1.10);
+  }
+  .hex-challenge-node:active {
+    transform: scale(0.96);
+  }
+  .hex-challenge-node--locked {
+    cursor: not-allowed;
+  }
+  @keyframes hexChallengePulse {
+    0%, 100% { r: 26px; opacity: 0.8; stroke-width: 2.5px; }
+    50% { r: 34px; opacity: 0.15; stroke-width: 5px; }
+  }
+  .hex-challenge-pulse {
+    animation: hexChallengePulse 2.6s infinite ease-in-out;
+    pointer-events: none;
+  }
+  .hex-branch-label {
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    fill: #fbbf24;
+    opacity: 0.9;
+    pointer-events: none;
+  }
+  html:not([data-theme="dark"]) .hex-branch-label {
+    fill: #9f1239;
+  }
+  .hex-challenge-branch path {
+    pointer-events: none;
+  }
 
   /* Anchored Popover */
   .path-popover {
@@ -10049,6 +10086,18 @@ function viewPathSerpentine(options){
     }
   }
 
+  // Dotted "path ahead" overlay from the active unit to the end (Coddy-style)
+  let dFuture = '';
+  if(activeUnitIndex < coords.length - 1){
+    dFuture = `M ${coords[activeUnitIndex].x} ${coords[activeUnitIndex].y}`;
+    for(let i = activeUnitIndex; i < coords.length - 1; i++){
+      const p1 = coords[i];
+      const p2 = coords[i+1];
+      const midY = (p1.y + p2.y) / 2;
+      dFuture += ` C ${p1.x} ${midY}, ${p2.x} ${midY}, ${p2.x} ${p2.y}`;
+    }
+  }
+
   // Active unit metadata for top chapter banner
   const curActiveUnit = allUnits[activeUnitIndex] || allUnits[0];
   const activeTrack = getTrackForUnit(curActiveUnit.id);
@@ -10078,9 +10127,9 @@ function viewPathSerpentine(options){
       const cy = (cb.startIdx === 0) ? 48 : (coords[cb.startIdx].y - 65);
       markersSVG += `
         <g class="path-chapter-ribbon" transform="translate(210, ${cy})">
-          <line x1="-190" y1="0" x2="-130" y2="0" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="4 4"/>
-          <line x1="130" y1="0" x2="190" y2="0" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" stroke-dasharray="4 4"/>
-          <rect x="-120" y="-14" width="240" height="28" rx="14" fill="rgba(22, 27, 36, 0.88)" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1"/>
+          <line x1="-190" y1="0" x2="-130" y2="0" stroke="rgba(190, 18, 60, 0.40)" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <line x1="130" y1="0" x2="190" y2="0" stroke="rgba(190, 18, 60, 0.40)" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <rect x="-120" y="-14" width="240" height="28" rx="14" fill="rgba(22, 27, 36, 0.88)" stroke="rgba(190, 18, 60, 0.50)" stroke-width="1.2"/>
           <text x="0" y="4" text-anchor="middle" font-size="11" font-weight="800" fill="#fbbf24" letter-spacing="0.04em">${escapeHtmlStr(cb.title)}</text>
         </g>`;
     }
@@ -10100,10 +10149,11 @@ function viewPathSerpentine(options){
     const isCompleted = (status === 'completed');
     const isActive = (status === 'active');
 
-    const bevelColor = isCompleted ? '#047857' : (isActive ? '#b45309' : '#020617');
+    const bevelColor = isCompleted ? '#047857' : (isActive ? '#b45309' : '#31081a');
     const topGrad = isCompleted ? 'url(#hexGradCompleted)' : (isActive ? 'url(#hexGradActive)' : 'url(#hexGradLocked)');
-    const strokeColor = isCompleted ? 'rgba(255,255,255,0.3)' : (isActive ? '#fef08a' : 'rgba(255,255,255,0.08)');
+    const strokeColor = isCompleted ? 'rgba(255,255,255,0.3)' : (isActive ? '#fef08a' : 'rgba(190,18,60,0.38)');
     const strokeWidth = isActive ? 2.5 : 1.5;
+    const glossOpacity = isCompleted ? 0.10 : (isActive ? 0.14 : 0.06);
 
     let centerIcon = '';
     let pulseHalo = '';
@@ -10122,7 +10172,7 @@ function viewPathSerpentine(options){
           </g>
         </g>`;
     } else {
-      centerIcon = `<text x="${x}" y="${y+6}" text-anchor="middle" font-size="16" fill="#64748b">🔒</text>`;
+      centerIcon = `<text x="${x}" y="${y+6}" text-anchor="middle" font-size="16" fill="#fda4af" opacity="0.75">🔒</text>`;
     }
 
     const labelX = (x < 210) ? (x + 46) : (x - 46);
@@ -10136,9 +10186,56 @@ function viewPathSerpentine(options){
         <polygon points="${x-34},${y} ${x-17},${y+29.5} ${x+17},${y+29.5} ${x+34},${y} ${x+34},${y+8} ${x+17},${y+37.5} ${x-17},${y+37.5} ${x-34},${y+8}" fill="${bevelColor}"/>
         <!-- Hexagon Top Face -->
         <polygon points="${x+34},${y} ${x+17},${y+29.5} ${x-17},${y+29.5} ${x-34},${y} ${x-17},${y-29.5} ${x+17},${y-29.5}" fill="${topGrad}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+        <!-- Glossy top-face highlight -->
+        <polygon points="${x-30},${y-4} ${x-15},${y-26} ${x+15},${y-26} ${x+30},${y-4}" fill="rgba(255,255,255,${glossOpacity})" pointer-events="none"/>
         ${centerIcon}
         <text class="hex-node-label" x="${labelX}" y="${y+4}" text-anchor="${labelAnchor}">${u.id} ${escapeHtmlStr(shortTitle)}</text>
         ${activeBubble}
+      </g>`;
+  });
+
+  // «Челлендж мастерства» — боковые ветви-гексагоны на финишных юнитах глав (по референсу Coddy)
+  let branchesSVG = '';
+  chapterBreakpoints.forEach((cb, cIdx) => {
+    const endIdx = (cIdx < chapterBreakpoints.length - 1) ? (chapterBreakpoints[cIdx + 1].startIdx - 1) : (allUnits.length - 1);
+    const u = allUnits[endIdx];
+    if(!u) return;
+    const { x, y } = coords[endIdx];
+    const track = getTrackForUnit(u.id);
+    const chDone = (state.passedUnitTests || []).includes(u.id);
+    const chUnlocked = endIdx <= activeUnitIndex;
+    const chStatus = chDone ? 'done' : (chUnlocked ? 'open' : 'locked');
+    const s = 0.72;
+    const bx = Math.max(64, Math.min(356, x + (x >= 210 ? 66 : -66)));
+    const by = y + 64;
+    const hp = (dx, dy) => `${(bx + dx * s).toFixed(1)},${(by + dy * s).toFixed(1)}`;
+    const chBevel = chDone ? '#047857' : (chStatus === 'open' ? '#8c0f30' : '#31081a');
+    const chGrad = chDone ? 'url(#hexGradCompleted)' : (chStatus === 'open' ? 'url(#hexGradChallenge)' : 'url(#hexGradLocked)');
+    const chStroke = chDone ? 'rgba(255,255,255,0.3)' : (chStatus === 'open' ? 'rgba(251,113,133,0.6)' : 'rgba(190,18,60,0.28)');
+    const chTopPts = [hp(34,0), hp(17,29.5), hp(-17,29.5), hp(-34,0), hp(-17,-29.5), hp(17,-29.5)].join(' ');
+    const chBevelPts = [hp(-34,0), hp(-17,29.5), hp(17,29.5), hp(34,0), hp(34,8), hp(17,37.5), hp(-17,37.5), hp(-34,8)].join(' ');
+    let chIcon = '';
+    let chHalo = '';
+    if(chDone){
+      chIcon = `<text x="${bx}" y="${by+6}" text-anchor="middle" font-size="16" font-weight="900" fill="#ffffff">✓</text>`;
+    } else if(chStatus === 'open'){
+      chHalo = `<circle class="hex-challenge-pulse" cx="${bx}" cy="${by}" r="28" fill="none" stroke="rgba(190,18,60,0.55)"/>`;
+      chIcon = `<text x="${bx}" y="${by+6}" text-anchor="middle" font-size="15">🧠</text>`;
+    } else {
+      chIcon = `<text x="${bx}" y="${by+5}" text-anchor="middle" font-size="12" fill="#fda4af" opacity="0.7">🔒</text>`;
+    }
+    const connectorStroke = chDone ? 'rgba(16,185,129,0.55)' : (chStatus === 'open' ? 'rgba(190,18,60,0.60)' : 'rgba(190,18,60,0.25)');
+
+    branchesSVG += `
+      <g class="hex-challenge-branch">
+        <path d="M ${x},${y + 30} Q ${x},${(y + by) / 2} ${bx},${by - 26}" fill="none" stroke="${connectorStroke}" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 8"/>
+        <g class="hex-challenge-node hex-challenge-node--${chStatus}" data-challenge-route="#${track.routePrefix}/unittest/${u.id}" data-challenge-status="${chStatus}" data-cx="${bx}" data-cy="${by}" role="button" tabindex="0" aria-label="Челлендж мастерства: рубежный Unit Test ${u.id}">
+          ${chHalo}
+          <polygon points="${chBevelPts}" fill="${chBevel}"/>
+          <polygon points="${chTopPts}" fill="${chGrad}" stroke="${chStroke}" stroke-width="${chStatus === 'open' ? 2 : 1.5}"/>
+          ${chIcon}
+          <text class="hex-branch-label" x="${bx}" y="${by + 50}" text-anchor="middle">ЧЕЛЛЕНДЖ МАСТЕРСТВА</text>
+        </g>
       </g>`;
   });
 
@@ -10187,8 +10284,12 @@ function viewPathSerpentine(options){
                 <stop offset="100%" stop-color="#d97706"/>
               </linearGradient>
               <linearGradient id="hexGradLocked" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#1e293b"/>
-                <stop offset="100%" stop-color="#0f172a"/>
+                <stop offset="0%" stop-color="#5b1024"/>
+                <stop offset="100%" stop-color="#2b0714"/>
+              </linearGradient>
+              <linearGradient id="hexGradChallenge" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#fb7185"/>
+                <stop offset="100%" stop-color="#be123c"/>
               </linearGradient>
               <linearGradient id="pathProgressGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="#10b981"/>
@@ -10198,15 +10299,21 @@ function viewPathSerpentine(options){
 
             <!-- Outer trail shadow -->
             <path d="${dPath}" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="22" stroke-linecap="round"/>
+            <!-- Burgundy under-glow of the trail -->
+            <path d="${dPath}" fill="none" stroke="rgba(190,18,60,0.12)" stroke-width="30" stroke-linecap="round"/>
             <!-- Background trail -->
             <path class="path-track-bg" d="${dPath}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="14" stroke-linecap="round"/>
             ${dProgress ? `<path class="path-track-progress" d="${dProgress}" fill="none" stroke="url(#pathProgressGrad)" stroke-width="8" stroke-linecap="round"/>` : ''}
+            ${dFuture ? `<path class="path-track-future" d="${dFuture}" fill="none" stroke="rgba(190,18,60,0.45)" stroke-width="4" stroke-linecap="round" stroke-dasharray="0.1 16"/>` : ''}
 
             <!-- Chapter ribbons -->
             ${markersSVG}
 
             <!-- 45 3D Hexagonal Nodes -->
             ${nodesSVG}
+
+            <!-- «Челлендж мастерства» side branches -->
+            ${branchesSVG}
           </svg>
 
           <!-- Anchored Popover Modal -->
@@ -13282,6 +13389,19 @@ document.addEventListener('click', async function(e){
     return;
   }
 
+  // «Челлендж мастерства» branch node click (navigate to the unit test route)
+  const challengeNode = e.target.closest('.hex-challenge-node');
+  if(challengeNode){
+    const chStatus = challengeNode.getAttribute('data-challenge-status');
+    const chRoute = challengeNode.getAttribute('data-challenge-route');
+    if(chStatus === 'locked'){
+      if(typeof showTactileToast === 'function') showTactileToast('🔒 Челлендж откроется после прохождения предыдущих юнитов');
+      return;
+    }
+    if(chRoute) location.hash = chRoute;
+    return;
+  }
+
   // 3D Serpentine Path node click (Open anchored popover)
   const hexNode = e.target.closest('.hex-3d-node');
   if(hexNode){
@@ -13680,10 +13800,10 @@ document.addEventListener('keydown', function(e){
       return;
     }
   }
-  if((e.key === 'Enter' || e.code === 'Space') && e.target && e.target.closest && e.target.closest('.hex-3d-node')){
+  if((e.key === 'Enter' || e.code === 'Space') && e.target && e.target.closest && (e.target.closest('.hex-3d-node') || e.target.closest('.hex-challenge-node'))){
     e.preventDefault();
     const clickEv = (typeof MouseEvent !== 'undefined') ? new MouseEvent('click', { bubbles: true, cancelable: true }) : { type: 'click', bubbles: true };
-    e.target.closest('.hex-3d-node').dispatchEvent(clickEv);
+    (e.target.closest('.hex-challenge-node') || e.target.closest('.hex-3d-node')).dispatchEvent(clickEv);
     return;
   }
   if(e.code === 'Space'){
