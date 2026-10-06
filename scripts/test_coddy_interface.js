@@ -530,10 +530,14 @@ async function main() {
   check(pathHtml.includes('href="#/cards"'), 'Right rail must provide SRS flashcards link');
   check(pathHtml.includes('href="#/mock"'), 'Right rail must provide mock interview link');
 
-  // 2.10. Переключатель режима («🎮 Игровой» / «💼 Профессиональный») в тулбаре
-  check(pathHtml.includes('path-mode-switcher'), '#/path must include .path-mode-switcher in toolbar');
-  check(pathHtml.includes('data-set-path-mode="game"') && pathHtml.includes('🎮 Игровой'), 'Switcher must feature 🎮 Игровой button');
-  check(pathHtml.includes('data-set-path-mode="pro"') && pathHtml.includes('💼 Профессиональный'), 'Switcher must feature 💼 Профессиональный button');
+  // 2.10. Переключатель режима («🎮 Игровой» / «💼 Профессиональный») — в настройках, НЕ в тулбаре #/path
+  check(!pathHtml.includes('path-mode-switcher'), '#/path toolbar must NOT contain .path-mode-switcher (moved to Settings per TZ)');
+  check(pathHtml.includes('До 1-го скрининга'), 'Right rail must include screening readiness widget «До 1-го скрининга %»');
+  await fireClick('data-open-settings-modal', '');
+  const settingsModalElPre = elementsById['settings-modal'];
+  check(settingsModalElPre && settingsModalElPre.innerHTML.includes('Настройки платформы'), 'Clicking [data-open-settings-modal] must open #settings-modal');
+  check(settingsModalElPre.innerHTML.includes('data-set-path-mode="game"') && settingsModalElPre.innerHTML.includes('Игровой режим'), 'Settings modal must feature 🎮 Игровой mode card');
+  check(settingsModalElPre.innerHTML.includes('data-set-path-mode="pro"') && settingsModalElPre.innerHTML.includes('Профессиональный'), 'Settings modal must feature 💼 Профессиональный mode card');
 
   // 2.11. Переключение в Профессиональный режим ('pro') и сохранение в state / localStorage
   await fireClick('data-set-path-mode', 'pro');

@@ -260,8 +260,19 @@ function diffShots(pm, pngjs, currentPath, baselinePath, diffPath) {
         await page.evaluate(() => (document.fonts ? document.fonts.ready : null)).catch(() => {});
 
         if (shot.action === 'pro') {
-          const sw = page.locator('[data-set-path-mode="pro"]').first();
-          if (await sw.count()) await sw.click().catch(() => {});
+          // Переключатель режимов перенесён в «⚙️ Настройки платформы» — открываем модалку и кликаем карточку pro.
+          // Клик через evaluate: первая найденная кнопка [data-open-settings-modal] — в скрытом десктопном сайдбаре,
+          // обычный Playwright-клик на mobile повиснет на ожидании видимости.
+          await page.evaluate(() => {
+            const gear = document.querySelector('.topbar [data-open-settings-modal]') || document.querySelector('[data-open-settings-modal]');
+            if (gear) gear.click();
+          }).catch(() => {});
+          await page.evaluate(() => {
+            const m = document.getElementById('settings-modal');
+            const card = m && m.querySelector('[data-set-path-mode="pro"]');
+            if (card) card.click();
+          }).catch(() => {});
+          await page.keyboard.press('Escape').catch(() => {}); // закрыть модалку, чтобы не перекрывала кадр
         }
         if (shot.action === 'mapPath') {
           const mp = page.locator('[data-map-mode="path"]').first();

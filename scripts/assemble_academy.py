@@ -2608,6 +2608,14 @@ EXTRA_CSS = r"""
     font-weight: 900;
     letter-spacing: 0.04em;
   }
+  /* Pro-hero на узких экранах: CTA полноширинный ПОД заголовком, а не справа
+     (иначе на 390px заголовок сжимается до 3 строк — дефект с mobile 390) */
+  @media (max-width: 640px) {
+    .pro-hero-card { padding: 18px 18px 16px; }
+    .pro-hero-card-head { flex-direction: column; align-items: stretch; gap: 12px; }
+    .pro-hero-meta { margin-bottom: 2px; }
+    .pro-hero-cta { width: 100%; text-align: center; padding: 13px 22px; }
+  }
   .pro-hero-progress-track {
     width: 100%;
     height: 5px;
@@ -7843,6 +7851,9 @@ function renderPathMobileStatsHTML(totalCompletedUnits, streakText){
 
 function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum){
   const chaptersMeta = getPathChaptersMeta(ALL_UNITS_COMBINED);
+  const e1 = (typeof getEchelonProgress === 'function') ? getEchelonProgress(1) : null;
+  const e1Pct = e1 ? e1.pct : 0;
+  const e1Remaining = e1 ? e1.skills.filter(s => getSkillMP(s.id) < 100).length : 0;
   const chaptersListHTML = chaptersMeta.map(ch => {
     const chCompleted = ch.units.filter(isUnitCompleted).length;
     const chPct = Math.round(chCompleted / ch.units.length * 100);
@@ -7877,6 +7888,20 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)
         </div>
       </div>
 
+      <!-- Widget 1: Screening Readiness — мотивирующая графа «До 1-го скрининга %» (по ТЗ) -->
+      <div class="panel coddy-rail-card">
+        <div class="coddy-rail-card-head">
+          <div class="coddy-rail-badge">🎯 До 1-го скрининга</div>
+          <a href="#/mock" class="coddy-rail-link">Симулятор →</a>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin:6px 0 8px;">
+          <span style="font-size:1.7rem;font-weight:900;color:var(--ink);">${e1Pct}%</span>
+          <span class="meta">готовности к тех-скринингу</span>
+        </div>
+        <div class="cd-bar cd-bar-track"><div class="cd-fill cd-bar-fill" style="width:${Math.max(6, e1Pct)}%;"></div></div>
+        <div class="meta" style="font-size:.75rem;margin-top:7px;">⏳ Осталось ${e1Remaining} ${pluralRuTopics(e1Remaining)} Эшелона 1</div>
+      </div>
+
       <!-- Widget 0: Course chapters progress (Coddy right-rail unit cards) -->
       <div class="panel coddy-rail-card">
         <div class="coddy-rail-card-head">
@@ -7888,7 +7913,7 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)
         </div>
       </div>
 
-      <!-- Widget 1: SRS Cards Review -->
+      <!-- Widget 2: SRS Cards Review -->
       <div class="panel coddy-rail-card">
         <div class="coddy-rail-card-head">
           <div class="coddy-rail-badge">🃏 SRS-Повторение</div>
@@ -7897,7 +7922,7 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)
         <h4 class="coddy-rail-title">Карточка дня</h4>
         <p class="coddy-rail-desc">Интервальное повторение RemNote: закрепи память перед практикой.</p>
       </div>
-      <!-- Widget 2: Streak & Level XP -->
+      <!-- Widget 3: Streak & Level XP -->
       <div class="panel coddy-rail-card">
         <div class="coddy-rail-badge">🔥 Стрик и цель дня</div>
         <div style="display:flex;align-items:baseline;gap:8px;margin:6px 0 8px;">
@@ -7908,15 +7933,6 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)
           <div class="progress-bar-fill" style="width:${Math.min(100, Math.round(((state.xp||0) % 100) / 100 * 100))}%;background:linear-gradient(90deg,#fbbf24,#f59e0b);"></div>
         </div>
         <div class="meta" style="font-size:0.75rem;">Цель: <strong>50 XP в день</strong> · Всего: <strong>${state.xp || 0} XP</strong></div>
-      </div>
-      <!-- Widget 3: Screening Readiness -->
-      <div class="panel coddy-rail-card">
-        <div class="coddy-rail-card-head">
-          <div class="coddy-rail-badge">🎯 Собеседование</div>
-          <a href="#/mock" class="coddy-rail-link">Симулятор →</a>
-        </div>
-        <h4 class="coddy-rail-title">Готовность к скринингу</h4>
-        <p class="coddy-rail-desc">Симулятор технического скрининга: лайв-кодинг и STAR-вопросы.</p>
       </div>
     </aside>`;
 }
@@ -8077,10 +8093,7 @@ function viewPathSerpentine(options){
   return `
     <div class="coddy-path-layout">
       <div class="container path-serpentine-wrap">
-        <!-- Mode Switcher in top toolbar -->
-        <div class="path-mode-switcher-wrap">
-          ${renderPathModeSwitcherHTML()}
-        </div>
+        <!-- Переключатель режимов game/pro перенесён в «⚙️ Настройки платформы» (по ТЗ — тех.информация не в топбаре) -->
 
         <!-- Mobile compact stats strip (visible when the right rail is hidden) -->
         ${renderPathMobileStatsHTML(totalCompletedUnits, streakText)}
@@ -8089,7 +8102,7 @@ function viewPathSerpentine(options){
         <div class="path-chapter-banner">
           <div class="path-chapter-banner-main">
             <div class="path-chapter-banner-left">
-              <div class="path-chapter-breadcrumb">${escapeHtmlStr(activeTrack.title.replace(/^[^a-zA-Zа-яА-Я0-9]+/, '').toUpperCase())}</div>
+              <div class="path-chapter-breadcrumb">ПРОГРАММА › РАЗДЕЛ ${activeChapterNum} · ГЛАВА ${activeChapterNum}</div>
               <div class="path-chapter-title">Юнит ${curActiveUnit.id} · ${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</div>
             </div>
             <button type="button" class="btn-3d-orange path-banner-cta" data-pro-start="${curActiveUnit.id}">ПРОДОЛЖИТЬ ➔</button>
@@ -8299,10 +8312,7 @@ function viewProPath(options){
   return `
     <div class="coddy-path-layout">
       <div class="container path-pro-wrap">
-        <!-- Mode Switcher in top toolbar -->
-        <div class="path-mode-switcher-wrap">
-          ${renderPathModeSwitcherHTML()}
-        </div>
+        <!-- Переключатель режимов game/pro перенесён в «⚙️ Настройки платформы» (по ТЗ — тех.информация не в топбаре) -->
 
         <!-- Mobile compact stats strip (visible when the right rail is hidden) -->
         ${renderPathMobileStatsHTML(totalCompletedUnits, streakText)}
