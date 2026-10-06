@@ -1485,10 +1485,12 @@ function fireClick(attrName, attrVal, extraAttrs = {}) {
   assert(fs.existsSync(verifyAllCmdPath), 'verify_all.cmd must exist in root directory');
 
   const verifyAllPyContent = fs.readFileSync(verifyAllPyPath, 'utf-8');
-  assert(verifyAllPyContent.includes("'1/5'") && verifyAllPyContent.includes("'5/5'") && verifyAllPyContent.includes('test_pwa_offline.js'), 'verify_all.py must define all 5 verification stages including test_pwa_offline.js');
+  const visualTestPath = path.join(__dirname, 'visual_test.js');
+  assert(fs.existsSync(visualTestPath), 'visual_test.js must exist in scripts/');
+  assert(verifyAllPyContent.includes("'1/6'") && verifyAllPyContent.includes("'6/6'") && verifyAllPyContent.includes('test_pwa_offline.js') && verifyAllPyContent.includes('visual_test.js'), 'verify_all.py must define all 6 verification stages including test_pwa_offline.js and visual_test.js');
 
   const verifyAllCmdContent = fs.readFileSync(verifyAllCmdPath, 'utf-8');
-  assert(verifyAllCmdContent.includes('[1/5]') && verifyAllCmdContent.includes('[5/5]') && verifyAllCmdContent.includes('test_pwa_offline.js'), 'verify_all.cmd must define all 5 verification stages including test_pwa_offline.js');
+  assert(verifyAllCmdContent.includes('[1/6]') && verifyAllCmdContent.includes('[6/6]') && verifyAllCmdContent.includes('test_pwa_offline.js') && verifyAllCmdContent.includes('visual_test.js'), 'verify_all.cmd must define all 6 verification stages including test_pwa_offline.js and visual_test.js');
 
   console.log('✓ All Pipeline Enhancements (audit_pipeline.py, verify_all.py, install_hooks.py, test_pwa_offline.js) verified!');
 
