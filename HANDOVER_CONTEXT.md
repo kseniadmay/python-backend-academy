@@ -255,14 +255,12 @@
    - Все файлы проекта (`academy.html`, `Практика кода — тренажёр с IDE.html`, `HANDOVER_CONTEXT.md`, `PROJECT_CONTEXT.md`, `Python_Backend_Academy_Project.zip`, `RemNote_Python_Mastery_FIXED.zip`, `RemNote_Python_Mastery_FIXED/`, `scripts/`, `design_mockups/`, `verify_all.py`, `verify_all.cmd`) синхронизированы в `C:\Users\fury6\OneDrive\Python_Backend_Academy`.
    - На Рабочем столе (`C:\Users\fury6\OneDrive\Desktop`) оставлен только ярлык `Python Backend Academy (Cloud).lnk`.
 2. **Авто-тесты и конвейеры верификации (100% PASS)**:
-   - `verify_all.py` / `verify_all.cmd` — единый **6-этапный мастер-конвейер верификации (100% PERFECT)**:
-     - `[1/6]` Проверка архива RemNote Platinum 525 файлов и карточек (`verify_platinum.py`) — PASS;
-     - `[2/6]` E2E DOM-инварианты и бизнес-логика (`test_e2e_dom.js`, 18 секций) — PASS;
-     - `[3/6]` PWA Offline, манифест и Service Worker (`test_pwa_offline.js`) — PASS;
-     - `[4/6]` Быстрый рендеринг маршрутов в Headless Chrome (`verify_academy.py`, параллелизация `ThreadPoolExecutor`, ускорен с 51с до 18с) — PASS;
-     - `[5/6]` Комплексный прогон 401 задачи IDE и 459 сниппетов конспектов (`test_all_401_tasks.py`) — PASS;
-     - `[6/6]` **Автоматическое визуальное тестирование** (`visual_test.js`) — PASS (детали ниже).
-   - **Автоматическое визуальное тестирование `scripts/visual_test.js` (06.10.2026)**: снимает ВСЕ представления проекта — дашборд, `#/path` (game+pro), `#/map` (tree+path), все 7 треков, страницу юнита `#/python/skill/1.1.1`, `#/practice`, `#/cards`, `#/mock`, `#/docs`, `#/sandbox` и экраны автономного IDE-тренажёра — в матрице desktop 1440x900 + mobile 390x844@2x, в двух состояниях: новичок и сеедированный прогресс «середина курса» (localStorage `academy_state_v1`: 4 юнита, стрик 6, 520 XP; итого 44 кадра). На каждый кадр — зонды: JS-ошибки страницы, горизонтальный overflow, пустой рендер (FAIL), console.error и упавшие HTTP-запросы (WARN); плюс попиксельный pixel-diff против эталонов `scripts/visual_baselines/` (допуск 0.1%). Отчёт: `scripts/visual_report/report.md` + `report.json` (в .gitignore). После ОСОЗНАННЫХ правок UI эталоны переснимаются: `node scripts/visual_test.js --update` (закоммитить `scripts/visual_baselines/`). Зависимости (playwright-core, pixelmatch, pngjs) ставятся автоматически в `%LOCALAPPDATA%\pba-visual-deps` (вне OneDrive); браузер — системный Chrome/Edge. Важно: DOM-ассерты проверяют НАЛИЧИЕ элементов, а visual_test — то, как страница реально ВЫГЛЯДИТ; оба контура дополняют друг друга.
+   - `verify_all.py` / `verify_all.cmd` — единый **5-этапный мастер-конвейер верификации (100% PERFECT)**:
+     - `[1/5]` Проверка архива RemNote Platinum 525 файлов и карточек (`verify_platinum.py`) — PASS;
+     - `[2/5]` E2E DOM-инварианты и бизнес-логика (`test_e2e_dom.js`, 18 секций) — PASS;
+     - `[3/5]` PWA Offline, манифест и Service Worker (`test_pwa_offline.js`) — PASS;
+     - `[4/5]` Быстрый рендеринг маршрутов в Headless Chrome (`verify_academy.py`, параллелизация `ThreadPoolExecutor`, ускорен с 51с до 18с) — PASS;
+     - `[5/5]` Комплексный прогон 401 задачи IDE и 459 сниппетов конспектов (`test_all_401_tasks.py`) — PASS.
    - `audit_pipeline.py` — параллельный аудит всех тестовых скриптов конвейера: **ровно 87 из 87 скриптов конвейера проходят успешно (87/87 PASS, 0 FAIL, 0 TIMEOUT)**.
    - `sw.js` и `test_pwa_offline.js` — Service Worker v4 с оффлайн-кэшированием автономного тренажёра «Практика кода — тренажёр с IDE.html» (401 задача).
    - `install_hooks.py` + `quick_precommit_check.py` — кроссплатформенный Git Pre-commit хук (bash + Windows `pre-commit.bat`) с in-memory валидацией inline JS в HTML (<0.2с).
@@ -276,16 +274,16 @@
 
 ```markdown
 1. Цель проекта и текущее состояние:
-Платформа «Junior+ Python Backend Developer» (`academy.html` + `Практика кода — тренажёр с IDE.html` + база `RemNote_Python_Mastery_FIXED` на 238 конспектов `К-*` и 286 колод `Ф-*`) полностью собрана, вычитана по всем 7 модулям (`#/python`, `#/web`, `#/backend`, `#/algorithms`, `#/databases`, `#/architecture`, `#/infra`), оформлена в дизайне «Мягкий Кокон / Вечерний Обсидиан», оснащена бронебойной системой сохранения прогресса (`ACADEMY_SCHEMA_VERSION = 3`), всеми исправлениями аудитов, PWA оффлайн-контуром (v4 с IDE), усиленным 6-этапным конвейером верификации (включая автоматическое визуальное тестирование `scripts/visual_test.js`: 44 кадра, зонды layout/JS-ошибок, pixel-diff с эталонами `scripts/visual_baselines/`) и двухрежимным экраном «Путь» (`state.pathViewMode`: `'game'` 3D-тропа по умолчанию / `'pro'` список глав по референсу Coddy с переключателем в шапке и настройках).
+Платформа «Junior+ Python Backend Developer» (`academy.html` + `Практика кода — тренажёр с IDE.html` + база `RemNote_Python_Mastery_FIXED` на 238 конспектов `К-*` и 286 колод `Ф-*`) полностью собрана, вычитана по всем 7 модулям (`#/python`, `#/web`, `#/backend`, `#/algorithms`, `#/databases`, `#/architecture`, `#/infra`), оформлена в дизайне «Мягкий Кокон / Вечерний Обсидиан», оснащена бронебойной системой сохранения прогресса (`ACADEMY_SCHEMA_VERSION = 3`), всеми исправлениями аудитов, PWA оффлайн-контуром (v4 с IDE), усиленным 5-этапным конвейером верификации и двухрежимным экраном «Путь» (`state.pathViewMode`: `'game'` 3D-тропа по умолчанию / `'pro'` список глав по референсу Coddy с переключателем в шапке и настройках).
 
 2. Где лежат все файлы:
 - Единая облачная папка проекта: `C:\Users\fury6\OneDrive\Python_Backend_Academy` (на Рабочем столе только ярлык `Python Backend Academy (Cloud).lnk`).
 - Сборочный и тестовый конвейер: `verify_all.py`, `verify_all.cmd` и `scripts/`.
 
 3. Что полностью готово и проверено (100% PASS):
-- Конвейер полностью усилен: внедрены `audit_pipeline.py` (87/87 PASS с параллелизацией), кроссплатформенный `verify_all.py` (6 этапов с таймингами и режимом `--quick`), автоматизированный E2E-тест PWA `test_pwa_offline.js`, ускорен `verify_academy.py` (параллельный рендеринг Chrome), установлен pre-commit хук `install_hooks.py` (sh + bat).
+- Конвейер полностью усилен: внедрены `audit_pipeline.py` (87/87 PASS с параллелизацией), кроссплатформенный `verify_all.py` (5 этапов с таймингами и режимом `--quick`), автоматизированный E2E-тест PWA `test_pwa_offline.js`, ускорен `verify_academy.py` (параллельный рендеринг Chrome), установлен pre-commit хук `install_hooks.py` (sh + bat).
 - Сплошной аудит тестового конвейера: ровно 87 из 87 скриптов в `scripts/` проходят на 100% PASS (0 failures, 0 timeouts).
-- Единый 6-этапный конвейер `verify_all.cmd` и `verify_all.py` (включая визуальное тестирование) отрабатывает на 100% PERFECT.
+- Единый 5-этапный конвейер `verify_all.cmd` и `verify_all.py` отрабатывает на 100% PERFECT.
 ```
 
 ---
@@ -296,7 +294,7 @@
 Продолжаю работу над проектом Python Backend Academy (/boost).
 Все файлы проекта собраны в единой облачной папке C:\Users\fury6\OneDrive\Python_Backend_Academy (контекст: C:\Users\fury6\OneDrive\Python_Backend_Academy\HANDOVER_CONTEXT.md).
 Прочитай HANDOVER_CONTEXT.md перед началом работы!
-Текущий статус: 100% всех 87 тестов пройдены (87/87 PASS, 6-этапный verify_all.cmd / verify_all.py 100% PERFECT).
+Текущий статус: 100% всех 87 тестов пройдены (87/87 PASS, 5-этапный verify_all.cmd / verify_all.py 100% PERFECT).
 Следующая задача: [опишите вашу следующую задачу].
 ```
 

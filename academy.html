@@ -484,6 +484,21 @@
   .cocoon-focus-desc{
     font-size:.86rem;line-height:1.44;color:var(--ink-soft);margin-bottom:11px;overflow-wrap:anywhere;
   }
+  /* Приглушённая скобочная часть заголовков юнитов: убирает «крик» длинных техдеталей */
+  .t-detail{font-size:.76em;font-weight:600;opacity:.62;letter-spacing:.01em;}
+  /* Тихие вторичные ссылки в фокус-карточке: один главный CTA на экран */
+  .focus-links{display:flex;gap:16px;justify-content:center;padding-top:1px;}
+  .focus-links a{font-size:.79rem;font-weight:600;color:var(--ink-soft);opacity:.78;text-decoration:none;border-bottom:1px dashed rgba(148,163,184,0.45);padding-bottom:1px;}
+  .focus-links a:hover{opacity:1;color:var(--ink);}
+  /* Песочница: сетка редактор+вывод и тёмная панель вывода (раньше был белый <pre>) */
+  .sandbox-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;align-items:start;}
+  #code-output{
+    background:rgba(2,6,23,0.55);border:1px solid var(--line);border-radius:14px;
+    color:var(--ink-soft);font-family:var(--font-m);font-size:.82rem;line-height:1.55;
+    padding:14px 16px;min-height:240px;white-space:pre-wrap;overflow-wrap:anywhere;
+    margin:0;box-sizing:border-box;
+  }
+  @media(max-width:1040px){.sandbox-grid{grid-template-columns:1fr;}}
 
   /* Translucent Glass Buttons with Glowing Borders (60/30/10 Harmony) */
   .btn-glass-emerald{
@@ -11099,8 +11114,9 @@ viewDashboard = function(){
     let badgeHtml = `<span class="st-next">⏳ Далее</span>`;
     if(smp >= 100) badgeHtml = `<span class="st-done">✓ 100 MP</span>`;
     else if(isNow || smp >= 50) badgeHtml = `<span class="st-now">${smp > 0 ? '🔥 ' + smp + ' MP' : '🔥 Сейчас'}</span>`;
+    const sm = s.title.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
     return `<a href="#${s.routePrefix}/skill/${s.id}" class="mini-item ${isNow ? 'now' : ''}" data-py-open-skill="${s.id}">
-      <span>${s.id} · ${s.title}</span>
+      <span>${s.id} · ${sm ? `${sm[1]} <span class="t-detail">(${sm[2]})</span>` : s.title}</span>
       ${badgeHtml}
     </a>`;
   }).join('');
@@ -11156,13 +11172,13 @@ viewDashboard = function(){
       <!-- Active 4-Minute Sprint Focus Card -->
       <div class="cocoon-focus-card">
         <div class="cocoon-focus-eyebrow"><span class="pulse-ring-dot"></span>✨ Фокус сейчас · 4 минуты<span class="sr-only"> · Правило 2 минут: Быстрый микро-шаг</span></div>
-        <div class="cocoon-focus-title">${focusSk.id} · ${focusSk.title}</div>
-        <div class="cocoon-focus-desc">Конспект <b>${focusKId}: ${focusNoteObj.title}</b> (${focusStepsCount} ${(focusStepsCount % 10 === 1 && focusStepsCount % 100 !== 11) ? 'короткий микро-шаг' : (focusStepsCount % 10 >= 2 && focusStepsCount % 10 <= 4 && (focusStepsCount % 100 < 10 || focusStepsCount % 100 >= 20) ? 'коротких микро-шага' : 'коротких микро-шагов')} с живым кодом и разбором Junior vs Senior).</div>
+        <div class="cocoon-focus-title">${(() => { const ft = focusSk.title.match(/^(.*?)\s*\(([^()]*)\)\s*$/); return ft ? `${focusSk.id} · ${ft[1]} <span class="t-detail">(${ft[2]})</span>` : `${focusSk.id} · ${focusSk.title}`; })()}</div>
+        <div class="cocoon-focus-desc">Конспект <b>${focusKId}: ${focusNoteObj.title}</b> · ${focusStepsCount} ${(focusStepsCount % 10 === 1 && focusStepsCount % 100 !== 11) ? 'микро-шаг' : (focusStepsCount % 10 >= 2 && focusStepsCount % 10 <= 4 && (focusStepsCount % 100 < 10 || focusStepsCount % 100 >= 20) ? 'микро-шага' : 'микро-шагов')} · живой код · разбор Junior vs Senior</div>
         <div style="display:flex;flex-direction:column;gap:7px;">
           <button class="btn-glass-emerald btn-sprint-cta" data-quick-microstep="">▶ Начать спринт (4 мин) ➔</button>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <a href="#/mock" class="btn-glass-ruby btn-glass-bordeaux" style="flex:1;padding:7px 12px;font-size:.81rem;text-align:center;">🎙️ Собеседование</a>
-            <a href="#/docs" class="btn btn-ghost" style="padding:7px 12px;font-size:.81rem;">📚 Справочник</a>
+          <div class="focus-links">
+            <a href="#/mock">🎙️ Собеседование</a>
+            <a href="#/docs">📚 Справочник</a>
           </div>
         </div>
       </div>
