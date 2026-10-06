@@ -927,6 +927,46 @@ EXTRA_CSS = r"""
   .dash-track-chip__bar{height:4px;border-radius:99px;background:var(--surface-2);overflow:hidden;}
   .dash-track-chip__fill{height:100%;border-radius:99px;background:linear-gradient(90deg, var(--emerald), var(--amber));}
 
+  /* Section 2.5: Dashboard «Мои результаты» — настоящий дашборд: цифры, проценты навыков, матрица */
+  .dash-results-panel{
+    background:var(--surface);border:1px solid var(--glass-border);border-radius:24px;padding:16px 18px;
+    margin-bottom:11px;box-shadow:var(--shadow-1);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  }
+  .dash-results-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+  .dash-results-head > span:first-child{font-weight:800;font-size:.94rem;color:var(--ink);}
+  .dash-results-head .meta{font-weight:600;font-size:.74rem;}
+  .dash-result-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+  @media (max-width:680px){
+    .dash-result-tiles{grid-template-columns:repeat(2,1fr);}
+    .dash-results-panel{padding:13px 13px;border-radius:18px;}
+  }
+  .dash-result-tile{
+    background:var(--surface-2);border:1px solid var(--line-soft);border-radius:16px;padding:10px 12px;
+    display:flex;flex-direction:column;gap:3px;min-width:0;
+  }
+  .dash-result-tile__num{
+    font-family:var(--font-d);font-size:1.42rem;font-weight:800;color:var(--ink);line-height:1.15;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .dash-result-tile__num em{font-style:normal;font-size:.78rem;font-weight:700;color:var(--ink-muted);}
+  .dash-result-tile__label{font-size:.71rem;font-weight:600;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dash-skill-matrix{display:flex;flex-direction:column;gap:7px;}
+  .dash-skill-row{
+    display:flex;flex-direction:column;gap:5px;padding:9px 11px;border-radius:14px;
+    background:var(--surface-2);border:1px solid var(--line-soft);text-decoration:none;color:var(--ink);
+    transition:border-color .15s,transform .12s;
+  }
+  .dash-skill-row:hover{border-color:var(--moss);transform:translateY(-1px);}
+  .dash-skill-row__top{display:flex;align-items:center;gap:7px;white-space:nowrap;overflow:hidden;}
+  .dash-skill-row__icon{flex:none;font-size:.86rem;}
+  .dash-skill-row__name{font-weight:700;font-size:.78rem;overflow:hidden;text-overflow:ellipsis;}
+  .dash-skill-row__mp{font-size:.68rem;font-weight:600;color:var(--ink-muted);overflow:hidden;text-overflow:ellipsis;}
+  .dash-skill-row__pct{margin-left:auto;font-size:.74rem;font-weight:800;color:var(--ink-soft);flex:none;}
+  .dash-skill-row__sqs{display:flex;flex-wrap:wrap;gap:3px;}
+  .dash-skill-row .m-sq{width:16px;height:16px;border-radius:5px;font-size:.5rem;}
+  .dash-goal-line{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+  .dash-results-foot{margin-top:13px;padding-top:11px;border-top:1px solid var(--line-soft);}
+
   /* 4 Interview Stages Switcher & Compact 1-Line Topic Checklist */
   .stage-pills{
     display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;
@@ -5246,31 +5286,10 @@ function viewPythonMastery(trackKey){
     const uPct = Math.round(uMp / (uMax || 1) * 100);
     const utPassed = state.passedUnitTests.includes(u.id);
     const effTier = getEffectiveUnitTier(u.id);
-    const echMeta = getEchelonMeta(effTier);
-    const uMeta = UNIT_INTERVIEW_META[u.id] || { tier: 2, stackTag: 'core' };
-    const isDeferredStack = (branch === 'fastapi' && uMeta.stackTag === 'django') || (branch === 'django' && u.id === '3.1') || uMeta.stackTag === 'flask';
-    const stackPill = isDeferredStack
-      ? `<span class="echelon-badge echelon-badge--t4">Вторая очередь / Доп. стек</span>`
-      : (uMeta.stackTag === 'fastapi' ? `<span class="echelon-badge echelon-badge--t2">⚡ Ветка FastAPI + SQLAlchemy</span>`
-        : (uMeta.stackTag === 'django' ? `<span class="echelon-badge echelon-badge--t2">🎸 Ветка Django + DRF</span>` : ''));
 
     const skillsRows = u.skills.map(s => {
       const mp = getSkillMP(s.id);
       const isGap = (state.diagnosticGaps || []).includes(s.id) && mp < 100;
-      const fDoneCount = s.fIds.filter(fid => state.reviewedDecks.includes(fid)).length;
-      const tSolvedCount = (s.taskIds||[]).filter(tid => solvedMap[tid] === 'solved').length;
-      const isSkillFullyConsolidated = (fDoneCount >= Math.min(1, s.fIds.length)) && (tSolvedCount >= Math.min(1, (s.taskIds||[]).length || 1));
-      const kBadges = s.kIds.map(kid => {
-        const isNoteRead = state.readNotes.includes(kid);
-        const isFullDone = isNoteRead && isSkillFullyConsolidated;
-        const noteMeta = ALL_NOTES_COMBINED[kid] || {};
-        const cls = isFullDone ? 'pill-mini pill-mini--done' : (isNoteRead ? 'pill-mini pill-mini--partial' : 'pill-mini');
-        const prefix = isFullDone ? '✓ ' : (isNoteRead ? '⏳ ' : '');
-        const tip = isFullDone
-          ? `${noteMeta.title||kid} — полностью закреплено (теория + карточки + код)`
-          : (isNoteRead ? `${noteMeta.title||kid} — теория прочитана! Закрепи карточками и задачей IDE для ✓` : (noteMeta.title||kid));
-        return `<span class="${cls}" data-py-jump-note="${s.id}:${kid}" title="${escapeHtmlStr(tip)}">${prefix}${kid}</span>`;
-      }).join('');
 
       return `
         <div class="skill-row">
@@ -5279,14 +5298,11 @@ function viewPythonMastery(trackKey){
             <div style="min-width:0;flex:1;">
               <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;min-width:0;">
                 <a href="#${tr.routePrefix}/skill/${s.id}" class="skill-row__title" style="font-weight:600;text-decoration:none;font-size:.96rem;">${s.id} · ${s.title}</a>
-                <span class="skill-row__meta-detail">${renderEchelonBadge(effTier)}</span>
                 ${isGap ? `<span class="echelon-badge echelon-badge--gap">🎯 Пробел диагностики</span>` : ''}
               </div>
-              <div class="meta skill-row__meta-detail" style="font-size:.77rem;">${mpLabel(mp)} · Конспектов: ${s.kIds.length} · Колод: ${fDoneCount}/${s.fIds.length} · Задач IDE: ${tSolvedCount}/${(s.taskIds||[]).length}</div>
             </div>
           </div>
           <div class="skill-row__badges">
-            ${kBadges}
             <a href="#${tr.routePrefix}/skill/${s.id}" class="btn btn-ghost skill-row__open-btn" style="padding:6px 12px;font-size:.8rem;">Открыть →</a>
           </div>
         </div>`;
@@ -5298,8 +5314,6 @@ function viewPythonMastery(trackKey){
           <div style="min-width:0;flex:1;">
             <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">
               <span class="topic-badge" style="margin:0;">Юнит ${u.id} · ${uMp} / ${uMax} MP (${uPct}%)</span>
-              <span class="echelon-badge echelon-badge--t${effTier}">${echMeta.label}</span>
-              ${stackPill}
             </div>
             <h2>${u.title}</h2>
             <p class="meta unit-card__desc" style="margin:4px 0 0;">${u.desc}</p>
@@ -9129,22 +9143,10 @@ function viewDocsHub(){
 
 // Override Dashboard with Variant A Mobile-First Cocoon Focus Screen + Trajectory Countdown + Spaced Repetition + 7-Track Mini-Matrix + Collapsible Modules Drawer
 viewDashboard = function(){
-  const p = stageProgress();
-  const curMp = totalPythonMP();
-  const maxMp = maxPythonMP();
-  const mpPct = Math.round(curMp / maxMp * 100);
-  const webMp = totalWebMP();
-  const backendMp = totalBackendMP();
-  const algoMp = totalAlgoMP();
-  const dbMp = totalDbMP();
-  const archMp = totalArchMP();
-  const infraMp = totalInfraMP();
   const tXp = todayXp();
   const goalPct = Math.min(100, Math.round(tXp / (state.dailyGoal || 50) * 100));
   const solvedMap = getIdeSolvedMap();
   const totalSolvedIde = countSolvedIdeTasks(solvedMap);
-  const totalCompletedLessons = state.completedLessons.length;
-  const totalLessonsCount = Object.keys(LESSONS).length;
 
   const e1 = getEchelonProgress(1);
   const e2 = getEchelonProgress(2);
@@ -9152,6 +9154,55 @@ viewDashboard = function(){
   const e4 = getEchelonProgress(4);
   const e1Remaining = e1.skills.filter(s => getSkillMP(s.id) < 100).length;
   const e1DoneUnits = Math.min(14, Math.max(1, 14 - Math.floor((e1Remaining / Math.max(1, e1.skills.length)) * 14)));
+
+  // --- Real dashboard: results across all 7 tracks (tiles + full skill matrix) ---
+  const TRACK_DASH_META = {
+    python: { icon: '🐍', name: 'Python' },
+    web: { icon: '🌐', name: 'Web' },
+    backend: { icon: '⚙️', name: 'Backend' },
+    algorithms: { icon: '⚡', name: 'Алгоритмы' },
+    databases: { icon: '🗄️', name: 'Базы данных' },
+    architecture: { icon: '🏛️', name: 'Архитектура' },
+    infra: { icon: '🚀', name: 'Инфраструктура' }
+  };
+  let masteredAll = 0;
+  let skillsAll = 0;
+  const trackMatrixRows = Object.keys(MASTERY_TRACKS).map(tk => {
+    const t = MASTERY_TRACKS[tk];
+    const meta = TRACK_DASH_META[tk] || { icon: '📘', name: tk };
+    const mp = totalTrackMP(tk);
+    const mx = maxTrackMP(tk) || 1;
+    const tpct = Math.round(mp / mx * 100);
+    const sqs = t.skills.map(s => {
+      const smp = getSkillMP(s.id);
+      if(smp >= 100) masteredAll++;
+      skillsAll++;
+      return `<button class="m-sq m-sq--${smp}" data-py-open-skill="${s.id}" title="${s.id} ${s.title} — ${mpLabel(smp)}">${smp===100?'👑':''}</button>`;
+    }).join('');
+    return { key: tk, route: t.routePrefix, icon: meta.icon, name: meta.name, pct: tpct, mp, mx, sqs };
+  });
+  const totalUnitsAll = trackMatrixRows.reduce((a, r) => a + (MASTERY_TRACKS[r.key].data.units || []).length, 0);
+  const passedUnitsCount = (state.passedUnitTests || []).filter(id => !String(id).includes('course')).length;
+  const activeDaysCount = Object.keys(state.dailyXpByDate || {}).filter(k => state.dailyXpByDate[k] > 0).length;
+
+  const resultsTilesHTML = [
+    { num: `${state.xp}`, label: '💎 XP всего' },
+    { num: `${totalSolvedIde}<em> / 401</em>`, label: '💻 задач в IDE' },
+    { num: `${masteredAll}<em> / ${skillsAll}</em>`, label: '🧠 навыков 👑' },
+    { num: `${passedUnitsCount}<em> / ${totalUnitsAll}</em>`, label: '🏆 юнитов сдано' }
+  ].map(t => `<div class="dash-result-tile"><span class="dash-result-tile__num">${t.num}</span><span class="dash-result-tile__label">${t.label}</span></div>`).join('');
+
+  const resultsMatrixHTML = trackMatrixRows.map(m => `
+    <a href="#${m.route}" class="dash-skill-row" title="${m.name}: ${m.mp} / ${m.mx} MP (${m.pct}%)" aria-label="${m.name}: ${m.pct}%">
+      <div class="dash-skill-row__top">
+        <span class="dash-skill-row__icon">${m.icon}</span>
+        <span class="dash-skill-row__name">${m.name}</span>
+        <span class="dash-skill-row__mp">${m.mp} / ${m.mx} MP</span>
+        <span class="dash-skill-row__pct">${m.pct}%</span>
+      </div>
+      <div class="dash-track-chip__bar"><div class="dash-track-chip__fill" style="width:${Math.max(3, m.pct)}%;"></div></div>
+      <div class="dash-skill-row__sqs">${m.sqs}</div>
+    </a>`).join('');
 
   // Determine the next priority skill for the 4-minute Cocoon Focus Card
   const openGaps = (state.diagnosticGaps || []).filter(sid => PY_SKILLS_BY_ID[sid] && getSkillMP(sid) < 100);
@@ -9194,24 +9245,6 @@ viewDashboard = function(){
   const srsPct = Math.min(100, Math.max(8, Math.round((srs.reviewedDecksCount / srsTotalDecks) * 100)));
   const srsRingOffset = (srsRingCircum * (1 - srsPct / 100)).toFixed(1);
 
-  const miniMatrixItems = [
-    { route: '/python', icon: '🐍', name: 'Python', pct: Math.round(curMp / maxMp * 100) },
-    { route: '/web', icon: '🌐', name: 'Web', pct: Math.round(webMp / 1000 * 100) },
-    { route: '/backend', icon: '⚙️', name: 'Backend', pct: Math.round(backendMp / 2400 * 100) },
-    { route: '/algorithms', icon: '⚡', name: 'Алго', pct: Math.round(algoMp / 1200 * 100) },
-    { route: '/databases', icon: '🗄️', name: 'БД', pct: Math.round(dbMp / 1700 * 100) },
-    { route: '/architecture', icon: '🏛️', name: 'Архит.', pct: Math.round(archMp / 1400 * 100) },
-    { route: '/infra', icon: '🚀', name: 'Инфра', pct: Math.round(infraMp / 2100 * 100) }
-  ].map(m => `
-    <a href="#${m.route}" class="dash-mini-track dash-track-chip" title="${m.name}: ${m.pct}%" style="flex-direction:column;align-items:stretch;gap:4px;">
-      <div class="dash-track-chip__top" style="display:flex;align-items:center;justify-content:space-between;gap:5px;">
-        <span class="dash-mini-track__icon">${m.icon}</span>
-        <span class="dash-mini-track__name">${m.name}</span>
-        <span class="dash-mini-track__pct">${m.pct}%</span>
-      </div>
-      <div class="dash-track-chip__bar"><div class="dash-track-chip__fill" style="width:${Math.max(4, Math.min(100, m.pct))}%;"></div></div>
-    </a>`).join('');
-
   return `
     <div class="container">
       <!-- Top Cocoon Pills -->
@@ -9245,6 +9278,28 @@ viewDashboard = function(){
         </div>
       </div>
 
+      <!-- Real Dashboard: Results Tiles + Full 126-Skill Matrix + Activity -->
+      <div class="dash-results-panel">
+        <div class="dash-results-head">
+          <span>📊 Мои результаты</span>
+          <span class="meta">${skillsAll} навыков · ${totalUnitsAll} юнитов · 💎 ${activeDaysCount} ${(activeDaysCount % 10 === 1 && activeDaysCount % 100 !== 11) ? 'день' : ((activeDaysCount % 10 >= 2 && activeDaysCount % 10 <= 4 && (activeDaysCount % 100 < 10 || activeDaysCount % 100 >= 20)) ? 'дня' : 'дней')} активности</span>
+        </div>
+        <div class="dash-result-tiles">
+          ${resultsTilesHTML}
+        </div>
+        <div class="dash-skill-matrix">
+          ${resultsMatrixHTML}
+        </div>
+        <div class="dash-results-foot">
+          <div class="dash-goal-line">
+            <span class="meta" style="font-weight:600;">🎯 Дневная цель: ${tXp} / ${state.dailyGoal || 50} XP</span>
+            <span class="meta" style="font-weight:800;color:var(--moss);">${goalPct}%</span>
+          </div>
+          <div class="mp-progress-track" style="margin:5px 0 9px;"><div class="mp-progress-fill" style="width:${goalPct}%;"></div></div>
+          ${buildSevenDayHeatmapHTML()}
+        </div>
+      </div>
+
       <!-- Spaced Repetition (SRS) Quick Review Strip -->
       <div class="panel srs-strip-card" style="padding:11px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
         <div style="display:flex;align-items:center;gap:10px;">
@@ -9271,68 +9326,39 @@ viewDashboard = function(){
         ${miniListHTML}
       </div>
 
-      <!-- 7-Track Mini-Matrix Bar directly on Dashboard -->
-      <div class="dash-mini-matrix">
-        ${miniMatrixItems}
-      </div>
-
       <!-- Collapsible Drawer for All Modules, Echelons, Pomodoro & Global Stats -->
       <details class="cocoon-details">
         <summary>Все модули, эшелоны и статистика ▾</summary>
 
-        <div class="hero" style="margin-bottom:16px;">
-          <div class="hero__row">
-            <div><div class="hero__stat-num">${curMp}</div><div class="hero__stat-label">из ${maxMp} MP Python (${mpPct}%)</div></div>
-            <div><div class="hero__stat-num" style="color:var(--clay-deep);">${state.xp}</div><div class="hero__stat-label">всего XP · Web: ${webMp}/1000 · Backend: ${backendMp}/2400 · Алгоритмы: ${algoMp}/1200 · БД: ${dbMp}/1700 · Архитектура: ${archMp}/1400 · Инфра: ${infraMp}/2100</div></div>
-            <div class="stat-row">
-              <div class="stat-chip">${ICONS.check}<b>${p.mastered}/${p.total}</b>&nbsp;модулей карты</div>
-              <div class="stat-chip">${ICONS.dot}<b>${totalCompletedLessons}/${totalLessonsCount}</b>&nbsp;уроков</div>
-              <div class="stat-chip">${ICONS.code}<b>${totalSolvedIde}/401</b>&nbsp;задач IDE</div>
-              <div class="stat-chip">${ICONS.cards}<b>${state.reviewedDecks.length}/${Object.keys(ALL_DECKS_COMBINED).length}</b>&nbsp;колод Ф-xxx</div>
-            </div>
-          </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <a href="#/python" class="btn btn-primary">🐍 Python (1.1–1.9) ${ICONS.arrowRight}</a>
-            <a href="#/web" class="btn btn-clay">🌐 Web (2.1–2.4)</a>
-            <a href="#/backend" class="btn btn-clay">⚙️ Backend (3.1–3.8)</a>
-            <a href="#/algorithms" class="btn btn-clay">⚡ Алгоритмы (4.1–4.6)</a>
-            <a href="#/databases" class="btn btn-clay">🗄️ Базы данных (5.1–5.6)</a>
-            <a href="#/architecture" class="btn btn-clay">🏛️ Архитектура (6.1–6.6)</a>
-            <a href="#/infra" class="btn btn-clay">🚀 Инфраструктура (7.1–7.6)</a>
-            <a href="#/practice" class="btn btn-ghost">💻 Тренажёр 401 задачи</a>
-            <a href="#/mock" class="btn btn-ghost">🎙️ Симулятор собеседования</a>
-            <a href="#/docs" class="btn btn-ghost">📚 Справочник</a>
-          </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+          <a href="#/python" class="btn btn-primary">🐍 Python (1.1–1.9) ${ICONS.arrowRight}</a>
+          <a href="#/web" class="btn btn-clay">🌐 Web (2.1–2.4)</a>
+          <a href="#/backend" class="btn btn-clay">⚙️ Backend (3.1–3.8)</a>
+          <a href="#/algorithms" class="btn btn-clay">⚡ Алгоритмы (4.1–4.6)</a>
+          <a href="#/databases" class="btn btn-clay">🗄️ Базы данных (5.1–5.6)</a>
+          <a href="#/architecture" class="btn btn-clay">🏛️ Архитектура (6.1–6.6)</a>
+          <a href="#/infra" class="btn btn-clay">🚀 Инфраструктура (7.1–7.6)</a>
+          <a href="#/practice" class="btn btn-ghost">💻 Тренажёр 401 задачи</a>
+          <a href="#/mock" class="btn btn-ghost">🎙️ Симулятор собеседования</a>
+          <a href="#/docs" class="btn btn-ghost">📚 Справочник</a>
         </div>
 
         ${buildPriorityRoadmapWidgetHTML({ compact: true })}
 
-        <div class="anti-proc-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:20px;">
-          <div class="panel" style="margin:0;">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-              <h3>🎯 Дневная цель (${tXp} / ${state.dailyGoal} XP)</h3>
-              <span class="topic-badge" style="margin:0;">${goalPct}%</span>
-            </div>
-            <div class="mp-progress-track" style="margin:10px 0;"><div class="mp-progress-fill" style="width:${goalPct}%;"></div></div>
-            <div class="meta">Активность за 7 дней (XP по дням):</div>
-            ${buildSevenDayHeatmapHTML()}
+        <div class="panel" style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h3>⏱ Фокус-спринт (Помодоро)</h3>
+            <button class="link-quiet" data-toggle-zen>${document.body.classList.contains('zen-mode') ? 'Выйти из Дзен' : '🧘 Дзен-режим'}</button>
           </div>
-
-          <div class="panel" style="margin:0;">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-              <h3>⏱ Фокус-спринт (Помодоро)</h3>
-              <button class="link-quiet" data-toggle-zen>${document.body.classList.contains('zen-mode') ? 'Выйти из Дзен' : '🧘 Дзен-режим'}</button>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin:12px 0;">
+            <span id="pomo-time-display" style="font-family:var(--font-d);font-size:2rem;font-weight:700;color:var(--moss-deep);">${formatPomo(pomoState.secondsLeft)}</span>
+            <div style="display:flex;gap:6px;">
+              <button class="btn ${pomoState.running?'btn-clay':'btn-primary'}" style="padding:8px 14px;font-size:.84rem;" data-pomo-toggle>${pomoState.running ? 'Пауза' : 'Старт'}</button>
+              <button class="btn btn-ghost" style="padding:8px 10px;font-size:.8rem;" data-pomo-set="15">15м</button>
+              <button class="btn btn-ghost" style="padding:8px 10px;font-size:.8rem;" data-pomo-set="25">25м</button>
             </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin:12px 0;">
-              <span id="pomo-time-display" style="font-family:var(--font-d);font-size:2rem;font-weight:700;color:var(--moss-deep);">${formatPomo(pomoState.secondsLeft)}</span>
-              <div style="display:flex;gap:6px;">
-                <button class="btn ${pomoState.running?'btn-clay':'btn-primary'}" style="padding:8px 14px;font-size:.84rem;" data-pomo-toggle>${pomoState.running ? 'Пауза' : 'Старт'}</button>
-                <button class="btn btn-ghost" style="padding:8px 10px;font-size:.8rem;" data-pomo-set="15">15м</button>
-                <button class="btn btn-ghost" style="padding:8px 10px;font-size:.8rem;" data-pomo-set="25">25м</button>
-              </div>
-            </div>
-            <p class="meta" style="margin:0;">Завершённый спринт приносит +25 XP. Звук: <button class="link-quiet" data-toggle-sound>${state.soundEnabled ? '🔊 Вкл' : '🔇 Выкл'}</button></p>
           </div>
+          <p class="meta" style="margin:0;">Завершённый спринт приносит +25 XP. Звук: <button class="link-quiet" data-toggle-sound>${state.soundEnabled ? '🔊 Вкл' : '🔇 Выкл'}</button></p>
         </div>
 
         <div class="panel" style="margin-bottom:0;">

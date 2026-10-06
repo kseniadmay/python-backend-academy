@@ -147,7 +147,7 @@ function assert(cond, msg) {
 // 1. Check Dashboard (#/)
 let html = navigate('#/');
 assert(html.includes('Правило 2 минут: Быстрый микро-шаг'), 'Dashboard missing 2-minute button');
-assert(html.includes('из 2800 MP Python'), 'Dashboard missing 2800 MP counter');
+assert(html.includes('Мои результаты') && html.includes('dash-skill-matrix'), 'Dashboard missing results panel with skill matrix');
 assert(html.includes('Дневная цель'), 'Dashboard missing Daily Goal');
 assert(html.includes('Фокус-спринт (Помодоро)'), 'Dashboard missing Pomodoro timer');
 console.log('✓ Route #/ (Dashboard) verified');
