@@ -31,6 +31,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const { spawnSync } = require('child_process');
+const { pathToFileURL } = require('url');
 
 const ROOT = path.resolve(__dirname, '..');
 const PORT = 8793;
@@ -181,7 +182,37 @@ function diffShots(pm, pngjs, currentPath, baselinePath, diffPath) {
   const shots = ONLY ? SHOTS.filter(s => s.name.includes(ONLY)) : SHOTS;
   if (!shots.length) { console.error('[visual] Ни один кадр не подходит под --only ' + ONLY); process.exit(1); }
 
-  const srv = await serve();
+  // Песочницы (например, ZCode) могут блокировать клиентские TCP-соединения на 127.0.0.1:
+  // сервер поднимается, но браузер не может открыть страницу и goto зависает.
+  // Проба loopback, при недоступности — работа напрямую через file:// (localStorage на file-origin работает).
+  let srv = null;
+  let FILE_MODE = process.env.PBA_FILE_URL === '1';
+  if (!FILE_MODE) {
+    srv = await serve();
+    const loopbackOk = await new Promise(res => {
+      const rq = http.get(`http://127.0.0.1:${PORT}/`, r => { r.resume(); res(true); });
+      rq.on('error', () => res(false));
+      rq.setTimeout(4000, () => { rq.destroy(); res(false); });
+    });
+    if (!loopbackOk) {
+      console.log('[visual] Loopback TCP недоступен (blocked by sandbox) — режим file://');
+      FILE_MODE = true;
+      await new Promise(r => srv.close(r));
+      srv = null;
+    }
+  }
+  const pageUrl = shot => {
+    if (!FILE_MODE) {
+      return shot.ide
+        ? `http://127.0.0.1:${PORT}/${encodeURIComponent('Практика кода — тренажёр с IDE.html')}`
+        : `http://127.0.0.1:${PORT}/academy.html${shot.hash}`;
+    }
+    const file = shot.ide
+      ? path.join(ROOT, 'Практика кода — тренажёр с IDE.html')
+      : path.join(ROOT, 'academy.html');
+    return pathToFileURL(file).href + (shot.ide ? '' : (shot.hash || ''));
+  };
+
   const browser = await chromium.launch({ executablePath: findBrowser(), headless: true });
   const results = [];
   let failures = 0;
@@ -196,35 +227,34 @@ function diffShots(pm, pngjs, currentPath, baselinePath, diffPath) {
         deviceScaleFactor: vp.dpr,
         isMobile: !!vp.isMobile, hasTouch: !!vp.hasTouch
       });
-      const page = await ctx.newPage();
-
-      await page.addInitScript(seeded
-        ? `try{localStorage.setItem('academy_state_v1', ${JSON.stringify(JSON.stringify(SEED_STATE))});}catch(e){}`
-        : `try{localStorage.removeItem('academy_state_v1');}catch(e){}`);
-
-      const pageErrors = [];
-      const consoleErrors = [];
-      const failedRequests = [];
-      page.on('pageerror', e => pageErrors.push(String((e && e.message) || e)));
-      page.on('console', m => { if (m.type() === 'error') consoleErrors.push(m.text().slice(0, 300)); });
-      page.on('requestfailed', r => failedRequests.push(r.url().slice(-120) + ' :: ' + ((r.failure() && r.failure().errorText) || '')));
-      page.on('response', r => { if (r.status() >= 400) failedRequests.push(r.url().slice(-120) + ' :: HTTP ' + r.status()); });
 
       for (const shot of shots) {
         if (!!shot.seed !== seeded) continue; // кадр относится к другому состоянию (без seed = новичок)
         if (!shot.viewports.includes(vpName)) continue;
 
-        const url = shot.ide
-          ? `http://127.0.0.1:${PORT}/${encodeURIComponent('Практика кода — тренажёр с IDE.html')}`
-          : `http://127.0.0.1:${PORT}/academy.html${shot.hash}`;
-        pageErrors.length = 0; consoleErrors.length = 0; failedRequests.length = 0;
+        // Своя страница на каждый кадр: повторный goto той же страницы отличается только
+        // hash'ем — same-document навигация в Playwright с waitUntil:'load' зависает до таймаута.
+        const page = await ctx.newPage();
+
+        await page.addInitScript(seeded
+          ? `try{localStorage.setItem('academy_state_v1', ${JSON.stringify(JSON.stringify(SEED_STATE))});}catch(e){}`
+          : `try{localStorage.removeItem('academy_state_v1');}catch(e){}`);
+
+        const pageErrors = [];
+        const consoleErrors = [];
+        const failedRequests = [];
+        page.on('pageerror', e => pageErrors.push(String((e && e.message) || e)));
+        page.on('console', m => { if (m.type() === 'error') consoleErrors.push(m.text().slice(0, 300)); });
+        page.on('requestfailed', r => failedRequests.push(r.url().slice(-120) + ' :: ' + ((r.failure() && r.failure().errorText) || '')));
+        page.on('response', r => { if (r.status() >= 400) failedRequests.push(r.url().slice(-120) + ' :: HTTP ' + r.status()); });
 
         const label = `${shot.name}_${vpName}`;
         try {
-          await page.goto(url, { waitUntil: 'load', timeout: 60000 });
+          await page.goto(pageUrl(shot), { waitUntil: 'load', timeout: 60000 });
         } catch (e) {
           results.push({ shot: label, status: 'FAIL', reason: 'навигация не удалась: ' + e.message });
           failures++; console.log(`[FAIL] ${label} :: навигация не удалась`);
+          await page.close().catch(() => {});
           continue;
         }
         await page.evaluate(() => (document.fonts ? document.fonts.ready : null)).catch(() => {});
@@ -282,13 +312,14 @@ function diffShots(pm, pngjs, currentPath, baselinePath, diffPath) {
           jsErrors: pageErrors.slice(), consoleErrors: consoleErrors.slice(), failedRequests: failedRequests.slice()
         });
         console.log(`[${status}] ${label}${diffPct !== null ? ' diff=' + diffPct + '%' : ''}${issues.length ? ' :: ' + issues.join('; ') : ''}`);
+        await page.close().catch(() => {});
       }
       await ctx.close();
     }
   }
 
   await browser.close();
-  srv.close();
+  if (srv) await new Promise(r => srv.close(r));
 
   fs.writeFileSync(path.join(OUT_DIR, 'report.json'), JSON.stringify({ generatedAt: new Date().toISOString(), update: UPDATE, tolerancePct: VISUAL_TOLERANCE_PCT, results }, null, 2));
 
