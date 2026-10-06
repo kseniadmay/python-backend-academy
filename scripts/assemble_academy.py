@@ -2226,7 +2226,9 @@ EXTRA_CSS = r"""
     background: rgba(190, 18, 60, 0.30);
     transition: background 0.2s ease, box-shadow 0.2s ease;
   }
-  html:not([data-theme="dark"]) .path-seg-bar {
+  /* Light theme tint only for empty segments: (0,2,1)-specificity override must not
+     beat .done/.active fills, so state classes are excluded via :not() */
+  html:not([data-theme="dark"]) .path-seg-bar:not(.done):not(.active) {
     background: rgba(107, 29, 47, 0.16);
   }
   .path-seg-bar.done {
@@ -3056,6 +3058,10 @@ EXTRA_CSS = r"""
     margin-bottom: 4px;
     letter-spacing: 0.04em;
   }
+  .prac-testcases-wrapper {
+    min-width: 0;
+    overflow-x: auto;
+  }
   .prac-testcases-table {
     width: 100%;
     border-collapse: collapse;
@@ -3064,6 +3070,10 @@ EXTRA_CSS = r"""
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid var(--line);
+  }
+  .prac-testcases-table code {
+    word-break: break-word;
+    white-space: normal;
   }
   .prac-testcases-table th, .prac-testcases-table td {
     padding: 8px 10px;
@@ -3171,6 +3181,49 @@ EXTRA_CSS = r"""
   .lesson-drawer {
     /* alias for academy-bottom-sheet */
   }
+
+  /* ================= VISUAL AUDIT FIXES (2026-10-07) ================= */
+  /* V20: элементам с классом .hidden действительно скрываемся (раньше класс не имел CSS,
+     и пустая консоль-полоса skill-лаборатории была видна всегда) */
+  .hidden{display:none !important;}
+  /* V15/V20: светлые темы консолей вывода — пергаментная палитра вместо тёмного квадрата */
+  html:not([data-theme="dark"]) .inline-code-out,
+  html:not([data-theme="dark"]) .snippet-out{
+    background:#f1f5f9;border-color:#cbd5e1;color:#0f172a;
+  }
+  html:not([data-theme="dark"]) #code-output{
+    background:#f1f5f9;border-color:#cbd5e1;color:#0f172a;
+  }
+  /* V9: на mobile в спринт-топбаре убираем тихую ссылку «Справка» — заголовку «К-…» нужен воздух */
+  @media (max-width:560px){
+    .sprint-focus-topbar .sprint-xp-pill[href="#/docs"]{display:none;}
+    .sprint-progress-meta{font-size:.68rem;}
+  }
+  /* V11: модалки на mobile прижаты к верху, карточки режима без длинных описаний —
+     секция «Управление данными» со «Сбросить прогресс» влезает в первый экран */
+  @media (max-width:560px){
+    .modal-backdrop{align-items:flex-start;padding:10px;}
+    .modal-card{max-height:calc(100vh - 20px);}
+    .settings-mode-desc{display:none;}
+  }
+  /* V14: docs-таблицы на mobile — панель скроллится по горизонтали, колонки не сжимаются в вертикаль */
+  @media (max-width:760px){
+    .docs-hub .panel{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    .docs-hub table{min-width:100%;}
+    .docs-hub th,.docs-hub td:first-child,.docs-hub td code{white-space:nowrap;}
+    .docs-hub td{word-break:break-word;}
+  }
+  /* V25: подсказки свайпов переносятся целиком, а не посреди фразы */
+  .fc-swipe-hint span{white-space:nowrap;}
+  /* V26: «100% HP» босса не переносится на две строки */
+  .boss-hp-val,.boss-hp-bar__label > span:last-child{white-space:nowrap;}
+  /* V23: в карточках эшелонов чип не прилипает к «N%» */
+  .echelon-card__header{gap:10px;}
+  .echelon-card__header .echelon-badge{flex:1 1 auto;min-width:0;}
+  /* V16: mono-чип юнита на треках не переносит «(P%)» на вторую строку */
+  .unit-card .topic-badge{white-space:nowrap;}
+  /* V8: экспресс-песочница навыка не срезает последнюю строку кода */
+  #skill-lab-scratchpad{min-height:112px !important;padding-bottom:14px !important;line-height:1.55 !important;}
 """
 
 # Let's define the injected JS upgrade block that extends the existing app cleanly
@@ -5313,10 +5366,9 @@ function viewPythonMastery(trackKey){
         <div class="unit-card__head">
           <div style="min-width:0;flex:1;">
             <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">
-              <span class="topic-badge" style="margin:0;">Юнит ${u.id} · ${uMp} / ${uMax} MP (${uPct}%)</span>
+              <span class="topic-badge" style="margin:0;">Юнит ${u.id} · ${uMp}/${uMax} MP · ${uPct}%</span>
             </div>
             <h2>${u.title}</h2>
-            <p class="meta unit-card__desc" style="margin:4px 0 0;">${u.desc}</p>
           </div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex:none;">
             <a href="#${tr.routePrefix}/unittest/${u.id}" class="btn ${utPassed?'btn-primary':'btn-clay unit-test-btn'}" style="padding:7px 11px;font-size:.78rem;white-space:nowrap;">
@@ -5332,7 +5384,7 @@ function viewPythonMastery(trackKey){
   const firstUnitHTML = unitsHTML.length > 0 ? unitsHTML[0] : '';
   const restUnitsHTML = unitsHTML.length > 1 ? `
     <details class="cocoon-details">
-      <summary><span>📚 Остальные юниты модуля (${unitsHTML.length - 1} из ${unitsHTML.length})</span><span class="meta">Раскрыть список ▾</span></summary>
+      <summary><span>📚 Остальные юниты (${unitsHTML.length - 1} из ${unitsHTML.length}) · раскрыть ▾</span></summary>
       ${unitsHTML.slice(1).join('')}
     </details>` : '';
 
@@ -6101,7 +6153,10 @@ function viewPythonUnitTest(unitId, trackKey){
     <div class="container">
       <div class="diag-header-row">
         <a href="#${tr.routePrefix}" class="back-link">${ICONS.chevronLeft} ${tr.backLabel}</a>
-        <div class="topic-badge">${title} · Вопрос ${unitTestState.idx+1} из ${questions.length}</div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:nowrap;min-width:0;">
+          ${(state.passedUnitTests || []).includes(unitId) && !isCourse ? `<span class="topic-badge" style="margin:0;background:var(--moss-soft);border-color:rgba(52,211,153,0.4);color:var(--moss-deep);white-space:nowrap;">✓ Сдано · ретейк</span>` : ''}
+          <div class="topic-badge">${title} · Вопрос ${unitTestState.idx+1} из ${questions.length}</div>
+        </div>
       </div>
       <div class="quiz-progress"><div class="quiz-progress__bar" style="width:${Math.round(unitTestState.idx/questions.length*100)}%;"></div></div>
       <div class="microstep-card">
@@ -7292,6 +7347,13 @@ function viewMockInterview(){
 
   const curTaskTier = getTaskInterviewTier(curTask.id);
   const curEchMeta = INTERVIEW_ECHELONS[curTaskTier] || INTERVIEW_ECHELONS[2];
+  // V24: desc вида «Задание: <заголовок>» дословно дублирует h2 — не выводим такой дубль.
+  // desc приходит HTML-ом (<p><strong>Задание:</strong> …</p>) — сравниваем очищенный текст.
+  const mockDescRaw = String(curTask.desc || '');
+  const mockDescText = mockDescRaw.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const mockDescClean = mockDescText.replace(/^(?:Задание|Задача)\s*[:·\-–—]?\s*/i, '').replace(/[.]\s*$/, '');
+  const mockTitleClean = String(curTask.title || '').replace(/[.]\s*$/, '');
+  const mockDescRedundant = !mockDescClean || mockDescClean === mockTitleClean;
 
   const curScen = STAR_SCENARIOS.find(x => x.id === mockInterviewState.starScenarioId) || STAR_SCENARIOS[0];
   const starOpts = STAR_SCENARIOS.map(sc =>
@@ -7353,11 +7415,11 @@ function viewMockInterview(){
         <span class="meta">Сократический интервьюер (4 уровня опор · 0 спойлеров кода)</span>
       </div>
       <h2 style="margin-bottom:10px;">${curTask.title}</h2>
-      <div class="lesson-theory" style="margin-bottom:14px;">${curTask.desc}</div>
+      ${!mockDescRedundant ? `<div class="lesson-theory" style="margin-bottom:14px;">${curTask.desc}</div>` : ''}
       ${buildCodeEditorWithGutterHTML('mock-code-editor', mockInterviewState.codeDraft, 220)}
       <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
         <button class="btn btn-primary" data-mock-run="${curTask.id}">${ICONS.play} Запустить решение (Ctrl+Enter)</button>
-        <button class="btn btn-ghost" data-mock-hint ${mockInterviewState.hintLevel>=socraticHints.length?'disabled':''}>💡 Запросить наводку интервьюера (${mockInterviewState.hintLevel}/${socraticHints.length})</button>
+        <button class="btn btn-ghost" data-mock-hint ${mockInterviewState.hintLevel>=socraticHints.length?'disabled':''}>💡 Запросить наводку интервьюера&nbsp;(${mockInterviewState.hintLevel}/${socraticHints.length})</button>
         <button class="btn btn-ghost" data-mock-reset="${curTask.id}">Сбросить код</button>
       </div>
       ${runFeedback}
@@ -8082,7 +8144,7 @@ function viewPathSerpentine(options){
   let markersSVG = '';
   chapterBreakpoints.forEach(cb => {
     if(coords[cb.startIdx]){
-      const cy = (cb.startIdx === 0) ? 48 : (coords[cb.startIdx].y - 65);
+      const cy = (cb.startIdx === 0) ? 48 : (coords[cb.startIdx].y - 80);
       markersSVG += `
         <g class="path-chapter-ribbon" transform="translate(210, ${cy})">
           <line x1="-190" y1="0" x2="-130" y2="0" stroke="rgba(190, 18, 60, 0.40)" stroke-width="1.5" stroke-dasharray="4 4"/>
@@ -8407,7 +8469,7 @@ function viewProPath(options){
             </div>
           </div>
           <div class="pro-lesson-tail">
-            ${isActive ? '<span class="pro-arrow">→</span>' : (isCompleted ? '<span class="pro-done-check">✓</span>' : '')}
+            ${isActive ? '<span class="pro-arrow">→</span>' : ''}
           </div>
         </div>
       `;
@@ -8421,7 +8483,7 @@ function viewProPath(options){
             <div class="pro-chapter-title">${escapeHtmlStr(ch.title)}</div>
           </div>
           <div class="pro-chapter-header-right">
-            <span class="pro-chapter-stat">${chCompleted}/${chTotal} · ${chPct}%</span>
+            <span class="pro-chapter-stat" style="white-space:nowrap;">${chCompleted}/${chTotal} · ${chPct}%</span>
             <span class="pro-chapter-chevron" style="transform:${isExpanded ? 'rotate(180deg)' : 'none'};">▼</span>
           </div>
         </div>
@@ -9044,7 +9106,7 @@ function buildSevenDayHeatmapHTML(){
     const k = dateIsoKey(d);
     const xp = (state.dailyXpByDate && state.dailyXpByDate[k]) || 0;
     const cls = xp >= state.dailyGoal ? 'heat-cell high' : (xp > 0 ? 'heat-cell active' : 'heat-cell');
-    html += `<div class="${cls}" title="${k}: ${xp} XP"><span>${days[d.getDay()]}</span><b>${xp}</b></div>`;
+    html += `<div class="${cls}" title="${k}: ${xp} XP"><span>${days[d.getDay()]}</span><b>${xp > 0 ? xp : '—'}</b></div>`;
   }
   return `<div class="heat-row">${html}</div>`;
 }
@@ -9081,7 +9143,7 @@ function getSpacedRepetitionStats(){
 // Reference Hub View (#/docs) — Complete Cheat Sheet & Set/Dict/List/SQL/Git Reference
 function viewDocsHub(){
   return `
-    <div class="container">
+    <div class="container docs-hub">
       <div class="topic-badge">Инженерный справочник · Шпаргалка по структурам данных, Big-O, SQL и Git</div>
       <h1 style="margin-bottom:8px;">📚 Справочник Python Backend</h1>
       <p class="meta" style="margin-bottom:18px;">Полные таблицы операций, асимптотики <span class="math-formula">O(1)</span> / <span class="math-formula">O(n)</span> и синтаксиса, чтобы всегда держать под рукой во время практики и повторения карточек.</p>
@@ -9177,13 +9239,15 @@ viewDashboard = function(){
       const smp = getSkillMP(s.id);
       if(smp >= 100) masteredAll++;
       skillsAll++;
-      return `<button class="m-sq m-sq--${smp}" data-py-open-skill="${s.id}" title="${s.id} ${s.title} — ${mpLabel(smp)}">${smp===100?'👑':''}</button>`;
+      return `<button class="m-sq m-sq--${smp}" data-py-open-skill="${s.id}" title="${s.id} ${s.title} — ${mpLabel(smp)}"></button>`;
     }).join('');
     return { key: tk, route: t.routePrefix, icon: meta.icon, name: meta.name, pct: tpct, mp, mx, sqs };
   });
   const totalUnitsAll = trackMatrixRows.reduce((a, r) => a + (MASTERY_TRACKS[r.key].data.units || []).length, 0);
   const passedUnitsCount = (state.passedUnitTests || []).filter(id => !String(id).includes('course')).length;
-  const activeDaysCount = Object.keys(state.dailyXpByDate || {}).filter(k => state.dailyXpByDate[k] > 0).length;
+  // V18: у свежей недели история XP пуста, но стрик честно говорит об активности — не показываем провальные «0 дней»
+  const historyActiveDays = Object.keys(state.dailyXpByDate || {}).filter(k => state.dailyXpByDate[k] > 0).length;
+  const activeDaysCount = Math.max(historyActiveDays, state.streak || 0);
 
   const resultsTilesHTML = [
     { num: `${state.xp}`, label: '💎 XP всего' },
@@ -10007,6 +10071,18 @@ render = function(){
   } else if(route === '/path'){
     root.innerHTML = (state.pathViewMode === 'pro') ? viewProPath() : viewPathSerpentine();
     navRoute = '/path';
+    // V12: активная нода тропы не должна оставаться под таб-баром — мягкий автоскролл к ней
+    setTimeout(function(){
+      try{
+        const activeNode = document.querySelector('.hex-node--active');
+        if(activeNode && typeof activeNode.scrollIntoView === 'function'){
+          const r = activeNode.getBoundingClientRect();
+          if(r.top < 90 || r.bottom > (window.innerHeight || 800) - 110){
+            activeNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+      }catch(err){}
+    }, 60);
   } else if(route === '/map'){
     root.innerHTML = viewMap();
     navRoute = '/map';
@@ -10026,6 +10102,18 @@ render = function(){
     navRoute = '/';
   }
   markActiveNav(navRoute);
+  // V8: экспресс-песочница навыка растёт по контенту — последняя строка кода не срезается
+  setTimeout(function(){
+    try{
+      const growTa = document.getElementById('skill-lab-scratchpad');
+      if(growTa && !growTa.dataset.autogrow){
+        growTa.dataset.autogrow = '1';
+        const fitTa = () => { growTa.style.height = 'auto'; growTa.style.height = Math.max(112, growTa.scrollHeight + 2) + 'px'; };
+        fitTa();
+        growTa.addEventListener('input', fitTa);
+      }
+    }catch(err){}
+  }, 60);
   document.getElementById('streak-num-d').textContent = state.streak;
   document.getElementById('streak-num-m').textContent = state.streak;
   const swEl = document.getElementById('streak-word-d');
@@ -11389,7 +11477,7 @@ document.addEventListener('click', async function(e){
         const pCta = document.getElementById('popover-cta-btn');
 
         if(pBadge) pBadge.textContent = `🎯 ${track.title}`;
-        if(pTitle) pTitle.textContent = `Юнит ${u.id}: ${u.title}`;
+        if(pTitle) pTitle.textContent = `Юнит ${u.id}: ${u.title.replace(/^Юнит\s+[\d.]+\s*·\s*/, '')}`;
 
         const isPassed = (state.passedUnitTests || []).includes(u.id) || ((u.skills||[]).length > 0 && (u.skills||[]).every(s => getSkillMP(s.id) >= 80));
         const uIdx = ALL_UNITS_COMBINED.findIndex(x => x.id === uid);
@@ -11447,6 +11535,23 @@ document.addEventListener('click', async function(e){
           }
         }
         popover.style.display = 'block';
+        // V13: кламп поповера в границы вьюпорта — при нижних гексах CTA не срезается кромкой
+        try{
+          const pr = popover.getBoundingClientRect();
+          const vh = window.innerHeight || 900;
+          const topBefore = parseFloat(popover.style.top) || 0;
+          if(pr.height > 0 && pr.bottom > vh - 12){
+            const aboveTop = cy - 220;
+            if(aboveTop > 0 && (nRect.top - pr.height) > 12){
+              popover.style.top = `${Math.round(aboveTop)}px`;
+              if(arrow) arrow.className = 'path-popover-arrow path-popover-arrow--down';
+            } else {
+              popover.style.top = `${Math.round(topBefore - (pr.bottom - (vh - 12)))}px`;
+            }
+          } else if(pr.height > 0 && pr.top < 12){
+            popover.style.top = `${Math.round(topBefore + (12 - pr.top))}px`;
+          }
+        }catch(err){}
         return;
       }
     }

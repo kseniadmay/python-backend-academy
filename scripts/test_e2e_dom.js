@@ -774,10 +774,10 @@ function fireClick(attrName, attrVal, extraAttrs = {}) {
   assert(elementsById['view-root'].innerHTML.includes('# candidate draft preserved'), 'Mock timer toggle/reset wiped out #mock-code-editor draft');
 
   await fireClick('data-mock-hint', '');
-  assert(elementsById['view-root'].innerHTML.includes('Запросить наводку интервьюера (1/4)'), '#/mock Socratic hint should increment to 1/4');
+  assert(elementsById['view-root'].innerHTML.includes('Запросить наводку интервьюера&nbsp;(1/4)') || elementsById['view-root'].innerHTML.includes('Запросить наводку интервьюера (1/4)'), '#/mock Socratic hint should increment to 1/4');
   await fireClick('data-mock-run', '240');
   assert(elementsById['view-root'].innerHTML.includes('Live-Coding раунд успешно пройден!'), '#/mock Live-Coding run should pass');
-  assert(elementsById['view-root'].innerHTML.includes('Запросить наводку интервьюера (0/4)'), '#/mock Scaffold Fading should reset hint level to 0/4');
+  assert(elementsById['view-root'].innerHTML.includes('Запросить наводку интервьюера&nbsp;(0/4)') || elementsById['view-root'].innerHTML.includes('Запросить наводку интервьюера (0/4)'), '#/mock Scaffold Fading should reset hint level to 0/4');
 
   // Switch to STAR Behavioral tab, verify all 4 scenarios have distinct demos and score 4/4, plus expanded verbs
   await fireClick('data-mock-tab', 'star');
