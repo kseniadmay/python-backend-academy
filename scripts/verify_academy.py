@@ -74,7 +74,7 @@ routes = [
     (base_uri + '#/infra', 'Матрица Мастерства Инфраструктура'),
     (base_uri + '#/infra/boss', 'Аудитор продакшен-инфраструктуры'),
     (base_uri + '#/mock', 'Симулятор собеседования'),
-    (base_uri + '#/map', 'Карта навыков'),
+    (base_uri + '#/map', 'Мои результаты'),  # Coddy-ref: #/map redirects to dashboard
     (base_uri + '#/path', 'Python Core'),
     (base_uri + '#/practice', 'Практика кода'),
     (base_uri + '#/cards', 'Центр 3D Флеш-карточек'),

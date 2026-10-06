@@ -928,42 +928,46 @@ EXTRA_CSS = r"""
   .dash-track-chip__fill{height:100%;border-radius:99px;background:linear-gradient(90deg, var(--emerald), var(--amber));}
 
   /* Section 2.5: Dashboard «Мои результаты» — настоящий дашборд: цифры, проценты навыков, матрица */
+  /* V31 (Coddy-ref): вторая итерация компактности — матрица в 2 колонки на desktop, плотные плитки */
   .dash-results-panel{
-    background:var(--surface);border:1px solid var(--glass-border);border-radius:24px;padding:16px 18px;
+    background:var(--surface);border:1px solid var(--glass-border);border-radius:24px;padding:14px 16px;
     margin-bottom:11px;box-shadow:var(--shadow-1);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
   }
-  .dash-results-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+  .dash-results-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
   .dash-results-head > span:first-child{font-weight:800;font-size:.94rem;color:var(--ink);}
   .dash-results-head .meta{font-weight:600;font-size:.74rem;}
-  .dash-result-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+  .dash-result-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:12px;}
   @media (max-width:680px){
     .dash-result-tiles{grid-template-columns:repeat(2,1fr);}
     .dash-results-panel{padding:13px 13px;border-radius:18px;}
   }
   .dash-result-tile{
-    background:var(--surface-2);border:1px solid var(--line-soft);border-radius:16px;padding:10px 12px;
-    display:flex;flex-direction:column;gap:3px;min-width:0;
+    background:var(--surface-2);border:1px solid var(--line-soft);border-radius:14px;padding:8px 11px;
+    display:flex;flex-direction:column;gap:2px;min-width:0;
   }
   .dash-result-tile__num{
-    font-family:var(--font-d);font-size:1.42rem;font-weight:800;color:var(--ink);line-height:1.15;
+    font-family:var(--font-d);font-size:1.28rem;font-weight:800;color:var(--ink);line-height:1.15;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
-  .dash-result-tile__num em{font-style:normal;font-size:.78rem;font-weight:700;color:var(--ink-muted);}
-  .dash-result-tile__label{font-size:.71rem;font-weight:600;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .dash-skill-matrix{display:flex;flex-direction:column;gap:7px;}
+  .dash-result-tile__num em{font-style:normal;font-size:.74rem;font-weight:700;color:var(--ink-muted);}
+  .dash-result-tile__label{font-size:.7rem;font-weight:600;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dash-skill-matrix{display:grid;grid-template-columns:1fr;gap:7px;}
+  @media (min-width:900px){
+    .dash-skill-matrix{grid-template-columns:1fr 1fr;gap:8px;}
+  }
   .dash-skill-row{
-    display:flex;flex-direction:column;gap:5px;padding:9px 11px;border-radius:14px;
+    display:flex;flex-direction:column;gap:4px;padding:8px 10px;border-radius:14px;
     background:var(--surface-2);border:1px solid var(--line-soft);text-decoration:none;color:var(--ink);
     transition:border-color .15s,transform .12s;
   }
   .dash-skill-row:hover{border-color:var(--moss);transform:translateY(-1px);}
-  .dash-skill-row__top{display:flex;align-items:center;gap:7px;white-space:nowrap;overflow:hidden;}
+  .dash-skill-row__top{display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;}
   .dash-skill-row__icon{flex:none;font-size:.86rem;}
   .dash-skill-row__name{font-weight:700;font-size:.78rem;overflow:hidden;text-overflow:ellipsis;}
-  .dash-skill-row__mp{font-size:.68rem;font-weight:600;color:var(--ink-muted);overflow:hidden;text-overflow:ellipsis;}
-  .dash-skill-row__pct{margin-left:auto;font-size:.74rem;font-weight:800;color:var(--ink-soft);flex:none;}
-  .dash-skill-row__sqs{display:flex;flex-wrap:wrap;gap:3px;}
-  .dash-skill-row .m-sq{width:16px;height:16px;border-radius:5px;font-size:.5rem;}
+  .dash-skill-row__mp{font-size:.66rem;font-weight:600;color:var(--ink-muted);overflow:hidden;text-overflow:ellipsis;}
+  .dash-skill-row__pct{margin-left:auto;font-size:.73rem;font-weight:800;color:var(--ink-soft);flex:none;}
+  .dash-skill-row__sqs{display:flex;flex-wrap:wrap;gap:2.5px;}
+  .dash-skill-row .m-sq{width:13px;height:13px;border-radius:4px;font-size:.5rem;}
   .dash-goal-line{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
   .dash-results-foot{margin-top:13px;padding-top:11px;border-top:1px solid var(--line-soft);}
 
@@ -3224,6 +3228,36 @@ EXTRA_CSS = r"""
   .unit-card .topic-badge{white-space:nowrap;}
   /* V8: экспресс-песочница навыка не срезает последнюю строку кода */
   #skill-lab-scratchpad{min-height:112px !important;padding-bottom:14px !important;line-height:1.55 !important;}
+
+  /* ================= CODDY-REFERENCE DESIGNER BATCH (2026-10-07, согласовано с Ксенией) ================= */
+  /* V6/V7-компаньон: инлайн-код в теории — цветные чипы-«ключевые слова» как в Coddy,
+     снимают тяжесть сплошных кодовых вставок (цвета платформы не меняем) */
+  .lesson-theory p > code:not(pre code),
+  .lesson-theory li > code:not(pre code){
+    background:var(--emerald-soft);border:1px solid var(--line);border-radius:7px;
+    padding:1px 6px;font-size:.82em;white-space:nowrap;
+  }
+  html:not([data-theme="dark"]) .lesson-theory p > code:not(pre code),
+  html:not([data-theme="dark"]) .lesson-theory li > code:not(pre code){
+    background:rgba(20,90,70,0.08);
+  }
+  /* V10: practice mobile — контент вкладки доходит до таб-бара, действие прижато вниз (как CTA у Coddy) */
+  @media (max-width:768px){
+    .practice-left-pane:not(.prac-pane--hidden-mobile){
+      display:flex;flex-direction:column;min-height:calc(100dvh - 340px);
+    }
+    .practice-left-pane:not(.prac-pane--hidden-mobile) > *:last-child{
+      margin-top:auto !important;padding-bottom:6px;
+    }
+  }
+  /* Docs: типографика приведена к паре шрифтов платформы (Onest + JetBrains Mono) — без смены структуры */
+  .docs-hub h1{font-family:var(--font-d);font-weight:800;font-size:1.42rem;letter-spacing:-0.01em;margin-bottom:8px;}
+  .docs-hub .panel h2{font-family:var(--font-d);font-weight:800;font-size:1.02rem;letter-spacing:-0.005em;margin:2px 0 10px;}
+  .docs-hub .panel p, .docs-hub .panel td, .docs-hub .panel li{font-family:var(--font-b);font-size:.84rem;line-height:1.5;}
+  .docs-hub .panel code{font-family:var(--font-m);font-size:.8em;}
+  .docs-hub th{font-family:var(--font-b);font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);}
+  .docs-hub td{font-family:var(--font-b);}
+  .docs-hub .math-formula{font-family:var(--font-m);font-size:.78em;}
 """
 
 # Let's define the injected JS upgrade block that extends the existing app cleanly
@@ -5820,12 +5854,19 @@ function viewPythonSkill(sid){
     const previewDeckId = sk.fIds && sk.fIds[0];
     const previewDeck = (previewDeckId && ALL_DECKS_COMBINED[previewDeckId]) || null;
     const previewCard = (previewDeck && previewDeck.cards && previewDeck.cards[0]) || null;
+    // V6 (Coddy-ref): наглядные модули (диаграмма памяти + fill-упражнение) живут в центральной колонке
+    // под теорией, правый рейл = только интерактив (песочница + блиц-карточка) — центр не пустеет
+    const theoryExtrasHTML = `
+      <div class="skill-lab-card" style="margin-top:12px;">
+        <h4>🔬 Смотри в память (${sk.id})</h4>
+        ${buildCPythonMemoryDiagramHTML(activeK, sk.id)}
+        ${buildTapToFillExerciseHTML(activeK, sk.id)}
+      </div>`;
+
     const labAsideHTML = `
       <aside class="skill-lab-aside" aria-label="Лаборатория закрепления">
         <div class="skill-lab-card">
           <h4>🧪 Лаборатория закрепления (${sk.id})</h4>
-          ${buildCPythonMemoryDiagramHTML(activeK, sk.id)}
-          ${buildTapToFillExerciseHTML(activeK, sk.id)}
           <div class="meta" style="font-size:.74rem;margin:8px 0 4px;font-weight:600;">⚡ Экспресс-песочница Python 3.13:</div>
           <textarea id="skill-lab-scratchpad" class="code-editor" spellcheck="false" style="min-height:92px;font-size:.78rem;padding:8px 10px;"># Проверь идею из конспекта ${activeK}\nimport sys\ndata = {"a": 1, "b": 2}\nprint("size:", sys.getsizeof(data), "keys:", list(data.keys()))</textarea>
           <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-top:6px;">
@@ -5843,8 +5884,8 @@ function viewPythonSkill(sid){
       </aside>`;
 
     bodyHTML = pySkillViewState.fullNoteMode
-      ? `${navDrawerHTML}` + steps.map((st, i) => `<div class="microstep-card"><div class="topic-badge">Шаг ${i+1} из ${steps.length}</div><h3>${st.title}</h3><div class="lesson-theory">${decorateCodeBlocksWithRunBtn(st.html)}</div></div>`).join('')
-      : `<div class="skill-split-layout"><div class="skill-theory-col">${feedHTML}${primaryActionHTML}${floatingStepNavHTML}${navDrawerHTML}</div>${labAsideHTML}</div>`;
+      ? `${navDrawerHTML}` + steps.map((st, i) => `<div class="microstep-card"><div class="topic-badge">Шаг ${i+1} из ${steps.length}</div><h3>${st.title}</h3><div class="lesson-theory">${decorateCodeBlocksWithRunBtn(st.html)}</div></div>`).join('') + theoryExtrasHTML
+      : `<div class="skill-split-layout"><div class="skill-theory-col">${feedHTML}${primaryActionHTML}${theoryExtrasHTML}${floatingStepNavHTML}${navDrawerHTML}</div>${labAsideHTML}</div>`;
   } else if(pySkillViewState.tab === 'cards'){
     const activeF = pySkillViewState.fId || sk.fIds[0];
     const deckObj = ALL_DECKS_COMBINED[activeF] || {id: activeF, title: activeF, cards: []};
@@ -6445,11 +6486,8 @@ function viewPracticeHub(){
     <div class="result-box--fail">Тесты не прошли:\n${practiceHubState.runOutput||''}</div>
     <div style="margin-top:8px;"><button class="btn btn-ghost" style="padding:6px 12px;font-size:.78rem;" data-prac-hint>💡 Разобрать ошибку с Сократовским интервьюером (${practiceHubState.hintLevel}/${socraticHints.length})</button></div>`;
 
-  const taskOptions = filtered.length > 0
-    ? filtered.slice(0, 500).map(t =>
-        `<option value="${t.id}" ${t.id===curTask.id?'selected':''}>${solvedMap[t.id]==='solved'?'✓ ':''}[Эшелон ${getTaskInterviewTier(t.id)}] #${t.id} [${t.tier}] ${t.title} (${t.topic})</option>`
-      ).join('')
-    : '<option disabled selected>Нет задач по выбранным фильтрам</option>';
+  // V7 (Coddy-ref): один механизм навигации по задачам — инлайн-свайпер в шапке задачи (‹ N/M ›);
+  // селект-список и дубль «Пред/След» из дравера фильтров сняты, поиск остался
 
   let echelonLabel = '🎯 Все эшелоны';
   if(practiceHubState.echelonFilter === '1') echelonLabel = '🎯 Эшелон 1';
@@ -6512,8 +6550,6 @@ function viewPracticeHub(){
         </select>
         <span class="prac-chip-display">${statusLabel} ▾</span>
       </label>
-
-      <button type="button" class="prac-chip-btn prac-chip prac-filters-toggle ${practiceHubState.mobileFiltersOpen?'is-active active':''}" data-toggle-prac-filters title="Все фильтры и выбор задачи">⚙️ Фильтры ▾</button>
     </div>`;
 
   const searchBarHTML = (practiceHubState.searchOpen || practiceHubState.search) ? `
@@ -6521,24 +6557,6 @@ function viewPracticeHub(){
       <input id="prac-search-input" type="text" class="code-editor prac-search-field" placeholder="Поиск по названию или #ID…" value="${escapeHtmlStr(practiceHubState.search)}">
       ${practiceHubState.search ? `<button type="button" class="btn btn-ghost" style="padding:4px 9px;font-size:.78rem;" data-clear-prac-search>✕ Очистить</button>` : ''}
     </div>` : '';
-
-  const taskSwiperHTML = `
-    <div class="prac-task-swiper">
-      <button type="button" class="btn btn-ghost" style="padding:5px 12px;font-size:.76rem;" data-prac-step="-1" ${filtered.length<=1?'disabled':''}>‹ Пред.</button>
-      <span style="font-size:.8rem;font-weight:700;text-align:center;">${filtered.length>0 ? `Задача #${curTask.id} (${curFilteredIdx + 1} из ${filtered.length})` : 'Нет задач по фильтру'}</span>
-      <button type="button" class="btn btn-ghost" style="padding:5px 12px;font-size:.76rem;" data-prac-step="1" ${filtered.length<=1?'disabled':''}>След. ›</button>
-    </div>`;
-
-  const filtersDrawerHTML = `
-    <div id="prac-filters-drawer" class="prac-filters-drawer prac-filters-collapsible ${practiceHubState.mobileFiltersOpen?'is-open':''}">
-      <div class="panel" style="padding:14px 16px;margin-bottom:12px;">
-        <div style="font-size:.82rem;font-weight:700;margin-bottom:8px;color:var(--ink-soft);">Полный список задач (${filtered.length} доступно):</div>
-        <select id="prac-task-select" class="code-editor" style="min-height:auto;padding:10px 12px;font-weight:600;font-size:.85rem;width:100%;margin-bottom:10px;">
-          ${taskOptions}
-        </select>
-        ${taskSwiperHTML}
-      </div>
-    </div>`;
 
   practiceHubState.mobileTab = practiceHubState.mobileTab || 'task';
   const curMobTab = practiceHubState.mobileTab;
@@ -6575,7 +6593,8 @@ function viewPracticeHub(){
       let parts = clean.split('==');
       let inp = parts[0] ? parts[0].trim() : `Тест #${idx+1}`;
       let exp = parts[1] ? parts[1].split(',')[0].trim() : 'True';
-      return `<tr><td><code>${escapeHtmlStr(inp.slice(0, 36))}</code></td><td><code>${escapeHtmlStr(exp.slice(0, 24))}</code></td><td><span style="color:var(--ink-muted);">Ожидает</span></td></tr>`;
+      const clip = (v, n) => v.length > n ? v.slice(0, n) + '…' : v;
+      return `<tr><td><code title="${escapeHtmlStr(inp)}">${escapeHtmlStr(clip(inp, 36))}</code></td><td><code title="${escapeHtmlStr(exp)}">${escapeHtmlStr(clip(exp, 24))}</code></td><td><span style="color:var(--ink-muted);">Ожидает</span></td></tr>`;
     }).join('');
   }
   if(!testCasesRowsHTML){
@@ -6653,7 +6672,7 @@ function viewPracticeHub(){
         ${renderEchelonBadge(curTaskEchelon)}
         ${solvedMap[curTask.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
       </div>
-      <div style="display:inline-flex;gap:4px;align-items:center;">
+      <div style="display:inline-flex;gap:4px;align-items:center;" class="prac-inline-swiper">
         <button type="button" class="btn btn-ghost" style="padding:3px 8px;font-size:.74rem;" data-prac-step="-1" ${filtered.length<=1?'disabled':''} title="Предыдущая задача">‹</button>
         <span style="font-size:.75rem;font-weight:700;color:var(--ink-muted);">${filtered.length>0 ? `${curFilteredIdx + 1}/${filtered.length}` : '0/0'}</span>
         <button type="button" class="btn btn-ghost" style="padding:3px 8px;font-size:.74rem;" data-prac-step="1" ${filtered.length<=1?'disabled':''} title="Следующая задача">›</button>
@@ -6691,7 +6710,6 @@ function viewPracticeHub(){
 
       ${chipsBarHTML}
       ${searchBarHTML}
-      ${filtersDrawerHTML}
 
       <div class="microstep-card">
         ${mobileTabsHTML}
@@ -7641,7 +7659,7 @@ diagIntroHTML = function(){
   return `
     <div class="container">
       <div class="diag-header-row">
-        <a href="#/map" class="back-link">${ICONS.chevronLeft} К карте навыков</a>
+        <a href="#/" class="back-link">${ICONS.chevronLeft} К результатам</a>
         <div class="topic-badge">Этап 0 · Калибровочная диагностика Эшелона 1 (Скрининг)</div>
       </div>
       <h1 style="margin-bottom:10px;">Калибровка приоритетов перед стартом</h1>
@@ -7662,7 +7680,7 @@ diagIntroHTML = function(){
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;">
         <button class="btn btn-primary" data-diag-start>Начать калибровку (${CORE_QUESTIONS.length} вопросов)</button>
-        <a href="#/map" class="btn btn-ghost">Пропустить, вернусь позже</a>
+        <a href="#/" class="btn btn-ghost">Пропустить, вернусь позже</a>
       </div>
     </div>`;
 };
@@ -7763,7 +7781,7 @@ diagQuestionHTML = function(pool, label){
   return `
     <div class="container" style="padding-bottom:${isRevealed ? '200px' : '32px'};">
       <div class="diag-header-row">
-        <a href="#/map" class="back-link">${ICONS.chevronLeft} Выйти к карте</a>
+        <a href="#/" class="back-link">${ICONS.chevronLeft} К результатам</a>
         <div class="topic-badge">${label} · вопрос ${diagState.idx+1} из ${pool.length}</div>
       </div>
       <div class="progress-bar"><div class="progress-bar__fill" style="width:${pct}%"></div></div>
@@ -7878,7 +7896,7 @@ diagResultsHTML = function(){
   return `
     <div class="container">
       <div class="diag-header-row">
-        <a href="#/map" class="back-link">${ICONS.chevronLeft} К карте навыков</a>
+        <a href="#/" class="back-link">${ICONS.chevronLeft} К результатам</a>
         <div class="topic-badge">Диагностика · результат калибровки</div>
       </div>
       <h1 style="margin-bottom:6px;">Результат: ${totalScore} из ${totalQ} верно</h1>
@@ -7886,7 +7904,7 @@ diagResultsHTML = function(){
       <div class="node-grid">${catsHTML}</div>
       ${calibratedNotice}
       <div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap;">
-        <a href="#/map" class="btn btn-primary">К карте навыков ${ICONS.arrowRight}</a>
+        <a href="#/" class="btn btn-primary">К результатам ${ICONS.arrowRight}</a>
         <button class="btn btn-ghost" data-diag-restart>Пройти ещё раз</button>
       </div>
     </div>`;
@@ -9479,11 +9497,6 @@ viewDashboard = function(){
               <h3 class="node-card__title">🎙️ Симулятор собеседования</h3>
               <p class="node-card__summary">Live-Coding с 20-минутным таймером, сократическим интервьюером (4 уровня опор) и тренажёром поведенческих ответов STAR.</p>
             </a>
-            <a href="#/map" class="node-card node-card--available" style="text-decoration:none;">
-              <div class="node-card__top"><span class="node-card__num">18 МОДУЛЕЙ · 64 УРОКА</span>${ICONS.map}</div>
-              <h3 class="node-card__title">🗺️ Полная карта Backend</h3>
-              <p class="node-card__summary">Python, Git, SQL, HTTP, ООП, Алгоритмы, ORM, Asyncio, FastAPI, pytest, Redis, Docker, OWASP, System Design, LLM и Финальный проект.</p>
-            </a>
             <a href="#/docs" class="node-card node-card--available" style="text-decoration:none;">
               <div class="node-card__top"><span class="node-card__num">ШПАРГАЛКА · ТАБЛИЦЫ</span>${ICONS.book || ICONS.map}</div>
               <h3 class="node-card__title">📚 Справочник Backend</h3>
@@ -9509,7 +9522,6 @@ NAV_ITEMS.splice(0, NAV_ITEMS.length,
   {route:'/databases', icon:'database', label:'Базы данных', shortLabel:'БД', group:'module'},
   {route:'/architecture', icon:'arch', label:'Архитектура', shortLabel:'Архит.', group:'module'},
   {route:'/infra', icon:'rocket', label:'Инфраструктура', shortLabel:'Инфра', group:'module'},
-  {route:'/map', icon:'map', label:'Карта навыков', shortLabel:'Карта', group:'learn'},
   {route:'/docs', icon:'map', label:'Справочник', shortLabel:'Справочник', group:'tool'},
   {route:'/sandbox', icon:'terminal', label:'Песочница', shortLabel:'Песочница', group:'tool'}
 );
@@ -10084,19 +10096,20 @@ render = function(){
       }catch(err){}
     }, 60);
   } else if(route === '/map'){
-    root.innerHTML = viewMap();
-    navRoute = '/map';
+    // Coddy-ref: один экран «Путь» — карта дублер дашборда; старые ссылки на #/map ведут на результаты
+    root.innerHTML = viewDashboard();
+    navRoute = '/';
   } else if(route === '/sandbox'){
     root.innerHTML = viewSandbox();
   } else if(route === '/diagnostic' || route === '/lesson/quiz'){
     root.innerHTML = viewDiagnostic();
-    navRoute = '/map';
+    navRoute = '/';
   } else if(route.indexOf('/topic/') === 0){
     root.innerHTML = viewTopic(route.slice(7));
-    navRoute = '/map';
+    navRoute = '/';
   } else if(route.indexOf('/lesson/') === 0){
     root.innerHTML = viewLesson(route.slice(8));
-    navRoute = '/map';
+    navRoute = '/';
   } else {
     root.innerHTML = viewDashboard();
     navRoute = '/';
@@ -11333,12 +11346,6 @@ document.addEventListener('click', async function(e){
     render();
     return;
   }
-  if(e.target.closest('[data-toggle-prac-filters]')){
-    practiceHubState.mobileFiltersOpen = !practiceHubState.mobileFiltersOpen;
-    savePracticeHubPosState();
-    render();
-    return;
-  }
   if(e.target.closest('[data-toggle-prac-search]')){
     practiceHubState.searchOpen = !practiceHubState.searchOpen;
     savePracticeHubPosState();
@@ -11697,10 +11704,6 @@ document.addEventListener('change', function(e){
     render();
   } else if(e.target.id === 'prac-status-filter'){
     practiceHubState.statusFilter = e.target.value;
-    savePracticeHubPosState();
-    render();
-  } else if(e.target.id === 'prac-task-select'){
-    selectPracticeTask(parseInt(e.target.value, 10));
     savePracticeHubPosState();
     render();
   } else if(e.target.id === 'mock-echelon-select'){

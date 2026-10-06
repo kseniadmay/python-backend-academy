@@ -128,15 +128,13 @@ const SEED_STATE = {
 
 const TRACKS = ['python', 'web', 'backend', 'algorithms', 'databases', 'architecture', 'infra'];
 
-// name → { hash, action: 'pro'|'mapPath'|null, seed: bool, viewports: [...] }
+// name → { hash, action: 'pro'|null, seed: bool, viewports: [...] }
 const SHOTS = [];
 function add(name, def) { SHOTS.push(Object.assign({ name, viewports: ['desktop', 'mobile'] }, def)); }
 
 add('dashboard', { hash: '#/' });
 add('path_game', { hash: '#/path' });
 add('path_pro', { hash: '#/path', action: 'pro' });
-add('map_tree', { hash: '#/map' });
-add('map_path', { hash: '#/map', action: 'mapPath' });
 for (const t of TRACKS) add('track_' + t, { hash: '#/' + t });
 add('skill_python_1_1_1', { hash: '#/python/skill/1.1.1' });
 add('practice_hub', { hash: '#/practice' });
@@ -273,10 +271,6 @@ function diffShots(pm, pngjs, currentPath, baselinePath, diffPath) {
             if (card) card.click();
           }).catch(() => {});
           await page.keyboard.press('Escape').catch(() => {}); // закрыть модалку, чтобы не перекрывала кадр
-        }
-        if (shot.action === 'mapPath') {
-          const mp = page.locator('[data-map-mode="path"]').first();
-          if (await mp.count()) await mp.click().catch(() => {});
         }
         await page.waitForTimeout(RENDER_SETTLE_MS);
 

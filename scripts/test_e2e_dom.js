@@ -407,7 +407,7 @@ console.log('✓ Route #/cards (286 unique combined decks, 6051 unique cards acr
 html = navigate('#/practice');
 assert(html.includes('Практика кода') && html.includes('/ 401 решено'), '#/practice failed to render 401 tasks');
 assert(html.includes('🥚 Уровень 1') && html.includes('👑 Уровень 7'), '#/practice missing animal difficulty tiers');
-assert(html.includes('#401 '), '#/practice dropdown truncated task #401!');
+assert(sandbox.IDE_TASKS_BY_ID[401] && html.includes('prac-inline-swiper'), '#/practice must keep 401 tasks reachable via inline swiper navigation (Coddy-ref)');
 assert(sandbox.IDE_TASKS.length === 401, `Expected 401 IDE_TASKS, got ${sandbox.IDE_TASKS.length}`);
 const allMappedTaskIds = new Set();
 for (const mObj of [sandbox.PY_MASTERY, sandbox.WEB_MASTERY, sandbox.BACKEND_MASTERY, sandbox.ALGO_MASTERY, sandbox.DB_MASTERY, sandbox.ARCH_MASTERY, sandbox.INFRA_MASTERY]) {
@@ -515,9 +515,9 @@ for (const [kid, note] of Object.entries(sandbox.INFRA_MASTERY.notes)) {
 }
 console.log('✓ All 238 K-notes across Python (68), Web (23), Backend (40), Algorithms (14), Databases (32), Architecture (14), and Infrastructure (47) verified: 0 empty code blocks, 0 fence/blockquote/#-header/$math leaks, >=3/4 steps + .jvs-grid + runnable snippets on all Algo, DB, Arch & Infra notes');
 
-// 8. Check Skill Tree Map (#/map) and all 18 Topic pages (#/topic/...)
+// 8. Check #/map redirect (Coddy-ref: single Path screen, map merged into dashboard) and all 18 Topic pages (#/topic/...)
 html = navigate('#/map');
-assert(html.includes('Карта навыков'), '#/map failed to render');
+assert(html.includes('Мои результаты'), '#/map must redirect to dashboard (Мои результаты)');
 const nodeIds = ['diag','py-basics','git','sql','http','oop','algo','orm','async','framework','testing','cache','docker','security','sysdesign','llm','final','interview'];
 for (const nid of nodeIds) {
   html = navigate(`#/topic/${nid}`);
@@ -942,9 +942,10 @@ function fireClick(attrName, attrVal, extraAttrs = {}) {
   const curMockHtml = elementsById['view-root'].innerHTML;
   assert(curMockHtml.includes('Эшелон 1') && !curMockHtml.includes('echelon-badge undefined'), '#/mock random task in Round 1 (Echelon 1) must select an Echelon 1 task with valid badgeClass');
 
-  const mapViewHtml = navigate('#/map');
-  assert(mapViewHtml.includes('Приоритетная архитектура подготовки к собеседованию (4 эшелона)') && mapViewHtml.includes('Связанные юниты:'), '#/map must include Priority Roadmap widget and linked unit badges');
-  assert(!mapViewHtml.includes('echelon-badge undefined') && mapViewHtml.includes('echelon-badge--t1'), '#/map must render valid echelon-badge--t1..t4 classes without undefined');
+  navigate('#/python/skill/1.1.1');
+  await fireClick('data-py-tab', 'theory');
+  const skillEchHtml2 = elementsById['view-root'].innerHTML;
+  assert(skillEchHtml2.includes('echelon-badge--t1') && !skillEchHtml2.includes('echelon-badge undefined'), 'Skill reader must render echelon-badge--t1 without undefined');
   const topicSqlHtml = navigate('#/topic/sql');
   assert(topicSqlHtml.includes('Двусторонняя синхронизация с 7 модулями Мастерства') && topicSqlHtml.includes('Юнит 5.2'), '#/topic/sql must display bi-directional unit cards');
   assert(!topicSqlHtml.includes('echelon-badge undefined'), '#/topic/sql must not contain echelon-badge undefined');
@@ -1363,7 +1364,7 @@ function fireClick(attrName, attrVal, extraAttrs = {}) {
 
   // 16.7. Mobile-Friendly Practice Filters in Practice Hub (#/practice)
   const practiceHtml = navigate('#/practice');
-  assert(practiceHtml.includes('prac-filters-toggle') && practiceHtml.includes('prac-filters-collapsible'), 'Practice Hub must support collapsible accordion filters on mobile');
+  assert(!practiceHtml.includes('prac-filters-drawer') && practiceHtml.includes('prac-inline-swiper'), 'Practice Hub must use single inline task navigation (Coddy-ref), filters drawer removed');
   assert(practiceHtml.includes('prac-chips-bar') && practiceHtml.includes('prac-chip--echelon') && practiceHtml.includes('prac-chip--cat'), 'Practice Hub must render horizontal chips bar with echelon and category chips');
 
   // Verify that changing echelon filter dynamically updates active task to match filter
@@ -1532,16 +1533,13 @@ function fireClick(attrName, attrVal, extraAttrs = {}) {
   assert(popoverEl.style.display === 'none', 'Clicking popover close button must hide the popover');
 
   // 19.3. #/map Mode Switching (Serpentine vs Tree)
-  const mapInitialHtml = navigate('#/map');
-  assert(mapInitialHtml.includes('data-map-mode="path"') && mapInitialHtml.includes('data-map-mode="tree"'), '#/map must feature mode switcher');
-  // Switch to Serpentine mode
-  await fireClick('data-map-mode', 'path');
-  const mapPathModeHtml = elementsById['view-root'].innerHTML;
-  assert(mapPathModeHtml.includes('path-serpentine') && mapPathModeHtml.includes('hex-3d-node'), '#/map in path mode must render 3D serpentine trail');
-  // Switch back to Tree mode
-  await fireClick('data-map-mode', 'tree');
-  const mapTreeModeHtml = elementsById['view-root'].innerHTML;
-  assert(mapTreeModeHtml.includes('Приоритетная архитектура подготовки к собеседованию'), '#/map in tree mode must render priority tree');
+  // Coddy-ref batch: #/map removed as a screen (redirects to dashboard) — echelon badges live on the skill reader now
+  const mapRedirectHtml = navigate('#/map');
+  assert(mapRedirectHtml.includes('Мои результаты'), '#/map must redirect to dashboard');
+  navigate('#/python/skill/1.1.1');
+  await fireClick('data-py-tab', 'theory');
+  const skillEchHtml = elementsById['view-root'].innerHTML;
+  assert(skillEchHtml.includes('echelon-badge--t') && !skillEchHtml.includes('echelon-badge undefined'), 'Skill reader must render valid echelon-badge classes without undefined');
 
   // 19.4. Duolingo-style Bite-Sized Lesson Runner elements
   const lessonTheoryHtml = navigate('#/lesson/testing-1');
