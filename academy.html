@@ -1620,13 +1620,31 @@
   .hex-3d-node {
     cursor: pointer;
     outline: none;
-    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 0.24s ease;
   }
   .hex-3d-node:hover {
-    transform: scale(1.08);
+    transform: scale(1.035);
   }
   .hex-3d-node:active {
-    transform: scale(0.96);
+    transform: scale(0.985);
+  }
+  .hex-3d-node:active .path-button-face,
+  .hex-3d-node:active .path-button-icon,
+  .hex-challenge-node:active .path-button-face,
+  .hex-challenge-node:active .path-button-icon { transform: translateY(4px); }
+  .path-button-face, .path-button-icon { transition: transform 0.16s ease; transform-box: fill-box; transform-origin: center; }
+  .hex-3d-node:hover .path-button-face, .hex-challenge-node:hover .path-button-face { filter: brightness(1.08); }
+  .hex-3d-node:focus-visible .path-node-face,
+  .hex-challenge-node:focus-visible .path-challenge-face,
+  .hex-3d-node:focus-visible .path-button-face,
+  .hex-challenge-node:focus-visible .path-button-face,
+  .hex-3d-node:focus-visible .path-paw-face,
+  .hex-challenge-node:focus-visible .path-paw-face {
+    stroke: #ffffff !important;
+    stroke-width: 3 !important;
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
   }
   .hex-node-label {
     display: none !important;
@@ -1641,36 +1659,42 @@
     0% { transform: translateY(0); }
     100% { transform: translateY(-4px); }
   }
+  .hex-pulse-halo, .hex-challenge-pulse {
+    pointer-events: none;
+  }
+  .hex-pulse-halo { animation: hexPulse 2.2s infinite ease-in-out; }
   @keyframes hexPulse {
     0%, 100% { r: 38px; opacity: 0.85; stroke-width: 2.5px; }
     50% { r: 48px; opacity: 0.2; stroke-width: 5px; }
-  }
-  .hex-pulse-halo {
-    animation: hexPulse 2.2s infinite ease-in-out;
-    pointer-events: none;
-  }
-  /* «Челлендж мастерства» — боковые ветви-гексагоны (по референсу Coddy) */
-  .hex-challenge-node {
-    cursor: pointer;
-    outline: none;
-    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  .hex-challenge-node:hover {
-    transform: scale(1.10);
-  }
-  .hex-challenge-node:active {
-    transform: scale(0.96);
-  }
-  .hex-challenge-node--locked {
-    cursor: not-allowed;
   }
   @keyframes hexChallengePulse {
     0%, 100% { r: 26px; opacity: 0.8; stroke-width: 2.5px; }
     50% { r: 34px; opacity: 0.15; stroke-width: 5px; }
   }
+  /* «Челлендж мастерства» — боковые ветви-гексагоны (по референсу Coddy) */
+  .hex-challenge-node {
+    cursor: pointer;
+    outline: none;
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 0.24s ease;
+  }
+  .hex-challenge-node:hover {
+    transform: scale(1.035);
+  }
+  .hex-challenge-node:active {
+    transform: scale(0.985);
+  }
+  .hex-challenge-node--locked {
+    cursor: not-allowed;
+  }
   .hex-challenge-pulse {
     animation: hexChallengePulse 2.6s infinite ease-in-out;
     pointer-events: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hex-3d-node, .hex-challenge-node, .path-popover { transition: none !important; animation: none !important; }
+    .hex-active-tooltip__inner, .hex-pulse-halo, .hex-challenge-pulse { animation: none !important; }
   }
   .hex-branch-label {
     font-size: 9.5px;
@@ -1691,33 +1715,38 @@
   .path-popover {
     position: absolute;
     z-index: 1000;
-    width: 280px;
-    background: rgba(22, 27, 36, 0.96);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 20px;
-    padding: 18px 18px 16px;
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    box-sizing: border-box;
+    width: min(340px, calc(100vw - 32px));
+    background: linear-gradient(155deg, rgba(28, 34, 45, 0.98), rgba(18, 22, 30, 0.98));
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 22px;
+    padding: 18px;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.42), 0 2px 8px rgba(0, 0, 0, 0.22);
     transform: translateX(-50%);
-    animation: popoverFadeIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: popoverFadeIn 0.16s ease-out;
     color: #f8fafc;
   }
+  .path-popover:focus-visible {
+    outline: 1px solid rgba(245, 158, 11, 0.55);
+    outline-offset: 3px;
+  }
   html:not([data-theme="dark"]) .path-popover {
-    background: rgba(255, 255, 255, 0.96);
-    border: 1px solid rgba(0, 0, 0, 0.10);
-    box-shadow: 0 18px 48px rgba(15, 23, 42, 0.18);
+    background: linear-gradient(155deg, rgba(255, 255, 255, 0.99), rgba(246, 247, 250, 0.99));
+    border: 1px solid rgba(20, 28, 40, 0.10);
+    box-shadow: 0 20px 48px rgba(15, 23, 42, 0.18), 0 2px 8px rgba(15, 23, 42, 0.08);
     color: #0f172a;
   }
   @keyframes popoverFadeIn {
-    from { opacity: 0; transform: translateX(-50%) scale(0.9); }
-    to { opacity: 1; transform: translateX(-50%) scale(1); }
+    from { opacity: 0; transform: translate(-50%, 5px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
   }
   .path-popover-arrow {
     position: absolute;
     width: 0; height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
     left: 50%;
     transform: translateX(-50%);
   }
@@ -1739,39 +1768,160 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    gap: 10px;
+    margin-bottom: 14px;
   }
   .path-popover-badge {
-    font-size: 0.72rem;
+    min-width: 0;
+    max-width: calc(100% - 36px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.68rem;
     font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 3px 8px;
-    border-radius: 6px;
-    background: rgba(245, 158, 11, 0.18);
-    color: #fbbf24;
+    letter-spacing: 0.02em;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(245, 158, 11, 0.12);
+    color: #f5bd4f;
+  }
+  html:not([data-theme="dark"]) .path-popover-badge {
+    background: rgba(180, 112, 21, 0.10);
+    color: #8a5614;
   }
   .path-popover-close {
     background: none;
     border: none;
-    color: #94a3b8;
-    font-size: 1.1rem;
+    color: #9da7b6;
+    font-size: 1rem;
     cursor: pointer;
-    padding: 0 4px;
-    line-height: 1;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    transition: background 0.16s ease, color 0.16s ease;
+  }
+  .path-popover-close:hover {
+    background: rgba(148, 163, 184, 0.12);
+    color: var(--ink);
   }
   .path-popover-title {
-    font-size: 1.05rem;
+    font-size: 1.16rem;
     font-weight: 800;
-    line-height: 1.35;
-    margin-bottom: 6px;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    margin: 0 0 9px;
   }
   .path-popover-status {
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: #94a3b8;
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.10);
+    font-size: 0.76rem;
+    font-weight: 650;
+    color: #b1bdcc;
     margin-bottom: 14px;
   }
+  html:not([data-theme="dark"]) .path-popover-status {
+    color: #526174;
+    background: rgba(71, 85, 105, 0.08);
+  }
+  .path-popover-skills-label {
+    margin-bottom: 8px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8793a4;
+  }
+  .path-popover-skills-list {
+    display: grid;
+    gap: 7px;
+  }
+  .path-popover-skill {
+    position: relative;
+    padding: 8px 10px 8px 28px;
+    border: 1px solid rgba(148, 163, 184, 0.10);
+    border-radius: 11px;
+    background: rgba(148, 163, 184, 0.055);
+    color: #c5ceda;
+    font-size: 0.76rem;
+    line-height: 1.42;
+  }
+  .path-popover-skill::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 14px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #f3b447;
+  }
+  html:not([data-theme="dark"]) .path-popover-skill {
+    color: #405064;
+    border-color: rgba(71, 85, 105, 0.10);
+    background: rgba(71, 85, 105, 0.035);
+  }
+  .path-popover-actions {
+    margin-top: 16px;
+  }
+  .path-popover .path-popover-cta {
+    min-height: 48px;
+    border-radius: 14px;
+    box-shadow: 0 5px 16px rgba(249, 115, 22, 0.22);
+    transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+  }
+  .path-popover .path-popover-cta:hover {
+    filter: brightness(1.04);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.27);
+  }
+  .path-popover .path-popover-cta:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 9px rgba(249, 115, 22, 0.18);
+  }
+  .path-node-style-picker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+  }
+  .path-node-style-label {
+    width: 100%;
+    margin-bottom: 1px;
+    font-size: 0.76rem;
+    font-weight: 750;
+    color: var(--ink-soft);
+  }
+  .path-node-style-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    padding: 8px 12px;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 750;
+    cursor: pointer;
+    transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+  }
+  .path-node-style-btn.active {
+    border-color: rgba(245, 158, 11, 0.48);
+    background: rgba(245, 158, 11, 0.10);
+    color: var(--ink);
+  }
+  .path-node-style-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
   .path-popover-cta {
     width: 100%;
     padding: 12px;
@@ -2012,6 +2162,10 @@
     flex-shrink: 0;
     position: sticky;
     top: 80px;
+    max-height: calc(100vh - 96px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 184, 0.28) transparent;
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -2061,6 +2215,12 @@
     margin-bottom: 8px;
   }
   .coddy-rail-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding: 3px 9px;
+    border-radius: 8px;
+    background: rgba(245, 158, 11, 0.09);
     font-size: 0.75rem;
     font-weight: 700;
     color: #f59e0b;
@@ -2069,6 +2229,11 @@
   }
   .coddy-rail-link:hover {
     opacity: 0.8;
+    background: rgba(245, 158, 11, 0.15);
+  }
+  .coddy-rail-link:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
   }
   .coddy-rail-badge {
     font-size: 0.70rem;
@@ -2096,14 +2261,14 @@
   .coddy-rail-chapters-list {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 3px;
     margin-top: 4px;
   }
   .crc-row {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 7px 8px;
+    padding: 6px 8px;
     border-radius: 10px;
     text-decoration: none;
     transition: background 0.15s ease;
@@ -2117,6 +2282,8 @@
   .crc-row--current {
     background: rgba(245, 158, 11, 0.10);
     box-shadow: inset 2.5px 0 0 #f59e0b;
+    padding-top: 8px;
+    padding-bottom: 8px;
   }
   html:not([data-theme="dark"]) .crc-row--current {
     background: rgba(217, 119, 6, 0.08);
@@ -2156,9 +2323,15 @@
     font-size: 0.78rem;
     font-weight: 700;
     color: var(--ink, #f1f5f9);
-    white-space: nowrap;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
     overflow: hidden;
-    text-overflow: ellipsis;
+  }
+  .crc-row--current .crc-title {
+    font-size: 0.80rem;
+    -webkit-line-clamp: 2;
   }
   .crc-bar {
     height: 5px;
@@ -2183,6 +2356,26 @@
     color: #94a3b8;
     min-width: 34px;
     text-align: right;
+  }
+  .coddy-rail-meter {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    margin: 5px 0 8px;
+  }
+  .coddy-rail-meter-value {
+    font-size: 1.85rem;
+    line-height: 1;
+    font-weight: 900;
+    color: var(--ink);
+    letter-spacing: -0.04em;
+  }
+  .coddy-rail-daily-summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 0.75rem;
+    color: var(--ink-soft);
   }
 
   @media (max-width: 640px) {
@@ -5697,6 +5890,7 @@ function ensureExtendedState(target){
   if(!s.stackBranch || !['fastapi','django','both'].includes(s.stackBranch)) s.stackBranch = 'fastapi';
   if(!s.unitSortMode || !['priority','number'].includes(s.unitSortMode)) s.unitSortMode = 'priority';
   if(!s.pathViewMode || !['game','pro'].includes(s.pathViewMode)) s.pathViewMode = 'game';
+  if(!s.pathNodeStyle || !['paw','button'].includes(s.pathNodeStyle)) s.pathNodeStyle = 'paw';
   if(!s.diagnosticGaps || !Array.isArray(s.diagnosticGaps)) s.diagnosticGaps = [];
   if(typeof s.diagCompleted !== 'boolean') s.diagCompleted = false;
   if(typeof s.diagScore !== 'number') s.diagScore = 0;
@@ -10099,17 +10293,20 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)
   const e1 = (typeof getEchelonProgress === 'function') ? getEchelonProgress(1) : null;
   const e1Pct = e1 ? e1.pct : 0;
   const e1Remaining = e1 ? e1.skills.filter(s => getSkillMP(s.id) < 100).length : 0;
+  const dailyGoal = Math.max(1, Number(state.dailyGoal) || 50);
+  const dailyXp = (typeof todayXp === 'function') ? todayXp() : 0;
+  const dailyPct = Math.min(100, Math.round(dailyXp / dailyGoal * 100));
   const chaptersListHTML = chaptersMeta.map(ch => {
     const chCompleted = ch.units.filter(isUnitCompleted).length;
     const chPct = Math.round(chCompleted / ch.units.length * 100);
     const route = (typeof getTrackForUnit === 'function' && ch.units[0]) ? getTrackForUnit(ch.units[0].id).routePrefix : 'python';
     const isCurrent = (ch.num === activeChapterNum);
     return `
-      <a class="crc-row ${isCurrent ? 'crc-row--current' : ''}" href="#/${route}" title="Глава ${ch.num}: ${escapeHtmlStr(ch.title)} — перейти к модулю">
+      <a class="crc-row ${isCurrent ? 'crc-row--current' : 'crc-row--compact'}" href="#/${route}" ${isCurrent ? 'aria-current="location"' : ''} title="Глава ${ch.num}: ${escapeHtmlStr(ch.title)} — перейти к модулю">
         <span class="crc-num">${ch.num}</span>
         <span class="crc-body">
           <span class="crc-title">${escapeHtmlStr(ch.title)}</span>
-          <span class="crc-bar"><span class="crc-bar-fill" style="width:${chPct}%;"></span></span>
+          ${isCurrent ? `<span class="crc-bar"><span class="crc-bar-fill" style="width:${chPct}%;"></span></span>` : ''}
         </span>
         <span class="crc-pct">${chCompleted}/${ch.units.length}</span>
       </a>`;
@@ -10139,11 +10336,11 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)
           <div class="coddy-rail-badge">🎯 До 1-го скрининга</div>
           <a href="#/mock" class="coddy-rail-link">Симулятор →</a>
         </div>
-        <div style="display:flex;align-items:baseline;gap:8px;margin:6px 0 8px;">
-          <span style="font-size:1.7rem;font-weight:900;color:var(--ink);">${e1Pct}%</span>
+        <div class="coddy-rail-meter">
+          <span class="coddy-rail-meter-value">${e1Pct}%</span>
           <span class="meta">готовности к тех-скринингу</span>
         </div>
-        <div class="cd-bar cd-bar-track"><div class="cd-fill cd-bar-fill" style="width:${Math.max(6, e1Pct)}%;"></div></div>
+        <div class="cd-bar cd-bar-track" role="progressbar" aria-label="Готовность к техническому скринингу" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${e1Pct}"><div class="cd-fill cd-bar-fill" style="width:${Math.max(6, e1Pct)}%;"></div></div>
         <div class="meta" style="font-size:.75rem;margin-top:7px;">⏳ Осталось ${e1Remaining} ${pluralRuTopics(e1Remaining)} Эшелона 1</div>
       </div>
 
@@ -10175,17 +10372,60 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)
           <span class="meta">${streakText} подряд</span>
         </div>
         <div class="progress-bar-wrap" style="height:6px;margin-bottom:8px;">
-          <div class="progress-bar-fill" style="width:${Math.min(100, Math.round(((state.xp||0) % 100) / 100 * 100))}%;background:linear-gradient(90deg,#fbbf24,#f59e0b);"></div>
+          <div class="progress-bar-fill" style="width:${dailyPct}%;background:linear-gradient(90deg,#fbbf24,#f59e0b);"></div>
         </div>
-        <div class="meta" style="font-size:0.75rem;">Цель: <strong>50 XP в день</strong> · Всего: <strong>${state.xp || 0} XP</strong></div>
+        <div class="coddy-rail-daily-summary"><span>Сегодня: <strong>${dailyXp}/${dailyGoal} XP</strong></span><span>${dailyXp >= dailyGoal ? 'Цель выполнена' : `Осталось ${dailyGoal - dailyXp} XP`}</span></div>
       </div>
     </aside>`;
 }
+
+// Набор контурных иконок для узлов тропы (референс: тёмно-серый гекс + светлая иконка вместо замка)
+const TRAIL_ICON_PATHS = {
+  star: '<path d="M12 3l2.7 5.5 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.8 1-6.1L3.2 9.4l6.1-.9z"/>',
+  book: '<path d="M6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5v-13A2.5 2.5 0 0 1 6.5 3z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20"/>',
+  code: '<path d="M8 7l-5 5 5 5"/><path d="M16 7l5 5-5 5"/>',
+  terminal: '<path d="M4 17l6-5-6-5"/><path d="M12 19h8"/>',
+  globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15.3 15.3 0 0 1 0 18 15.3 15.3 0 0 1 0-18z"/>',
+  layers: '<path d="M12 2l10 6-10 6L2 8z"/><path d="M2 14l10 6 10-6"/>',
+  zap: '<path d="M13 2L4 14h6l-1 8 9-12h-6z"/>',
+  database: '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
+  cloud: '<path d="M17.5 19a4.5 4.5 0 0 0 0-9 6.5 6.5 0 0 0-12.6 1.7A4.2 4.2 0 0 0 6.8 19z"/>',
+  wrench: '<path d="M14.7 6.3a4.8 4.8 0 0 0-6 6L3 18l3 3 5.7-5.7a4.8 4.8 0 0 0 6-6L14 13l-3-3z"/>',
+  branch: '<circle cx="6" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><path d="M6 15V3"/><path d="M18 9a9 9 0 0 1-9 9"/>',
+  shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  trophy: '<path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 5H4v1a3 3 0 0 0 3 3"/><path d="M17 5h3v1a3 3 0 0 1-3 3"/>'
+};
+function trailIconCenter(x, y, name, size, color){
+  const d = TRAIL_ICON_PATHS[name] || TRAIL_ICON_PATHS.star;
+  return `<g transform="translate(${x - size/2} ${y - size/2}) scale(${(size/24).toFixed(3)})" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" pointer-events="none">${d}</g>`;
+}
+function trailPawShape(x, y, fill, stroke, strokeWidth){
+  const parts = '<circle cx="-15" cy="-14" r="6.2"/><circle cx="-5" cy="-22" r="6.2"/><circle cx="5" cy="-22" r="6.2"/><circle cx="15" cy="-14" r="6.2"/><path d="M-18 6c-1-7 3-16 9-17 4-.7 6 3 9 3s5-3.7 9-3c6 1 10 10 9 17-1 7-8 11-16 6-2-1-3-1-5 0-8 5-15 1-16-6z"/>';
+  return `<g class="path-node-paw" transform="translate(${x} ${y})"><g transform="translate(0 2)" fill="rgba(0,0,0,0.30)" stroke="none">${parts}</g><g class="path-paw-face" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linejoin="round">${parts}</g></g>`;
+}
+function trailIsometricButton(x, y, fill, stroke, strokeWidth){
+  const top = `M${x} ${y-25} L${x+24} ${y-12} L${x+24} ${y+10} L${x} ${y+23} L${x-24} ${y+10} L${x-24} ${y-12} Z`;
+  const side = `M${x-24} ${y+10} L${x} ${y+23} L${x+24} ${y+10} L${x+24} ${y+18} L${x} ${y+31} L${x-24} ${y+18} Z`;
+  const shadow = `M${x} ${y-19} L${x+24} ${y-6} L${x+24} ${y+16} L${x} ${y+29} L${x-24} ${y+16} L${x-24} ${y-6} Z`;
+  const inset = `M${x} ${y-18} L${x+17} ${y-9} L${x+17} ${y+7} L${x} ${y+16} L${x-17} ${y+7} L${x-17} ${y-9} Z`;
+  return `<path d="${shadow}" fill="rgba(0,0,0,0.34)" transform="translate(0 4)"/><g class="path-button-face"><path d="${side}" fill="url(#pathButtonSide)" stroke="rgba(255,255,255,0.12)" stroke-width="1" stroke-linejoin="round"/><path d="${top}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linejoin="round"/><path d="${inset}" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="1" stroke-linejoin="round"/><path d="M${x-15} ${y-12} L${x} ${y-20} L${x+15} ${y-12}" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+}
+// Тематические иконки по главам (циклятся внутри главы)
+const TRAIL_CHAPTER_ICONS = [
+  ['terminal', 'code', 'star', 'book'],
+  ['globe', 'code', 'book', 'star'],
+  ['layers', 'code', 'shield', 'book'],
+  ['branch', 'zap', 'code', 'book'],
+  ['database', 'terminal', 'book', 'star'],
+  ['cloud', 'layers', 'book', 'star'],
+  ['wrench', 'cloud', 'shield', 'book']
+];
 
 function viewPathSerpentine(options){
   options = options || {};
   ensureExtendedState();
   const allUnits = ALL_UNITS_COMBINED;
+  const usePawNodes = state.pathNodeStyle !== 'button';
   
   // Find which units are completed vs active vs locked
   let activeUnitIndex = -1;
@@ -10261,6 +10501,9 @@ function viewPathSerpentine(options){
     const isActive = u.id === curActiveUnit.id;
     return `<div class="path-seg-bar ${isPassed ? 'done' : (isActive ? 'active' : '')}" title="Юнит ${u.id}: ${escapeHtmlStr(u.title)}"></div>`;
   }).join('');
+  const chapterProgressLabel = completedInChapter === 0
+    ? `Начни · ${totalInChapter}`
+    : `${completedInChapter} / ${totalInChapter}`;
 
   // Chapter ribbon markers between modules
   const chapterBreakpoints = [
@@ -10272,6 +10515,9 @@ function viewPathSerpentine(options){
     { startIdx: 33, title: 'Глава 6: Системный дизайн' },
     { startIdx: 39, title: 'Глава 7: Инфраструктура и DevOps' }
   ];
+  // Последний юнит главы получает отдельную иконку трофея.
+  const chapterLastIdxSet = new Set(chapterBreakpoints.slice(1).map(cb => cb.startIdx - 1));
+  chapterLastIdxSet.add(allUnits.length - 1);
 
   let markersSVG = '';
   chapterBreakpoints.forEach(cb => {
@@ -10301,46 +10547,56 @@ function viewPathSerpentine(options){
     const isCompleted = (status === 'completed');
     const isActive = (status === 'active');
 
-    const bevelColor = isCompleted ? '#047857' : (isActive ? '#b45309' : '#31081a');
     const topGrad = isCompleted ? 'url(#hexGradCompleted)' : (isActive ? 'url(#hexGradActive)' : 'url(#hexGradLocked)');
-    const strokeColor = isCompleted ? 'rgba(255,255,255,0.3)' : (isActive ? '#fef08a' : 'rgba(190,18,60,0.38)');
-    const strokeWidth = isActive ? 2.5 : 1.5;
-    const glossOpacity = isCompleted ? 0.10 : (isActive ? 0.14 : 0.06);
+    const buttonGrad = isCompleted ? 'url(#pathButtonCompleted)' : (isActive ? 'url(#pathButtonActive)' : 'url(#pathButtonLocked)');
+    const strokeColor = isCompleted ? 'rgba(255,255,255,0.3)' : (isActive ? '#fef08a' : 'rgba(148,163,184,0.28)');
+    const strokeWidth = isActive ? 2 : 1.5;
 
     let centerIcon = '';
     let pulseHalo = '';
     let activeBubble = '';
+    const cbIdx = chapterBreakpoints.reduce((acc, cb, ci) => (i >= cb.startIdx ? ci : acc), 0);
+    const iconSet = TRAIL_CHAPTER_ICONS[cbIdx] || TRAIL_CHAPTER_ICONS[0];
+    const iconName = chapterLastIdxSet.has(i) ? 'trophy' : iconSet[(i - chapterBreakpoints[cbIdx].startIdx) % iconSet.length];
     if(isCompleted){
-      centerIcon = `<text x="${x}" y="${y+7}" text-anchor="middle" font-size="22" font-weight="900" fill="#ffffff">✓</text>`;
+      centerIcon = `<text x="${x}" y="${y+(usePawNodes?10:7)}" text-anchor="middle" font-size="${usePawNodes?18:22}" font-weight="900" fill="#ffffff">✓</text>`;
     } else if(isActive){
       pulseHalo = `<circle class="hex-pulse-halo" cx="${x}" cy="${y}" r="40" fill="none" stroke="rgba(245, 158, 11, 0.6)"/>`;
-      centerIcon = `<text x="${x}" y="${y+7}" text-anchor="middle" font-size="22">🏆</text>`;
+      centerIcon = trailIconCenter(x, y + (usePawNodes ? 5 : 1), iconName, usePawNodes ? 20 : 26, '#ffffff');
+      const unitStarted = (u.skills || []).some(s => (getSkillMP(s.id) || 0) > 0);
+      const bubbleTxt = unitStarted ? 'ПРОДОЛЖИТЬ' : 'НАЧАТЬ';
+      const bubbleW = unitStarted ? 104 : 72;
+      // Keep the active CTA clear of the chapter ribbon at chapter boundaries.
+      const bubbleY = chapterStartSet.has(i) ? y - 120 : y - 44;
       activeBubble = `
-        <g class="hex-active-tooltip" transform="translate(${x}, ${y - 44})">
+        <g class="hex-active-tooltip" transform="translate(${x}, ${bubbleY})">
           <g class="hex-active-tooltip__inner">
-            <rect x="-36" y="-16" width="72" height="22" rx="11" fill="#ff7a00" filter="drop-shadow(0 4px 10px rgba(255,122,0,0.45))"/>
+            <rect x="${-bubbleW/2}" y="-16" width="${bubbleW}" height="22" rx="11" fill="#ff7a00" filter="drop-shadow(0 4px 10px rgba(255,122,0,0.45))"/>
             <polygon points="-5,6 5,6 0,11" fill="#ff7a00"/>
-            <text x="0" y="-1" text-anchor="middle" font-size="10.5" font-weight="900" fill="#ffffff" letter-spacing="0.08em">НАЧАТЬ</text>
+            <text x="0" y="-1" text-anchor="middle" font-size="10.5" font-weight="900" fill="#ffffff" letter-spacing="0.08em">${bubbleTxt}</text>
           </g>
         </g>`;
     } else {
-      centerIcon = `<text x="${x}" y="${y+6}" text-anchor="middle" font-size="16" fill="#fda4af" opacity="0.75">🔒</text>`;
+      centerIcon = trailIconCenter(x, y + (usePawNodes ? 5 : 0), iconName, usePawNodes ? 18 : 24, '#8b93a3');
     }
 
+    const nodeShape = usePawNodes
+      ? trailPawShape(x, y, topGrad, strokeColor, strokeWidth)
+      : trailIsometricButton(x, y, buttonGrad, isActive ? 'rgba(255,230,160,0.95)' : (isCompleted ? 'rgba(167,243,208,0.75)' : 'rgba(203,213,225,0.42)'), isActive ? 1.8 : 1.3);
+
+    const buttonContent = usePawNodes ? centerIcon : `<g class="path-button-icon">${centerIcon}</g>`;
     const labelX = (x < 210) ? (x + 46) : (x - 46);
     const labelAnchor = (x < 210) ? 'start' : 'end';
     const shortTitle = (u.title.length > 22) ? u.title.slice(0, 20) + '…' : u.title;
+    const nodeStateLabel = isCompleted ? 'Пройден' : (isActive ? 'Текущий юнит, доступен для продолжения' : 'Заблокирован: сначала пройдите предыдущие юниты');
+    const nodeAccessibleLabel = `Юнит ${u.id}: ${cleanUnitTitle(u.id, u.title)}. ${nodeStateLabel}. Нажмите Enter или пробел, чтобы открыть.`;
 
     nodesSVG += `
-      <g class="hex-3d-node hex-node--${status}" data-unit-id="${u.id}" data-node-idx="${i}" data-cx="${x}" data-cy="${y}" role="button" tabindex="0">
+      <g class="hex-3d-node hex-node--${status}" data-unit-id="${u.id}" data-node-idx="${i}" data-cx="${x}" data-cy="${y}" role="button" tabindex="0" aria-label="${escapeHtmlStr(nodeAccessibleLabel)}" aria-keyshortcuts="Enter Space ArrowUp ArrowDown Home End" title="${escapeHtmlStr(nodeAccessibleLabel)}">
         ${pulseHalo}
-        <!-- 3D Bevel Extrusion -->
-        <polygon points="${x-34},${y} ${x-17},${y+29.5} ${x+17},${y+29.5} ${x+34},${y} ${x+34},${y+8} ${x+17},${y+37.5} ${x-17},${y+37.5} ${x-34},${y+8}" fill="${bevelColor}"/>
-        <!-- Hexagon Top Face -->
-        <polygon points="${x+34},${y} ${x+17},${y+29.5} ${x-17},${y+29.5} ${x-34},${y} ${x-17},${y-29.5} ${x+17},${y-29.5}" fill="${topGrad}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
-        <!-- Glossy top-face highlight -->
-        <polygon points="${x-30},${y-4} ${x-15},${y-26} ${x+15},${y-26} ${x+30},${y-4}" fill="rgba(255,255,255,${glossOpacity})" pointer-events="none"/>
-        ${centerIcon}
+        <circle cx="${x}" cy="${y}" r="34" fill="transparent" pointer-events="all"/>
+        ${nodeShape}
+        ${buttonContent}
         <text class="hex-node-label" x="${labelX}" y="${y+4}" text-anchor="${labelAnchor}">${u.id} ${escapeHtmlStr(shortTitle)}</text>
         ${activeBubble}
       </g>`;
@@ -10357,36 +10613,36 @@ function viewPathSerpentine(options){
     const chDone = (state.passedUnitTests || []).includes(u.id);
     const chUnlocked = endIdx <= activeUnitIndex;
     const chStatus = chDone ? 'done' : (chUnlocked ? 'open' : 'locked');
-    const s = 0.72;
     const bx = Math.max(64, Math.min(356, x + (x >= 210 ? 66 : -66)));
-    const by = y + 64;
-    const hp = (dx, dy) => `${(bx + dx * s).toFixed(1)},${(by + dy * s).toFixed(1)}`;
-    const chBevel = chDone ? '#047857' : (chStatus === 'open' ? '#8c0f30' : '#31081a');
+    const by = y + 56;
     const chGrad = chDone ? 'url(#hexGradCompleted)' : (chStatus === 'open' ? 'url(#hexGradChallenge)' : 'url(#hexGradLocked)');
-    const chStroke = chDone ? 'rgba(255,255,255,0.3)' : (chStatus === 'open' ? 'rgba(251,113,133,0.6)' : 'rgba(190,18,60,0.28)');
-    const chTopPts = [hp(34,0), hp(17,29.5), hp(-17,29.5), hp(-34,0), hp(-17,-29.5), hp(17,-29.5)].join(' ');
-    const chBevelPts = [hp(-34,0), hp(-17,29.5), hp(17,29.5), hp(34,0), hp(34,8), hp(17,37.5), hp(-17,37.5), hp(-34,8)].join(' ');
+    const chButtonGrad = chDone ? 'url(#pathButtonCompleted)' : (chStatus === 'open' ? 'url(#pathButtonChallenge)' : 'url(#pathButtonLocked)');
+    const chStroke = chDone ? 'rgba(255,255,255,0.3)' : (chStatus === 'open' ? 'rgba(251,113,133,0.6)' : 'rgba(148,163,184,0.28)');
     let chIcon = '';
     let chHalo = '';
     if(chDone){
-      chIcon = `<text x="${bx}" y="${by+6}" text-anchor="middle" font-size="16" font-weight="900" fill="#ffffff">✓</text>`;
+      chIcon = `<text x="${bx}" y="${by+(usePawNodes?8:6)}" text-anchor="middle" font-size="${usePawNodes?15:16}" font-weight="900" fill="#ffffff">✓</text>`;
     } else if(chStatus === 'open'){
       chHalo = `<circle class="hex-challenge-pulse" cx="${bx}" cy="${by}" r="28" fill="none" stroke="rgba(190,18,60,0.55)"/>`;
-      chIcon = `<text x="${bx}" y="${by+6}" text-anchor="middle" font-size="15">🧠</text>`;
+      chIcon = trailIconCenter(bx, by + (usePawNodes?4:1), 'zap', usePawNodes?17:22, '#ffffff');
     } else {
-      chIcon = `<text x="${bx}" y="${by+5}" text-anchor="middle" font-size="12" fill="#fda4af" opacity="0.7">🔒</text>`;
+      chIcon = trailIconCenter(bx, by + (usePawNodes?4:0), 'zap', usePawNodes?16:20, '#8b93a3');
     }
-    const connectorStroke = chDone ? 'rgba(16,185,129,0.55)' : (chStatus === 'open' ? 'rgba(190,18,60,0.60)' : 'rgba(190,18,60,0.25)');
+    const challengeShape = usePawNodes
+      ? trailPawShape(bx, by, chGrad, chStroke, chStatus === 'open' ? 1.8 : 1.3)
+      : trailIsometricButton(bx, by, chButtonGrad, chStatus === 'open' ? 'rgba(253,164,175,0.9)' : 'rgba(203,213,225,0.42)', chStatus === 'open' ? 1.7 : 1.2);
+    const challengeContent = usePawNodes ? chIcon : `<g class="path-button-icon">${chIcon}</g>`;
+    const connectorStroke = chDone ? 'rgba(16,185,129,0.55)' : (chStatus === 'open' ? 'rgba(190,18,60,0.60)' : 'rgba(148,163,184,0.25)');
 
     branchesSVG += `
       <g class="hex-challenge-branch">
-        <path d="M ${x},${y + 30} Q ${x},${(y + by) / 2} ${bx},${by - 26}" fill="none" stroke="${connectorStroke}" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 8"/>
-        <g class="hex-challenge-node hex-challenge-node--${chStatus}" data-challenge-route="#${track.routePrefix}/unittest/${u.id}" data-challenge-status="${chStatus}" data-cx="${bx}" data-cy="${by}" role="button" tabindex="0" aria-label="Челлендж мастерства: рубежный Unit Test ${u.id}">
+        <path d="M ${x},${y + 30} Q ${x},${(y + by) / 2} ${bx},${by - 22}" fill="none" stroke="${connectorStroke}" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="1 8"/>
+        <g class="hex-challenge-node hex-challenge-node--${chStatus}" data-challenge-route="#${track.routePrefix}/unittest/${u.id}" data-challenge-status="${chStatus}" data-cx="${bx}" data-cy="${by}" role="button" tabindex="0" aria-label="Челлендж мастерства, проверка юнита ${u.id}. ${chDone ? 'Пройдено' : (chUnlocked ? 'Доступно' : 'Заблокировано до прохождения предыдущих юнитов')}. Нажмите Enter или пробел, чтобы открыть." aria-keyshortcuts="Enter Space" aria-disabled="${chStatus === 'locked' ? 'true' : 'false'}">
           ${chHalo}
-          <polygon points="${chBevelPts}" fill="${chBevel}"/>
-          <polygon points="${chTopPts}" fill="${chGrad}" stroke="${chStroke}" stroke-width="${chStatus === 'open' ? 2 : 1.5}"/>
-          ${chIcon}
-          <text class="hex-branch-label" x="${bx}" y="${by + 50}" text-anchor="middle">ЧЕЛЛЕНДЖ МАСТЕРСТВА</text>
+          <circle cx="${bx}" cy="${by}" r="24" fill="transparent" pointer-events="all"/>
+          ${challengeShape}
+          ${challengeContent}
+          <text class="hex-branch-label" x="${bx}" y="${by + 46}" text-anchor="middle">ЧЕЛЛЕНДЖ МАСТЕРСТВА</text>
         </g>
       </g>`;
   });
@@ -10410,7 +10666,6 @@ function viewPathSerpentine(options){
               <div class="path-chapter-breadcrumb">ПРОГРАММА › РАЗДЕЛ ${activeChapterNum} · ГЛАВА ${activeChapterNum}</div>
               <div class="path-chapter-title">Юнит ${curActiveUnit.id} · ${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</div>
             </div>
-            <button type="button" class="btn-3d-orange path-banner-cta" data-pro-start="${curActiveUnit.id}">ПРОДОЛЖИТЬ ➔</button>
           </div>
           <div class="path-chapter-banner-right">
             <div class="path-chapter-progress-row">
@@ -10418,14 +10673,14 @@ function viewPathSerpentine(options){
               <div class="path-chapter-segments">
                 ${chapterSegmentsHTML}
               </div>
-              <span class="path-chapter-count">${completedInChapter} / ${totalInChapter}</span>
+              <span class="path-chapter-count" title="${completedInChapter === 0 ? `Начни главу: в ней ${totalInChapter} ${pluralizeRu(totalInChapter, 'юнит', 'юнита', 'юнитов')}` : `Завершено юнитов: ${completedInChapter} из ${totalInChapter}`}" aria-label="${completedInChapter === 0 ? `Начни главу: ${totalInChapter} ${pluralizeRu(totalInChapter, 'юнит', 'юнита', 'юнитов')}` : `Завершено юнитов: ${completedInChapter} из ${totalInChapter}`}">${chapterProgressLabel}</span>
             </div>
           </div>
         </div>
 
         <!-- S-Curve SVG Trail -->
         <div class="path-serpentine" style="position:relative;">
-          <svg class="path-serpentine-svg" viewBox="0 0 420 ${totalH}" xmlns="http://www.w3.org/2000/svg">
+          <svg class="path-serpentine-svg" viewBox="0 0 420 ${totalH}" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Путь обучения: ${allUnits.length} юнитов и челленджи">
             <defs>
               <linearGradient id="hexGradCompleted" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="#34d399"/>
@@ -10436,13 +10691,18 @@ function viewPathSerpentine(options){
                 <stop offset="100%" stop-color="#d97706"/>
               </linearGradient>
               <linearGradient id="hexGradLocked" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#5b1024"/>
-                <stop offset="100%" stop-color="#2b0714"/>
+                <stop offset="0%" stop-color="#3a4150"/>
+                <stop offset="100%" stop-color="#15181f"/>
               </linearGradient>
               <linearGradient id="hexGradChallenge" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="#fb7185"/>
                 <stop offset="100%" stop-color="#be123c"/>
               </linearGradient>
+              <linearGradient id="pathButtonActive" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffd166"/><stop offset="0.52" stop-color="#f59e0b"/><stop offset="1" stop-color="#c65a08"/></linearGradient>
+              <linearGradient id="pathButtonCompleted" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#6ee7b7"/><stop offset="0.52" stop-color="#10b981"/><stop offset="1" stop-color="#047857"/></linearGradient>
+              <linearGradient id="pathButtonLocked" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#566174"/><stop offset="0.55" stop-color="#303949"/><stop offset="1" stop-color="#1b2230"/></linearGradient>
+              <linearGradient id="pathButtonSide" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#303a4b"/><stop offset="1" stop-color="#111722"/></linearGradient>
+              <linearGradient id="pathButtonChallenge" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fda4af"/><stop offset="0.55" stop-color="#e11d48"/><stop offset="1" stop-color="#9f1239"/></linearGradient>
               <linearGradient id="pathProgressGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="#10b981"/>
                 <stop offset="100%" stop-color="#f59e0b"/>
@@ -10456,7 +10716,7 @@ function viewPathSerpentine(options){
             <!-- Background trail -->
             <path class="path-track-bg" d="${dPath}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="14" stroke-linecap="round"/>
             ${dProgress ? `<path class="path-track-progress" d="${dProgress}" fill="none" stroke="url(#pathProgressGrad)" stroke-width="8" stroke-linecap="round"/>` : ''}
-            ${dFuture ? `<path class="path-track-future" d="${dFuture}" fill="none" stroke="rgba(190,18,60,0.45)" stroke-width="4" stroke-linecap="round" stroke-dasharray="0.1 16"/>` : ''}
+            ${dFuture ? `<path class="path-track-future" d="${dFuture}" fill="none" stroke="rgba(154,161,175,0.45)" stroke-width="4" stroke-linecap="round" stroke-dasharray="0.1 16"/>` : ''}
 
             <!-- Chapter ribbons -->
             ${markersSVG}
@@ -10469,7 +10729,7 @@ function viewPathSerpentine(options){
           </svg>
 
           <!-- Anchored Popover Modal -->
-          <div id="path-anchored-popover" class="path-popover" style="display:none;" role="dialog" aria-modal="true">
+          <div id="path-anchored-popover" class="path-popover" style="display:none;" role="dialog" tabindex="-1" aria-labelledby="popover-title" aria-describedby="popover-status">
             <div class="path-popover-arrow path-popover-arrow--down" id="popover-arrow"></div>
             <div class="path-popover-content">
               <div class="path-popover-header">
@@ -10478,7 +10738,7 @@ function viewPathSerpentine(options){
               </div>
               <h3 class="path-popover-title" id="popover-title">Юнит 1.1: Переменные и память</h3>
               <div class="path-popover-status" id="popover-status">В процессе изучения</div>
-              <div class="path-popover-skills" id="popover-skills" style="font-size:0.8rem;color:var(--ink-soft);margin-bottom:14px;line-height:1.45;"></div>
+              <div class="path-popover-skills" id="popover-skills"></div>
               <div class="path-popover-actions">
                 <button type="button" class="btn-3d-orange path-popover-cta" id="popover-cta-btn">НАЧАТЬ ➔</button>
               </div>
@@ -10527,6 +10787,9 @@ function viewProPath(options){
   const activeChapCompleted = activeChap.units.filter(u => (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80))).length;
   const activeChapTotal = activeChap.units.length;
   const activeChapPct = Math.round(activeChapCompleted / activeChapTotal * 100);
+  const activeChapSummary = activeChapCompleted === 0
+    ? `Начни главу · ${activeChapTotal} ${pluralizeRu(activeChapTotal, 'юнит', 'юнита', 'юнитов')}`
+    : `Глава ${activeChap.num}: ${escapeHtmlStr(activeChap.title)} · ${activeChapCompleted}/${activeChapTotal} уроков · ${activeChapPct}%`;
 
   // Segments for active chapter
   const activeChapSegmentsHTML = activeChap.units.map(u => {
@@ -10542,13 +10805,13 @@ function viewProPath(options){
         <div class="pro-hero-card-left">
           <div class="pro-hero-breadcrumb">ПРОГРАММА › РАЗДЕЛ ${activeChap.num} · ГЛАВА ${activeChap.num}</div>
           <h2 class="pro-hero-title">Юнит ${curActiveUnit.id} · ${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</h2>
-          <div class="pro-hero-meta">Глава ${activeChap.num}: ${escapeHtmlStr(activeChap.title)} · ${activeChapCompleted}/${activeChapTotal} уроков · ${activeChapPct}%</div>
+          <div class="pro-hero-meta">${activeChapSummary}</div>
         </div>
         <button type="button" class="btn-3d-orange pro-hero-cta" data-pro-start="${curActiveUnit.id}">ПРОДОЛЖИТЬ</button>
       </div>
 
       <div class="pro-hero-progress-track">
-        <div class="pro-hero-progress-fill" style="width:${Math.max(6, activeChapPct)}%;"></div>
+        <div class="pro-hero-progress-fill" style="width:${activeChapPct}%;"></div>
       </div>
 
       <div class="path-chapter-progress-row" style="margin-top:4px;">
@@ -10556,7 +10819,7 @@ function viewProPath(options){
         <div class="path-chapter-segments">
           ${activeChapSegmentsHTML}
         </div>
-        <span class="path-chapter-count">${activeChapCompleted} / ${activeChapTotal}</span>
+        <span class="path-chapter-count" title="${activeChapCompleted === 0 ? `Начни главу: в ней ${activeChapTotal} ${pluralizeRu(activeChapTotal, 'юнит', 'юнита', 'юнитов')}` : `Завершено юнитов: ${activeChapCompleted} из ${activeChapTotal}`}" aria-label="${activeChapCompleted === 0 ? `Начни главу: ${activeChapTotal} ${pluralizeRu(activeChapTotal, 'юнит', 'юнита', 'юнитов')}` : `Завершено юнитов: ${activeChapCompleted} из ${activeChapTotal}`}">${activeChapCompleted === 0 ? `Начни · ${activeChapTotal}` : `${activeChapCompleted} / ${activeChapTotal}`}</span>
       </div>
     </div>
   `;
@@ -11768,6 +12031,7 @@ function openSettingsModal(){
 
   const isGame = (state.pathViewMode !== 'pro');
   const isPro = (state.pathViewMode === 'pro');
+  const pathNodeStyle = state.pathNodeStyle === 'button' ? 'button' : 'paw';
 
   const modal = document.createElement('div');
   modal.id = 'settings-modal';
@@ -11794,7 +12058,7 @@ function openSettingsModal(){
               <span class="settings-mode-name">Игровой режим</span>
               ${isGame ? '<span class="settings-mode-badge">Активен</span>' : ''}
             </div>
-            <div class="settings-mode-desc">Извилистая 3D-тропа с гексагональными нодами, всплывающими карточками и игровой атмосферой Coddy.</div>
+            <div class="settings-mode-desc">Извилистая игровая тропа с анимированными узлами и карточками юнитов.</div>
           </button>
 
           <button type="button" class="settings-mode-card ${isPro ? 'active' : ''}" data-set-path-mode="pro">
@@ -11805,6 +12069,11 @@ function openSettingsModal(){
             </div>
             <div class="settings-mode-desc">Структурированный список уроков по главам с верхней Hero-карточкой фокуса и бейджами «Теория + Практика».</div>
           </button>
+        </div>
+        <div class="path-node-style-picker" role="group" aria-label="Форма узлов игровой тропы">
+          <div class="path-node-style-label">Форма узлов</div>
+          <button type="button" class="path-node-style-btn ${pathNodeStyle === 'paw' ? 'active' : ''}" data-set-path-node-style="paw" aria-pressed="${pathNodeStyle === 'paw'}">🐾 Лапки</button>
+          <button type="button" class="path-node-style-btn ${pathNodeStyle === 'button' ? 'active' : ''}" data-set-path-node-style="button" aria-pressed="${pathNodeStyle === 'button'}">◉ Кнопки</button>
         </div>
       </div>
 
@@ -12376,6 +12645,20 @@ document.addEventListener('click', async function(e){
       if(typeof showTactileToast === 'function'){
         showTactileToast(targetMode === 'pro' ? '💼 Включён профессиональный режим' : '🎮 Включён игровой режим 3D-тропы');
       }
+    }
+    return;
+  }
+
+  const nodeStyleBtn = e.target.closest('[data-set-path-node-style]');
+  if(nodeStyleBtn){
+    const nodeStyle = nodeStyleBtn.getAttribute('data-set-path-node-style');
+    if(nodeStyle === 'paw' || nodeStyle === 'button'){
+      ensureExtendedState();
+      state.pathNodeStyle = nodeStyle;
+      saveState(state);
+      render();
+      if(typeof isSettingsModalOpen !== 'undefined' && isSettingsModalOpen) openSettingsModal();
+      if(typeof showTactileToast === 'function') showTactileToast(nodeStyle === 'paw' ? '🐾 Стиль карты: лапки' : '◉ Стиль карты: кнопки');
     }
     return;
   }
@@ -13628,9 +13911,11 @@ document.addEventListener('click', async function(e){
   // 3D Serpentine Path node click (Open anchored popover)
   const hexNode = e.target.closest('.hex-3d-node');
   if(hexNode){
+    const openedByKeyboard = e.detail === 0;
     const uid = hexNode.getAttribute('data-unit-id');
     const popover = document.getElementById('path-anchored-popover');
     if(popover && uid && typeof ALL_UNITS_COMBINED !== 'undefined'){
+      popover.setAttribute('data-return-focus-unit', uid);
       const u = ALL_UNITS_COMBINED.find(x => x.id === uid);
       if(u){
         const track = getTrackForUnit(uid);
@@ -13640,7 +13925,7 @@ document.addEventListener('click', async function(e){
         const pSkills = document.getElementById('popover-skills');
         const pCta = document.getElementById('popover-cta-btn');
 
-        if(pBadge) pBadge.textContent = `🎯 ${track.title}`;
+        if(pBadge) pBadge.textContent = `ТРЕК · ${track.title.split('Матрица Мастерства').pop().trim() || track.title}`;
         if(pTitle) pTitle.textContent = `Юнит ${u.id}: ${u.title.replace(/^Юнит\s+[\d.]+\s*·\s*/, '')}`;
 
         const isPassed = (state.passedUnitTests || []).includes(u.id) || ((u.skills||[]).length > 0 && (u.skills||[]).every(s => getSkillMP(s.id) >= 80));
@@ -13656,18 +13941,21 @@ document.addEventListener('click', async function(e){
         if(pStatus){
           if(isPassed) pStatus.textContent = '✅ Юнит завершён (освоен на 100%)';
           else if(isActive) pStatus.textContent = '🏆 Текущая цель курса';
-          else if(isLocked) pStatus.textContent = '🔒 Доступ откроется после предыдущих юнитов';
+          else if(isLocked) pStatus.textContent = 'Пройдите уроки выше, чтобы открыть это!';
           else pStatus.textContent = '📖 Доступен для изучения';
         }
 
         if(pSkills){
-          const skList = (u.skills || []).map(s => s.title).slice(0, 3).join(' • ');
-          pSkills.textContent = skList ? `Навыки: ${skList}` : '';
+          const skillItems = (u.skills || []).slice(0, 3);
+          pSkills.innerHTML = skillItems.length
+            ? `<div class="path-popover-skills-label">В этом юните</div><div class="path-popover-skills-list">${skillItems.map(s => `<div class="path-popover-skill">${escapeHtmlStr(s.title)}</div>`).join('')}</div>`
+            : '';
         }
 
         if(pCta){
+          const unitStarted = (u.skills || []).some(s => (getSkillMP(s.id) || 0) > 0);
           pCta.className = isPassed ? 'btn-3d-emerald path-popover-cta' : (isLocked ? 'btn-3d-locked path-popover-cta' : 'btn-3d-orange path-popover-cta');
-          pCta.textContent = isPassed ? 'ОБЗОР ➔' : (isLocked ? 'ЗАБЛОКИРОВАНО' : 'НАЧАТЬ ➔');
+          pCta.textContent = isPassed ? 'ОБЗОР ➔' : (isLocked ? 'ЗАБЛОКИРОВАНО' : (unitStarted ? 'ПРОДОЛЖИТЬ ➔' : 'НАЧАТЬ ➔'));
           pCta.disabled = isLocked;
           pCta.setAttribute('data-target-route', `#${track.routePrefix}/skill/${(u.skills && u.skills[0]) ? u.skills[0].id : ''}`);
         }
@@ -13683,11 +13971,13 @@ document.addEventListener('click', async function(e){
             cx = parseFloat(hexNode.getAttribute('data-cx')) || 210;
             cy = parseFloat(hexNode.getAttribute('data-cy')) || 100;
           }
-          const clampedCx = Math.max(148, Math.min(pWidth - 148, cx));
+          const popoverWidth = parseFloat(window.getComputedStyle(popover).width) || 340;
+          const popoverHalfWidth = popoverWidth / 2;
+          const clampedCx = Math.max(popoverHalfWidth + 8, Math.min(pWidth - popoverHalfWidth - 8, cx));
           popover.style.left = `${Math.round(clampedCx)}px`;
           const arrow = document.getElementById('popover-arrow');
           if(arrow){
-            const arrowX = Math.max(24, Math.min(256, 140 + (cx - clampedCx)));
+            const arrowX = Math.max(20, Math.min(popoverWidth - 20, popoverHalfWidth + (cx - clampedCx)));
             arrow.style.left = `${Math.round(arrowX)}px`;
           }
           if(cy > 240){
@@ -13699,22 +13989,22 @@ document.addEventListener('click', async function(e){
           }
         }
         popover.style.display = 'block';
-        // V13: кламп поповера в границы вьюпорта — при нижних гексах CTA не срезается кромкой
+        if(openedByKeyboard && typeof popover.focus === 'function') popover.focus();
+        // Clamp to the viewport; disable the scale-in animation while measuring its full size.
         try{
-          const pr = popover.getBoundingClientRect();
+          const prevAnim = popover.style.animation;
+          popover.style.animation = 'none';
           const vh = window.innerHeight || 900;
-          const topBefore = parseFloat(popover.style.top) || 0;
-          if(pr.height > 0 && pr.bottom > vh - 12){
-            const aboveTop = cy - 220;
-            if(aboveTop > 0 && (nRect.top - pr.height) > 12){
-              popover.style.top = `${Math.round(aboveTop)}px`;
-              if(arrow) arrow.className = 'path-popover-arrow path-popover-arrow--down';
-            } else {
-              popover.style.top = `${Math.round(topBefore - (pr.bottom - (vh - 12)))}px`;
-            }
-          } else if(pr.height > 0 && pr.top < 12){
-            popover.style.top = `${Math.round(topBefore + (12 - pr.top))}px`;
+          let pr = popover.getBoundingClientRect();
+          if(pr.height > 0){
+            const curTop = parseFloat(popover.style.top) || 0;
+            let delta = 0;
+            if(pr.bottom > vh - 12) delta = -(pr.bottom - (vh - 12));
+            popover.style.top = `${Math.round(curTop + delta)}px`;
+            pr = popover.getBoundingClientRect();
+            if(pr.top < 12) popover.style.top = `${Math.round(parseFloat(popover.style.top) + (12 - pr.top))}px`;
           }
+          popover.style.animation = prevAnim;
         }catch(err){}
         return;
       }
@@ -13724,7 +14014,12 @@ document.addEventListener('click', async function(e){
   // Popover close and CTA button
   if(e.target.closest('#popover-close-btn')){
     const popover = document.getElementById('path-anchored-popover');
-    if(popover) popover.style.display = 'none';
+    if(popover){
+      popover.style.display = 'none';
+      const returnId = popover.getAttribute('data-return-focus-unit');
+      const returnNode = Array.from(document.querySelectorAll('.hex-3d-node')).find(node => node.getAttribute('data-unit-id') === returnId);
+      if(returnNode && typeof returnNode.focus === 'function') returnNode.focus();
+    }
     return;
   }
   const popCta = e.target.closest('#popover-cta-btn');
@@ -14033,6 +14328,25 @@ document.addEventListener('keydown', function(e){
     const popover = document.getElementById('path-anchored-popover');
     if(popover && popover.style && popover.style.display !== 'none'){
       popover.style.display = 'none';
+      const returnId = popover.getAttribute('data-return-focus-unit');
+      const returnNode = Array.from(document.querySelectorAll('.hex-3d-node')).find(node => node.getAttribute('data-unit-id') === returnId);
+      if(returnNode && typeof returnNode.focus === 'function') returnNode.focus();
+      return;
+    }
+  }
+  const focusedPathNode = e.target && e.target.closest ? e.target.closest('.hex-3d-node') : null;
+  if(focusedPathNode && (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Home' || e.key === 'End')){
+    const nodes = Array.from(document.querySelectorAll('.hex-3d-node'));
+    const currentIndex = nodes.indexOf(focusedPathNode);
+    let nextIndex = currentIndex;
+    if(e.key === 'ArrowDown') nextIndex = Math.min(nodes.length - 1, currentIndex + 1);
+    else if(e.key === 'ArrowUp') nextIndex = Math.max(0, currentIndex - 1);
+    else if(e.key === 'Home') nextIndex = 0;
+    else if(e.key === 'End') nextIndex = nodes.length - 1;
+    if(nextIndex !== currentIndex && nodes[nextIndex]){
+      e.preventDefault();
+      nodes[nextIndex].focus();
+      nodes[nextIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
   }
