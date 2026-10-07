@@ -638,7 +638,26 @@ function fireClick(attrName, attrVal, extraAttrs = {}) {
   assert(htmlAfterTask.includes('Сократовская наводка (0/4)'), 'Scaffold Fading failed: hintLevel did not reset to 0 after solving task!');
 
   // Pass Unit Test 1.1 (4 questions: correct indices 1, 1, 2, 1) -> should promote all Unit 1.1 skills to 100 MP (Mastered 👑)
+  // Start modal «Готовы начать тест?» on a fresh test (Coddy-style); «Начать тест» dismisses it
   navigate('#/python/unittest/1.1');
+  let utModalHtml = elementsById['view-root'].innerHTML;
+  assert(utModalHtml.includes('Готовы начать тест?'), 'Fresh Unit Test 1.1 should show start modal');
+  assert(utModalHtml.includes('Показывать разбор после ответа'), 'Start modal should contain explanation toggle');
+  assert(utModalHtml.includes('Всегда открывать тест без этой модалки'), 'Start modal should contain the always-skip quiet link');
+  await fireClick('data-ut-start', '');
+  utModalHtml = elementsById['view-root'].innerHTML;
+  assert(!utModalHtml.includes('Готовы начать тест?'), '«Начать тест» should dismiss the start modal');
+
+  // Explanation toggle: OFF hides the notice after answering, ON brings it back
+  await fireClick('data-ut-toggle-explain', '');
+  await fireClick('data-ut-ans', '1');
+  let utNoExpl = elementsById['view-root'].innerHTML;
+  assert(!utNoExpl.includes('✓ Верно!') && !utNoExpl.includes('✗ Обрати внимание'), 'Explanation notice must be hidden when toggle is OFF');
+  assert(utNoExpl.includes('Следующий вопрос'), 'Answer flow must still advance with toggle OFF');
+  await fireClick('data-ut-toggle-explain', '');
+  await fireClick('data-ut-ans', '1');
+  assert(elementsById['view-root'].innerHTML.includes('✓ Верно!'), 'Explanation notice returns when toggle is ON');
+
   const utAnswers = [1, 1, 2, 1];
   for (const ans of utAnswers) {
     await fireClick('data-ut-ans', String(ans));
@@ -648,6 +667,21 @@ function fireClick(attrName, attrVal, extraAttrs = {}) {
   assert(utHtml.includes('Рубежный тест успешно взят!'), 'Unit Test 1.1 should complete with mastery');
   let pyHtml = navigate('#/python');
   assert(pyHtml.includes('Мастерство 100 MP (5)'), 'All 5 skills of Unit 1.1 should now be at 100 MP (Mastered)');
+
+  // Retake: open the passed test (finish screen) and restart -> retake badge, NO start modal
+  navigate('#/python/unittest/1.1');
+  await fireClick('data-ut-restart', '1.1');
+  const utRetakeHtml = elementsById['view-root'].innerHTML;
+  assert(utRetakeHtml.includes('✓ Сдано · ретейк'), 'Retake badge should be shown on restart of a passed test');
+  assert(!utRetakeHtml.includes('Готовы начать тест?'), 'Start modal must NOT appear on retake');
+
+  // «Всегда открывать тест без этой модалки»: dismisses now and suppresses the modal for every later fresh test
+  navigate('#/python/unittest/1.2');
+  assert(elementsById['view-root'].innerHTML.includes('Готовы начать тест?'), 'Fresh Unit Test 1.2 should show start modal');
+  await fireClick('data-ut-always-skip', '');
+  assert(!elementsById['view-root'].innerHTML.includes('Готовы начать тест?'), 'always-skip link should dismiss the modal');
+  navigate('#/python/unittest/1.3');
+  assert(!elementsById['view-root'].innerHTML.includes('Готовы начать тест?'), 'always-skip preference should suppress modal for other fresh tests');
 
   // Also test passing Backend Unit Test 3.6 (4 questions: correct indices 1, 1, 1, 1) -> should promote all 3 Unit 3.6 skills (3.6.1, 3.6.2, 3.6.3) to 100 MP
   navigate('#/backend/unittest/3.6');

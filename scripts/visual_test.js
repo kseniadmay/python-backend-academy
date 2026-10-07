@@ -142,6 +142,8 @@ add('cards_hub', { hash: '#/cards' });
 add('mock_interview', { hash: '#/mock' });
 add('docs_hub', { hash: '#/docs' });
 add('sandbox', { hash: '#/sandbox' });
+// стартовая модалка рубежного теста «Готовы начать тест?» (новичок; 1.5 нет в SEED_STATE — модалка показывается)
+add('unittest_start_modal', { hash: '#/python/unittest/1.5' });
 // сеедированный прогресс «середина курса»
 add('dashboard_seed', { hash: '#/', seed: true });
 add('path_game_seed', { hash: '#/path', seed: true });

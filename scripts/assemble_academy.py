@@ -3258,6 +3258,33 @@ EXTRA_CSS = r"""
   .docs-hub th{font-family:var(--font-b);font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);}
   .docs-hub td{font-family:var(--font-b);}
   .docs-hub .math-formula{font-family:var(--font-m);font-size:.78em;}
+
+  /* ================= UT START MODAL «Готовы начать тест?» (Coddy-референс; стекло и цвета платформы не меняем) ================= */
+  .ut-start-backdrop{z-index:100;}
+  .ut-start-card{
+    background:var(--surface);
+    -webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);
+    border:1px solid var(--line);border-radius:26px;
+    max-width:400px;width:100%;padding:26px 26px 18px;text-align:center;
+    box-shadow:0 18px 56px rgba(0,0,0,0.30), inset 0 0 0 1px rgba(16,185,129,0.06);
+    display:flex;flex-direction:column;gap:12px;box-sizing:border-box;
+  }
+  .ut-start-emoji{font-size:2rem;line-height:1;}
+  .ut-start-title{margin:2px 0 0;font-family:var(--font-d);font-weight:800;font-size:1.3rem;letter-spacing:-0.01em;color:var(--ink);}
+  .ut-start-sub{margin:0;color:var(--ink-soft);font-size:.88rem;}
+  .ut-start-btn{width:100%;padding:13px 16px;font-size:1rem;margin-top:4px;}
+  .ut-skip-btn{width:100%;}
+  .ut-toggle-row{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;
+    background:transparent;border:1px solid var(--line);border-radius:14px;
+    padding:10px 14px;cursor:pointer;color:var(--ink);font-family:var(--font-b);font-size:.85rem;text-align:left;box-sizing:border-box;
+  }
+  .ut-switch{position:relative;width:36px;height:20px;border-radius:999px;background:rgba(148,163,184,0.40);transition:background .2s;flex:0 0 auto;}
+  .ut-switch--on{background:var(--emerald);}
+  .ut-switch-knob{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.35);transition:transform .2s;}
+  .ut-switch--on .ut-switch-knob{transform:translateX(16px);}
+  .ut-start-card .link-quiet{font-size:.78rem;font-family:var(--font-b);background:none;border:none;cursor:pointer;color:var(--ink-soft);text-decoration:underline;text-underline-offset:3px;}
+  .ut-start-hint{margin:0;font-size:.72rem;color:var(--ink-soft);opacity:.85;}
 """
 
 # Let's define the injected JS upgrade block that extends the existing app cleanly
@@ -3608,6 +3635,8 @@ function ensureExtendedState(target){
   if(!s.completedNoteSteps || typeof s.completedNoteSteps !== 'object') s.completedNoteSteps = {};
   if(!s.unlockedChunks || typeof s.unlockedChunks !== 'object') s.unlockedChunks = {};
   if(typeof s.soundEnabled !== 'boolean') s.soundEnabled = true;
+  if(typeof s.utShowExplanations !== 'boolean') s.utShowExplanations = true; // тумблер «Показывать разбор после ответа»
+  if(typeof s.utSkipStartModal !== 'boolean') s.utSkipStartModal = false; // «Всегда открывать тест без этой модалки»
   if(!s.stackBranch || !['fastapi','django','both'].includes(s.stackBranch)) s.stackBranch = 'fastapi';
   if(!s.unitSortMode || !['priority','number'].includes(s.unitSortMode)) s.unitSortMode = 'priority';
   if(!s.pathViewMode || !['game','pro'].includes(s.pathViewMode)) s.pathViewMode = 'game';
@@ -3756,6 +3785,10 @@ function mergeProgressStates(baseRaw, incomingRaw){
   merged.theme = bNewer ? (b.theme || a.theme) : (a.theme || b.theme);
   merged.stackBranch = bNewer ? (b.stackBranch || a.stackBranch) : (a.stackBranch || b.stackBranch);
   merged.unitSortMode = bNewer ? (b.unitSortMode || a.unitSortMode) : (a.unitSortMode || b.unitSortMode);
+  // Предпочтения рубежных тестов: явное булево сильнее дефолта, более свежий источник сильнее старого
+  const pickUtPref = (x, y, dflt) => (typeof x === 'boolean' ? x : (typeof y === 'boolean' ? y : dflt));
+  merged.utShowExplanations = bNewer ? pickUtPref(b.utShowExplanations, a.utShowExplanations, true) : pickUtPref(a.utShowExplanations, b.utShowExplanations, true);
+  merged.utSkipStartModal = bNewer ? pickUtPref(b.utSkipStartModal, a.utSkipStartModal, false) : pickUtPref(a.utSkipStartModal, b.utSkipStartModal, false);
   return ensureExtendedState(merged);
 }
 window.mergeProgressStates = mergeProgressStates;
@@ -6157,6 +6190,12 @@ function viewPythonUnitTest(unitId, trackKey){
     }
   }
 
+  // Стартовая модалка «Готовы начать тест?» — только на открытии «с нуля»:
+  // ни одного ответа, не ретейк, настройка «без модалки» не включена, тест ещё не начат в этой сессии.
+  const answeredCount = (unitTestState.answers || []).filter(a => a !== undefined && a !== null).length;
+  const isRetake = !isCourse && (state.passedUnitTests || []).includes(unitId);
+  const showStartModal = !unitTestState.finished && !unitTestState.started && answeredCount === 0 && !isRetake && !state.utSkipStartModal;
+
   if(unitTestState.finished){
     const score = questions.filter((q, i) => unitTestState.answers[i] === q.correct).length;
     const pct = Math.round(score / questions.length * 100);
@@ -6207,9 +6246,28 @@ function viewPythonUnitTest(unitId, trackKey){
           ${unitTestState.idx > 0 ? `<button class="btn btn-ghost" data-ut-prev>← Предыдущий вопрос</button>` : `<span></span>`}
           ${rev ? `<button class="btn btn-primary" data-ut-next>${unitTestState.idx+1>=questions.length?'Завершить тест':'Следующий вопрос'} ${ICONS.arrowRight}</button>` : ''}
         </div>
-        ${rev ? `<div class="notice" style="margin-top:14px;">${sel===q.correct?'✓ Верно! ':'✗ Обрати внимание: '}${formatRichInlineText(q.explain)}</div>` : ''}
+        ${rev && state.utShowExplanations ? `<div class="notice" style="margin-top:14px;">${sel===q.correct?'✓ Верно! ':'✗ Обрати внимание: '}${formatRichInlineText(q.explain)}</div>` : ''}
+      </div>
+    </div>` + (!showStartModal ? '' : (() => {
+      const qn = questions.length;
+      const qWord = (qn % 10 === 1 && qn % 100 !== 11) ? 'вопрос' : ([2,3,4].includes(qn % 10) && ![12,13,14].includes(qn % 100)) ? 'вопроса' : 'вопросов';
+      return `
+    <div class="modal-backdrop ut-start-backdrop" role="dialog" aria-modal="true" aria-label="Готовы начать тест?">
+      <div class="ut-start-card">
+        <div class="ut-start-emoji" aria-hidden="true">🧪</div>
+        <h2 class="ut-start-title">Готовы начать тест?</h2>
+        <p class="ut-start-sub">${qn} ${qWord} · порог 75% · +50 XP</p>
+        <button type="button" class="btn-glass-emerald ut-start-btn" data-ut-start>▶ Начать тест</button>
+        <a href="#${tr.routePrefix}" class="btn btn-ghost ut-skip-btn">Пропустить</a>
+        <button type="button" class="ut-toggle-row" data-ut-toggle-explain aria-pressed="${state.utShowExplanations ? 'true' : 'false'}">
+          <span>Показывать разбор после ответа</span>
+          <span class="ut-switch ${state.utShowExplanations ? 'ut-switch--on' : ''}" aria-hidden="true"><span class="ut-switch-knob"></span></span>
+        </button>
+        <button type="button" class="link-quiet" data-ut-always-skip>Всегда открывать тест без этой модалки</button>
+        <p class="ut-start-hint">Это можно изменить в «⚙️ Настройки платформы»</p>
       </div>
     </div>`;
+    })());
 }
 
 /* ================= GLOBAL FLASHCARDS HUB (#/cards) ================= */
@@ -9707,6 +9765,19 @@ function openSettingsModal(){
           </button>
         </div>
       </div>
+      <!-- Рубежные тесты: разбор и стартовая модалка -->
+      <div class="settings-section" style="margin-top:20px;">
+        <div class="settings-section-title">🧪 Рубежные тесты</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+          <button type="button" class="btn btn-ghost" data-ut-toggle-explain style="flex:1;min-width:170px;">
+            ${state.utShowExplanations ? '📝 Разбор после ответа: Вкл' : '📝 Разбор после ответа: Выкл'}
+          </button>
+          <button type="button" class="btn btn-ghost" data-ut-toggle-skipmodal style="flex:1;min-width:170px;">
+            ${state.utSkipStartModal ? '⏭️ Открывать тест без модалки: Вкл' : '⏭️ Открывать тест без модалки: Выкл'}
+          </button>
+        </div>
+        <p class="meta" style="margin:10px 0 0;font-size:0.78rem;">Стартовая модалка — окно «Готовы начать тест?» перед рубежным тестом. Дублирует тихую ссылку под её кнопками.</p>
+      </div>
 
       <!-- Данные и сброс -->
       <div class="settings-section" style="margin-top:20px;border-top:1px solid var(--line);padding-top:16px;">
@@ -11167,6 +11238,37 @@ document.addEventListener('click', async function(e){
       awardXp(30);
     }
     saveState(state);
+    render();
+    return;
+  }
+
+  // Unit Test start modal actions («Готовы начать тест?»)
+  if(e.target.closest('[data-ut-start]') && unitTestState){
+    unitTestState.started = true;
+    render();
+    return;
+  }
+  if(e.target.closest('[data-ut-always-skip]')){
+    ensureExtendedState();
+    state.utSkipStartModal = true;
+    saveState(state);
+    if(unitTestState) unitTestState.started = true;
+    render();
+    return;
+  }
+  if(e.target.closest('[data-ut-toggle-explain]')){
+    ensureExtendedState();
+    state.utShowExplanations = !state.utShowExplanations;
+    saveState(state);
+    if(typeof isSettingsModalOpen !== 'undefined' && isSettingsModalOpen) openSettingsModal();
+    render();
+    return;
+  }
+  if(e.target.closest('[data-ut-toggle-skipmodal]')){
+    ensureExtendedState();
+    state.utSkipStartModal = !state.utSkipStartModal;
+    saveState(state);
+    if(typeof isSettingsModalOpen !== 'undefined' && isSettingsModalOpen) openSettingsModal();
     render();
     return;
   }
