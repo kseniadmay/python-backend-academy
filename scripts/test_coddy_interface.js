@@ -448,7 +448,10 @@ async function main() {
   const chMatches = pathHtml.match(/class="[^"]*hex-challenge-node[^"]*"/g) || [];
   check(chMatches.length === 7, `#/path must render exactly 7 mastery challenge branch nodes (found ${chMatches.length})`);
   check((pathHtml.match(/data-challenge-route="[^"]*\/unittest\//g) || []).length === 7, 'Every challenge branch must link to a /unittest/ route');
-  check(pathHtml.includes('ЧЕЛЛЕНДЖ МАСТЕРСТВА'), 'Challenge branches must carry the mastery challenge label');
+  check(pathHtml.includes('ЧЕЛЛЕНДЖ') && pathHtml.includes('МАСТЕРСТВА'), 'Challenge branches must carry the mastery challenge label');
+  check(pathHtml.includes('hex-node-underlabel'), 'Active and next two trail nodes must carry unit-name underlabels');
+  check(pathHtml.includes('coddy-rail-card--row'), 'Right rail must render the compact one-row SRS card');
+  check(!pathHtml.includes('Стрик и цель дня'), 'Right rail must not duplicate streak (topbar pill + stats row already show it)');
 
   // 2.3. Расположение и отсутствие коллизий координат нод
   const cyMatches = [...pathHtml.matchAll(/data-unit-id="([^"]+)"[\s\S]*?cy="([^"]+)"/g)];

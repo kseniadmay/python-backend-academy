@@ -1646,8 +1646,20 @@
     stroke-width: 3 !important;
     filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
   }
-  .hex-node-label {
-    display: none !important;
+  .hex-node-underlabel {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    fill: #97a1b2;
+    stroke: rgba(13, 16, 22, 0.85);
+    stroke-width: 3px;
+    stroke-linejoin: round;
+    paint-order: stroke;
+    pointer-events: none;
+  }
+  html:not([data-theme="dark"]) .hex-node-underlabel {
+    fill: #5a6678;
+    stroke: rgba(250, 248, 245, 0.92);
   }
   .hex-active-tooltip {
     pointer-events: none;
@@ -2213,6 +2225,12 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 8px;
+  }
+  .coddy-rail-card--row {
+    padding: 10px 12px;
+  }
+  .coddy-rail-card--row .coddy-rail-card-head {
+    margin-bottom: 0;
   }
   .coddy-rail-link {
     display: inline-flex;
@@ -3019,9 +3037,11 @@
   /* V11: модалки на mobile прижаты к верху, карточки режима без длинных описаний —
      секция «Управление данными» со «Сбросить прогресс» влезает в первый экран */
   @media (max-width:560px){
-    .modal-backdrop{align-items:flex-start;padding:10px;}
-    .modal-card{max-height:calc(100vh - 20px);}
+    .modal-backdrop{align-items:flex-start;padding:8px;}
+    .modal-card{max-height:calc(100vh - 16px);padding:14px;}
     .settings-mode-desc{display:none;}
+    .settings-section{margin-top:10px !important;padding-top:8px !important;}
+    .settings-section p.meta{display:none;}
   }
   /* V14: docs-таблицы на mobile — панель скроллится по горизонтали, колонки не сжимаются в вертикаль */
   @media (max-width:760px){
@@ -3098,6 +3118,50 @@
   .ut-switch--on .ut-switch-knob{transform:translateX(16px);}
   .ut-start-card .link-quiet{font-size:.78rem;font-family:var(--font-b);background:none;border:none;cursor:pointer;color:var(--ink-soft);text-decoration:underline;text-underline-offset:3px;}
   .ut-start-hint{margin:0;font-size:.72rem;color:var(--ink-soft);opacity:.85;}
+
+  /* ================= PATH SECTION GATE CARDS (Coddy-референс v1; Hard Gate) ================= */
+  .path-section-gate {
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .path-section-gate-bg {
+    transition: filter 0.22s ease, stroke 0.22s ease, fill 0.22s ease;
+  }
+  .path-gate-btn {
+    cursor: pointer;
+    outline: none;
+    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .path-gate-btn--unlocked:hover .path-gate-btn-rect {
+    filter: brightness(1.15) drop-shadow(0 6px 16px rgba(16, 185, 129, 0.55));
+  }
+  .path-gate-btn--unlocked:active {
+    transform: scale(0.98);
+  }
+  .path-gate-btn--locked {
+    cursor: not-allowed;
+  }
+  .path-gate-btn:focus-visible rect {
+    stroke: #ffffff !important;
+    stroke-width: 2.5 !important;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+  }
+  html:not([data-theme="dark"]) .path-section-gate-bg {
+    fill: rgba(255, 255, 255, 0.95);
+    stroke: rgba(190, 18, 60, 0.30);
+  }
+  html:not([data-theme="dark"]) .path-gate-title {
+    fill: #0f172a;
+  }
+  html:not([data-theme="dark"]) .path-gate-sub {
+    fill: #475569;
+  }
+  html:not([data-theme="dark"]) .path-gate-btn--locked rect {
+    fill: rgba(241, 245, 249, 0.95);
+    stroke: rgba(190, 18, 60, 0.30);
+  }
+  html:not([data-theme="dark"]) .path-gate-btn--locked text {
+    fill: #be123c;
+  }
 
 </style>
 <link rel="manifest" href="manifest.json">
@@ -5890,7 +5954,7 @@ function ensureExtendedState(target){
   if(!s.stackBranch || !['fastapi','django','both'].includes(s.stackBranch)) s.stackBranch = 'fastapi';
   if(!s.unitSortMode || !['priority','number'].includes(s.unitSortMode)) s.unitSortMode = 'priority';
   if(!s.pathViewMode || !['game','pro'].includes(s.pathViewMode)) s.pathViewMode = 'game';
-  if(!s.pathNodeStyle || !['paw','button'].includes(s.pathNodeStyle)) s.pathNodeStyle = 'paw';
+  if(!s.pathNodeStyle || !['paw','button'].includes(s.pathNodeStyle)) s.pathNodeStyle = 'button'; // выбор Ксении: по умолчанию «Кнопки» (ближе к Coddy)
   if(!s.diagnosticGaps || !Array.isArray(s.diagnosticGaps)) s.diagnosticGaps = [];
   if(typeof s.diagCompleted !== 'boolean') s.diagCompleted = false;
   if(typeof s.diagScore !== 'number') s.diagScore = 0;
@@ -10355,26 +10419,18 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)
         </div>
       </div>
 
-      <!-- Widget 2: SRS Cards Review -->
+      <!-- Widget 3: Daily goal (streak lives in the topbar pill, no duplicate) -->
       <div class="panel coddy-rail-card">
-        <div class="coddy-rail-card-head">
-          <div class="coddy-rail-badge">🃏 SRS-Повторение</div>
-          <a href="#/cards" class="coddy-rail-link">Повторить →</a>
-        </div>
-        <h4 class="coddy-rail-title">Карточка дня</h4>
-        <p class="coddy-rail-desc">Интервальное повторение RemNote: закрепи память перед практикой.</p>
-      </div>
-      <!-- Widget 3: Streak & Level XP -->
-      <div class="panel coddy-rail-card">
-        <div class="coddy-rail-badge">🔥 Стрик и цель дня</div>
-        <div style="display:flex;align-items:baseline;gap:8px;margin:6px 0 8px;">
-          <span style="font-size:1.6rem;font-weight:900;color:#f43f5e;">🔥 ${state.streak || 0}</span>
-          <span class="meta">${streakText} подряд</span>
-        </div>
-        <div class="progress-bar-wrap" style="height:6px;margin-bottom:8px;">
+        <div class="coddy-rail-badge">🎯 Цель дня</div>
+        <div class="progress-bar-wrap" style="height:6px;margin:10px 0 8px;">
           <div class="progress-bar-fill" style="width:${dailyPct}%;background:linear-gradient(90deg,#fbbf24,#f59e0b);"></div>
         </div>
         <div class="coddy-rail-daily-summary"><span>Сегодня: <strong>${dailyXp}/${dailyGoal} XP</strong></span><span>${dailyXp >= dailyGoal ? 'Цель выполнена' : `Осталось ${dailyGoal - dailyXp} XP`}</span></div>
+      </div>
+      <!-- Widget 2: SRS Cards Review (compact one-row card) -->
+      <div class="panel coddy-rail-card coddy-rail-card--row">
+        <div class="coddy-rail-badge">🃏 Повторение карточек</div>
+        <a href="#/cards" class="coddy-rail-link">Повторить →</a>
       </div>
     </aside>`;
 }
@@ -10441,14 +10497,14 @@ function viewPathSerpentine(options){
 
   // Track coordinates for each of the 45 nodes
   // Account for chapter spacing: Chapter 1 starts at y=130 (with Chapter 1 ribbon at y=48)
-  // Each chapter transition adds +90px of breathing room for chapter ribbon markers!
+  // Each chapter transition adds +150px of breathing room for Coddy-style Section Gate Cards!
   const chapterStartSet = new Set([9, 13, 21, 27, 33, 39]);
   let curY = 130;
   const coords = allUnits.map((u, i) => {
     if(i > 0){
       curY += 115;
       if(chapterStartSet.has(i)){
-        curY += 90; // Dedicated gap for chapter ribbon marker
+        curY += 150; // Dedicated gap for Coddy Section Gate Card (Variant C)
       }
     }
     const x = Math.round(210 + 110 * Math.sin((i * Math.PI) / 2.2));
@@ -10505,31 +10561,113 @@ function viewPathSerpentine(options){
     ? `Начни · ${totalInChapter}`
     : `${completedInChapter} / ${totalInChapter}`;
 
-  // Chapter ribbon markers between modules
+  // Chapter markers: Chapter 1 has top ribbon, Chapters 2..7 have Coddy Section Gate Cards (Variant C, Hard Gate)
   const chapterBreakpoints = [
-    { startIdx: 0, title: 'Глава 1: Python Core' },
-    { startIdx: 9, title: 'Глава 2: Web & HTTP' },
-    { startIdx: 13, title: 'Глава 3: Backend & Архитектура' },
-    { startIdx: 21, title: 'Глава 4: Алгоритмы и структуры данных' },
-    { startIdx: 27, title: 'Глава 5: Базы данных и SQL' },
-    { startIdx: 33, title: 'Глава 6: Системный дизайн' },
-    { startIdx: 39, title: 'Глава 7: Инфраструктура и DevOps' }
+    { startIdx: 0, title: 'Глава 1: Python Core', chapterNum: 1, track: 'python', shortTitle: 'Python Core', unitsCount: 9 },
+    { startIdx: 9, title: 'Глава 2: Web & HTTP', chapterNum: 2, track: 'web', shortTitle: 'Web & HTTP', unitsCount: 4 },
+    { startIdx: 13, title: 'Глава 3: Backend & Архитектура', chapterNum: 3, track: 'backend', shortTitle: 'Backend & Архитектура', unitsCount: 8 },
+    { startIdx: 21, title: 'Глава 4: Алгоритмы и структуры данных', chapterNum: 4, track: 'algorithms', shortTitle: 'Алгоритмы и структуры', unitsCount: 6 },
+    { startIdx: 27, title: 'Глава 5: Базы данных и SQL', chapterNum: 5, track: 'databases', shortTitle: 'Базы данных и SQL', unitsCount: 6 },
+    { startIdx: 33, title: 'Глава 6: Системный дизайн', chapterNum: 6, track: 'architecture', shortTitle: 'Системный дизайн', unitsCount: 6 },
+    { startIdx: 39, title: 'Глава 7: Инфраструктура и DevOps', chapterNum: 7, track: 'infra', shortTitle: 'Инфраструктура и DevOps', unitsCount: 6 }
   ];
   // Последний юнит главы получает отдельную иконку трофея.
   const chapterLastIdxSet = new Set(chapterBreakpoints.slice(1).map(cb => cb.startIdx - 1));
   chapterLastIdxSet.add(allUnits.length - 1);
 
   let markersSVG = '';
-  chapterBreakpoints.forEach(cb => {
+  chapterBreakpoints.forEach((cb, ci) => {
     if(coords[cb.startIdx]){
-      const cy = (cb.startIdx === 0) ? 48 : (coords[cb.startIdx].y - 80);
-      markersSVG += `
-        <g class="path-chapter-ribbon" transform="translate(210, ${cy})">
-          <line x1="-190" y1="0" x2="-130" y2="0" stroke="rgba(190, 18, 60, 0.40)" stroke-width="1.5" stroke-dasharray="4 4"/>
-          <line x1="130" y1="0" x2="190" y2="0" stroke="rgba(190, 18, 60, 0.40)" stroke-width="1.5" stroke-dasharray="4 4"/>
-          <rect x="-120" y="-14" width="240" height="28" rx="14" fill="rgba(22, 27, 36, 0.88)" stroke="rgba(190, 18, 60, 0.50)" stroke-width="1.2"/>
-          <text x="0" y="4" text-anchor="middle" font-size="11" font-weight="800" fill="#fbbf24" letter-spacing="0.04em">${escapeHtmlStr(cb.title)}</text>
-        </g>`;
+      if(cb.startIdx === 0){
+        // Chapter 1 retains clean top ribbon
+        const cy = 48;
+        markersSVG += `
+          <g class="path-chapter-ribbon" transform="translate(210, ${cy})">
+            <line x1="-190" y1="0" x2="-130" y2="0" stroke="rgba(190, 18, 60, 0.40)" stroke-width="1.5" stroke-dasharray="4 4"/>
+            <line x1="130" y1="0" x2="190" y2="0" stroke="rgba(190, 18, 60, 0.40)" stroke-width="1.5" stroke-dasharray="4 4"/>
+            <rect x="-120" y="-14" width="240" height="28" rx="14" fill="rgba(22, 27, 36, 0.88)" stroke="rgba(190, 18, 60, 0.50)" stroke-width="1.2"/>
+            <text x="0" y="4" text-anchor="middle" font-size="11" font-weight="800" fill="#fbbf24" letter-spacing="0.04em">${escapeHtmlStr(cb.title)}</text>
+          </g>`;
+      } else {
+        // Chapters 2..7 get Coddy-style Section Gate Cards (Variant C, Hard Gate)
+        const prevCb = chapterBreakpoints[ci - 1];
+        const prevUnits = allUnits.slice(prevCb.startIdx, cb.startIdx);
+        const isPrevChapterDone = prevUnits.length > 0 && prevUnits.every(isUnitCompleted);
+
+        const nextStartIdx = (ci + 1 < chapterBreakpoints.length) ? chapterBreakpoints[ci + 1].startIdx : allUnits.length;
+        const curUnits = allUnits.slice(cb.startIdx, nextStartIdx);
+        const curCompletedCount = curUnits.filter(isUnitCompleted).length;
+        const isCurChapterDone = curUnits.length > 0 && curCompletedCount === curUnits.length;
+        const isCurChapterActive = isPrevChapterDone && !isCurChapterDone;
+
+        const gateStatus = !isPrevChapterDone ? 'locked' : (isCurChapterDone ? 'completed' : 'active');
+        const isLocked = (gateStatus === 'locked');
+
+        const prevY = coords[cb.startIdx - 1].y;
+        const nextY = coords[cb.startIdx].y;
+        const cy = Math.round((prevY + nextY) / 2);
+
+        let hexFill = 'url(#pathButtonActive)';
+        let hexStroke = 'rgba(251, 191, 36, 0.95)';
+        let hexGlow = 'filter="drop-shadow(0 0 10px rgba(245, 158, 11, 0.65))"';
+        let hexText = `<text x="0" y="-48" text-anchor="middle" font-size="14" font-weight="900" fill="#ffffff">${cb.chapterNum}</text>`;
+
+        if(isLocked){
+          hexFill = 'url(#pathButtonLocked)';
+          hexStroke = 'rgba(190, 18, 60, 0.60)';
+          hexGlow = '';
+          hexText = `<text x="0" y="-49" text-anchor="middle" font-size="12" font-weight="900" fill="#fda4af">🔒</text>`;
+        } else if(isCurChapterDone){
+          hexFill = 'url(#pathButtonCompleted)';
+          hexStroke = 'rgba(52, 211, 153, 0.85)';
+          hexGlow = 'filter="drop-shadow(0 0 10px rgba(16, 185, 129, 0.55))"';
+          hexText = `<text x="0" y="-48" text-anchor="middle" font-size="15" font-weight="900" fill="#ffffff">✓</text>`;
+        }
+
+        const hexBadge = `
+          <g class="path-gate-hex-badge" ${hexGlow}>
+            <polygon points="0,-72 16,-63 16,-44 0,-35 -16,-44 -16,-63" fill="${hexFill}" stroke="${hexStroke}" stroke-width="1.8" stroke-linejoin="round"/>
+            <polygon points="0,-68 13,-60 13,-46 0,-38 -13,-46 -13,-60" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1" stroke-linejoin="round"/>
+            ${hexText}
+          </g>`;
+
+        let subText = '';
+        if(isLocked){
+          subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10.5" font-weight="600" fill="#fda4af">🔒 ${cb.unitsCount} ${pluralizeRu(cb.unitsCount, 'юнит', 'юнита', 'юнитов')} · Откроется после «${escapeHtmlStr(prevCb.shortTitle)}»</text>`;
+        } else if(isCurChapterDone){
+          subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10.5" font-weight="600" fill="#6ee7b7">✓ Все ${cb.unitsCount} из ${cb.unitsCount} юнитов сданы · 100%</text>`;
+        } else {
+          const pct = Math.round(curCompletedCount / cb.unitsCount * 100);
+          subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10.5" font-weight="600" fill="#fcd34d">${curCompletedCount} из ${cb.unitsCount} ${pluralizeRu(cb.unitsCount, 'юнита', 'юнитов', 'юнитов')} сдано · ${pct}%</text>`;
+        }
+
+        let btnContent = '';
+        if(isLocked){
+          btnContent = `
+            <g class="path-gate-btn path-gate-btn--locked" data-gate-track="${cb.track}" data-gate-locked="1" data-gate-prev-title="${escapeHtmlStr(prevCb.shortTitle)}" role="button" tabindex="0" aria-label="Раздел ${cb.chapterNum} заблокирован. Завершите темы «${escapeHtmlStr(prevCb.shortTitle)}»." aria-disabled="true">
+              <rect x="-110" y="18" width="220" height="28" rx="14" fill="rgba(65, 12, 26, 0.75)" stroke="rgba(190, 18, 60, 0.55)" stroke-width="1.2"/>
+              <text x="0" y="36" text-anchor="middle" font-size="10.5" font-weight="800" fill="#fda4af" letter-spacing="0.06em">🔒 РАЗДЕЛ ЗАКРЫТ</text>
+            </g>`;
+        } else {
+          const btnLabel = isCurChapterDone ? 'ОБЗОР РАЗДЕЛА ➔' : 'ПЕРЕЙТИ К РАЗДЕЛУ ➔';
+          btnContent = `
+            <g class="path-gate-btn path-gate-btn--unlocked" data-gate-track="${cb.track}" data-gate-locked="0" role="button" tabindex="0" aria-label="Перейти к разделу ${cb.chapterNum}: ${escapeHtmlStr(cb.shortTitle)}" aria-keyshortcuts="Enter Space">
+              <rect class="path-gate-btn-rect" x="-110" y="18" width="220" height="28" rx="14" fill="url(#hexGradCompleted)" stroke="rgba(52, 211, 153, 0.60)" stroke-width="1.2" filter="drop-shadow(0 4px 12px rgba(16,185,129,0.40))"/>
+              <text x="0" y="36" text-anchor="middle" font-size="10.5" font-weight="900" fill="#ffffff" letter-spacing="0.06em">${btnLabel}</text>
+            </g>`;
+        }
+
+        markersSVG += `
+          <g class="path-section-gate path-chapter-ribbon path-section-gate--${gateStatus}" transform="translate(210, ${cy})">
+            <line x1="-195" y1="0" x2="-160" y2="0" stroke="rgba(190, 18, 60, 0.40)" stroke-width="1.5" stroke-dasharray="4 4"/>
+            <line x1="160" y1="0" x2="195" y2="0" stroke="rgba(190, 18, 60, 0.40)" stroke-width="1.5" stroke-dasharray="4 4"/>
+            <rect class="path-section-gate-bg" x="-155" y="-53" width="310" height="112" rx="18" fill="rgba(19, 24, 34, 0.94)" stroke="${isLocked ? 'rgba(190, 18, 60, 0.45)' : (isCurChapterDone ? 'rgba(16, 185, 129, 0.50)' : 'rgba(245, 158, 11, 0.60)')}" stroke-width="1.5" filter="drop-shadow(0 12px 28px rgba(0,0,0,0.65))"/>
+            ${hexBadge}
+            <text class="path-gate-title" x="0" y="-14" text-anchor="middle" font-size="12" font-weight="900" fill="#f8fafc" letter-spacing="0.08em">РАЗДЕЛ ${cb.chapterNum}: ${escapeHtmlStr(cb.shortTitle.toUpperCase())}</text>
+            ${subText}
+            ${btnContent}
+          </g>`;
+      }
     }
   });
 
@@ -10566,8 +10704,7 @@ function viewPathSerpentine(options){
       const unitStarted = (u.skills || []).some(s => (getSkillMP(s.id) || 0) > 0);
       const bubbleTxt = unitStarted ? 'ПРОДОЛЖИТЬ' : 'НАЧАТЬ';
       const bubbleW = unitStarted ? 104 : 72;
-      // Keep the active CTA clear of the chapter ribbon at chapter boundaries.
-      const bubbleY = chapterStartSet.has(i) ? y - 120 : y - 44;
+      const bubbleY = y - 44;
       activeBubble = `
         <g class="hex-active-tooltip" transform="translate(${x}, ${bubbleY})">
           <g class="hex-active-tooltip__inner">
@@ -10577,7 +10714,7 @@ function viewPathSerpentine(options){
           </g>
         </g>`;
     } else {
-      centerIcon = trailIconCenter(x, y + (usePawNodes ? 5 : 0), iconName, usePawNodes ? 18 : 24, '#8b93a3');
+      centerIcon = trailIconCenter(x, y + (usePawNodes ? 5 : 0), iconName, usePawNodes ? 18 : 24, '#a9b3c3');
     }
 
     const nodeShape = usePawNodes
@@ -10585,9 +10722,15 @@ function viewPathSerpentine(options){
       : trailIsometricButton(x, y, buttonGrad, isActive ? 'rgba(255,230,160,0.95)' : (isCompleted ? 'rgba(167,243,208,0.75)' : 'rgba(203,213,225,0.42)'), isActive ? 1.8 : 1.3);
 
     const buttonContent = usePawNodes ? centerIcon : `<g class="path-button-icon">${centerIcon}</g>`;
-    const labelX = (x < 210) ? (x + 46) : (x - 46);
-    const labelAnchor = (x < 210) ? 'start' : 'end';
-    const shortTitle = (u.title.length > 22) ? u.title.slice(0, 20) + '…' : u.title;
+    // Подпись темы под активным узлом и двумя следующими (видно «что дальше» без клика)
+    const showUnderLabel = (i >= activeUnitIndex && i <= activeUnitIndex + 2);
+    const underTitleFull = cleanUnitTitle(u.id, u.title);
+    const shortTitle = (underTitleFull.length > 24) ? underTitleFull.slice(0, 22) + '…' : underTitleFull;
+    // у финишных юнитов главы снизу-сбоку висит ветка челленджа — уводим подпись в противоположную сторону
+    const hasBranchBelow = chapterLastIdxSet.has(i);
+    const branchDir = (x >= 210) ? 1 : -1;
+    const underLabelX = hasBranchBelow ? (x - branchDir * 44) : x;
+    const underLabelAnchor = hasBranchBelow ? (branchDir === 1 ? 'end' : 'start') : 'middle';
     const nodeStateLabel = isCompleted ? 'Пройден' : (isActive ? 'Текущий юнит, доступен для продолжения' : 'Заблокирован: сначала пройдите предыдущие юниты');
     const nodeAccessibleLabel = `Юнит ${u.id}: ${cleanUnitTitle(u.id, u.title)}. ${nodeStateLabel}. Нажмите Enter или пробел, чтобы открыть.`;
 
@@ -10597,7 +10740,7 @@ function viewPathSerpentine(options){
         <circle cx="${x}" cy="${y}" r="34" fill="transparent" pointer-events="all"/>
         ${nodeShape}
         ${buttonContent}
-        <text class="hex-node-label" x="${labelX}" y="${y+4}" text-anchor="${labelAnchor}">${u.id} ${escapeHtmlStr(shortTitle)}</text>
+        ${showUnderLabel ? `<text class="hex-node-underlabel" x="${underLabelX}" y="${y + 52}" text-anchor="${underLabelAnchor}">${escapeHtmlStr(shortTitle)}</text>` : ''}
         ${activeBubble}
       </g>`;
   });
@@ -10626,7 +10769,7 @@ function viewPathSerpentine(options){
       chHalo = `<circle class="hex-challenge-pulse" cx="${bx}" cy="${by}" r="28" fill="none" stroke="rgba(190,18,60,0.55)"/>`;
       chIcon = trailIconCenter(bx, by + (usePawNodes?4:1), 'zap', usePawNodes?17:22, '#ffffff');
     } else {
-      chIcon = trailIconCenter(bx, by + (usePawNodes?4:0), 'zap', usePawNodes?16:20, '#8b93a3');
+      chIcon = trailIconCenter(bx, by + (usePawNodes?4:0), 'zap', usePawNodes?16:20, '#a9b3c3');
     }
     const challengeShape = usePawNodes
       ? trailPawShape(bx, by, chGrad, chStroke, chStatus === 'open' ? 1.8 : 1.3)
@@ -10642,7 +10785,7 @@ function viewPathSerpentine(options){
           <circle cx="${bx}" cy="${by}" r="24" fill="transparent" pointer-events="all"/>
           ${challengeShape}
           ${challengeContent}
-          <text class="hex-branch-label" x="${bx}" y="${by + 46}" text-anchor="middle">ЧЕЛЛЕНДЖ МАСТЕРСТВА</text>
+          <text class="hex-branch-label" x="${bx}" y="${by + 44}" text-anchor="middle">ЧЕЛЛЕНДЖ<tspan x="${bx}" dy="13">МАСТЕРСТВА</tspan></text>
         </g>
       </g>`;
   });
@@ -13895,6 +14038,22 @@ document.addEventListener('click', async function(e){
     return;
   }
 
+  // Section Gate button click (navigate to track or show locked toast)
+  const gateBtn = e.target.closest('[data-gate-track]');
+  if(gateBtn){
+    const isLocked = gateBtn.getAttribute('data-gate-locked') === '1';
+    const track = gateBtn.getAttribute('data-gate-track');
+    const prevTitle = gateBtn.getAttribute('data-gate-prev-title') || 'предыдущего раздела';
+    if(isLocked){
+      if(typeof showTactileToast === 'function'){
+        showTactileToast(`🔒 Завершите все темы «${prevTitle}», чтобы открыть этот раздел!`);
+      }
+      return;
+    }
+    if(track) location.hash = `#/${track}`;
+    return;
+  }
+
   // «Челлендж мастерства» branch node click (navigate to the unit test route)
   const challengeNode = e.target.closest('.hex-challenge-node');
   if(challengeNode){
@@ -14350,10 +14509,10 @@ document.addEventListener('keydown', function(e){
       return;
     }
   }
-  if((e.key === 'Enter' || e.code === 'Space') && e.target && e.target.closest && (e.target.closest('.hex-3d-node') || e.target.closest('.hex-challenge-node'))){
+  if((e.key === 'Enter' || e.code === 'Space') && e.target && e.target.closest && (e.target.closest('.hex-3d-node') || e.target.closest('.hex-challenge-node') || e.target.closest('[data-gate-track]'))){
     e.preventDefault();
     const clickEv = (typeof MouseEvent !== 'undefined') ? new MouseEvent('click', { bubbles: true, cancelable: true }) : { type: 'click', bubbles: true };
-    (e.target.closest('.hex-challenge-node') || e.target.closest('.hex-3d-node')).dispatchEvent(clickEv);
+    (e.target.closest('[data-gate-track]') || e.target.closest('.hex-challenge-node') || e.target.closest('.hex-3d-node')).dispatchEvent(clickEv);
     return;
   }
   if(e.code === 'Space'){
