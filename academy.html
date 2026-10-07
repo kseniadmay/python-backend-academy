@@ -8134,9 +8134,14 @@ function viewPythonSkill(sid){
         </div>
         <div class="sprint-progress-track"><div class="sprint-progress-fill" style="width:${sprintPct}%;"></div></div>
       </div>
-      <button type="button" class="sprint-audio-btn" data-toggle-audio title="Озвучить конспект (Web Speech API)" aria-label="Озвучить конспект">🔊</button>
-      <a href="#/docs" class="sprint-xp-pill" style="text-decoration:none;" title="Справочник синтаксиса и методов Python">📚 Справка</a>
-      <span class="sprint-xp-pill">⚡ +10 XP</span>
+      <span class="sprint-xp-pill" aria-live="polite">⚡ +${pySkillViewState.tab==='code'?25:pySkillViewState.tab==='cards'?10:10} XP</span>
+      <div class="sprint-overflow-menu" style="position:relative;">
+        <button type="button" class="sprint-overflow-btn icon-btn" title="Дополнительно" aria-label="Дополнительные действия" style="border-radius:10px;padding:6px 9px;font-size:.86rem;">···</button>
+        <div class="sprint-overflow-dropdown" style="display:none;position:absolute;right:0;top:calc(100% + 6px);z-index:20;background:var(--surface);border:1px solid var(--glass-border);border-radius:14px;padding:6px;min-width:160px;box-shadow:var(--shadow-1);backdrop-filter:blur(18px);">
+          <button type="button" class="sprint-overflow-item" data-toggle-audio style="display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border:none;background:none;font-family:inherit;font-size:.84rem;color:var(--ink);border-radius:9px;cursor:pointer;text-align:left;">🔊 Озвучить конспект</button>
+          <a href="#/docs" class="sprint-overflow-item" style="display:flex;align-items:center;gap:8px;padding:7px 10px;font-size:.84rem;color:var(--ink);border-radius:9px;text-decoration:none;">📚 Справочник Python</a>
+        </div>
+      </div>
     </div>
     <div id="theory-audio-bar" class="theory-audio-bar" style="display:${state.audioBarOpen ? 'flex' : 'none'};">
       <button type="button" class="theory-audio-btn" data-audio-play title="Воспроизвести / Пауза">▶</button>
@@ -8150,13 +8155,34 @@ function viewPythonSkill(sid){
   const notesDoneCount = sk.kIds.filter(k => state.readNotes.includes(k)).length;
   const decksDoneCount = sk.fIds.filter(f => state.reviewedDecks.includes(f)).length;
   const tasksDoneCount = (sk.taskIds||[]).filter(tid => solvedMap[tid] === 'solved').length;
+  // Вкладки: счётчик только в активной, в неактивных — только иконка+название (без «(0/N)»)
+  const _theoryActive = pySkillViewState.tab==='theory';
+  const _cardsActive  = pySkillViewState.tab==='cards';
+  const _codeActive   = pySkillViewState.tab==='code';
+  const theoryTabLabel = notesDoneCount>=sk.kIds.length ? `✓ 📖 Конспект` : `📖 Конспект${_theoryActive ? ` (${notesDoneCount}/${sk.kIds.length})` : ''}`;
+  const cardsTabLabel  = (decksDoneCount>=sk.fIds.length && sk.fIds.length>0) ? `✓ 🃏 Карточки` : `🃏 Карточки${_cardsActive ? ` (${decksDoneCount}/${sk.fIds.length})` : ''}`;
+  const codeTabLabel   = tasksDoneCount>0 ? `✓ 💻 Практика${_codeActive ? ` (${tasksDoneCount}/${(sk.taskIds||[]).length})` : ''}` : `💻 Практика${_codeActive ? ` (0/${(sk.taskIds||[]).length})` : ''}`;
+  // Pipeline-strip «① Теория → ② Карточки → ③ Код»
+  const notesDone = notesDoneCount >= sk.kIds.length && sk.kIds.length > 0;
+  const decksDone = decksDoneCount >= sk.fIds.length && sk.fIds.length > 0;
+  const codeDone  = tasksDoneCount >= (sk.taskIds||[]).length && (sk.taskIds||[]).length > 0;
+  const pipelineHTML = `
+    <div class="pipeline-strip" role="navigation" aria-label="Этапы навыка">
+      <span class="pipe-step${_theoryActive?' pipe-step--active':''}${notesDone?' pipe-step--done':''}">① Теория</span>
+      <span class="pipe-arrow" aria-hidden="true">──▶</span>
+      <span class="pipe-step${_cardsActive?' pipe-step--active':''}${decksDone?' pipe-step--done':''}">② Карточки</span>
+      <span class="pipe-arrow" aria-hidden="true">──▶</span>
+      <span class="pipe-step${_codeActive?' pipe-step--active':''}${codeDone?' pipe-step--done':''}">③ Код</span>
+    </div>`;
   const tabsHTML = `
     <div class="subtabs subtabs--compact">
-      <button class="subtab ${pySkillViewState.tab==='theory'?'active':''}" data-py-tab="theory">${notesDoneCount>=sk.kIds.length?'✓ ':'1. '}📖 Конспект (${notesDoneCount}/${sk.kIds.length})</button>
-      <button class="subtab ${pySkillViewState.tab==='cards'?'active':''}" data-py-tab="cards">${decksDoneCount>=sk.fIds.length && sk.fIds.length>0?'✓ ':'2. '}🃏 Карточки (${decksDoneCount}/${sk.fIds.length})<span class="sr-only"> 3D Карточки</span></button>
-      <button class="subtab ${pySkillViewState.tab==='code'?'active':''}" data-py-tab="code">${tasksDoneCount>0?'✓ ':'3. '}💻 Практика (${tasksDoneCount}/${(sk.taskIds||[]).length})</button>
+      <button class="subtab ${_theoryActive?'active':''}" data-py-tab="theory">${theoryTabLabel}</button>
+      <button class="subtab ${_cardsActive?'active':''}" data-py-tab="cards">${cardsTabLabel}<span class="sr-only"> 3D Карточки</span></button>
+      <button class="subtab ${_codeActive?'active':''}" data-py-tab="code">${codeTabLabel}</button>
       <a href="#${tr.routePrefix}/unittest/${sk.unitId}" class="subtab" style="text-decoration:none;">⚡ Тест<span class="sr-only"> ${sk.unitId}</span></a>
-    </div>`;
+    </div>
+    ${pipelineHTML}`;
+
 
   let bodyHTML = '';
   let showTopTabs = true;
@@ -8181,115 +8207,20 @@ function viewPythonSkill(sid){
 
     const primaryActionHTML = hasMoreChunks ? `
       <div style="margin-top:12px;">
-        <button class="btn-glass-emerald btn-sprint-cta" data-chunk-more="py">Понятно, дальше (+10 XP) ➔</button>
+        <button class="btn-glass-emerald" style="width:100%;justify-content:center;" data-chunk-more="py">Понятно, дальше (+10 XP) ➔</button>
       </div>` : `
       <div style="margin-top:12px;">
         ${stepIdx + 1 < steps.length
-          ? `<button class="btn-glass-emerald btn-sprint-cta" data-py-next-step="${stepIdx+1}">Понятно, дальше (+10 XP) ➔</button>`
-          : `<button class="btn-glass-emerald btn-sprint-cta" data-py-finish-note="${activeK}">✓ Конспект изучен — перейти к карточкам (+15 XP) ${ICONS.arrowRight}</button>`}
+          ? `<button class="btn-glass-emerald" style="width:100%;justify-content:center;" data-py-next-step="${stepIdx+1}">Понятно, дальше (+10 XP) ➔</button>`
+          : `<button class="btn-glass-emerald" style="width:100%;justify-content:center;" data-py-finish-note="${activeK}">✓ Конспект изучен — перейти к карточкам (+15 XP) ${ICONS.arrowRight}</button>`}
         <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:6px;">
           <span class="meta">${isRead ? '✓ Теория прочитана (закрепи карточками и кодом!)' : 'Этап 1 из 3: Теория → Карточки → Код'}</span>
         </div>
       </div>`;
 
-    const floatingStepNavHTML = `
-      <div class="floating-step-nav">
-        <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;">
-          ${sk.kIds.length > 1 ? sk.kIds.map(kid => `<button class="btn ${kid===activeK?'btn-primary':'btn-ghost'}" style="padding:4px 9px;font-size:.73rem;" data-py-select-k="${kid}">${state.readNotes.includes(kid)?'✓ ':''}${kid}</button>`).join('') : `<span class="meta" style="font-size:.73rem;font-weight:600;">${activeK} · ${noteObj.title || ''}</span>`}
-        </div>
-        <div style="display:flex;gap:6px;align-items:center;">
-          <button class="btn btn-ghost" style="padding:4px 9px;font-size:.73rem;" data-py-step="${Math.max(0, stepIdx-1)}" ${stepIdx===0?'disabled':''}>← ${stepIdx > 0 ? `Шаг ${stepIdx}` : 'Назад'}</button>
-          <span class="meta" style="font-size:.73rem;font-weight:700;">Шаг ${stepIdx+1}/${steps.length}</span>
-          ${stepIdx + 1 < steps.length
-            ? `<button class="btn btn-ghost" style="padding:4px 9px;font-size:.73rem;" data-py-next-step="${stepIdx+1}">Шаг ${stepIdx+2} →</button>`
-            : `<button class="btn btn-primary" style="padding:4px 9px;font-size:.73rem;" data-py-finish-note="${activeK}">К карточкам →</button>`}
-        </div>
-      </div>`;
-
-    const navDrawerHTML = `
-      <details class="cocoon-details cocoon-details--compact" style="margin-top:12px;">
-        <summary><span>🧭 Навигация по конспекту (${activeK})</span><span class="meta">${sk.kIds.length > 1 ? `Конспекты (${sk.kIds.length}) ▾` : 'Шаги темы ▾'}</span></summary>
-        <div class="sprint-step-header">
-          <div class="microstep-dots">${dotsHTML}</div>
-          <span class="meta" style="font-size:.73rem;white-space:nowrap;">Шаг ${stepIdx+1}/${steps.length}</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
-          <div>
-            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">
-              <span class="topic-badge" style="margin:0;">Юнит ${sk.unitId} · ${sk.id}</span>
-              <span class="echelon-badge echelon-badge--t${effTier}">${echMeta.label}</span>
-            </div>
-            <h1 style="font-size:1.15rem;margin:0;">${sk.title}</h1>
-          </div>
-          ${mp > 0 ? `<div class="state-tag ${mp>=80?'state-tag--mastered':'state-tag--available'}">${mpLabel(mp)}</div>` : ''}
-        </div>
-        ${sk.kIds.length > 1 ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">${kSelector}</div>` : ''}
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
-          <a href="#${tr.routePrefix}" class="back-link" style="margin:0;">${ICONS.chevronLeft} ${tr.backLabel}</a>
-          <button class="link-quiet" data-py-toggle-fullnote>${pySkillViewState.fullNoteMode ? 'По кусочкам' : 'Показать весь конспект'}</button>
-        </div>
-      </details>`;
-
-    const previewDeckId = sk.fIds && sk.fIds[0];
-    const previewDeck = (previewDeckId && ALL_DECKS_COMBINED[previewDeckId]) || null;
-    const previewCard = (previewDeck && previewDeck.cards && previewDeck.cards[0]) || null;
-    
-    // Подготовка черновика скетчпада: сохраненный черновик или релевантный код микро-шага
-    const draftKey = `${sk.id}:${activeK}:${stepIdx}`;
-    if(!pySkillViewState.labDrafts) pySkillViewState.labDrafts = {};
-    const scratchpadCode = pySkillViewState.labDrafts[draftKey] || getStepDefaultScratchpadCode(activeK, sk.id, curStep, stepIdx);
-
-    const theoryExtrasHTML = `
-      <details class="cocoon-details cocoon-details--compact" style="margin-top:12px;">
-        <summary><span>🔬 Анатомия памяти CPython & Упражнение (${sk.id})</span><span class="meta">Подробнее ▾</span></summary>
-        <div class="skill-lab-card" style="margin-top:8px;border:none;box-shadow:none;padding:0;">
-          ${buildCPythonMemoryDiagramHTML(activeK, sk.id)}
-          ${buildTapToFillExerciseHTML(activeK, sk.id)}
-        </div>
-      </details>`;
-
-    const labAsideHTML = `
-      <aside class="skill-lab-aside" aria-label="Лаборатория закрепления">
-        <div class="skill-lab-card">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-            <h4 style="margin:0;">🧪 Интерактивный челлендж (${sk.id})</h4>
-            <span class="meta" style="font-size:.72rem;">Python 3.13</span>
-          </div>
-          <div class="meta" style="font-size:.74rem;margin:4px 0 6px;font-weight:600;">⚡ Песочница к Шагу ${stepIdx+1}: «${curStep.title || 'Теория'}»</div>
-          <textarea id="skill-lab-scratchpad" class="code-editor" spellcheck="false" style="min-height:108px;font-size:.82rem;padding:9px 10px;line-height:1.45;">${escapeHtmlStr(scratchpadCode)}</textarea>
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap;">
-            <div style="display:flex;gap:6px;align-items:center;">
-              <button type="button" class="btn btn-primary" style="padding:6px 12px;font-size:.78rem;" data-run-lab-scratchpad title="Запустить код (Ctrl+Enter)">▶ Запустить код (Ctrl+Enter)</button>
-              <button type="button" class="btn btn-ghost" style="padding:5px 8px;font-size:.74rem;" data-copy-lab-code title="Копировать код">📋</button>
-              <button type="button" class="btn btn-ghost" style="padding:5px 8px;font-size:.74rem;" data-reset-lab-code title="Сбросить код к исходному">↺</button>
-            </div>
-            <button type="button" class="link-quiet" style="font-size:.73rem;" data-py-tab="code">К задаче IDE →</button>
-          </div>
-          <div id="skill-lab-output-box" class="hidden" style="margin-top:8px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-              <span class="meta" style="font-size:.72rem;font-weight:700;">Вывод программы:</span>
-              <div style="display:flex;gap:4px;">
-                <button type="button" class="link-quiet" style="font-size:.72rem;" data-copy-lab-out>Копировать</button>
-                <button type="button" class="link-quiet" style="font-size:.72rem;" data-clear-lab-out>Очистить</button>
-              </div>
-            </div>
-            <pre id="skill-lab-output" class="inline-code-out" style="margin:0;font-size:.76rem;"></pre>
-          </div>
-        </div>
-        ${previewCard ? `
-        <div class="skill-lab-card">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <h4 style="margin:0;">🃏 Блиц-карточка (${previewDeckId})</h4>
-            <span class="meta" style="font-size:.72rem;">Колода</span>
-          </div>
-          <div style="font-size:.82rem;font-weight:600;margin-bottom:8px;line-height:1.4;">${formatRichInlineText(previewCard.q)}</div>
-          <button type="button" class="btn btn-ghost" style="width:100%;justify-content:center;padding:6px 10px;font-size:.76rem;" data-py-tab="cards">Открыть колоду (${previewDeck.cards.length} карточек) →</button>
-        </div>` : ''}
-      </aside>`;
-
     bodyHTML = pySkillViewState.fullNoteMode
-      ? `${navDrawerHTML}` + steps.map((st, i) => `<div class="microstep-card"><div class="topic-badge">Шаг ${i+1} из ${steps.length}</div><h3>${st.title}</h3><div class="lesson-theory">${decorateCodeBlocksWithRunBtn(st.html)}</div></div>`).join('') + theoryExtrasHTML
-      : `<div class="skill-split-layout"><div class="skill-theory-col">${feedHTML}${primaryActionHTML}${floatingStepNavHTML}${theoryExtrasHTML}${navDrawerHTML}</div>${labAsideHTML}</div>`;
+      ? steps.map((st, i) => `<div class="microstep-card"><div class="topic-badge">Шаг ${i+1} из ${steps.length}</div><h3>${st.title}</h3><div class="lesson-theory">${decorateCodeBlocksWithRunBtn(st.html)}</div></div>`).join('')
+      : `<div class="coddy-lesson-card" style="max-width:760px;margin:0 auto;">${feedHTML}${primaryActionHTML}</div>`;
   } else if(pySkillViewState.tab === 'cards'){
     const activeF = pySkillViewState.fId || sk.fIds[0];
     const deckObj = ALL_DECKS_COMBINED[activeF] || {id: activeF, title: activeF, cards: []};
@@ -8410,7 +8341,7 @@ function viewPythonSkill(sid){
   }
 
   return `
-    <div class="container ${pySkillViewState.tab==='theory' && !pySkillViewState.fullNoteMode ? 'container--wide' : ''}">
+    <div class="container" style="max-width:880px;">
       ${focusTopbarHTML}
       ${celebrationBanner}
       ${showTopTabs ? tabsHTML : ''}
