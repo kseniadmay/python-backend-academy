@@ -1166,15 +1166,15 @@ EXTRA_CSS = r"""
     transition:opacity .35s ease,color .35s ease;
   }
   .feed-chunk-new{
-    border-left:3px solid var(--moss);
-    background:rgba(20,90,70,0.07);
-    border-radius:0 16px 16px 0;
-    padding:12px 14px;
+    border-left:none;
+    background:transparent;
+    border-radius:0;
+    padding:6px 0;
     margin-top:6px;
     animation:fogReveal .45s cubic-bezier(0.22,1,0.36,1) forwards;
   }
   html:not([data-theme="dark"]) .feed-chunk-new{
-    background:rgba(20,90,70,0.04);
+    background:transparent;
   }
   @keyframes fogReveal{
     0%{opacity:0;filter:blur(7px);transform:translateY(10px);}
@@ -5346,14 +5346,24 @@ async function getFastPythonRunner(){
       setStdout: function(o){ stdoutFn = o && o.batched; },
       setStderr: function(o){ stderrFn = o && o.batched; },
       runPython: function(src){
-        window.__py_stdout_cb = function(s){ if(stdoutFn) stdoutFn(s); };
-        window.__py_stderr_cb = function(s){ if(stderrFn) stderrFn(s); };
-        window.__py_result_Bridge = {};
-        const wrapped = BRYTHON_PRELUDE + `\nimport sys, io as _io\nfrom browser import window as _bw\nclass _WOut:\n    def write(self, s):\n        if s:\n            _bw.__py_stdout_cb(str(s))\n    def flush(self): pass\nsys.stdout = _WOut()\nsys.stderr = _WOut()\n` + src + `\ntry:\n    _bw.__py_result_Bridge.res = bool(__result__)\n    _bw.__py_result_Bridge.msg = str(__message__)\nexcept Exception:\n    pass\n`;
+        window.pba_stdout_cb = function(s){
+          if(typeof s !== 'string'){
+            try { s = (s && typeof s.$js === 'function') ? String(s.$js()) : String(s); } catch(e){ s = String(s); }
+          }
+          if(stdoutFn) stdoutFn(String(s));
+        };
+        window.pba_stderr_cb = function(s){
+          if(typeof s !== 'string'){
+            try { s = (s && typeof s.$js === 'function') ? String(s.$js()) : String(s); } catch(e){ s = String(s); }
+          }
+          if(stderrFn) stderrFn(String(s));
+        };
+        window.pba_result_bridge = {};
+        const wrapped = BRYTHON_PRELUDE + `\nimport sys, io as _io\nfrom browser import window as _bw\nclass _PBAOut:\n    def write(self, s):\n        if s is not None:\n            _bw.pba_stdout_cb(str(s))\n    def flush(self): pass\nclass _PBAErr:\n    def write(self, s):\n        if s is not None:\n            _bw.pba_stderr_cb(str(s))\n    def flush(self): pass\nsys.stdout = _PBAOut()\nsys.stderr = _PBAErr()\n` + src + `\ntry:\n    _bw.pba_result_bridge.res = bool(__result__)\n    _bw.pba_result_bridge.msg = str(__message__)\nexcept Exception:\n    pass\n`;
         window.__BRYTHON__.runPythonSource(wrapped, '__main_' + Math.random().toString(36).slice(2));
         lastGlobals = {
-          __result__: window.__py_result_Bridge.res,
-          __message__: window.__py_result_Bridge.msg || ''
+          __result__: window.pba_result_bridge.res,
+          __message__: window.pba_result_bridge.msg || ''
         };
       },
       globals: {
@@ -5445,7 +5455,8 @@ let pySkillViewState = {
   codeDraft: '',
   hintLevel: 0,
   runStatus: null,
-  runOutput: ''
+  runOutput: '',
+  labDrafts: {}
 };
 
 function saveReadingPosition(){
@@ -5475,6 +5486,7 @@ function ensurePySkillState(sid){
     const firstF = (saved.fId && sk.fIds.includes(saved.fId)) ? saved.fId : (sk.fIds[0] || null);
     const firstT = (saved.taskId && sk.taskIds && sk.taskIds.includes(saved.taskId)) ? saved.taskId : ((sk.taskIds && sk.taskIds[0]) || 240);
     const tObj = IDE_TASKS_BY_ID[firstT];
+    const oldDrafts = (pySkillViewState && pySkillViewState.labDrafts) ? pySkillViewState.labDrafts : {};
     pySkillViewState = {
       sid: sk.id,
       tab: (isInitialBoot && ['theory','cards','code'].includes(saved.tab)) ? saved.tab : 'theory',
@@ -5490,7 +5502,8 @@ function ensurePySkillState(sid){
       codeDraft: tObj ? getIdeDraft(firstT, tObj.initialCode) : '',
       hintLevel: 0,
       runStatus: null,
-      runOutput: ''
+      runOutput: '',
+      labDrafts: oldDrafts
     };
   }
   return sk;
@@ -5990,6 +6003,29 @@ function buildSprintFinishCelebrationHTML(cel){
     </div>`;
 }
 
+function getStepDefaultScratchpadCode(activeK, sid, curStep, stepIdx){
+  if(curStep && curStep.html){
+    const m = curStep.html.match(/<pre><code>([\s\S]*?)<\/code><\/pre>/i);
+    if(m && m[1]){
+      const raw = m[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').trim();
+      const lines = raw.split('\n');
+      if(lines.length >= 1 && lines.length <= 15 && !/^(SELECT|INSERT|docker|git)/i.test(lines[0])){
+        return raw;
+      }
+    }
+  }
+  if(/1\.1\.[1-4]|К-00[1-4]/.test(String(sid) + ' ' + String(activeK))){
+    if(stepIdx === 0 || stepIdx === 1){
+      return `# Быстрый эксперимент со списками (Шаг ${stepIdx+1})\nitems = [1, 2, 3, 4, 5]\nitems.append(6)\nprint("Список:", items, "Срез:", items[1:4])`;
+    } else if(stepIdx === 2){
+      return `# Быстрый эксперимент со словарем (Шаг 3)\nuser = {"id": 42, "role": "admin"}\nprint("Ключи:", list(user.keys()), "Значения:", list(user.values()))`;
+    } else if(stepIdx === 3){
+      return `# Быстрый эксперимент с множеством (Шаг 4)\na = {1, 2, 3}\nb = {3, 4, 5}\nprint("Пересечение:", a & b, "Объединение:", a | b)`;
+    }
+  }
+  return `# Проверь идею из конспекта ${activeK} (Шаг ${stepIdx+1})\nitems = [10, 20, 30]\nprint("Длина:", len(items), "Первый элемент:", items[0])`;
+}
+
 function viewPythonSkill(sid){
   const sk = ensurePySkillState(sid);
   const tr = getTrackForSkill(sk.id);
@@ -6011,7 +6047,7 @@ function viewPythonSkill(sid){
   const totalChunks = chunks.length;
   const curChunkIdx = Math.min(pySkillViewState.chunkIdx || 0, Math.max(0, totalChunks - 1));
 
-  let topbarMetaLeft = `${activeK} · Навык ${sk.id}`;
+  let topbarMetaLeft = `${tr.title || 'Курс'} › Юнит ${sk.unitId} · ${sk.title || sk.id}`;
   let topbarMetaRight = `Шаг ${stepIdx+1}/${steps.length}`;
   let sprintPct = Math.min(100, Math.max(10, Math.round(((stepIdx + (curChunkIdx + 1) / Math.max(1, totalChunks)) / Math.max(1, steps.length)) * 100)));
 
@@ -6019,7 +6055,7 @@ function viewPythonSkill(sid){
     const activeF = pySkillViewState.fId || sk.fIds[0];
     const deckObj = ALL_DECKS_COMBINED[activeF] || {id: activeF, cards: []};
     const cIdx = Math.min(pySkillViewState.cardIdx, Math.max(0, (deckObj.cards||[]).length - 1));
-    topbarMetaLeft = `🃏 ${activeF || 'Колода'} · Навык ${sk.id}`;
+    topbarMetaLeft = `🃏 ${deckObj.title || activeF} · Юнит ${sk.unitId}`;
     topbarMetaRight = `Карточка ${cIdx+1}/${Math.max(1, (deckObj.cards||[]).length)}`;
     sprintPct = Math.min(100, Math.max(10, Math.round(((cIdx + 1) / Math.max(1, (deckObj.cards||[]).length)) * 100)));
   } else if(pySkillViewState.tab === 'code'){
@@ -6027,7 +6063,7 @@ function viewPythonSkill(sid){
     const activeTid = tIds.includes(pySkillViewState.taskId) ? pySkillViewState.taskId : tIds[0];
     const tObj = IDE_TASKS_BY_ID[activeTid] || IDE_TASKS[0];
     const curTaskIdx = Math.max(0, tIds.indexOf(activeTid));
-    topbarMetaLeft = `💻 Задача #${tObj.id} · <span style="font-weight:700;color:var(--amber);">${tObj.tier}</span> · Навык ${sk.id}`;
+    topbarMetaLeft = `💻 Задача #${tObj.id} · <span style="font-weight:700;color:var(--amber);">${tObj.tier}</span> · ${tObj.title}`;
     topbarMetaRight = `Задача ${curTaskIdx+1}/${tIds.length}`;
     sprintPct = Math.min(100, Math.max(10, Math.round(((curTaskIdx + 1) / Math.max(1, tIds.length)) * 100)));
   }
@@ -6044,7 +6080,7 @@ function viewPythonSkill(sid){
       </div>
       <button type="button" class="sprint-audio-btn" data-toggle-audio title="Озвучить конспект (Web Speech API)" aria-label="Озвучить конспект">🔊</button>
       <a href="#/docs" class="sprint-xp-pill" style="text-decoration:none;" title="Справочник синтаксиса и методов Python">📚 Справка</a>
-      <span class="sprint-xp-pill">⚡ +10 XP<span class="sr-only"> ${mpLabel(mp)}</span></span>
+      <span class="sprint-xp-pill">⚡ +10 XP</span>
     </div>
     <div id="theory-audio-bar" class="theory-audio-bar" style="display:${state.audioBarOpen ? 'flex' : 'none'};">
       <button type="button" class="theory-audio-btn" data-audio-play title="Воспроизвести / Пауза">▶</button>
@@ -6090,10 +6126,6 @@ function viewPythonSkill(sid){
     const primaryActionHTML = hasMoreChunks ? `
       <div style="margin-top:12px;">
         <button class="btn-glass-emerald btn-sprint-cta" data-chunk-more="py">Понятно, дальше (+10 XP) ➔</button>
-        <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:6px;">
-          <span class="sr-only">Кусочек ${curChunkIdx + 1} из ${totalChunks} · <button class="link-quiet" data-chunk-reveal-step="py">Открыть шаг целиком</button></span>
-          <button class="link-quiet" data-chunk-reveal-step="py">Весь шаг сразу</button>
-        </div>
       </div>` : `
       <div style="margin-top:12px;">
         ${stepIdx + 1 < steps.length
@@ -6107,10 +6139,10 @@ function viewPythonSkill(sid){
     const floatingStepNavHTML = `
       <div class="floating-step-nav">
         <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;">
-          ${sk.kIds.map(kid => `<button class="btn ${kid===activeK?'btn-primary':'btn-ghost'}" style="padding:4px 9px;font-size:.73rem;" data-py-select-k="${kid}">${state.readNotes.includes(kid)?'✓ ':''}${kid}</button>`).join('')}
+          ${sk.kIds.length > 1 ? sk.kIds.map(kid => `<button class="btn ${kid===activeK?'btn-primary':'btn-ghost'}" style="padding:4px 9px;font-size:.73rem;" data-py-select-k="${kid}">${state.readNotes.includes(kid)?'✓ ':''}${kid}</button>`).join('') : `<span class="meta" style="font-size:.73rem;font-weight:600;">${activeK} · ${noteObj.title || ''}</span>`}
         </div>
         <div style="display:flex;gap:6px;align-items:center;">
-          <button class="btn btn-ghost" style="padding:4px 9px;font-size:.73rem;" data-py-step="${Math.max(0, stepIdx-1)}" ${stepIdx===0?'disabled':''}>← Шаг ${stepIdx}</button>
+          <button class="btn btn-ghost" style="padding:4px 9px;font-size:.73rem;" data-py-step="${Math.max(0, stepIdx-1)}" ${stepIdx===0?'disabled':''}>← ${stepIdx > 0 ? `Шаг ${stepIdx}` : 'Назад'}</button>
           <span class="meta" style="font-size:.73rem;font-weight:700;">Шаг ${stepIdx+1}/${steps.length}</span>
           ${stepIdx + 1 < steps.length
             ? `<button class="btn btn-ghost" style="padding:4px 9px;font-size:.73rem;" data-py-next-step="${stepIdx+1}">Шаг ${stepIdx+2} →</button>`
@@ -6120,22 +6152,22 @@ function viewPythonSkill(sid){
 
     const navDrawerHTML = `
       <details class="cocoon-details cocoon-details--compact" style="margin-top:12px;">
-        <summary><span>🧭 Навигация по теме (${activeK})</span><span class="meta">Конспекты (${sk.kIds.length}) ▾</span></summary>
+        <summary><span>🧭 Навигация по конспекту (${activeK})</span><span class="meta">${sk.kIds.length > 1 ? `Конспекты (${sk.kIds.length}) ▾` : 'Шаги темы ▾'}</span></summary>
         <div class="sprint-step-header">
           <div class="microstep-dots">${dotsHTML}</div>
-          <span class="meta" style="font-size:.73rem;white-space:nowrap;">Шаг ${stepIdx+1}/${steps.length}<span class="sr-only"> Микро-шаг ${stepIdx+1} из ${steps.length}</span></span>
+          <span class="meta" style="font-size:.73rem;white-space:nowrap;">Шаг ${stepIdx+1}/${steps.length}</span>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
           <div>
             <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">
-              <span class="topic-badge" style="margin:0;">Юнит ${sk.unitId} · Навык ${sk.id}</span>
+              <span class="topic-badge" style="margin:0;">Юнит ${sk.unitId} · ${sk.id}</span>
               <span class="echelon-badge echelon-badge--t${effTier}">${echMeta.label}</span>
             </div>
             <h1 style="font-size:1.15rem;margin:0;">${sk.title}</h1>
           </div>
-          <div class="state-tag ${mp>=80?'state-tag--mastered':'state-tag--available'}">${mpLabel(mp)}</div>
+          ${mp > 0 ? `<div class="state-tag ${mp>=80?'state-tag--mastered':'state-tag--available'}">${mpLabel(mp)}</div>` : ''}
         </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">${kSelector}</div>
+        ${sk.kIds.length > 1 ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">${kSelector}</div>` : ''}
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
           <a href="#${tr.routePrefix}" class="back-link" style="margin:0;">${ICONS.chevronLeft} ${tr.backLabel}</a>
           <button class="link-quiet" data-py-toggle-fullnote>${pySkillViewState.fullNoteMode ? 'По кусочкам' : 'Показать весь конспект'}</button>
@@ -6145,38 +6177,63 @@ function viewPythonSkill(sid){
     const previewDeckId = sk.fIds && sk.fIds[0];
     const previewDeck = (previewDeckId && ALL_DECKS_COMBINED[previewDeckId]) || null;
     const previewCard = (previewDeck && previewDeck.cards && previewDeck.cards[0]) || null;
-    // V6 (Coddy-ref): наглядные модули (диаграмма памяти + fill-упражнение) живут в центральной колонке
-    // под теорией, правый рейл = только интерактив (песочница + блиц-карточка) — центр не пустеет
+    
+    // Подготовка черновика скетчпада: сохраненный черновик или релевантный код микро-шага
+    const draftKey = `${sk.id}:${activeK}:${stepIdx}`;
+    if(!pySkillViewState.labDrafts) pySkillViewState.labDrafts = {};
+    const scratchpadCode = pySkillViewState.labDrafts[draftKey] || getStepDefaultScratchpadCode(activeK, sk.id, curStep, stepIdx);
+
     const theoryExtrasHTML = `
-      <div class="skill-lab-card" style="margin-top:12px;">
-        <h4>🔬 Смотри в память (${sk.id})</h4>
-        ${buildCPythonMemoryDiagramHTML(activeK, sk.id)}
-        ${buildTapToFillExerciseHTML(activeK, sk.id)}
-      </div>`;
+      <details class="cocoon-details cocoon-details--compact" style="margin-top:12px;">
+        <summary><span>🔬 Анатомия памяти CPython & Упражнение (${sk.id})</span><span class="meta">Подробнее ▾</span></summary>
+        <div class="skill-lab-card" style="margin-top:8px;border:none;box-shadow:none;padding:0;">
+          ${buildCPythonMemoryDiagramHTML(activeK, sk.id)}
+          ${buildTapToFillExerciseHTML(activeK, sk.id)}
+        </div>
+      </details>`;
 
     const labAsideHTML = `
       <aside class="skill-lab-aside" aria-label="Лаборатория закрепления">
         <div class="skill-lab-card">
-          <h4>🧪 Лаборатория закрепления (${sk.id})</h4>
-          <div class="meta" style="font-size:.74rem;margin:8px 0 4px;font-weight:600;">⚡ Экспресс-песочница Python 3.13:</div>
-          <textarea id="skill-lab-scratchpad" class="code-editor" spellcheck="false" style="min-height:92px;font-size:.78rem;padding:8px 10px;"># Проверь идею из конспекта ${activeK}\nimport sys\ndata = {"a": 1, "b": 2}\nprint("size:", sys.getsizeof(data), "keys:", list(data.keys()))</textarea>
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-top:6px;">
-            <button type="button" class="btn btn-primary" style="padding:5px 10px;font-size:.75rem;" data-run-lab-scratchpad>▶ Запустить код</button>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <h4 style="margin:0;">🧪 Интерактивный челлендж (${sk.id})</h4>
+            <span class="meta" style="font-size:.72rem;">Python 3.13</span>
+          </div>
+          <div class="meta" style="font-size:.74rem;margin:4px 0 6px;font-weight:600;">⚡ Песочница к Шагу ${stepIdx+1}: «${curStep.title || 'Теория'}»</div>
+          <textarea id="skill-lab-scratchpad" class="code-editor" spellcheck="false" style="min-height:108px;font-size:.82rem;padding:9px 10px;line-height:1.45;">${escapeHtmlStr(scratchpadCode)}</textarea>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap;">
+            <div style="display:flex;gap:6px;align-items:center;">
+              <button type="button" class="btn btn-primary" style="padding:6px 12px;font-size:.78rem;" data-run-lab-scratchpad title="Запустить код (Ctrl+Enter)">▶ Запустить код (Ctrl+Enter)</button>
+              <button type="button" class="btn btn-ghost" style="padding:5px 8px;font-size:.74rem;" data-copy-lab-code title="Копировать код">📋</button>
+              <button type="button" class="btn btn-ghost" style="padding:5px 8px;font-size:.74rem;" data-reset-lab-code title="Сбросить код к исходному">↺</button>
+            </div>
             <button type="button" class="link-quiet" style="font-size:.73rem;" data-py-tab="code">К задаче IDE →</button>
           </div>
-          <pre id="skill-lab-output" class="inline-code-out hidden" style="margin-top:6px;font-size:.76rem;"></pre>
+          <div id="skill-lab-output-box" class="hidden" style="margin-top:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <span class="meta" style="font-size:.72rem;font-weight:700;">Вывод программы:</span>
+              <div style="display:flex;gap:4px;">
+                <button type="button" class="link-quiet" style="font-size:.72rem;" data-copy-lab-out>Копировать</button>
+                <button type="button" class="link-quiet" style="font-size:.72rem;" data-clear-lab-out>Очистить</button>
+              </div>
+            </div>
+            <pre id="skill-lab-output" class="inline-code-out" style="margin:0;font-size:.76rem;"></pre>
+          </div>
         </div>
         ${previewCard ? `
         <div class="skill-lab-card">
-          <h4>🃏 Блиц-карточка (${previewDeckId})</h4>
-          <div style="font-size:.82rem;font-weight:600;margin-bottom:6px;">${formatRichInlineText(previewCard.q)}</div>
-          <button type="button" class="btn btn-ghost" style="width:100%;justify-content:center;padding:6px 10px;font-size:.76rem;" data-py-tab="cards">Открыть колоду ${previewDeckId} (${previewDeck.cards.length}) →</button>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <h4 style="margin:0;">🃏 Блиц-карточка (${previewDeckId})</h4>
+            <span class="meta" style="font-size:.72rem;">Колода</span>
+          </div>
+          <div style="font-size:.82rem;font-weight:600;margin-bottom:8px;line-height:1.4;">${formatRichInlineText(previewCard.q)}</div>
+          <button type="button" class="btn btn-ghost" style="width:100%;justify-content:center;padding:6px 10px;font-size:.76rem;" data-py-tab="cards">Открыть колоду (${previewDeck.cards.length} карточек) →</button>
         </div>` : ''}
       </aside>`;
 
     bodyHTML = pySkillViewState.fullNoteMode
       ? `${navDrawerHTML}` + steps.map((st, i) => `<div class="microstep-card"><div class="topic-badge">Шаг ${i+1} из ${steps.length}</div><h3>${st.title}</h3><div class="lesson-theory">${decorateCodeBlocksWithRunBtn(st.html)}</div></div>`).join('') + theoryExtrasHTML
-      : `<div class="skill-split-layout"><div class="skill-theory-col">${feedHTML}${primaryActionHTML}${theoryExtrasHTML}${floatingStepNavHTML}${navDrawerHTML}</div>${labAsideHTML}</div>`;
+      : `<div class="skill-split-layout"><div class="skill-theory-col">${feedHTML}${primaryActionHTML}${floatingStepNavHTML}${theoryExtrasHTML}${navDrawerHTML}</div>${labAsideHTML}</div>`;
   } else if(pySkillViewState.tab === 'cards'){
     const activeF = pySkillViewState.fId || sk.fIds[0];
     const deckObj = ALL_DECKS_COMBINED[activeF] || {id: activeF, title: activeF, cards: []};
@@ -7505,6 +7562,14 @@ function getMockCandidateTasks(){
 }
 
 function syncActiveEditorDrafts(){
+  const labEd = document.getElementById('skill-lab-scratchpad');
+  if(labEd && typeof labEd.value === 'string' && pySkillViewState && pySkillViewState.sid){
+    if(!pySkillViewState.labDrafts) pySkillViewState.labDrafts = {};
+    const activeK = pySkillViewState.kId || 'unknown';
+    const stepIdx = pySkillViewState.stepIdx || 0;
+    const dKey = `${pySkillViewState.sid}:${activeK}:${stepIdx}`;
+    pySkillViewState.labDrafts[dKey] = labEd.value;
+  }
   const pyEd = document.getElementById('py-skill-editor');
   if(pyEd && typeof pyEd.value === 'string' && pyEd.value.length > 0){
     pySkillViewState.codeDraft = pyEd.value;
@@ -10597,7 +10662,7 @@ render = function(){
     root.innerHTML = viewDashboard();
     navRoute = '/';
   }
-  markActiveNav(navRoute);
+  markActiveNav(isSprintFocus ? null : navRoute);
   // V8: экспресс-песочница навыка растёт по контенту — последняя строка кода не срезается
   setTimeout(function(){
     try{
@@ -11490,9 +11555,12 @@ document.addEventListener('click', async function(e){
 
   const labRunBtn = e.target.closest('[data-run-lab-scratchpad]');
   if(labRunBtn){
+    syncActiveEditorDrafts();
     const ta = document.getElementById('skill-lab-scratchpad');
+    const outBox = document.getElementById('skill-lab-output-box');
     const out = document.getElementById('skill-lab-output');
     if(ta && out){
+      if(outBox) outBox.classList.remove('hidden');
       out.classList.remove('hidden');
       out.textContent = '⏳ Выполняю в Python 3.13…';
       labRunBtn.setAttribute('disabled', 'disabled');
@@ -11513,6 +11581,68 @@ document.addEventListener('click', async function(e){
       }
       labRunBtn.removeAttribute('disabled');
     }
+    return;
+  }
+
+  if(e.target.closest('[data-copy-lab-code]')){
+    const ta = document.getElementById('skill-lab-scratchpad');
+    if(ta && navigator.clipboard){
+      navigator.clipboard.writeText(ta.value);
+      const btn = e.target.closest('[data-copy-lab-code]');
+      if(btn){
+        const orig = btn.textContent;
+        btn.textContent = '✓';
+        setTimeout(() => { btn.textContent = orig; }, 1200);
+      }
+    }
+    return;
+  }
+
+  if(e.target.closest('[data-reset-lab-code]')){
+    const ta = document.getElementById('skill-lab-scratchpad');
+    if(ta && pySkillViewState && pySkillViewState.sid){
+      const activeK = pySkillViewState.kId || 'unknown';
+      const stepIdx = pySkillViewState.stepIdx || 0;
+      const noteObj = ALL_NOTES_COMBINED[activeK] || {};
+      const steps = noteObj.steps || [];
+      const curStep = steps[stepIdx] || {};
+      const defCode = getStepDefaultScratchpadCode(activeK, pySkillViewState.sid, curStep, stepIdx);
+      ta.value = defCode;
+      const dKey = `${pySkillViewState.sid}:${activeK}:${stepIdx}`;
+      if(!pySkillViewState.labDrafts) pySkillViewState.labDrafts = {};
+      pySkillViewState.labDrafts[dKey] = defCode;
+      const gut = document.getElementById('skill-lab-scratchpad-gutter');
+      if(gut){
+        const lc = Math.max(1, defCode.split('\n').length);
+        const nums = [];
+        for(let i = 1; i <= lc; i++) nums.push(i);
+        gut.textContent = nums.join('\n');
+      }
+      const outBox = document.getElementById('skill-lab-output-box');
+      if(outBox) outBox.classList.add('hidden');
+    }
+    return;
+  }
+
+  if(e.target.closest('[data-copy-lab-out]')){
+    const out = document.getElementById('skill-lab-output');
+    if(out && navigator.clipboard){
+      navigator.clipboard.writeText(out.textContent);
+      const btn = e.target.closest('[data-copy-lab-out]');
+      if(btn){
+        const orig = btn.textContent;
+        btn.textContent = '✓ Скопировано';
+        setTimeout(() => { btn.textContent = orig; }, 1200);
+      }
+    }
+    return;
+  }
+
+  if(e.target.closest('[data-clear-lab-out]')){
+    const outBox = document.getElementById('skill-lab-output-box');
+    const out = document.getElementById('skill-lab-output');
+    if(out) out.textContent = '';
+    if(outBox) outBox.classList.add('hidden');
     return;
   }
 
@@ -12421,8 +12551,20 @@ document.addEventListener('keydown', function(e){
     if(mr){ e.preventDefault(); mr.click(); return; }
     const sb = document.getElementById('run-btn');
     if(sb){ e.preventDefault(); sb.click(); return; }
+    const slr = document.querySelector('[data-run-lab-scratchpad]');
+    if(slr){ e.preventDefault(); slr.click(); return; }
   }
   const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+  if(e.key === 'Tab' && e.target && e.target.id === 'skill-lab-scratchpad'){
+    e.preventDefault();
+    const ta = e.target;
+    const s = ta.selectionStart;
+    const end = ta.selectionEnd;
+    ta.value = ta.value.substring(0, s) + '    ' + ta.value.substring(end);
+    ta.selectionStart = ta.selectionEnd = s + 4;
+    try { ta.dispatchEvent(new Event('input', { bubbles: true })); } catch(err){}
+    return;
+  }
   if(tag === 'textarea' || tag === 'input' || tag === 'select') return;
   if(e.key === 'Escape'){
     if(typeof isSettingsModalOpen !== 'undefined' && isSettingsModalOpen){
@@ -12463,6 +12605,8 @@ document.addEventListener('keydown', function(e){
   if(e.code === 'Space'){
     const flipBtn = document.querySelector('[data-py-flip-card], [data-hub-flip]');
     if(flipBtn){ e.preventDefault(); flipBtn.click(); return; }
+    const pyNextBtn = document.querySelector('[data-chunk-more="py"], [data-py-next-step]');
+    if(pyNextBtn){ e.preventDefault(); pyNextBtn.click(); return; }
   }
   if(e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4'){
     const rateBtn = document.querySelector(`[data-py-rate-card="${e.key}"], [data-hub-rate="${e.key}"]`);
@@ -12471,6 +12615,8 @@ document.addEventListener('keydown', function(e){
   if(e.key === 'Enter' && !e.ctrlKey && !e.metaKey){
     const bsNext = document.querySelector('.academy-bottom-sheet [data-lesson-next], .academy-bottom-sheet [data-diag-next]');
     if(bsNext){ e.preventDefault(); bsNext.click(); return; }
+    const pyNextBtn = document.querySelector('[data-chunk-more="py"], [data-py-next-step]');
+    if(pyNextBtn){ e.preventDefault(); pyNextBtn.click(); return; }
   }
 });
 
