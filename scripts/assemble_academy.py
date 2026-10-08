@@ -6323,6 +6323,7 @@ function buildSocraticHintsForTask(tObj){
   return [h0, h1, h2, h3];
 }
 window.buildSocraticHintsForTask = buildSocraticHintsForTask;
+window.getSkillMP = getSkillMP;
 
 async function runIdeTaskVerification(taskObj, codeStr){
   let buf = '';
@@ -12630,6 +12631,151 @@ full_upgrade_js = (
 init_marker = "/* ================= INIT ================= */\nrenderNav();\napplyThemeIcon();\nrender();"
 assert init_marker in html_out, "Could not find INIT marker"
 html_out = html_out.replace(init_marker, full_upgrade_js, 1)
+
+# Cross-device progress sync is kept in this canonical build step so rebuilds retain it.
+sync_init_marker = 'hydrateAndMergeAllProgressSources();\nbumpStreak();\nrestoreFromIndexedDBIfNeeded();\nsaveState(state);'
+assert sync_init_marker in html_out, "Could not find progress hydration marker"
+sync_client_js = r'''
+const PROGRESS_SYNC_ENDPOINT = window.ACADEMY_SYNC_ENDPOINT || '/api/sync';
+const PROGRESS_SYNC_TOKEN_KEY = 'academy_sync_access_code';
+const PROGRESS_SYNC_DEVICE_KEY = 'academy_sync_device_id';
+const PROGRESS_SYNC_REVISION_KEY = 'academy_sync_server_revision';
+const PROGRESS_SYNC_INTERVAL_MS = 20000;
+let progressSyncTimer = null;
+let progressSyncInFlight = false;
+let progressSyncDirty = false;
+let progressSyncLastSignature = '';
+let progressSyncPromptOpen = false;
+let progressSyncAuthPrompted = false;
+
+function progressSyncClientId(){
+  try{
+    let id = localStorage.getItem(PROGRESS_SYNC_DEVICE_KEY);
+    if(!id){ id = 'device-' + (window.crypto && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36)); localStorage.setItem(PROGRESS_SYNC_DEVICE_KEY, id); }
+    return id;
+  }catch(e){ return 'device-' + Math.random().toString(36).slice(2); }
+}
+function progressSyncBundle(){
+  return {
+    academyState: state,
+    ideStatus: (typeof getIdeSolvedMap === 'function') ? getIdeSolvedMap() : {},
+    ideDrafts: safeParseJsonObj(localStorage.getItem(IDE_DRAFTS_KEY)) || {}
+  };
+}
+function progressSyncMergeBundle(bundle){
+  if(!bundle || typeof bundle !== 'object') return false;
+  let changed = false;
+  if(bundle.academyState && typeof bundle.academyState === 'object'){
+    const before = JSON.stringify(state);
+    state = mergeProgressStates(state, bundle.academyState);
+    changed = changed || before !== JSON.stringify(state);
+  }
+  if(bundle.ideStatus && typeof bundle.ideStatus === 'object'){
+    const current = getIdeSolvedMap();
+    const merged = mergeIdeStatusMaps(current, bundle.ideStatus);
+    if(JSON.stringify(current) !== JSON.stringify(merged)) changed = true;
+    try{ localStorage.setItem('practice-ide-status', JSON.stringify(merged)); localStorage.setItem('practice-ide-status-backup', JSON.stringify(merged)); }catch(e){}
+  }
+  if(bundle.ideDrafts && typeof bundle.ideDrafts === 'object'){
+    const current = safeParseJsonObj(localStorage.getItem(IDE_DRAFTS_KEY)) || {};
+    const merged = mergeIdeDraftMaps(current, bundle.ideDrafts);
+    if(JSON.stringify(current) !== JSON.stringify(merged)) changed = true;
+    try{ localStorage.setItem(IDE_DRAFTS_KEY, JSON.stringify(merged)); }catch(e){}
+  }
+  if(changed){ saveState(state); writeWindowNameBackup(state); }
+  return changed;
+}
+function progressSyncSaveRevision(revision){
+  try{ localStorage.setItem(PROGRESS_SYNC_REVISION_KEY, String(Number(revision) || 0)); }catch(e){}
+}
+async function progressSyncRequest(method, payload){
+  const token = localStorage.getItem(PROGRESS_SYNC_TOKEN_KEY) || '';
+  const response = await fetch(PROGRESS_SYNC_ENDPOINT, {
+    method,
+    headers: Object.assign(method === 'POST' ? {'Content-Type':'application/json'} : {}, token ? {Authorization:'Bearer ' + token} : {}),
+    cache: 'no-store',
+    body: method === 'POST' ? JSON.stringify(payload) : undefined
+  });
+  const data = await response.json();
+  if(!response.ok && response.status !== 409){ const error = new Error(data.error || ('HTTP ' + response.status)); error.status = response.status; throw error; }
+  return {data, status: response.status};
+}
+async function runProgressSync(){
+  if(progressSyncInFlight || location.protocol === 'file:') return;
+  progressSyncInFlight = true;
+  progressSyncDirty = false;
+  try{
+    const remote = await progressSyncRequest('GET');
+    const revision = Number(remote.data.updatedAt) || 0;
+    const knownRevision = Number(localStorage.getItem(PROGRESS_SYNC_REVISION_KEY)) || 0;
+    if(remote.data.bundle && revision > knownRevision){
+      if(progressSyncMergeBundle(remote.data.bundle) && typeof render === 'function') render();
+      progressSyncSaveRevision(revision);
+    }
+    const bundle = progressSyncBundle();
+    const signature = JSON.stringify(bundle);
+    if(signature !== progressSyncLastSignature || progressSyncDirty || !revision){
+      const pushed = await progressSyncRequest('POST', {
+        bundle,
+        baseUpdatedAt: Number(localStorage.getItem(PROGRESS_SYNC_REVISION_KEY)) || revision,
+        clientId: progressSyncClientId(),
+        device: /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'mobile' : 'desktop'
+      });
+      if(pushed.status === 409){
+        if(progressSyncMergeBundle(pushed.data.bundle) && typeof render === 'function') render();
+        progressSyncSaveRevision(pushed.data.updatedAt);
+        progressSyncDirty = true;
+      }else{
+        progressSyncSaveRevision(pushed.data.updatedAt);
+        if(pushed.data.bundle && progressSyncMergeBundle(pushed.data.bundle) && typeof render === 'function') render();
+        progressSyncLastSignature = JSON.stringify(progressSyncBundle());
+      }
+    }
+  }catch(e){
+    if(e && e.status === 401 && !progressSyncPromptOpen && !progressSyncAuthPrompted){
+      progressSyncPromptOpen = true;
+      progressSyncAuthPrompted = true;
+      try{
+        const code = window.prompt('Введите код синхронизации с Render (одинаковый на ПК и телефоне):');
+        if(code && code.trim()){ localStorage.setItem(PROGRESS_SYNC_TOKEN_KEY, code.trim()); progressSyncDirty = true; }
+      }catch(ignore){}
+      finally{ progressSyncPromptOpen = false; }
+    }
+    // Network may be unavailable while the local multi-layer backup remains active.
+  }finally{
+    progressSyncInFlight = false;
+    if(progressSyncDirty) setTimeout(runProgressSync, 250);
+  }
+}
+function scheduleProgressSync(){
+  progressSyncDirty = true;
+  if(progressSyncTimer) clearTimeout(progressSyncTimer);
+  progressSyncTimer = setTimeout(runProgressSync, 800);
+}
+const localSaveState = saveState;
+saveState = function(s){ localSaveState(s); scheduleProgressSync(); };
+const localSaveIdeDraft = saveIdeDraft;
+saveIdeDraft = function(taskId, codeStr){ localSaveIdeDraft(taskId, codeStr); scheduleProgressSync(); };
+const localSetIdeTaskSolved = setIdeTaskSolved;
+setIdeTaskSolved = function(taskId, codeStr){ localSetIdeTaskSolved(taskId, codeStr); scheduleProgressSync(); };
+window.addEventListener('storage', function(e){
+  if(e && (e.key === 'practice-ide-status' || e.key === 'practice-ide-status-backup' || e.key === IDE_DRAFTS_KEY)) scheduleProgressSync();
+});
+window.addEventListener('focus', runProgressSync);
+window.addEventListener('online', runProgressSync);
+document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') runProgressSync(); });
+window.addEventListener('pagehide', function(){
+  if(location.protocol === 'file:') return;
+  try{
+    const body = JSON.stringify({bundle: progressSyncBundle(), baseUpdatedAt: Number(localStorage.getItem(PROGRESS_SYNC_REVISION_KEY)) || 0, clientId: progressSyncClientId(), device: 'pagehide'});
+    const token = localStorage.getItem(PROGRESS_SYNC_TOKEN_KEY) || '';
+    fetch(PROGRESS_SYNC_ENDPOINT, {method:'POST', headers:Object.assign({'Content-Type':'application/json'}, token ? {Authorization:'Bearer ' + token} : {}), body, keepalive:true}).catch(function(){});
+  }catch(e){}
+});
+progressSyncTimer = setInterval(runProgressSync, PROGRESS_SYNC_INTERVAL_MS);
+setTimeout(runProgressSync, 1200);
+'''
+html_out = html_out.replace(sync_init_marker, sync_init_marker + '\n' + sync_client_js, 1)
 
 with open(OUT_HTML_PATH, 'w', encoding='utf-8', newline='\n') as f:
     f.write(html_out)

@@ -6527,6 +6527,146 @@ bumpStreak();
 restoreFromIndexedDBIfNeeded();
 saveState(state);
 
+const PROGRESS_SYNC_ENDPOINT = window.ACADEMY_SYNC_ENDPOINT || '/api/sync';
+const PROGRESS_SYNC_TOKEN_KEY = 'academy_sync_access_code';
+const PROGRESS_SYNC_DEVICE_KEY = 'academy_sync_device_id';
+const PROGRESS_SYNC_REVISION_KEY = 'academy_sync_server_revision';
+const PROGRESS_SYNC_INTERVAL_MS = 20000;
+let progressSyncTimer = null;
+let progressSyncInFlight = false;
+let progressSyncDirty = false;
+let progressSyncLastSignature = '';
+let progressSyncPromptOpen = false;
+let progressSyncAuthPrompted = false;
+
+function progressSyncClientId(){
+  try{
+    let id = localStorage.getItem(PROGRESS_SYNC_DEVICE_KEY);
+    if(!id){ id = 'device-' + (window.crypto && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36)); localStorage.setItem(PROGRESS_SYNC_DEVICE_KEY, id); }
+    return id;
+  }catch(e){ return 'device-' + Math.random().toString(36).slice(2); }
+}
+function progressSyncBundle(){
+  return {
+    academyState: state,
+    ideStatus: (typeof getIdeSolvedMap === 'function') ? getIdeSolvedMap() : {},
+    ideDrafts: safeParseJsonObj(localStorage.getItem(IDE_DRAFTS_KEY)) || {}
+  };
+}
+function progressSyncMergeBundle(bundle){
+  if(!bundle || typeof bundle !== 'object') return false;
+  let changed = false;
+  if(bundle.academyState && typeof bundle.academyState === 'object'){
+    const before = JSON.stringify(state);
+    state = mergeProgressStates(state, bundle.academyState);
+    changed = changed || before !== JSON.stringify(state);
+  }
+  if(bundle.ideStatus && typeof bundle.ideStatus === 'object'){
+    const current = getIdeSolvedMap();
+    const merged = mergeIdeStatusMaps(current, bundle.ideStatus);
+    if(JSON.stringify(current) !== JSON.stringify(merged)) changed = true;
+    try{ localStorage.setItem('practice-ide-status', JSON.stringify(merged)); localStorage.setItem('practice-ide-status-backup', JSON.stringify(merged)); }catch(e){}
+  }
+  if(bundle.ideDrafts && typeof bundle.ideDrafts === 'object'){
+    const current = safeParseJsonObj(localStorage.getItem(IDE_DRAFTS_KEY)) || {};
+    const merged = mergeIdeDraftMaps(current, bundle.ideDrafts);
+    if(JSON.stringify(current) !== JSON.stringify(merged)) changed = true;
+    try{ localStorage.setItem(IDE_DRAFTS_KEY, JSON.stringify(merged)); }catch(e){}
+  }
+  if(changed){ saveState(state); writeWindowNameBackup(state); }
+  return changed;
+}
+function progressSyncSaveRevision(revision){
+  try{ localStorage.setItem(PROGRESS_SYNC_REVISION_KEY, String(Number(revision) || 0)); }catch(e){}
+}
+async function progressSyncRequest(method, payload){
+  const token = localStorage.getItem(PROGRESS_SYNC_TOKEN_KEY) || '';
+  const response = await fetch(PROGRESS_SYNC_ENDPOINT, {
+    method,
+    headers: Object.assign(method === 'POST' ? {'Content-Type':'application/json'} : {}, token ? {Authorization:'Bearer ' + token} : {}),
+    cache: 'no-store',
+    body: method === 'POST' ? JSON.stringify(payload) : undefined
+  });
+  const data = await response.json();
+  if(!response.ok && response.status !== 409){ const error = new Error(data.error || ('HTTP ' + response.status)); error.status = response.status; throw error; }
+  return {data, status: response.status};
+}
+async function runProgressSync(){
+  if(progressSyncInFlight || location.protocol === 'file:') return;
+  progressSyncInFlight = true;
+  progressSyncDirty = false;
+  try{
+    const remote = await progressSyncRequest('GET');
+    const revision = Number(remote.data.updatedAt) || 0;
+    const knownRevision = Number(localStorage.getItem(PROGRESS_SYNC_REVISION_KEY)) || 0;
+    if(remote.data.bundle && revision > knownRevision){
+      if(progressSyncMergeBundle(remote.data.bundle) && typeof render === 'function') render();
+      progressSyncSaveRevision(revision);
+    }
+    const bundle = progressSyncBundle();
+    const signature = JSON.stringify(bundle);
+    if(signature !== progressSyncLastSignature || progressSyncDirty || !revision){
+      const pushed = await progressSyncRequest('POST', {
+        bundle,
+        baseUpdatedAt: Number(localStorage.getItem(PROGRESS_SYNC_REVISION_KEY)) || revision,
+        clientId: progressSyncClientId(),
+        device: /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'mobile' : 'desktop'
+      });
+      if(pushed.status === 409){
+        if(progressSyncMergeBundle(pushed.data.bundle) && typeof render === 'function') render();
+        progressSyncSaveRevision(pushed.data.updatedAt);
+        progressSyncDirty = true;
+      }else{
+        progressSyncSaveRevision(pushed.data.updatedAt);
+        if(pushed.data.bundle && progressSyncMergeBundle(pushed.data.bundle) && typeof render === 'function') render();
+        progressSyncLastSignature = JSON.stringify(progressSyncBundle());
+      }
+    }
+  }catch(e){
+    if(e && e.status === 401 && !progressSyncPromptOpen && !progressSyncAuthPrompted){
+      progressSyncPromptOpen = true;
+      progressSyncAuthPrompted = true;
+      try{
+        const code = window.prompt('Введите код синхронизации с Render (одинаковый на ПК и телефоне):');
+        if(code && code.trim()){ localStorage.setItem(PROGRESS_SYNC_TOKEN_KEY, code.trim()); progressSyncDirty = true; }
+      }catch(ignore){}
+      finally{ progressSyncPromptOpen = false; }
+    }
+    // Network may be unavailable while the local multi-layer backup remains active.
+  }finally{
+    progressSyncInFlight = false;
+    if(progressSyncDirty) setTimeout(runProgressSync, 250);
+  }
+}
+function scheduleProgressSync(){
+  progressSyncDirty = true;
+  if(progressSyncTimer) clearTimeout(progressSyncTimer);
+  progressSyncTimer = setTimeout(runProgressSync, 800);
+}
+const localSaveState = saveState;
+saveState = function(s){ localSaveState(s); scheduleProgressSync(); };
+const localSaveIdeDraft = saveIdeDraft;
+saveIdeDraft = function(taskId, codeStr){ localSaveIdeDraft(taskId, codeStr); scheduleProgressSync(); };
+const localSetIdeTaskSolved = setIdeTaskSolved;
+setIdeTaskSolved = function(taskId, codeStr){ localSetIdeTaskSolved(taskId, codeStr); scheduleProgressSync(); };
+window.addEventListener('storage', function(e){
+  if(e && (e.key === 'practice-ide-status' || e.key === 'practice-ide-status-backup' || e.key === IDE_DRAFTS_KEY)) scheduleProgressSync();
+});
+window.addEventListener('focus', runProgressSync);
+window.addEventListener('online', runProgressSync);
+document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') runProgressSync(); });
+window.addEventListener('pagehide', function(){
+  if(location.protocol === 'file:') return;
+  try{
+    const body = JSON.stringify({bundle: progressSyncBundle(), baseUpdatedAt: Number(localStorage.getItem(PROGRESS_SYNC_REVISION_KEY)) || 0, clientId: progressSyncClientId(), device: 'pagehide'});
+    const token = localStorage.getItem(PROGRESS_SYNC_TOKEN_KEY) || '';
+    fetch(PROGRESS_SYNC_ENDPOINT, {method:'POST', headers:Object.assign({'Content-Type':'application/json'}, token ? {Authorization:'Bearer ' + token} : {}), body, keepalive:true}).catch(function(){});
+  }catch(e){}
+});
+progressSyncTimer = setInterval(runProgressSync, PROGRESS_SYNC_INTERVAL_MS);
+setTimeout(runProgressSync, 1200);
+
+
 // Russian pluralization helper (1 день / 2 дня / 5 дней)
 function pluralizeRu(n, one, two, five){
   const abs = Math.abs(Number(n) || 0) % 100;
@@ -8134,14 +8274,9 @@ function viewPythonSkill(sid){
         </div>
         <div class="sprint-progress-track"><div class="sprint-progress-fill" style="width:${sprintPct}%;"></div></div>
       </div>
-      <span class="sprint-xp-pill" aria-live="polite">⚡ +${pySkillViewState.tab==='code'?25:pySkillViewState.tab==='cards'?10:10} XP</span>
-      <div class="sprint-overflow-menu" style="position:relative;">
-        <button type="button" class="sprint-overflow-btn icon-btn" title="Дополнительно" aria-label="Дополнительные действия" style="border-radius:10px;padding:6px 9px;font-size:.86rem;">···</button>
-        <div class="sprint-overflow-dropdown" style="display:none;position:absolute;right:0;top:calc(100% + 6px);z-index:20;background:var(--surface);border:1px solid var(--glass-border);border-radius:14px;padding:6px;min-width:160px;box-shadow:var(--shadow-1);backdrop-filter:blur(18px);">
-          <button type="button" class="sprint-overflow-item" data-toggle-audio style="display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border:none;background:none;font-family:inherit;font-size:.84rem;color:var(--ink);border-radius:9px;cursor:pointer;text-align:left;">🔊 Озвучить конспект</button>
-          <a href="#/docs" class="sprint-overflow-item" style="display:flex;align-items:center;gap:8px;padding:7px 10px;font-size:.84rem;color:var(--ink);border-radius:9px;text-decoration:none;">📚 Справочник Python</a>
-        </div>
-      </div>
+      <button type="button" class="sprint-audio-btn" data-toggle-audio title="Озвучить конспект (Web Speech API)" aria-label="Озвучить конспект">🔊</button>
+      <a href="#/docs" class="sprint-xp-pill" style="text-decoration:none;" title="Справочник синтаксиса и методов Python">📚 Справка</a>
+      <span class="sprint-xp-pill">⚡ +10 XP</span>
     </div>
     <div id="theory-audio-bar" class="theory-audio-bar" style="display:${state.audioBarOpen ? 'flex' : 'none'};">
       <button type="button" class="theory-audio-btn" data-audio-play title="Воспроизвести / Пауза">▶</button>
@@ -8155,34 +8290,13 @@ function viewPythonSkill(sid){
   const notesDoneCount = sk.kIds.filter(k => state.readNotes.includes(k)).length;
   const decksDoneCount = sk.fIds.filter(f => state.reviewedDecks.includes(f)).length;
   const tasksDoneCount = (sk.taskIds||[]).filter(tid => solvedMap[tid] === 'solved').length;
-  // Вкладки: счётчик только в активной, в неактивных — только иконка+название (без «(0/N)»)
-  const _theoryActive = pySkillViewState.tab==='theory';
-  const _cardsActive  = pySkillViewState.tab==='cards';
-  const _codeActive   = pySkillViewState.tab==='code';
-  const theoryTabLabel = notesDoneCount>=sk.kIds.length ? `✓ 📖 Конспект` : `📖 Конспект${_theoryActive ? ` (${notesDoneCount}/${sk.kIds.length})` : ''}`;
-  const cardsTabLabel  = (decksDoneCount>=sk.fIds.length && sk.fIds.length>0) ? `✓ 🃏 Карточки` : `🃏 Карточки${_cardsActive ? ` (${decksDoneCount}/${sk.fIds.length})` : ''}`;
-  const codeTabLabel   = tasksDoneCount>0 ? `✓ 💻 Практика${_codeActive ? ` (${tasksDoneCount}/${(sk.taskIds||[]).length})` : ''}` : `💻 Практика${_codeActive ? ` (0/${(sk.taskIds||[]).length})` : ''}`;
-  // Pipeline-strip «① Теория → ② Карточки → ③ Код»
-  const notesDone = notesDoneCount >= sk.kIds.length && sk.kIds.length > 0;
-  const decksDone = decksDoneCount >= sk.fIds.length && sk.fIds.length > 0;
-  const codeDone  = tasksDoneCount >= (sk.taskIds||[]).length && (sk.taskIds||[]).length > 0;
-  const pipelineHTML = `
-    <div class="pipeline-strip" role="navigation" aria-label="Этапы навыка">
-      <span class="pipe-step${_theoryActive?' pipe-step--active':''}${notesDone?' pipe-step--done':''}">① Теория</span>
-      <span class="pipe-arrow" aria-hidden="true">──▶</span>
-      <span class="pipe-step${_cardsActive?' pipe-step--active':''}${decksDone?' pipe-step--done':''}">② Карточки</span>
-      <span class="pipe-arrow" aria-hidden="true">──▶</span>
-      <span class="pipe-step${_codeActive?' pipe-step--active':''}${codeDone?' pipe-step--done':''}">③ Код</span>
-    </div>`;
   const tabsHTML = `
     <div class="subtabs subtabs--compact">
-      <button class="subtab ${_theoryActive?'active':''}" data-py-tab="theory">${theoryTabLabel}</button>
-      <button class="subtab ${_cardsActive?'active':''}" data-py-tab="cards">${cardsTabLabel}<span class="sr-only"> 3D Карточки</span></button>
-      <button class="subtab ${_codeActive?'active':''}" data-py-tab="code">${codeTabLabel}</button>
+      <button class="subtab ${pySkillViewState.tab==='theory'?'active':''}" data-py-tab="theory">${notesDoneCount>=sk.kIds.length?'✓ ':'1. '}📖 Конспект (${notesDoneCount}/${sk.kIds.length})</button>
+      <button class="subtab ${pySkillViewState.tab==='cards'?'active':''}" data-py-tab="cards">${decksDoneCount>=sk.fIds.length && sk.fIds.length>0?'✓ ':'2. '}🃏 Карточки (${decksDoneCount}/${sk.fIds.length})<span class="sr-only"> 3D Карточки</span></button>
+      <button class="subtab ${pySkillViewState.tab==='code'?'active':''}" data-py-tab="code">${tasksDoneCount>0?'✓ ':'3. '}💻 Практика (${tasksDoneCount}/${(sk.taskIds||[]).length})</button>
       <a href="#${tr.routePrefix}/unittest/${sk.unitId}" class="subtab" style="text-decoration:none;">⚡ Тест<span class="sr-only"> ${sk.unitId}</span></a>
-    </div>
-    ${pipelineHTML}`;
-
+    </div>`;
 
   let bodyHTML = '';
   let showTopTabs = true;
@@ -8207,12 +8321,12 @@ function viewPythonSkill(sid){
 
     const primaryActionHTML = hasMoreChunks ? `
       <div style="margin-top:12px;">
-        <button class="btn-glass-emerald" style="width:100%;justify-content:center;" data-chunk-more="py">Понятно, дальше (+10 XP) ➔</button>
+        <button class="btn-glass-emerald btn-sprint-cta" data-chunk-more="py">Понятно, дальше (+10 XP) ➔</button>
       </div>` : `
       <div style="margin-top:12px;">
         ${stepIdx + 1 < steps.length
-          ? `<button class="btn-glass-emerald" style="width:100%;justify-content:center;" data-py-next-step="${stepIdx+1}">Понятно, дальше (+10 XP) ➔</button>`
-          : `<button class="btn-glass-emerald" style="width:100%;justify-content:center;" data-py-finish-note="${activeK}">✓ Конспект изучен — перейти к карточкам (+15 XP) ${ICONS.arrowRight}</button>`}
+          ? `<button class="btn-glass-emerald btn-sprint-cta" data-py-next-step="${stepIdx+1}">Понятно, дальше (+10 XP) ➔</button>`
+          : `<button class="btn-glass-emerald btn-sprint-cta" data-py-finish-note="${activeK}">✓ Конспект изучен — перейти к карточкам (+15 XP) ${ICONS.arrowRight}</button>`}
         <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:6px;">
           <span class="meta">${isRead ? '✓ Теория прочитана (закрепи карточками и кодом!)' : 'Этап 1 из 3: Теория → Карточки → Код'}</span>
         </div>
@@ -8405,6 +8519,7 @@ function buildSocraticHintsForTask(tObj){
   return [h0, h1, h2, h3];
 }
 window.buildSocraticHintsForTask = buildSocraticHintsForTask;
+window.getSkillMP = getSkillMP;
 
 async function runIdeTaskVerification(taskObj, codeStr){
   let buf = '';

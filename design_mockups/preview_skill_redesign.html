@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Редизайн экрана урока/навыка (#/python/skill/1.1.1) как в Coddy</title>
+<style>
+  :root {
+    --bg: #0d1016;
+    --panel: #131822;
+    --border: #232c3d;
+    --text: #d7dce6;
+    --muted: #8b95a8;
+    --emerald: #10b981;
+    --amber: #f59e0b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px 20px 80px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Onest', 'Segoe UI', system-ui, sans-serif;
+    line-height: 1.5;
+  }
+  .container { max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 26px; margin: 0 0 8px; color: #fff; }
+  .desc { color: var(--muted); margin-bottom: 24px; font-size: 15px; }
+  .comparison {
+    background: rgba(225, 29, 72, 0.08);
+    border: 1px solid rgba(225, 29, 72, 0.25);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 32px;
+    font-size: 14px;
+  }
+  .comparison b { color: #fda4af; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 28px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  .card img {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    display: block;
+    background: #000;
+  }
+  .card-body { padding: 20px; }
+  .card-tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .tag-rec { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+  .tag-acc { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+  .card-title { font-size: 18px; font-weight: 700; margin: 0 0 8px; color: #fff; }
+  .card-text { font-size: 14px; color: var(--muted); margin: 0 0 12px; }
+  ul { padding-left: 20px; font-size: 13.5px; margin: 0; color: var(--text); }
+  li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🎯 Редизайн экрана навыка: убираем перегруз → переходим к лёгкому сплиту Coddy</h1>
+  <div class="desc">Сравнение того, почему сейчас тяжело, и как сделать легко и просто по каноническому референсу Coddy.</div>
+
+  <div class="comparison">
+    <b>Почему сейчас тяжело на 1.1.1:</b> в центральную и правую колонки вывалено 6 разнородных блоков одновременно (теория + огромная кнопка + блок «🔬 Смотри в память» со сложной диаграммой + «Zero-Keyboard токен-банк» + песочница с 10 строками кода + блиц-карточка). Студент перегружен визуальным шумом.
+  </div>
+
+  <div class="grid">
+    <!-- Вариант 1 -->
+    <div class="card">
+      <img src="skill_clean_split_1791396387389.jpg" alt="Чистый сплит Coddy">
+      <div class="card-body">
+        <span class="card-tag tag-rec">ВАРИАНТ 1 (КАНОНИЧЕСКИЙ CODDY · РЕКОМЕНДУЮ)</span>
+        <div class="card-title">Чистый двухколоночный сплит: Теория слева, Практика справа</div>
+        <p class="card-text">В точности как на референс-видео Coddy (v2):</p>
+        <ul>
+          <li><b>Слева (45%)</b>: крупный заголовок, 2-3 коротких ясных предложения теории с изумрудными инлайн-чипами + плашка «💡 Челлендж» с одной конкретной задачей.</li>
+          <li><b>Справа (55%)</b>: тёмный редактор кода с готовым минимальным шаблоном + кнопка «▶ Запустить код» + таблица вывода тестов внизу.</li>
+          <li>Никаких тяжелых диаграмм памяти и блиц-карточек прямо на экране: они выносятся в отдельные вкладки или открываются по кнопке.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Вариант 2 -->
+    <div class="card">
+      <img src="skill_accordion_split_1791396405052.jpg" alt="Сплит с аккордеонами">
+      <div class="card-body">
+        <span class="card-tag tag-acc">ВАРИАНТ 2 (С АККОРДЕОНАМИ)</span>
+        <div class="card-title">Сплит со свёрнутыми аккордеонами деталей</div>
+        <p class="card-text">Та же чистая двухколонка, но сложные инженерные детали сохранены в свёрнутом виде:</p>
+        <ul>
+          <li>Теория остаётся супер-короткой и лёгкой.</li>
+          <li>Ниже идут аккуратные закрытые плашки: <code>+ Подсказка</code> и <code>+ Устройство в памяти (CPython) ▾</code>.</li>
+          <li>Кому интересно копнуть глубже — раскрывает в один клик, а новичка экран не пугает сложными схемами.</li>
+          <li>Справа — тот же редактор кода и кнопка запуска.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

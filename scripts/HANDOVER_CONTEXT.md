@@ -332,6 +332,14 @@
 4. **Разгрузка первого экрана**: тяжелая анатомия памяти CPython и fill-интерактив спрятаны в компактный аккордеон `🔬 Анатомия памяти CPython & Упражнение (1.1.1) ▾`, освобождая первый экран под теорию и эксперимент с кодом.
 5. **Кэш PWA**: поднят до `academy-pwa-v14` в `sw.js`.
 
+### ✅ 25. Кросс-устройственная синхронизация прогресса (08.10.2026)
+Синхронизация прогресса ПК ↔ телефон через интернет (Render + Neon PostgreSQL), чтобы облако работало при выключенном ПК:
+1. **Сервер (`scripts/server.js`)**: новый REST API `GET/POST /api/sync` — единый бандл `{academyState, ideStatus, ideDrafts}`; хранение в PostgreSQL (Neon, таблица `academy_progress_sync`) при заданном `DATABASE_URL`, иначе локальный JSON `data/progress_sync.json` (атомарная запись через tmp+rename). Авторизация по `SYNC_TOKEN` (Bearer, timing-safe сравнение); защита от lost-update: при POST от устройства, не видевшего более новый бандл другого устройства, — 409 + текущий бандл для повторного слияния; серверный monotonic-merge одновременных push. Добавлен `/healthz` для Render; CORS-заголовки продублированы в OPTIONS-ветке; туннель cloudflared — только на win32; порт из `PORT`/`PBA_PORT`.
+2. **Клиент (вшито в сборщик канонически, `assemble_academy.py`)**: `runProgressSync()` каждые 20 c + по фокусу/online/visibility; merge через существующие `mergeProgressStates`/`mergeIdeStatusMaps`/`mergeIdeDraftMaps`; отправка при каждом `saveState`/`saveIdeDraft`/`setIdeTaskSolved` (дебаунс 800 мс) и `pagehide` (keepalive POST); код доступа хранится только в `localStorage` (`academy_sync_access_code`); при 401 — стеклянная модалка ввода кода. Оффлайн/file:// — синхронизация отключена.
+3. **Деплой**: `package.json` (npm start → `scripts/server.js`, зависимость `pg`), `render.yaml` (Blueprint: web service, healthcheck `/healthz`, envVars `SYNC_TOKEN`/`DATABASE_URL` sync:false), `.env.example`, инструкция в README («Синхронизация прогресса ПК ↔ телефон через интернет»: Neon → Render Blueprint → код на обоих устройствах; перенос накопленного прогресса через экспорт/импорт JSON). В production сервер требует оба env (fail-fast).
+4. **e2e-тесты приведены к новым экранам Coddy** (`scripts/test_e2e_dom.js`): ассерты skill-view переписаны под сплит-экран ✅24 («Шаг 1/», `sprint-focus-topbar`, `coddy-lesson-card`, chunk-CTA вместо «Навык N.N.N»/«Микро-шаг 1 из»/microstep-dot); MP-ассерты переведены на экспортированный `window.getSkillMP` (не зависят от разметки); мок Brython обновлён под новый мост `pba_result_bridge`/`pba_stdout_cb`; ассерты Consolidation Lab/floating-step-nav/echelon-бейджей ослаблены до негативных (UI сознательно удалён коммитами 9c9aa30/деклаттерингом). Итог: e2e 100% PERFECT (~20 с).
+5. **Кэш PWA**: поднят до `academy-pwa-v15` в `sw.js` (в academy.html добавлен экспорт `window.getSkillMP` для e2e).
+
 ---
 
 ## 6. Статус верификации и синхронизации
