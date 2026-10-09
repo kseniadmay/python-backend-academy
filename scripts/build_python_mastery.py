@@ -340,7 +340,8 @@ def parse_module_section(section_md: str, mod_prefix: str):
             stitle = _clean_skill_title(skill_blocks[s_idx + 1])
             sbody = skill_blocks[s_idx + 2]
             k_ids = re.findall(r'/(К-\d+)', sbody) + EXTRA_K_BY_SKILL.get(sid, [])
-            raw_f_ids = re.findall(r'/(Ф-\d+)', sbody) + EXTRA_F_BY_SKILL.get(sid, [])
+            _extra_f = set(EXTRA_F_BY_SKILL.get(sid, []))
+            raw_f_ids = [f for f in re.findall(r'/(Ф-\d+)', sbody) if f not in _extra_f]
             f_ids = [f"{fid}@{mod_tag}" if f"{fid}@{mod_tag}" in f_files_map else fid for fid in raw_f_ids]
             k_ids = list(dict.fromkeys(k_ids))
             f_ids = list(dict.fromkeys(f_ids))
@@ -358,7 +359,6 @@ def parse_module_section(section_md: str, mod_prefix: str):
                 'practiceDesc': prac_txt,
                 'kIds': k_ids,
                 'fIds': f_ids,
-                'fIdsExtra': [f for f in f_ids if f in EXTRA_F_BY_SKILL.get(sid, [])],
                 'notes': k_ids,
                 'decks': f_ids,
                 'taskIds': SKILL_TASK_IDS.get(sid, [])
