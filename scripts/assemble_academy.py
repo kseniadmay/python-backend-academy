@@ -6146,11 +6146,21 @@ function viewPythonSkill(sid){
     const cIdx = Math.min(pySkillViewState.cardIdx, Math.max(0, cards.length - 1));
     const curCard = cards[cIdx] || {q: 'Карточки загружаются', a: ''};
 
-    const fSelector = sk.fIds.map(fid => {
+    const fChip = fid => {
       const d = ALL_DECKS_COMBINED[fid] || {title: fid, cards: []};
       const done = state.reviewedDecks.includes(fid);
       return `<button class="btn ${fid===activeF?'btn-primary':'btn-ghost'}" style="padding:6px 11px;font-size:.78rem;" data-py-select-f="${fid}">${done?'✓ ':''}${fid} (${(d.cards||[]).length})</button>`;
-    }).join('');
+    };
+    const extraFids = sk.fIdsExtra || [];
+    const ownFids = sk.fIds.filter(fid => !extraFids.includes(fid));
+    const crossFids = sk.fIds.filter(fid => extraFids.includes(fid));
+    const showCross = pySkillViewState.showAllDecks || crossFids.includes(activeF);
+    const fSelector = ownFids.map(fChip).join('')
+      + (crossFids.length
+        ? (showCross
+          ? crossFids.map(fChip).join('')
+          : `<button class="btn btn-ghost" style="padding:6px 11px;font-size:.78rem;opacity:.72;" data-py-toggle-cross>▸ Ещё ${crossFids.length} колод других юнитов</button>`)
+        : '');
 
     bodyHTML = `
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">${fSelector}</div>
@@ -11237,6 +11247,12 @@ document.addEventListener('click', async function(e){
     pySkillViewState.cardIdx = 0;
     pySkillViewState.cardFlipped = false;
     pySkillViewState.sprintCelebration = null;
+    saveReadingPosition();
+    render();
+    return;
+  }
+  if(e.target.closest('[data-py-toggle-cross]')){
+    pySkillViewState.showAllDecks = true;
     saveReadingPosition();
     render();
     return;

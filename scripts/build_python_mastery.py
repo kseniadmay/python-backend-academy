@@ -358,6 +358,7 @@ def parse_module_section(section_md: str, mod_prefix: str):
                 'practiceDesc': prac_txt,
                 'kIds': k_ids,
                 'fIds': f_ids,
+                'fIdsExtra': [f for f in f_ids if f in EXTRA_F_BY_SKILL.get(sid, [])],
                 'notes': k_ids,
                 'decks': f_ids,
                 'taskIds': SKILL_TASK_IDS.get(sid, [])
