@@ -1066,12 +1066,15 @@ EXTRA_CSS = r"""
     position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
   }
   .subtabs--compact{
-    display:flex;gap:4px;overflow-x:auto;flex-wrap:nowrap !important;margin-bottom:8px !important;padding-bottom:1px !important;border-bottom:none !important;
+    display:flex;gap:2px;overflow-x:auto;flex-wrap:nowrap !important;margin-bottom:8px !important;padding:3px !important;border:1px solid var(--line) !important;border-radius:999px !important;background:var(--surface-2) !important;
     scrollbar-width:none;-webkit-overflow-scrolling:touch;
   }
   .subtabs--compact::-webkit-scrollbar{display:none;}
   .subtabs--compact .subtab{
-    padding:5px 6px;font-size:.72rem;border-radius:10px;white-space:nowrap;flex:1 1 auto;text-align:center;
+    padding:5px 10px;font-size:.74rem;border-radius:999px;white-space:nowrap;flex:1 1 auto;text-align:center;border:none !important;background:transparent;color:var(--ink-muted);font-weight:600;transition:all .18s ease;
+  }
+  .subtabs--compact .subtab.active{
+    background:var(--surface) !important;color:var(--moss-deep) !important;box-shadow:0 1px 3px rgba(0,0,0,0.08);font-weight:700;
   }
   .sprint-step-header{
     display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:nowrap;margin-bottom:8px;
@@ -1217,14 +1220,25 @@ EXTRA_CSS = r"""
     line-height:1.55;overflow-x:auto;border:1px solid rgba(52,211,153,0.28);
   }
   .math-formula{
-    font-family:'Cambria Math','Times New Roman',serif;font-style:italic;font-weight:700;
-    padding:1px 6px;border-radius:6px;background:var(--amber-soft);color:var(--clay-deep);
-    border:1px solid rgba(245,158,11,0.28);white-space:nowrap;
+    font-family:var(--font-m);font-size:.86em;font-weight:600;font-style:normal;
+    padding:2px 6px;border-radius:6px;background:rgba(20,90,70,0.08);color:var(--moss-deep);
+    border:1px solid rgba(20,90,70,0.22);white-space:nowrap;
   }
   .inline-code-pill, .fc-q code, .fc-a code, .quiz-opt code, .notice code{
     font-family:var(--font-m);font-size:.86em;padding:2px 6px;border-radius:6px;
     background:var(--surface-2);color:var(--moss-deep);border:1px solid var(--line);
   }
+  .tok-kw{color:#f472b6;font-weight:700;}
+  .tok-str{color:#34d399;}
+  .tok-com{color:#64748b;font-style:italic;}
+  .tok-num{color:#fbbf24;}
+  .tok-builtin{color:#38bdf8;font-weight:600;}
+  .f-deck-chip-bar{
+    display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;
+  }
+  .f-deck-chip-bar::-webkit-scrollbar{display:none;}
+  .f-deck-chip-bar .btn{flex-shrink:0;white-space:nowrap;}
 
   /* ---------- Tactile Bottom Sheet Drawer (Coddy Mobile Feedback) ---------- */
   .academy-bottom-sheet{
@@ -1756,7 +1770,7 @@ EXTRA_CSS = r"""
   .fc-rate-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px;}
   @media (max-width:600px){.fc-rate-row{grid-template-columns:1fr 1fr;}}
   .fc-swipe-hint{
-    font-size:.73rem;color:var(--ink-muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:10px;
+    display:none !important;
   }
 
   /* ---------- Section 8: Module Boss Arena & Segmented Boss HP Bar ---------- */
@@ -5835,14 +5849,32 @@ function formatQuizQuestionPromptHTML(rawText){
 }
 window.formatQuizQuestionPromptHTML = formatQuizQuestionPromptHTML;
 
+// Lightweight client-side Python syntax highlighter (keywords, strings, comments, numbers, built-in calls)
+function highlightPythonTokens(codeInner){
+  if(codeInner.indexOf('tok-') !== -1) return codeInner;
+  let out = codeInner;
+  // 1. Comments
+  out = out.replace(/(#.*?)(?=\n|$)/g, '<span class="tok-com">$1</span>');
+  // 2. Strings
+  out = out.replace(/(['"][^'"\n]*['"])/g, '<span class="tok-str">$1</span>');
+  // 3. Keywords
+  out = out.replace(/\b(def|return|for|in|if|else|elif|while|class|import|from|as|try|except|finally|with|lambda|yield|raise|pass|break|continue|and|or|not|is|True|False|None)\b/g, '<span class="tok-kw">$1</span>');
+  // 4. Builtins & Methods
+  out = out.replace(/\b(print|len|range|list|dict|set|tuple|int|str|float|bool|min|max|sum|sorted|enumerate|zip|map|filter|all|any|open|isinstance|type|super|append|extend|pop|remove|add|update|get|keys|values|items)\b(?=\s*\()/g, '<span class="tok-builtin">$1</span>');
+  // 5. Numbers
+  out = out.replace(/\b(\d+)\b(?![^<]*>)/g, '<span class="tok-num">$1</span>');
+  return out;
+}
+
 // Helper to decorate <pre><code> blocks with inline "▶ Запустить в Python" button (skips already-decorated RemNote K-note blocks)
 function decorateCodeBlocksWithRunBtn(htmlStr){
   const s = String(htmlStr || '');
   if(s.indexOf('snippet-wrap') !== -1 || s.indexOf('code-snippet-wrap') !== -1) return s;
   return s.replace(/<pre><code>([\s\S]*?)<\/code><\/pre>/g, function(full, codeInner){
     const looksLikePython = !(/^(SELECT|INSERT|UPDATE|DELETE|CREATE|FROM|docker|git|GET|POST|PATCH|PUT|paths:)/i.test(codeInner.trim()));
-    if(!looksLikePython) return full;
-    return `<div class="code-snippet-wrap"><button type="button" class="run-inline-btn" data-run-inline>▶ Запустить код</button><pre><code>${codeInner}</code></pre></div>`;
+    const highlighted = looksLikePython ? highlightPythonTokens(codeInner) : codeInner;
+    if(!looksLikePython) return `<pre><code>${highlighted}</code></pre>`;
+    return `<div class="code-snippet-wrap"><button type="button" class="run-inline-btn" data-run-inline>▶ Запустить код</button><pre><code>${highlighted}</code></pre></div>`;
   });
 }
 
@@ -5952,58 +5984,28 @@ function pluralRuTopics(n){
 
 function buildSprintFinishCelebrationHTML(cel){
   if(!cel) return '';
-  const streakVal = (typeof state !== 'undefined' && state && state.streak) ? state.streak : 1;
-  const activeCount = Math.min(6, Math.max(1, streakVal % 6 || 6));
   const remaining = (cel.remainingTopics !== undefined) ? cel.remainingTopics : 7;
   const prevP = (cel.prevPct !== undefined) ? cel.prevPct : 0;
   const newP = (cel.newPct !== undefined) ? cel.newPct : 2;
   return `
-    <div class="sprint-finish-card">
-      <div class="sprint-finish-orb">👑</div>
-      <div class="cocoon-focus-eyebrow" style="margin-bottom:8px;">Этап 1 (Теория) пройден · +15 XP · Переходим к закреплению!</div>
-      <h2 style="font-size:1.45rem;margin-bottom:6px;">Спринт завершён! Конспект ${escapeHtmlStr(cel.kid || 'темы')} изучен!<span class="sr-only"> Минус 1 тема до скрининга!</span></h2>
-      <p class="meta" style="max-width:540px;margin:0 auto 10px;">Минус 1 тема до скрининга! Чтобы навык получил полную галочку <b>✓</b> и запомнился надолго, пройди 3D-карточки и реши практическую задачу в IDE:</p>
+    <div class="sprint-finish-card" style="max-width:560px;margin:12px auto;text-align:center;">
+      <div class="sprint-finish-orb" style="font-size:2rem;margin-bottom:6px;">🎯</div>
+      <div class="cocoon-focus-eyebrow" style="margin-bottom:6px;">Теория закреплена · +15 XP за конспект</div>
+      <h2 style="font-size:1.35rem;margin-bottom:8px;">Конспект ${escapeHtmlStr(cel.kid || 'темы')} изучен!</h2>
+      <p class="meta" style="max-width:480px;margin:0 auto 12px;font-size:.88rem;">Материал пройден! Закрепи тему на карточках или переходи к коду в IDE:</p>
 
-      <div class="daily-activity-strip">
-        <div class="daily-activity-head">
-          <span>✓ Дневная активность выполнена!</span>
-          <span class="active-accent">${activeCount} / 6</span>
-        </div>
-        <div class="daily-week-segments">
-          ${[1,2,3,4,5,6].map(i => `<div class="day-seg ${i <= activeCount ? 'done' : ''}"></div>`).join('')}
-        </div>
-      </div>
-
-      <div class="stats-grid-2x2">
-        <div class="stat-card">
-          <div class="stat-head">XP ЗАРАБОТАНО</div>
-          <div class="stat-val">+15 XP</div>
-        </div>
-        <div class="stat-card emerald">
-          <div class="stat-head">ДО СКРИНИНГА</div>
-          <div class="stat-val">${remaining} ${pluralRuTopics(remaining)} (-1)</div>
-        </div>
-        <div class="stat-card emerald">
-          <div class="stat-head">ТОЧНОСТЬ</div>
-          <div class="stat-val">100 %</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-head">ВРЕМЯ СЕССИИ</div>
-          <div class="stat-val">02:15</div>
-        </div>
-      </div>
-
-      <div class="countdown-shift-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-weight:800;font-size:.92rem;">
-          <span>🎯 Готовность: ${prevP}% ➔ ${newP}%</span>
-          <span style="color:var(--moss);">⏳ Осталось ${remaining} ${pluralRuTopics(remaining)}!</span>
+      <div class="countdown-shift-card" style="margin:12px 0;padding:12px 16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-weight:700;font-size:.88rem;">
+          <span>🎯 Прогресс юнита: ${prevP}% ➔ ${newP}%</span>
+          <span style="color:var(--moss);">⏳ До скрининга: ${remaining} ${pluralRuTopics(remaining)}</span>
         </div>
         <div class="cd-bar cd-bar-track"><div class="cd-fill cd-bar-fill" style="width:${Math.max(8, newP)}%;"></div></div>
       </div>
-      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:16px;">
-        <button class="btn-glass-emerald" data-py-tab="cards" data-dismiss-celebration>🃏 Этап 2: Закрепить на 3D-карточках ➔</button>
-        <button class="btn-glass-ruby" data-py-tab="code" data-dismiss-celebration>💻 Этап 3: Решить задачу в IDE ➔</button>
-        <button class="btn btn-ghost" data-quick-microstep="" data-dismiss-celebration>🚀 Следующая тема спринта</button>
+
+      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px;">
+        <button class="btn-glass-emerald" data-py-tab="cards" data-dismiss-celebration>🃏 Закрепить на карточках ➔</button>
+        <button class="btn-glass-ruby" data-py-tab="code" data-dismiss-celebration>💻 Решить задачу в IDE ➔</button>
+        <button class="btn btn-ghost" data-quick-microstep="" data-dismiss-celebration>Следующая тема</button>
       </div>
     </div>`;
 }
@@ -6078,12 +6080,11 @@ function viewPythonSkill(sid){
       <a href="#${tr.routePrefix}" class="sprint-close-btn" title="${tr.backLabel}">✕<span class="sr-only"> ${tr.backLabel}</span></a>
       <div class="sprint-progress-wrap">
         <div class="sprint-progress-meta">
-          <span>${topbarMetaLeft}</span>
-          <span>${topbarMetaRight}<span class="sr-only"> Прогресс</span></span>
+          <span>${echMeta.badge} ${echMeta.title} · ${topbarMetaLeft}</span>
+          <span>${topbarMetaRight}</span>
         </div>
         <div class="sprint-progress-track"><div class="sprint-progress-fill" style="width:${sprintPct}%;"></div></div>
       </div>
-      <button type="button" class="sprint-audio-btn" data-toggle-audio title="Озвучить конспект (Web Speech API)" aria-label="Озвучить конспект">🔊</button>
       <a href="#/docs" class="sprint-xp-pill" style="text-decoration:none;" title="Справочник синтаксиса и методов Python">📚 Справка</a>
       <span class="sprint-xp-pill">⚡ +10 XP</span>
     </div>
@@ -6127,17 +6128,23 @@ function viewPythonSkill(sid){
     ).join('') + `</div>`;
 
     const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
+    const canGoBack = (curChunkIdx > 0 || stepIdx > 0);
+    const backBtnHTML = canGoBack ? `<button type="button" class="btn btn-ghost" data-chunk-prev="py" style="padding:11px 16px;border-radius:14px;font-size:.88rem;">← Назад</button>` : '';
 
     const primaryActionHTML = hasMoreChunks ? `
-      <div style="margin-top:12px;">
-        <button class="btn-glass-emerald btn-sprint-cta" data-chunk-more="py">Понятно, дальше (+10 XP) ➔</button>
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
+        ${backBtnHTML}
+        <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-chunk-more="py">Понятно, дальше (+10 XP) ➔</button>
       </div>` : `
       <div style="margin-top:12px;">
-        ${stepIdx + 1 < steps.length
-          ? `<button class="btn-glass-emerald btn-sprint-cta" data-py-next-step="${stepIdx+1}">Понятно, дальше (+10 XP) ➔</button>`
-          : `<button class="btn-glass-emerald btn-sprint-cta" data-py-finish-note="${activeK}">✓ Конспект изучен — перейти к карточкам (+15 XP) ${ICONS.arrowRight}</button>`}
+        <div style="display:flex;gap:8px;align-items:center;">
+          ${backBtnHTML}
+          ${stepIdx + 1 < steps.length
+            ? `<button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-next-step="${stepIdx+1}">Понятно, дальше (+10 XP) ➔</button>`
+            : `<button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-finish-note="${activeK}">✓ Конспект изучен — перейти к карточкам (+15 XP) ${ICONS.arrowRight}</button>`}
+        </div>
         <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:6px;">
-          <span class="meta">${isRead ? '✓ Теория прочитана (закрепи карточками и кодом!)' : 'Этап 1 из 3: Теория → Карточки → Код'}</span>
+          <span class="meta">${isRead ? '✓ Теория прочитана' : 'Этап 1 из 3: Теория → Карточки → Код'}</span>
         </div>
       </div>`;
 
@@ -6154,31 +6161,30 @@ function viewPythonSkill(sid){
     const fSelector = sk.fIds.map(fid => {
       const d = ALL_DECKS_COMBINED[fid] || {title: fid, cards: []};
       const done = state.reviewedDecks.includes(fid);
-      return `<button class="btn ${fid===activeF?'btn-primary':'btn-ghost'}" style="padding:6px 11px;font-size:.78rem;" data-py-select-f="${fid}">${done?'✓ ':''}${fid} (${(d.cards||[]).length})</button>`;
+      return `<button class="btn ${fid===activeF?'btn-primary':'btn-ghost'}" style="padding:6px 12px;font-size:.78rem;" data-py-select-f="${fid}">${done?'✓ ':''}${fid} (${(d.cards||[]).length})</button>`;
     }).join('');
 
     bodyHTML = `
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">${fSelector}</div>
+      <div class="f-deck-chip-bar">${fSelector}</div>
       <div class="microstep-bar" style="padding:8px 12px;margin-bottom:10px;">
         <span><strong>${deckObj.id}: ${deckObj.title}</strong> · Карточка ${cIdx+1} из ${cards.length}</span>
         <div style="display:flex;gap:8px;align-items:center;">
           <button class="btn btn-ghost" style="padding:4px 10px;font-size:.76rem;" data-py-prev-card ${cIdx===0?'disabled':''}>← Предыдущая</button>
-          <span class="meta">Пробел — переворот</span>
         </div>
       </div>
       <div class="fc-stage" style="margin:10px 0;">
         ${buildFcStoriesBarHTML(deckObj.id, cards.length, cIdx)}
         <div class="fc-card ${pySkillViewState.cardFlipped?'fc-card--Answer':''}" data-py-flip-card>
           <div>
-            <div class="topic-badge">${pySkillViewState.cardFlipped ? 'Ответ (нажми или Пробел)' : 'Вопрос (нажми или Пробел, чтобы увидеть ответ)'}</div>
+            <div class="topic-badge">${pySkillViewState.cardFlipped ? 'Ответ' : 'Вопрос'}</div>
             <div class="fc-q">${formatRichInlineText(curCard.q)}</div>
             ${pySkillViewState.cardFlipped ? `<div class="fc-a">${formatRichInlineText(curCard.a)}</div>` : ''}
           </div>
-          <div class="meta" style="margin-top:14px;">Нажми на карточку для переворота · Карточка ${cIdx+1}/${cards.length}</div>
+          <div class="meta" style="margin-top:12px;text-align:center;">Карточка ${cIdx+1} из ${cards.length}</div>
         </div>
         ${pySkillViewState.cardFlipped ? `
           <div class="fc-rate-row">
-            <button class="btn btn-ghost" data-py-rate-card="1">1 · Снова (в повтор)</button>
+            <button class="btn btn-ghost" data-py-rate-card="1">1 · Снова</button>
             <button class="btn btn-ghost" data-py-rate-card="2">2 · Трудно (+2 XP)</button>
             <button class="btn btn-clay" data-py-rate-card="3">3 · Хорошо (+5 XP)</button>
             <button class="btn btn-primary" data-py-rate-card="4">4 · Легко (+10 XP)</button>
@@ -9305,7 +9311,6 @@ lessonTheoryHTML = function(){
           </div>
           <div class="sprint-progress-track"><div class="sprint-progress-fill" style="width:${sprintPct}%;"></div></div>
         </div>
-        <button type="button" class="sprint-audio-btn" data-toggle-audio title="Озвучить конспект (Web Speech API)" aria-label="Озвучить конспект">🔊</button>
         <span class="sprint-xp-pill">⚡ +10 XP</span>
       </div>
       <div id="theory-audio-bar" class="theory-audio-bar" style="display:${state.audioBarOpen ? 'flex' : 'none'};">
@@ -9339,7 +9344,6 @@ function buildLessonStageTopbarHTML(l, rightLabel, pct, xpLabel){
         </div>
         <div class="sprint-progress-track"><div class="sprint-progress-fill" style="width:${pct}%;"></div></div>
       </div>
-      <button type="button" class="sprint-audio-btn" data-toggle-audio title="Озвучить конспект (Web Speech API)" aria-label="Озвучить конспект">🔊</button>
       <span class="sprint-xp-pill">${xpLabel}</span>
     </div>
     <div id="theory-audio-bar" class="theory-audio-bar" style="display:${state.audioBarOpen ? 'flex' : 'none'};">
@@ -10896,6 +10900,30 @@ document.addEventListener('click', async function(e){
         }
       });
     }catch(err){}
+    return;
+  }
+
+  const chunkPrevBtn = e.target.closest('[data-chunk-prev]');
+  if(chunkPrevBtn){
+    const mode = chunkPrevBtn.getAttribute('data-chunk-prev');
+    if(mode === 'lesson'){
+      if(lessonMicroState.chunkIdx > 0){
+        lessonMicroState.chunkIdx -= 1;
+      } else if(lessonMicroState.stepIdx > 0){
+        lessonMicroState.stepIdx -= 1;
+        lessonMicroState.chunkIdx = 0;
+      }
+      saveLessonDraftState();
+    } else {
+      if(pySkillViewState.chunkIdx > 0){
+        pySkillViewState.chunkIdx -= 1;
+      } else if(pySkillViewState.stepIdx > 0){
+        pySkillViewState.stepIdx -= 1;
+        pySkillViewState.chunkIdx = 0;
+      }
+      saveReadingPosition();
+    }
+    render();
     return;
   }
 
