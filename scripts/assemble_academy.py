@@ -1735,14 +1735,14 @@ EXTRA_CSS = r"""
     background:var(--surface);border:1.5px solid var(--line);border-radius:24px;padding:28px 26px;
     min-height:215px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;
     box-shadow:var(--shadow-1);transform-style:preserve-3d;
-    transition:transform .52s cubic-bezier(0.34,1.56,0.64,1),border-color .22s,background .25s;
+    transition:border-color .22s,background .25s,box-shadow .25s;
     position:relative;overflow:hidden;touch-action:pan-y;
   }
   .fc-card::after{
     content:"";position:absolute;inset:0;pointer-events:none;
     background:linear-gradient(125deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 45%);
   }
-  .fc-card:hover{border-color:var(--moss);transform:translateY(-2px) rotateX(1.5deg);}
+  .fc-card:hover{border-color:var(--moss);box-shadow:0 10px 24px rgba(28,32,26,.12);}
   .fc-card--Answer{
     background:var(--moss-soft);border-color:var(--moss);
     animation:cardFlipSpring .46s cubic-bezier(0.34,1.56,0.64,1);
@@ -5802,14 +5802,19 @@ function formatRichInlineText(rawStr){
     s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
     s = s.replace(/\b(d\[key\]|d\.get\(key\)|\.get\(\)|\.append\(\)|x in seen|x in collection|range\(\d+\)|Dog\(\)\.speak\(\)|raise ValueError\([^)]*\)|DELETE FROM users;|PRIMARY KEY|FOREIGN KEY|GROUP BY|ORDER BY|HAVING|WHERE|JOIN|UNION|COMMIT|ROLLBACK|git commit|git push|git clone|git init|Content-Type|application\/json|@property|@staticmethod|@cached_property|@lru_cache|KeyError|IndexError|TypeError|SyntaxError|UnboundLocalError|RecursionError|__defaults__|sys\.getrecursionlimit\(\))\b/g, '<code>$1</code>');
   }
-  // Format Big-O notation with mathematical styling
-  s = s.replace(/\bO\(n\^2\)/g, '<span class="math-formula">O(n²)</span>');
-  s = s.replace(/\bO\(n²\)/g, '<span class="math-formula">O(n²)</span>');
+  // Format Big-O notation and mathematical styling
+  s = s.replace(/\$([^\$\n]+)\$/g, '<span class="math-formula">$1</span>');
+  s = s.replace(/\bO\((?:n\^2|n²)\)/g, '<span class="math-formula">O(n²)</span>');
   s = s.replace(/\bO\(1\)/g, '<span class="math-formula">O(1)</span>');
   s = s.replace(/\bO\(n\)/g, '<span class="math-formula">O(n)</span>');
   s = s.replace(/\bO\(log\s*n\)/g, '<span class="math-formula">O(log n)</span>');
   s = s.replace(/\bO\(n\s*log\s*n\)/g, '<span class="math-formula">O(n log n)</span>');
   s = s.replace(/\bO\(V\s*\+\s*E\)/g, '<span class="math-formula">O(V + E)</span>');
+  s = s.replace(/\bO\(min\([^)]+\)\)/gi, '<span class="math-formula">O(min(n, m))</span>');
+  s = s.replace(/\bO\(max\([^)]+\)\)/gi, '<span class="math-formula">O(max(n, m))</span>');
+  s = s.replace(/\bO\(len\([^)]+\)\)/gi, function(m){ return '<span class="math-formula">' + m + '</span>'; });
+  s = s.replace(/\bO\(n\s*\+\s*m\)/gi, '<span class="math-formula">O(n + m)</span>');
+  s = s.replace(/<span class="math-formula"><span class="math-formula">([^<]+)<\/span><\/span>/g, '<span class="math-formula">$1</span>');
   return s;
 }
 window.formatRichInlineText = formatRichInlineText;
@@ -6171,7 +6176,6 @@ function viewPythonSkill(sid){
           </div>
           <div class="meta" style="margin-top:14px;">Нажми на карточку для переворота · Карточка ${cIdx+1}/${cards.length}</div>
         </div>
-        <div class="fc-swipe-hint"><span>⬅️ Свайп влево: 1 · Снова</span><span>⬆️ Свайп вверх: 3 · Хорошо</span><span>Свайп вправо: 4 · Легко ➡️</span></div>
         ${pySkillViewState.cardFlipped ? `
           <div class="fc-rate-row">
             <button class="btn btn-ghost" data-py-rate-card="1">1 · Снова (в повтор)</button>
@@ -6644,7 +6648,6 @@ function viewCardsHub(){
             <div class="meta cards-flip-prompt" style="margin-top:16px;">${cardsHubState.flipped ? 'Оцени лёгкость ответа 1–4' : 'Нажми на карточку для переворота'}</div>
           </div>
         </div>
-        <div class="fc-swipe-hint"><span>⬅️ Свайп влево: 1 · Снова</span><span>⬆️ Свайп вверх: 3 · Хорошо</span><span>Свайп вправо: 4 · Легко ➡️</span></div>
         <div class="fc-rate-row">
           <button class="btn btn-ghost" data-hub-rate="1">1 · Снова</button>
           <button class="btn btn-ghost" data-hub-rate="2">2 · Трудно (+2 XP)</button>
@@ -12401,44 +12404,6 @@ document.addEventListener('scroll', function(e){
     if(gut) gut.scrollTop = e.target.scrollTop;
   }
 }, true);
-
-// Touch swipe gestures for 3D Flashcards (swipe left -> rate 1, swipe right -> rate 4, swipe up -> rate 3)
-let _fcTouchStartX = null;
-let _fcTouchStartY = null;
-document.addEventListener('touchstart', function(e){
-  const card = e.target && e.target.closest ? e.target.closest('.fc-card, .fc-scene') : null;
-  if(!card || !e.changedTouches || !e.changedTouches[0]) return;
-  // Prevent false swipes when scrolling code blocks or selecting text
-  const tag = e.target.tagName;
-  if(tag === 'PRE' || tag === 'CODE' || tag === 'TEXTAREA' || tag === 'INPUT') return;
-  if(e.target.closest && e.target.closest('pre, code, textarea, input, .code-editor-shell')) return;
-  _fcTouchStartX = e.changedTouches[0].clientX;
-  _fcTouchStartY = e.changedTouches[0].clientY;
-}, { passive: true });
-
-document.addEventListener('touchend', function(e){
-  if(_fcTouchStartX === null || _fcTouchStartY === null) return;
-  const card = e.target && e.target.closest ? e.target.closest('.fc-card, .fc-scene') : null;
-  if(!card || !e.changedTouches || !e.changedTouches[0]){
-    _fcTouchStartX = null;
-    _fcTouchStartY = null;
-    return;
-  }
-  const dx = e.changedTouches[0].clientX - _fcTouchStartX;
-  const dy = e.changedTouches[0].clientY - _fcTouchStartY;
-  _fcTouchStartX = null;
-  _fcTouchStartY = null;
-  let rateVal = null;
-  if(Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)){
-    rateVal = dx < 0 ? 1 : 4;
-  } else if(dy < -45 && Math.abs(dy) > Math.abs(dx)){
-    rateVal = 3;
-  }
-  if(rateVal !== null){
-    const btn = document.querySelector(`[data-hub-rate="${rateVal}"], [data-py-rate-card="${rateVal}"]`);
-    if(btn) btn.click();
-  }
-}, { passive: true });
 
 // Keyboard shortcuts: Ctrl+Enter to run/verify code, Space to flip card, 1..4 to rate card
 document.addEventListener('keydown', function(e){

@@ -511,7 +511,7 @@ def _format_latex_expr(expr: str) -> str:
     s = re.sub(r'_\{([^{}]+)\}', r'_\1', s)
     s = re.sub(r'\^2(?!\d)', '²', s)
     s = re.sub(r'\^3(?!\d)', '³', s)
-    return s
+    return f'<span class="math-formula">{s}</span>'
 
 def _align_python_inline_comments(raw_code: str) -> str:
     lines = raw_code.splitlines()
