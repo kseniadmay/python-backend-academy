@@ -1375,9 +1375,6 @@
   .fc-a{font-size:1rem;line-height:1.65;white-space:pre-line;color:var(--ink);margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
   .fc-rate-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px;}
   @media (max-width:600px){.fc-rate-row{grid-template-columns:1fr 1fr;}}
-  .fc-swipe-hint{
-    font-size:.73rem;color:var(--ink-muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:10px;
-  }
 
   /* ---------- Section 8: Module Boss Arena & Segmented Boss HP Bar ---------- */
   .boss-arena-card{
@@ -3050,8 +3047,6 @@
     .docs-hub th,.docs-hub td:first-child,.docs-hub td code{white-space:nowrap;}
     .docs-hub td{word-break:break-word;}
   }
-  /* V25: подсказки свайпов переносятся целиком, а не посреди фразы */
-  .fc-swipe-hint span{white-space:nowrap;}
   /* V26: «100% HP» босса не переносится на две строки */
   .boss-hp-val,.boss-hp-bar__label > span:last-child{white-space:nowrap;}
   /* V23: в карточках эшелонов чип не прилипает к «N%» */
@@ -8367,7 +8362,6 @@ function viewPythonSkill(sid){
           </div>
           <div class="meta" style="margin-top:14px;">Нажми на карточку для переворота · Карточка ${cIdx+1}/${cards.length}</div>
         </div>
-        <div class="fc-swipe-hint"><span>⬅️ Свайп влево: 1 · Снова</span><span>⬆️ Свайп вверх: 3 · Хорошо</span><span>Свайп вправо: 4 · Легко ➡️</span></div>
         ${pySkillViewState.cardFlipped ? `
           <div class="fc-rate-row">
             <button class="btn btn-ghost" data-py-rate-card="1">1 · Снова (в повтор)</button>
@@ -8840,7 +8834,6 @@ function viewCardsHub(){
             <div class="meta cards-flip-prompt" style="margin-top:16px;">${cardsHubState.flipped ? 'Оцени лёгкость ответа 1–4' : 'Нажми на карточку для переворота'}</div>
           </div>
         </div>
-        <div class="fc-swipe-hint"><span>⬅️ Свайп влево: 1 · Снова</span><span>⬆️ Свайп вверх: 3 · Хорошо</span><span>Свайп вправо: 4 · Легко ➡️</span></div>
         <div class="fc-rate-row">
           <button class="btn btn-ghost" data-hub-rate="1">1 · Снова</button>
           <button class="btn btn-ghost" data-hub-rate="2">2 · Трудно (+2 XP)</button>
@@ -14596,44 +14589,6 @@ document.addEventListener('scroll', function(e){
     if(gut) gut.scrollTop = e.target.scrollTop;
   }
 }, true);
-
-// Touch swipe gestures for 3D Flashcards (swipe left -> rate 1, swipe right -> rate 4, swipe up -> rate 3)
-let _fcTouchStartX = null;
-let _fcTouchStartY = null;
-document.addEventListener('touchstart', function(e){
-  const card = e.target && e.target.closest ? e.target.closest('.fc-card, .fc-scene') : null;
-  if(!card || !e.changedTouches || !e.changedTouches[0]) return;
-  // Prevent false swipes when scrolling code blocks or selecting text
-  const tag = e.target.tagName;
-  if(tag === 'PRE' || tag === 'CODE' || tag === 'TEXTAREA' || tag === 'INPUT') return;
-  if(e.target.closest && e.target.closest('pre, code, textarea, input, .code-editor-shell')) return;
-  _fcTouchStartX = e.changedTouches[0].clientX;
-  _fcTouchStartY = e.changedTouches[0].clientY;
-}, { passive: true });
-
-document.addEventListener('touchend', function(e){
-  if(_fcTouchStartX === null || _fcTouchStartY === null) return;
-  const card = e.target && e.target.closest ? e.target.closest('.fc-card, .fc-scene') : null;
-  if(!card || !e.changedTouches || !e.changedTouches[0]){
-    _fcTouchStartX = null;
-    _fcTouchStartY = null;
-    return;
-  }
-  const dx = e.changedTouches[0].clientX - _fcTouchStartX;
-  const dy = e.changedTouches[0].clientY - _fcTouchStartY;
-  _fcTouchStartX = null;
-  _fcTouchStartY = null;
-  let rateVal = null;
-  if(Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)){
-    rateVal = dx < 0 ? 1 : 4;
-  } else if(dy < -45 && Math.abs(dy) > Math.abs(dx)){
-    rateVal = 3;
-  }
-  if(rateVal !== null){
-    const btn = document.querySelector(`[data-hub-rate="${rateVal}"], [data-py-rate-card="${rateVal}"]`);
-    if(btn) btn.click();
-  }
-}, { passive: true });
 
 // Keyboard shortcuts: Ctrl+Enter to run/verify code, Space to flip card, 1..4 to rate card
 document.addEventListener('keydown', function(e){
