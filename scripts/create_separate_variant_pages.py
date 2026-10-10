@@ -1,0 +1,502 @@
+# -*- coding: utf-8 -*-
+import os
+
+mockup_dir = r"C:\Users\fury6\OneDrive\Python_Backend_Academy\design_mockups"
+
+base_template = """<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__PAGE_TITLE__ — Python Backend Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #0b0d0e;
+    --surface: #141719;
+    --surface-card: #161b22;
+    --ink: #f0f6fc;
+    --ink-soft: #8b949e;
+    --ink-muted: #586069;
+    --line: rgba(255, 255, 255, 0.08);
+    --font-d: 'Unbounded', sans-serif;
+    --font-b: 'Golos Text', sans-serif;
+    --font-m: 'JetBrains Mono', monospace;
+    --emerald: #10b981;
+    --radar-speed: 4.4s;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-b);
+    padding: 30px 20px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    -webkit-font-smoothing: antialiased;
+  }
+  .stage-wrap {
+    width: 100%;
+    max-width: 820px;
+  }
+  .nav-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    font-size: 0.82rem;
+  }
+  .nav-strip a {
+    color: #34d399;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .nav-strip span {
+    color: var(--ink-soft);
+  }
+
+  /* TOPBAR ЭШЕЛОН */
+  .echelon-topbar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 18px;
+    margin-bottom: 24px;
+    border-radius: 18px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+  .echelon-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .echelon-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+  }
+  .echelon-bordeaux {
+    color: #be123c;
+    font-weight: 800;
+  }
+  .echelon-emerald {
+    color: #34d399;
+    font-weight: 600;
+  }
+  .echelon-track {
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+  .echelon-fill {
+    height: 100%;
+    width: 35%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #6b1d2f 0%, #be123c 35%, #059669 75%, #10b981 100%);
+  }
+
+  /* DYNAMIC TITLE */
+  .dynamic-unit-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.02rem;
+    letter-spacing: -0.01em;
+  }
+  .unit-name-part {
+    font-family: var(--font-d);
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .dot-sep-part {
+    color: var(--ink-muted);
+    font-weight: 700;
+    opacity: 0.45;
+    font-size: 1.15rem;
+    line-height: 1;
+    user-select: none;
+  }
+  .active-sub-part {
+    font-family: var(--font-b);
+    font-weight: 500;
+    color: var(--ink-soft);
+  }
+
+  /* DOTS NECKLACE */
+  .dots-necklace {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    padding: 6px 0;
+  }
+  .dots-stage-divider {
+    width: 2px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+    margin: 0 5px;
+  }
+  .dot-jewel {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.16);
+    position: relative;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.4, 1);
+  }
+  .dot-jewel:hover {
+    transform: scale(1.5);
+    background: rgba(255, 255, 255, 0.5);
+  }
+  .dot-jewel.done {
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981, 0 0 16px rgba(16, 185, 129, 0.65), 0 0 26px rgba(16, 185, 129, 0.35);
+  }
+  .dot-jewel.active {
+    width: 9px;
+    height: 9px;
+    background: #ffffff;
+    box-shadow: 0 0 10px #ffffff, 0 0 22px rgba(255, 255, 255, 0.95), 0 0 38px rgba(255, 255, 255, 0.6);
+    animation: radar-breathe-white 4.4s infinite ease-in-out;
+  }
+  .dot-jewel.active::before,
+  .dot-jewel.active::after {
+    content: '';
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    pointer-events: none;
+    animation: radar-ripple-white 4.4s infinite cubic-bezier(0.2, 0.8, 0.4, 1);
+  }
+  .dot-jewel.active::after {
+    animation-delay: 2.2s;
+  }
+  .dot-jewel.milestone {
+    border-radius: 2px;
+    transform: rotate(45deg);
+    background: rgba(245, 158, 11, 0.3);
+    border: 1px solid rgba(245, 158, 11, 0.7);
+  }
+  @keyframes radar-breathe-white {
+    0%, 100% {
+      box-shadow: 0 0 8px #ffffff, 0 0 16px rgba(255, 255, 255, 0.75), 0 0 26px rgba(255, 255, 255, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 14px #ffffff, 0 0 28px rgba(255, 255, 255, 1), 0 0 46px rgba(255, 255, 255, 0.7);
+    }
+  }
+  @keyframes radar-ripple-white {
+    0% { width: 9px; height: 9px; opacity: 1; border-color: rgba(255, 255, 255, 0.9); }
+    100% { width: 32px; height: 32px; opacity: 0; border-color: rgba(255, 255, 255, 0); }
+  }
+
+  /* FLASHCARD */
+  .fc-card {
+    background: var(--surface-card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 26px 28px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .fc-card:hover {
+    box-shadow: 0 12px 38px rgba(0, 0, 0, 0.5);
+  }
+  .fc-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .badge-question {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--ink-soft);
+  }
+  .badge-cheat {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 4px 11px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--ink-soft);
+  }
+  .fc-question-text {
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    color: var(--ink);
+  }
+  .fc-answer-box {
+    display: none;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: #e2e8f0;
+  }
+  .fc-card.is-flipped .fc-answer-box {
+    display: block;
+  }
+  .fc-card.is-flipped .badge-question {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+  }
+  .fc-inline-code {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    color: #34d399;
+    font-family: var(--font-m);
+    font-size: 0.92rem;
+  }
+  .fc-inline-kw {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #38bdf8;
+    font-family: var(--font-m);
+    font-size: 0.92rem;
+  }
+  .fc-meta {
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+    text-align: center;
+    margin-top: 16px;
+  }
+  .fc-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 16px;
+  }
+  .btn-ghost {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--ink);
+    padding: 12px 20px;
+    border-radius: 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-primary {
+    background: rgba(16, 185, 129, 0.16);
+    border: 1px solid rgba(16, 185, 129, 0.45);
+    color: #34d399;
+    padding: 12px 24px;
+    border-radius: 14px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    flex: 1;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.15);
+  }
+</style>
+</head>
+<body>
+<div class="stage-wrap">
+  <div class="nav-strip">
+    <span>Тестовая страница: <strong>__PAGE_TITLE__</strong></span>
+    <div>
+      <a href="variant_a_top_centered.html" style="__STYLE_A__">A: Сверху центр</a> ·
+      <a href="variant_b_bottom_centered.html" style="__STYLE_B__">B: Снизу центр</a> ·
+      <a href="variant_c_bottom_left.html" style="__STYLE_C__">C: Снизу слева</a> ·
+      <a href="variant_d_top_left.html" style="__STYLE_D__">D: Сверху слева</a>
+    </div>
+  </div>
+
+  <div class="echelon-topbar">
+    <div class="echelon-wrap">
+      <div class="echelon-meta">
+        <span class="echelon-bordeaux">Эшелон 1</span>
+        <span style="color:var(--ink-muted);opacity:0.6;">·</span>
+        <span class="echelon-emerald">0% готовности к скринингу</span>
+      </div>
+      <div class="echelon-track">
+        <div class="echelon-fill"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <div style="padding:5px 11px;border-radius:999px;background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.35);color:#fbbf24;font-size:0.75rem;font-weight:700;">⚡ +55 XP за сутки</div>
+      <div style="padding:6px 14px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);font-size:0.75rem;font-weight:600;">📖 Справка</div>
+    </div>
+  </div>
+
+  __HUD_LAYOUT__
+
+  <div class="fc-card" id="fc-card" onclick="toggleCardFlip()">
+    <div class="fc-card-header">
+      <span class="badge-question" id="fc-badge">Вопрос</span>
+      <span class="badge-cheat" onclick="event.stopPropagation();">💡 Шпаргалка</span>
+    </div>
+    <div class="fc-question-text">
+      Каковы главные преимущества list comprehension перед классическим циклом <span class="fc-inline-kw">for</span> с <span class="fc-inline-code">list.append()</span> ?
+    </div>
+    <div class="fc-answer-box" id="fc-answer">
+      <strong>1. Производительность:</strong> Генератор списка выполняется на уровне синтаксического байткода CPython (инструкция <code>LIST_APPEND</code>) без накладных расходов на поиск метода атрибута и повторный вызов функции на каждой итерации.<br><br>
+      <strong>2. Декларативная лаконичность:</strong> Создание и наполнение списка объединяются в единое компактное выражение.
+    </div>
+    <div class="fc-meta">Карточка 1 из 19 · Нажми на карточку или Пробел для ответа</div>
+  </div>
+
+  <div class="fc-actions">
+    <button class="btn-ghost" disabled>← Назад</button>
+    <button class="btn-primary" onclick="toggleCardFlip()">Показать ответ (Пробел)</button>
+    <button class="btn-ghost">Дальше →</button>
+  </div>
+</div>
+
+<script>
+function toggleCardFlip() {
+  const card = document.getElementById('fc-card');
+  const badge = document.getElementById('fc-badge');
+  card.classList.toggle('is-flipped');
+  badge.textContent = card.classList.contains('is-flipped') ? 'Ответ' : 'Вопрос';
+}
+
+window.addEventListener('keydown', (e) => {
+  if (e.code === 'Space') {
+    e.preventDefault();
+    toggleCardFlip();
+  }
+});
+</script>
+</body>
+</html>
+"""
+
+dots_html = """
+    <div class="dots-necklace" title="Конспекты (10) → Карточки (10) → Практика (4) → Зачёт (1)">
+      <span class="dot-jewel done" title="Конспект 1"></span>
+      <span class="dot-jewel done" title="Конспект 2"></span>
+      <span class="dot-jewel done" title="Конспект 3"></span>
+      <span class="dot-jewel" title="Конспект 4"></span>
+      <span class="dot-jewel" title="Конспект 5"></span>
+      <span class="dot-jewel" title="Конспект 6"></span>
+      <span class="dot-jewel" title="Конспект 7"></span>
+      <span class="dot-jewel" title="Конспект 8"></span>
+      <span class="dot-jewel" title="Конспект 9"></span>
+      <span class="dot-jewel" title="Конспект 10"></span>
+      <span class="dots-stage-divider"></span>
+      <span class="dot-jewel active" title="Активная карточка: list comprehension, dict comprehension и set"></span>
+      <span class="dot-jewel done"></span>
+      <span class="dot-jewel done"></span>
+      <span class="dot-jewel done"></span>
+      <span class="dot-jewel done"></span>
+      <span class="dot-jewel done"></span>
+      <span class="dot-jewel done"></span>
+      <span class="dot-jewel done"></span>
+      <span class="dot-jewel done"></span>
+      <span class="dot-jewel done"></span>
+      <span class="dots-stage-divider"></span>
+      <span class="dot-jewel done"></span>
+      <span class="dot-jewel done"></span>
+      <span class="dot-jewel done"></span>
+      <span class="dot-jewel"></span>
+      <span class="dots-stage-divider"></span>
+      <span class="dot-jewel milestone" title="Рубежный зачёт"></span>
+    </div>
+"""
+
+title_html = """
+    <div class="dynamic-unit-title">
+      <span class="unit-name-part">Базовый синтаксис</span>
+      <span class="dot-sep-part">·</span>
+      <span class="active-sub-part">list comprehension, dict comprehension и set</span>
+    </div>
+"""
+
+variants = [
+    {
+        "file": "variant_a_top_centered.html",
+        "title": "Вариант A: Заголовок сверху над точками (по центру)",
+        "key": "A",
+        "layout": f"""
+  <div style="display:flex;flex-direction:column;align-items:center;gap:12px;margin:20px 0 22px;">
+    {title_html}
+    {dots_html}
+  </div>
+"""
+    },
+    {
+        "file": "variant_b_bottom_centered.html",
+        "title": "Вариант B: Заголовок снизу под точками (по центру)",
+        "key": "B",
+        "layout": f"""
+  <div style="display:flex;flex-direction:column;align-items:center;gap:12px;margin:20px 0 22px;">
+    {dots_html}
+    {title_html}
+  </div>
+"""
+    },
+    {
+        "file": "variant_c_bottom_left.html",
+        "title": "Вариант C: Заголовок снизу под точками (по левому краю карточки)",
+        "key": "C",
+        "layout": f"""
+  <div style="display:flex;flex-direction:column;gap:12px;margin:20px 0 22px;">
+    {dots_html}
+    <div style="display:flex;align-items:center;justify-content:flex-start;padding-left:2px;">
+      {title_html}
+    </div>
+  </div>
+"""
+    },
+    {
+        "file": "variant_d_top_left.html",
+        "title": "Вариант D: Заголовок сверху над точками (по левому краю карточки)",
+        "key": "D",
+        "layout": f"""
+  <div style="display:flex;flex-direction:column;gap:12px;margin:20px 0 22px;">
+    <div style="display:flex;align-items:center;justify-content:flex-start;padding-left:2px;">
+      {title_html}
+    </div>
+    {dots_html}
+  </div>
+"""
+    }
+]
+
+for v in variants:
+    content = base_template
+    content = content.replace("__PAGE_TITLE__", v["title"])
+    content = content.replace("__HUD_LAYOUT__", v["layout"])
+    for k in ["A", "B", "C", "D"]:
+        active_style = "color:#ffffff;font-weight:700;text-decoration:underline;" if k == v["key"] else ""
+        content = content.replace(f"__STYLE_{k}__", active_style)
+    
+    file_path = os.path.join(mockup_dir, v["file"])
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write(content)
+    print(f"Created dedicated test page: {v['file']}")
+
+print("All dedicated variant pages created successfully!")
