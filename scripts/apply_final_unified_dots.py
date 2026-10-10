@@ -102,12 +102,13 @@ css_to_inject = """
   }
 
   .dots-necklace {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
-    width: auto;
+    width: 100%;
     position: relative;
-    padding: 0;
+    padding: 6px 0;
     background: transparent;
     border: none;
     box-shadow: none;
@@ -298,12 +299,29 @@ new_view_python_skill = """function viewPythonSkill(sid){
       ${examDot}
     </div>`;
 
+  let activeItemTitle = '';
+  if(pySkillViewState.tab === 'theory'){
+    const rawNoteTitle = (noteObj && noteObj.title) || activeK || '';
+    activeItemTitle = rawNoteTitle.replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+  } else if(pySkillViewState.tab === 'cards'){
+    const curDeck = ALL_DECKS_COMBINED[activeF] || {};
+    const rawDeckTitle = curDeck.title || activeF || '';
+    activeItemTitle = rawDeckTitle.replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
+  } else if(pySkillViewState.tab === 'code'){
+    const curTask = IDE_TASKS_BY_ID[activeTid] || {};
+    activeItemTitle = curTask.title || ('Задача #' + activeTid);
+  } else if(pySkillViewState.tab === 'exam'){
+    activeItemTitle = 'Рубежный зачёт';
+  }
+
   const eyebrowDotsHTML = `
     <div class="topic-eyebrow-track" style="max-width:780px;margin:14px auto 18px;">
-      <div style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;">
-        <span class="unit-breadcrumb-title" style="font-family:var(--font-d);font-size:1.02rem;font-weight:700;letter-spacing:-0.01em;color:var(--ink);">${escapeHtmlStr(cleanUnitTitle)}</span>
-        <span style="color:var(--ink-muted);font-weight:700;opacity:0.45;font-size:1.15rem;line-height:1;user-select:none;">·</span>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;">
         ${dotsNecklaceHTML}
+        <div class="dynamic-unit-title" style="display:inline-flex;align-items:center;gap:8px;font-size:0.98rem;letter-spacing:-0.01em;text-align:center;">
+          <span style="font-family:var(--font-d);font-weight:700;color:var(--ink);">${escapeHtmlStr(cleanUnitTitle)}</span>
+          ${activeItemTitle ? `<span style="color:var(--ink-muted);font-weight:700;opacity:0.45;font-size:1.15rem;line-height:1;user-select:none;">·</span><span style="font-family:var(--font-b);font-weight:500;color:var(--ink-soft);">${escapeHtmlStr(activeItemTitle)}</span>` : ''}
+        </div>
       </div>
     </div>`;
 
@@ -477,10 +495,10 @@ print("Saved academy.html")
 with open(SW_PATH, "r", encoding="utf-8") as f:
     sw_content = f.read()
 
-sw_content = re.sub(r"const CACHE_NAME = 'academy-pwa-v\d+';", "const CACHE_NAME = 'academy-pwa-v25';", sw_content)
+sw_content = re.sub(r"const CACHE_NAME = 'academy-pwa-v\d+';", "const CACHE_NAME = 'academy-pwa-v26';", sw_content)
 with open(SW_PATH, "w", encoding="utf-8") as f:
     f.write(sw_content)
-print("Updated sw.js to v25")
+print("Updated sw.js to v26")
 
 # 6. Extract academy script to scripts/extracted_academy.js if exists
 try:
