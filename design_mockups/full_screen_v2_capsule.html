@@ -3658,10 +3658,11 @@
   }
 
   .dot-jewel {
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     position: relative;
     z-index: 3;
     transition: all 0.25s cubic-bezier(0.2, 0.8, 0.4, 1);
@@ -3723,8 +3724,8 @@
     width: 7.5px;
     height: 7.5px;
     background: #ffffff !important;
-    border: 1.5px solid rgba(20, 90, 70, 0.45) !important;
-    box-shadow: 0 0 0 2px rgba(20, 90, 70, 0.18), 0 1px 3px rgba(15, 23, 42, 0.06) !important;
+    border: 1px solid rgba(15, 23, 42, 0.25) !important;
+    box-shadow: 0 0 0 2px rgba(20, 90, 70, 0.28), 0 1px 3px rgba(15, 23, 42, 0.08) !important;
   }
   :root[data-theme="light"] .dots-stage-divider {
     width: 1px;
@@ -3740,8 +3741,8 @@
     width: 7.5px;
     height: 7.5px;
     background: #ffffff !important;
-    border: 1.5px solid rgba(217, 119, 6, 0.5) !important;
-    box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.2), 0 1px 3px rgba(15, 23, 42, 0.06) !important;
+    border: 1px solid rgba(217, 119, 6, 0.5) !important;
+    box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.25), 0 1px 3px rgba(15, 23, 42, 0.08) !important;
   }
 
 
@@ -3759,6 +3760,19 @@
     100% { width: 32px; height: 32px; opacity: 0; border-color: rgba(255, 255, 255, 0); }
   }
 
+  .dots-necklace--capsule {
+    display: inline-flex !important;
+    width: auto !important;
+    padding: 6px 16px !important;
+    border-radius: 999px !important;
+    background: rgba(15, 23, 42, 0.035) !important;
+    border: 1px solid rgba(15, 23, 42, 0.06) !important;
+    gap: 8px !important;
+  }
+  :root[data-theme="dark"] .dots-necklace--capsule {
+    background: rgba(255, 255, 255, 0.035) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  }
 </style>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0d1016" media="(prefers-color-scheme: dark)">
@@ -8889,7 +8903,7 @@ function viewPythonSkill(sid){
   const examDot = `<span class="dot-jewel milestone ${examActive ? 'active' : ''}" title="👑 Рубежный зачёт Юнита ${sk.unitId}" data-py-select-exam="${sk.unitId}"></span>`;
 
   const dotsNecklaceHTML = `
-    <div class="dots-necklace" id="radar-dots-necklace" title="Конспекты → Карточки → Практика → Зачёт">
+    <div class="dots-necklace dots-necklace--capsule" id="radar-dots-necklace" title="Конспекты → Карточки → Практика → Зачёт">
       ${noteDots}
       <span class="dots-stage-divider" title="Переход к карточкам"></span>
       ${cardDots}
@@ -12967,12 +12981,12 @@ window.closeSettingsModal = closeSettingsModal;
   try{
     if(!localStorage.getItem('academy-obsidian-v2')){
       localStorage.setItem('academy-obsidian-v2', '1');
-      state.theme = 'dark';
+      state.theme = 'light';
       saveState(state);
-      document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.setAttribute('data-theme', 'light');
     } else if(!state.theme){
-      state.theme = 'dark';
-      document.documentElement.setAttribute('data-theme', 'dark');
+      state.theme = 'light';
+      document.documentElement.setAttribute('data-theme', 'light');
     }
     if(document.head && !document.getElementById('onest-font-link')){
       const link = document.createElement('link');
