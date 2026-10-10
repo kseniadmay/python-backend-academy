@@ -315,12 +315,14 @@ new_view_python_skill = """function viewPythonSkill(sid){
   }
 
   const eyebrowDotsHTML = `
-    <div class="topic-eyebrow-track" style="max-width:780px;margin:14px auto 18px;">
-      <div style="display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;">
-        ${dotsNecklaceHTML}
-        <div class="dynamic-unit-title" style="display:inline-flex;align-items:center;gap:8px;font-size:0.98rem;letter-spacing:-0.01em;text-align:center;">
-          <span style="font-family:var(--font-d);font-weight:700;color:var(--ink);">${escapeHtmlStr(cleanUnitTitle)}</span>
-          ${activeItemTitle ? `<span style="color:var(--ink-muted);font-weight:700;opacity:0.45;font-size:1.15rem;line-height:1;user-select:none;">·</span><span style="font-family:var(--font-b);font-weight:500;color:var(--ink-soft);">${escapeHtmlStr(activeItemTitle)}</span>` : ''}
+    <div class="topic-eyebrow-track" style="max-width:780px;margin:14px auto 20px;">
+      <div style="display:flex;flex-direction:column;gap:14px;width:100%;">
+        <div style="display:flex;flex-direction:column;align-items:flex-start;padding-left:2px;">
+          <h2 style="font-family:var(--font-d);font-size:1.15rem;font-weight:700;color:var(--ink);letter-spacing:-0.01em;line-height:1.25;margin:0;">${escapeHtmlStr(cleanUnitTitle)}</h2>
+          ${activeItemTitle ? `<div style="font-family:var(--font-b);font-size:0.88rem;font-weight:500;color:var(--ink-soft);line-height:1.4;margin-top:3px;">${escapeHtmlStr(activeItemTitle)}</div>` : ''}
+        </div>
+        <div style="display:flex;justify-content:center;width:100%;">
+          ${dotsNecklaceHTML}
         </div>
       </div>
     </div>`;
@@ -495,10 +497,10 @@ print("Saved academy.html")
 with open(SW_PATH, "r", encoding="utf-8") as f:
     sw_content = f.read()
 
-sw_content = re.sub(r"const CACHE_NAME = 'academy-pwa-v\d+';", "const CACHE_NAME = 'academy-pwa-v26';", sw_content)
+sw_content = re.sub(r"const CACHE_NAME = 'academy-pwa-v\d+';", "const CACHE_NAME = 'academy-pwa-v27';", sw_content)
 with open(SW_PATH, "w", encoding="utf-8") as f:
     f.write(sw_content)
-print("Updated sw.js to v26")
+print("Updated sw.js to v27")
 
 # 6. Extract academy script to scripts/extracted_academy.js if exists
 try:
