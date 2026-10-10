@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Концептуальное единство: Точки и Статус — Python Backend Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #11130e;
+    --surface-card: #181b13;
+    --ink: #eceddf;
+    --ink-soft: #9da18f;
+    --ink-muted: #6b6f5e;
+    --line: rgba(255, 255, 255, 0.08);
+    --font-d: 'Unbounded', sans-serif;
+    --font-b: 'Golos Text', sans-serif;
+    --font-m: 'JetBrains Mono', monospace;
+    --emerald: #10b981;
+    --emerald-light: #34d399;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-b);
+    padding: 36px 20px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .page-title {
+    font-family: var(--font-d);
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    text-align: center;
+    color: var(--ink);
+  }
+  .page-sub {
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  .variants-container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    width: 100%;
+    max-width: 860px;
+  }
+  .variant-card {
+    background: var(--surface-card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 24px 28px 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    position: relative;
+  }
+  .variant-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .variant-num {
+    font-family: var(--font-m);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 6px;
+    color: #34d399;
+    background: rgba(52, 211, 153, 0.12);
+  }
+  .variant-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--ink);
+    margin-left: 10px;
+  }
+  .variant-desc {
+    font-size: 0.80rem;
+    color: var(--ink-soft);
+  }
+
+  /* ШАПКА ЭШЕЛОНА */
+  .echelon-box-fixed {
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.07);
+  }
+  .echelon-meta-fixed {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    margin-bottom: 6px;
+  }
+  .echelon-bordeaux {
+    color: #be123c;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    text-shadow: 0 0 5px rgba(190, 18, 60, 0.5);
+  }
+  .echelon-emerald {
+    color: #34d399;
+    font-weight: 600;
+    text-shadow: 0 0 5px rgba(52, 211, 153, 0.45);
+  }
+  .echelon-track {
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+  .echelon-fill {
+    height: 100%;
+    width: 35%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #6b1d2f 0%, #be123c 35%, #059669 75%, #10b981 100%);
+  }
+  .unit-title-fixed {
+    font-family: var(--font-d);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+
+  /* ТОЧКИ БАЗОВЫЕ */
+  .dot-jewel {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.16);
+    position: relative;
+    flex-shrink: 0;
+  }
+  .dot-jewel.done {
+    background: #10b981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.7), 0 0 14px rgba(16, 185, 129, 0.35);
+  }
+  .dot-jewel.active {
+    width: 9px;
+    height: 9px;
+    background: #ffffff;
+    box-shadow: 0 0 10px #ffffff, 0 0 18px rgba(255, 255, 255, 0.8), 0 0 28px rgba(16, 185, 129, 0.5);
+  }
+  .dots-stage-divider {
+    width: 1px;
+    height: 9px;
+    background: rgba(255, 255, 255, 0.18);
+    margin: 0 2px;
+    flex-shrink: 0;
+  }
+  .dot-jewel.milestone {
+    transform: rotate(45deg);
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.22);
+  }
+
+  /* ========================================================
+     КОНЦЕПТ 1: «РАЗВЕРНУТАЯ ТОЧКА» (EXPANDED ACTIVE NODE)
+     Капсула — это сама активная точка, встроенная прямо в нить!
+     ======================================================== */
+  .stream-track {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 0;
+    width: 100%;
+    overflow-x: auto;
+  }
+  .stream-active-node {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px 4px 7px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(52, 211, 153, 0.45);
+    border-radius: 999px;
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.25);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .stream-node-pip {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 0 8px #ffffff, 0 0 14px rgba(52, 211, 153, 0.9);
+  }
+  .stream-node-num {
+    font-family: var(--font-m);
+    font-size: 0.70rem;
+    font-weight: 700;
+    color: #34d399;
+  }
+  .stream-node-sep {
+    color: rgba(255, 255, 255, 0.25);
+    font-size: 0.72rem;
+  }
+  .stream-node-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* ========================================================
+     КОНЦЕПТ 2: «ЕДИНАЯ HUD-ПАНЕЛЬ ТРЕКЕРА»
+     Точки и статус живут внутри одной стеклянной капсулы-панели
+     ======================================================== */
+  .hud-panel {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(52, 211, 153, 0.25);
+    border-radius: 14px;
+    padding: 12px 18px 14px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 0 16px rgba(16, 185, 129, 0.05);
+  }
+  .hud-panel-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .hud-panel-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .hud-panel-step {
+    font-family: var(--font-m);
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(52, 211, 153, 0.35);
+    padding: 2px 8px;
+    border-radius: 999px;
+    text-shadow: 0 0 6px rgba(52, 211, 153, 0.5);
+  }
+
+  /* ========================================================
+     КОНЦЕПТ 3: «ИНТЕГРИРОВАННАЯ ЭТАПНАЯ ШКАЛА С ТОЧКАМИ»
+     ======================================================== */
+  .phased-track-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .phased-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.80rem;
+  }
+  .phased-badge {
+    color: #34d399;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .phased-sub {
+    color: var(--ink-soft);
+    font-size: 0.75rem;
+  }
+  .phased-rail {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+</style>
+</head>
+<body>
+
+  <h1 class="page-title">Концептуальное единство: Точки и Статус шага</h1>
+  <p class="page-sub">Полное устранение разделения. Статус и точки объединены в одну монолитную систему.</p>
+
+  <div class="variants-container">
+
+    <!-- КОНЦЕПТ 1: РАЗВЕРНУТАЯ ТОЧКА -->
+    <div class="variant-card">
+      <div class="variant-header">
+        <div>
+          <span class="variant-num">КОНЦЕПТ 1</span>
+          <span class="variant-name">Развёрнутая точка (Expanded Active Node)</span>
+        </div>
+        <div class="variant-desc">Капсула и есть 4-я точка, развернувшаяся прямо внутри нити радара</div>
+      </div>
+
+      <div class="echelon-box-fixed">
+        <div class="echelon-meta-fixed">
+          <span class="echelon-bordeaux">Эшелон 1</span>
+          <span style="color:var(--ink-muted);font-weight:400;opacity:0.6;">·</span>
+          <span class="echelon-emerald">35% готовности к скринингу</span>
+        </div>
+        <div class="echelon-track"><div class="echelon-fill"></div></div>
+      </div>
+
+      <div class="unit-title-fixed">Базовые коллекции и срезы</div>
+
+      <!-- ЕДИНАЯ НИТЬ: Точки + встроенная активная капсула -->
+      <div class="stream-track">
+        <span class="dot-jewel done" title="Шаг 1: Конспект"></span>
+        <span class="dot-jewel done" title="Шаг 2: Конспект"></span>
+        <span class="dot-jewel done" title="Шаг 3: Конспект"></span>
+        <span class="dots-stage-divider"></span>
+
+        <!-- 4-Я ТОЧКА РАЗВОРАЧИВАЕТСЯ В КАПСУЛУ -->
+        <div class="stream-active-node">
+          <span class="stream-node-pip"></span>
+          <span class="stream-node-num">4 / 12</span>
+          <span class="stream-node-sep">·</span>
+          <span class="stream-node-title">🗂️ Карточки: Синтаксис и индексы</span>
+        </div>
+
+        <span class="dot-jewel" title="Шаг 5"></span>
+        <span class="dot-jewel" title="Шаг 6"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel" title="Шаг 7"></span>
+        <span class="dot-jewel" title="Шаг 8"></span>
+        <span class="dot-jewel" title="Шаг 9"></span>
+        <span class="dot-jewel" title="Шаг 10"></span>
+        <span class="dot-jewel" title="Шаг 11"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel milestone" title="Зачёт"></span>
+      </div>
+    </div>
+
+
+    <!-- КОНЦЕПТ 2: ЕДИНАЯ HUD-ПАНЕЛЬ -->
+    <div class="variant-card">
+      <div class="variant-header">
+        <div>
+          <span class="variant-num">КОНЦЕПТ 2</span>
+          <span class="variant-name">Единая HUD-панель трекера</span>
+        </div>
+        <div class="variant-desc">Точки и статус объединены внутри единого стеклянного приборного виджета</div>
+      </div>
+
+      <div class="echelon-box-fixed">
+        <div class="echelon-meta-fixed">
+          <span class="echelon-bordeaux">Эшелон 1</span>
+          <span style="color:var(--ink-muted);font-weight:400;opacity:0.6;">·</span>
+          <span class="echelon-emerald">35% готовности к скринингу</span>
+        </div>
+        <div class="echelon-track"><div class="echelon-fill"></div></div>
+      </div>
+
+      <div class="unit-title-fixed">Базовые коллекции и срезы</div>
+
+      <!-- ЕДИНЫЙ ПРИБОР -->
+      <div class="hud-panel">
+        <div class="hud-panel-top">
+          <div class="hud-panel-title">
+            <span>🗂️</span>
+            <span>Карточки: Синтаксис и индексы</span>
+          </div>
+          <span class="hud-panel-step">Шаг 4 из 12</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
+          <span class="dot-jewel done"></span>
+          <span class="dot-jewel done"></span>
+          <span class="dot-jewel done"></span>
+          <span class="dots-stage-divider"></span>
+          <span class="dot-jewel active"></span>
+          <span class="dot-jewel"></span>
+          <span class="dot-jewel"></span>
+          <span class="dots-stage-divider"></span>
+          <span class="dot-jewel"></span>
+          <span class="dot-jewel"></span>
+          <span class="dot-jewel"></span>
+          <span class="dot-jewel"></span>
+          <span class="dot-jewel"></span>
+          <span class="dots-stage-divider"></span>
+          <span class="dot-jewel milestone"></span>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- КОНЦЕПТ 3: ЭТАПНЫЙ РЕЛЬС -->
+    <div class="variant-card">
+      <div class="variant-header">
+        <div>
+          <span class="variant-num">КОНЦЕПТ 3</span>
+          <span class="variant-name">Шелковый рельс-капсула</span>
+        </div>
+        <div class="variant-desc">Вся цепочка точек упакована в единую капсулу-рельс с живым счетчиком сверху</div>
+      </div>
+
+      <div class="echelon-box-fixed">
+        <div class="echelon-meta-fixed">
+          <span class="echelon-bordeaux">Эшелон 1</span>
+          <span style="color:var(--ink-muted);font-weight:400;opacity:0.6;">·</span>
+          <span class="echelon-emerald">35% готовности к скринингу</span>
+        </div>
+        <div class="echelon-track"><div class="echelon-fill"></div></div>
+      </div>
+
+      <div class="unit-title-fixed">Базовые коллекции и срезы</div>
+
+      <div class="phased-track-box">
+        <div class="phased-header">
+          <span class="phased-badge">🗂️ Карточки: Синтаксис и индексы</span>
+          <span class="phased-sub">4 из 12 шагов пройдено</span>
+        </div>
+        <div class="phased-rail">
+          <span class="dot-jewel done" style="flex:1;"></span>
+          <span class="dot-jewel done" style="flex:1;"></span>
+          <span class="dot-jewel done" style="flex:1;"></span>
+          <span class="dots-stage-divider"></span>
+          <span class="dot-jewel active" style="flex:1;"></span>
+          <span class="dot-jewel" style="flex:1;"></span>
+          <span class="dot-jewel" style="flex:1;"></span>
+          <span class="dots-stage-divider"></span>
+          <span class="dot-jewel" style="flex:1;"></span>
+          <span class="dot-jewel" style="flex:1;"></span>
+          <span class="dot-jewel" style="flex:1;"></span>
+          <span class="dot-jewel" style="flex:1;"></span>
+          <span class="dot-jewel" style="flex:1;"></span>
+          <span class="dots-stage-divider"></span>
+          <span class="dot-jewel milestone" style="flex:1;"></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

@@ -8670,20 +8670,21 @@ function viewPythonSkill(sid){
   const dayXpVal = (typeof todayXp === 'function') ? todayXp() : 0;
 
   const focusTopbarHTML = `
-    <div class="echelon-topbar-clean">
+    <div class="echelon-topbar-clean sprint-focus-topbar sprint-topbar" style="padding: 12px 20px;">
+      <a href="#${tr.routePrefix}" class="sprint-close-btn sr-only" title="${tr.backLabel}">${tr.backLabel}</a>
       <div class="echelon-clean-wrap">
-        <div class="echelon-clean-meta">
-          <span><span style="color:var(--ink);font-weight:500;">${echMeta.shortLabel}</span> <span style="color:rgba(255,255,255,0.28);margin:0 4px;">·</span> <span style="color:var(--ink-muted);font-weight:400;">${echMeta.focus}</span></span>
-          <span style="color:${echMeta.color || '#34d399'};font-family:var(--font-m);font-weight:500;">
-            🎯 ${echPct}% готовности ${echMeta.targetLabel}
-          </span>
+        <div class="echelon-clean-meta" style="font-size: 0.78rem; justify-content: flex-start; gap: 8px; align-items: center;">
+          <span class="echelon-bordeaux-title">Эшелон ${curEchTier}</span>
+          <span style="color:var(--ink-muted);font-weight:400;opacity:0.6;">·</span>
+          <span class="echelon-readiness-emerald">${echPct}% готовности ${echMeta.targetLabel || 'к скринингу'}</span>
+          <span class="sr-only">Шаг ${stepIdx+1}/${steps.length}</span>
         </div>
-        <div class="echelon-clean-track">
-          <div class="echelon-clean-fill" style="width:${echPct}%;background:${echMeta.gradient};"></div>
+        <div class="echelon-clean-track" style="height: 6px; margin-top: 3px;">
+          <div class="echelon-clean-fill" style="width: ${echPct}%;"></div>
         </div>
       </div>
       <div style="display:flex;gap:10px;align-items:center;margin-left:14px;flex:none;">
-        <div class="sprint-xp-pill" style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:999px;background:rgba(16,185,129,0.14);border:1px solid rgba(52,211,153,0.35);color:#34d399;font-size:0.75rem;font-weight:500;white-space:nowrap;letter-spacing:0.01em;" title="Заработано за сутки: ${dayXpVal} XP">⚡ ${dayXpVal} XP сегодня</div>
+        <div class="sprint-xp-pill" style="display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:999px;background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.35);color:#fbbf24;font-size:0.75rem;font-weight:700;white-space:nowrap;letter-spacing:0.01em;" title="Заработано за сутки: ${dayXpVal} XP">⚡ +${dayXpVal || 120} XP за сутки</div>
         <a href="#/docs" class="topbar-help-btn" style="padding:6px 14px;border-radius:10px;" title="Справочник синтаксиса и методов Python"><span class="topbar-help-text">📖 Справка</span></a>
       </div>
     </div>
@@ -8791,19 +8792,49 @@ function viewPythonSkill(sid){
     const rawUnitTitle = curUnit.title || sk.title || '';
     const cleanUnitTitle = rawUnitTitle.replace(/^Юнит\s+[\d.]+\s*[·•\-:]\s*/i, '').trim() || rawUnitTitle;
 
+    // Непрерывная нить атомарных точек трекера (Continuous Atomic Dots)
+    const noteDots = allUnitNotes.map((item, idx) => {
+      const isDone = state.readNotes.includes(item.kId);
+      const isActive = (item.kId === activeK);
+      return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="📖 Конспект: ${escapeHtmlStr(item.title)}" data-py-select-k="${item.kId}" data-py-skill-id="${item.skillId}"></span>`;
+    }).join('');
+
+    const cardDots = (sk.fIds || []).map((fid, idx) => {
+      const d = ALL_DECKS_COMBINED[fid] || {};
+      const isDone = state.reviewedDecks.includes(fid);
+      const isActive = (pySkillViewState.tab === 'cards' && (pySkillViewState.fId === fid || (!pySkillViewState.fId && idx === 0)));
+      return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="🗂️ Карточки: ${escapeHtmlStr(d.title || fid)}" data-py-select-f="${fid}"></span>`;
+    }).join('');
+
+    const taskDots = (sk.taskIds || [240, 241, 242]).map((tid, idx) => {
+      const t = IDE_TASKS_BY_ID[tid] || {};
+      const isDone = (solvedMap[tid] === 'solved');
+      const isActive = (pySkillViewState.tab === 'code' && (pySkillViewState.taskId === tid || (!pySkillViewState.taskId && idx === 0)));
+      return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="⚡ Задача #${tid}: ${escapeHtmlStr(t.title || '')}" data-py-select-task="${tid}"></span>`;
+    }).join('');
+
+    const examActive = (pySkillViewState.tab === 'exam');
+    const examDot = `<span class="dot-jewel milestone ${examActive ? 'active' : ''}" title="👑 Рубежный зачёт Юнита ${sk.unitId}"></span>`;
+
+    const dotsNecklaceHTML = `
+      <div class="dots-necklace" title="Конспекты → Карточки → Практика → Зачёт">
+        ${noteDots}
+        <span class="dots-stage-divider" title="Переход к карточкам"></span>
+        ${cardDots}
+        <span class="dots-stage-divider" title="Переход к практике"></span>
+        ${taskDots}
+        <span class="dots-stage-divider" title="Рубежный зачёт"></span>
+        ${examDot}
+      </div>`;
+
     const eyebrowDotsHTML = `
       <div class="topic-eyebrow-track">
         <div class="topic-eyebrow-tags">
-          <span class="topic-eyebrow-unit">Юнит ${sk.unitId}: ${escapeHtmlStr(cleanUnitTitle)}</span>
-          <span style="color:var(--line);">•</span>
-          <span class="topic-eyebrow-num">Тема ${curNoteNum} из ${totalNotesInUnit}</span>
+          <div class="unit-breadcrumb">
+            <span class="unit-breadcrumb-title">${escapeHtmlStr(cleanUnitTitle)}</span>
+          </div>
         </div>
-        <div class="dots-necklace" title="${totalNotesInUnit} тем Юнита ${sk.unitId}">
-          <div class="dots-necklace-wire" style="width:${wireTotalWidth}px;"></div>
-          <div class="dots-necklace-wire-active" style="width:${wireActiveWidth}px;"></div>
-          ${unitJewelDotsHTML}
-          <span class="dots-necklace-label">${curNoteNum}/${totalNotesInUnit}</span>
-        </div>
+        ${dotsNecklaceHTML}
       </div>`;
 
     bodyHTML = pySkillViewState.fullNoteMode

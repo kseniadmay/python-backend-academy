@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3 принципиально новых варианта навигации по темам Юнита</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700;800&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #080c12;
+    --surface: #101622;
+    --surface-2: #161f30;
+    --ink: #f8fafc;
+    --ink-soft: #94a3b8;
+    --ink-muted: #64748b;
+    --line: rgba(255, 255, 255, 0.10);
+    --moss: #10b981;
+    --moss-soft: rgba(16, 185, 129, 0.14);
+    --amber: #f59e0b;
+    --sky: #38bdf8;
+    --font-d: 'Unbounded', sans-serif;
+    --font-b: 'Golos Text', sans-serif;
+    --font-m: 'JetBrains Mono', monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px 20px 80px;
+    background: #06090f; color: var(--ink);
+    font-family: var(--font-b);
+    max-width: 960px; margin: 0 auto;
+  }
+  .header-box {
+    margin-bottom: 28px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  .header-box h1 {
+    font-family: var(--font-d);
+    font-size: 1.45rem;
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
+  }
+  .header-box p {
+    color: var(--ink-soft);
+    font-size: 0.90rem;
+    margin: 0;
+  }
+  .proto-card {
+    background: #0d131c;
+    border: 1.5px solid var(--line);
+    border-radius: 20px;
+    padding: 24px 26px;
+    margin-bottom: 30px;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.4);
+  }
+  .proto-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+  }
+  .b-1 { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+  .b-2 { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+  .b-3 { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+  .proto-title {
+    font-size: 1.18rem;
+    font-weight: 700;
+    margin: 0 0 6px;
+    color: #f8fafc;
+  }
+  .proto-desc {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    margin: 0 0 20px;
+    line-height: 1.5;
+  }
+
+  /* ========================================================
+     ВАРИАНТ 1: КРУПНЫЕ НУМЕРОВАННЫЕ МЕДАЛЬОНЫ (DUOLINGO/CODDY)
+     ======================================================== */
+  .medallions-wrap {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 10px 4px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+  .medallions-track-line {
+    position: absolute;
+    left: 20px; right: 20px;
+    top: 50%; transform: translateY(-50%);
+    height: 3px;
+    background: rgba(255, 255, 255, 0.10);
+    z-index: 1;
+  }
+  .medallions-track-active {
+    position: absolute;
+    left: 20px;
+    top: 50%; transform: translateY(-50%);
+    height: 3px;
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+    z-index: 2;
+    transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .medallion-list {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    position: relative;
+    z-index: 3;
+    list-style: none;
+    margin: 0; padding: 0;
+  }
+  .medallion-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-m);
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    background: #0f1520;
+    border: 2px solid rgba(255, 255, 255, 0.18);
+    color: var(--ink-muted);
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    outline: none;
+  }
+  .medallion-btn:hover {
+    transform: scale(1.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #fff;
+  }
+  .medallion-btn.done {
+    background: #10b981;
+    border-color: #34d399;
+    color: #062b1a;
+    font-size: 0.85rem;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+  }
+  .medallion-btn.active {
+    width: 40px; height: 40px;
+    margin: -4px;
+    background: #10b981;
+    border: 3px solid #ffffff;
+    color: #ffffff;
+    font-size: 0.95rem;
+    box-shadow: 0 0 16px #10b981, 0 0 28px rgba(52, 211, 153, 0.8);
+    animation: med-pulse 2s infinite ease-in-out;
+  }
+  .medallion-btn.milestone {
+    border-color: #f59e0b;
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+  }
+  @keyframes med-pulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 14px #10b981; }
+    50% { transform: scale(1.1); box-shadow: 0 0 22px #34d399; }
+  }
+
+  /* ========================================================
+     ВАРИАНТ 2: СТЕППЕР С БОЛЬШИМИ КНОПКАМИ «ПРЕД. / СЛЕД.»
+     ======================================================== */
+  .stepper-nav-bar {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  }
+  .nav-step-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .nav-step-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.10);
+    color: var(--ink);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+  .nav-step-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+  .stepper-center-badge {
+    text-align: center;
+    flex: 1;
+    min-width: 0;
+  }
+  .stepper-unit-label {
+    font-size: 0.74rem;
+    color: var(--ink-muted);
+    margin-bottom: 2px;
+  }
+  .stepper-topic-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #f8fafc;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .stepper-mini-meter {
+    width: 140px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    margin: 6px auto 0;
+    overflow: hidden;
+  }
+  .stepper-meter-fill {
+    height: 100%;
+    background: #10b981;
+    border-radius: 999px;
+    transition: width 0.3s ease;
+  }
+
+  /* ========================================================
+     ВАРИАНТ 3: ПАЙПЛАЙН-СЕГМЕНТЫ (GITHUB ACTIONS / VERCEL)
+     ======================================================== */
+  .pipeline-bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 6px;
+    overflow-x: auto;
+  }
+  .pipe-step {
+    flex: 1;
+    min-width: 44px;
+    padding: 8px 4px;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    outline: none;
+    transition: all 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .pipe-step:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .pipe-step-line {
+    width: 100%;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    transition: background 0.25s, box-shadow 0.25s;
+  }
+  .pipe-step-num {
+    font-size: 0.70rem;
+    font-family: var(--font-m);
+    font-weight: 700;
+    color: var(--ink-muted);
+  }
+  .pipe-step.done .pipe-step-line {
+    background: #10b981;
+  }
+  .pipe-step.done .pipe-step-num {
+    color: #34d399;
+  }
+  .pipe-step.active {
+    background: rgba(56, 189, 248, 0.10);
+  }
+  .pipe-step.active .pipe-step-line {
+    background: #38bdf8;
+    box-shadow: 0 0 8px #38bdf8;
+    height: 5px;
+  }
+  .pipe-step.active .pipe-step-num {
+    color: #38bdf8;
+    font-weight: 800;
+  }
+  .pipe-step.milestone .pipe-step-line {
+    background: #f59e0b;
+  }
+  .pipe-step.milestone .pipe-step-num {
+    color: #f59e0b;
+  }
+
+  /* Демо-карточка содержания */
+  .preview-content-card {
+    background: #080d14;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-top: 14px;
+  }
+  .preview-content-title {
+    font-size: 1.10rem;
+    font-weight: 700;
+    margin: 0 0 6px;
+    color: #f8fafc;
+  }
+  .preview-content-text {
+    font-size: 0.86rem;
+    color: var(--ink-soft);
+    margin: 0;
+    line-height: 1.55;
+  }
+</style>
+</head>
+<body>
+
+  <div class="header-box">
+    <h1>3 принципиально новых варианта навигации по темам Юнита</h1>
+    <p>Все варианты ниже полностью интерактивны. Попробуйте нажимать кнопки и переключать темы прямо на этой странице.</p>
+  </div>
+
+  <!-- ======================== ВАРИАНТ 1 ======================== -->
+  <div class="proto-card">
+    <span class="proto-badge b-1">Вариант 1: Медальоны с номерами</span>
+    <h2 class="proto-title">Нумерованные круглые медальоны (Duolingo / Coddy)</h2>
+    <p class="proto-desc">Крупные осязаемые кнопки (32–40px) с видимыми номерами внутри кружков: <code>1</code>, <code>2</code>, <code>3</code>... Галочки для изученных и корона 👑 для рубежного теста. Больше никаких слепых микро-точек!</p>
+    
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <span style="font-weight:700;font-size:0.86rem;color:#f8fafc;">Юнит 1.1: Базовый синтаксис</span>
+      <span id="v1-label" style="font-family:var(--font-m);font-size:0.78rem;font-weight:700;color:var(--moss);">3/13 тем</span>
+    </div>
+
+    <div class="medallions-wrap">
+      <div class="medallions-track-line"></div>
+      <div class="medallions-track-active" id="v1-wire" style="width:16%;"></div>
+      <ul class="medallion-list" id="v1-list">
+        <li><button class="medallion-btn done" data-idx="0">✓</button></li>
+        <li><button class="medallion-btn done" data-idx="1">✓</button></li>
+        <li><button class="medallion-btn active" data-idx="2">3</button></li>
+        <li><button class="medallion-btn" data-idx="3">4</button></li>
+        <li><button class="medallion-btn" data-idx="4">5</button></li>
+        <li><button class="medallion-btn" data-idx="5">6</button></li>
+        <li><button class="medallion-btn" data-idx="6">7</button></li>
+        <li><button class="medallion-btn" data-idx="7">8</button></li>
+        <li><button class="medallion-btn" data-idx="8">9</button></li>
+        <li><button class="medallion-btn" data-idx="9">10</button></li>
+        <li><button class="medallion-btn" data-idx="10">11</button></li>
+        <li><button class="medallion-btn" data-idx="11">12</button></li>
+        <li><button class="medallion-btn milestone" data-idx="12">👑</button></li>
+      </ul>
+    </div>
+
+    <div class="preview-content-card">
+      <div class="preview-content-title" id="v1-card-title">Тема 3: Срезы в Python (slice)</div>
+      <p class="preview-content-text" id="v1-card-text">Срез lst[i:j] возвращает новый объект, поверхностную копию (shallow copy). Оригинал списка никогда не изменяется.</p>
+    </div>
+  </div>
+
+  <!-- ======================== ВАРИАНТ 2 ======================== -->
+  <div class="proto-card">
+    <span class="proto-badge b-2">Вариант 2: Кнопочный степпер</span>
+    <h2 class="proto-title">Линейный степпер с большими кнопками «‹ Пред. / След. ›»</h2>
+    <p class="proto-desc">Полный отказ от рядов из 13 кружков! Две крупные, удобные кнопки навигации («← Назад» и «Вперёд →»), название текущей темы по центру и микро-шкала прогресса. Ноль промахов пальцем и мыши.</p>
+
+    <div class="stepper-nav-bar">
+      <button class="nav-step-btn" id="v2-prev">
+        <span>←</span>
+        <span id="v2-prev-label">2. Индексы</span>
+      </button>
+
+      <div class="stepper-center-badge">
+        <div class="stepper-unit-label" id="v2-meta">Юнит 1.1 · Тема 3 из 13 (23%)</div>
+        <div class="stepper-topic-name" id="v2-cur-title">К-003: Срезы в Python (slice)</div>
+        <div class="stepper-mini-meter">
+          <div class="stepper-meter-fill" id="v2-meter" style="width:23%;"></div>
+        </div>
+      </div>
+
+      <button class="nav-step-btn" id="v2-next" style="background:rgba(56,189,248,0.12);color:#38bdf8;border-color:rgba(56,189,248,0.3);">
+        <span id="v2-next-label">4. frozenset</span>
+        <span>→</span>
+      </button>
+    </div>
+
+    <div class="preview-content-card">
+      <div class="preview-content-title" id="v2-card-title">Тема 3: Срезы в Python (slice)</div>
+      <p class="preview-content-text" id="v2-card-text">Срез lst[i:j] возвращает новый объект, поверхностную копию (shallow copy). Оригинал списка никогда не изменяется.</p>
+    </div>
+  </div>
+
+  <!-- ======================== ВАРИАНТ 3 ======================== -->
+  <div class="proto-card">
+    <span class="proto-badge b-3">Вариант 3: Пайплайн-сегменты</span>
+    <h2 class="proto-title">Штриховой пайплайн узлов (GitHub Actions / Linear)</h2>
+    <p class="proto-desc">Минималистичные сегменты-ступени одинаковой ширины. Пройденные сегменты светятся изумрудным, активный узел подсвечен неоновым цветом, контрольный тест выделен золотом.</p>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-weight:700;font-size:0.86rem;color:#f8fafc;">Юнит 1.1: Базовый синтаксис</span>
+      <span id="v3-label" style="font-family:var(--font-m);font-size:0.78rem;font-weight:700;color:#38bdf8;">Тема 3 из 13 (23%)</span>
+    </div>
+
+    <div class="pipeline-bar" id="v3-bar">
+      <button class="pipe-step done" data-idx="0"><div class="pipe-step-line"></div><span class="pipe-step-num">01</span></button>
+      <button class="pipe-step done" data-idx="1"><div class="pipe-step-line"></div><span class="pipe-step-num">02</span></button>
+      <button class="pipe-step active" data-idx="2"><div class="pipe-step-line"></div><span class="pipe-step-num">03</span></button>
+      <button class="pipe-step" data-idx="3"><div class="pipe-step-line"></div><span class="pipe-step-num">04</span></button>
+      <button class="pipe-step" data-idx="4"><div class="pipe-step-line"></div><span class="pipe-step-num">05</span></button>
+      <button class="pipe-step" data-idx="5"><div class="pipe-step-line"></div><span class="pipe-step-num">06</span></button>
+      <button class="pipe-step" data-idx="6"><div class="pipe-step-line"></div><span class="pipe-step-num">07</span></button>
+      <button class="pipe-step" data-idx="7"><div class="pipe-step-line"></div><span class="pipe-step-num">08</span></button>
+      <button class="pipe-step" data-idx="8"><div class="pipe-step-line"></div><span class="pipe-step-num">09</span></button>
+      <button class="pipe-step" data-idx="9"><div class="pipe-step-line"></div><span class="pipe-step-num">10</span></button>
+      <button class="pipe-step" data-idx="10"><div class="pipe-step-line"></div><span class="pipe-step-num">11</span></button>
+      <button class="pipe-step" data-idx="11"><div class="pipe-step-line"></div><span class="pipe-step-num">12</span></button>
+      <button class="pipe-step milestone" data-idx="12"><div class="pipe-step-line"></div><span class="pipe-step-num">👑</span></button>
+    </div>
+
+    <div class="preview-content-card">
+      <div class="preview-content-title" id="v3-card-title">Тема 3: Срезы в Python (slice)</div>
+      <p class="preview-content-text" id="v3-card-text">Срез lst[i:j] возвращает новый объект, поверхностную копию (shallow copy). Оригинал списка никогда не изменяется.</p>
+    </div>
+  </div>
+
+  <script>
+    const topics = [
+      { id: '01', title: 'Память и структуры данных', desc: 'Устройство объектов в CPython, overhead и ссылки.' },
+      { id: '02', title: 'list vs tuple: выбор типов', desc: 'Мутабельность, оптимизация памяти, tuple как ключ dict.' },
+      { id: '03', title: 'Срезы: shallow copy [start:stop:step]', desc: 'Срез lst[i:j] возвращает новый объект. Изменение среза не трогает оригинал.' },
+      { id: '04', title: 'frozenset: неизменяемое множество', desc: 'Хэшируемость множеств, использование в качестве ключей словаря.' },
+      { id: '05', title: 'Передача аргументов в функции', desc: 'Pass by assignment, ловушка дефолтных мутабельных аргументов def f(x=[]).' },
+      { id: '06', title: 'Методы словаря dict', desc: 'get(), setdefault(), pop(), update() и время доступа O(1).' },
+      { id: '07', title: 'Методы списка list', desc: 'append vs extend vs insert(0), амортизированная сложность.' },
+      { id: '08', title: 'namedtuple из collections', desc: 'Легковесные структуры данных с доступом по именам полей.' },
+      { id: '09', title: 'deque и Counter', desc: 'Очередь с O(1) с обоих концов и быстрый подсчёт частот элементов.' },
+      { id: '10', title: 'Присваивание и копирование объектов', desc: 'a = b vs copy.copy() vs copy.deepcopy().' },
+      { id: '11', title: 'Файловый ввод-вывод with open', desc: 'Контекстные менеджеры, буферизация и кодировка utf-8.' },
+      { id: '12', title: 'Встроенные функции: zip, id', desc: 'Параллельная итерация и проверка идентичности объекта.' },
+      { id: '13', title: 'Рубежный тест 1.1 👑', desc: 'Финальный рубежный тест проверки мастерства по всему Юниту 1.1.' }
+    ];
+
+    let curIdx = 2; // Тема 3
+
+    // Вариант 1: логика медальонов
+    const v1Btns = document.querySelectorAll('#v1-list .medallion-btn');
+    const v1Wire = document.getElementById('v1-wire');
+    const v1Label = document.getElementById('v1-label');
+    const v1CardTitle = document.getElementById('v1-card-title');
+    const v1CardText = document.getElementById('v1-card-text');
+
+    function updateV1(idx) {
+      v1Btns.forEach((btn, i) => {
+        btn.classList.remove('active');
+        if (i < idx) {
+          btn.classList.add('done');
+          btn.textContent = '✓';
+        } else if (i === idx) {
+          btn.classList.remove('done');
+          btn.classList.add('active');
+          btn.textContent = (idx === 12) ? '👑' : (idx + 1);
+        } else {
+          btn.classList.remove('done');
+          btn.textContent = (i === 12) ? '👑' : (i + 1);
+        }
+      });
+      v1Wire.style.width = (idx / 12 * 100) + '%';
+      v1Label.textContent = (idx + 1) + '/13 тем';
+      v1CardTitle.textContent = `Тема ${idx + 1}: ${topics[idx].title}`;
+      v1CardText.textContent = topics[idx].desc;
+    }
+
+    v1Btns.forEach(b => {
+      b.addEventListener('click', () => {
+        curIdx = parseInt(b.getAttribute('data-idx'), 10);
+        updateV1(curIdx);
+        updateV2(curIdx);
+        updateV3(curIdx);
+      });
+    });
+
+    // Вариант 2: логика степпера
+    const v2Prev = document.getElementById('v2-prev');
+    const v2Next = document.getElementById('v2-next');
+    const v2PrevLabel = document.getElementById('v2-prev-label');
+    const v2NextLabel = document.getElementById('v2-next-label');
+    const v2CurTitle = document.getElementById('v2-cur-title');
+    const v2Meta = document.getElementById('v2-meta');
+    const v2Meter = document.getElementById('v2-meter');
+    const v2CardTitle = document.getElementById('v2-card-title');
+    const v2CardText = document.getElementById('v2-card-text');
+
+    function updateV2(idx) {
+      const pct = Math.round(((idx + 1) / 13) * 100);
+      v2Meta.textContent = `Юнит 1.1 · Тема ${idx + 1} из 13 (${pct}%)`;
+      v2CurTitle.textContent = `К-0${idx < 9 ? '0' : ''}${idx + 1}: ${topics[idx].title}`;
+      v2Meter.style.width = pct + '%';
+      v2CardTitle.textContent = `Тема ${idx + 1}: ${topics[idx].title}`;
+      v2CardText.textContent = topics[idx].desc;
+
+      if (idx > 0) {
+        v2Prev.disabled = false;
+        v2PrevLabel.textContent = `${idx}. ${topics[idx - 1].title.split(':')[0]}`;
+      } else {
+        v2Prev.disabled = true;
+        v2PrevLabel.textContent = 'Начало';
+      }
+
+      if (idx < 12) {
+        v2Next.disabled = false;
+        v2NextLabel.textContent = `${idx + 2}. ${topics[idx + 1].title.split(':')[0]}`;
+      } else {
+        v2Next.disabled = true;
+        v2NextLabel.textContent = 'Конец юнита';
+      }
+    }
+
+    v2Prev.addEventListener('click', () => {
+      if (curIdx > 0) {
+        curIdx--;
+        updateV1(curIdx);
+        updateV2(curIdx);
+        updateV3(curIdx);
+      }
+    });
+
+    v2Next.addEventListener('click', () => {
+      if (curIdx < 12) {
+        curIdx++;
+        updateV1(curIdx);
+        updateV2(curIdx);
+        updateV3(curIdx);
+      }
+    });
+
+    // Вариант 3: логика пайплайна
+    const v3Steps = document.querySelectorAll('#v3-bar .pipe-step');
+    const v3Label = document.getElementById('v3-label');
+    const v3CardTitle = document.getElementById('v3-card-title');
+    const v3CardText = document.getElementById('v3-card-text');
+
+    function updateV3(idx) {
+      const pct = Math.round(((idx + 1) / 13) * 100);
+      v3Steps.forEach((s, i) => {
+        s.classList.remove('active');
+        if (i < idx) {
+          s.classList.add('done');
+        } else if (i === idx) {
+          s.classList.remove('done');
+          s.classList.add('active');
+        } else {
+          s.classList.remove('done');
+        }
+      });
+      v3Label.textContent = `Тема ${idx + 1} из 13 (${pct}%)`;
+      v3CardTitle.textContent = `Тема ${idx + 1}: ${topics[idx].title}`;
+      v3CardText.textContent = topics[idx].desc;
+    }
+
+    v3Steps.forEach(s => {
+      s.addEventListener('click', () => {
+        curIdx = parseInt(s.getAttribute('data-idx'), 10);
+        updateV1(curIdx);
+        updateV2(curIdx);
+        updateV3(curIdx);
+      });
+    });
+  </script>
+</body>
+</html>

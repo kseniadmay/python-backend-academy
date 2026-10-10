@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Полировка шапки Эшелона и Готовности — Python Backend Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700;800&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #11130e;
+    --surface: #181b13;
+    --surface-card: #1c2016;
+    --ink: #eceddf;
+    --ink-soft: #9da18f;
+    --ink-muted: #6b6f5e;
+    --line: rgba(255, 255, 255, 0.08);
+    --font-d: 'Unbounded', sans-serif;
+    --font-b: 'Golos Text', sans-serif;
+    --font-m: 'JetBrains Mono', monospace;
+    --bordeaux: #f43f5e;
+    --bordeaux-deep: #be123c;
+    --emerald: #10b981;
+    --emerald-light: #34d399;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-b);
+    padding: 36px 20px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .page-title {
+    font-family: var(--font-d);
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    text-align: center;
+    color: var(--ink);
+  }
+  .page-sub {
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    margin-bottom: 30px;
+    text-align: center;
+    max-width: 640px;
+    line-height: 1.45;
+  }
+  .variants-container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    width: 100%;
+    max-width: 860px;
+  }
+  .variant-card {
+    background: var(--surface-card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 24px 28px 26px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    position: relative;
+    overflow: hidden;
+  }
+  .variant-badge-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .variant-tag {
+    font-family: var(--font-m);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 6px;
+    letter-spacing: 0.04em;
+  }
+  .tag-a { color: #38bdf8; background: rgba(56, 189, 248, 0.12); }
+  .tag-b { color: #10b981; background: rgba(16, 185, 129, 0.12); }
+  .tag-c { color: #fbbf24; background: rgba(251, 191, 36, 0.12); }
+  .variant-title-text {
+    font-weight: 600;
+    font-size: 0.96rem;
+    color: var(--ink);
+    margin-left: 10px;
+  }
+  .variant-expl {
+    font-size: 0.80rem;
+    color: var(--ink-soft);
+  }
+
+  /* ВАРИАНТ 2 БАЗА: Стек темы и капсулы */
+  .v2-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .v2-unit-title {
+    font-family: var(--font-d);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .stage-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3.5px 12px 3.5px 5px;
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.32);
+    border-radius: 999px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.12);
+  }
+  .stage-step-num {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-family: var(--font-m);
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .stage-step-title {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #38bdf8;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ТОЧКИ РАДАРА */
+  .dots-necklace {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 0 6px;
+  }
+  .dot-jewel {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.16);
+    position: relative;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+  .dot-jewel.active {
+    width: 9px;
+    height: 9px;
+    background: #ffffff;
+    box-shadow: 0 0 10px #ffffff, 0 0 20px rgba(255, 255, 255, 0.8), 0 0 32px rgba(16, 185, 129, 0.5);
+  }
+  .dots-stage-divider {
+    width: 1px;
+    height: 9px;
+    background: rgba(255, 255, 255, 0.18);
+    margin: 0 2px;
+  }
+  .dot-jewel.milestone {
+    transform: rotate(45deg);
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.22);
+  }
+
+  /* ========================================================
+     СТИЛИЗАЦИИ ШАПКИ ЭШЕЛОНА
+     ======================================================== */
+
+  /* КОНЦЕПТ A: «Баланс сторон» (Слева Эшелон, Справа 35% готовности над шкалой) */
+  .echelon-box-a {
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.07);
+  }
+  .echelon-row-a {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 7px;
+  }
+  .echelon-badge-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .echelon-num-roman {
+    font-family: var(--font-d);
+    font-size: 0.86rem;
+    font-weight: 800;
+    color: #fb7185;
+    letter-spacing: 0.02em;
+    text-shadow: 0 0 12px rgba(244, 63, 94, 0.55);
+  }
+  .echelon-readiness-right {
+    font-size: 0.78rem;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 5px;
+  }
+  .readiness-pct-a {
+    font-family: var(--font-m);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #34d399;
+    text-shadow: 0 0 10px rgba(52, 211, 153, 0.6);
+  }
+  .readiness-label-a {
+    font-size: 0.76rem;
+    color: var(--ink-soft);
+    font-weight: 400;
+  }
+  .track-a {
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.07);
+    position: relative;
+    overflow: visible;
+  }
+  .fill-a {
+    height: 100%;
+    width: 35%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #be123c 0%, #10b981 100%);
+    position: relative;
+  }
+  .fill-a::after {
+    content: '';
+    position: absolute;
+    right: -2px;
+    top: -2px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #34d399;
+    box-shadow: 0 0 10px #34d399, 0 0 16px rgba(52, 211, 153, 0.8);
+  }
+
+  /* КОНЦЕПТ B: «Иерархический фокус» (Слева в одну строку, но текст спокойный, а 35% ярко светится) */
+  .echelon-box-b {
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.07);
+  }
+  .echelon-row-b {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 7px;
+  }
+  .echelon-chip-b {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(244, 63, 94, 0.12);
+    border: 1px solid rgba(244, 63, 94, 0.35);
+    padding: 1.5px 8px;
+    border-radius: 6px;
+    font-family: var(--font-d);
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: #fb7185;
+    text-shadow: 0 0 8px rgba(244, 63, 94, 0.5);
+    letter-spacing: 0.03em;
+  }
+  .sep-dot-b {
+    color: rgba(255, 255, 255, 0.25);
+    font-size: 0.75rem;
+  }
+  .pct-b {
+    font-family: var(--font-m);
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: #34d399;
+    text-shadow: 0 0 10px rgba(52, 211, 153, 0.75);
+  }
+  .sub-b {
+    font-size: 0.77rem;
+    color: var(--ink-soft);
+    font-weight: 400;
+  }
+
+  /* КОНЦЕПТ C: «Премиальная капсула с индикатором-мишенью» */
+  .echelon-box-c {
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.07);
+  }
+  .echelon-row-c {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 7px;
+  }
+  .echelon-left-c {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .echelon-title-c {
+    font-family: var(--font-d);
+    font-size: 0.84rem;
+    font-weight: 800;
+    color: #f43f5e;
+    text-shadow: 0 0 10px rgba(244, 63, 94, 0.45);
+  }
+  .screening-target-badge {
+    font-size: 0.70rem;
+    font-weight: 600;
+    color: #94a3b8;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    padding: 2px 7px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .echelon-right-c {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pct-glow-pill {
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #34d399;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-family: var(--font-m);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
+  }
+</style>
+</head>
+<body>
+
+  <h1 class="page-title">Эшелон & Готовность: Варианты Полировки</h1>
+  <p class="page-sub">Стек темы слева утвержден (Вариант 2). Ниже 3 решения для устранения цветового шума и гармонизации шапки эшелона.</p>
+
+  <div class="variants-container">
+
+    <!-- ВАРИАНТ A -->
+    <div class="variant-card">
+      <div class="variant-badge-row">
+        <div>
+          <span class="variant-tag tag-a">ВАРИАНТ A · БАЛАНС СТОРОН</span>
+          <span class="variant-title-text">Эшелон слева, 35% справа над шкалой</span>
+        </div>
+        <div class="variant-expl">Убирает пустоту справа, шкала связывает статус и цель</div>
+      </div>
+
+      <div class="echelon-box-a">
+        <div class="echelon-row-a">
+          <div class="echelon-badge-left">
+            <span class="echelon-num-roman">Эшелон I</span>
+          </div>
+          <div class="echelon-readiness-right">
+            <span class="readiness-pct-a">35%</span>
+            <span class="readiness-label-a">готовности к скринингу</span>
+          </div>
+        </div>
+        <div class="track-a"><div class="fill-a"></div></div>
+      </div>
+
+      <!-- Контент Варианта 2 -->
+      <div class="v2-stack">
+        <span class="v2-unit-title">Базовые коллекции и срезы</span>
+        <div class="stage-status-pill">
+          <span class="stage-step-num">1 / 12</span>
+          <span class="stage-step-title">📖 Конспект: Структуры данных</span>
+        </div>
+      </div>
+
+      <div class="dots-necklace">
+        <span class="dot-jewel active" title="Шаг 1"></span>
+        <span class="dot-jewel" title="Шаг 2"></span>
+        <span class="dot-jewel" title="Шаг 3"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel" title="Шаг 4"></span>
+        <span class="dot-jewel" title="Шаг 5"></span>
+        <span class="dot-jewel" title="Шаг 6"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel" title="Шаг 7"></span>
+        <span class="dot-jewel" title="Шаг 8"></span>
+        <span class="dot-jewel" title="Шаг 9"></span>
+        <span class="dot-jewel" title="Шаг 10"></span>
+        <span class="dot-jewel" title="Шаг 11"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel milestone" title="Зачёт"></span>
+      </div>
+    </div>
+
+
+    <!-- ВАРИАНТ B -->
+    <div class="variant-card">
+      <div class="variant-badge-row">
+        <div>
+          <span class="variant-tag tag-b">ВАРИАНТ B · ИЕРАРХИЯ В ОДНУ СТРОКУ</span>
+          <span class="variant-title-text">Чип «Эшелон I» + Акцент на цифре 35%</span>
+        </div>
+        <div class="variant-expl">Текст спокойный, изумрудный неон только на цифре 35%</div>
+      </div>
+
+      <div class="echelon-box-b">
+        <div class="echelon-row-b">
+          <div class="echelon-chip-b">ЭШЕЛОН I</div>
+          <span class="sep-dot-b">·</span>
+          <span class="pct-b">35%</span>
+          <span class="sub-b">готовности к скринингу</span>
+        </div>
+        <div class="track-a"><div class="fill-a"></div></div>
+      </div>
+
+      <!-- Контент Варианта 2 -->
+      <div class="v2-stack">
+        <span class="v2-unit-title">Базовые коллекции и срезы</span>
+        <div class="stage-status-pill">
+          <span class="stage-step-num">1 / 12</span>
+          <span class="stage-step-title">📖 Конспект: Структуры данных</span>
+        </div>
+      </div>
+
+      <div class="dots-necklace">
+        <span class="dot-jewel active" title="Шаг 1"></span>
+        <span class="dot-jewel" title="Шаг 2"></span>
+        <span class="dot-jewel" title="Шаг 3"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel" title="Шаг 4"></span>
+        <span class="dot-jewel" title="Шаг 5"></span>
+        <span class="dot-jewel" title="Шаг 6"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel" title="Шаг 7"></span>
+        <span class="dot-jewel" title="Шаг 8"></span>
+        <span class="dot-jewel" title="Шаг 9"></span>
+        <span class="dot-jewel" title="Шаг 10"></span>
+        <span class="dot-jewel" title="Шаг 11"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel milestone" title="Зачёт"></span>
+      </div>
+    </div>
+
+
+    <!-- ВАРИАНТ C -->
+    <div class="variant-card">
+      <div class="variant-badge-row">
+        <div>
+          <span class="variant-tag tag-c">ВАРИАНТ C · ЦЕЛЬ «СКРИНИНГ» КАК БЕЙДЖ</span>
+          <span class="variant-title-text">«Эшелон I» + тег цели + капсула 35%</span>
+        </div>
+        <div class="variant-expl">Четкая структура: что за эшелон, какая цель, процент готовности</div>
+      </div>
+
+      <div class="echelon-box-c">
+        <div class="echelon-row-c">
+          <div class="echelon-left-c">
+            <span class="echelon-title-c">Эшелон I</span>
+            <span class="screening-target-badge">Цель: Скрининг</span>
+          </div>
+          <div class="echelon-right-c">
+            <span style="font-size: 0.76rem; color: var(--ink-soft);">готовность</span>
+            <span class="pct-glow-pill">35%</span>
+          </div>
+        </div>
+        <div class="track-a"><div class="fill-a"></div></div>
+      </div>
+
+      <!-- Контент Варианта 2 -->
+      <div class="v2-stack">
+        <span class="v2-unit-title">Базовые коллекции и срезы</span>
+        <div class="stage-status-pill">
+          <span class="stage-step-num">1 / 12</span>
+          <span class="stage-step-title">📖 Конспект: Структуры данных</span>
+        </div>
+      </div>
+
+      <div class="dots-necklace">
+        <span class="dot-jewel active" title="Шаг 1"></span>
+        <span class="dot-jewel" title="Шаг 2"></span>
+        <span class="dot-jewel" title="Шаг 3"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel" title="Шаг 4"></span>
+        <span class="dot-jewel" title="Шаг 5"></span>
+        <span class="dot-jewel" title="Шаг 6"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel" title="Шаг 7"></span>
+        <span class="dot-jewel" title="Шаг 8"></span>
+        <span class="dot-jewel" title="Шаг 9"></span>
+        <span class="dot-jewel" title="Шаг 10"></span>
+        <span class="dot-jewel" title="Шаг 11"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel milestone" title="Зачёт"></span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Атомарный трекер: 1 карточка = 1 точка — Python Backend Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #11130e;
+    --surface-card: #181b13;
+    --ink: #eceddf;
+    --ink-soft: #9da18f;
+    --ink-muted: #6b6f5e;
+    --line: rgba(255, 255, 255, 0.08);
+    --font-d: 'Unbounded', sans-serif;
+    --font-b: 'Golos Text', sans-serif;
+    --font-m: 'JetBrains Mono', monospace;
+    --emerald: #10b981;
+    --emerald-light: #34d399;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-b);
+    padding: 36px 20px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .page-title {
+    font-family: var(--font-d);
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    text-align: center;
+    color: var(--ink);
+  }
+  .page-sub {
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    margin-bottom: 30px;
+    text-align: center;
+    max-width: 680px;
+  }
+  .tracker-showcase {
+    width: 100%;
+    max-width: 820px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  .showcase-card {
+    background: var(--surface-card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 24px 28px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    position: relative;
+  }
+  .showcase-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .badge-opt {
+    font-family: var(--font-m);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 6px;
+    color: #34d399;
+    background: rgba(52, 211, 153, 0.12);
+  }
+
+  /* ШАПКА ЭШЕЛОНА */
+  .echelon-box-fixed {
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.07);
+  }
+  .echelon-meta-fixed {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    margin-bottom: 6px;
+  }
+  .echelon-bordeaux {
+    color: #be123c;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    text-shadow: 0 0 5px rgba(190, 18, 60, 0.5);
+  }
+  .echelon-emerald {
+    color: #34d399;
+    font-weight: 600;
+    text-shadow: 0 0 5px rgba(52, 211, 153, 0.45);
+  }
+  .echelon-track {
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+  .echelon-fill {
+    height: 100%;
+    width: 35%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #6b1d2f 0%, #be123c 35%, #059669 75%, #10b981 100%);
+  }
+
+  .unit-title {
+    font-family: var(--font-d);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+
+  /* ТОЧКИ ПРЯМОГО ДЕЙСТВИЯ */
+  .dot-jewel {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.16);
+    position: relative;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+  .dot-jewel.done {
+    background: #10b981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.7), 0 0 14px rgba(16, 185, 129, 0.35);
+  }
+  .dot-jewel.active {
+    width: 9px;
+    height: 9px;
+    background: #ffffff;
+    box-shadow: 0 0 10px #ffffff, 0 0 18px rgba(255, 255, 255, 0.9), 0 0 28px rgba(16, 185, 129, 0.7);
+  }
+  .dot-jewel.milestone {
+    transform: rotate(45deg);
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.22);
+  }
+
+  /* СЕКЦИОННЫЙ РАДАР (ВАРИАНТ 1) */
+  .cluster-radar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 10px 18px;
+    margin-bottom: 20px;
+  }
+  .radar-cluster-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .cluster-label {
+    font-family: var(--font-m);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--ink-muted);
+  }
+  .radar-cluster-item.done .cluster-label { color: #34d399; }
+  .radar-cluster-item.active .cluster-label {
+    color: #ffffff;
+    text-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
+  }
+  .cluster-dots-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .radar-cluster-divider {
+    width: 1px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  /* ИНТЕРАКТИВНОЕ ПОЛЕ КАРТОЧКИ */
+  .fc-box {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 20px;
+    margin-top: 10px;
+  }
+  .fc-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 0.80rem;
+    color: #34d399;
+    font-weight: 600;
+  }
+  .fc-question-text {
+    font-size: 1.08rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 16px;
+    line-height: 1.45;
+  }
+  .fc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .fc-choice {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--ink);
+    font-size: 0.88rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .fc-choice:hover {
+    border-color: rgba(52, 211, 153, 0.5);
+    background: rgba(16, 185, 129, 0.08);
+  }
+  .btn-answer {
+    background: #10b981;
+    color: #06241a;
+    font-weight: 700;
+    font-size: 0.88rem;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.4);
+  }
+</style>
+</head>
+<body>
+
+  <h1 class="page-title">Идея пользователя: Каждая карточка и задача — это точка трекера</h1>
+  <p class="page-sub">Точки больше не обозначают абстрактные группы. 1 карточка = 1 точка. 1 задача кода = 1 точка. Решение карточки физически зажигает изумрудную точку на глазах пользователя.</p>
+
+  <div class="tracker-showcase">
+
+    <!-- ВАРИАНТ 1: КЛАСТЕРНЫЙ РАДАР ПРЯМОГО ДЕЙСТВИЯ -->
+    <div class="showcase-card">
+      <div class="showcase-header">
+        <div>
+          <span class="badge-opt">КОНЦЕПТ · ПРЯМАЯ СВЯЗЬ 1:1</span>
+          <span style="font-weight:600;margin-left:8px;">Секционный радар: 3 конспекта + 4 карточки + 5 задач + 1 зачёт</span>
+        </div>
+        <span style="font-size:0.78rem;color:var(--ink-soft);">Всего 13 атомарных шагов</span>
+      </div>
+
+      <div class="echelon-box-fixed">
+        <div class="echelon-meta-fixed">
+          <span class="echelon-bordeaux">Эшелон 1</span>
+          <span style="color:var(--ink-muted);opacity:0.6;">·</span>
+          <span class="echelon-emerald">35% готовности к скринингу</span>
+        </div>
+        <div class="echelon-track"><div class="echelon-fill"></div></div>
+      </div>
+
+      <div class="unit-title">Базовые коллекции и срезы</div>
+
+      <!-- КЛАСТЕРНЫЙ РАДАР -->
+      <div class="cluster-radar">
+        <!-- 1. ТЕОРИЯ (3/3 СДАНО) -->
+        <div class="radar-cluster-item done">
+          <span class="cluster-label">📖 ТЕОРИЯ (3/3 ✓)</span>
+          <div class="cluster-dots-row">
+            <span class="dot-jewel done" title="Конспект 1: Списки"></span>
+            <span class="dot-jewel done" title="Конспект 2: Кортежи"></span>
+            <span class="dot-jewel done" title="Конспект 3: Срезы"></span>
+          </div>
+        </div>
+
+        <div class="radar-cluster-divider"></div>
+
+        <!-- 2. КАРТОЧКИ (АКТИВНА КАРТОЧКА 2 ИЗ 4) -->
+        <div class="radar-cluster-item active">
+          <span class="cluster-label" style="color:#34d399;">🗂️ КАРТОЧКИ (2/4 АКТИВНО)</span>
+          <div class="cluster-dots-row">
+            <span class="dot-jewel done" title="Карточка 1: Пройдена ✓"></span>
+            <span class="dot-jewel active" title="Карточка 2: Решаем сейчас!"></span>
+            <span class="dot-jewel" title="Карточка 3: Впереди"></span>
+            <span class="dot-jewel" title="Карточка 4: Впереди"></span>
+          </div>
+        </div>
+
+        <div class="radar-cluster-divider"></div>
+
+        <!-- 3. ПРАКТИКА (5 ЗАДАЧ КОДА) -->
+        <div class="radar-cluster-item">
+          <span class="cluster-label">⚡ ЗАДАЧИ КОДА (0/5)</span>
+          <div class="cluster-dots-row">
+            <span class="dot-jewel" title="Задача 1: Реверс срезом"></span>
+            <span class="dot-jewel" title="Задача 2: Диагональ"></span>
+            <span class="dot-jewel" title="Задача 3: Отрицательные"></span>
+            <span class="dot-jewel" title="Задача 4: Подсписок"></span>
+            <span class="dot-jewel" title="Задача 5: Кортеж vs Список"></span>
+          </div>
+        </div>
+
+        <div class="radar-cluster-divider"></div>
+
+        <!-- 4. ЗАЧЁТ -->
+        <div class="radar-cluster-item">
+          <span class="cluster-label">👑 ЗАЧЁТ</span>
+          <div class="cluster-dots-row">
+            <span class="dot-jewel milestone" title="Рубежный зачёт"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ТЕЛО АКТИВНОЙ КАРТОЧКИ (ПРИВЯЗАНО К 2-Й ТОЧКЕ КАРТОЧЕК) -->
+      <div class="fc-box">
+        <div class="fc-meta">
+          <span>Текущий шаг: Карточка №2 из 4 (Точка 5 из 13)</span>
+          <span>+10 XP к скринингу</span>
+        </div>
+        <div class="fc-question-text">
+          Что вернёт срез <code>numbers[1:4:2]</code> для списка <code>numbers = [10, 20, 30, 40, 50]</code>?
+        </div>
+        <div class="fc-grid">
+          <button class="fc-choice">A) [20, 40]</button>
+          <button class="fc-choice">B) [20, 30, 40]</button>
+          <button class="fc-choice">C) [10, 30]</button>
+          <button class="fc-choice">D) [20]</button>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:0.78rem;color:var(--ink-muted);">Правильный ответ зажжёт 5-ю точку изумрудным светом</span>
+          <button class="btn-answer">Ответить и зажечь точку ➔</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</body>
+</html>

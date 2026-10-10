@@ -378,7 +378,7 @@ console.log('✓ Route #/infra (6 Units 7.1–7.6, 21 Skills, 47 K-notes, 45 F-d
 // 5. Check Global 3D Flashcards Hub (#/cards) & verify 0 cross-track overlap (286 unique decks, 6051 unique cards)
 html = navigate('#/cards');
 assert(html.includes('Центр 3D Флеш-карточек'), '#/cards failed to render');
-assert(html.includes('Ф-001') && html.includes('Ф-141') && html.includes('Ф-171') && html.includes('Ф-186') && html.includes('Ф-230'), '#/cards missing Ф-001, Ф-141, Ф-171, Ф-186 or Ф-230 deck');
+assert(html.includes('Ф-001') && html.includes('Ф-141') && html.includes('Ф-171') && html.includes('Ф-186') && html.includes('Ф-238'), '#/cards missing Ф-001, Ф-141, Ф-171, Ф-186 or Ф-238 deck');
 assert(html.includes('2 181 карточка'), '#/cards missing accurate 2 181 flashcards count');
 const totalDeckCards = Object.values(sandbox.PY_MASTERY.decks).reduce((acc, d) => acc + d.cards.length, 0);
 assert(totalDeckCards === 2181, `Expected 2181 total cards in PY_MASTERY.decks, got ${totalDeckCards}`);

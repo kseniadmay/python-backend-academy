@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Стили Эшелона в одну строку слева — Python Backend Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700;800&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #11130e;
+    --surface-card: #181b13;
+    --ink: #eceddf;
+    --ink-soft: #9da18f;
+    --ink-muted: #6b6f5e;
+    --line: rgba(255, 255, 255, 0.08);
+    --font-d: 'Unbounded', sans-serif;
+    --font-b: 'Golos Text', sans-serif;
+    --font-m: 'JetBrains Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-b);
+    padding: 36px 20px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .page-title {
+    font-family: var(--font-d);
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    text-align: center;
+    color: var(--ink);
+  }
+  .page-sub {
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  .variants-container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    width: 100%;
+    max-width: 860px;
+  }
+  .variant-card {
+    background: var(--surface-card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 24px 28px 26px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    position: relative;
+  }
+  .variant-badge-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .variant-tag {
+    font-family: var(--font-m);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 6px;
+  }
+  .tag-1 { color: #34d399; background: rgba(52, 211, 153, 0.12); }
+  .tag-2 { color: #38bdf8; background: rgba(56, 189, 248, 0.12); }
+  .tag-3 { color: #f43f5e; background: rgba(244, 63, 94, 0.12); }
+  .variant-title-text {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--ink);
+    margin-left: 10px;
+  }
+  .variant-expl {
+    font-size: 0.80rem;
+    color: var(--ink-soft);
+  }
+
+  /* ВАРИАНТ 2 БАЗА: Стек темы и капсулы */
+  .v2-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .v2-unit-title {
+    font-family: var(--font-d);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .stage-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3.5px 12px 3.5px 5px;
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.32);
+    border-radius: 999px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.12);
+  }
+  .stage-step-num {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-family: var(--font-m);
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .stage-step-title {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #38bdf8;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ТОЧКИ РАДАРА */
+  .dots-necklace {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 0 6px;
+  }
+  .dot-jewel {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.16);
+    position: relative;
+    cursor: pointer;
+  }
+  .dot-jewel.active {
+    width: 9px;
+    height: 9px;
+    background: #ffffff;
+    box-shadow: 0 0 10px #ffffff, 0 0 20px rgba(255, 255, 255, 0.8), 0 0 32px rgba(16, 185, 129, 0.5);
+  }
+  .dots-stage-divider {
+    width: 1px;
+    height: 9px;
+    background: rgba(255, 255, 255, 0.18);
+    margin: 0 2px;
+  }
+  .dot-jewel.milestone {
+    transform: rotate(45deg);
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.22);
+  }
+
+  /* ========================================================
+     3 СТИЛЯ В ОДНУ СТРОКУ СЛЕВА (БЕЗ СМЕНЫ ПОЗИЦИИ)
+     ======================================================== */
+
+  /* СТИЛЬ 1: Кристальный контраст и шелковое свечение */
+  .echelon-box-s1 {
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.07);
+  }
+  .echelon-line-s1 {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 8px;
+  }
+  .s1-echelon {
+    font-family: var(--font-d);
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #fb7185;
+    letter-spacing: 0.03em;
+    text-shadow: 0 0 8px rgba(251, 113, 133, 0.55), 0 0 16px rgba(244, 63, 94, 0.3);
+  }
+  .s1-dot {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.8rem;
+  }
+  .s1-readiness {
+    font-size: 0.80rem;
+    font-weight: 500;
+    color: #34d399;
+    letter-spacing: 0.01em;
+    text-shadow: 0 0 8px rgba(52, 211, 153, 0.5), 0 0 16px rgba(16, 185, 129, 0.25);
+  }
+  .s1-track {
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.07);
+    position: relative;
+  }
+  .s1-fill {
+    height: 100%;
+    width: 35%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #be123c 0%, #059669 60%, #34d399 100%);
+    box-shadow: 0 0 8px rgba(52, 211, 153, 0.4);
+    position: relative;
+  }
+  .s1-fill::after {
+    content: '';
+    position: absolute;
+    right: -2px;
+    top: -2px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #34d399;
+    box-shadow: 0 0 8px #34d399, 0 0 14px rgba(52, 211, 153, 0.8);
+  }
+
+  /* СТИЛЬ 2: Микро-чип с деликатным бордовым тиснением */
+  .echelon-box-s2 {
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.07);
+  }
+  .echelon-line-s2 {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding: 3px 10px 3px 6px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+  }
+  .s2-echelon {
+    font-family: var(--font-d);
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: #f43f5e;
+    background: rgba(244, 63, 94, 0.14);
+    border: 1px solid rgba(244, 63, 94, 0.35);
+    padding: 1.5px 7px;
+    border-radius: 5px;
+    text-shadow: 0 0 6px rgba(244, 63, 94, 0.4);
+  }
+  .s2-readiness {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #34d399;
+    text-shadow: 0 0 6px rgba(52, 211, 153, 0.45);
+  }
+
+  /* СТИЛЬ 3: Акцент на цифре 35% (изумруд) при сохранении всей строки в одном тоне */
+  .echelon-box-s3 {
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.07);
+  }
+  .echelon-line-s3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .s3-echelon {
+    font-family: var(--font-d);
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #fb7185;
+    text-shadow: 0 0 10px rgba(244, 63, 94, 0.6);
+  }
+  .s3-dot {
+    color: rgba(255, 255, 255, 0.25);
+    font-size: 0.75rem;
+  }
+  .s3-readiness {
+    font-size: 0.80rem;
+    font-weight: 500;
+    color: #10b981;
+    text-shadow: 0 0 8px rgba(16, 185, 129, 0.55);
+  }
+  .s3-track {
+    height: 3px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .s3-fill {
+    height: 100%;
+    width: 35%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #be123c 0%, #10b981 100%);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+  }
+</style>
+</head>
+<body>
+
+  <h1 class="page-title">Эшелон в одну строку слева: 3 варианта полировки</h1>
+  <p class="page-sub">Позиция строго слева сохранена. Полировка шрифтов, свечения, разделителя и градиента шкалы.</p>
+
+  <div class="variants-container">
+
+    <!-- ВАРИАНТ 1 -->
+    <div class="variant-card">
+      <div class="variant-badge-row">
+        <div>
+          <span class="variant-tag tag-1">ВАРИАНТ 1 · ЖИВОЙ ИНДИКАТОР</span>
+          <span class="variant-title-text">Градиентный бордо-изумруд + светящаяся бусина на 35%</span>
+        </div>
+        <div class="variant-expl">Шелковое свечение без размытия, бегунок связывает прогресс со шкалой</div>
+      </div>
+
+      <div class="echelon-box-s1">
+        <div class="echelon-line-s1">
+          <span class="s1-echelon">Эшелон I</span>
+          <span class="s1-dot">·</span>
+          <span class="s1-readiness">35% готовности к скринингу</span>
+        </div>
+        <div class="s1-track"><div class="s1-fill"></div></div>
+      </div>
+
+      <div class="v2-stack">
+        <span class="v2-unit-title">Базовые коллекции и срезы</span>
+        <div class="stage-status-pill">
+          <span class="stage-step-num">1 / 12</span>
+          <span class="stage-step-title">📖 Конспект: Структуры данных</span>
+        </div>
+      </div>
+
+      <div class="dots-necklace">
+        <span class="dot-jewel active" title="Шаг 1"></span>
+        <span class="dot-jewel" title="Шаг 2"></span>
+        <span class="dot-jewel" title="Шаг 3"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel" title="Шаг 4"></span>
+        <span class="dot-jewel" title="Шаг 5"></span>
+        <span class="dot-jewel" title="Шаг 6"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel" title="Шаг 7"></span>
+        <span class="dot-jewel" title="Шаг 8"></span>
+        <span class="dot-jewel" title="Шаг 9"></span>
+        <span class="dot-jewel" title="Шаг 10"></span>
+        <span class="dot-jewel" title="Шаг 11"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel milestone" title="Зачёт"></span>
+      </div>
+    </div>
+
+
+    <!-- ВАРИАНТ 2 -->
+    <div class="variant-card">
+      <div class="variant-badge-row">
+        <div>
+          <span class="variant-tag tag-2">ВАРИАНТ 2 · МИКРО-ЧИП СТАТУСА</span>
+          <span class="variant-title-text">«ЭШЕЛОН I» в мини-рамке + мягкая подложка строки</span>
+        </div>
+        <div class="variant-expl">Придает строке статус инженерного прибора, защищает от цветового смешения</div>
+      </div>
+
+      <div class="echelon-box-s2">
+        <div class="echelon-line-s2">
+          <span class="s2-echelon">ЭШЕЛОН I</span>
+          <span class="s1-dot">·</span>
+          <span class="s2-readiness">35% готовности к скринингу</span>
+        </div>
+        <div class="s1-track"><div class="s1-fill"></div></div>
+      </div>
+
+      <div class="v2-stack">
+        <span class="v2-unit-title">Базовые коллекции и срезы</span>
+        <div class="stage-status-pill">
+          <span class="stage-step-num">1 / 12</span>
+          <span class="stage-step-title">📖 Конспект: Структуры данных</span>
+        </div>
+      </div>
+
+      <div class="dots-necklace">
+        <span class="dot-jewel active" title="Шаг 1"></span>
+        <span class="dot-jewel" title="Шаг 2"></span>
+        <span class="dot-jewel" title="Шаг 3"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel" title="Шаг 4"></span>
+        <span class="dot-jewel" title="Шаг 5"></span>
+        <span class="dot-jewel" title="Шаг 6"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel" title="Шаг 7"></span>
+        <span class="dot-jewel" title="Шаг 8"></span>
+        <span class="dot-jewel" title="Шаг 9"></span>
+        <span class="dot-jewel" title="Шаг 10"></span>
+        <span class="dot-jewel" title="Шаг 11"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel milestone" title="Зачёт"></span>
+      </div>
+    </div>
+
+
+    <!-- ВАРИАНТ 3 -->
+    <div class="variant-card">
+      <div class="variant-badge-row">
+        <div>
+          <span class="variant-tag tag-3">ВАРИАНТ 3 · МИНИМАЛИЗМ СВЕЧЕНИЯ</span>
+          <span class="variant-title-text">Утончённая шкала 3px + глубокий чистый изумруд</span>
+        </div>
+        <div class="variant-expl">Строгий минималистичный вид с равномерным свечением без лишних рамок</div>
+      </div>
+
+      <div class="echelon-box-s3">
+        <div class="echelon-line-s3">
+          <span class="s3-echelon">Эшелон I</span>
+          <span class="s3-dot">·</span>
+          <span class="s3-readiness">35% готовности к скринингу</span>
+        </div>
+        <div class="s3-track"><div class="s3-fill"></div></div>
+      </div>
+
+      <div class="v2-stack">
+        <span class="v2-unit-title">Базовые коллекции и срезы</span>
+        <div class="stage-status-pill">
+          <span class="stage-step-num">1 / 12</span>
+          <span class="stage-step-title">📖 Конспект: Структуры данных</span>
+        </div>
+      </div>
+
+      <div class="dots-necklace">
+        <span class="dot-jewel active" title="Шаг 1"></span>
+        <span class="dot-jewel" title="Шаг 2"></span>
+        <span class="dot-jewel" title="Шаг 3"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel" title="Шаг 4"></span>
+        <span class="dot-jewel" title="Шаг 5"></span>
+        <span class="dot-jewel" title="Шаг 6"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel" title="Шаг 7"></span>
+        <span class="dot-jewel" title="Шаг 8"></span>
+        <span class="dot-jewel" title="Шаг 9"></span>
+        <span class="dot-jewel" title="Шаг 10"></span>
+        <span class="dot-jewel" title="Шаг 11"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel milestone" title="Зачёт"></span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

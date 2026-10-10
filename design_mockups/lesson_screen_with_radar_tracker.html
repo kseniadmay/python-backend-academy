@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Тестовый экран урока: Радарный трекер (4.4 сек)</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06090e;
+    --surface: #0d131e;
+    --surface-elevated: #131c2b;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-subtle: rgba(255, 255, 255, 0.04);
+    --text-main: #f8fafc;
+    --text-soft: #94a3b8;
+    --text-muted: #64748b;
+    --emerald: #10b981;
+    --amber: #f59e0b;
+    --amber-soft: rgba(245, 158, 11, 0.15);
+    --v3-speed: 4.4s;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px 20px 60px;
+    background: var(--bg);
+    color: var(--text-main);
+    font-family: 'Golos Text', sans-serif;
+    display: flex;
+    justify-content: center;
+  }
+  .app-container {
+    width: 100%;
+    max-width: 860px;
+  }
+
+  /* Хлебные крошки и заголовок */
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .unit-badge {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-soft);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .unit-badge span {
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.12);
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+  .progress-stat {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ========================================================
+     РАДАРНЫЙ ТРЕКЕР (Amber Radar 4.4s — без надписей)
+     ======================================================== */
+  .radar-tracker-slot {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  .tracker-track {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+  }
+  .r-dot {
+    position: relative;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #111827;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.4, 1);
+  }
+  .r-dot:hover {
+    transform: scale(1.35);
+    border-color: rgba(255, 255, 255, 0.45);
+  }
+  .r-dot.done {
+    background: var(--emerald);
+    border-color: var(--emerald);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.85);
+  }
+  .r-dot.active {
+    background: var(--amber);
+    border-color: #fbbf24;
+    box-shadow: 0 0 16px var(--amber);
+    animation: radar-breathe var(--v3-speed, 4.4s) infinite ease-in-out;
+  }
+  .r-dot.active::before,
+  .r-dot.active::after {
+    content: '';
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 1.5px solid var(--amber);
+    pointer-events: none;
+    animation: radar-ripple var(--v3-speed, 4.4s) infinite cubic-bezier(0.2, 0.8, 0.4, 1);
+  }
+  .r-dot.active::after {
+    animation-delay: calc(var(--v3-speed, 4.4s) / 2);
+  }
+  .r-dot.final {
+    border-radius: 3px;
+    transform: rotate(45deg);
+    border-color: rgba(245, 158, 11, 0.4);
+  }
+  .r-dot.final:hover {
+    transform: rotate(45deg) scale(1.35);
+  }
+  @keyframes radar-breathe {
+    0%, 100% { box-shadow: 0 0 10px var(--amber), 0 0 18px rgba(245, 158, 11, 0.35); }
+    50% { box-shadow: 0 0 18px #fbbf24, 0 0 30px rgba(245, 158, 11, 0.7); }
+  }
+  @keyframes radar-ripple {
+    0% { width: 13px; height: 13px; opacity: 0.95; }
+    100% { width: 36px; height: 36px; opacity: 0; }
+  }
+
+  /* Карточка урока */
+  .lesson-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px 32px;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+  }
+  .lesson-eyebrow {
+    font-size: 0.82rem;
+    color: var(--amber);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .lesson-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+    margin: 0 0 20px;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+  }
+
+  /* Вкладки */
+  .tab-strip {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 12px;
+  }
+  .tab-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-muted);
+    font-size: 0.86rem;
+    font-weight: 600;
+    padding: 7px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Golos Text', sans-serif;
+    transition: all 0.2s ease;
+  }
+  .tab-btn:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .tab-btn.active {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  /* Содержимое теории */
+  .content-block {
+    line-height: 1.65;
+    color: #cbd5e1;
+    font-size: 0.95rem;
+  }
+  .content-block p {
+    margin: 0 0 16px;
+  }
+  .code-frame {
+    background: #080c14;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88rem;
+    margin: 18px 0;
+    color: #38bdf8;
+    overflow-x: auto;
+  }
+  .code-comment { color: #64748b; }
+  .code-kw { color: #f43f5e; }
+  .code-var { color: #f8fafc; }
+
+  /* Нижняя панель действий */
+  .footer-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-subtle);
+  }
+  .nav-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-size: 0.86rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .nav-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+  }
+  .primary-cta {
+    background: var(--amber);
+    color: #080c14;
+    border: none;
+    font-weight: 700;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+    transition: all 0.2s ease;
+  }
+  .primary-cta:hover {
+    background: #fbbf24;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
+  }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Верхняя панель -->
+  <div class="top-bar">
+    <div class="unit-badge">
+      <span>ЮНИТ 1.1</span> Базовый синтаксис Python
+    </div>
+    <div class="progress-stat" id="stat-text">3 из 13 тем (23%)</div>
+  </div>
+
+  <!-- РАДАРНЫЙ ТРЕКЕР БЕЗ НАДПИСЕЙ -->
+  <div class="radar-tracker-slot">
+    <div class="tracker-track" id="tracker-track">
+      <!-- 13 светящихся точек генерируются JS -->
+    </div>
+  </div>
+
+  <!-- КАРТОЧКА УРОКА -->
+  <div class="lesson-card">
+    <div class="lesson-eyebrow" id="eyebrow-text">Тема 3 из 13 · Индексация & Срезы</div>
+    <h1 class="lesson-title" id="lesson-title">K-003: Срезы в Python (slice)</h1>
+
+    <div class="tab-strip">
+      <button class="tab-btn active">📖 Теория</button>
+      <button class="tab-btn">⚡ Задачи практики (3)</button>
+      <button class="tab-btn">💻 Код-песочница</button>
+    </div>
+
+    <div class="content-block">
+      <p>Срез (синтаксис <code>lst[start:stop:step]</code>) позволяет извлекать подстроки и подсписки. В Python срез всегда создаёт <strong>новый объект — поверхностную копию (shallow copy)</strong> элементов, оставляя исходную коллекцию неизменной.</p>
+
+      <div class="code-frame">
+<span class="code-comment"># Пример базового среза</span>
+<span class="code-var">numbers</span> = [10, 20, 30, 40, 50]
+<span class="code-var">subset</span> = <span class="code-var">numbers</span>[1:4]   <span class="code-comment"># [20, 30, 40]</span>
+<span class="code-var">reversed_lst</span> = <span class="code-var">numbers</span>[::-1] <span class="code-comment"># [50, 40, 30, 20, 10]</span>
+      </div>
+
+      <p>Если шаг отрицательный, обход выполняется справа налево, а значения по умолчанию для <code>start</code> и <code>stop</code> меняются местами.</p>
+    </div>
+
+    <div class="footer-actions">
+      <button class="nav-btn" id="btn-prev">← Предыдущая тема</button>
+      <button class="primary-cta" id="btn-next">Перейти к практике (3 задачи) →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const topics = [
+    { num: 1, title: "K-001: Переменные и типы данных", group: "Основы синтаксиса" },
+    { num: 2, title: "K-002: Индексация последовательностей", group: "Индексация" },
+    { num: 3, title: "K-003: Срезы в Python (slice)", group: "Индексация & Срезы" },
+    { num: 4, title: "K-004: Множества set и frozenset", group: "Коллекции" },
+    { num: 5, title: "K-005: Словари dict и хеширование", group: "Коллекции" },
+    { num: 6, title: "K-006: Условные конструкции и match/case", group: "Управление потоком" },
+    { num: 7, title: "K-007: Циклы for, while и break/continue", group: "Циклы" },
+    { num: 8, title: "K-008: Функции def и аргументы *args/**kwargs", group: "Функции" },
+    { num: 9, title: "K-009: Области видимости LEGB", group: "Функции & Замыкания" },
+    { num: 10, title: "K-010: Лямбда-функции и map/filter", group: "Функции" },
+    { num: 11, title: "K-011: Списковые включения list comprehension", group: "Генераторы" },
+    { num: 12, title: "K-012: Обработка исключений try/except", group: "Исключения" },
+    { num: 13, title: "Аттестация: Рубежный тест Юнита 1.1", group: "Итоговый контроль" }
+  ];
+
+  let currentTopic = 3;
+  const track = document.getElementById('tracker-track');
+
+  function renderTrack() {
+    track.innerHTML = '';
+    topics.forEach((t, i) => {
+      const idx = i + 1;
+      const dot = document.createElement('div');
+      dot.className = 'r-dot';
+      dot.dataset.idx = idx;
+      dot.title = t.title;
+
+      if (idx < currentTopic) dot.classList.add('done');
+      if (idx === currentTopic) dot.classList.add('active');
+      if (idx === 13) dot.classList.add('final');
+
+      dot.addEventListener('click', () => {
+        setTopic(idx);
+      });
+      track.appendChild(dot);
+    });
+  }
+
+  function setTopic(idx) {
+    currentTopic = idx;
+    renderTrack();
+    const t = topics[idx - 1];
+    document.getElementById('lesson-title').textContent = t.title;
+    document.getElementById('eyebrow-text').textContent = `Тема ${idx} из 13 · ${t.group}`;
+    const pct = Math.round((idx / 13) * 100);
+    document.getElementById('stat-text').textContent = `${idx} из 13 тем (${pct}%)`;
+  }
+
+  document.getElementById('btn-prev').addEventListener('click', () => {
+    if (currentTopic > 1) setTopic(currentTopic - 1);
+  });
+  document.getElementById('btn-next').addEventListener('click', () => {
+    if (currentTopic < 13) setTopic(currentTopic + 1);
+  });
+
+  renderTrack();
+</script>
+
+</body>
+</html>

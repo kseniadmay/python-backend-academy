@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Варианты декомпозиции капсулы шага — Python Backend Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #11130e;
+    --surface-card: #181b13;
+    --ink: #eceddf;
+    --ink-soft: #9da18f;
+    --ink-muted: #6b6f5e;
+    --line: rgba(255, 255, 255, 0.08);
+    --font-d: 'Unbounded', sans-serif;
+    --font-b: 'Golos Text', sans-serif;
+    --font-m: 'JetBrains Mono', monospace;
+    --cards-purple: #c084fc;
+    --cards-purple-bg: rgba(192, 132, 252, 0.10);
+    --cards-purple-border: rgba(192, 132, 252, 0.32);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-b);
+    padding: 36px 20px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .page-title {
+    font-family: var(--font-d);
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    text-align: center;
+    color: var(--ink);
+  }
+  .page-sub {
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  .variants-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    width: 100%;
+    max-width: 860px;
+  }
+  .variant-card {
+    background: var(--surface-card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 24px 28px 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    position: relative;
+  }
+  .variant-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .variant-num {
+    font-family: var(--font-m);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 6px;
+    letter-spacing: 0.04em;
+  }
+  .v-tag-1 { color: #34d399; background: rgba(52, 211, 153, 0.12); }
+  .v-tag-2 { color: #c084fc; background: rgba(192, 132, 252, 0.12); }
+  .v-tag-3 { color: #38bdf8; background: rgba(56, 189, 248, 0.12); }
+  .v-tag-4 { color: #fbbf24; background: rgba(251, 191, 36, 0.12); }
+
+  .variant-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--ink);
+    margin-left: 10px;
+  }
+  .variant-desc {
+    font-size: 0.80rem;
+    color: var(--ink-soft);
+  }
+
+  /* ШАПКА ЭШЕЛОНА (УТВЕРЖДЕННЫЙ ВИД) */
+  .echelon-box-fixed {
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.07);
+  }
+  .echelon-meta-fixed {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    margin-bottom: 6px;
+  }
+  .echelon-bordeaux {
+    color: #be123c;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    text-shadow: 0 0 5px rgba(190, 18, 60, 0.5);
+  }
+  .echelon-emerald {
+    color: #34d399;
+    font-weight: 600;
+    text-shadow: 0 0 5px rgba(52, 211, 153, 0.45);
+  }
+  .echelon-track {
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+  .echelon-fill {
+    height: 100%;
+    width: 35%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #6b1d2f 0%, #be123c 35%, #059669 75%, #10b981 100%);
+  }
+
+  /* ЗАГОЛОВОК ЮНИТА */
+  .unit-title-fixed {
+    font-family: var(--font-d);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 9px;
+  }
+
+  /* ТОЧКИ РАДАРА */
+  .dots-necklace {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 16px 0 4px;
+  }
+  .dot-jewel {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.16);
+    position: relative;
+    cursor: pointer;
+  }
+  .dot-jewel.done {
+    background: #10b981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+  }
+  .dot-jewel.active {
+    width: 9px;
+    height: 9px;
+    background: #ffffff;
+    box-shadow: 0 0 10px #ffffff, 0 0 20px rgba(255, 255, 255, 0.8), 0 0 32px rgba(192, 132, 252, 0.5);
+  }
+  .dots-stage-divider {
+    width: 1px;
+    height: 9px;
+    background: rgba(255, 255, 255, 0.18);
+    margin: 0 2px;
+  }
+  .dot-jewel.milestone {
+    transform: rotate(45deg);
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.22);
+  }
+
+  /* ========================================================
+     ВАРИАНТЫ ДЕКОМПОЗИЦИИ КАПСУЛЫ
+     ======================================================== */
+
+  /* ВАРИАНТ 1: Модульные чипы (Раздельные бейджи) */
+  .opt1-wrap {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex-wrap: wrap;
+  }
+  .opt1-step-chip {
+    font-family: var(--font-m);
+    font-size: 0.70rem;
+    font-weight: 700;
+    color: var(--ink);
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.02em;
+  }
+  .opt1-type-chip {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--cards-purple);
+    background: var(--cards-purple-bg);
+    border: 1px solid var(--cards-purple-border);
+    padding: 3px 9px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    letter-spacing: 0.02em;
+  }
+  .opt1-topic-name {
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* ВАРИАНТ 2: Иерархический микро-стек */
+  .opt2-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .opt2-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font-m);
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--cards-purple);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .opt2-eyebrow-step {
+    color: var(--ink-soft);
+  }
+  .opt2-topic-title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  /* ВАРИАНТ 3: Сегментированная капсула (Sleek Segmented Pill) */
+  .opt3-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 12px 3px 6px;
+    background: var(--cards-purple-bg);
+    border: 1px solid var(--cards-purple-border);
+    border-radius: 999px;
+    box-shadow: 0 0 14px rgba(192, 132, 252, 0.14);
+    gap: 8px;
+  }
+  .opt3-num {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    font-family: var(--font-m);
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--ink);
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
+  .opt3-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--cards-purple);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .opt3-sep {
+    color: rgba(255, 255, 255, 0.2);
+    font-weight: 300;
+    font-size: 0.75rem;
+  }
+  .opt3-topic {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* ВАРИАНТ 4: Воздушный инлайн-хлебные крошки (Без капсулы) */
+  .opt4-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+  }
+  .opt4-counter {
+    font-family: var(--font-m);
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--ink);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2px 7px;
+    border-radius: 5px;
+  }
+  .opt4-format {
+    color: var(--cards-purple);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .opt4-arrow {
+    color: rgba(255, 255, 255, 0.25);
+    font-size: 0.75rem;
+  }
+  .opt4-title {
+    color: var(--ink);
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+  <h1 class="page-title">Варианты декомпозиции статуса шага</h1>
+  <p class="page-sub">Как разобрать монолитную капсулу «[4 / 12] 🗂️ Карточки: Синтаксис и индексы» на более чистые компоненты</p>
+
+  <div class="variants-container">
+
+    <!-- ВАРИАНТ 1 -->
+    <div class="variant-card">
+      <div class="variant-header">
+        <div>
+          <span class="variant-num v-tag-1">ВАРИАНТ 1</span>
+          <span class="variant-name">Модульные чипы</span>
+        </div>
+        <div class="variant-desc">Чип шага + цветной бейдж формата + чистое название темы</div>
+      </div>
+
+      <div class="echelon-box-fixed">
+        <div class="echelon-meta-fixed">
+          <span class="echelon-bordeaux">Эшелон 1</span>
+          <span style="color:var(--ink-muted);font-weight:400;opacity:0.6;">·</span>
+          <span class="echelon-emerald">35% готовности к скринингу</span>
+        </div>
+        <div class="echelon-track"><div class="echelon-fill"></div></div>
+      </div>
+
+      <div class="unit-title-fixed">Базовые коллекции и срезы</div>
+
+      <!-- Декомпозиция Вариант 1 -->
+      <div class="opt1-wrap">
+        <span class="opt1-step-chip">4 / 12</span>
+        <span class="opt1-type-chip">🗂️ КАРТОЧКИ</span>
+        <span class="opt1-topic-name">Синтаксис и индексы</span>
+      </div>
+
+      <div class="dots-necklace">
+        <span class="dot-jewel done" title="Шаг 1"></span>
+        <span class="dot-jewel done" title="Шаг 2"></span>
+        <span class="dot-jewel done" title="Шаг 3"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel active" title="Шаг 4"></span>
+        <span class="dot-jewel" title="Шаг 5"></span>
+        <span class="dot-jewel" title="Шаг 6"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel" title="Шаг 7"></span>
+        <span class="dot-jewel" title="Шаг 8"></span>
+        <span class="dot-jewel" title="Шаг 9"></span>
+        <span class="dot-jewel" title="Шаг 10"></span>
+        <span class="dot-jewel" title="Шаг 11"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel milestone" title="Зачёт"></span>
+      </div>
+    </div>
+
+
+    <!-- ВАРИАНТ 2 -->
+    <div class="variant-card">
+      <div class="variant-header">
+        <div>
+          <span class="variant-num v-tag-2">ВАРИАНТ 2</span>
+          <span class="variant-name">Иерархический микро-стек</span>
+        </div>
+        <div class="variant-desc">Сверху надпись «Шаг 4 из 12 · Карточки», снизу чистое имя активности</div>
+      </div>
+
+      <div class="echelon-box-fixed">
+        <div class="echelon-meta-fixed">
+          <span class="echelon-bordeaux">Эшелон 1</span>
+          <span style="color:var(--ink-muted);font-weight:400;opacity:0.6;">·</span>
+          <span class="echelon-emerald">35% готовности к скринингу</span>
+        </div>
+        <div class="echelon-track"><div class="echelon-fill"></div></div>
+      </div>
+
+      <div class="unit-title-fixed">Базовые коллекции и срезы</div>
+
+      <!-- Декомпозиция Вариант 2 -->
+      <div class="opt2-wrap">
+        <div class="opt2-eyebrow">
+          <span class="opt2-eyebrow-step">ШАГ 4 ИЗ 12</span>
+          <span style="opacity:0.4;">·</span>
+          <span>КАРТОЧКИ</span>
+        </div>
+        <div class="opt2-topic-title">
+          <span>🗂️</span>
+          <span>Синтаксис и индексы</span>
+        </div>
+      </div>
+
+      <div class="dots-necklace">
+        <span class="dot-jewel done" title="Шаг 1"></span>
+        <span class="dot-jewel done" title="Шаг 2"></span>
+        <span class="dot-jewel done" title="Шаг 3"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel active" title="Шаг 4"></span>
+        <span class="dot-jewel" title="Шаг 5"></span>
+        <span class="dot-jewel" title="Шаг 6"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel" title="Шаг 7"></span>
+        <span class="dot-jewel" title="Шаг 8"></span>
+        <span class="dot-jewel" title="Шаг 9"></span>
+        <span class="dot-jewel" title="Шаг 10"></span>
+        <span class="dot-jewel" title="Шаг 11"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel milestone" title="Зачёт"></span>
+      </div>
+    </div>
+
+
+    <!-- ВАРИАНТ 3 -->
+    <div class="variant-card">
+      <div class="variant-header">
+        <div>
+          <span class="variant-num v-tag-3">ВАРИАНТ 3</span>
+          <span class="variant-name">Сегментированная капсула</span>
+        </div>
+        <div class="variant-desc">Номер шага, тег типа и название темы разделены легкими вертикальными чертами</div>
+      </div>
+
+      <div class="echelon-box-fixed">
+        <div class="echelon-meta-fixed">
+          <span class="echelon-bordeaux">Эшелон 1</span>
+          <span style="color:var(--ink-muted);font-weight:400;opacity:0.6;">·</span>
+          <span class="echelon-emerald">35% готовности к скринингу</span>
+        </div>
+        <div class="echelon-track"><div class="echelon-fill"></div></div>
+      </div>
+
+      <div class="unit-title-fixed">Базовые коллекции и срезы</div>
+
+      <!-- Декомпозиция Вариант 3 -->
+      <div>
+        <div class="opt3-pill">
+          <span class="opt3-num">4 / 12</span>
+          <span class="opt3-badge">🗂️ КАРТОЧКИ</span>
+          <span class="opt3-sep">│</span>
+          <span class="opt3-topic">Синтаксис и индексы</span>
+        </div>
+      </div>
+
+      <div class="dots-necklace">
+        <span class="dot-jewel done" title="Шаг 1"></span>
+        <span class="dot-jewel done" title="Шаг 2"></span>
+        <span class="dot-jewel done" title="Шаг 3"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel active" title="Шаг 4"></span>
+        <span class="dot-jewel" title="Шаг 5"></span>
+        <span class="dot-jewel" title="Шаг 6"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel" title="Шаг 7"></span>
+        <span class="dot-jewel" title="Шаг 8"></span>
+        <span class="dot-jewel" title="Шаг 9"></span>
+        <span class="dot-jewel" title="Шаг 10"></span>
+        <span class="dot-jewel" title="Шаг 11"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel milestone" title="Зачёт"></span>
+      </div>
+    </div>
+
+
+    <!-- ВАРИАНТ 4 -->
+    <div class="variant-card">
+      <div class="variant-header">
+        <div>
+          <span class="variant-num v-tag-4">ВАРИАНТ 4</span>
+          <span class="variant-name">Воздушный инлайн-поток</span>
+        </div>
+        <div class="variant-desc">Без замкнутой капсулы: микро-бейдж шага со стрелкой-навигатором</div>
+      </div>
+
+      <div class="echelon-box-fixed">
+        <div class="echelon-meta-fixed">
+          <span class="echelon-bordeaux">Эшелон 1</span>
+          <span style="color:var(--ink-muted);font-weight:400;opacity:0.6;">·</span>
+          <span class="echelon-emerald">35% готовности к скринингу</span>
+        </div>
+        <div class="echelon-track"><div class="echelon-fill"></div></div>
+      </div>
+
+      <div class="unit-title-fixed">Базовые коллекции и срезы</div>
+
+      <!-- Декомпозиция Вариант 4 -->
+      <div class="opt4-wrap">
+        <span class="opt4-counter">4 / 12</span>
+        <span class="opt4-format">🗂️ Карточки</span>
+        <span class="opt4-arrow">→</span>
+        <span class="opt4-title">Синтаксис и индексы</span>
+      </div>
+
+      <div class="dots-necklace">
+        <span class="dot-jewel done" title="Шаг 1"></span>
+        <span class="dot-jewel done" title="Шаг 2"></span>
+        <span class="dot-jewel done" title="Шаг 3"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel active" title="Шаг 4"></span>
+        <span class="dot-jewel" title="Шаг 5"></span>
+        <span class="dot-jewel" title="Шаг 6"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel" title="Шаг 7"></span>
+        <span class="dot-jewel" title="Шаг 8"></span>
+        <span class="dot-jewel" title="Шаг 9"></span>
+        <span class="dot-jewel" title="Шаг 10"></span>
+        <span class="dot-jewel" title="Шаг 11"></span>
+        <span class="dots-stage-divider"></span>
+        <span class="dot-jewel milestone" title="Зачёт"></span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
