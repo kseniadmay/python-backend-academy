@@ -8862,7 +8862,7 @@ function viewPythonSkill(sid){
     const n = ALL_NOTES_COMBINED[kId] || { title: kId };
     const isDone = state.readNotes.includes(kId);
     const isActive = (pySkillViewState.tab === 'theory' && kId === activeK);
-    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="📖 Конспект: ${escapeHtmlStr(n.title)}" data-py-select-k="${kId}" data-py-skill-id="${sk.id}"></span>`;
+    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" data-py-select-k="${kId}" data-py-skill-id="${sk.id}"></span>`;
   }).join('');
 
   // 2. Флеш-карточки текущего навыка
@@ -8871,7 +8871,7 @@ function viewPythonSkill(sid){
     const d = ALL_DECKS_COMBINED[fid] || {};
     const isDone = state.reviewedDecks.includes(fid);
     const isActive = (pySkillViewState.tab === 'cards' && (activeF === fid || (!activeF && idx === 0)));
-    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="🗂️ Карточки: ${escapeHtmlStr(d.title || fid)}" data-py-select-f="${fid}"></span>`;
+    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" data-py-select-f="${fid}"></span>`;
   }).join('');
 
   // 3. Задачи практики кода текущего навыка
@@ -8881,21 +8881,21 @@ function viewPythonSkill(sid){
     const t = IDE_TASKS_BY_ID[tid] || {};
     const isDone = (solvedMap[tid] === 'solved');
     const isActive = (pySkillViewState.tab === 'code' && (activeTid === tid || (!activeTid && idx === 0)));
-    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="⚡ Задача #${tid}: ${escapeHtmlStr(t.title || '')}" data-py-select-task="${tid}"></span>`;
+    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" data-py-select-task="${tid}"></span>`;
   }).join('');
 
   // 4. Рубежный зачёт Юнита
   const examActive = (pySkillViewState.tab === 'exam');
-  const examDot = `<span class="dot-jewel milestone ${examActive ? 'active' : ''}" title="👑 Рубежный зачёт Юнита ${sk.unitId}" data-py-select-exam="${sk.unitId}"></span>`;
+  const examDot = `<span class="dot-jewel milestone ${examActive ? 'active' : ''}" data-py-select-exam="${sk.unitId}"></span>`;
 
   const dotsNecklaceHTML = `
-    <div class="dots-necklace" id="radar-dots-necklace" title="Конспекты → Карточки → Практика → Зачёт">
+    <div class="dots-necklace" id="radar-dots-necklace">
       ${noteDots}
-      <span class="dots-stage-divider" title="Переход к карточкам"></span>
+      <span class="dots-stage-divider"></span>
       ${cardDots}
-      <span class="dots-stage-divider" title="Переход к практике"></span>
+      <span class="dots-stage-divider"></span>
       ${taskDots}
-      <span class="dots-stage-divider" title="Рубежный зачёт"></span>
+      <span class="dots-stage-divider"></span>
       ${examDot}
     </div>`;
 
