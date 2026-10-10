@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Интерактивные примеры редизайна нити тем (Варианты А, Б, В)</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700;800&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #090d13;
+    --surface: #121721;
+    --surface-2: #18202d;
+    --ink: #f8fafc;
+    --ink-soft: #94a3b8;
+    --ink-muted: #64748b;
+    --line: rgba(255, 255, 255, 0.10);
+    --moss: #10b981;
+    --moss-soft: rgba(16, 185, 129, 0.14);
+    --amber: #f59e0b;
+    --font-d: 'Unbounded', sans-serif;
+    --font-b: 'Golos Text', sans-serif;
+    --font-m: 'JetBrains Mono', monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px 24px 80px;
+    background: #070a0f; color: var(--ink);
+    font-family: var(--font-b);
+    max-width: 960px; margin: 0 auto;
+  }
+  .page-header {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .page-header h1 {
+    font-family: var(--font-d);
+    font-size: 1.45rem;
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
+  }
+  .page-header p {
+    color: var(--ink-soft);
+    font-size: 0.90rem;
+    margin: 0;
+    line-height: 1.5;
+  }
+  .interactive-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    color: #38bdf8;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin-top: 12px;
+  }
+  .variant-section {
+    background: #0f141d;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 24px 26px;
+    margin-bottom: 32px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  }
+  .variant-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+  .badge-a { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+  .badge-b { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+  .badge-c { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+
+  .variant-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0 0 6px;
+    color: #f8fafc;
+  }
+  .variant-desc {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    margin-bottom: 20px;
+    line-height: 1.45;
+  }
+  
+  /* ================== ВАРИАНТ А: ВСТРОЕННАЯ ШАПКА КАРТОЧКИ ================== */
+  .card-integrated {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+  .card-head-integrated {
+    background: rgba(255, 255, 255, 0.025);
+    border-bottom: 1px solid var(--line);
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .card-body-integrated {
+    padding: 22px 24px;
+  }
+
+  .dots-necklace {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    position: relative;
+    padding: 4px 6px;
+    user-select: none;
+  }
+  .dots-necklace-wire {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 1.5px;
+    background: rgba(255, 255, 255, 0.12);
+    z-index: 1;
+    pointer-events: none;
+  }
+  .dots-necklace-wire-active {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 1.5px;
+    background: #10b981;
+    box-shadow: 0 0 6px #10b981;
+    z-index: 2;
+    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+  .dot-jewel {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #0d1016;
+    border: 1.5px solid rgba(255, 255, 255, 0.20);
+    position: relative;
+    z-index: 3;
+    flex-shrink: 0;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  .dot-jewel:hover {
+    transform: scale(1.4);
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+  .dot-jewel.done {
+    background: #10b981;
+    border-color: #34d399;
+    box-shadow: 0 0 7px rgba(16, 185, 129, 0.75);
+  }
+  .dot-jewel.active {
+    width: 14px;
+    height: 14px;
+    margin: -2px;
+    background: #34d399;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 10px #10b981, 0 0 20px rgba(52, 211, 153, 0.85);
+    animation: jewel-pulse 2.2s infinite ease-in-out;
+  }
+  .dot-jewel.milestone {
+    border-color: rgba(245, 158, 11, 0.75);
+    background: rgba(245, 158, 11, 0.15);
+  }
+  @keyframes jewel-pulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 10px #10b981, 0 0 18px rgba(16, 185, 129, 0.65);
+    }
+    50% {
+      transform: scale(1.15);
+      box-shadow: 0 0 16px #34d399, 0 0 28px rgba(52, 211, 153, 0.95);
+    }
+  }
+
+  /* ================== ВАРИАНТ Б: ГОРИЗОНТАЛЬНАЯ ЛЕНТА ЧИПОВ ================== */
+  .chips-track {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 6px 2px 10px;
+    user-select: none;
+    scrollbar-width: thin;
+  }
+  .chip-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 0.80rem;
+    font-weight: 600;
+    white-space: nowrap;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .chip-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--ink);
+  }
+  .chip-item.done {
+    border-color: rgba(16, 185, 129, 0.35);
+    background: rgba(16, 185, 129, 0.10);
+    color: #34d399;
+  }
+  .chip-item.active {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.22);
+    color: #ffffff;
+    font-weight: 700;
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.35);
+  }
+  .chip-item.milestone {
+    border-color: rgba(245, 158, 11, 0.45);
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.08);
+  }
+
+  /* ================== ВАРИАНТ В: BREADCRUMB + ВЫПАДАЮЩИЙ СПИСОК ================== */
+  .dropdown-breadcrumb-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 18px;
+    position: relative;
+    user-select: none;
+  }
+  .dropdown-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--line);
+    padding: 7px 14px;
+    border-radius: 10px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--ink);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .dropdown-trigger:hover {
+    background: rgba(255, 255, 255, 0.10);
+  }
+  .segmented-bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 240px;
+  }
+  .segment {
+    flex: 1;
+    height: 7px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .segment:hover {
+    transform: scaleY(1.3);
+  }
+  .segment.done {
+    background: #10b981;
+  }
+  .segment.active {
+    background: #34d399;
+    box-shadow: 0 0 8px #10b981;
+  }
+  .segment.milestone {
+    background: #f59e0b;
+  }
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 12px;
+    width: 380px;
+    max-height: 320px;
+    overflow-y: auto;
+    background: #141a24;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 14px;
+    padding: 6px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+    z-index: 100;
+  }
+  .dropdown-menu.open {
+    display: block;
+  }
+  .menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+  }
+  .menu-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--ink);
+  }
+  .menu-item.active {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+  <div class="page-header">
+    <h1>Тестовые интерактивные примеры редизайна (Юнит 1.1)</h1>
+    <p>Каждый вариант ниже полностью кликабелен. Попробуйте нажимать на точки, чипы и оглавление, чтобы оценить эргономику и физику каждого подхода прямо в браузере.</p>
+    <div class="interactive-hint">💡 Все компоненты живые: кликайте по темам для переключения!</div>
+  </div>
+
+  <!-- ================== ВАРИАНТ А ================== -->
+  <div class="variant-section">
+    <span class="variant-badge badge-a">Вариант А</span>
+    <h2 class="variant-title">Встроенная шапка карточки урока (Unified Card Shell)</h2>
+    <div class="variant-desc">Нить точек и заголовок юнита монолитно встроены в шапку самой карточки. Нет лишних пустых полос над уроком. Кликните по любой точке:</div>
+    
+    <div class="card-integrated">
+      <div class="card-head-integrated">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-weight:700;font-size:0.86rem;color:#f8fafc;">Юнит 1.1: Базовый синтаксис</span>
+          <span style="color:var(--line);">•</span>
+          <span id="va-badge" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.32);color:#34d399;padding:2px 9px;border-radius:999px;font-size:0.72rem;font-weight:700;">Тема 3 из 13</span>
+        </div>
+        <div class="dots-necklace" id="va-track">
+          <div class="dots-necklace-wire" style="width:228px;"></div>
+          <div class="dots-necklace-wire-active" id="va-wire" style="width:38px;"></div>
+          <span class="dot-jewel done" data-idx="0" title="1. К-001 Память"></span>
+          <span class="dot-jewel done" data-idx="1" title="2. К-002 Индексы"></span>
+          <span class="dot-jewel active" data-idx="2" title="3. К-003 Срезы"></span>
+          <span class="dot-jewel" data-idx="3" title="4. К-004 frozenset"></span>
+          <span class="dot-jewel" data-idx="4" title="5. К-005 Аргументы"></span>
+          <span class="dot-jewel" data-idx="5" title="6. К-006 Методы dict"></span>
+          <span class="dot-jewel" data-idx="6" title="7. К-007 Методы list"></span>
+          <span class="dot-jewel" data-idx="7" title="8. К-008 namedtuple"></span>
+          <span class="dot-jewel" data-idx="8" title="9. К-009 deque, Counter"></span>
+          <span class="dot-jewel" data-idx="9" title="10. К-010 Присваивание"></span>
+          <span class="dot-jewel" data-idx="10" title="11. К-011 Файлы"></span>
+          <span class="dot-jewel" data-idx="11" title="12. К-012 zip, id"></span>
+          <span class="dot-jewel milestone" data-idx="12" title="13. Рубежный тест 1.1 👑"></span>
+          <span id="va-label" style="font-size:0.75rem;font-family:var(--font-m);font-weight:700;color:var(--moss);margin-left:4px;">3/13</span>
+        </div>
+      </div>
+      <div class="card-body-integrated">
+        <h3 id="va-title" style="margin:0 0 8px;font-size:1.30rem;font-weight:700;color:#f8fafc;">Срез – это всегда копия (Тема 3)</h3>
+        <p id="va-desc" style="color:var(--ink-soft);font-size:0.92rem;line-height:1.6;margin:0;">Важное отличие от обращения по индексу: lst[i] возвращает сам элемент, а lst[i:j] – новый объект, поверхностную копию (shallow copy)...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== ВАРИАНТ Б ================== -->
+  <div class="variant-section">
+    <span class="variant-badge badge-b">Вариант Б</span>
+    <h2 class="variant-title">Лента чипов с названиями тем (Topic Story Pills)</h2>
+    <div class="variant-desc">Вместо анонимных точек — реальные названия тем. Сразу видно, что изучено и что дальше. Кликните по любому чипу:</div>
+    
+    <div style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-weight:700;font-size:0.86rem;color:#f8fafc;">Юнит 1.1: Базовый синтаксис</span>
+      <span id="vb-counter" style="font-size:0.75rem;font-family:var(--font-m);font-weight:700;color:var(--moss);">Прогресс: 3 из 13 тем</span>
+    </div>
+    <div class="chips-track" id="vb-track">
+      <div class="chip-item done" data-idx="0">✓ 1. Память</div>
+      <div class="chip-item done" data-idx="1">✓ 2. Индексы</div>
+      <div class="chip-item active" data-idx="2">🟢 3. Срезы (Сейчас)</div>
+      <div class="chip-item" data-idx="3">4. frozenset</div>
+      <div class="chip-item" data-idx="4">5. Dict methods</div>
+      <div class="chip-item" data-idx="5">6. List methods</div>
+      <div class="chip-item" data-idx="6">7. namedtuple</div>
+      <div class="chip-item" data-idx="7">8. deque</div>
+      <div class="chip-item milestone" data-idx="12">👑 13. Тест 1.1</div>
+    </div>
+    <div style="margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 20px;">
+      <h4 id="vb-title" style="margin:0 0 6px;color:#f8fafc;font-size:1.05rem;">Текущая выбранная тема: 3. Срезы в Python</h4>
+      <p id="vb-desc" style="margin:0;color:var(--ink-soft);font-size:0.86rem;">Изучение синтаксиса срезов list[start:stop:step] и shallow copy.</p>
+    </div>
+  </div>
+
+  <!-- ================== ВАРИАНТ В ================== -->
+  <div class="variant-section">
+    <span class="variant-badge badge-c">Вариант В</span>
+    <h2 class="variant-title">Оглавление юнита + Сегментированный трекер (Menu & Segments)</h2>
+    <div class="variant-desc">Лаконичный заголовок с кнопкой «▾ Все 13 тем» (кликните, чтобы открыть выпадающий список) и плоский штриховой трекер Apple/Linear:</div>
+    
+    <div class="dropdown-breadcrumb-bar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="color:var(--ink-muted);font-size:0.82rem;font-weight:600;">Юнит 1.1</span>
+        <button class="dropdown-trigger" id="vc-trigger">
+          <span id="vc-btn-label">📖 Тема 3 из 13: Срезы в Python</span>
+          <span style="color:#38bdf8;font-size:0.74rem;">▾ Все 13 тем</span>
+        </button>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="segmented-bar" id="vc-bar">
+          <div class="segment done" data-idx="0"></div>
+          <div class="segment done" data-idx="1"></div>
+          <div class="segment active" data-idx="2"></div>
+          <div class="segment" data-idx="3"></div>
+          <div class="segment" data-idx="4"></div>
+          <div class="segment" data-idx="5"></div>
+          <div class="segment" data-idx="6"></div>
+          <div class="segment" data-idx="7"></div>
+          <div class="segment" data-idx="8"></div>
+          <div class="segment" data-idx="9"></div>
+          <div class="segment" data-idx="10"></div>
+          <div class="segment" data-idx="11"></div>
+          <div class="segment milestone" data-idx="12"></div>
+        </div>
+        <span id="vc-label" style="font-size:0.75rem;font-family:var(--font-m);font-weight:700;color:var(--moss);">3/13</span>
+      </div>
+
+      <!-- Выпадающее меню -->
+      <div class="dropdown-menu" id="vc-menu">
+        <div class="menu-item" data-idx="0"><span>1. К-001 Память и структуры данных</span><span style="color:#34d399;">✓ Пройдено</span></div>
+        <div class="menu-item" data-idx="1"><span>2. К-002 Индексация list vs tuple</span><span style="color:#34d399;">✓ Пройдено</span></div>
+        <div class="menu-item active" data-idx="2"><span>3. К-003 Срезы [start:stop:step]</span><span style="color:#38bdf8;">🟢 Сейчас</span></div>
+        <div class="menu-item" data-idx="3"><span>4. К-004 frozenset и хэширование</span><span style="color:var(--ink-muted);">Не начато</span></div>
+        <div class="menu-item" data-idx="4"><span>5. К-005 Передача аргументов</span><span style="color:var(--ink-muted);">Не начато</span></div>
+        <div class="menu-item" data-idx="5"><span>6. К-006 Методы dict (get, setdefault)</span><span style="color:var(--ink-muted);">Не начато</span></div>
+        <div class="menu-item" data-idx="6"><span>7. К-007 Методы list и сложность</span><span style="color:var(--ink-muted);">Не начато</span></div>
+        <div class="menu-item" data-idx="12"><span>13. Рубежный тест 1.1 👑</span><span style="color:#f59e0b;">Рубеж</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const topics = [
+      { id: 'К-001', title: 'Память и структуры данных: list, dict, set', desc: 'Устройство объектов в CPython, overhead и ссылки.' },
+      { id: 'К-002', title: 'list vs tuple: когда что выбрать', desc: 'Мутабельность, оптимизация памяти, tuple как ключ dict.' },
+      { id: 'К-003', title: 'Срезы: [start:stop:step] и shallow copy', desc: 'Срез возвращает новый объект. Изменение среза не затрагивает оригинал.' },
+      { id: 'К-004', title: 'frozenset: неизменяемое множество', desc: 'Хэшируемость множеств, использование в качестве ключей dict.' },
+      { id: 'К-005', title: 'Передача аргументов: pass by object reference', desc: 'Мутабельные дефолтные аргументы def f(x=[]).' },
+      { id: 'К-006', title: 'Методы словаря dict', desc: 'get, setdefault, pop, update и время доступа O(1).' },
+      { id: 'К-007', title: 'Методы списка list', desc: 'append vs extend vs insert(0), амортизированное время.' },
+      { id: 'К-008', title: 'namedtuple из collections', desc: 'Легковесные структуры данных с доступом по имени.' },
+      { id: 'К-009', title: 'deque и Counter', desc: 'Очередь с O(1) добавлением с обоих концов и подсчёт частот.' },
+      { id: 'К-010', title: 'Присваивание и копирование', desc: 'a = b vs copy() vs deepcopy().' },
+      { id: 'К-011', title: 'Файловый ввод-вывод with open', desc: 'Контекстные менеджеры и буферизация.' },
+      { id: 'К-012', title: 'Встроенные функции: zip, enumerate, id', desc: 'Итераторы и проверка идентичности.' },
+      { id: 'ТЕСТ-1', title: 'Рубежный тест 1.1 👑', desc: 'Комплексный тест проверки мастерства юнита 1.1.' }
+    ];
+
+    // Интерактивность Варианта А
+    const vaTrack = document.getElementById('va-track');
+    const vaDots = vaTrack.querySelectorAll('.dot-jewel');
+    const vaWire = document.getElementById('va-wire');
+    const vaBadge = document.getElementById('va-badge');
+    const vaLabel = document.getElementById('va-label');
+    const vaTitle = document.getElementById('va-title');
+    const vaDesc = document.getElementById('va-desc');
+
+    vaDots.forEach((dot) => {
+      dot.addEventListener('click', () => {
+        const idx = parseInt(dot.getAttribute('data-idx'), 10);
+        vaDots.forEach((d, i) => {
+          d.classList.remove('active');
+          if (i < idx) d.classList.add('done');
+          else if (i > idx) d.classList.remove('done');
+        });
+        dot.classList.add('active');
+        vaWire.style.width = (idx * 19) + 'px';
+        vaBadge.textContent = `Тема ${idx + 1} из 13`;
+        vaLabel.textContent = `${idx + 1}/13`;
+        vaTitle.textContent = `${topics[idx].title} (Тема ${idx + 1})`;
+        vaDesc.textContent = topics[idx].desc;
+      });
+    });
+
+    // Интерактивность Варианта Б
+    const vbTrack = document.getElementById('vb-track');
+    const vbChips = vbTrack.querySelectorAll('.chip-item');
+    const vbCounter = document.getElementById('vb-counter');
+    const vbTitle = document.getElementById('vb-title');
+    const vbDesc = document.getElementById('vb-desc');
+
+    vbChips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const idx = parseInt(chip.getAttribute('data-idx'), 10);
+        vbChips.forEach((c) => c.classList.remove('active'));
+        chip.classList.add('active');
+        vbCounter.textContent = `Прогресс: ${idx + 1} из 13 тем`;
+        vbTitle.textContent = `Выбрано: ${topics[idx].title}`;
+        vbDesc.textContent = topics[idx].desc;
+      });
+    });
+
+    // Интерактивность Варианта В
+    const vcTrigger = document.getElementById('vc-trigger');
+    const vcMenu = document.getElementById('vc-menu');
+    const vcBtnLabel = document.getElementById('vc-btn-label');
+    const vcSegments = document.querySelectorAll('#vc-bar .segment');
+    const vcLabel = document.getElementById('vc-label');
+
+    vcTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      vcMenu.classList.toggle('open');
+    });
+
+    document.addEventListener('click', () => {
+      vcMenu.classList.remove('open');
+    });
+
+    document.querySelectorAll('#vc-menu .menu-item').forEach((item) => {
+      item.addEventListener('click', () => {
+        const idx = parseInt(item.getAttribute('data-idx'), 10);
+        document.querySelectorAll('#vc-menu .menu-item').forEach(m => m.classList.remove('active'));
+        item.classList.add('active');
+        vcBtnLabel.textContent = `📖 Тема ${idx + 1} из 13: ${topics[idx].title}`;
+        vcLabel.textContent = `${idx + 1}/13`;
+        vcSegments.forEach((seg, sIdx) => {
+          seg.classList.remove('active');
+          if (sIdx < idx) seg.classList.add('done');
+          else if (sIdx > idx) seg.classList.remove('done');
+        });
+        if (vcSegments[idx]) vcSegments[idx].classList.add('active');
+        vcMenu.classList.remove('open');
+      });
+    });
+  </script>
+</body>
+</html>
