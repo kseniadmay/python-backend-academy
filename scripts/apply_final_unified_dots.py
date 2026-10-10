@@ -102,13 +102,12 @@ css_to_inject = """
   }
 
   .dots-necklace {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
     gap: 10px;
-    width: 100%;
+    width: auto;
     position: relative;
-    padding: 6px 0 10px;
+    padding: 0;
     background: transparent;
     border: none;
     box-shadow: none;
@@ -300,13 +299,12 @@ new_view_python_skill = """function viewPythonSkill(sid){
     </div>`;
 
   const eyebrowDotsHTML = `
-    <div class="topic-eyebrow-track" style="max-width:780px;margin:14px auto 16px;">
-      <div class="topic-eyebrow-tags" style="display:flex;align-items:center;justify-content:center;width:100%;margin-bottom:10px;">
-        <div class="unit-breadcrumb">
-          <span class="unit-breadcrumb-title" style="font-family:var(--font-d);font-size:1.06rem;font-weight:700;letter-spacing:-0.01em;">${escapeHtmlStr(cleanUnitTitle)}</span>
-        </div>
+    <div class="topic-eyebrow-track" style="max-width:780px;margin:14px auto 18px;">
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;">
+        <span class="unit-breadcrumb-title" style="font-family:var(--font-d);font-size:1.02rem;font-weight:700;letter-spacing:-0.01em;color:var(--ink);">${escapeHtmlStr(cleanUnitTitle)}</span>
+        <span style="color:var(--ink-muted);font-weight:700;opacity:0.45;font-size:1.15rem;line-height:1;user-select:none;">·</span>
+        ${dotsNecklaceHTML}
       </div>
-      ${dotsNecklaceHTML}
     </div>`;
 
   let bodyHTML = '';
@@ -479,10 +477,10 @@ print("Saved academy.html")
 with open(SW_PATH, "r", encoding="utf-8") as f:
     sw_content = f.read()
 
-sw_content = re.sub(r"const CACHE_NAME = 'academy-pwa-v\d+';", "const CACHE_NAME = 'academy-pwa-v24';", sw_content)
+sw_content = re.sub(r"const CACHE_NAME = 'academy-pwa-v\d+';", "const CACHE_NAME = 'academy-pwa-v25';", sw_content)
 with open(SW_PATH, "w", encoding="utf-8") as f:
     f.write(sw_content)
-print("Updated sw.js to v24")
+print("Updated sw.js to v25")
 
 # 6. Extract academy script to scripts/extracted_academy.js if exists
 try:

@@ -1031,7 +1031,7 @@ function fireClick(attrName, attrVal, extraAttrs = {}) {
   let practiceHubDom = navigate('#/practice');
   assert(practiceHubDom.includes('practice-desktop-grid') && practiceHubDom.includes('practice-left-pane') && practiceHubDom.includes('practice-right-pane'), '#/practice must render desktop Split-View layout (.practice-desktop-grid, .practice-left-pane, .practice-right-pane)');
   let skillTheoryDom = navigate('#/python/skill/1.1.1');
-  assert(skillTheoryDom.includes('coddy-lesson-card') && skillTheoryDom.includes('subtabs--compact') && skillTheoryDom.includes('data-chunk-idx'), '#/python/skill/1.1.1 must render the Coddy lesson card layout (subtabs, chunk feed)');
+  assert(skillTheoryDom.includes('coddy-lesson-card') && (skillTheoryDom.includes('subtabs--compact') || skillTheoryDom.includes('dots-necklace')) && skillTheoryDom.includes('data-chunk-idx'), '#/python/skill/1.1.1 must render the Coddy lesson card layout (unified dots, chunk feed)');
 
   // Test Progressive Chunk Scroll-Reveal in interactive lesson (#/lesson/py-basics-1, unconditionally on step 0!)
   let lessonChunkHtml = navigate('#/lesson/py-basics-1');
