@@ -1497,28 +1497,38 @@
     justify-content: space-between;
     gap: 12px;
     margin-bottom: 12px;
+  .topic-eyebrow-track {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
     padding: 0 2px;
   }
   .topic-eyebrow-tags {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 0.76rem;
-    font-weight: 400;
+    font-size: 0.78rem;
+    font-weight: 500;
     color: var(--ink-muted);
   }
   .topic-eyebrow-unit {
     color: var(--ink);
-    font-weight: 500;
+    font-weight: 700;
+    letter-spacing: -0.01em;
   }
   .topic-eyebrow-num {
     background: rgba(16, 185, 129, 0.12);
-    border: 1px solid rgba(16, 185, 129, 0.25);
+    border: 1px solid rgba(16, 185, 129, 0.32);
     color: var(--moss);
-    padding: 2px 8px;
+    padding: 2px 9px;
     border-radius: 999px;
-    font-size: 0.70rem;
-    font-weight: 500;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1.25;
+    display: inline-flex;
+    align-items: center;
   }
   .dots-necklace {
     display: flex;
@@ -1526,23 +1536,32 @@
     gap: 9px;
     position: relative;
     padding: 4px 6px;
+    flex-shrink: 0;
   }
   .dots-necklace-wire {
     position: absolute;
-    left: 8px;
-    right: 28px;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
     height: 1.5px;
-    background: rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.12);
     z-index: 1;
+    pointer-events: none;
+  }
+  html:not([data-theme="dark"]) .dots-necklace-wire {
+    background: rgba(0, 0, 0, 0.12);
   }
   .dots-necklace-wire-active {
     position: absolute;
-    left: 8px;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
     height: 1.5px;
     background: #10b981;
     box-shadow: 0 0 6px #10b981;
     z-index: 2;
-    transition: width .3s ease;
+    transition: width .3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
   }
   .dot-jewel {
     width: 10px;
@@ -1554,9 +1573,16 @@
     z-index: 3;
     transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     cursor: pointer;
+    flex-shrink: 0;
+    box-sizing: border-box;
+  }
+  html:not([data-theme="dark"]) .dot-jewel {
+    background: #f8fafc;
+    border-color: rgba(0, 0, 0, 0.22);
   }
   .dot-jewel:hover {
-    transform: scale(1.4);
+    transform: scale(1.35);
+    border-color: rgba(255, 255, 255, 0.5);
   }
   .dot-jewel.done {
     background: #10b981;
@@ -1566,23 +1592,35 @@
   .dot-jewel.active {
     width: 14px;
     height: 14px;
+    margin: -2px;
     background: #34d399;
     border: 2px solid #ffffff;
-    box-shadow: 0 0 12px #10b981, 0 0 24px rgba(52, 211, 153, 0.9);
-    animation: jewel-pulse 2s infinite ease-in-out;
+    box-shadow: 0 0 10px #10b981, 0 0 20px rgba(52, 211, 153, 0.85);
+    animation: jewel-pulse 2.2s infinite ease-in-out;
   }
   .dot-jewel.milestone {
-    border-color: rgba(245, 158, 11, 0.6);
+    border-color: rgba(245, 158, 11, 0.75);
     background: rgba(245, 158, 11, 0.15);
   }
+  @keyframes jewel-pulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 10px #10b981, 0 0 18px rgba(16, 185, 129, 0.65);
+    }
+    50% {
+      transform: scale(1.15);
+      box-shadow: 0 0 16px #34d399, 0 0 28px rgba(52, 211, 153, 0.95);
+    }
+  }
   .dots-necklace-label {
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-family: var(--font-m);
-    font-weight: 500;
+    font-weight: 700;
     color: var(--moss);
-    margin-left: 2px;
+    margin-left: 4px;
     position: relative;
     z-index: 3;
+    white-space: nowrap;
   }
 
   .echelon-badge{
@@ -8736,7 +8774,8 @@ function viewPythonSkill(sid){
     const totalNotesInUnit = Math.max(1, allUnitNotes.length);
     const activeNoteIdx = Math.max(0, allUnitNotes.findIndex(item => item.kId === activeK));
     const curNoteNum = activeNoteIdx + 1;
-    const dotsActivePct = totalNotesInUnit > 1 ? Math.round((activeNoteIdx / (totalNotesInUnit - 1)) * 100) : 100;
+    const wireTotalWidth = (totalNotesInUnit - 1) * 19;
+    const wireActiveWidth = activeNoteIdx * 19;
 
     const unitJewelDotsHTML = allUnitNotes.map((item, idx) => {
       const isDone = state.readNotes.includes(item.kId);
@@ -8746,7 +8785,7 @@ function viewPythonSkill(sid){
       if(isActive) cls += ' active';
       else if(isDone) cls += ' done';
       if(isMilestone) cls += ' milestone';
-      return `<span class="${cls}" title="${idx+1}. ${item.kId}: ${escapeHtmlStr(item.title)}" data-py-select-k="${item.kId}"></span>`;
+      return `<span class="${cls}" title="${idx+1}. ${item.kId}: ${escapeHtmlStr(item.title)}" data-py-select-k="${item.kId}" data-py-skill-id="${item.skillId}"></span>`;
     }).join('');
 
     const rawUnitTitle = curUnit.title || sk.title || '';
@@ -8760,8 +8799,8 @@ function viewPythonSkill(sid){
           <span class="topic-eyebrow-num">Тема ${curNoteNum} из ${totalNotesInUnit}</span>
         </div>
         <div class="dots-necklace" title="${totalNotesInUnit} тем Юнита ${sk.unitId}">
-          <div class="dots-necklace-wire"></div>
-          <div class="dots-necklace-wire-active" style="width:${dotsActivePct}%;"></div>
+          <div class="dots-necklace-wire" style="width:${wireTotalWidth}px;"></div>
+          <div class="dots-necklace-wire-active" style="width:${wireActiveWidth}px;"></div>
           ${unitJewelDotsHTML}
           <span class="dots-necklace-label">${curNoteNum}/${totalNotesInUnit}</span>
         </div>
@@ -13822,7 +13861,22 @@ document.addEventListener('click', async function(e){
   }
   const psk = e.target.closest('[data-py-select-k]');
   if(psk){
-    pySkillViewState.kId = psk.getAttribute('data-py-select-k');
+    const targetK = psk.getAttribute('data-py-select-k');
+    const targetSkill = psk.getAttribute('data-py-skill-id');
+    if(targetSkill && pySkillViewState.sid && targetSkill !== pySkillViewState.sid){
+      const tr = getTrackForSkill(targetSkill);
+      ensurePySkillState(targetSkill);
+      pySkillViewState.tab = 'theory';
+      pySkillViewState.kId = targetK;
+      pySkillViewState.stepIdx = 0;
+      pySkillViewState.chunkIdx = 0;
+      pySkillViewState.sprintCelebration = null;
+      saveReadingPosition();
+      location.hash = '#' + tr.routePrefix + '/skill/' + targetSkill;
+      render();
+      return;
+    }
+    pySkillViewState.kId = targetK;
     pySkillViewState.stepIdx = 0;
     pySkillViewState.chunkIdx = 0;
     pySkillViewState.sprintCelebration = null;
