@@ -8,190 +8,7 @@ EXTRACTED_JS_PATH = r"C:\Users\fury6\OneDrive\Python_Backend_Academy\scripts\ext
 with open(ACADEMY_PATH, "r", encoding="utf-8") as f:
     html = f.read()
 
-# 1. Ensure CSS
-css_to_inject = """
-  /* ================= ТОПБАР: ЭШЕЛОН 1, ГОТОВНОСТЬ И ЯНТАРНЫЙ БЭЙДЖ ================= */
-  .echelon-topbar-clean {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 10px 18px;
-    margin-bottom: 24px;
-    border-radius: 18px;
-    background: var(--surface);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    box-shadow: var(--shadow-1);
-  }
-  .echelon-clean-wrap {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
-  .echelon-clean-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.74rem;
-    font-weight: 700;
-  }
-  .echelon-bordeaux-title {
-    color: #be123c;
-    font-weight: 800;
-    letter-spacing: -0.01em;
-    text-shadow: 0 0 5px rgba(190, 18, 60, 0.5);
-  }
-  :root[data-theme="light"] .echelon-bordeaux-title {
-    color: #881337;
-    text-shadow: none;
-  }
-  .echelon-readiness-emerald {
-    color: #34d399;
-    font-weight: 600;
-    text-shadow: 0 0 5px rgba(52, 211, 153, 0.45);
-  }
-  :root[data-theme="light"] .echelon-readiness-emerald {
-    color: #059669;
-    text-shadow: none;
-  }
-  .echelon-clean-track {
-    height: 6px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.08);
-    overflow: hidden;
-    position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-  }
-  .echelon-clean-fill {
-    height: 100%;
-    width: 35%;
-    border-radius: 999px;
-    background: linear-gradient(90deg, #6b1d2f 0%, #be123c 35%, #059669 75%, #10b981 100%);
-    box-shadow: none;
-    position: relative;
-  }
-
-  /* ================= ЕДИНЫЙ ПЕДАГОГИЧЕСКИЙ ТРЕКЕР: CONTINUOUS ATOMIC DOTS ================= */
-  .topic-eyebrow-track {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    margin-bottom: 22px;
-    width: 100%;
-  }
-  .topic-eyebrow-tags {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    width: 100%;
-  }
-  .unit-breadcrumb {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .unit-breadcrumb-title {
-    color: var(--ink);
-    font-weight: 600;
-    font-size: 0.88rem;
-    letter-spacing: -0.01em;
-  }
-
-  .dots-necklace {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    position: relative;
-    padding: 6px 0;
-    background: transparent;
-    border: none;
-    box-shadow: none;
-  }
-  .dots-stage-divider {
-    width: 2px;
-    height: 8px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.15);
-    margin: 0 5px;
-  }
-
-  .dot-jewel {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.16);
-    position: relative;
-    z-index: 3;
-    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.4, 1);
-    cursor: pointer;
-  }
-  .dot-jewel:hover {
-    transform: scale(1.5);
-    background: rgba(255, 255, 255, 0.5);
-  }
-  .dot-jewel.done {
-    background: #10b981;
-    box-shadow: 0 0 8px rgba(16, 185, 129, 1), 0 0 16px rgba(16, 185, 129, 0.65), 0 0 26px rgba(16, 185, 129, 0.35);
-  }
-  .dot-jewel.active {
-    width: 9px;
-    height: 9px;
-    background: #ffffff;
-    box-shadow: 0 0 10px #ffffff, 0 0 22px rgba(255, 255, 255, 0.95), 0 0 38px rgba(255, 255, 255, 0.6);
-    animation: radar-breathe-white 4.4s infinite ease-in-out;
-  }
-  .dot-jewel.active::before,
-  .dot-jewel.active::after {
-    content: '';
-    position: absolute;
-    left: 50%; top: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    pointer-events: none;
-    animation: radar-ripple-white 4.4s infinite cubic-bezier(0.2, 0.8, 0.4, 1);
-  }
-  .dot-jewel.active::after {
-    animation-delay: 2.2s;
-  }
-  .dot-jewel.milestone {
-    border-radius: 2px;
-    transform: rotate(45deg);
-    background: rgba(255, 255, 255, 0.25);
-  }
-  .dot-jewel.milestone:hover {
-    transform: rotate(45deg) scale(1.4);
-  }
-
-  @keyframes radar-breathe-white {
-    0%, 100% {
-      box-shadow: 0 0 8px #ffffff, 0 0 16px rgba(255, 255, 255, 0.75), 0 0 26px rgba(255, 255, 255, 0.4);
-    }
-    50% {
-      box-shadow: 0 0 14px #ffffff, 0 0 28px rgba(255, 255, 255, 1), 0 0 46px rgba(255, 255, 255, 0.7);
-    }
-  }
-  @keyframes radar-ripple-white {
-    0% { width: 9px; height: 9px; opacity: 1; border-color: rgba(255, 255, 255, 0.9); }
-    100% { width: 32px; height: 32px; opacity: 0; border-color: rgba(255, 255, 255, 0); }
-  }
-"""
-
-if ".echelon-bordeaux-title" not in html:
-    style_pos = html.find("</style>")
-    if style_pos != -1:
-        html = html[:style_pos] + "\n" + css_to_inject + "\n" + html[style_pos:]
-        print("Injected CSS into academy.html")
-    else:
-        print("Warning: </style> not found")
-
-# 2. Replace viewPythonSkill function completely with the new clean, continuous version
+# 1. Сформируем новую функцию viewPythonSkill(sid)
 new_view_python_skill = """function viewPythonSkill(sid){
   const sk = ensurePySkillState(sid);
   const tr = getTrackForSkill(sk.id);
@@ -201,7 +18,7 @@ new_view_python_skill = """function viewPythonSkill(sid){
   const solvedMap = getIdeSolvedMap();
   const celebrationBanner = buildSprintFinishCelebrationHTML(pySkillViewState.sprintCelebration);
 
-  const activeK = pySkillViewState.kId || sk.kIds[0];
+  const activeK = pySkillViewState.kId || (sk.kIds && sk.kIds[0]);
   const noteObj = ALL_NOTES_COMBINED[activeK] || {id: activeK, title: activeK, steps: [{title: activeK, html: '<p>Конспект загружается.</p>'}]};
   const steps = noteObj.steps || [];
   const stepIdx = Math.min(pySkillViewState.stepIdx, Math.max(0, steps.length - 1));
@@ -245,27 +62,20 @@ new_view_python_skill = """function viewPythonSkill(sid){
       <button type="button" class="theory-audio-btn" data-audio-close style="margin-left:auto;" title="Скрыть аудио-бар">✕</button>
     </div>`;
 
-  // Расчёт непрерывной нити точек (Continuous Atomic Dots) для всего Юнита
+  // Расчёт непрерывной нити точек (Continuous Atomic Dots) строго для текущего навыка
   const curUnit = (typeof ALL_UNITS_COMBINED !== 'undefined') ? (ALL_UNITS_COMBINED.find(u => u.id === sk.unitId) || { skills: [sk], title: sk.title || '' }) : { skills: [sk], title: sk.title || '' };
-  const allUnitNotes = [];
-  (curUnit.skills || [sk]).forEach(s => {
-    (s.kIds || []).forEach(k => {
-      const n = ALL_NOTES_COMBINED[k] || { title: k };
-      allUnitNotes.push({ kId: k, skillId: s.id, title: n.title });
-    });
-  });
-
   const rawUnitTitle = curUnit.title || sk.title || '';
   const cleanUnitTitle = rawUnitTitle.replace(/^Юнит\\s+[\\d.]+\\s*[·•\\-:]\\s*/i, '').trim() || rawUnitTitle;
 
-  // 1. Конспекты теории
-  const noteDots = allUnitNotes.map((item, idx) => {
-    const isDone = state.readNotes.includes(item.kId);
-    const isActive = (pySkillViewState.tab === 'theory' && item.kId === activeK);
-    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="📖 Конспект: ${escapeHtmlStr(item.title)}" data-py-select-k="${item.kId}" data-py-skill-id="${item.skillId}"></span>`;
+  // 1. Конспекты теории текущего навыка
+  const noteDots = (sk.kIds || []).map((kId, idx) => {
+    const n = ALL_NOTES_COMBINED[kId] || { title: kId };
+    const isDone = state.readNotes.includes(kId);
+    const isActive = (pySkillViewState.tab === 'theory' && kId === activeK);
+    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="📖 Конспект: ${escapeHtmlStr(n.title)}" data-py-select-k="${kId}" data-py-skill-id="${sk.id}"></span>`;
   }).join('');
 
-  // 2. Флеш-карточки
+  // 2. Флеш-карточки текущего навыка
   const activeF = pySkillViewState.fId || (sk.fIds && sk.fIds[0]);
   const cardDots = (sk.fIds || []).map((fid, idx) => {
     const d = ALL_DECKS_COMBINED[fid] || {};
@@ -274,8 +84,8 @@ new_view_python_skill = """function viewPythonSkill(sid){
     return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="🗂️ Карточки: ${escapeHtmlStr(d.title || fid)}" data-py-select-f="${fid}"></span>`;
   }).join('');
 
-  // 3. Задачи практики кода
-  const tIds = (sk.taskIds && sk.taskIds.length) ? sk.taskIds : [240, 241, 242];
+  // 3. Задачи практики кода текущего навыка
+  const tIds = (sk.taskIds && sk.taskIds.length) ? sk.taskIds : [20, 19, 39, 255, 258];
   const activeTid = tIds.includes(pySkillViewState.taskId) ? pySkillViewState.taskId : tIds[0];
   const taskDots = tIds.map((tid, idx) => {
     const t = IDE_TASKS_BY_ID[tid] || {};
@@ -284,7 +94,7 @@ new_view_python_skill = """function viewPythonSkill(sid){
     return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="⚡ Задача #${tid}: ${escapeHtmlStr(t.title || '')}" data-py-select-task="${tid}"></span>`;
   }).join('');
 
-  // 4. Рубежный зачёт
+  // 4. Рубежный зачёт Юнита
   const examActive = (pySkillViewState.tab === 'exam');
   const examDot = `<span class="dot-jewel milestone ${examActive ? 'active' : ''}" title="👑 Рубежный зачёт Юнита ${sk.unitId}" data-py-select-exam="${sk.unitId}"></span>`;
 
@@ -302,24 +112,25 @@ new_view_python_skill = """function viewPythonSkill(sid){
   let activeItemTitle = '';
   if(pySkillViewState.tab === 'theory'){
     const rawNoteTitle = (noteObj && noteObj.title) || activeK || '';
-    activeItemTitle = rawNoteTitle.replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+    activeItemTitle = rawNoteTitle.replace(/^К-\\d+\\s*[:·•\\-]\\s*/i, '').trim();
   } else if(pySkillViewState.tab === 'cards'){
     const curDeck = ALL_DECKS_COMBINED[activeF] || {};
     const rawDeckTitle = curDeck.title || activeF || '';
-    activeItemTitle = rawDeckTitle.replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
+    activeItemTitle = rawDeckTitle.replace(/^Ф-\\d+\\s*[:·•\\-]\\s*/i, '').trim();
   } else if(pySkillViewState.tab === 'code'){
     const curTask = IDE_TASKS_BY_ID[activeTid] || {};
     activeItemTitle = curTask.title || ('Задача #' + activeTid);
   } else if(pySkillViewState.tab === 'exam'){
-    activeItemTitle = 'Рубежный зачёт';
+    activeItemTitle = 'Рубежный зачёт Юнита ' + sk.unitId;
   }
 
+  // Деликатный двухстрочный заголовок: название юнита приглушено и не кричит (Refined Eyebrow), активная тема — выразительный элегантный фокус
   const eyebrowDotsHTML = `
     <div class="topic-eyebrow-track" style="max-width:780px;margin:14px auto 20px;">
-      <div style="display:flex;flex-direction:column;gap:14px;width:100%;">
-        <div style="display:flex;flex-direction:column;align-items:flex-start;padding-left:2px;">
-          <h2 style="font-family:var(--font-d);font-size:1.15rem;font-weight:700;color:var(--ink);letter-spacing:-0.01em;line-height:1.25;margin:0;">${escapeHtmlStr(cleanUnitTitle)}</h2>
-          ${activeItemTitle ? `<div style="font-family:var(--font-b);font-size:0.88rem;font-weight:500;color:var(--ink-soft);line-height:1.4;margin-top:3px;">${escapeHtmlStr(activeItemTitle)}</div>` : ''}
+      <div style="display:flex;flex-direction:column;gap:12px;width:100%;">
+        <div style="display:flex;flex-direction:column;align-items:flex-start;padding-left:2px;gap:2px;">
+          <div style="font-family:var(--font-b);font-size:0.82rem;font-weight:600;color:var(--ink-muted);letter-spacing:0.04em;text-transform:uppercase;line-height:1.2;">${escapeHtmlStr(cleanUnitTitle)}</div>
+          ${activeItemTitle ? `<div style="font-family:var(--font-d);font-size:1.15rem;font-weight:600;color:var(--ink);line-height:1.3;letter-spacing:-0.01em;">${escapeHtmlStr(activeItemTitle)}</div>` : ''}
         </div>
         <div style="display:flex;justify-content:center;width:100%;">
           ${dotsNecklaceHTML}
@@ -339,92 +150,74 @@ new_view_python_skill = """function viewPythonSkill(sid){
     const canGoBack = (curChunkIdx > 0 || stepIdx > 0);
     const backBtnHTML = canGoBack ? `<button type="button" class="btn btn-ghost" data-chunk-prev="py" style="padding:11px 16px;border-radius:14px;font-size:.88rem;">← Назад</button>` : '';
 
-    const primaryActionHTML = hasMoreChunks ? `
-      <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
-        ${backBtnHTML}
-        <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-chunk-more="py">Понятно, дальше (+10 XP) ➔</button>
-      </div>` : `
-      <div style="margin-top:12px;">
-        <div style="display:flex;gap:8px;align-items:center;">
-          ${backBtnHTML}
-          ${stepIdx + 1 < steps.length
-            ? `<button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-next-step="${stepIdx+1}">Понятно, дальше (+10 XP) ➔</button>`
-            : `<button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-finish-note="${activeK}">✓ Конспект изучен — перейти к карточкам (+15 XP) ${ICONS.arrowRight}</button>`}
-        </div>
-        <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:6px;">
-          <span class="meta">${isRead ? '✓ Теория прочитана' : 'Этап 1 из 3: Теория → Карточки → Код'}</span>
+    let primaryActionHTML = '';
+    if(hasMoreChunks){
+      primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-chunk-more="py">Понятно, дальше (+10 XP) ➔</button>`;
+    } else if(stepIdx + 1 < steps.length){
+      primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-next-step="${stepIdx+1}">Понятно, дальше (+10 XP) ➔</button>`;
+    } else {
+      primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-finish-note="${activeK}">${isRead ? '✓ Конспект усвоен' : '✓ Завершить конспект (+10 MP)'}</button>`;
+    }
+
+    bodyHTML = `
+      <div class="card coddy-lesson-card" style="margin-top:0;">
+        ${feedHTML}
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--glass-border);flex-wrap:wrap;">
+          <div>${backBtnHTML}</div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <button type="button" class="btn btn-ghost" data-audio-toggle style="padding:11px 14px;border-radius:14px;font-size:.88rem;" title="Слушать аудио">🎧 Озвучить</button>
+            ${primaryActionHTML}
+          </div>
         </div>
       </div>`;
-
-    bodyHTML = pySkillViewState.fullNoteMode
-      ? `<div class="coddy-lesson-card" style="max-width:780px;margin:0 auto;">` + steps.map((st, i) => `<div class="microstep-card"><div class="topic-badge">Шаг ${i+1} из ${steps.length}</div><h3>${st.title}</h3><div class="lesson-theory">${decorateCodeBlocksWithRunBtn(st.html)}</div></div>`).join('') + `</div>`
-      : `<div class="coddy-lesson-card" style="max-width:780px;margin:0 auto;">${feedHTML}${primaryActionHTML}</div>`;
   } else if(pySkillViewState.tab === 'cards'){
     const deckObj = ALL_DECKS_COMBINED[activeF] || {id: activeF, title: activeF, cards: []};
     const cards = deckObj.cards || [];
-    const cIdx = Math.min(pySkillViewState.cardIdx, Math.max(0, cards.length - 1));
-    const curCard = cards[cIdx] || {q: 'Карточки загружаются', a: ''};
+    const cardIdx = Math.min(pySkillViewState.cardIdx, Math.max(0, cards.length - 1));
+    const curCard = cards[cardIdx] || {q: 'Карточек пока нет', a: ''};
+    const isFlipped = pySkillViewState.cardFlipped;
 
     bodyHTML = `
-      <div class="fc-stage" style="margin:10px auto;max-width:780px;">
-        <div class="fc-card ${pySkillViewState.cardFlipped?'fc-card--Answer':''}" data-py-flip-card>
-          <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-              <div class="topic-badge">${pySkillViewState.cardFlipped ? 'Ответ' : 'Вопрос'}</div>
-              <a href="#/docs" class="card-help-badge" onclick="event.stopPropagation();" title="Открыть справку по теме в боковой панели">💡 Шпаргалка</a>
-            </div>
-            <div class="fc-q">${formatRichInlineText(curCard.q)}</div>
-            ${pySkillViewState.cardFlipped ? `<div class="fc-a">${formatRichInlineText(curCard.a)}</div>` : ''}
-          </div>
-          <div class="meta" style="margin-top:12px;text-align:center;">Карточка ${cIdx+1} из ${cards.length}</div>
+      <div class="card" style="margin-top:0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <span style="font-size:0.80rem;color:var(--ink-muted);font-weight:600;">Карточка ${cards.length ? cardIdx + 1 : 0} из ${cards.length}</span>
+          <span style="font-size:0.75rem;padding:2px 8px;border-radius:999px;background:rgba(20,90,70,0.1);color:var(--moss);font-weight:600;">Интервальное повторение</span>
         </div>
-        ${pySkillViewState.cardFlipped ? `
-          <div class="fc-rate-row" style="margin-top:12px;">
-            <button class="btn btn-ghost" data-py-rate-card="1">Снова</button>
-            <button class="btn btn-burgundy" data-py-rate-card="2">Трудно (+2 XP)</button>
-            <button class="btn btn-clay" data-py-rate-card="3">Хорошо (+5 XP)</button>
-            <button class="btn btn-primary" data-py-rate-card="4">Легко (+10 XP)</button>
-          </div>` : `
-          <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn btn-ghost" data-py-prev-card ${cIdx===0?'disabled':''}>← Назад</button>
-            <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-flip-card>Показать ответ (Пробел)</button>
-            <button class="btn btn-ghost" data-py-rate-card="3">Дальше →</button>
-          </div>`}
+        <div class="py-flashcard ${isFlipped ? 'flipped' : ''}" data-py-flip-card style="min-height:180px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:26px 20px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);transition:all .25s ease;">
+          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-muted);margin-bottom:8px;">${isFlipped ? 'Ответ' : 'Вопрос (нажмите или пробел)'}</div>
+          <div style="font-size:1.08rem;font-weight:600;line-height:1.45;color:var(--ink);">${isFlipped ? curCard.a : curCard.q}</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;">
+          <button class="btn btn-ghost" data-py-prev-card ${cardIdx === 0 ? 'disabled' : ''}>← Назад</button>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost" data-py-rate-card="hard" title="Повторить скоро">Сложно</button>
+            <button class="btn btn-ghost" data-py-rate-card="good" title="В пределах нормы">Нормально</button>
+            <button class="btn btn-emerald" data-py-rate-card="easy" title="Отлично знаю">Легко (+5 MP)</button>
+          </div>
+          <button class="btn btn-ghost" data-py-next-card ${cardIdx + 1 >= cards.length ? 'disabled' : ''}>Дальше →</button>
+        </div>
       </div>`;
-  } else {
-    // Code Practice tab
-    pySkillViewState.taskId = activeTid;
-    const tObj = IDE_TASKS_BY_ID[activeTid] || IDE_TASKS[0];
-    if(!pySkillViewState.codeDraft) pySkillViewState.codeDraft = getIdeDraft(activeTid, tObj.initialCode);
-
+  } else if(pySkillViewState.tab === 'code'){
+    const tObj = IDE_TASKS_BY_ID[activeTid] || {id: activeTid, title: 'Задача #' + activeTid, desc: '', initialCode: ''};
     const socraticHints = buildSocraticHintsForTask(tObj);
-    const socraticLabels = [
-      'Уровень 0 (Zero Hint — Граничные условия)',
-      'Уровень 1 (Conceptual Hint — Концепция)',
-      'Уровень 2 (Structural Hint — Декомпозиция)',
-      'Уровень 3 (Tactical Hint — Сигнатура и контракт)'
-    ];
-    const shownHints = socraticHints.slice(0, pySkillViewState.hintLevel).map((h, idx) =>
-      `<div class="hint-box"><strong>${socraticLabels[idx] || ('Уровень опоры ' + idx)}:</strong> ${h}</div>`
+    const shownHints = socraticHints.slice(0, pySkillViewState.hintLevel).map((h, i) =>
+      `<div class="socratic-hint" style="margin:8px 0;padding:10px 14px;border-radius:12px;background:rgba(217,119,6,0.08);border-left:3px solid var(--amber);font-size:0.86rem;line-height:1.45;"><strong>💡 Наводка ${i+1}:</strong> ${h}</div>`
     ).join('');
 
-    const curTaskIdx = tIds.indexOf(activeTid);
-    const nextUnsolvedTid = tIds.find(tid => tid !== activeTid && solvedMap[tid] !== 'solved') || (curTaskIdx >= 0 && curTaskIdx + 1 < tIds.length ? tIds[curTaskIdx + 1] : null);
     let runFeedback = '';
-    if(pySkillViewState.runStatus === 'running') runFeedback = `<div class="test-running-shimmer" style="margin-top:10px;">⚡ Выполняю тесты в Python…</div>`;
-    else if(pySkillViewState.runStatus === 'pass') runFeedback = `
-      <div class="result-box--pass correct-pulse-anim">${ICONS.check} Все тесты пройдены! (+25 XP, навык закреплён на практике!)\\n${pySkillViewState.runOutput||''}</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
-        ${nextUnsolvedTid ? `<button class="btn btn-primary" data-py-select-task="${nextUnsolvedTid}">Следующая задача навыка (#${nextUnsolvedTid}) →</button>` : ''}
-        <a href="#${tr.routePrefix}/unittest/${sk.unitId}" class="btn btn-clay">⚡ Пройти рубежный Unit Test ${sk.unitId} (на 100 MP 👑)</a>
+    if(pySkillViewState.runStatus === 'pass') runFeedback = `
+      <div class="result-feedback result-feedback--pass" style="margin-top:12px;padding:12px;border-radius:12px;background:rgba(16,185,129,0.12);border:1px solid #10b981;color:#10b981;">
+        <div style="font-weight:700;">✓ Все тесты пройдены! (+15 MP)</div>
       </div>`;
     else if(pySkillViewState.runStatus === 'fail') runFeedback = `
-      <div class="result-box--fail">Пока не проходит:\\n${pySkillViewState.runOutput||''}</div>
-      <div style="margin-top:8px;"><button class="btn btn-ghost" style="padding:6px 12px;font-size:.78rem;" data-py-task-hint>💡 Разобрать ошибку с Сократовским интервьюером (${pySkillViewState.hintLevel}/${socraticHints.length})</button></div>`;
+      <div class="result-feedback result-feedback--fail" style="margin-top:12px;padding:12px;border-radius:12px;background:rgba(239,68,68,0.12);border:1px solid #ef4444;color:#ef4444;">
+        <div style="font-weight:700;">✗ Ошибка выполнения или неверный результат</div>
+        <pre style="margin-top:6px;font-size:0.80rem;white-space:pre-wrap;">${escapeHtmlStr(pySkillViewState.runOutput)}</pre>
+      </div>`;
 
     bodyHTML = `
-      <div class="microstep-card" style="max-width:780px;margin:0 auto;">
-        <div class="practice-desktop-grid">
+      <div class="card" style="margin-top:0;">
+        <div class="practice-layout">
           <div class="practice-left-pane">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
               <span class="topic-badge" style="margin:0;display:inline-flex;align-items:center;gap:6px;">Задача #${tObj.id} · <span class="badge" style="background:rgba(217,119,6,0.18);color:var(--amber);padding:1px 7px;border-radius:10px;font-weight:700;">${tObj.tier}</span> · ${tObj.topic}</span>
@@ -459,21 +252,44 @@ new_view_python_skill = """function viewPythonSkill(sid){
     </div>`;
 }"""
 
-# Locate viewPythonSkill in academy.html
+# Заменим функцию viewPythonSkill в academy.html
 func_start = html.find("function viewPythonSkill(sid){")
 if func_start == -1:
     raise Exception("function viewPythonSkill(sid) not found!")
 
-# Find end of function (before function escapeHtmlStr(s))
 func_end = html.find("function escapeHtmlStr(s){", func_start)
 if func_end == -1:
     raise Exception("function escapeHtmlStr(s) not found!")
 
 html = html[:func_start] + new_view_python_skill + "\n\n" + html[func_end:]
-print("viewPythonSkill replaced successfully")
+print("viewPythonSkill replaced")
 
-# 3. Add data-py-select-exam listener if missing
-if "data-py-select-exam" not in html:
+# 2. Обновим обработчики кликов в click listener:
+# Добавим tab switching для data-py-select-k, data-py-select-f, data-py-select-task и обработчик data-py-select-exam
+
+# а) data-py-select-k: убедимся что pySkillViewState.tab = 'theory'
+k_target = "const psk = e.target.closest('[data-py-select-k]');\n  if(psk){\n"
+k_replace = "const psk = e.target.closest('[data-py-select-k]');\n  if(psk){\n    pySkillViewState.tab = 'theory';\n"
+if k_target in html and "pySkillViewState.tab = 'theory';" not in html[html.find(k_target):html.find(k_target)+150]:
+    html = html.replace(k_target, k_replace, 1)
+    print("Updated data-py-select-k with pySkillViewState.tab = 'theory'")
+
+# б) data-py-select-f: убедимся что pySkillViewState.tab = 'cards'
+f_target = "const psf = e.target.closest('[data-py-select-f]');\n  if(psf){\n"
+f_replace = "const psf = e.target.closest('[data-py-select-f]');\n  if(psf){\n    pySkillViewState.tab = 'cards';\n"
+if f_target in html and "pySkillViewState.tab = 'cards';" not in html[html.find(f_target):html.find(f_target)+150]:
+    html = html.replace(f_target, f_replace, 1)
+    print("Updated data-py-select-f with pySkillViewState.tab = 'cards'")
+
+# в) data-py-select-task: убедимся что pySkillViewState.tab = 'code'
+task_target = "const pstask = e.target.closest('[data-py-select-task]');\n  if(pstask){\n    pySkillViewState.sprintCelebration = null;"
+task_replace = "const pstask = e.target.closest('[data-py-select-task]');\n  if(pstask){\n    pySkillViewState.tab = 'code';\n    pySkillViewState.sprintCelebration = null;"
+if task_target in html:
+    html = html.replace(task_target, task_replace, 1)
+    print("Updated data-py-select-task with pySkillViewState.tab = 'code'")
+
+# г) data-py-select-exam: добавим обработчик перед data-py-select-k
+if "closest('[data-py-select-exam]')" not in html:
     exam_handler = """  const pse = e.target.closest('[data-py-select-exam]');
   if(pse){
     const unitId = pse.getAttribute('data-py-select-exam');
@@ -482,35 +298,30 @@ if "data-py-select-exam" not in html:
     return;
   }
 """
-    # Insert before const psk = e.target.closest('[data-py-select-k]');
     k_pos = html.find("const psk = e.target.closest('[data-py-select-k]');")
     if k_pos != -1:
         html = html[:k_pos] + exam_handler + "\n" + html[k_pos:]
-        print("data-py-select-exam handler added")
+        print("Added data-py-select-exam click handler")
 
-# 4. Save academy.html
+# 3. Сохраним academy.html
 with open(ACADEMY_PATH, "w", encoding="utf-8") as f:
     f.write(html)
-print("Saved academy.html")
+print("Saved academy.html successfully")
 
-# 5. Update sw.js to v24
+# 4. Обновим sw.js
 with open(SW_PATH, "r", encoding="utf-8") as f:
-    sw_content = f.read()
-
-sw_content = re.sub(r"const CACHE_NAME = 'academy-pwa-v\d+';", "const CACHE_NAME = 'academy-pwa-v27';", sw_content)
+    sw = f.read()
+sw = re.sub(r"const CACHE_NAME = 'academy-pwa-v\d+';", "const CACHE_NAME = 'academy-pwa-v28';", sw)
 with open(SW_PATH, "w", encoding="utf-8") as f:
-    f.write(sw_content)
-print("Updated sw.js to v27")
+    f.write(sw)
+print("Updated sw.js to v28")
 
-# 6. Extract academy script to scripts/extracted_academy.js if exists
-try:
-    script_m = re.findall(r'<script\b[^>]*>([\s\S]*?)<\/script>', html)
-    if script_m:
-        largest_script = max(script_m, key=len)
-        with open(EXTRACTED_JS_PATH, "w", encoding="utf-8") as f:
-            f.write(largest_script)
-        print("Updated scripts/extracted_academy.js")
-except Exception as e:
-    print("Could not update extracted_academy.js:", e)
+# 5. Обновим extracted_academy.js
+script_m = re.findall(r'<script\b[^>]*>([\s\S]*?)<\/script>', html)
+if script_m:
+    largest = max(script_m, key=len)
+    with open(EXTRACTED_JS_PATH, "w", encoding="utf-8") as f:
+        f.write(largest)
+    print("Updated scripts/extracted_academy.js")
 
-print("Done applying unified dots and topbar!")
+print("All done!")

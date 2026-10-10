@@ -8767,7 +8767,7 @@ function viewPythonSkill(sid){
   const solvedMap = getIdeSolvedMap();
   const celebrationBanner = buildSprintFinishCelebrationHTML(pySkillViewState.sprintCelebration);
 
-  const activeK = pySkillViewState.kId || sk.kIds[0];
+  const activeK = pySkillViewState.kId || (sk.kIds && sk.kIds[0]);
   const noteObj = ALL_NOTES_COMBINED[activeK] || {id: activeK, title: activeK, steps: [{title: activeK, html: '<p>Конспект загружается.</p>'}]};
   const steps = noteObj.steps || [];
   const stepIdx = Math.min(pySkillViewState.stepIdx, Math.max(0, steps.length - 1));
@@ -8811,27 +8811,20 @@ function viewPythonSkill(sid){
       <button type="button" class="theory-audio-btn" data-audio-close style="margin-left:auto;" title="Скрыть аудио-бар">✕</button>
     </div>`;
 
-  // Расчёт непрерывной нити точек (Continuous Atomic Dots) для всего Юнита
+  // Расчёт непрерывной нити точек (Continuous Atomic Dots) строго для текущего навыка
   const curUnit = (typeof ALL_UNITS_COMBINED !== 'undefined') ? (ALL_UNITS_COMBINED.find(u => u.id === sk.unitId) || { skills: [sk], title: sk.title || '' }) : { skills: [sk], title: sk.title || '' };
-  const allUnitNotes = [];
-  (curUnit.skills || [sk]).forEach(s => {
-    (s.kIds || []).forEach(k => {
-      const n = ALL_NOTES_COMBINED[k] || { title: k };
-      allUnitNotes.push({ kId: k, skillId: s.id, title: n.title });
-    });
-  });
-
   const rawUnitTitle = curUnit.title || sk.title || '';
   const cleanUnitTitle = rawUnitTitle.replace(/^Юнит\s+[\d.]+\s*[·•\-:]\s*/i, '').trim() || rawUnitTitle;
 
-  // 1. Конспекты теории
-  const noteDots = allUnitNotes.map((item, idx) => {
-    const isDone = state.readNotes.includes(item.kId);
-    const isActive = (pySkillViewState.tab === 'theory' && item.kId === activeK);
-    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="📖 Конспект: ${escapeHtmlStr(item.title)}" data-py-select-k="${item.kId}" data-py-skill-id="${item.skillId}"></span>`;
+  // 1. Конспекты теории текущего навыка
+  const noteDots = (sk.kIds || []).map((kId, idx) => {
+    const n = ALL_NOTES_COMBINED[kId] || { title: kId };
+    const isDone = state.readNotes.includes(kId);
+    const isActive = (pySkillViewState.tab === 'theory' && kId === activeK);
+    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="📖 Конспект: ${escapeHtmlStr(n.title)}" data-py-select-k="${kId}" data-py-skill-id="${sk.id}"></span>`;
   }).join('');
 
-  // 2. Флеш-карточки
+  // 2. Флеш-карточки текущего навыка
   const activeF = pySkillViewState.fId || (sk.fIds && sk.fIds[0]);
   const cardDots = (sk.fIds || []).map((fid, idx) => {
     const d = ALL_DECKS_COMBINED[fid] || {};
@@ -8840,8 +8833,8 @@ function viewPythonSkill(sid){
     return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="🗂️ Карточки: ${escapeHtmlStr(d.title || fid)}" data-py-select-f="${fid}"></span>`;
   }).join('');
 
-  // 3. Задачи практики кода
-  const tIds = (sk.taskIds && sk.taskIds.length) ? sk.taskIds : [240, 241, 242];
+  // 3. Задачи практики кода текущего навыка
+  const tIds = (sk.taskIds && sk.taskIds.length) ? sk.taskIds : [20, 19, 39, 255, 258];
   const activeTid = tIds.includes(pySkillViewState.taskId) ? pySkillViewState.taskId : tIds[0];
   const taskDots = tIds.map((tid, idx) => {
     const t = IDE_TASKS_BY_ID[tid] || {};
@@ -8850,7 +8843,7 @@ function viewPythonSkill(sid){
     return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="⚡ Задача #${tid}: ${escapeHtmlStr(t.title || '')}" data-py-select-task="${tid}"></span>`;
   }).join('');
 
-  // 4. Рубежный зачёт
+  // 4. Рубежный зачёт Юнита
   const examActive = (pySkillViewState.tab === 'exam');
   const examDot = `<span class="dot-jewel milestone ${examActive ? 'active' : ''}" title="👑 Рубежный зачёт Юнита ${sk.unitId}" data-py-select-exam="${sk.unitId}"></span>`;
 
@@ -8877,15 +8870,16 @@ function viewPythonSkill(sid){
     const curTask = IDE_TASKS_BY_ID[activeTid] || {};
     activeItemTitle = curTask.title || ('Задача #' + activeTid);
   } else if(pySkillViewState.tab === 'exam'){
-    activeItemTitle = 'Рубежный зачёт';
+    activeItemTitle = 'Рубежный зачёт Юнита ' + sk.unitId;
   }
 
+  // Деликатный двухстрочный заголовок: название юнита приглушено и не кричит (Refined Eyebrow), активная тема — выразительный элегантный фокус
   const eyebrowDotsHTML = `
     <div class="topic-eyebrow-track" style="max-width:780px;margin:14px auto 20px;">
-      <div style="display:flex;flex-direction:column;gap:14px;width:100%;">
-        <div style="display:flex;flex-direction:column;align-items:flex-start;padding-left:2px;">
-          <h2 style="font-family:var(--font-d);font-size:1.15rem;font-weight:700;color:var(--ink);letter-spacing:-0.01em;line-height:1.25;margin:0;">${escapeHtmlStr(cleanUnitTitle)}</h2>
-          ${activeItemTitle ? `<div style="font-family:var(--font-b);font-size:0.88rem;font-weight:500;color:var(--ink-soft);line-height:1.4;margin-top:3px;">${escapeHtmlStr(activeItemTitle)}</div>` : ''}
+      <div style="display:flex;flex-direction:column;gap:12px;width:100%;">
+        <div style="display:flex;flex-direction:column;align-items:flex-start;padding-left:2px;gap:2px;">
+          <div style="font-family:var(--font-b);font-size:0.82rem;font-weight:600;color:var(--ink-muted);letter-spacing:0.04em;text-transform:uppercase;line-height:1.2;">${escapeHtmlStr(cleanUnitTitle)}</div>
+          ${activeItemTitle ? `<div style="font-family:var(--font-d);font-size:1.15rem;font-weight:600;color:var(--ink);line-height:1.3;letter-spacing:-0.01em;">${escapeHtmlStr(activeItemTitle)}</div>` : ''}
         </div>
         <div style="display:flex;justify-content:center;width:100%;">
           ${dotsNecklaceHTML}
@@ -8905,92 +8899,74 @@ function viewPythonSkill(sid){
     const canGoBack = (curChunkIdx > 0 || stepIdx > 0);
     const backBtnHTML = canGoBack ? `<button type="button" class="btn btn-ghost" data-chunk-prev="py" style="padding:11px 16px;border-radius:14px;font-size:.88rem;">← Назад</button>` : '';
 
-    const primaryActionHTML = hasMoreChunks ? `
-      <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
-        ${backBtnHTML}
-        <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-chunk-more="py">Понятно, дальше (+10 XP) ➔</button>
-      </div>` : `
-      <div style="margin-top:12px;">
-        <div style="display:flex;gap:8px;align-items:center;">
-          ${backBtnHTML}
-          ${stepIdx + 1 < steps.length
-            ? `<button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-next-step="${stepIdx+1}">Понятно, дальше (+10 XP) ➔</button>`
-            : `<button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-finish-note="${activeK}">✓ Конспект изучен — перейти к карточкам (+15 XP) ${ICONS.arrowRight}</button>`}
-        </div>
-        <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:6px;">
-          <span class="meta">${isRead ? '✓ Теория прочитана' : 'Этап 1 из 3: Теория → Карточки → Код'}</span>
+    let primaryActionHTML = '';
+    if(hasMoreChunks){
+      primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-chunk-more="py">Понятно, дальше (+10 XP) ➔</button>`;
+    } else if(stepIdx + 1 < steps.length){
+      primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-next-step="${stepIdx+1}">Понятно, дальше (+10 XP) ➔</button>`;
+    } else {
+      primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-finish-note="${activeK}">${isRead ? '✓ Конспект усвоен' : '✓ Завершить конспект (+10 MP)'}</button>`;
+    }
+
+    bodyHTML = `
+      <div class="card coddy-lesson-card" style="margin-top:0;">
+        ${feedHTML}
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--glass-border);flex-wrap:wrap;">
+          <div>${backBtnHTML}</div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <button type="button" class="btn btn-ghost" data-audio-toggle style="padding:11px 14px;border-radius:14px;font-size:.88rem;" title="Слушать аудио">🎧 Озвучить</button>
+            ${primaryActionHTML}
+          </div>
         </div>
       </div>`;
-
-    bodyHTML = pySkillViewState.fullNoteMode
-      ? `<div class="coddy-lesson-card" style="max-width:780px;margin:0 auto;">` + steps.map((st, i) => `<div class="microstep-card"><div class="topic-badge">Шаг ${i+1} из ${steps.length}</div><h3>${st.title}</h3><div class="lesson-theory">${decorateCodeBlocksWithRunBtn(st.html)}</div></div>`).join('') + `</div>`
-      : `<div class="coddy-lesson-card" style="max-width:780px;margin:0 auto;">${feedHTML}${primaryActionHTML}</div>`;
   } else if(pySkillViewState.tab === 'cards'){
     const deckObj = ALL_DECKS_COMBINED[activeF] || {id: activeF, title: activeF, cards: []};
     const cards = deckObj.cards || [];
-    const cIdx = Math.min(pySkillViewState.cardIdx, Math.max(0, cards.length - 1));
-    const curCard = cards[cIdx] || {q: 'Карточки загружаются', a: ''};
+    const cardIdx = Math.min(pySkillViewState.cardIdx, Math.max(0, cards.length - 1));
+    const curCard = cards[cardIdx] || {q: 'Карточек пока нет', a: ''};
+    const isFlipped = pySkillViewState.cardFlipped;
 
     bodyHTML = `
-      <div class="fc-stage" style="margin:10px auto;max-width:780px;">
-        <div class="fc-card ${pySkillViewState.cardFlipped?'fc-card--Answer':''}" data-py-flip-card>
-          <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-              <div class="topic-badge">${pySkillViewState.cardFlipped ? 'Ответ' : 'Вопрос'}</div>
-              <a href="#/docs" class="card-help-badge" onclick="event.stopPropagation();" title="Открыть справку по теме в боковой панели">💡 Шпаргалка</a>
-            </div>
-            <div class="fc-q">${formatRichInlineText(curCard.q)}</div>
-            ${pySkillViewState.cardFlipped ? `<div class="fc-a">${formatRichInlineText(curCard.a)}</div>` : ''}
-          </div>
-          <div class="meta" style="margin-top:12px;text-align:center;">Карточка ${cIdx+1} из ${cards.length}</div>
+      <div class="card" style="margin-top:0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <span style="font-size:0.80rem;color:var(--ink-muted);font-weight:600;">Карточка ${cards.length ? cardIdx + 1 : 0} из ${cards.length}</span>
+          <span style="font-size:0.75rem;padding:2px 8px;border-radius:999px;background:rgba(20,90,70,0.1);color:var(--moss);font-weight:600;">Интервальное повторение</span>
         </div>
-        ${pySkillViewState.cardFlipped ? `
-          <div class="fc-rate-row" style="margin-top:12px;">
-            <button class="btn btn-ghost" data-py-rate-card="1">Снова</button>
-            <button class="btn btn-burgundy" data-py-rate-card="2">Трудно (+2 XP)</button>
-            <button class="btn btn-clay" data-py-rate-card="3">Хорошо (+5 XP)</button>
-            <button class="btn btn-primary" data-py-rate-card="4">Легко (+10 XP)</button>
-          </div>` : `
-          <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn btn-ghost" data-py-prev-card ${cIdx===0?'disabled':''}>← Назад</button>
-            <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-flip-card>Показать ответ (Пробел)</button>
-            <button class="btn btn-ghost" data-py-rate-card="3">Дальше →</button>
-          </div>`}
+        <div class="py-flashcard ${isFlipped ? 'flipped' : ''}" data-py-flip-card style="min-height:180px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:26px 20px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);transition:all .25s ease;">
+          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-muted);margin-bottom:8px;">${isFlipped ? 'Ответ' : 'Вопрос (нажмите или пробел)'}</div>
+          <div style="font-size:1.08rem;font-weight:600;line-height:1.45;color:var(--ink);">${isFlipped ? curCard.a : curCard.q}</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;">
+          <button class="btn btn-ghost" data-py-prev-card ${cardIdx === 0 ? 'disabled' : ''}>← Назад</button>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost" data-py-rate-card="hard" title="Повторить скоро">Сложно</button>
+            <button class="btn btn-ghost" data-py-rate-card="good" title="В пределах нормы">Нормально</button>
+            <button class="btn btn-emerald" data-py-rate-card="easy" title="Отлично знаю">Легко (+5 MP)</button>
+          </div>
+          <button class="btn btn-ghost" data-py-next-card ${cardIdx + 1 >= cards.length ? 'disabled' : ''}>Дальше →</button>
+        </div>
       </div>`;
-  } else {
-    // Code Practice tab
-    pySkillViewState.taskId = activeTid;
-    const tObj = IDE_TASKS_BY_ID[activeTid] || IDE_TASKS[0];
-    if(!pySkillViewState.codeDraft) pySkillViewState.codeDraft = getIdeDraft(activeTid, tObj.initialCode);
-
+  } else if(pySkillViewState.tab === 'code'){
+    const tObj = IDE_TASKS_BY_ID[activeTid] || {id: activeTid, title: 'Задача #' + activeTid, desc: '', initialCode: ''};
     const socraticHints = buildSocraticHintsForTask(tObj);
-    const socraticLabels = [
-      'Уровень 0 (Zero Hint — Граничные условия)',
-      'Уровень 1 (Conceptual Hint — Концепция)',
-      'Уровень 2 (Structural Hint — Декомпозиция)',
-      'Уровень 3 (Tactical Hint — Сигнатура и контракт)'
-    ];
-    const shownHints = socraticHints.slice(0, pySkillViewState.hintLevel).map((h, idx) =>
-      `<div class="hint-box"><strong>${socraticLabels[idx] || ('Уровень опоры ' + idx)}:</strong> ${h}</div>`
+    const shownHints = socraticHints.slice(0, pySkillViewState.hintLevel).map((h, i) =>
+      `<div class="socratic-hint" style="margin:8px 0;padding:10px 14px;border-radius:12px;background:rgba(217,119,6,0.08);border-left:3px solid var(--amber);font-size:0.86rem;line-height:1.45;"><strong>💡 Наводка ${i+1}:</strong> ${h}</div>`
     ).join('');
 
-    const curTaskIdx = tIds.indexOf(activeTid);
-    const nextUnsolvedTid = tIds.find(tid => tid !== activeTid && solvedMap[tid] !== 'solved') || (curTaskIdx >= 0 && curTaskIdx + 1 < tIds.length ? tIds[curTaskIdx + 1] : null);
     let runFeedback = '';
-    if(pySkillViewState.runStatus === 'running') runFeedback = `<div class="test-running-shimmer" style="margin-top:10px;">⚡ Выполняю тесты в Python…</div>`;
-    else if(pySkillViewState.runStatus === 'pass') runFeedback = `
-      <div class="result-box--pass correct-pulse-anim">${ICONS.check} Все тесты пройдены! (+25 XP, навык закреплён на практике!)\n${pySkillViewState.runOutput||''}</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
-        ${nextUnsolvedTid ? `<button class="btn btn-primary" data-py-select-task="${nextUnsolvedTid}">Следующая задача навыка (#${nextUnsolvedTid}) →</button>` : ''}
-        <a href="#${tr.routePrefix}/unittest/${sk.unitId}" class="btn btn-clay">⚡ Пройти рубежный Unit Test ${sk.unitId} (на 100 MP 👑)</a>
+    if(pySkillViewState.runStatus === 'pass') runFeedback = `
+      <div class="result-feedback result-feedback--pass" style="margin-top:12px;padding:12px;border-radius:12px;background:rgba(16,185,129,0.12);border:1px solid #10b981;color:#10b981;">
+        <div style="font-weight:700;">✓ Все тесты пройдены! (+15 MP)</div>
       </div>`;
     else if(pySkillViewState.runStatus === 'fail') runFeedback = `
-      <div class="result-box--fail">Пока не проходит:\n${pySkillViewState.runOutput||''}</div>
-      <div style="margin-top:8px;"><button class="btn btn-ghost" style="padding:6px 12px;font-size:.78rem;" data-py-task-hint>💡 Разобрать ошибку с Сократовским интервьюером (${pySkillViewState.hintLevel}/${socraticHints.length})</button></div>`;
+      <div class="result-feedback result-feedback--fail" style="margin-top:12px;padding:12px;border-radius:12px;background:rgba(239,68,68,0.12);border:1px solid #ef4444;color:#ef4444;">
+        <div style="font-weight:700;">✗ Ошибка выполнения или неверный результат</div>
+        <pre style="margin-top:6px;font-size:0.80rem;white-space:pre-wrap;">${escapeHtmlStr(pySkillViewState.runOutput)}</pre>
+      </div>`;
 
     bodyHTML = `
-      <div class="microstep-card" style="max-width:780px;margin:0 auto;">
-        <div class="practice-desktop-grid">
+      <div class="card" style="margin-top:0;">
+        <div class="practice-layout">
           <div class="practice-left-pane">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
               <span class="topic-badge" style="margin:0;display:inline-flex;align-items:center;gap:6px;">Задача #${tObj.id} · <span class="badge" style="background:rgba(217,119,6,0.18);color:var(--amber);padding:1px 7px;border-radius:10px;font-weight:700;">${tObj.tier}</span> · ${tObj.topic}</span>
@@ -13934,8 +13910,17 @@ document.addEventListener('click', async function(e){
     render();
     return;
   }
-  const psk = e.target.closest('[data-py-select-k]');
+    const pse = e.target.closest('[data-py-select-exam]');
+  if(pse){
+    const unitId = pse.getAttribute('data-py-select-exam');
+    const tr = getTrackForSkill(pySkillViewState.sid || '1.1.1');
+    location.hash = '#' + tr.routePrefix + '/unittest/' + unitId;
+    return;
+  }
+
+const psk = e.target.closest('[data-py-select-k]');
   if(psk){
+    pySkillViewState.tab = 'theory';
     pySkillViewState.kId = psk.getAttribute('data-py-select-k');
     pySkillViewState.stepIdx = 0;
     pySkillViewState.chunkIdx = 0;
@@ -14016,6 +14001,7 @@ document.addEventListener('click', async function(e){
   // Skill Flashcards actions
   const psf = e.target.closest('[data-py-select-f]');
   if(psf){
+    pySkillViewState.tab = 'cards';
     pySkillViewState.fId = psf.getAttribute('data-py-select-f');
     pySkillViewState.cardIdx = 0;
     pySkillViewState.cardFlipped = false;
@@ -14085,6 +14071,7 @@ document.addEventListener('click', async function(e){
   // Skill Code Practice actions
   const pstask = e.target.closest('[data-py-select-task]');
   if(pstask){
+    pySkillViewState.tab = 'code';
     pySkillViewState.sprintCelebration = null;
     const ed = document.getElementById('py-skill-editor');
     if(ed && ed.value && pySkillViewState.taskId){
