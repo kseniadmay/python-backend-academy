@@ -14345,6 +14345,18 @@ const psk = e.target.closest('[data-py-select-k]');
     }
     return;
   }
+  if(e.target.closest('[data-py-next-card]')){
+    const fid = pySkillViewState.fId;
+    const deck = ALL_DECKS_COMBINED[fid] || {cards:[]};
+    if(pySkillViewState.cardIdx + 1 < (deck.cards || []).length){
+      pySkillViewState.cardIdx++;
+      pySkillViewState.cardFlipped = false;
+      pySkillViewState.sprintCelebration = null;
+      saveReadingPosition();
+      render();
+    }
+    return;
+  }
   if(e.target.closest('[data-py-flip-card]')){
     pySkillViewState.cardFlipped = !pySkillViewState.cardFlipped;
     pySkillViewState.sprintCelebration = null;
@@ -14354,7 +14366,14 @@ const psk = e.target.closest('[data-py-select-k]');
   const prc = e.target.closest('[data-py-rate-card]');
   if(prc){
     pySkillViewState.sprintCelebration = null;
-    const rating = parseInt(prc.getAttribute('data-py-rate-card'), 10);
+    const rawRate = prc.getAttribute('data-py-rate-card');
+    let rating = parseInt(rawRate, 10);
+    if(isNaN(rating)){
+      if(rawRate === 'hard') rating = 2;
+      else if(rawRate === 'good') rating = 3;
+      else if(rawRate === 'easy') rating = 4;
+      else rating = 3;
+    }
     const fid = pySkillViewState.fId;
     const deck = ALL_DECKS_COMBINED[fid] || {cards:[]};
     ensureExtendedState();
