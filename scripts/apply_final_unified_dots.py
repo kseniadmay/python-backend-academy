@@ -191,7 +191,6 @@ new_view_python_skill = """function viewPythonSkill(sid){
             <div class="fc-q">${formatRichInlineText(curCard.q)}</div>
             ${pySkillViewState.cardFlipped ? `<div class="fc-a">${formatRichInlineText(curCard.a)}</div>` : ''}
           </div>
-          <div class="meta" style="margin-top:12px;text-align:center;">Карточка ${cIdx+1} из ${cards.length}</div>
         </div>
         ${pySkillViewState.cardFlipped ? `
           <div class="fc-rate-row" style="margin-top:14px;">
