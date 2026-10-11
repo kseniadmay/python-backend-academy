@@ -800,13 +800,14 @@
     border-radius:0;
     padding:2px 0;
     margin-top:0;
-    animation:coddyStreamReveal .2s ease-out forwards;
+    opacity:1;
+    animation:none;
   }
   html:not([data-theme="dark"]) .feed-chunk-new{
     background:transparent;
   }
   @keyframes coddyStreamReveal{
-    0%{opacity:0;}
+    0%{opacity:1;}
     100%{opacity:1;}
   }
   @keyframes chunkReveal{
@@ -1429,6 +1430,8 @@
     padding:6px 12px;border-radius:999px;background:var(--emerald);color:#fff;
     font-family:var(--font-d);font-weight:800;font-size:.84rem;box-shadow:0 8px 20px rgba(16,185,129,0.35);
     animation:float-up-fade .95s cubic-bezier(0.22,1,0.36,1) forwards;
+    will-change:transform, opacity;
+    transform:translateZ(0);
   }
   @keyframes float-up-fade{
     0%{opacity:0;transform:translateY(10px) scale(0.9);}
@@ -8835,8 +8838,8 @@ function viewPythonSkill(sid){
       </div>
       <div style="display:flex;gap:10px;align-items:center;margin-left:14px;flex:none;">
         <div class="sprint-xp-pill" style="display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:999px;background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.35);color:#fbbf24;font-size:0.75rem;font-weight:700;white-space:nowrap;letter-spacing:0.01em;" title="Заработано за сутки: ${dayXpVal} XP">⚡ +${dayXpVal || 55} XP за сутки</div>
-        <button type="button" class="topbar-help-btn" data-toggle-audio data-audio-toggle style="padding:6px 14px;border-radius:10px;cursor:pointer;" title="Слушать аудио / Аудио-компаньон"><span class="topbar-audio-text">🎧 Озвучить</span></button>
         <a href="#/docs" class="topbar-help-btn" style="padding:6px 14px;border-radius:10px;" title="Справочник синтаксиса и методов Python"><span class="topbar-help-text">📖 Справка</span></a>
+        <button type="button" class="topbar-help-btn" data-toggle-audio data-audio-toggle style="padding:6px 14px;border-radius:10px;cursor:pointer;" title="Слушать аудио / Аудио-компаньон"><span class="topbar-audio-text">🎧 Озвучить</span></button>
       </div>
     </div>
     <div id="theory-audio-bar" class="theory-audio-bar" style="display:${state.audioBarOpen ? 'flex' : 'none'};">
@@ -14041,8 +14044,7 @@ const psk = e.target.closest('[data-py-select-k]');
     pySkillViewState.sprintCelebration = null;
     saveReadingPosition();
     render();
-    window.scrollTo({ top: 0, behavior: 'instant' });
-    return;
+        return;
   }
   if(e.target.closest('[data-py-toggle-fullnote]')){
     pySkillViewState.fullNoteMode = !pySkillViewState.fullNoteMode;
