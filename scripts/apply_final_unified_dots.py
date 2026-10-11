@@ -185,7 +185,7 @@ new_view_python_skill = """function viewPythonSkill(sid){
         </div>
         <div class="py-flashcard ${isFlipped ? 'flipped' : ''}" data-py-flip-card style="min-height:180px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:26px 20px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);transition:all .25s ease;">
           <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-muted);margin-bottom:8px;">${isFlipped ? 'Ответ' : 'Вопрос (нажмите или пробел)'}</div>
-          <div style="font-size:1.08rem;font-weight:600;line-height:1.45;color:var(--ink);">${isFlipped ? curCard.a : curCard.q}</div>
+          <div style="font-size:1.08rem;font-weight:600;line-height:1.45;color:var(--ink);">${isFlipped ? (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.a) : curCard.a) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.q) : curCard.q)}</div>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;">
           <button class="btn btn-ghost" data-py-prev-card ${cardIdx === 0 ? 'disabled' : ''}>← Назад</button>
