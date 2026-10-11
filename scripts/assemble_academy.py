@@ -6194,10 +6194,6 @@ function viewPythonSkill(sid){
             <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-flip-card>Показать ответ (Пробел)</button>
             <button class="btn btn-ghost" data-py-rate-card="3">Дальше →</button>
           </div>`}
-        <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-          <button class="link-quiet" data-py-tab="theory">← Вернуться к конспекту</button>
-          <button class="link-quiet" style="font-weight:700;color:var(--moss);" data-py-tab="code">Этап 3: Практика кода в IDE (${(sk.taskIds||[]).length} задач) ➔</button>
-        </div>
       </div>`;
   } else {
     // Code Practice tab for this skill
