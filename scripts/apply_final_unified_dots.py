@@ -173,35 +173,29 @@ new_view_python_skill = """function viewPythonSkill(sid){
   } else if(pySkillViewState.tab === 'cards'){
     const deckObj = ALL_DECKS_COMBINED[activeF] || {id: activeF, title: activeF, cards: []};
     const cards = deckObj.cards || [];
-    const cIdx = Math.min(pySkillViewState.cardIdx, Math.max(0, cards.length - 1));
-    const curCard = cards[cIdx] || {q: 'Карточки загружаются', a: ''};
+    const cardIdx = Math.min(pySkillViewState.cardIdx, Math.max(0, cards.length - 1));
+    const curCard = cards[cardIdx] || {q: 'Карточек пока нет', a: ''};
+    const isFlipped = pySkillViewState.cardFlipped;
 
     bodyHTML = `
-      <div class="fc-stage" style="margin:10px auto;max-width:780px;">
-        ${buildFcStoriesBarHTML(deckObj.id, cards.length, cIdx)}
-        <div class="fc-card ${pySkillViewState.cardFlipped?'fc-card--Answer':''}" data-py-flip-card>
-          <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-              <div class="topic-badge">${pySkillViewState.cardFlipped ? 'Ответ' : 'Вопрос'}</div>
-              <a href="#/docs" class="card-help-badge" onclick="event.stopPropagation();" title="Открыть справку по теме в боковой панели">💡 Шпаргалка</a>
-            </div>
-            <div class="fc-q">${formatRichInlineText(curCard.q)}</div>
-            ${pySkillViewState.cardFlipped ? `<div class="fc-a">${formatRichInlineText(curCard.a)}</div>` : ''}
-          </div>
-          <div class="meta" style="margin-top:14px;text-align:center;">${pySkillViewState.cardFlipped ? 'Оцени лёгкость ответа 1–4' : 'Нажми на карточку для переворота'} · Карточка ${cIdx+1} из ${cards.length}</div>
+      <div class="card" style="margin-top:0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <span style="font-size:0.80rem;color:var(--ink-muted);font-weight:600;">Карточка ${cards.length ? cardIdx + 1 : 0} из ${cards.length}</span>
+          <span style="font-size:0.75rem;padding:2px 8px;border-radius:999px;background:rgba(20,90,70,0.1);color:var(--moss);font-weight:600;">Интервальное повторение</span>
         </div>
-        ${pySkillViewState.cardFlipped ? `
-          <div class="fc-rate-row" style="margin-top:12px;">
-            <button class="btn btn-ghost" data-py-rate-card="1">1 · Снова</button>
-            <button class="btn btn-burgundy" data-py-rate-card="2">2 · Трудно (+2 XP)</button>
-            <button class="btn btn-clay" data-py-rate-card="3">3 · Хорошо (+5 XP)</button>
-            <button class="btn btn-primary" data-py-rate-card="4">4 · Легко (+10 XP)</button>
-          </div>` : `
-          <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn btn-ghost" data-py-prev-card ${cIdx===0?'disabled':''}>← Назад</button>
-            <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-flip-card>Показать ответ (Пробел)</button>
-            <button class="btn btn-ghost" data-py-rate-card="3" ${cIdx + 1 >= cards.length ? 'disabled' : ''}>Дальше →</button>
-          </div>`}
+        <div class="py-flashcard ${isFlipped ? 'flipped' : ''}" data-py-flip-card style="min-height:180px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:26px 20px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);transition:all .25s ease;">
+          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-muted);margin-bottom:8px;">${isFlipped ? 'Ответ' : 'Вопрос (нажмите или пробел)'}</div>
+          <div style="font-size:1.08rem;font-weight:600;line-height:1.45;color:var(--ink);">${isFlipped ? curCard.a : curCard.q}</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;">
+          <button class="btn btn-ghost" data-py-prev-card ${cardIdx === 0 ? 'disabled' : ''}>← Назад</button>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost" data-py-rate-card="hard" title="Повторить скоро">Сложно</button>
+            <button class="btn btn-ghost" data-py-rate-card="good" title="В пределах нормы">Нормально</button>
+            <button class="btn btn-emerald" data-py-rate-card="easy" title="Отлично знаю">Легко (+5 MP)</button>
+          </div>
+          <button class="btn btn-ghost" data-py-next-card ${cardIdx + 1 >= cards.length ? 'disabled' : ''}>Дальше →</button>
+        </div>
       </div>`;
   } else if(pySkillViewState.tab === 'code'){
     const tObj = IDE_TASKS_BY_ID[activeTid] || {id: activeTid, title: 'Задача #' + activeTid, desc: '', initialCode: ''};
