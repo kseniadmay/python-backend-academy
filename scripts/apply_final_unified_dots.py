@@ -176,28 +176,12 @@ new_view_python_skill = """function viewPythonSkill(sid){
     const cIdx = Math.min(pySkillViewState.cardIdx, Math.max(0, cards.length - 1));
     const curCard = cards[cIdx] || {q: 'Карточки загружаются', a: ''};
 
-    const activeFIdx = sk.fIds.indexOf(activeF);
-    const prevF = activeFIdx > 0 ? sk.fIds[activeFIdx - 1] : null;
-    const nextF = activeFIdx < sk.fIds.length - 1 ? sk.fIds[activeFIdx + 1] : null;
-
-    const dotsHTML = sk.fIds.map((fid, idx) => {
-      const isCur = fid === activeF;
-      const isDone = state.reviewedDecks.includes(fid);
-      const dObj = ALL_DECKS_COMBINED[fid] || {};
-      return `<span class="track-dot ${isCur ? 'active' : ''} ${isDone ? 'done' : ''}" data-py-select-f="${fid}" title="${fid}: ${dObj.title || fid}"></span>`;
-    }).join('');
-
     bodyHTML = `
-      <div style="display:flex;justify-content:center;margin:8px 0 14px;">
-        <div class="deck-mini-track">
-          <button class="track-arrow" title="Предыдущая колода" ${prevF ? `data-py-select-f="${prevF}"` : 'disabled style="opacity:0.3;cursor:not-allowed;"'}>◀</button>
-          <span>Колода ${activeFIdx + 1} из ${sk.fIds.length} · <strong>${deckObj.id}: ${deckObj.title || deckObj.id}</strong></span>
-          <div class="track-dots">${dotsHTML}</div>
-          <button class="track-arrow" title="Следующая колода" ${nextF ? `data-py-select-f="${nextF}"` : 'disabled style="opacity:0.3;cursor:not-allowed;"'}>▶</button>
+      <div class="card" style="margin-top:0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <span style="font-size:0.80rem;color:var(--ink-muted);font-weight:600;">Карточка ${cards.length ? cIdx + 1 : 0} из ${cards.length}</span>
+          <span style="font-size:0.75rem;padding:2px 8px;border-radius:999px;background:rgba(20,90,70,0.1);color:var(--moss);font-weight:600;">Интервальное повторение</span>
         </div>
-      </div>
-      <div class="fc-stage" style="margin:10px 0;">
-        ${buildFcStoriesBarHTML(deckObj.id, cards.length, cIdx)}
         <div class="fc-card ${pySkillViewState.cardFlipped?'fc-card--Answer':''}" data-py-flip-card>
           <div>
             <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -210,7 +194,7 @@ new_view_python_skill = """function viewPythonSkill(sid){
           <div class="meta" style="margin-top:12px;text-align:center;">Карточка ${cIdx+1} из ${cards.length}</div>
         </div>
         ${pySkillViewState.cardFlipped ? `
-          <div class="fc-rate-row" style="margin-top:12px;">
+          <div class="fc-rate-row" style="margin-top:14px;">
             <button class="btn btn-ghost" data-py-rate-card="1">Снова</button>
             <button class="btn btn-burgundy" data-py-rate-card="2">Трудно (+2 XP)</button>
             <button class="btn btn-clay" data-py-rate-card="3">Хорошо (+5 XP)</button>
@@ -221,7 +205,7 @@ new_view_python_skill = """function viewPythonSkill(sid){
             <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-flip-card>Показать ответ (Пробел)</button>
             <button class="btn btn-ghost" data-py-rate-card="3" ${cIdx + 1 >= cards.length ? 'disabled' : ''}>Дальше →</button>
           </div>`}
-        <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
           <button class="link-quiet" data-py-tab="theory">← Вернуться к конспекту</button>
           <button class="link-quiet" style="font-weight:700;color:var(--moss);" data-py-tab="code">Этап 3: Практика кода в IDE (${(sk.taskIds||[]).length} задач) ➔</button>
         </div>
