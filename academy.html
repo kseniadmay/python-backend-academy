@@ -798,8 +798,50 @@
     overflow-anchor:none;
   }
   .coddy-lesson-card{
-    min-height:280px;
+    height:460px;
+    min-height:460px;
+    max-height:460px;
     overflow-anchor:none;
+  }
+  @media (max-height:620px){
+    .coddy-lesson-card{
+      height:380px !important;
+      min-height:380px !important;
+      max-height:380px !important;
+    }
+  }
+  #py-theory-text,
+  #lesson-theory-text{
+    flex:1;
+    min-height:0;
+    max-height:380px;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    scrollbar-width:thin;
+    scrollbar-gutter:stable;
+  }
+  @media (max-height:620px){
+    #py-theory-text,
+    #lesson-theory-text{
+      max-height:300px !important;
+    }
+  }
+  #py-theory-text::-webkit-scrollbar,
+  #lesson-theory-text::-webkit-scrollbar{
+    width:5px;
+  }
+  #py-theory-text::-webkit-scrollbar-track,
+  #lesson-theory-text::-webkit-scrollbar-track{
+    background:transparent;
+  }
+  #py-theory-text::-webkit-scrollbar-thumb,
+  #lesson-theory-text::-webkit-scrollbar-thumb{
+    background:rgba(0,0,0,0.12);
+    border-radius:999px;
+  }
+  html.dark #py-theory-text::-webkit-scrollbar-thumb,
+  html.dark #lesson-theory-text::-webkit-scrollbar-thumb{
+    background:rgba(255,255,255,0.15);
   }
   .feed-chunk{
     border:none;border-radius:0;padding:2px 0;background:transparent;
@@ -8961,13 +9003,13 @@ function viewPythonSkill(sid){
   if(pySkillViewState.tab === 'theory'){
     const isRead = state.readNotes.includes(activeK);
 
-    const feedHTML = `<div class="scroll-feed" id="py-theory-text">` + chunks.slice(0, curChunkIdx + 1).map((ch, ci) =>
+    const feedHTML = `<div class="scroll-feed" id="py-theory-text" style="flex:1;min-height:0;max-height:380px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-gutter:stable;">` + chunks.slice(0, curChunkIdx + 1).map((ch, ci) =>
       `<div class="feed-chunk ${ci < curChunkIdx ? 'feed-chunk-prev' : 'feed-chunk-new'} lesson-theory" data-chunk-idx="${ci}">${ch}</div>`
     ).join('') + `</div>`;
 
     const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
     const canGoBack = (curChunkIdx > 0 || stepIdx > 0);
-    const backBtnHTML = canGoBack ? `<button type="button" class="btn btn-ghost" data-chunk-prev="py" style="padding:11px 16px;border-radius:14px;font-size:.88rem;">← Назад</button>` : '';
+    const backBtnHTML = `<button type="button" class="btn btn-ghost" data-chunk-prev="py" style="padding:11px 0;width:105px;min-width:105px;max-width:105px;box-sizing:border-box;border-radius:14px;font-size:.88rem;text-align:center;${canGoBack ? '' : 'visibility:hidden;pointer-events:none;'}" ${canGoBack ? '' : 'disabled aria-hidden="true"'}>← Назад</button>`;
 
     let primaryActionHTML = '';
     if(hasMoreChunks){
@@ -8982,10 +9024,10 @@ function viewPythonSkill(sid){
     }
 
     bodyHTML = `
-      <div class="card coddy-lesson-card" style="margin-top:0;display:flex;flex-direction:column;justify-content:space-between;min-height:460px;">
-        <div style="flex:1;">${feedHTML}</div>
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--glass-border);flex-wrap:wrap;flex:none;">
-          <div>${backBtnHTML}</div>
+      <div class="card coddy-lesson-card" style="margin-top:0;display:flex;flex-direction:column;justify-content:space-between;height:460px;min-height:460px;max-height:460px;">
+        <div style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;">${feedHTML}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--glass-border);flex-wrap:nowrap;flex:none;">
+          <div class="py-back-btn-slot" style="flex:0 0 105px;width:105px;min-width:105px;max-width:105px;height:42px;min-height:42px;display:flex;align-items:center;">${backBtnHTML}</div>
           <div style="display:flex;gap:10px;align-items:center;flex:1;justify-content:flex-end;">
             ${primaryActionHTML}
           </div>
@@ -12005,11 +12047,23 @@ lessonTheoryHTML = function(){
   const curChunkIdx = Math.min(lessonMicroState.chunkIdx || 0, Math.max(0, totalChunks - 1));
   const sprintPct = Math.min(100, Math.max(10, Math.round(((sIdx + (curChunkIdx + 1) / Math.max(1, totalChunks)) / Math.max(1, steps.length)) * 100)));
 
-  const feedHTML = `<div class="scroll-feed">` + chunks.slice(0, curChunkIdx + 1).map((ch, ci) =>
+  const feedHTML = `<div class="scroll-feed" id="lesson-theory-text" style="flex:1;min-height:0;max-height:380px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-gutter:stable;">` + chunks.slice(0, curChunkIdx + 1).map((ch, ci) =>
     `<div class="feed-chunk ${ci < curChunkIdx ? 'feed-chunk-prev' : 'feed-chunk-new'} lesson-theory" data-chunk-idx="${ci}">${ch}</div>`
   ).join('') + `</div>`;
 
   const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
+  const canGoBack = (curChunkIdx > 0 || sIdx > 0);
+  const backBtnHTML = `<button type="button" class="btn btn-ghost" data-chunk-prev="lesson" style="padding:11px 0;width:105px;min-width:105px;max-width:105px;box-sizing:border-box;border-radius:14px;font-size:.88rem;text-align:center;${canGoBack ? '' : 'visibility:hidden;pointer-events:none;'}" ${canGoBack ? '' : 'disabled aria-hidden="true"'}>← Назад</button>`;
+
+  let primaryActionHTML = '';
+  if(hasMoreChunks){
+    primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-chunk-more="lesson">Понятно, дальше (+10 XP) ➔</button>`;
+  } else if(sIdx + 1 < steps.length){
+    primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-lstep-jump="${sIdx+1}">Следующий шаг (${sIdx+2}/${steps.length}) (+10 XP) ➔</button>`;
+  } else {
+    primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-lesson-next="check">Дальше: мини-проверка (+10 XP) ${ICONS.arrowRight}</button>`;
+  }
+
   const isLastStepAndChunk = (sIdx + 1 >= steps.length) && !hasMoreChunks;
   const e1 = getEchelonProgress(1);
   const remE1 = e1.skills.filter(s => getSkillMP(s.id) < 100).length;
@@ -12058,21 +12112,13 @@ lessonTheoryHTML = function(){
       </div>
     </div>` : '';
 
-  const primaryLessonActionHTML = hasMoreChunks ? `
-    <div class="floating-step-nav" style="margin-top:14px;">
-      <button class="btn btn-ghost" style="padding:8px 12px;" data-lstep-jump="${Math.max(0, sIdx-1)}" ${sIdx===0?'disabled':''}>← Шаг назад</button>
-      <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-chunk-more="lesson">Понятно, дальше (+10 XP) ➔</button>
-      <span class="sr-only">Кусочек ${curChunkIdx + 1} из ${totalChunks} · <button class="link-quiet" data-chunk-reveal-step="lesson">Открыть шаг целиком</button></span>
-    </div>` : `
-    <div style="margin-top:14px;">
-      <div class="floating-step-nav">
-        <button class="btn btn-ghost" style="padding:8px 12px;" data-lstep-jump="${Math.max(0, sIdx-1)}" ${sIdx===0?'disabled':''}>← Предыдущий шаг</button>
-        ${sIdx + 1 < steps.length
-          ? `<button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-lstep-jump="${sIdx+1}">Следующий шаг (${sIdx+2}/${steps.length}) (+10 XP) ➔</button>`
-          : `<button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-lesson-next="check">Дальше: мини-проверка (+10 XP) ${ICONS.arrowRight}</button>`}
+  const primaryLessonActionHTML = `
+    <div class="floating-step-nav" style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--glass-border);flex-wrap:nowrap;flex:none;box-shadow:none;background:transparent;border-left:none;border-right:none;border-bottom:none;border-radius:0;padding-left:0;padding-right:0;">
+      <div class="lesson-back-btn-slot" style="flex:0 0 105px;width:105px;min-width:105px;max-width:105px;height:42px;min-height:42px;display:flex;align-items:center;">
+        ${backBtnHTML}
       </div>
-      <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:6px;">
-        <button class="link-quiet" data-lesson-next="check">К практике урока →</button>
+      <div style="display:flex;gap:10px;align-items:center;flex:1;justify-content:flex-end;">
+        ${primaryActionHTML}
       </div>
     </div>`;
 
@@ -12093,7 +12139,11 @@ lessonTheoryHTML = function(){
 
   const body = lessonMicroState.fullMode
     ? `${navDrawerHTML}<div class="microstep-card"><div class="lesson-theory">${decorateCodeBlocksWithRunBtn(l.theory)}</div></div>`
-    : `${feedHTML}${primaryLessonActionHTML}${finishSprintBanner}${navDrawerHTML}`;
+    : `<div class="card coddy-lesson-card" style="margin-top:0;display:flex;flex-direction:column;justify-content:space-between;height:460px;min-height:460px;max-height:460px;">
+        <div style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;">${feedHTML}</div>
+        ${primaryLessonActionHTML}
+      </div>
+      ${finishSprintBanner}${navDrawerHTML}`;
 
   return `
     <div class="container">
@@ -13672,6 +13722,61 @@ document.addEventListener('click', async function(e){
       }
       lessonMicroState.chunkIdx = nextCIdx;
       saveLessonDraftState();
+
+      const feedContainer = document.getElementById('lesson-theory-text');
+      const l = (typeof LESSONS !== 'undefined' ? LESSONS[curLid] : null) || {theory:'', title:''};
+      const steps = (typeof splitHtmlIntoMicroSteps === 'function') ? splitHtmlIntoMicroSteps(l.theory, l.title) : [];
+      const curStep = steps[curSIdx] || {title:'', html:''};
+      const chunks = (typeof splitStepHtmlIntoChunks === 'function') ? splitStepHtmlIntoChunks(curStep.html) : [];
+
+      if(feedContainer && nextCIdx < chunks.length){
+        feedContainer.querySelectorAll('.feed-chunk-new').forEach(function(el){
+          el.classList.remove('feed-chunk-new');
+          el.classList.add('feed-chunk-prev');
+        });
+        const newEl = document.createElement('div');
+        newEl.className = 'feed-chunk feed-chunk-new lesson-theory';
+        newEl.setAttribute('data-chunk-idx', nextCIdx);
+        newEl.innerHTML = chunks[nextCIdx];
+        feedContainer.appendChild(newEl);
+
+        const hasMore = (nextCIdx + 1 < chunks.length);
+        const cardParent = feedContainer.closest('.coddy-lesson-card');
+        if(!hasMore){
+          chunkMoreBtn.removeAttribute('data-chunk-more');
+          if(curSIdx + 1 < steps.length){
+            chunkMoreBtn.setAttribute('data-lstep-jump', curSIdx + 1);
+            chunkMoreBtn.textContent = `Следующий шаг (${curSIdx+2}/${steps.length}) (+10 XP) ➔`;
+          } else {
+            chunkMoreBtn.setAttribute('data-lesson-next', 'check');
+            chunkMoreBtn.innerHTML = `Дальше: мини-проверка (+10 XP) ${ICONS.arrowRight}`;
+          }
+        }
+
+        if(cardParent){
+          const backBtn = cardParent.querySelector('[data-chunk-prev]');
+          if(backBtn){
+            backBtn.style.visibility = 'visible';
+            backBtn.style.pointerEvents = 'auto';
+            backBtn.removeAttribute('disabled');
+            backBtn.removeAttribute('aria-hidden');
+          }
+        }
+
+        const sprintPct = Math.min(100, Math.max(10, Math.round(((curSIdx + (nextCIdx + 1) / Math.max(1, chunks.length)) / Math.max(1, steps.length)) * 100)));
+        const fillEl = document.querySelector('.sprint-progress-fill');
+        if(fillEl) fillEl.style.width = sprintPct + '%';
+
+        const xpPill = document.querySelector('.sprint-xp-pill');
+        if(xpPill && typeof todayXp === 'function'){
+          const dayXpVal = todayXp();
+          xpPill.textContent = `⚡ +${dayXpVal} XP за сутки`;
+          xpPill.title = `Заработано за сутки: ${dayXpVal} XP`;
+        }
+
+        feedContainer.scrollTo({ top: feedContainer.scrollHeight, behavior: 'smooth' });
+        return;
+      }
     } else {
       pySkillViewState.sprintCelebration = null;
       const activeK = pySkillViewState.kId || 'unknown';
@@ -13709,25 +13814,31 @@ document.addEventListener('click', async function(e){
         newEl.innerHTML = chunks[nextCIdx];
         feedContainer.appendChild(newEl);
 
-        // Обновляем кнопку действия
+        // Обновляем кнопку действия in-place без пересоздания DOM-узла
         const hasMore = (nextCIdx + 1 < chunks.length);
         const cardParent = feedContainer.closest('.coddy-lesson-card');
         const isRead = state.readNotes && state.readNotes.includes(activeK);
         if(!hasMore){
+          chunkMoreBtn.removeAttribute('data-chunk-more');
           if(curSIdx + 1 < steps.length){
             const stepKey = `${activeK}:${curSIdx+1}`;
             const stepAlreadyDone = isRead || (state.completedNoteSteps && state.completedNoteSteps[stepKey]);
-            chunkMoreBtn.outerHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-next-step="${curSIdx+1}">Понятно, дальше${stepAlreadyDone ? '' : ' (+10 XP)'} ➔</button>`;
+            chunkMoreBtn.setAttribute('data-py-next-step', curSIdx + 1);
+            chunkMoreBtn.textContent = `Понятно, дальше${stepAlreadyDone ? '' : ' (+10 XP)'} ➔`;
           } else {
-            chunkMoreBtn.outerHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-finish-note="${activeK}">${isRead ? '✓ Конспект усвоен' : '✓ Завершить конспект (+10 MP)'}</button>`;
+            chunkMoreBtn.setAttribute('data-py-finish-note', activeK);
+            chunkMoreBtn.textContent = isRead ? '✓ Конспект усвоен' : '✓ Завершить конспект (+10 MP)';
           }
         }
 
-        // Обновляем кнопку «Назад» если её ещё не было
+        // Показываем кнопку «Назад» на месте существующего слота
         if(cardParent){
-          const leftSlot = cardParent.querySelector('div > button[data-chunk-prev]') ? null : cardParent.querySelector('.btn-ghost')?.parentElement;
-          if(leftSlot && !leftSlot.querySelector('[data-chunk-prev]')){
-            leftSlot.innerHTML = `<button type="button" class="btn btn-ghost" data-chunk-prev="py" style="padding:11px 16px;border-radius:14px;font-size:.88rem;">← Назад</button>`;
+          const backBtn = cardParent.querySelector('[data-chunk-prev]');
+          if(backBtn){
+            backBtn.style.visibility = 'visible';
+            backBtn.style.pointerEvents = 'auto';
+            backBtn.removeAttribute('disabled');
+            backBtn.removeAttribute('aria-hidden');
           }
         }
 
@@ -13739,7 +13850,8 @@ document.addEventListener('click', async function(e){
           xpPill.title = `Заработано за сутки: ${dayXpVal} XP`;
         }
 
-        // Никакого автоматического scrollIntoView: экран стоит монолитно, абзацы не шевелятся!
+        // Плавный автоскролл контейнера теории к новому блоку (карточка и кнопка монолитны!)
+        feedContainer.scrollTo({ top: feedContainer.scrollHeight, behavior: 'smooth' });
         return;
       }
     }
@@ -13751,6 +13863,51 @@ document.addEventListener('click', async function(e){
   if(chunkPrevBtn){
     const mode = chunkPrevBtn.getAttribute('data-chunk-prev');
     if(mode === 'lesson'){
+      const feedContainer = document.getElementById('lesson-theory-text');
+      if(feedContainer && lessonMicroState.chunkIdx > 0){
+        const lastChunkEl = feedContainer.querySelector(`[data-chunk-idx="${lessonMicroState.chunkIdx}"]`);
+        if(lastChunkEl){
+          lastChunkEl.remove();
+        }
+        lessonMicroState.chunkIdx -= 1;
+        saveLessonDraftState();
+
+        const curLastChunk = feedContainer.querySelector(`[data-chunk-idx="${lessonMicroState.chunkIdx}"]`);
+        if(curLastChunk){
+          curLastChunk.classList.remove('feed-chunk-prev');
+          curLastChunk.classList.add('feed-chunk-new');
+        }
+
+        const cardParent = feedContainer.closest('.coddy-lesson-card');
+        if(cardParent){
+          if(lessonMicroState.chunkIdx === 0 && (lessonMicroState.stepIdx || 0) === 0){
+            chunkPrevBtn.style.visibility = 'hidden';
+            chunkPrevBtn.style.pointerEvents = 'none';
+            chunkPrevBtn.setAttribute('disabled', '');
+            chunkPrevBtn.setAttribute('aria-hidden', 'true');
+          }
+          const actBtn = cardParent.querySelector('[data-lstep-jump], [data-lesson-next], [data-chunk-more]');
+          if(actBtn){
+            actBtn.removeAttribute('data-lstep-jump');
+            actBtn.removeAttribute('data-lesson-next');
+            actBtn.setAttribute('data-chunk-more', 'lesson');
+            actBtn.textContent = 'Понятно, дальше (+10 XP) ➔';
+          }
+        }
+
+        const curLid = lessonMicroState.lessonId || (lessonState ? lessonState.lessonId : 'unknown');
+        const l = (typeof LESSONS !== 'undefined' ? LESSONS[curLid] : null) || {theory:'', title:''};
+        const steps = (typeof splitHtmlIntoMicroSteps === 'function') ? splitHtmlIntoMicroSteps(l.theory, l.title) : [];
+        const curStep = steps[lessonMicroState.stepIdx || 0] || {title:'', html:''};
+        const chunks = (typeof splitStepHtmlIntoChunks === 'function') ? splitStepHtmlIntoChunks(curStep.html) : [];
+        const sprintPct = Math.min(100, Math.max(10, Math.round((((lessonMicroState.stepIdx || 0) + (lessonMicroState.chunkIdx + 1) / Math.max(1, chunks.length)) / Math.max(1, steps.length)) * 100)));
+        const fillEl = document.querySelector('.sprint-progress-fill');
+        if(fillEl) fillEl.style.width = sprintPct + '%';
+
+        feedContainer.scrollTo({ top: feedContainer.scrollHeight, behavior: 'smooth' });
+        return;
+      }
+
       if(lessonMicroState.chunkIdx > 0){
         lessonMicroState.chunkIdx -= 1;
       } else if(lessonMicroState.stepIdx > 0){
@@ -13759,6 +13916,47 @@ document.addEventListener('click', async function(e){
       }
       saveLessonDraftState();
     } else {
+      const feedContainer = document.getElementById('py-theory-text');
+      if(feedContainer && pySkillViewState.chunkIdx > 0){
+        // Удаляем последний добавленный блок из DOM
+        const lastChunkEl = feedContainer.querySelector(`[data-chunk-idx="${pySkillViewState.chunkIdx}"]`);
+        if(lastChunkEl){
+          lastChunkEl.remove();
+        }
+        pySkillViewState.chunkIdx -= 1;
+        saveReadingPosition();
+
+        // Помечаем актуальный последний блок
+        const curLastChunk = feedContainer.querySelector(`[data-chunk-idx="${pySkillViewState.chunkIdx}"]`);
+        if(curLastChunk){
+          curLastChunk.classList.remove('feed-chunk-prev');
+          curLastChunk.classList.add('feed-chunk-new');
+        }
+
+        const cardParent = feedContainer.closest('.coddy-lesson-card');
+        if(cardParent){
+          // Если откатились на нулевой чанк и нулевой шаг — плавно скрываем слот «Назад»
+          if(pySkillViewState.chunkIdx === 0 && (pySkillViewState.stepIdx || 0) === 0){
+            chunkPrevBtn.style.visibility = 'hidden';
+            chunkPrevBtn.style.pointerEvents = 'none';
+            chunkPrevBtn.setAttribute('disabled', '');
+            chunkPrevBtn.setAttribute('aria-hidden', 'true');
+          }
+          // Кнопка действия возвращается в состояние data-chunk-more
+          const actBtn = cardParent.querySelector('[data-py-next-step], [data-py-finish-note], [data-chunk-more]');
+          if(actBtn){
+            actBtn.removeAttribute('data-py-next-step');
+            actBtn.removeAttribute('data-py-finish-note');
+            actBtn.setAttribute('data-chunk-more', 'py');
+            actBtn.textContent = 'Понятно, дальше (+10 XP) ➔';
+          }
+        }
+
+        // Мягко скроллим контейнер к текущему концу контента
+        feedContainer.scrollTo({ top: feedContainer.scrollHeight, behavior: 'smooth' });
+        return;
+      }
+
       if(pySkillViewState.chunkIdx > 0){
         pySkillViewState.chunkIdx -= 1;
       } else if(pySkillViewState.stepIdx > 0){
@@ -14087,23 +14285,32 @@ const psk = e.target.closest('[data-py-select-k]');
 
     if(feedContainer && chunks.length > 0){
       feedContainer.innerHTML = `<div class="feed-chunk feed-chunk-new lesson-theory" data-chunk-idx="0">${chunks[0]}</div>`;
+      feedContainer.scrollTo({ top: 0, behavior: 'auto' });
       const cardParent = feedContainer.closest('.coddy-lesson-card');
       const isRead = state.readNotes && state.readNotes.includes(activeK);
       const hasMoreChunks = (chunks.length > 1);
       if(hasMoreChunks){
-        pns.outerHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-chunk-more="py">Понятно, дальше (+10 XP) ➔</button>`;
+        pns.removeAttribute('data-py-next-step');
+        pns.setAttribute('data-chunk-more', 'py');
+        pns.textContent = 'Понятно, дальше (+10 XP) ➔';
       } else if(nextStepIdx + 1 < steps.length){
         const nextKey = `${activeK}:${nextStepIdx+1}`;
         const stepAlreadyDone = isRead || (state.completedNoteSteps && state.completedNoteSteps[nextKey]);
-        pns.outerHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-next-step="${nextStepIdx+1}">Понятно, дальше${stepAlreadyDone ? '' : ' (+10 XP)'} ➔</button>`;
+        pns.setAttribute('data-py-next-step', nextStepIdx + 1);
+        pns.textContent = `Понятно, дальше${stepAlreadyDone ? '' : ' (+10 XP)'} ➔`;
       } else {
-        pns.outerHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-finish-note="${activeK}">${isRead ? '✓ Конспект усвоен' : '✓ Завершить конспект (+10 MP)'}</button>`;
+        pns.removeAttribute('data-py-next-step');
+        pns.setAttribute('data-py-finish-note', activeK);
+        pns.textContent = isRead ? '✓ Конспект усвоен' : '✓ Завершить конспект (+10 MP)';
       }
 
       if(cardParent){
-        const leftSlot = cardParent.querySelector('div > button[data-chunk-prev]') ? null : cardParent.querySelector('.btn-ghost')?.parentElement;
-        if(leftSlot && !leftSlot.querySelector('[data-chunk-prev]')){
-          leftSlot.innerHTML = `<button type="button" class="btn btn-ghost" data-chunk-prev="py" style="padding:11px 16px;border-radius:14px;font-size:.88rem;">← Назад</button>`;
+        const backBtn = cardParent.querySelector('[data-chunk-prev]');
+        if(backBtn){
+          backBtn.style.visibility = 'visible';
+          backBtn.style.pointerEvents = 'auto';
+          backBtn.removeAttribute('disabled');
+          backBtn.removeAttribute('aria-hidden');
         }
       }
 
