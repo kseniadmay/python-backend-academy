@@ -75,7 +75,7 @@
 ├── 📄 Практика кода — тренажёр с IDE.html        # Автономный тренажёр на 401 задачу (~361 КБ)
 ├── 📦 Python_Backend_Academy_Project.zip         # Полный архив проекта (546 файлов)
 ├── 📦 RemNote_Python_Mastery_FIXED.zip           # Архив канонической базы конспектов и карточек
-├── 📂 design_mockups\                            # Утверждённые эталонные макеты мобильного дизайна (mobile_test_step1..3.png, mobile_coddy_flow.png)
+├── 📂 design_mockups\                            # Каталог эталонов (canonical_pro_screen_benchmark.html/.png) и утверждённые макеты мобильного дизайна (mobile_test_step1..3.png, mobile_coddy_flow.png)
 ├── 📂 RemNote_Python_Mastery_FIXED\              # Каноническая база конспектов и карточек (525 .md файлов: мастер-индекс + 238 К-* + 286 Ф-*)
 │   ├── 📄 00 · 🗺️ Карта Мастерства.md            # Мастер-индекс: 7 модулей (01–07), 45 юнитов, 126 навыков
 │   ├── 📂 01 · 🐍 Python\                        # 9 юнитов (1.1–1.9), 28 навыков: 68 К-* + 125 Ф-* (193 файла) — ✅ ВЫЧИТАНО И ВШИТО В #/python
@@ -339,6 +339,67 @@
 3. **Деплой**: `package.json` (npm start → `scripts/server.js`, зависимость `pg`), `render.yaml` (Blueprint: web service, healthcheck `/healthz`, envVars `SYNC_TOKEN`/`DATABASE_URL` sync:false), `.env.example`, инструкция в README («Синхронизация прогресса ПК ↔ телефон через интернет»: Neon → Render Blueprint → код на обоих устройствах; перенос накопленного прогресса через экспорт/импорт JSON). В production сервер требует оба env (fail-fast).
 4. **e2e-тесты приведены к новым экранам Coddy** (`scripts/test_e2e_dom.js`): ассерты skill-view переписаны под сплит-экран ✅24 («Шаг 1/», `sprint-focus-topbar`, `coddy-lesson-card`, chunk-CTA вместо «Навык N.N.N»/«Микро-шаг 1 из»/microstep-dot); MP-ассерты переведены на экспортированный `window.getSkillMP` (не зависят от разметки); мок Brython обновлён под новый мост `pba_result_bridge`/`pba_stdout_cb`; ассерты Consolidation Lab/floating-step-nav/echelon-бейджей ослаблены до негативных (UI сознательно удалён коммитами 9c9aa30/деклаттерингом). Итог: e2e 100% PERFECT (~20 с).
 5. **Кэш PWA**: поднят до `academy-pwa-v15` в `sw.js` (в academy.html добавлен экспорт `window.getSkillMP` для e2e).
+
+---
+
+## 5. Каталог эталонов и канонический каркас интерфейса
+
+### 🏛️ Утверждённый статус эталонов (Canonical Benchmarks)
+По результатам согласования реальное живое состояние интерфейса платформы (зафиксированное в `test_authentic_improvements.html` и `test_authentic_improvements.png`) утверждено в качестве **КАНОНИЧЕСКОГО ЭТАЛОНА (BENCHMARK)** для всех последующих сессий и доработок.
+
+Файлы эталонов размещены и зафиксированы:
+- `design_mockups/canonical_pro_screen_benchmark.html` — полный автономный HTML-эталон живого состояния со всеми скриптами, стилями и разметкой (зеркало в `C:\Users\fury6\.gemini\antigravity\scratch\design_mockups\canonical_pro_screen_benchmark.html`).
+- `design_mockups/canonical_pro_screen_benchmark.png` — утверждённый визуальный референс рендеринга высокого разрешения (зеркало в `C:\Users\fury6\.gemini\antigravity\scratch\design_mockups\canonical_pro_screen_benchmark.png`).
+
+---
+
+### 🎨 Канонический каркас и спецификации компонентов
+
+#### 1. Спецификация фона и атмосферы (Evening Obsidian & Ambient Orbs)
+- **Базовый фон**: Тёмная тема «Вечерний Обсидиан» (`#0d1016`, токен `--paper: #0d1016;`).
+- **Фиксированные световые сферы (Ambient Orbs)**: создают эффект эфемеризации и глубокого объёма без утяжеления интерфейса:
+  - `.ambient-orb--burgundy`:
+    - `width: 380px; height: 380px;`
+    - `top: -90px; left: -80px;`
+    - `background: rgba(190, 18, 60, 0.24);` (в тёмной теме токен `--orb-burgundy`)
+    - `filter: blur(68px); border-radius: 50%; pointer-events: none; z-index: 0; position: fixed;`
+  - `.ambient-orb--emerald`:
+    - `width: 360px; height: 360px;`
+    - `bottom: -80px; right: -70px;`
+    - `background: rgba(16, 185, 129, 0.20);` (в тёмной теме токен `--orb-emerald`)
+    - `filter: blur(68px); border-radius: 50%; pointer-events: none; z-index: 0; position: fixed;`
+- **Контраст поверхностей**: полупрозрачные поверхности `.surface` с `background: rgba(22, 27, 36, 0.74)` и размытием `backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);`.
+
+#### 2. Спецификация десктопного сайдбара (Desktop Sidebar)
+- **Геометрия**: фиксированная ширина `width: 236px; flex: none; height: 100vh; position: sticky; top: 0;`.
+- **Материал**: `background: var(--surface)` (`rgba(22, 27, 36, 0.74)`), граница `border-right: 1px solid var(--line)` (`rgba(255, 255, 255, 0.09)`), стекло `backdrop-filter: blur(20px);`.
+- **Бренд и логотип**: `.brand` (шрифт Onest, `font-weight: 700; font-size: 1.15rem;`, векторная SVG-пиктограмма сети узлов графа знаний, подзаголовок `.brand-sub`).
+- **Навигация**: векторные SVG-иконки из словаря `ICONS` (`#/path`, `#/map`, `#/practice`, `#/cards`, `#/mock`, `#/docs`, `#/sandbox`, `#/settings`) с активным изумрудным выделением `.active` (`--moss-soft` / `--moss-deep`).
+- **Статусные чипы подвала (`.sidebar-foot`)**:
+  - Томат-таймер 🍅 15:00: быстрая кнопка запуска `.btn-quick-start` `[data-quick-microstep]` («⚡ Микро-шаг (2 мин)») и глобальный чип Pomodoro (`.topbar-pomo-pill`).
+  - Стрик активности 🔥: плашка `.streak-pill` с SVG-пламенем `id="flame-icon-d"` и счётчиком дней `id="streak-num-d"` (например, `11 дней подряд`).
+  - Переключатель темы: компактная кнопка `.icon-btn` `id="theme-toggle-d"` (`aria-label="Переключить тему"`).
+  - Тихие ссылки: `.link-quiet` `id="reset-btn-d"` («Сбросить прогресс»).
+
+#### 3. Спецификация режима «Путь» (Pro Path View — `viewProPath` в `academy.html`)
+- **Лейаут**: двухколоночный грид `.coddy-path-layout` (основной контент `.path-pro-wrap` + правый рейл `.coddy-right-rail`).
+- **Hero-карточка текущего урока (`.pro-hero-card`)**:
+  - Хлебные крошки Coddy: `.pro-hero-breadcrumb` (`ПРОГРАММА › РАЗДЕЛ N · ГЛАВА N`).
+  - Заголовок и мета: `.pro-hero-title` (`Юнит X.Y · Название темы`) и `.pro-hero-meta` (`Глава N: Название · X/Y уроков · %`).
+  - Доминантная 3D CTA кнопка: оранжевая стеклянная `.btn-3d-orange.pro-hero-cta` («ПРОДОЛЖИТЬ»).
+  - Двухуровневый прогресс главы: сплошной трек `.pro-hero-progress-track` с градиентным заполнением + сегментированная полоса юнитов `.path-chapter-progress-row` с мишенью 🎯 и барами `.path-seg-bar` (`.done`, `.active`).
+- **Аккордеон глав курса (`.pro-chapter-box`, Главы 1–7)**:
+  - Шапка главы `.pro-chapter-header`: номер главы, название, счётчик сдачи `X/Y · %` и анимированный шеврон `▼`.
+  - Список уроков `.pro-lesson-list` с карточками `.pro-lesson-row`:
+    - Индикаторы состояния: пройден `✓` (`.pro-icon-done`), текущий `▶` (`.pro-icon-play`), заблокирован `🔒` (`.pro-icon-locked`).
+    - Бейджи типа активности: `.pro-lesson-badge` («Теория + Практика» или «Испытание»).
+    - Пилюли ключевых тем: превью навыков конспекта в виде компактных стеклянных тегов.
+- **Радар скрининга и правый рейл (`.coddy-right-rail`)**:
+  - Верхний стат-бар: 📘 `X/45` юнитов, 🔥 стрик дней, 💎 общий XP.
+  - Виджет готовности к скринингу: `.coddy-rail-card` «🎯 До 1-го скрининга» (процент готовности Эшелона 1 + обратный отсчёт оставшихся тем).
+  - Радар тем скрининга: «🎯 Радар скрининга» (14 тем обязательного тех-скрининга: сложность O(n), хеш-таблицы dict/set, SQL JOIN и индексы и др.).
+  - Очередь SRS-блиц: «🧠 Очередь SRS» (интервальное повторение ключевых терминов: GIL, MRO, Дескрипторы со ссылкой в `#/cards`).
+  - Цель дня и повторение: «🎯 Цель дня» (прогресс дневного XP) и компактный переход к карточкам «🃏 Повторение карточек».
 
 ---
 
