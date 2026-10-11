@@ -14046,8 +14046,50 @@ const psk = e.target.closest('[data-py-select-k]');
     pySkillViewState.chunkIdx = 0;
     pySkillViewState.sprintCelebration = null;
     saveReadingPosition();
+
+    // Бесшовное переключение шага без перерисовки всей страницы и без прыжков кнопки
+    const feedContainer = document.getElementById('py-theory-text');
+    const noteObj = (typeof ALL_NOTES_COMBINED !== 'undefined' ? ALL_NOTES_COMBINED[activeK] : null) || {steps:[]};
+    const steps = noteObj.steps || [];
+    const curStep = steps[nextStepIdx] || {title:'', html:''};
+    const chunks = (typeof splitStepHtmlIntoChunks === 'function') ? splitStepHtmlIntoChunks(curStep.html).slice() : [];
+    if(chunks.length > 0 && curStep.title && !/^<h[1-6]\b/i.test(String(chunks[0] || '').trim())){
+      chunks[0] = `<h4>${curStep.title}</h4>\n` + chunks[0];
+    }
+
+    if(feedContainer && chunks.length > 0){
+      feedContainer.innerHTML = `<div class="feed-chunk feed-chunk-new lesson-theory" data-chunk-idx="0">${chunks[0]}</div>`;
+      const cardParent = feedContainer.closest('.coddy-lesson-card');
+      const isRead = state.readNotes && state.readNotes.includes(activeK);
+      const hasMoreChunks = (chunks.length > 1);
+      if(hasMoreChunks){
+        pns.outerHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-chunk-more="py">Понятно, дальше (+10 XP) ➔</button>`;
+      } else if(nextStepIdx + 1 < steps.length){
+        const nextKey = `${activeK}:${nextStepIdx+1}`;
+        const stepAlreadyDone = isRead || (state.completedNoteSteps && state.completedNoteSteps[nextKey]);
+        pns.outerHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-next-step="${nextStepIdx+1}">Понятно, дальше${stepAlreadyDone ? '' : ' (+10 XP)'} ➔</button>`;
+      } else {
+        pns.outerHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-finish-note="${activeK}">${isRead ? '✓ Конспект усвоен' : '✓ Завершить конспект (+10 MP)'}</button>`;
+      }
+
+      if(cardParent){
+        const leftSlot = cardParent.querySelector('div > button[data-chunk-prev]') ? null : cardParent.querySelector('.btn-ghost')?.parentElement;
+        if(leftSlot && !leftSlot.querySelector('[data-chunk-prev]')){
+          leftSlot.innerHTML = `<button type="button" class="btn btn-ghost" data-chunk-prev="py" style="padding:11px 16px;border-radius:14px;font-size:.88rem;">← Назад</button>`;
+        }
+      }
+
+      const xpPill = document.querySelector('.sprint-xp-pill');
+      if(xpPill && typeof todayXp === 'function'){
+        const dayXpVal = todayXp();
+        xpPill.textContent = `⚡ +${dayXpVal} XP за сутки`;
+        xpPill.title = `Заработано за сутки: ${dayXpVal} XP`;
+      }
+      return;
+    }
+
     render();
-        return;
+    return;
   }
   if(e.target.closest('[data-py-toggle-fullnote]')){
     pySkillViewState.fullNoteMode = !pySkillViewState.fullNoteMode;
