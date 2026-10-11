@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Улучшение экрана Практики: Сравнение вариантов Coddy Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #090d14;
+    --panel: #111722;
+    --panel-subtle: rgba(255, 255, 255, 0.035);
+    --border: rgba(255, 255, 255, 0.08);
+    --border-hover: rgba(52, 211, 153, 0.35);
+    --text: #e2e8f0;
+    --text-muted: #8896ab;
+    --text-dim: #64748b;
+    --emerald: #10b981;
+    --emerald-light: #34d399;
+    --emerald-glow: rgba(16, 185, 129, 0.25);
+    --emerald-glass: rgba(16, 185, 129, 0.12);
+    --amber: #f59e0b;
+    --amber-glass: rgba(245, 158, 11, 0.12);
+    --code-bg: #0b0f17;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Onest', sans-serif;
+    line-height: 1.5;
+    padding: 24px 20px 80px;
+    background-image: 
+      radial-gradient(ellipse at 20% 0%, rgba(20, 90, 70, 0.25) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 10%, rgba(217, 119, 6, 0.14) 0%, transparent 50%);
+  }
+  .proto-container {
+    max-width: 980px;
+    margin: 0 auto;
+  }
+  .proto-header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .proto-badge {
+    display: inline-block;
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--emerald-light);
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    padding: 3px 12px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+  }
+  .proto-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+  .proto-desc {
+    font-size: 0.90rem;
+    color: var(--text-muted);
+    max-width: 620px;
+    margin: 0 auto 18px;
+  }
+  .tab-nav {
+    display: inline-flex;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 4px;
+    gap: 4px;
+    margin-bottom: 22px;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    padding: 7px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .tab-btn.active {
+    background: var(--emerald);
+    color: #042f1f;
+    box-shadow: 0 2px 14px var(--emerald-glow);
+  }
+
+  /* Tracker Dots */
+  .dots-necklace {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 14px;
+    margin-bottom: 20px;
+  }
+  .dot-jewel {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    transition: all .2s;
+  }
+  .dot-jewel.done { background: var(--emerald); box-shadow: 0 0 6px rgba(16,185,129,0.5); }
+  .dot-jewel.active { background: #fff; transform: scale(1.3); box-shadow: 0 0 8px rgba(255,255,255,0.8); }
+  .dots-divider { width: 1px; height: 10px; background: rgba(255,255,255,0.18); margin: 0 4px; }
+
+  /* Card Split */
+  .practice-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 22px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  }
+  .split-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: 20px;
+    align-items: stretch;
+  }
+  @media (max-width: 860px) {
+    .split-layout { grid-template-columns: 1fr; }
+  }
+
+  /* Left Pane */
+  .left-pane {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+  }
+  .task-meta-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .meta-tag-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .badge-id { color: var(--text-muted); }
+  .badge-tier {
+    background: var(--amber-glass);
+    color: var(--amber);
+    padding: 2px 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+  }
+  .badge-counter {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .link-docs {
+    font-size: 0.78rem;
+    color: var(--emerald-light);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.9;
+  }
+  .link-docs:hover { opacity: 1; text-decoration: underline; }
+
+  .task-mission {
+    font-size: 0.90rem;
+    color: #cbd5e1;
+    line-height: 1.55;
+    margin-bottom: 14px;
+  }
+  .code-inline {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 6px;
+    padding: 1px 6px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.82rem;
+    color: #38bdf8;
+  }
+
+  /* Data-Flow Transform Card (The Upgrade) */
+  .dataflow-card {
+    background: rgba(16, 185, 129, 0.04);
+    border: 1px solid rgba(16, 185, 129, 0.20);
+    border-radius: 14px;
+    padding: 14px;
+    margin: 10px 0 16px;
+  }
+  .dataflow-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--emerald-light);
+    margin-bottom: 10px;
+  }
+  .dataflow-stream {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.82rem;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .df-box {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+  }
+  .df-label {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    font-family: 'Onest', sans-serif;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .df-val {
+    color: #34d399;
+    font-weight: 600;
+    word-break: break-all;
+  }
+  .df-val.input-val { color: #94a3b8; }
+  .df-arrow {
+    color: var(--emerald);
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 0 4px;
+    flex: none;
+  }
+
+  /* Socratic Hints Box */
+  .hints-box {
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .hint-btn {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 9px 14px;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all .2s;
+  }
+  .hint-btn:hover {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.35);
+    color: var(--amber);
+  }
+  .hint-content {
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.22);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-top: 10px;
+    font-size: 0.82rem;
+    color: #fde68a;
+    line-height: 1.45;
+  }
+
+  /* Right Pane (Code Editor & Zero-Keyboard) */
+  .right-pane {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .editor-shell {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .editor-top-tray {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.025);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .editor-top-tray::-webkit-scrollbar { height: 4px; }
+  .editor-top-tray::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+  .key-chip {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-muted);
+    font-family: 'Fira Code', monospace;
+    font-size: 0.74rem;
+    padding: 3px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .15s;
+  }
+  .key-chip:hover {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: var(--emerald-light);
+    color: #fff;
+  }
+  .key-chip.special-chip {
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.3);
+    color: var(--emerald-light);
+    font-weight: 600;
+  }
+
+  .editor-body {
+    display: flex;
+    min-height: 230px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.84rem;
+    line-height: 1.6;
+  }
+  .line-numbers {
+    padding: 12px 10px;
+    color: #475569;
+    text-align: right;
+    user-select: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.2);
+  }
+  .code-textarea {
+    flex: 1;
+    padding: 12px 14px;
+    background: transparent;
+    border: none;
+    color: #f1f5f9;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    resize: none;
+    outline: none;
+    white-space: pre-wrap; /* No horizontal scrollbar! */
+    word-break: break-word;
+  }
+
+  /* Quick Tokens Bar (Placed neatly under editor) */
+  .quick-tokens-tray {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin: 10px 0 14px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .quick-tray-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    margin-right: 2px;
+  }
+  .token-pill {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.76rem;
+    color: #93c5fd;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .token-pill:hover {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: #38bdf8;
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+  /* CTA Bar */
+  .action-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .btn-reset {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.84rem;
+    font-weight: 600;
+    padding: 12px 16px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all .2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-reset:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+  .btn-check-solution {
+    flex: 1;
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    border: 1px solid rgba(52, 211, 153, 0.4);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 0.90rem;
+    font-weight: 700;
+    padding: 13px 20px;
+    border-radius: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35);
+    transition: all .2s ease;
+  }
+  .btn-check-solution:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(16, 185, 129, 0.5);
+    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    color: #042f1f;
+  }
+  .xp-tag {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 1px 6px;
+    font-size: 0.74rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="proto-container">
+  <div class="proto-header">
+    <div class="proto-badge">Coddy Mastery UI Redesign</div>
+    <h1 class="proto-title">Интерактивный редизайн экрана Практики</h1>
+    <p class="proto-desc">Устранение визуального шума, избавление от горизонтального скролла, наглядный Data-Flow I/O и собранный Zero-Keyboard инструментарий.</p>
+    <div class="tab-nav">
+      <button class="tab-btn active" id="tab-v1" onclick="switchView('v1')">Вариант 1: Coddy Studio Pro (Рекомендуемый)</button>
+      <button class="tab-btn" id="tab-v2" onclick="switchView('v2')">Вариант 2: Compact Minimalist</button>
+    </div>
+  </div>
+
+  <!-- Eyebrow & Tracker -->
+  <div style="text-align: center; margin-bottom: 14px;">
+    <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 2px;">Юнит 1.1 · Базовый синтаксис</div>
+    <div style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 10px;">Разворот списка срезом [::-1]</div>
+    <div class="dots-necklace">
+      <span class="dot-jewel done" title="Конспект 1"></span>
+      <span class="dot-jewel done" title="Конспект 2"></span>
+      <span class="dot-jewel done" title="Конспект 3"></span>
+      <span class="dots-divider"></span>
+      <span class="dot-jewel done" title="Карточки 1"></span>
+      <span class="dots-divider"></span>
+      <span class="dot-jewel active" title="Задача #20"></span>
+      <span class="dot-jewel" title="Задача #19"></span>
+      <span class="dot-jewel" title="Задача #39"></span>
+      <span class="dot-jewel" title="Задача #255"></span>
+      <span class="dot-jewel" title="Задача #258"></span>
+      <span class="dots-divider"></span>
+      <span class="dot-jewel" title="Рубежный зачет"></span>
+    </div>
+  </div>
+
+  <!-- Variant 1: Coddy Studio Pro -->
+  <div id="view-v1" class="practice-card">
+    <div class="split-layout">
+      <!-- Left Pane -->
+      <div class="left-pane">
+        <div>
+          <div class="task-meta-bar">
+            <div class="meta-tag-group">
+              <span class="badge-id">Задача #20</span>
+              <span class="badge-tier">🥚 Уровень 1</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="badge-counter">1 из 5</span>
+              <span style="color:var(--border);">·</span>
+              <a href="#/docs" class="link-docs">📖 Справка</a>
+            </div>
+          </div>
+
+          <div class="task-mission">
+            <strong>Задание:</strong> Создайте исходный список чисел <code class="code-inline">original</code> и получите его инвертированную копию <code class="code-inline">reversed_list</code> с помощью шага среза <code class="code-inline">[::-1]</code>.
+          </div>
+
+          <!-- DataFlow Transform Visualizer -->
+          <div class="dataflow-card">
+            <div class="dataflow-header">
+              <span>⚡ Поток данных (I/O Flow)</span>
+              <span style="font-family:'Fira Code'; font-size:0.75rem; color:#93c5fd;">step: -1</span>
+            </div>
+            <div class="dataflow-stream">
+              <div class="df-box">
+                <span class="df-label">Вход (original)</span>
+                <span class="df-val input-val">[1, 2, 3, 4, 5]</span>
+              </div>
+              <div class="df-arrow">➔</div>
+              <div class="df-box">
+                <span class="df-label">Ожидание (результат)</span>
+                <span class="df-val">[5, 4, 3, 2, 1]</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hints-box">
+          <button class="hint-btn" id="v1-hint-btn" onclick="toggleHint('v1')">
+            💡 Сократовская наводка (1/4)
+          </button>
+          <div id="v1-hint-content" class="hint-content" style="display:none;">
+            Какое третье значение в синтаксисе среза <code class="code-inline">[start:stop:step]</code> отвечает за шаг обхода в обратную сторону?
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Pane -->
+      <div class="right-pane">
+        <div>
+          <div class="editor-shell">
+            <div class="editor-top-tray">
+              <button class="key-chip special-chip" onclick="insertCode('v1', '[::-1]')">[::-1]</button>
+              <button class="key-chip" onclick="insertCode('v1', 'original')">original</button>
+              <button class="key-chip" onclick="insertCode('v1', 'reversed_list')">reversed_list</button>
+              <button class="key-chip" onclick="insertCode('v1', '    ')">Tab ⇥</button>
+              <button class="key-chip" onclick="insertCode('v1', ':')">:</button>
+              <button class="key-chip" onclick="insertCode('v1', '[]')">[ ]</button>
+              <button class="key-chip" onclick="insertCode('v1', '()')">( )</button>
+              <button class="key-chip" onclick="insertCode('v1', '{}')">{ }</button>
+            </div>
+            <div class="editor-body">
+              <div class="line-numbers">1<br>2<br>3<br>4<br>5</div>
+              <textarea id="v1-code" class="code-textarea" spellcheck="false"># Задача #20: Реверс списка срезом
+# Заполните целевые переменные:
+original = None  # TODO: [1, 2, 3, 4, 5]
+reversed_list = None  # TODO: реверс</textarea>
+            </div>
+          </div>
+
+          <!-- Quick Tokens Tray -->
+          <div class="quick-tokens-tray">
+            <span class="quick-tray-label">Вставка:</span>
+            <button class="token-pill" onclick="insertCode('v1', '[1, 2, 3, 4, 5]')">[1, 2, 3, 4, 5]</button>
+            <button class="token-pill" onclick="insertCode('v1', 'original[::-1]')">original[::-1]</button>
+            <button class="token-pill" onclick="insertCode('v1', '[::-1]')">[::-1]</button>
+          </div>
+        </div>
+
+        <div class="action-bar">
+          <button class="btn-reset" onclick="resetCode('v1')" title="Сбросить код к шаблону">↺ Сбросить</button>
+          <button class="btn-check-solution" onclick="alert('Решение верное! +15 XP')">
+            <span>▶ Проверить решение</span>
+            <span class="xp-tag">+15 XP</span>
+            <span style="font-size:0.75rem; opacity:0.8;">(Ctrl+Enter)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Variant 2: Compact Minimalist -->
+  <div id="view-v2" class="practice-card" style="display:none;">
+    <div class="split-layout">
+      <div class="left-pane" style="background:transparent; border-color:transparent; padding:6px;">
+        <div>
+          <div class="task-meta-bar">
+            <span class="badge-tier">🥚 Уровень 1 · Задача #20</span>
+            <span class="badge-counter">Шаг 1 из 5</span>
+          </div>
+          <div class="task-mission" style="font-size:0.95rem;">
+            Инициализируйте <code class="code-inline">original = [1, 2, 3, 4, 5]</code> и создайте копию с разворотом <code class="code-inline">reversed_list</code>.
+          </div>
+          <div style="background:rgba(255,255,255,0.03); border-radius:12px; padding:12px; border:1px solid var(--border); font-family:'Fira Code'; font-size:0.82rem; margin:14px 0;">
+            <div style="color:#94a3b8;"># Ожидаемый вывод:</div>
+            <div style="color:#34d399; margin-top:4px;">reversed_list == [5, 4, 3, 2, 1]</div>
+          </div>
+        </div>
+        <div class="hints-box">
+          <button class="hint-btn" onclick="toggleHint('v2')">💡 Подсказка (1/4)</button>
+          <div id="v2-hint-content" class="hint-content" style="display:none;">
+            Используйте отрицательный шаг среза: <code class="code-inline">list[::-1]</code>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-pane">
+        <div class="editor-shell">
+          <div class="editor-body" style="min-height:260px;">
+            <div class="line-numbers">1<br>2<br>3<br>4</div>
+            <textarea id="v2-code" class="code-textarea" spellcheck="false">original = [1, 2, 3, 4, 5]
+reversed_list = original[::-1]</textarea>
+          </div>
+        </div>
+        <div style="margin-top:14px;" class="action-bar">
+          <button class="btn-check-solution" style="width:100%;" onclick="alert('Успешно решено!')">
+            <span>Проверить решение (Ctrl+Enter)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function switchView(tab){
+  document.getElementById('view-v1').style.display = (tab === 'v1') ? 'block' : 'none';
+  document.getElementById('view-v2').style.display = (tab === 'v2') ? 'block' : 'none';
+  document.getElementById('tab-v1').classList.toggle('active', tab === 'v1');
+  document.getElementById('tab-v2').classList.toggle('active', tab === 'v2');
+}
+function toggleHint(tab){
+  const el = document.getElementById(tab + '-hint-content');
+  if(el){
+    el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+  }
+}
+function insertCode(tab, txt){
+  const ta = document.getElementById(tab + '-code');
+  if(!ta) return;
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const val = ta.value;
+  ta.value = val.substring(0, start) + txt + val.substring(end);
+  ta.focus();
+  ta.selectionStart = ta.selectionEnd = start + txt.length;
+}
+function resetCode(tab){
+  const ta = document.getElementById(tab + '-code');
+  if(!ta) return;
+  ta.value = '# Задача #20: Реверс списка срезом\n# Заполните целевые переменные:\noriginal = None  # TODO: [1, 2, 3, 4, 5]\nreversed_list = None  # TODO: реверс';
+}
+</script>
+</body>
+</html>
