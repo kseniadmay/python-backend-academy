@@ -779,6 +779,7 @@
     border:none;border-radius:0;padding:2px 0;background:transparent;
     box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;
     overflow-anchor:none;
+    contain:layout style;
   }
   .feed-chunk + .feed-chunk{
     border-top:none;
@@ -1165,7 +1166,8 @@
   .microstep-card{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:22px 24px;box-shadow:var(--shadow-1);margin-bottom:14px;overflow-x:hidden;}
   .lesson-theory table,.microstep-card table,.feed-chunk table{display:block;width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .lesson-theory pre,.microstep-card pre,.feed-chunk pre{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-  .code-snippet-wrap,.snippet-wrap{position:relative;margin-bottom:14px;}
+  .code-snippet-wrap,.snippet-wrap{position:relative;margin-bottom:14px;min-height:56px;contain:layout;}
+  .code-snippet-wrap pre,.snippet-wrap pre{min-height:48px;contain:layout;}
   .code-run-bar{display:flex;align-items:center;justify-content:space-between;background:var(--surface-2);border:1px solid var(--line);border-bottom:none;border-radius:12px 12px 0 0;padding:6px 12px;}
   .snippet-wrap pre{margin-top:0 !important;border-top-left-radius:0 !important;border-top-right-radius:0 !important;}
   .run-inline-btn{position:absolute;top:8px;right:8px;background:rgba(16,185,129,0.22);color:var(--ink);border:1px solid rgba(52,211,153,0.45);border-radius:10px;padding:4px 10px;font-size:.74rem;font-weight:700;cursor:pointer;backdrop-filter:blur(8px);}
@@ -8761,14 +8763,15 @@ function buildSprintFinishCelebrationHTML(cel){
   const isAlreadyRead = Boolean(cel.wasAlreadyRead || (state.readNotes && state.readNotes.includes(cel.kid)));
   const xpBadge = isAlreadyRead ? '' : ' · +15 XP';
   return `
-    <div class="sprint-finish-card" style="max-width:520px;margin:14px auto;text-align:center;">
-      <div class="sprint-finish-orb" style="font-size:2.2rem;margin-bottom:6px;">✨</div>
-      <div class="cocoon-focus-eyebrow" style="margin-bottom:6px;">Конспект закреплён${xpBadge}</div>
-      <h2 style="font-size:1.35rem;margin-bottom:8px;">Конспект ${escapeHtmlStr(cel.kid || 'темы')} ${isAlreadyRead ? 'повторён' : 'изучен'}!</h2>
-      <p class="meta" style="max-width:440px;margin:0 auto 14px;font-size:.9rem;">Отличный темп! Закрепи изученное активным припоминанием на карточках:</p>
-
-      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:10px;">
-        <button class="btn-glass-emerald btn-lg" style="width:100%;max-width:380px;justify-content:center;" data-py-tab="cards" data-dismiss-celebration>🃏 Закрепить на карточках ➔</button>
+    <div class="celebration-modal-overlay" style="position:fixed;inset:0;background:rgba(10,14,20,0.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;">
+      <div class="sprint-finish-card" style="max-width:500px;width:100%;margin:0 auto;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.65);border:1.5px solid rgba(52,211,153,0.5);">
+        <div class="sprint-finish-orb" style="font-size:2.2rem;margin-bottom:6px;">✨</div>
+        <div class="cocoon-focus-eyebrow" style="margin-bottom:6px;">Конспект закреплён${xpBadge}</div>
+        <h2 style="font-size:1.35rem;margin-bottom:8px;">Конспект ${escapeHtmlStr(cel.kid || 'темы')} ${isAlreadyRead ? 'повторён' : 'изучен'}!</h2>
+        <p class="meta" style="max-width:440px;margin:0 auto 14px;font-size:.9rem;">Отличный темп! Закрепи изученное активным припоминанием на карточках:</p>
+        <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px;">
+          <button class="btn-glass-emerald btn-lg" style="width:100%;max-width:380px;justify-content:center;" data-py-tab="cards" data-dismiss-celebration>🃏 Закрепить на карточках ➔</button>
+        </div>
       </div>
     </div>`;
 }
@@ -8951,11 +8954,11 @@ function viewPythonSkill(sid){
     }
 
     bodyHTML = `
-      <div class="card coddy-lesson-card" style="margin-top:0;">
-        ${feedHTML}
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--glass-border);flex-wrap:wrap;">
+      <div class="card coddy-lesson-card" style="margin-top:0;display:flex;flex-direction:column;justify-content:space-between;min-height:460px;">
+        <div style="flex:1;">${feedHTML}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--glass-border);flex-wrap:wrap;flex:none;">
           <div>${backBtnHTML}</div>
-          <div style="display:flex;gap:10px;align-items:center;">
+          <div style="display:flex;gap:10px;align-items:center;flex:1;justify-content:flex-end;">
             ${primaryActionHTML}
           </div>
         </div>
@@ -9036,9 +9039,9 @@ function viewPythonSkill(sid){
   return `
     <div class="container" style="max-width:880px;">
       ${focusTopbarHTML}
-      ${celebrationBanner}
       ${eyebrowDotsHTML}
       ${bodyHTML}
+      ${celebrationBanner}
     </div>`;
 }
 
