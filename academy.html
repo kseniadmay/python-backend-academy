@@ -1185,9 +1185,13 @@
   }
   .token-chip:active{transform:translateY(0);}
 
-  .practice-right-pane .code-editor{
-    white-space:pre-wrap !important;
-    word-break:break-word !important;
+  .practice-right-pane textarea.code-editor,
+  .practice-right-pane .code-editor,
+  .practice-right-pane .editor-with-gutter textarea.code-editor,
+  .practice-right-pane .code-editor-shell textarea.code-editor{
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+    overflow-x: hidden !important;
   }
   .btn-check-solution{
     flex:1;background:linear-gradient(135deg, #059669 0%, #10b981 100%);
@@ -1203,6 +1207,52 @@
   .xp-tag{
     background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.2);
     border-radius:6px;padding:1px 6px;font-size:0.74rem;font-weight:700;
+  }
+
+  /* Slice Anatomy Visualizer Widget */
+  .slice-anatomy-widget{
+    background:rgba(217,119,6,0.06);border:1px solid rgba(217,119,6,0.24);
+    border-radius:12px;padding:10px 12px;margin:10px 0 12px;
+  }
+  .slice-anatomy-header{
+    display:flex;align-items:center;justify-content:space-between;
+    font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;
+    color:var(--amber);margin-bottom:8px;
+  }
+  .slice-step-badge{
+    background:rgba(217,119,6,0.18);color:#fbbf24;padding:2px 6px;
+    border-radius:6px;font-family:var(--font-mono, monospace);font-size:0.72rem;
+  }
+  .slice-grid{
+    display:flex;gap:6px;justify-content:center;margin:6px 0 8px;
+  }
+  .slice-col{
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+  }
+  .slice-pos-idx{
+    font-size:0.68rem;color:var(--ink-muted);font-family:var(--font-mono, monospace);
+  }
+  .slice-neg-idx{
+    font-size:0.66rem;color:#f59e0b;font-family:var(--font-mono, monospace);font-weight:600;
+  }
+  .slice-cell{
+    width:36px;height:34px;display:flex;align-items:center;justify-content:center;
+    background:rgba(0,0,0,0.35);border:1px solid var(--glass-border);
+    border-radius:8px;font-family:var(--font-mono, monospace);font-weight:700;
+    color:#34d399;font-size:0.86rem;
+  }
+  .slice-flow-cue{
+    font-size:0.72rem;color:var(--amber);text-align:center;font-weight:600;
+    margin-top:4px;display:flex;align-items:center;justify-content:center;gap:6px;
+  }
+  .practice-kbd-dock{
+    display:flex;align-items:center;justify-content:space-between;margin-top:8px;
+    font-size:0.72rem;color:var(--ink-muted);padding:4px 6px;
+  }
+  .practice-kbd-dock kbd{
+    background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);
+    border-radius:4px;padding:2px 5px;font-size:0.70rem;font-family:var(--font-mono, monospace);
+    color:var(--ink-soft);margin:0 2px;
   }
 
   /* Quick 2-minute micro-step button */
@@ -1390,6 +1440,12 @@
   }
   .py-acc-btn:hover, .py-key-btn:hover{border-color:var(--moss);background:var(--emerald-soft);}
   .py-acc-btn:active, .py-key-btn:active{transform:scale(0.95);}
+  .py-acc-btn--special{
+    background:rgba(16,185,129,0.12);border-color:rgba(52,211,153,0.42);color:var(--emerald);
+  }
+  .py-acc-btn--special:hover{
+    background:rgba(16,185,129,0.24);border-color:var(--emerald);color:var(--ink);
+  }
   .code-editor-shell, .editor-with-gutter{
     display:flex;align-items:stretch;background:var(--surface);border:1px solid var(--line);
     border-radius:0 0 14px 14px;overflow:hidden;position:relative;
@@ -7545,7 +7601,7 @@ function todayXp(){
 }
 
 // Helper: Build Code Editor with synchronized Line-Numbers Gutter and Sticky Python Accessory Bar
-function buildCodeEditorWithGutterHTML(editorId, codeStr, minHeightPx){
+function buildCodeEditorWithGutterHTML(editorId, codeStr, minHeightPx, customTokens){
   const raw = String(codeStr || '');
   const lineCount = Math.max(1, raw.split('\n').length);
   const nums = [];
@@ -7553,7 +7609,14 @@ function buildCodeEditorWithGutterHTML(editorId, codeStr, minHeightPx){
   const mh = typeof minHeightPx === 'number'
     ? minHeightPx
     : (parseInt(String(minHeightPx || '').replace(/\D+/g, ''), 10) || 200);
-  const tokens = [
+
+  const tokens = [];
+  if(Array.isArray(customTokens) && customTokens.length > 0){
+    customTokens.forEach(ct => {
+      if(ct && typeof ct === 'string') tokens.push({ label: ct, val: ct, isSpecial: true });
+    });
+  }
+  const defaultTokens = [
     { label: 'Tab ⇥', val: '    ' },
     { label: ':', val: ':' },
     { label: '_', val: '_' },
@@ -7567,8 +7630,14 @@ function buildCodeEditorWithGutterHTML(editorId, codeStr, minHeightPx){
     { label: '==', val: ' == ' },
     { label: '->', val: ' -> ' }
   ];
+  defaultTokens.forEach(dt => {
+    if(!tokens.some(t => t.val === dt.val)){
+      tokens.push(dt);
+    }
+  });
+
   const barBtns = tokens.map(t =>
-    `<button type="button" class="py-key-btn py-acc-btn" data-insert-token="${escapeHtmlStr(t.val)}" data-target-editor="${editorId}">${escapeHtmlStr(t.label)}</button>`
+    `<button type="button" class="py-key-btn py-acc-btn ${t.isSpecial ? 'py-acc-btn--special' : ''}" data-insert-token="${escapeHtmlStr(t.val)}" data-target-editor="${editorId}">${escapeHtmlStr(t.label)}</button>`
   ).join('');
   return `
     <div class="py-editor-shell" data-editor-shell="${editorId}">
@@ -8957,6 +9026,25 @@ function buildTaskSpecDetails(tObj){
 
   let ioCard = '';
   if(inputVal || outputVal){
+    let sliceVisual = '';
+    if(/реверс|срез|\[::-1\]|reverse/i.test(tObj.title + ' ' + desc) || (sol && sol.includes('[::-1]'))){
+      sliceVisual = `
+        <div class="slice-anatomy-widget">
+          <div class="slice-anatomy-header">
+            <span>📐 Анатомия среза [start:stop:step]</span>
+            <span class="slice-step-badge">step = -1 (реверс)</span>
+          </div>
+          <div class="slice-grid">
+            <div class="slice-col"><span class="slice-pos-idx">0</span><span class="slice-cell">1</span><span class="slice-neg-idx">-5</span></div>
+            <div class="slice-col"><span class="slice-pos-idx">1</span><span class="slice-cell">2</span><span class="slice-neg-idx">-4</span></div>
+            <div class="slice-col"><span class="slice-pos-idx">2</span><span class="slice-cell">3</span><span class="slice-neg-idx">-3</span></div>
+            <div class="slice-col"><span class="slice-pos-idx">3</span><span class="slice-cell">4</span><span class="slice-neg-idx">-2</span></div>
+            <div class="slice-col"><span class="slice-pos-idx">4</span><span class="slice-cell">5</span><span class="slice-neg-idx">-1</span></div>
+          </div>
+          <div class="slice-flow-cue">⟵ Обход справа налево от конца списка: original[::-1]</div>
+        </div>`;
+    }
+
     if(inputVal && outputVal){
       ioCard = `
         <div class="dataflow-card">
@@ -8975,7 +9063,8 @@ function buildTaskSpecDetails(tObj){
               <span class="df-val">${escapeHtmlStr(outputVal)}</span>
             </div>
           </div>
-        </div>`;
+        </div>
+        ${sliceVisual}`;
     } else {
       ioCard = `
         <div class="dataflow-card">
@@ -8988,7 +9077,8 @@ function buildTaskSpecDetails(tObj){
               <span class="df-val">${escapeHtmlStr(inputVal || outputVal)}</span>
             </div>
           </div>
-        </div>`;
+        </div>
+        ${sliceVisual}`;
     }
   }
 
@@ -9000,7 +9090,7 @@ function buildTaskSpecDetails(tObj){
     const sliceMatches = sol.match(/\[[^\]]+\]/g);
     if(sliceMatches){
       sliceMatches.forEach(sm => {
-        if(sm.length <= 16 && !tokens.includes(sm)) tokens.push(sm);
+        if(sm.length <= 16 && !sm.includes(',') && !tokens.includes(sm)) tokens.push(sm);
       });
     }
     const methodMatches = sol.match(/\.[a-zA-Z_][a-zA-Z0-9_]*\(\)/g);
@@ -9243,6 +9333,13 @@ function viewPythonSkill(sid){
         <pre style="margin-top:6px;font-size:0.80rem;white-space:pre-wrap;">${escapeHtmlStr(pySkillViewState.runOutput)}</pre>
       </div>`;
 
+    let cleanDesc = String(tObj.desc || '');
+    cleanDesc = cleanDesc.replace(/^<p>\s*<strong>\s*Задание\s*[:.-]?\s*<\/strong>\s*/i, '<p>');
+    cleanDesc = cleanDesc.replace(/^<p>\s*Задание\s*[:.-]?\s*/i, '<p>');
+    cleanDesc = cleanDesc.replace(/^<strong>\s*Задание\s*[:.-]?\s*<\/strong>\s*/i, '');
+    cleanDesc = cleanDesc.replace(/^Задание\s*[:.-]?\s*/i, '').trim();
+    cleanDesc = cleanDesc.replace(/^<p>/i, '').replace(/<\/p>$/i, '').trim();
+
     bodyHTML = `
       <div class="card" style="margin-top:0;">
         <div class="practice-layout practice-coddy-split">
@@ -9255,35 +9352,36 @@ function viewPythonSkill(sid){
                 </div>
                 <div style="display:flex;gap:8px;align-items:center;">
                   <span style="font-size:0.78rem;color:var(--ink-muted);font-weight:600;">${taskIdx >= 0 ? taskIdx + 1 : 1} из ${tIds.length}</span>
-                  <span style="color:var(--glass-border);">·</span>
-                  <a href="#/docs" class="link-quiet" style="font-size:0.78rem;" title="Справочник Python">📖 Справка</a>
                   ${solvedMap[tObj.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
                 </div>
               </div>
               <div class="lesson-theory" style="font-size:0.89rem;color:var(--ink-soft);line-height:1.55;margin-bottom:12px;">
-                <strong>Задание:</strong> ${tObj.desc}
+                <strong>Задание:</strong> ${cleanDesc}
               </div>
               ${spec.ioCard}
             </div>
             <div style="margin-top:auto;padding-top:12px;border-top:1px solid var(--glass-border);">
-              <button type="button" class="btn btn-ghost" data-py-task-hint style="width:100%;justify-content:center;font-size:0.82rem;padding:9px 12px;border-radius:12px;" ${pySkillViewState.hintLevel>=socraticHints.length?'disabled':''}>
-                💡 Сократовская наводка (${pySkillViewState.hintLevel}/${socraticHints.length})
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <span style="font-size:0.75rem;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:0.04em;">💡 Наставник Сократ</span>
+                <span style="font-size:0.72rem;color:var(--ink-muted);">Уровень скаффолдинга: <strong>${pySkillViewState.hintLevel} / ${socraticHints.length}</strong></span>
+              </div>
+              <button type="button" class="btn btn-ghost" data-py-task-hint style="width:100%;justify-content:center;font-size:0.82rem;padding:9px 12px;border-radius:12px;border:1px dashed rgba(217,119,6,0.35);background:rgba(217,119,6,0.04);" ${pySkillViewState.hintLevel>=socraticHints.length?'disabled':''}>
+                ${pySkillViewState.hintLevel>=socraticHints.length ? '✓ Все наводки раскрыты' : 'Получить наводку без готового кода ➔'}
               </button>
               ${shownHints}
             </div>
           </div>
           <div class="practice-right-pane" style="display:flex;flex-direction:column;justify-content:space-between;">
             <div>
-              ${buildCodeEditorWithGutterHTML('py-skill-editor', pySkillViewState.codeDraft, 220)}
-              ${spec.quickTokens && spec.quickTokens.length ? `
-                <div class="practice-quick-tokens">
-                  <span style="font-size:0.72rem;color:var(--ink-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.04em;margin-right:2px;">Вставка:</span>
-                  ${spec.quickTokens.map(tok => `<button type="button" class="token-chip" data-insert-token="${escapeHtmlStr(tok)}" data-target-editor="py-skill-editor">${escapeHtmlStr(tok)}</button>`).join('')}
-                </div>` : ''}
+              ${buildCodeEditorWithGutterHTML('py-skill-editor', pySkillViewState.codeDraft, 220, spec.quickTokens)}
+              <div class="practice-kbd-dock">
+                <span><kbd>Ctrl</kbd>+<kbd>Enter</kbd> Запустить тесты</span>
+                <span><kbd>Tab</kbd> Отступ</span>
+              </div>
             </div>
             <div style="margin-top:10px;">
               <div style="display:flex;gap:10px;align-items:center;">
-                <button type="button" class="btn btn-ghost" data-py-reset-task="${tObj.id}" style="padding:12px 16px;border-radius:14px;" title="Сбросить код к исходному">↺ Сбросить</button>
+                <button type="button" class="btn btn-ghost" data-py-reset-task="${tObj.id}" style="padding:12px 14px;border-radius:14px;flex:none;opacity:0.8;" title="Сбросить код к исходному шаблону">↺</button>
                 <button type="button" class="btn-check-solution" data-py-run-task="${tObj.id}">
                   <span>${ICONS.play} Проверить решение</span>
                   <span class="xp-tag">+15 XP</span>

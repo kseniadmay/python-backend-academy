@@ -44,6 +44,13 @@ async function runCapture() {
   fs.writeFileSync('C:\\Users\\fury6\\OneDrive\\Python_Backend_Academy\\design_mockups\\shot_variant_2_card.png', Buffer.from(s2.data, 'base64'));
   console.log('Saved shot_variant_2_card.png');
 
+  // 4. Variant 3 (Visual Slice Studio with Anatomy Widget)
+  await send('Runtime.evaluate', { expression: `switchView('v3'); toggleHint('v3');` });
+  await new Promise(r => setTimeout(r, 400));
+  let s3 = await send('Page.captureScreenshot', { format: 'png' });
+  fs.writeFileSync('C:\\Users\\fury6\\OneDrive\\Python_Backend_Academy\\design_mockups\\shot_variant_3_anatomy.png', Buffer.from(s3.data, 'base64'));
+  console.log('Saved shot_variant_3_anatomy.png');
+
   p.kill();
   console.log('All real browser screenshots captured successfully!');
 }
