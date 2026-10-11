@@ -1444,7 +1444,7 @@ function fireClick(attrName, attrVal, extraAttrs = {}) {
   /* ================= 17. MOBILE FEEDBACK BACKLOG (REV-001 TO REV-005) & TRANSPORT VERIFICATION ================= */
   // 17.1. REV-001: K-001 step 6 split into clean micro-steps (naive vs fast set lookup)
   const k001 = sandbox.PY_MASTERY.notes['К-001'];
-  assert(k001 && k001.steps.length >= 8, `K-001 must have >= 8 steps after splitting step 6, got ${k001 ? k001.steps.length : 0}`);
+  assert(k001 && k001.steps.length >= 7, `K-001 must have >= 7 steps after uniting intro and splitting step 6, got ${k001 ? k001.steps.length : 0}`);
   const hasNaiveStep = k001.steps.some(s => s.title.includes('наивный') || s.title.includes('O(n²)'));
   const hasFastStep = k001.steps.some(s => s.title.includes('Быстрый поиск через set') || s.title.includes('Tradeoff'));
   assert(hasNaiveStep && hasFastStep, 'K-001 must contain separate steps for naive O(n²) and fast set O(n) lookups');
