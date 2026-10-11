@@ -1424,8 +1424,32 @@
   }
   .fc-q{font-size:1.08rem;font-weight:600;line-height:1.55;white-space:pre-line;}
   .fc-a{font-size:1rem;line-height:1.65;white-space:pre-line;color:var(--ink);margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
-  .fc-rate-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px;}
+  .fc-rate-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;}
   @media (max-width:600px){.fc-rate-row{grid-template-columns:1fr 1fr;}}
+  .fc-rate-row .btn{
+    padding:12px 14px !important;font-size:0.92rem !important;font-weight:700 !important;
+    border-radius:14px !important;text-align:center;justify-content:center;
+    transition:transform .12s, filter .15s, box-shadow .15s !important;
+  }
+  .fc-rate-row .btn-ghost{
+    background:rgba(255,255,255,0.04) !important;border:1.5px solid rgba(255,255,255,0.14) !important;color:#f1f5f9 !important;
+  }
+  .fc-rate-row .btn-ghost:hover{background:rgba(255,255,255,0.08) !important;}
+  .fc-rate-row .btn-burgundy{
+    background:rgba(136,19,55,0.45) !important;border:1.5px solid #be123c !important;color:#fecdd3 !important;
+    box-shadow:0 0 14px rgba(190,18,60,0.25) !important;
+  }
+  .fc-rate-row .btn-burgundy:hover{background:rgba(136,19,55,0.65) !important;border-color:#fb7185 !important;}
+  .fc-rate-row .btn-clay{
+    background:rgba(180,83,9,0.28) !important;border:1.5px solid #d97706 !important;color:#fef3c7 !important;
+    box-shadow:0 0 14px rgba(217,119,6,0.25) !important;
+  }
+  .fc-rate-row .btn-clay:hover{background:rgba(180,83,9,0.45) !important;border-color:#f59e0b !important;}
+  .fc-rate-row .btn-primary{
+    background:#10b981 !important;border:1.5px solid #10b981 !important;color:#ffffff !important;
+    box-shadow:0 0 16px rgba(16,185,129,0.35) !important;
+  }
+  .fc-rate-row .btn-primary:hover{background:#059669 !important;}
   .fc-swipe-hint{
     display:none !important;
   }
@@ -8994,28 +9018,57 @@ function viewPythonSkill(sid){
   } else if(pySkillViewState.tab === 'cards'){
     const deckObj = ALL_DECKS_COMBINED[activeF] || {id: activeF, title: activeF, cards: []};
     const cards = deckObj.cards || [];
-    const cardIdx = Math.min(pySkillViewState.cardIdx, Math.max(0, cards.length - 1));
-    const curCard = cards[cardIdx] || {q: 'Карточек пока нет', a: ''};
-    const isFlipped = pySkillViewState.cardFlipped;
+    const cIdx = Math.min(pySkillViewState.cardIdx, Math.max(0, cards.length - 1));
+    const curCard = cards[cIdx] || {q: 'Карточки загружаются', a: ''};
+
+    const activeFIdx = sk.fIds.indexOf(activeF);
+    const prevF = activeFIdx > 0 ? sk.fIds[activeFIdx - 1] : null;
+    const nextF = activeFIdx < sk.fIds.length - 1 ? sk.fIds[activeFIdx + 1] : null;
+
+    const dotsHTML = sk.fIds.map((fid, idx) => {
+      const isCur = fid === activeF;
+      const isDone = state.reviewedDecks.includes(fid);
+      const dObj = ALL_DECKS_COMBINED[fid] || {};
+      return `<span class="track-dot ${isCur ? 'active' : ''} ${isDone ? 'done' : ''}" data-py-select-f="${fid}" title="${fid}: ${dObj.title || fid}"></span>`;
+    }).join('');
 
     bodyHTML = `
-      <div class="card" style="margin-top:0;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <span style="font-size:0.80rem;color:var(--ink-muted);font-weight:600;">Карточка ${cards.length ? cardIdx + 1 : 0} из ${cards.length}</span>
-          <span style="font-size:0.75rem;padding:2px 8px;border-radius:999px;background:rgba(20,90,70,0.1);color:var(--moss);font-weight:600;">Интервальное повторение</span>
+      <div style="display:flex;justify-content:center;margin:8px 0 14px;">
+        <div class="deck-mini-track">
+          <button class="track-arrow" title="Предыдущая колода" ${prevF ? `data-py-select-f="${prevF}"` : 'disabled style="opacity:0.3;cursor:not-allowed;"'}>◀</button>
+          <span>Колода ${activeFIdx + 1} из ${sk.fIds.length} · <strong>${deckObj.id}: ${deckObj.title || deckObj.id}</strong></span>
+          <div class="track-dots">${dotsHTML}</div>
+          <button class="track-arrow" title="Следующая колода" ${nextF ? `data-py-select-f="${nextF}"` : 'disabled style="opacity:0.3;cursor:not-allowed;"'}>▶</button>
         </div>
-        <div class="py-flashcard ${isFlipped ? 'flipped' : ''}" data-py-flip-card style="min-height:180px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:26px 20px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);transition:all .25s ease;">
-          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-muted);margin-bottom:8px;">${isFlipped ? 'Ответ' : 'Вопрос (нажмите или пробел)'}</div>
-          <div style="font-size:1.08rem;font-weight:600;line-height:1.45;color:var(--ink);">${isFlipped ? (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.a) : curCard.a) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.q) : curCard.q)}</div>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;">
-          <button class="btn btn-ghost" data-py-prev-card ${cardIdx === 0 ? 'disabled' : ''}>← Назад</button>
-          <div style="display:flex;gap:8px;">
-            <button class="btn btn-ghost" data-py-rate-card="hard" title="Повторить скоро">Сложно</button>
-            <button class="btn btn-ghost" data-py-rate-card="good" title="В пределах нормы">Нормально</button>
-            <button class="btn btn-emerald" data-py-rate-card="easy" title="Отлично знаю">Легко (+5 MP)</button>
+      </div>
+      <div class="fc-stage" style="margin:10px 0;">
+        ${buildFcStoriesBarHTML(deckObj.id, cards.length, cIdx)}
+        <div class="fc-card ${pySkillViewState.cardFlipped?'fc-card--Answer':''}" data-py-flip-card>
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div class="topic-badge">${pySkillViewState.cardFlipped ? 'Ответ' : 'Вопрос'}</div>
+              <a href="#/docs" class="card-help-badge" onclick="event.stopPropagation();" title="Открыть справку по теме в боковой панели">💡 Шпаргалка</a>
+            </div>
+            <div class="fc-q">${formatRichInlineText(curCard.q)}</div>
+            ${pySkillViewState.cardFlipped ? `<div class="fc-a">${formatRichInlineText(curCard.a)}</div>` : ''}
           </div>
-          <button class="btn btn-ghost" data-py-next-card ${cardIdx + 1 >= cards.length ? 'disabled' : ''}>Дальше →</button>
+          <div class="meta" style="margin-top:12px;text-align:center;">Карточка ${cIdx+1} из ${cards.length}</div>
+        </div>
+        ${pySkillViewState.cardFlipped ? `
+          <div class="fc-rate-row" style="margin-top:12px;">
+            <button class="btn btn-ghost" data-py-rate-card="1">Снова</button>
+            <button class="btn btn-burgundy" data-py-rate-card="2">Трудно (+2 XP)</button>
+            <button class="btn btn-clay" data-py-rate-card="3">Хорошо (+5 XP)</button>
+            <button class="btn btn-primary" data-py-rate-card="4">Легко (+10 XP)</button>
+          </div>` : `
+          <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-ghost" data-py-prev-card ${cIdx===0?'disabled':''}>← Назад</button>
+            <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-flip-card>Показать ответ (Пробел)</button>
+            <button class="btn btn-ghost" data-py-rate-card="3" ${cIdx + 1 >= cards.length ? 'disabled' : ''}>Дальше →</button>
+          </div>`}
+        <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <button class="link-quiet" data-py-tab="theory">← Вернуться к конспекту</button>
+          <button class="link-quiet" style="font-weight:700;color:var(--moss);" data-py-tab="code">Этап 3: Практика кода в IDE (${(sk.taskIds||[]).length} задач) ➔</button>
         </div>
       </div>`;
   } else if(pySkillViewState.tab === 'code'){
@@ -9431,27 +9484,31 @@ function viewCardsHub(){
         </div>
         <select id="cards-deck-select" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.85rem;font-weight:600;">${deckOpts}</select>
       </div>
-      <div class="card fc-stage" style="margin-top:16px;">
+      <div class="fc-stage" style="margin-top:16px;">
         ${buildFcStoriesBarHTML(deck.id, cards.length, cIdx)}
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;margin-top:10px;">
-          <span style="font-size:0.80rem;color:var(--ink-muted);font-weight:600;">Карточка ${cards.length ? cIdx + 1 : 0} из ${cards.length} · <strong>${deck.id}: ${deck.title}</strong> ${renderEchelonBadge(curDeckTier)}</span>
-          <span style="font-size:0.75rem;padding:2px 8px;border-radius:999px;background:rgba(20,90,70,0.1);color:var(--moss);font-weight:600;">Интервальное повторение</span>
-        </div>
-        <div class="py-flashcard fc-card fc-card--3d ${cardsHubState.flipped ? 'flipped fc-card--flipped fc-card--Answer' : ''}" data-hub-flip style="min-height:180px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:26px 20px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);transition:all .25s ease;">
-          <div class="fc-card-inner" style="width:100%;display:flex;flex-direction:column;align-items:center;">
-            <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-muted);margin-bottom:8px;">${cardsHubState.flipped ? 'Ответ' : 'Вопрос (нажмите или пробел)'}</div>
-            <div style="font-size:1.08rem;font-weight:600;line-height:1.45;color:var(--ink);">${cardsHubState.flipped ? (typeof formatRichInlineText === 'function' ? formatRichInlineText(cur.a) : cur.a) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(cur.q) : cur.q)}</div>
+        <div class="fc-card fc-card--3d ${cardsHubState.flipped ? 'fc-card--flipped fc-card--Answer' : ''}" data-hub-flip style="margin-top:10px;">
+          <div class="fc-card-inner">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div class="topic-badge">${cardsHubState.flipped ? 'Ответ' : 'Вопрос'}</div>
+              <a href="#/docs" class="card-help-badge" onclick="event.stopPropagation();" title="Открыть справку по теме в боковой панели">💡 Шпаргалка</a>
+            </div>
+            <div class="fc-q">${typeof formatRichInlineText === 'function' ? formatRichInlineText(cur.q) : cur.q}</div>
+            ${cardsHubState.flipped ? `<div class="fc-a" style="margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);">${typeof formatRichInlineText === 'function' ? formatRichInlineText(cur.a) : cur.a}</div>` : ''}
           </div>
+          <div class="meta" style="margin-top:12px;text-align:center;">Карточка ${cards.length ? cIdx + 1 : 0} из ${cards.length}</div>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;">
-          <button class="btn btn-ghost" data-hub-prev ${cIdx === 0 ? 'disabled' : ''}>← Назад</button>
-          <div style="display:flex;gap:8px;">
-            <button class="btn btn-ghost" data-hub-rate="hard" title="Повторить скоро">Сложно</button>
-            <button class="btn btn-ghost" data-hub-rate="good" title="В пределах нормы">Нормально</button>
-            <button class="btn btn-emerald" data-hub-rate="easy" title="Отлично знаю">Легко (+5 MP)</button>
-          </div>
-          <button class="btn btn-ghost" data-hub-next ${cIdx + 1 >= cards.length ? 'disabled' : ''}>Дальше →</button>
-        </div>
+        ${cardsHubState.flipped ? `
+          <div class="fc-rate-row" style="margin-top:12px;">
+            <button class="btn btn-ghost" data-hub-rate="1">Снова</button>
+            <button class="btn btn-burgundy" data-hub-rate="2">Трудно (+2 XP)</button>
+            <button class="btn btn-clay" data-hub-rate="3">Хорошо (+5 XP)</button>
+            <button class="btn btn-primary" data-hub-rate="4">Легко (+10 XP)</button>
+          </div>` : `
+          <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-ghost" data-hub-prev ${cIdx===0?'disabled':''}>← Назад</button>
+            <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-hub-flip>Показать ответ (Пробел)</button>
+            <button class="btn btn-ghost" data-hub-next ${cIdx + 1 >= cards.length ? 'disabled' : ''}>Дальше →</button>
+          </div>`}
       </div>
     </div>`;
 }
