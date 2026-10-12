@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Дашборд — Python Backend Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ================= RESET & CORE TOKENS ================= */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root, :root[data-theme="light"] {
+    --paper: #faf8f5;
+    --surface: rgba(255, 255, 255, 0.88);
+    --surface-2: rgba(15, 23, 42, 0.045);
+    --surface-hover: rgba(15, 23, 42, 0.08);
+    --ink: #0f172a;
+    --ink-soft: #334155;
+    --ink-muted: #64748b;
+    --line: rgba(0, 0, 0, 0.07);
+    --line-soft: rgba(0, 0, 0, 0.045);
+    --hairline-light: rgba(0, 0, 0, 0.07);
+    --emerald: #145a46;
+    --emerald-soft: rgba(20, 90, 70, 0.10);
+    --emerald-glow: rgba(20, 90, 70, 0.25);
+    --amber: #d97706;
+    --amber-soft: rgba(217, 119, 6, 0.11);
+    --bordeaux: #6b1d2f;
+    --bordeaux-soft: rgba(107, 29, 47, 0.09);
+    --moss: #145a46;
+    --moss-deep: #0f4536;
+    --moss-soft: rgba(20, 90, 70, 0.10);
+    --shadow-1: 0 10px 30px -10px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+    --shadow-glow: 0 12px 36px rgba(20, 90, 70, 0.18);
+    --font-d: 'Onest', 'Golos Text', -apple-system, sans-serif;
+    --font-b: 'Onest', 'Golos Text', -apple-system, sans-serif;
+    --font-m: 'JetBrains Mono', monospace;
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --orb-burgundy: rgba(107, 29, 47, 0.08);
+    --orb-emerald: rgba(20, 90, 70, 0.08);
+    --modal-bg: rgba(255, 255, 255, 0.94);
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #0d1016;
+    --surface: rgba(22, 27, 36, 0.74);
+    --surface-2: rgba(30, 37, 49, 0.66);
+    --surface-hover: rgba(45, 55, 72, 0.60);
+    --ink: #f8fafc;
+    --ink-soft: #cbd5e1;
+    --ink-muted: #94a3b8;
+    --line: rgba(255, 255, 255, 0.09);
+    --line-soft: rgba(255, 255, 255, 0.05);
+    --hairline-light: rgba(255, 255, 255, 0.08);
+    --emerald: #10b981;
+    --emerald-soft: rgba(16, 185, 129, 0.16);
+    --emerald-glow: rgba(16, 185, 129, 0.40);
+    --amber: #f59e0b;
+    --amber-soft: rgba(245, 158, 11, 0.16);
+    --bordeaux: #fb7185;
+    --bordeaux-soft: rgba(190, 18, 60, 0.22);
+    --moss: #10b981;
+    --moss-deep: #6ee7b7;
+    --moss-soft: rgba(16, 185, 129, 0.18);
+    --shadow-1: 0 16px 40px -12px rgba(0, 0, 0, 0.55);
+    --shadow-glow: 0 16px 44px rgba(16, 185, 129, 0.28);
+    --glass-border: rgba(255, 255, 255, 0.10);
+    --orb-burgundy: rgba(190, 18, 60, 0.24);
+    --orb-emerald: rgba(16, 185, 129, 0.20);
+    --modal-bg: rgba(18, 22, 30, 0.94);
+  }
+
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-b);
+    line-height: 1.5;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Accessibility focus ring */
+  button:focus-visible, a:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--emerald) !important;
+    outline-offset: 2px !important;
+  }
+
+  /* Ambient light spheres (Evening Obsidian / Ephemeral Parchment) */
+  .ambient-orb {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(68px);
+    transition: background 0.4s ease;
+  }
+  .ambient-orb--burgundy {
+    width: 420px;
+    height: 420px;
+    top: -100px;
+    left: -90px;
+    background: var(--orb-burgundy);
+    animation: orb-drift-1 16s ease-in-out infinite alternate;
+  }
+  .ambient-orb--emerald {
+    width: 380px;
+    height: 380px;
+    bottom: -90px;
+    right: -80px;
+    background: var(--orb-emerald);
+    animation: orb-drift-2 18s ease-in-out infinite alternate;
+  }
+  @keyframes orb-drift-1 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, 40px) scale(1.08); }
+  }
+  @keyframes orb-drift-2 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-35px, -25px) scale(1.06); }
+  }
+
+  /* ================= LAYOUT ================= */
+  #app {
+    display: flex;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Desktop Sidebar (236px) */
+  .sidebar {
+    width: 236px;
+    flex: none;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--line);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    flex-direction: column;
+    padding: 18px 14px 14px;
+    gap: 12px;
+    z-index: 20;
+    box-sizing: border-box;
+    transition: transform 0.25s ease;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--font-d);
+    font-weight: 800;
+    font-size: 1.14rem;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .brand svg {
+    color: var(--emerald);
+    stroke-width: 2;
+  }
+  .brand-sub {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: -6px;
+    padding-left: 28px;
+  }
+
+  .nav-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 4px;
+    overflow-y: auto;
+    flex: 1;
+    padding-right: 2px;
+  }
+  .nav-group::-webkit-scrollbar { width: 4px; }
+  .nav-group::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 11px;
+    border-radius: 12px;
+    color: var(--ink-soft);
+    text-decoration: none;
+    font-size: 0.86rem;
+    font-weight: 600;
+    transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .nav-link:hover {
+    color: var(--ink);
+    background: var(--surface-2);
+    transform: translateX(2px);
+  }
+  .nav-link.active {
+    background: var(--emerald-soft);
+    color: var(--moss);
+    font-weight: 700;
+  }
+  .nav-link.active svg {
+    color: var(--emerald);
+  }
+  .nav-link svg {
+    width: 18px;
+    height: 18px;
+    flex: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    fill: none;
+  }
+
+  /* Sidebar Modules Accordion */
+  .sidebar-modules {
+    margin: 6px 0;
+    border-radius: 13px;
+    background: var(--surface-2);
+    border: 1px solid var(--line-soft);
+    overflow: hidden;
+  }
+  .sidebar-modules summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 9px 11px;
+    font-size: 0.80rem;
+    font-weight: 700;
+    color: var(--ink);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+  }
+  .sidebar-modules summary::-webkit-details-marker { display: none; }
+  .sidebar-modules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 2px 5px 8px;
+  }
+  .module-link-mini {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 8px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--ink-soft);
+    font-size: 0.77rem;
+    font-weight: 600;
+  }
+  .module-link-mini:hover {
+    background: var(--surface-hover);
+    color: var(--ink);
+  }
+  .mini-pct {
+    font-family: var(--font-m);
+    font-size: 0.70rem;
+    color: var(--ink-muted);
+  }
+
+  /* Sidebar Footer */
+  .sidebar-foot {
+    border-top: 1px solid var(--line-soft);
+    padding-top: 11px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .streak-pill-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px;
+    border-radius: 12px;
+    background: var(--surface-2);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .streak-fire {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .streak-fire svg {
+    color: var(--amber);
+  }
+  .sidebar-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    background: var(--surface);
+    color: var(--ink-soft);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.16s ease;
+  }
+  .icon-btn:hover {
+    border-color: var(--moss);
+    color: var(--ink);
+    transform: translateY(-1px);
+  }
+  .icon-btn svg {
+    width: 17px;
+    height: 17px;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    fill: none;
+  }
+  .pomo-side-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 10px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 0.76rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: var(--font-m);
+    transition: all 0.16s ease;
+  }
+  .pomo-side-btn:hover {
+    border-color: var(--emerald);
+    background: var(--emerald-soft);
+  }
+  .pomo-side-btn.running {
+    background: var(--emerald-soft);
+    border-color: var(--emerald);
+    color: var(--moss);
+  }
+
+  /* ================= MAIN SHELL ================= */
+  .shell {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* Mobile Topbar */
+  .mobile-topbar {
+    display: none;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 10px 14px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  @media (max-width: 880px) {
+    .sidebar { display: none; }
+    .mobile-topbar { display: flex; }
+    .shell { padding-bottom: calc(76px + env(safe-area-inset-bottom, 14px)); }
+  }
+
+  /* Mobile Bottom Tabbar */
+  .mobile-tabbar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 7px 10px calc(7px + env(safe-area-inset-bottom, 12px));
+    justify-content: space-around;
+  }
+  @media (max-width: 880px) {
+    .mobile-tabbar { display: flex; }
+  }
+  .tabbar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    color: var(--ink-muted);
+    text-decoration: none;
+    font-size: 0.68rem;
+    font-weight: 600;
+    transition: color 0.14s ease;
+  }
+  .tabbar-item.active {
+    color: var(--emerald);
+    font-weight: 700;
+  }
+  .tabbar-item svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+  }
+
+  /* Main Scrollable Canvas */
+  main {
+    flex: 1;
+    padding: 26px 20px 48px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+  }
+  @media (max-width: 560px) {
+    main { padding: 14px 12px 36px; }
+  }
+  .container {
+    width: 100%;
+    max-width: 860px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* ================= DASHBOARD COMPONENTS ================= */
+
+  /* 1. Top Cocoon Pills */
+  .dash-top-pills {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .cocoon-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--glass-border);
+    font-size: 0.79rem;
+    font-weight: 700;
+    color: var(--ink);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: var(--shadow-1);
+    white-space: nowrap;
+  }
+  .cocoon-pill--interactive {
+    cursor: pointer;
+    transition: all 0.16s ease;
+  }
+  .cocoon-pill--interactive:hover {
+    transform: translateY(-1px);
+    border-color: var(--emerald);
+    background: var(--surface-hover);
+  }
+  .pill-group {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+
+  /* 2. Trajectory Card (Countdown to Screening) */
+  .cd-box {
+    background: var(--surface);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 16px 20px;
+    box-shadow: var(--shadow-1);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  @media (max-width: 560px) {
+    .cd-box { padding: 13px 15px; border-radius: 18px; gap: 7px; }
+  }
+  .cd-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  .cd-title {
+    font-family: var(--font-d);
+    font-weight: 800;
+    font-size: 0.96rem;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .cd-count {
+    font-weight: 800;
+    font-size: 0.80rem;
+    color: var(--moss);
+    background: var(--emerald-soft);
+    padding: 3px 11px;
+    border-radius: 999px;
+    border: 1px solid rgba(16, 185, 129, 0.28);
+    white-space: nowrap;
+  }
+  .cd-bar-track {
+    height: 5px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    overflow: hidden;
+    border: 1px solid var(--line-soft);
+    position: relative;
+  }
+  .cd-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #be123c 0%, #d97706 48%, #10b981 100%);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.45);
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .cd-checkpoint-sub {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.74rem;
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+
+  /* 3. Primary Focus Cocoon Card (Single Dominant CTA) */
+  .cocoon-focus-card {
+    background: linear-gradient(155deg, rgba(16, 185, 129, 0.12), rgba(190, 18, 60, 0.05)), var(--surface);
+    border: 1.5px solid rgba(52, 211, 153, 0.38);
+    border-radius: 26px;
+    padding: 24px 26px;
+    box-shadow: var(--shadow-1), var(--shadow-glow);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.25s ease;
+  }
+  @media (max-width: 560px) {
+    .cocoon-focus-card { padding: 16px 16px; border-radius: 20px; gap: 10px; }
+  }
+
+  .cocoon-focus-card::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -40px;
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle, var(--emerald-glow), transparent 70%);
+    pointer-events: none;
+    opacity: 0.75;
+  }
+
+  .cocoon-focus-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.73rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 11px;
+    border-radius: 999px;
+    background: rgba(16, 185, 129, 0.18);
+    color: var(--moss);
+    border: 1px solid rgba(52, 211, 153, 0.38);
+    width: fit-content;
+  }
+  .pulse-ring-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--emerald);
+    display: inline-block;
+    position: relative;
+    flex: none;
+    animation: pulse-ring 2s infinite;
+  }
+  @keyframes pulse-ring {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.65); }
+    70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  }
+
+  .cocoon-focus-title {
+    font-family: var(--font-d);
+    font-size: clamp(1.18rem, 1.05rem + 0.9vw, 1.55rem);
+    font-weight: 800;
+    line-height: 1.25;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .cocoon-focus-title .sub-meta {
+    font-size: 0.82em;
+    font-weight: 600;
+    opacity: 0.75;
+  }
+  .cocoon-focus-desc {
+    font-size: 0.89rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  /* Single Dominant CTA Button */
+  .btn-sprint-dominant {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.32), rgba(16, 185, 129, 0.16)), var(--surface);
+    border: 1.5px solid rgba(52, 211, 153, 0.65);
+    color: var(--ink);
+    border-radius: 16px;
+    padding: 14px 24px;
+    font-family: var(--font-d);
+    font-weight: 800;
+    font-size: 1.02rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 8px 28px rgba(16, 185, 129, 0.22);
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-sprint-dominant:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.45), rgba(16, 185, 129, 0.24)), var(--surface);
+    border-color: rgba(52, 211, 153, 0.95);
+    box-shadow: 0 12px 34px rgba(16, 185, 129, 0.35);
+  }
+  .btn-sprint-dominant:active {
+    transform: translateY(0);
+    filter: brightness(0.95);
+  }
+  .btn-sprint-dominant::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%; width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    animation: shimmer-light 3.5s infinite;
+  }
+  @keyframes shimmer-light {
+    0% { left: -100%; }
+    30% { left: 120%; }
+    100% { left: 120%; }
+  }
+
+  .focus-secondary-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    padding-top: 2px;
+  }
+  .focus-link-quiet {
+    font-size: 0.81rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(148, 163, 184, 0.45);
+    padding-bottom: 2px;
+    transition: all 0.14s ease;
+  }
+  .focus-link-quiet:hover {
+    color: var(--ink);
+    border-bottom-color: var(--emerald);
+  }
+
+  /* 4. SRS Quick Review Strip */
+  .srs-strip-card {
+    background: var(--surface);
+    border: 1px solid var(--glass-border);
+    border-radius: 22px;
+    padding: 13px 18px;
+    box-shadow: var(--shadow-1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .srs-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .srs-ring-svg {
+    width: 44px;
+    height: 44px;
+    transform: rotate(-90deg);
+    flex: none;
+  }
+  .srs-ring-bg {
+    fill: none;
+    stroke: var(--surface-2);
+    stroke-width: 4;
+  }
+  .srs-ring-fg {
+    fill: none;
+    stroke: var(--emerald);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 106.8;
+    stroke-dashoffset: 28.5; /* 73% */
+    transition: stroke-dashoffset 0.5s ease;
+  }
+  .srs-title {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--ink);
+  }
+  .srs-meta {
+    font-size: 0.77rem;
+    color: var(--ink-muted);
+  }
+  .srs-badges {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+  .srs-chip {
+    background: var(--surface-2);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--ink);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s ease;
+  }
+  .srs-chip:hover {
+    border-color: var(--emerald);
+    background: var(--emerald-soft);
+    color: var(--moss);
+    transform: translateY(-1px);
+  }
+
+  /* 5. 4 Interview Stages Switcher & Minimalist Checklist */
+  .stage-switcher-box {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .stage-pills {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    background: var(--surface-2);
+    padding: 4px;
+    border-radius: 16px;
+    border: 1px solid var(--line-soft);
+  }
+  @media (max-width: 560px) {
+    .stage-pills { grid-template-columns: repeat(2, 1fr); }
+  }
+  .stage-pill {
+    padding: 7px 6px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+  }
+  .stage-pill:hover {
+    background: var(--surface-hover);
+    color: var(--ink);
+  }
+  .stage-pill.active {
+    background: var(--surface);
+    border-color: var(--glass-border);
+    color: var(--moss);
+    box-shadow: 0 4px 16px var(--shadow-1);
+  }
+  .stage-pill .stage-pct {
+    font-size: 0.69rem;
+    font-family: var(--font-m);
+    opacity: 0.75;
+  }
+
+  .stage-topics-list {
+    background: var(--surface);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 10px 14px;
+    box-shadow: var(--shadow-1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .topic-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 7px 10px;
+    border-radius: 12px;
+    font-size: 0.83rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .topic-item-row:hover {
+    background: var(--surface-2);
+    transform: translateX(2px);
+  }
+  .topic-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+  }
+  .topic-status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.73rem;
+    font-weight: 700;
+  }
+  .topic-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex: none;
+  }
+  .status-done { color: var(--moss); }
+  .status-done .topic-dot { background: var(--emerald); }
+  .status-active { color: var(--amber); }
+  .status-active .topic-dot { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+  .status-queued { color: var(--ink-muted); }
+
+
+  /* 6. Collapsible Drawer (Details) */
+  .cocoon-details {
+    background: var(--surface);
+    border: 1px solid var(--glass-border);
+    border-radius: 22px;
+    padding: 13px 18px;
+    box-shadow: var(--shadow-1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: all 0.2s ease;
+  }
+  .cocoon-details summary {
+    list-style: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.86rem;
+    color: var(--ink);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+  }
+  .cocoon-details summary::-webkit-details-marker { display: none; }
+  .cocoon-details summary::after {
+    content: '▾';
+    font-size: 1.05rem;
+    transition: transform 0.2s ease;
+  }
+  .cocoon-details[open] summary::after {
+    transform: rotate(180deg);
+  }
+  .details-content {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .modules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+  }
+  .module-card {
+    background: var(--surface-2);
+    border: 1px solid var(--line-soft);
+    border-radius: 14px;
+    padding: 12px 14px;
+    text-decoration: none;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    transition: all 0.15s ease;
+  }
+  .module-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--emerald);
+    background: var(--surface-hover);
+  }
+  .module-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--ink-muted);
+  }
+  .module-card-title {
+    font-size: 0.90rem;
+    font-weight: 700;
+  }
+  .module-card-desc {
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    line-height: 1.35;
+  }
+
+  /* ================= MODALS ================= */
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .modal-overlay.open {
+    display: flex;
+    opacity: 1;
+  }
+  .modal-window {
+    background: var(--modal-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 26px;
+    width: 100%;
+    max-width: 540px;
+    padding: 24px 26px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transform: translateY(12px) scale(0.98);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .modal-overlay.open .modal-window {
+    transform: translateY(0) scale(1);
+  }
+  .modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-title {
+    font-family: var(--font-d);
+    font-weight: 800;
+    font-size: 1.15rem;
+    color: var(--ink);
+  }
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--glass-border);
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.15s ease;
+  }
+  .modal-close:hover {
+    color: var(--ink);
+    background: var(--surface-hover);
+  }
+
+  /* Interactive Quiz Sprint Inside Modal */
+  .sprint-quiz-box {
+    background: var(--surface-2);
+    border: 1px solid var(--line-soft);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .quiz-code-snippet {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--line-soft);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-family: var(--font-m);
+    font-size: 0.85rem;
+    color: var(--emerald);
+    line-height: 1.4;
+  }
+  .quiz-opts {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .quiz-opt-btn {
+    text-align: left;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 0.86rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .quiz-opt-btn:hover {
+    border-color: var(--emerald);
+    background: var(--surface-hover);
+  }
+  .quiz-opt-btn.correct {
+    background: var(--emerald-soft);
+    border-color: var(--emerald);
+    color: var(--moss);
+    font-weight: 700;
+  }
+  .quiz-opt-btn.wrong {
+    background: var(--bordeaux-soft);
+    border-color: var(--bordeaux);
+    color: var(--bordeaux);
+    font-weight: 700;
+  }
+  .quiz-feedback {
+    display: none;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.pass { background: var(--emerald-soft); color: var(--moss); }
+  .quiz-feedback.fail { background: var(--bordeaux-soft); color: var(--bordeaux); }
+
+  /* Notification Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface);
+    border: 1.5px solid var(--emerald);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: var(--ink);
+    z-index: 200;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+</style>
+</head>
+<body>
+
+<!-- Ambient Orbs for Depth -->
+<div class="ambient-orb ambient-orb--burgundy" aria-hidden="true"></div>
+<div class="ambient-orb ambient-orb--emerald" aria-hidden="true"></div>
+
+<div id="app">
+  <!-- Desktop Sidebar (236px) -->
+  <aside class="sidebar">
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="6" cy="6" r="2.2"/>
+        <circle cx="18" cy="6" r="2.2"/>
+        <circle cx="12" cy="18" r="2.2"/>
+        <path d="M7.8 7.6 10.5 16M16.2 7.6 13.5 16M8.3 6h7.4"/>
+      </svg>
+      <span>Academy</span>
+    </div>
+    <div class="brand-sub">Python Backend</div>
+
+    <nav class="nav-group">
+      <a href="#/" class="nav-link active">
+        <svg viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5M6 10v9h5v-5h2v5h5v-9"/></svg>
+        <span>Дашборд</span>
+      </a>
+      <a href="#/path" class="nav-link">
+        <svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M7.8 7.6 10.5 16M16.2 7.6 13.5 16M8.3 6h7.4"/></svg>
+        <span>Тропа Coddy</span>
+      </a>
+      <a href="#/map" class="nav-link">
+        <svg viewBox="0 0 24 24"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+        <span>Карта навыков</span>
+      </a>
+      <a href="#/practice" class="nav-link">
+        <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        <span>Практика IDE</span>
+      </a>
+      <a href="#/cards" class="nav-link">
+        <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        <span>3D Карточки</span>
+      </a>
+      <a href="#/mock" class="nav-link">
+        <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+        <span>Собеседование</span>
+      </a>
+
+      <!-- Collapsible Module Index in Sidebar -->
+      <details class="sidebar-modules">
+        <summary>
+          <span>7 Модулей курса</span>
+          <span style="font-size:0.75rem;opacity:0.7;">▾</span>
+        </summary>
+        <div class="sidebar-modules-list">
+          <a href="#/python" class="module-link-mini"><span>01 · 🐍 Python</span><span class="mini-pct">42%</span></a>
+          <a href="#/web" class="module-link-mini"><span>02 · 🌐 Web</span><span class="mini-pct">15%</span></a>
+          <a href="#/backend" class="module-link-mini"><span>03 · ⚙️ Backend</span><span class="mini-pct">0%</span></a>
+          <a href="#/algorithms" class="module-link-mini"><span>04 · ⚡ Алгоритмы</span><span class="mini-pct">0%</span></a>
+          <a href="#/databases" class="module-link-mini"><span>05 · 🗄️ Базы данных</span><span class="mini-pct">0%</span></a>
+          <a href="#/architecture" class="module-link-mini"><span>06 · 🏛️ Архитектура</span><span class="mini-pct">0%</span></a>
+          <a href="#/infra" class="module-link-mini"><span>07 · 🚀 Инфра</span><span class="mini-pct">0%</span></a>
+        </div>
+      </details>
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-foot">
+      <div class="streak-pill-box">
+        <div class="streak-fire">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 3c-.5 3-3 4-3 7.5A3.5 3.5 0 0 0 12 14a3.5 3.5 0 0 0 3-5c1.5 1 2 2.7 2 4.2A5 5 0 0 1 12 21a5 5 0 0 1-5-5.2C7 12 9 9 9 7c1 1 1.2 2 1.2 2S11 5 12 3Z"/>
+          </svg>
+          <span id="streak-side-text">11 дней подряд</span>
+        </div>
+        <span style="font-size:0.72rem;color:var(--emerald);">+10 XP</span>
+      </div>
+
+      <div class="sidebar-controls">
+        <button class="pomo-side-btn" id="pomo-btn" title="Запустить 15-минутный спринт">
+          <span>🍅</span>
+          <span id="pomo-side-time">15:00</span>
+        </button>
+        <button class="icon-btn" id="theme-toggle" aria-label="Переключить тему" title="Светлая/Тёмная тема">
+          <svg viewBox="0 0 24 24" id="theme-icon"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Shell & Main Content -->
+  <div class="shell">
+    <!-- Mobile Topbar -->
+    <header class="mobile-topbar">
+      <div class="brand" style="font-size:1.02rem;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/>
+        </svg>
+        <span>Academy</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="cocoon-pill" style="padding:4px 9px;font-size:0.74rem;">🔥 11 дн.</span>
+        <button class="icon-btn" id="mobile-theme-toggle" aria-label="Тема" style="width:30px;height:30px;">
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;"><circle cx="12" cy="12" r="5"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <div class="container">
+        <!-- 1. Top Cocoon Pills -->
+        <div class="dash-top-pills">
+          <div class="pill-group">
+            <span class="cocoon-pill">🔥 11 дн. подряд · 🧊 2 заморозки</span>
+            <span class="cocoon-pill" style="border-color:rgba(16,185,129,0.35);color:var(--moss);">🎯 45/50 XP сегодня</span>
+          </div>
+          <div class="pill-group">
+            <button class="cocoon-pill cocoon-pill--interactive" id="open-context-btn">
+              <span>🔄 Контекст</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Trajectory Card (Countdown to 1st Screening) -->
+        <section class="cd-box" aria-label="Траектория скрининга">
+          <div class="cd-top">
+            <span class="cd-title">
+              <span>🎯 До 1-го тех-скрининга:</span>
+              <span style="color:var(--emerald);">42%</span>
+            </span>
+            <span class="cd-count">⏳ Осталось 8 тем</span>
+          </div>
+          <div class="cd-bar-track">
+            <div class="cd-bar-fill" style="width: 42%;"></div>
+          </div>
+          <div class="cd-checkpoint-sub">
+            <span>Шаг 6 из 14 юнитов Эшелона 1</span>
+            <span style="opacity:0.8;">Открывает доступ к реальным скринингам</span>
+          </div>
+        </section>
+
+        <!-- 3. Primary Focus Cocoon Card (Single Dominant CTA) -->
+        <section class="cocoon-focus-card" aria-label="Активный фокус">
+          <div class="cocoon-focus-eyebrow">
+            <span class="pulse-ring-dot"></span>
+            <span>✨ Фокус сейчас · 2 минуты</span>
+          </div>
+
+          <h1 class="cocoon-focus-title">
+            1.1 · Базовые коллекции и срезы
+            <span class="sub-meta">(list, tuple, slice)</span>
+          </h1>
+
+          <p class="cocoon-focus-desc">
+            Конспект <b>К-001: Структура списков и кортежей в памяти CPython</b> · 8 микро-шагов · живой код · сравнительный разбор Junior vs Senior.
+          </p>
+
+          <button class="btn-sprint-dominant" id="start-sprint-btn">
+            <span>▶ Начать спринт (2 мин) ➔</span>
+          </button>
+
+          <div class="focus-secondary-links">
+            <a href="#/mock" class="focus-link-quiet">🎙️ Симулятор собеседования</a>
+            <span style="color:var(--line);">•</span>
+            <a href="#/docs" class="focus-link-quiet">📚 Справочник формул</a>
+          </div>
+        </section>
+
+        <!-- 4. SRS Quick Review Strip -->
+        <section class="srs-strip-card" aria-label="Интервальное повторение">
+          <div class="srs-info">
+            <svg class="srs-ring-svg" viewBox="0 0 38 38" aria-hidden="true">
+              <circle class="srs-ring-bg" cx="19" cy="19" r="15"/>
+              <circle class="srs-ring-fg" cx="19" cy="19" r="15"/>
+            </svg>
+            <div>
+              <div class="srs-title">🔁 Интервальное повторение (SRS)</div>
+              <div class="srs-meta">Повторено колод: <b>24</b> · К повторению сегодня: <b>14 карточек</b></div>
+            </div>
+          </div>
+          <div class="srs-badges">
+            <button class="srs-chip" data-deck="gil">🃏 GIL & Память (5)</button>
+            <button class="srs-chip" data-deck="sql">🃏 SQL Индексы (4)</button>
+            <button class="srs-chip" data-deck="async">🃏 Asyncio (5)</button>
+          </div>
+        </section>
+
+        <!-- 5. 4 Interview Stages Switcher & Checklist -->
+        <section class="stage-switcher-box" aria-label="Этапы подготовки к собеседованию">
+          <div class="stage-pills">
+            <button class="stage-pill active" data-stage="1">
+              <span>1. Скрининг</span>
+              <span class="stage-pct">42% сдано</span>
+            </button>
+            <button class="stage-pill" data-stage="2">
+              <span>2. Стек</span>
+              <span class="stage-pct">18% сдано</span>
+            </button>
+            <button class="stage-pill" data-stage="3">
+              <span>3. Прод</span>
+              <span class="stage-pct">5% сдано</span>
+            </button>
+            <button class="stage-pill" data-stage="4">
+              <span>4. Оффер</span>
+              <span class="stage-pct">0% сдано</span>
+            </button>
+          </div>
+
+          <div class="stage-topics-list" id="stage-topics-container">
+            <!-- Dynamic topics checklist inserted via JS -->
+          </div>
+        </section>
+
+        <!-- 6. Collapsible Drawer (All Modules & Deep Metrics) -->
+        <details class="cocoon-details">
+          <summary>Все 7 модулей, эшелоны и детальная статистика</summary>
+          <div class="details-content">
+            <div class="modules-grid">
+              <a href="#/python" class="module-card">
+                <div class="module-card-top"><span>МОДУЛЬ 01 · 2800 MP</span><span>42%</span></div>
+                <div class="module-card-title">🐍 Python Core</div>
+                <div class="module-card-desc">28 навыков, 68 конспектов К-xxx, коллекции, дескрипторы, метаклассы и GIL.</div>
+              </a>
+              <a href="#/web" class="module-card">
+                <div class="module-card-top"><span>МОДУЛЬ 02 · 1000 MP</span><span>15%</span></div>
+                <div class="module-card-title">🌐 Web & HTTP</div>
+                <div class="module-card-desc">HTTP/1.1–HTTP/3, RESTful API, безопасность, CORS, CSRF, JWT-токены.</div>
+              </a>
+              <a href="#/backend" class="module-card">
+                <div class="module-card-top"><span>МОДУЛЬ 03 · 2400 MP</span><span>0%</span></div>
+                <div class="module-card-title">⚙️ Backend & Frameworks</div>
+                <div class="module-card-desc">FastAPI + Pydantic v2, Django ORM, асинхронные обработчики и фоновые таски.</div>
+              </a>
+              <a href="#/algorithms" class="module-card">
+                <div class="module-card-top"><span>МОДУЛЬ 04 · 1200 MP</span><span>0%</span></div>
+                <div class="module-card-title">⚡ Алгоритмы & Big O</div>
+                <div class="module-card-desc">Два указателя, бинарный поиск, стеки, деревья, хеш-таблицы и CPython структуры.</div>
+              </a>
+              <a href="#/databases" class="module-card">
+                <div class="module-card-top"><span>МОДУЛЬ 05 · 1700 MP</span><span>0%</span></div>
+                <div class="module-card-title">🗄️ Базы данных</div>
+                <div class="module-card-desc">PostgreSQL B-Tree, MVCC, транзакции ACID, EXPLAIN ANALYZE и Redis кэш.</div>
+              </a>
+              <a href="#/architecture" class="module-card">
+                <div class="module-card-top"><span>МОДУЛЬ 06 · 1400 MP</span><span>0%</span></div>
+                <div class="module-card-title">🏛️ Архитектура</div>
+                <div class="module-card-desc">Clean Architecture, GoF паттерны, Event-Driven, Saga и Transactional Outbox.</div>
+              </a>
+              <a href="#/infra" class="module-card">
+                <div class="module-card-top"><span>МОДУЛЬ 07 · 2100 MP</span><span>0%</span></div>
+                <div class="module-card-title">🚀 Инфраструктура</div>
+                <div class="module-card-desc">Docker multi-stage, CI/CD GitHub Actions, Linux systemd, Prometheus & Sentry.</div>
+              </a>
+            </div>
+          </div>
+        </details>
+      </div>
+    </main>
+
+    <!-- Mobile Bottom Tabbar -->
+    <nav class="mobile-tabbar">
+      <a href="#/" class="tabbar-item active">
+        <svg viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5M6 10v9h5v-5h2v5h5v-9"/></svg>
+        <span>Дашборд</span>
+      </a>
+      <a href="#/path" class="tabbar-item">
+        <svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/></svg>
+        <span>Тропа</span>
+      </a>
+      <a href="#/practice" class="tabbar-item">
+        <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        <span>IDE</span>
+      </a>
+      <a href="#/cards" class="tabbar-item">
+        <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+        <span>Карточки</span>
+      </a>
+      <a href="#/mock" class="tabbar-item">
+        <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/></svg>
+        <span>Интервью</span>
+      </a>
+    </nav>
+  </div>
+</div>
+
+<!-- Sprint Interactive Modal -->
+<div class="modal-overlay" id="sprint-modal" role="dialog" aria-modal="true" aria-labelledby="sprint-modal-title">
+  <div class="modal-window">
+    <div class="modal-head">
+      <div class="modal-title" id="sprint-modal-title">⚡ Спринт: Срезы списков в Python</div>
+      <button class="modal-close" id="close-sprint-btn" aria-label="Закрыть">✕</button>
+    </div>
+
+    <div class="sprint-quiz-box">
+      <div style="font-size:0.86rem;color:var(--ink-soft);">
+        Что выведет следующий фрагмент кода и какая сложность по времени операции среза?
+      </div>
+
+      <pre class="quiz-code-snippet"><code>nums = [10, 20, 30, 40, 50]
+sub = nums[1:4]
+print(sub)</code></pre>
+
+      <div class="quiz-opts">
+        <button class="quiz-opt-btn" data-correct="true">
+          <b>A)</b> <code>[20, 30, 40]</code> — сложность O(k), где k — длина среза
+        </button>
+        <button class="quiz-opt-btn" data-correct="false">
+          <b>B)</b> <code>[20, 30, 40, 50]</code> — срез включает правый индекс
+        </button>
+        <button class="quiz-opt-btn" data-correct="false">
+          <b>C)</b> <code>[10, 20, 30]</code> — нумерация с 1
+        </button>
+      </div>
+
+      <div class="quiz-feedback" id="quiz-feedback-box"></div>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:8px;">
+      <button class="btn-sprint-dominant" id="finish-sprint-btn" style="padding:10px 18px;font-size:0.88rem;display:none;">
+        Завершить шаг (+10 XP) ➔
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Context Modal -->
+<div class="modal-overlay" id="context-modal" role="dialog" aria-modal="true" aria-labelledby="context-modal-title">
+  <div class="modal-window">
+    <div class="modal-head">
+      <div class="modal-title" id="context-modal-title">🔄 Контекст платформы</div>
+      <button class="modal-close" id="close-context-btn" aria-label="Закрыть">✕</button>
+    </div>
+
+    <div style="font-size:0.86rem;color:var(--ink-soft);line-height:1.5;display:flex;flex-direction:column;gap:10px;">
+      <p><b>Статус сессии:</b> Все 7 модулей синхронизированы в облачной папке OneDrive. Архитектура 4 эшелонов активна.</p>
+      <div style="background:var(--surface-2);padding:12px;border-radius:12px;font-family:var(--font-m);font-size:0.78rem;">
+        <div>Стрик: 11 дней</div>
+        <div>Осталось тем до скрининга: 8 из 14</div>
+        <div>Решено задач в IDE: 32 / 401</div>
+        <div>Текущая тема: 1.1 Срезы списков (list, tuple)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast-el">
+  <span>✨</span>
+  <span id="toast-text">Спринт успешно завершён! +10 XP</span>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // State
+  let currentStage = 1;
+  let pomoRunning = false;
+  let pomoSeconds = 15 * 60;
+  let pomoInterval = 0;
+
+  const STAGE_DATA = {
+    1: [
+      { id: '1.1', title: 'Базовые коллекции: срезы и память list/tuple', status: 'active', statusText: 'В фокусе' },
+      { id: '1.2', title: 'Хеш-таблицы: коллизии dict/set и open addressing', status: 'queued', statusText: 'Очередь' },
+      { id: '1.3', title: 'Сложность Big O базовых операций и замеры timeit', status: 'done', statusText: 'Сдано ✓' },
+      { id: '1.4', title: 'Функции, области видимости LEGB, замыкания', status: 'queued', statusText: 'Очередь' },
+      { id: '1.9', title: 'Работа с исключениями и контекстные менеджеры', status: 'queued', statusText: 'Очередь' }
+    ],
+    2: [
+      { id: '2.1', title: 'HTTP/1.1 vs HTTP/2, структура заголовков и статус-коды', status: 'active', statusText: 'В фокусе' },
+      { id: '2.2', title: 'RESTful принципы и идемпотентность методов', status: 'done', statusText: 'Сдано ✓' },
+      { id: '3.1', title: 'FastAPI dependency injection и жизненный цикл yield', status: 'queued', statusText: 'Очередь' },
+      { id: '5.1', title: 'Реляционная модель, ключи и нормализация 3NF', status: 'queued', statusText: 'Очередь' }
+    ],
+    3: [
+      { id: '3.7', title: 'Асинхронные очереди задач: Celery, TaskIQ, RabbitMQ', status: 'queued', statusText: 'Очередь' },
+      { id: '7.1', title: 'Docker: multi-stage сборка и слои кэширования', status: 'active', statusText: 'В фокусе' },
+      { id: '7.2', title: 'CI/CD пайплайны GitHub Actions с тестами pytest', status: 'queued', statusText: 'Очередь' },
+      { id: '7.4', title: 'Мониторинг: Prometheus, Grafana, Sentry', status: 'queued', statusText: 'Очередь' }
+    ],
+    4: [
+      { id: '6.1', title: 'Clean Architecture и инверсия зависимостей (DIP)', status: 'queued', statusText: 'Очередь' },
+      { id: '6.2', title: 'Паттерны GoF: Factory, Repository, Unit of Work', status: 'queued', statusText: 'Очередь' },
+      { id: '6.5', title: 'Паттерн Saga и Transactional Outbox', status: 'queued', statusText: 'Очередь' }
+    ]
+  };
+
+  function renderStageTopics(stageNum) {
+    const container = document.getElementById('stage-topics-container');
+    if (!container) return;
+    const items = STAGE_DATA[stageNum] || [];
+    container.innerHTML = items.map(item => `
+      <div class="topic-item-row" data-topic-id="${item.id}" data-topic-title="${item.title}">
+        <div class="topic-left">
+          <span style="font-family:var(--font-m);font-size:0.75rem;color:var(--ink-muted);">${item.id}</span>
+          <span>${item.title}</span>
+        </div>
+        <div class="topic-status-indicator status-${item.status}">
+          <span class="topic-dot"></span>
+          <span>${item.statusText}</span>
+        </div>
+      </div>
+    `).join('');
+
+    // Clicking any topic selects it into the focus cocoon card
+    container.querySelectorAll('.topic-item-row').forEach(row => {
+      row.addEventListener('click', function() {
+        const tid = this.getAttribute('data-topic-id');
+        const ttitle = this.getAttribute('data-topic-title');
+        const focusTitle = document.querySelector('.cocoon-focus-title');
+        const focusCard = document.querySelector('.cocoon-focus-card');
+        if (focusTitle && focusCard) {
+          focusTitle.innerHTML = `${tid} · ${ttitle}`;
+          focusCard.style.borderColor = 'var(--emerald)';
+          showToast(`🎯 Фокус спринта переключён на: ${tid}`);
+        }
+      });
+    });
+  }
+
+  // Stage Switcher
+  const stagePills = document.querySelectorAll('.stage-pill');
+  stagePills.forEach(pill => {
+    pill.addEventListener('click', function() {
+      const s = parseInt(this.getAttribute('data-stage'), 10);
+      currentStage = s;
+      stagePills.forEach(p => p.classList.remove('active'));
+      this.classList.add('active');
+      renderStageTopics(s);
+    });
+  });
+
+  // Initial Render of Topics
+  renderStageTopics(1);
+
+  // Theme Toggle
+  function toggleTheme() {
+    const root = document.documentElement;
+    const current = root.getAttribute('data-theme') || 'dark';
+    const next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      localStorage.setItem('academy_theme_preference', next);
+    } catch (e) {}
+  }
+
+  const themeBtn = document.getElementById('theme-toggle');
+  const mobileThemeBtn = document.getElementById('mobile-theme-toggle');
+  if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
+  if (mobileThemeBtn) mobileThemeBtn.addEventListener('click', toggleTheme);
+
+  // Pomodoro Timer
+  const pomoBtn = document.getElementById('pomo-btn');
+  const pomoTimeDisplay = document.getElementById('pomo-side-time');
+
+  function updatePomoDisplay() {
+    const mins = Math.floor(pomoSeconds / 60).toString().padStart(2, '0');
+    const secs = (pomoSeconds % 60).toString().padStart(2, '0');
+    if (pomoTimeDisplay) pomoTimeDisplay.textContent = `${mins}:${secs}`;
+  }
+
+  if (pomoBtn) {
+    pomoBtn.addEventListener('click', function() {
+      if (pomoRunning) {
+        clearInterval(pomoInterval);
+        pomoRunning = false;
+        pomoBtn.classList.remove('running');
+      } else {
+        pomoRunning = true;
+        pomoBtn.classList.add('running');
+        pomoInterval = setInterval(function() {
+          if (pomoSeconds > 0) {
+            pomoSeconds--;
+            updatePomoDisplay();
+          } else {
+            clearInterval(pomoInterval);
+            pomoRunning = false;
+            pomoBtn.classList.remove('running');
+            showToast('🍅 Время спринта истекло! Отличная концентрация (+25 XP)');
+            pomoSeconds = 15 * 60;
+            updatePomoDisplay();
+          }
+        }, 1000);
+      }
+    });
+  }
+
+  // Toast Helper
+  function showToast(text) {
+    const toast = document.getElementById('toast-el');
+    const toastText = document.getElementById('toast-text');
+    if (!toast || !toastText) return;
+    toastText.textContent = text;
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3200);
+  }
+
+  // Sprint Modal
+  const sprintModal = document.getElementById('sprint-modal');
+  const startSprintBtn = document.getElementById('start-sprint-btn');
+  const closeSprintBtn = document.getElementById('close-sprint-btn');
+  const finishSprintBtn = document.getElementById('finish-sprint-btn');
+  const feedbackBox = document.getElementById('quiz-feedback-box');
+
+  if (startSprintBtn) {
+    startSprintBtn.addEventListener('click', function() {
+      if (sprintModal) sprintModal.classList.add('open');
+    });
+  }
+  if (closeSprintBtn) {
+    closeSprintBtn.addEventListener('click', function() {
+      if (sprintModal) sprintModal.classList.remove('open');
+    });
+  }
+
+  // Quiz Interaction
+  const quizBtns = document.querySelectorAll('.quiz-opt-btn');
+  quizBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const isCorrect = this.getAttribute('data-correct') === 'true';
+      quizBtns.forEach(b => {
+        b.disabled = true;
+        if (b.getAttribute('data-correct') === 'true') {
+          b.classList.add('correct');
+        }
+      });
+      if (!isCorrect) {
+        this.classList.add('wrong');
+        feedbackBox.textContent = '❌ Не совсем: срез [1:4] берёт элементы по индексам 1, 2 и 3 (не включая 4). Сложность O(k), так как создаётся новый список.';
+        feedbackBox.className = 'quiz-feedback show fail';
+      } else {
+        feedbackBox.textContent = '✓ Верно! Срезы создают поверхностную копию поддиапазона за O(k), где k — размер среза.';
+        feedbackBox.className = 'quiz-feedback show pass';
+      }
+      if (finishSprintBtn) finishSprintBtn.style.display = 'inline-flex';
+    });
+  });
+
+  if (finishSprintBtn) {
+    finishSprintBtn.addEventListener('click', function() {
+      if (sprintModal) sprintModal.classList.remove('open');
+      showToast('🎉 Микро-шаг завершён! +10 XP начислено.');
+    });
+  }
+
+  // Context Modal
+  const contextModal = document.getElementById('context-modal');
+  const openContextBtn = document.getElementById('open-context-btn');
+  const closeContextBtn = document.getElementById('close-context-btn');
+
+  if (openContextBtn) {
+    openContextBtn.addEventListener('click', function() {
+      if (contextModal) contextModal.classList.add('open');
+    });
+  }
+  if (closeContextBtn) {
+    closeContextBtn.addEventListener('click', function() {
+      if (contextModal) contextModal.classList.remove('open');
+    });
+  }
+
+  // Close modals on backdrop click
+  window.addEventListener('click', function(e) {
+    if (e.target === sprintModal) sprintModal.classList.remove('open');
+    if (e.target === contextModal) contextModal.classList.remove('open');
+  });
+
+  // SRS Chips toast
+  document.querySelectorAll('.srs-chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      const deck = this.getAttribute('data-deck');
+      showToast(`🃏 Открыта сессия повторения колоды: ${deck}`);
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
