@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Рабочий стол темы и практики — Python Backend Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ================= RESET & CORE TOKENS ================= */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root, :root[data-theme="light"] {
+    --paper: #faf8f5;
+    --surface: rgba(255, 255, 255, 0.88);
+    --surface-2: rgba(15, 23, 42, 0.045);
+    --surface-hover: rgba(15, 23, 42, 0.08);
+    --ink: #0f172a;
+    --ink-soft: #334155;
+    --ink-muted: #64748b;
+    --line: rgba(0, 0, 0, 0.07);
+    --line-soft: rgba(0, 0, 0, 0.045);
+    --hairline-light: rgba(0, 0, 0, 0.07);
+    --emerald: #145a46;
+    --emerald-soft: rgba(20, 90, 70, 0.10);
+    --emerald-glow: rgba(20, 90, 70, 0.22);
+    --amber: #d97706;
+    --amber-soft: rgba(217, 119, 6, 0.11);
+    --bordeaux: #6b1d2f;
+    --bordeaux-soft: rgba(107, 29, 47, 0.09);
+    --moss: #145a46;
+    --moss-deep: #0f4536;
+    --shadow-1: 0 10px 30px -10px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+    --shadow-glow: 0 12px 36px rgba(20, 90, 70, 0.16);
+    --font-d: 'Onest', 'Golos Text', -apple-system, sans-serif;
+    --font-b: 'Onest', 'Golos Text', -apple-system, sans-serif;
+    --font-m: 'JetBrains Mono', monospace;
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --orb-burgundy: rgba(107, 29, 47, 0.07);
+    --orb-emerald: rgba(20, 90, 70, 0.07);
+    --editor-bg: #ffffff;
+    --terminal-bg: #090d14;
+    --terminal-text: #38bdf8;
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #0d1016;
+    --surface: rgba(22, 27, 36, 0.74);
+    --surface-2: rgba(30, 37, 49, 0.66);
+    --surface-hover: rgba(45, 55, 72, 0.60);
+    --ink: #f8fafc;
+    --ink-soft: #cbd5e1;
+    --ink-muted: #94a3b8;
+    --line: rgba(255, 255, 255, 0.09);
+    --line-soft: rgba(255, 255, 255, 0.05);
+    --hairline-light: rgba(255, 255, 255, 0.08);
+    --emerald: #10b981;
+    --emerald-soft: rgba(16, 185, 129, 0.16);
+    --emerald-glow: rgba(16, 185, 129, 0.38);
+    --amber: #f59e0b;
+    --amber-soft: rgba(245, 158, 11, 0.16);
+    --bordeaux: #fb7185;
+    --bordeaux-soft: rgba(190, 18, 60, 0.22);
+    --moss: #10b981;
+    --moss-deep: #6ee7b7;
+    --shadow-1: 0 16px 40px -12px rgba(0, 0, 0, 0.55);
+    --shadow-glow: 0 16px 44px rgba(16, 185, 129, 0.26);
+    --glass-border: rgba(255, 255, 255, 0.10);
+    --orb-burgundy: rgba(190, 18, 60, 0.24);
+    --orb-emerald: rgba(16, 185, 129, 0.20);
+    --editor-bg: rgba(15, 20, 28, 0.85);
+    --terminal-bg: #07090e;
+    --terminal-text: #a7f3d0;
+  }
+
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-b);
+    line-height: 1.5;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Ambient light spheres */
+  .ambient-orb {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(68px);
+    transition: background 0.4s ease;
+  }
+  .ambient-orb--burgundy {
+    width: 420px;
+    height: 420px;
+    top: -100px;
+    left: -90px;
+    background: var(--orb-burgundy);
+  }
+  .ambient-orb--emerald {
+    width: 380px;
+    height: 380px;
+    bottom: -90px;
+    right: -80px;
+    background: var(--orb-emerald);
+  }
+
+  /* ================= TOPBAR (COMPACT SPRINT BAR) ================= */
+  .sprint-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    padding: 10px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    box-sizing: border-box;
+  }
+  @media (max-width: 600px) {
+    .sprint-topbar { padding: 8px 12px; }
+  }
+
+  .sprint-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+  .sprint-close-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+    transition: all 0.15s ease;
+    flex: none;
+  }
+  .sprint-close-btn:hover {
+    color: var(--ink);
+    background: var(--surface-hover);
+    transform: translateY(-1px);
+  }
+
+  .sprint-breadcrumbs {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .sprint-breadcrumbs-track {
+    font-size: 0.70rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sprint-breadcrumbs-title {
+    font-family: var(--font-d);
+    font-size: 0.94rem;
+    font-weight: 800;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sprint-nav-center {
+    flex: 1;
+    max-width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  @media (max-width: 760px) {
+    .sprint-nav-center { display: none; }
+  }
+  .sprint-progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.73rem;
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+  .sprint-progress-track {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    border: 1px solid var(--line-soft);
+    overflow: hidden;
+  }
+  .sprint-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--emerald), #34d399);
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+    transition: width 0.35s ease;
+  }
+
+  .sprint-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: none;
+  }
+  .sprint-xp-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: var(--emerald-soft);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: var(--moss);
+    font-size: 0.76rem;
+    font-weight: 800;
+  }
+  .theme-toggle-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .theme-toggle-btn:hover {
+    color: var(--ink);
+    transform: translateY(-1px);
+  }
+
+  /* ================= SUBTABS STRIP ================= */
+  .subtabs-strip {
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 6px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .subtabs-segmented {
+    display: inline-flex;
+    background: var(--surface-2);
+    padding: 3px;
+    border-radius: 14px;
+    border: 1px solid var(--line-soft);
+    gap: 3px;
+  }
+  .subtab-btn {
+    padding: 6px 13px;
+    border-radius: 11px;
+    border: none;
+    background: transparent;
+    color: var(--ink-soft);
+    font-family: var(--font-b);
+    font-size: 0.81rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .subtab-btn:hover {
+    color: var(--ink);
+  }
+  .subtab-btn.active {
+    background: var(--surface);
+    color: var(--moss);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  }
+
+  .subtabs-tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tool-pill-btn {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--glass-border);
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.14s ease;
+  }
+  .tool-pill-btn:hover {
+    background: var(--surface-hover);
+    color: var(--ink);
+  }
+
+  /* ================= MAIN WORKSPACE (SPLIT LAYOUT) ================= */
+  .workspace-main {
+    flex: 1;
+    display: flex;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+  @media (max-width: 980px) {
+    .workspace-main { flex-direction: column; overflow-y: auto; }
+  }
+
+  /* LEFT PANE: Theory & Microsteps (Coddy Scroll-Feed) */
+  .theory-pane {
+    flex: 1.1;
+    min-width: 0;
+    overflow-y: auto;
+    padding: 24px 28px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    border-right: 1px solid var(--line);
+    background: transparent;
+  }
+  @media (max-width: 600px) {
+    .theory-pane { padding: 16px 14px 36px; }
+  }
+
+  .microstep-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.74rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--emerald-soft);
+    color: var(--moss);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    width: fit-content;
+  }
+  .microstep-title {
+    font-family: var(--font-d);
+    font-size: clamp(1.15rem, 1.05rem + 0.6vw, 1.45rem);
+    font-weight: 800;
+    line-height: 1.28;
+    color: var(--ink);
+    letter-spacing: -0.015em;
+  }
+  .microstep-prose {
+    font-size: 0.94rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .microstep-prose p { margin: 0; }
+  .microstep-prose strong { color: var(--ink); }
+  .microstep-prose code {
+    font-family: var(--font-m);
+    font-size: 0.86rem;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: var(--surface-2);
+    border: 1px solid var(--line-soft);
+    color: var(--emerald);
+  }
+
+  /* ASCII / Memory Architecture Box */
+  .ascii-arch-box {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 14px 16px;
+    font-family: var(--font-m);
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: var(--ink);
+    overflow-x: auto;
+    white-space: pre;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Junior vs Senior Comparison Grid */
+  .jvs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 4px;
+  }
+  @media (max-width: 600px) {
+    .jvs-grid { grid-template-columns: 1fr; }
+  }
+  .jvs-card {
+    border-radius: 16px;
+    padding: 13px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  .jvs-card--junior {
+    background: rgba(107, 29, 47, 0.07);
+    border: 1px solid rgba(107, 29, 47, 0.28);
+    color: var(--ink-soft);
+  }
+  :root[data-theme="dark"] .jvs-card--junior {
+    background: rgba(190, 18, 60, 0.12);
+    border-color: rgba(251, 113, 133, 0.28);
+  }
+  .jvs-card--senior {
+    background: var(--emerald-soft);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: var(--ink-soft);
+  }
+  .jvs-badge {
+    font-weight: 800;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .jvs-card--junior .jvs-badge { color: var(--bordeaux); }
+  .jvs-card--senior .jvs-badge { color: var(--moss); }
+
+  /* Microstep Single Dominant CTA */
+  .step-cta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .btn-step-dominant {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(16, 185, 129, 0.18)), var(--surface);
+    border: 1.5px solid rgba(52, 211, 153, 0.70);
+    color: var(--ink);
+    border-radius: 14px;
+    padding: 12px 22px;
+    font-family: var(--font-d);
+    font-weight: 800;
+    font-size: 0.94rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 6px 22px rgba(16, 185, 129, 0.20);
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .btn-step-dominant:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(16, 185, 129, 0.32);
+    border-color: rgba(52, 211, 153, 0.95);
+  }
+  .btn-step-prev {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ink-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color 0.14s ease;
+  }
+  .btn-step-prev:hover { color: var(--ink); }
+
+  /* RIGHT PANE: Interactive IDE & Code Studio */
+  .ide-pane {
+    flex: 1.3;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  @media (max-width: 980px) {
+    .ide-pane { min-height: 480px; }
+  }
+
+  .ide-header {
+    padding: 8px 14px;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .ide-tabs {
+    display: flex;
+    gap: 4px;
+  }
+  .ide-tab {
+    padding: 5px 11px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: var(--font-m);
+    transition: all 0.14s ease;
+  }
+  .ide-tab.active {
+    background: var(--surface);
+    border-color: var(--line-soft);
+    color: var(--ink);
+  }
+
+  .ide-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .btn-run-code {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.28), rgba(16, 185, 129, 0.14)), var(--surface);
+    border: 1.5px solid rgba(52, 211, 153, 0.65);
+    color: var(--ink);
+    border-radius: 10px;
+    padding: 6px 14px;
+    font-family: var(--font-m);
+    font-weight: 800;
+    font-size: 0.81rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.16s ease;
+  }
+  .btn-run-code:hover {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.42), rgba(16, 185, 129, 0.22)), var(--surface);
+    border-color: rgba(52, 211, 153, 0.95);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
+  }
+  .btn-ide-tool {
+    padding: 5px 8px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: var(--surface);
+    color: var(--ink-muted);
+    font-size: 0.74rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.14s ease;
+  }
+  .btn-ide-tool:hover {
+    color: var(--ink);
+    border-color: var(--emerald);
+  }
+
+  /* Code Editor Container */
+  .code-editor-wrap {
+    flex: 1.2;
+    min-height: 230px;
+    display: flex;
+    position: relative;
+    background: var(--editor-bg);
+  }
+  .code-line-numbers {
+    width: 38px;
+    padding: 14px 0;
+    text-align: right;
+    font-family: var(--font-m);
+    font-size: 0.84rem;
+    line-height: 1.55;
+    color: var(--ink-muted);
+    opacity: 0.6;
+    user-select: none;
+    border-right: 1px solid var(--line-soft);
+  }
+  .code-textarea {
+    flex: 1;
+    padding: 14px 16px;
+    font-family: var(--font-m);
+    font-size: 0.86rem;
+    line-height: 1.55;
+    color: var(--ink);
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    white-space: pre;
+    tab-size: 4;
+  }
+
+  /* Terminal Output Pane */
+  .terminal-wrap {
+    flex: 0.9;
+    min-height: 160px;
+    border-top: 1px solid var(--line);
+    background: var(--terminal-bg);
+    display: flex;
+    flex-direction: column;
+  }
+  .terminal-header {
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-m);
+    font-size: 0.74rem;
+    color: var(--ink-muted);
+  }
+  .terminal-output {
+    flex: 1;
+    padding: 12px 14px;
+    font-family: var(--font-m);
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--terminal-text);
+    overflow-y: auto;
+    white-space: pre-wrap;
+  }
+
+  /* ================= ALTERNATIVE VIEWS (CARDS & QUIZ) ================= */
+  .view-container {
+    display: none;
+    flex: 1;
+    padding: 28px 20px;
+    max-width: 740px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    width: 100%;
+  }
+  .view-container.active { display: flex; flex-direction: column; gap: 16px; }
+
+  /* 3D Flashcard */
+  .card-scene {
+    perspective: 1000px;
+    width: 100%;
+    min-height: 280px;
+    cursor: pointer;
+  }
+  .flashcard-3d {
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .flashcard-3d.flipped { transform: rotateY(180deg); }
+
+  .flashcard-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 24px;
+    padding: 28px 30px;
+    background: var(--surface);
+    border: 1.5px solid var(--glass-border);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow: var(--shadow-1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+  }
+  .flashcard-face--back {
+    transform: rotateY(180deg);
+    border-color: rgba(52, 211, 153, 0.45);
+    background: linear-gradient(155deg, rgba(16, 185, 129, 0.10), transparent), var(--surface);
+  }
+  .card-prompt {
+    font-family: var(--font-d);
+    font-size: 1.15rem;
+    font-weight: 800;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  .card-answer {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+
+  .card-rating-bar {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    padding-top: 12px;
+  }
+  .btn-rate {
+    flex: 1;
+    padding: 10px 8px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: center;
+  }
+  .btn-rate:hover {
+    border-color: var(--emerald);
+    transform: translateY(-2px);
+  }
+  .btn-rate--again { border-color: rgba(190, 18, 60, 0.4); }
+  .btn-rate--easy { border-color: rgba(16, 185, 129, 0.4); color: var(--moss); }
+
+  /* Toast Notification */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface);
+    border: 1.5px solid var(--emerald);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: var(--ink);
+    z-index: 200;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="ambient-orb ambient-orb--burgundy" aria-hidden="true"></div>
+<div class="ambient-orb ambient-orb--emerald" aria-hidden="true"></div>
+
+<!-- 1. SPRINT FOCUS TOPBAR -->
+<header class="sprint-topbar">
+  <div class="sprint-nav-left">
+    <a href="dashboard_prototype.html" class="sprint-close-btn" title="Вернуться на Дашборд" aria-label="Закрыть">✕</a>
+    <div class="sprint-breadcrumbs">
+      <span class="sprint-breadcrumbs-track">🐍 Python Core › Юнит 1.1 · Коллекции</span>
+      <span class="sprint-breadcrumbs-title">1.1.1 · Структура списков и срезы (list & slice)</span>
+    </div>
+  </div>
+
+  <div class="sprint-nav-center">
+    <div class="sprint-progress-meta">
+      <span id="step-counter-text">Шаг 1 из 8</span>
+      <span style="color:var(--emerald);">12% пройдено</span>
+    </div>
+    <div class="sprint-progress-track">
+      <div class="sprint-progress-fill" id="progress-bar-fill" style="width: 12.5%;"></div>
+    </div>
+  </div>
+
+  <div class="sprint-nav-right">
+    <div class="sprint-xp-pill">
+      <span>⚡</span>
+      <span>+10 XP</span>
+    </div>
+    <button class="theme-toggle-btn" id="theme-btn" aria-label="Переключить тему">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- 2. SUBTABS STRIP (Activity Switcher) -->
+<nav class="subtabs-strip">
+  <div class="subtabs-segmented">
+    <button class="subtab-btn active" data-view="theory">
+      <span>📖</span><span>Конспект (Теория)</span>
+    </button>
+    <button class="subtab-btn" data-view="cards">
+      <span>🃏</span><span>Карточки (SRS)</span>
+    </button>
+    <button class="subtab-btn" data-view="quiz">
+      <span>⚡</span><span>Блиц-квиз</span>
+    </button>
+  </div>
+
+  <div class="subtabs-tools">
+    <button class="tool-pill-btn" id="reset-code-btn">↺ Сброс кода</button>
+    <button class="tool-pill-btn" id="shortcut-hint-btn">⌨️ Ctrl+Enter</button>
+  </div>
+</nav>
+
+<!-- 3. MAIN WORKSPACE VIEW (Theory + IDE Split Layout) -->
+<main class="workspace-main" id="view-theory">
+  <!-- LEFT PANE: Theory & Microsteps -->
+  <section class="theory-pane" aria-label="Теоретический конспект">
+    <div class="microstep-eyebrow">
+      <span>✨ Микро-шаг 1 из 8 · 2 минуты</span>
+    </div>
+
+    <h1 class="microstep-title" id="step-title">
+      Анатомия памяти PyListObject: массив указателей ob_item
+    </h1>
+
+    <div class="microstep-prose" id="step-prose">
+      <p>
+        В Python список <code>list</code> — это не связанный список (linked list), а <b>динамический массив указателей</b> на объекты. В исходном коде CPython (файл <code>listobject.h</code>) структура определена как <code>PyListObject</code>:
+      </p>
+
+      <div class="ascii-arch-box">
++--------------------+
+|   PyListObject     |
++--------------------+
+| ob_refcnt: 1       |
+| ob_type: &PyList_T |
+| ob_size: 4         |  --> логическая длина списка (len)
+| allocated: 8       |  --> физически выделенная ёмкость (capacity)
+| ob_item: [ * ]------> [ &obj0, &obj1, &obj2, &obj3, NULL, ... ]
++--------------------+      |       |       |       |
+                            v       v       v       v
+                         [10]    [20]    [30]    [40] (отдельные PyObject в куче)
+      </div>
+
+      <p>
+        <b>Ключевой вывод для Backend:</b> операция взятия по индексу <code>lst[i]</code> выполняется строго за <b>O(1)</b> (мгновенное смещение по формуле <code>ob_item + i * sizeof(void*)</code>). Однако срезы <code>lst[1:3]</code> выделяют <i>новый массив</i> и копируют указатели, поэтому их сложность равна <b>O(k)</b>, где <code>k</code> — длина среза.
+      </p>
+
+      <div class="jvs-grid">
+        <div class="jvs-card jvs-card--junior">
+          <div class="jvs-badge">⚠️ Junior-подход</div>
+          <div>Использует <code>nums[start:stop]</code> внутри цикла обработки миллионов записей, создавая гигабайты временных списков и перегружая GC.</div>
+        </div>
+        <div class="jvs-card jvs-card--senior">
+          <div class="jvs-badge">✓ Senior-инженерия</div>
+          <div>Использует итераторы, генераторы или <code>itertools.islice</code> для потоковой обработки срезов без копирования памяти.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-cta-row">
+      <button class="btn-step-prev" id="btn-prev-step" style="visibility:hidden;">← Шаг назад</button>
+      <button class="btn-step-dominant" id="btn-next-step">
+        <span>Понятно, дальше (+10 XP) ➔</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- RIGHT PANE: Interactive IDE & Terminal -->
+  <section class="ide-pane" aria-label="Студия кода и скетчпад">
+    <div class="ide-header">
+      <div class="ide-tabs">
+        <button class="ide-tab active">📝 Скетчпад (main.py)</button>
+        <button class="ide-tab">🎯 Задача #001</button>
+      </div>
+      <div class="ide-actions">
+        <button class="btn-ide-tool" id="copy-code-btn" title="Скопировать код">📋</button>
+        <button class="btn-run-code" id="run-btn">
+          <span>▶ Запустить</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="code-editor-wrap">
+      <div class="code-line-numbers" id="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9</div>
+      <textarea class="code-textarea" id="code-editor" spellcheck="false"># Эксперимент: замер ёмкости и срезы в памяти CPython
+import sys
+
+items = [10, 20, 30, 40]
+print("Длина:", len(items))
+print("Размер в байтах:", sys.getsizeof(items))
+
+# Взятие среза создаёт новый объект list:
+sub = items[1:3]
+print("Срез items[1:3]:", sub)
+print("Это разные объекты в памяти:", items is sub)</textarea>
+    </div>
+
+    <div class="terminal-wrap">
+      <div class="terminal-header">
+        <span>ВЫВОД КОНСОЛИ (STDOUT)</span>
+        <span id="terminal-status" style="color:var(--emerald);">● Готов к выполнению</span>
+      </div>
+      <div class="terminal-output" id="terminal-out">Нажмите «▶ Запустить» или нажмите Ctrl+Enter для выполнения кода...</div>
+    </div>
+  </section>
+</main>
+
+<!-- 4. FLASHCARDS VIEW -->
+<section class="view-container" id="view-cards">
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <span class="microstep-eyebrow">🃏 Колода Ф-001 · 1 из 12 карточек</span>
+    <span style="font-size:0.78rem;font-weight:700;color:var(--ink-muted);">Пробел — перевернуть</span>
+  </div>
+
+  <div class="card-scene" id="card-scene">
+    <div class="flashcard-3d" id="flashcard">
+      <div class="flashcard-face flashcard-face--front">
+        <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:var(--ink-muted);">Вопрос карточки</div>
+        <div class="card-prompt">
+          Какова алгоритмическая сложность по времени и памяти операции среза списка <code>lst[a:b]</code> в Python?
+        </div>
+        <div style="font-size:0.78rem;color:var(--ink-muted);text-align:center;">Кликните или нажмите Пробел для ответа ➔</div>
+      </div>
+
+      <div class="flashcard-face flashcard-face--back">
+        <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:var(--emerald);">Эталонный ответ</div>
+        <div class="card-answer">
+          Сложность составляет <b>O(k)</b> по времени и <b>O(k)</b> по памяти, где <code>k = b - a</code> — длина результирующего среза.<br><br>
+          CPython аллоцирует новый объект <code>PyListObject</code> и копирует <code>k</code> указателей на элементы из исходного списка.
+        </div>
+        <div class="card-rating-bar">
+          <button class="btn-rate btn-rate--again" data-rating="1">Снова (1м)</button>
+          <button class="btn-rate" data-rating="2">Трудно (10м)</button>
+          <button class="btn-rate" data-rating="3">Хорошо (1д)</button>
+          <button class="btn-rate btn-rate--easy" data-rating="4">Легко (4д)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. BLITZ QUIZ VIEW -->
+<section class="view-container" id="view-quiz">
+  <div class="microstep-eyebrow">⚡ Блиц-проверка понимания</div>
+  <h2 style="font-family:var(--font-d);font-size:1.15rem;font-weight:800;color:var(--ink);">
+    Что произойдёт, если изменить мутабельный объект внутри поверхностной копии среза?
+  </h2>
+
+  <pre class="ascii-arch-box">a = [[1, 2], [3, 4]]
+b = a[:]
+b[0].append(99)
+print(a[0])</pre>
+
+  <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px;" id="quiz-options">
+    <button class="btn-rate" style="text-align:left;padding:12px 14px;" data-quiz="false">
+      <b>A)</b> Выведет <code>[1, 2]</code> — срез создаёт независимую глубокую копию всех объектов
+    </button>
+    <button class="btn-rate" style="text-align:left;padding:12px 14px;" data-quiz="true">
+      <b>B)</b> Выведет <code>[1, 2, 99]</code> — срез копирует только указатели, внутренние списки общие
+    </button>
+    <button class="btn-rate" style="text-align:left;padding:12px 14px;" data-quiz="false">
+      <b>C)</b> Ошибка <code>TypeError: list indices must be integers</code>
+    </button>
+  </div>
+  <div id="quiz-msg" style="display:none;padding:12px 14px;border-radius:12px;font-size:0.86rem;"></div>
+</section>
+
+<!-- Toast Message -->
+<div class="toast" id="toast-el">
+  <span>✨</span>
+  <span id="toast-msg">Код успешно выполнен! +10 XP</span>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // Microsteps data
+  const STEPS = [
+    {
+      num: 1,
+      title: "Анатомия памяти PyListObject: массив указателей ob_item",
+      prose: `<p>В Python список <code>list</code> — это не связанный список, а <b>динамический массив указателей</b>. В CPython структура определена как <code>PyListObject</code>.</p>
+              <div class="ascii-arch-box">
++--------------------+
+|   PyListObject     |
++--------------------+
+| ob_size: 4         |  --> логическая длина списка (len)
+| allocated: 8       |  --> физическая ёмкость массива
+| ob_item: [ * ]------> [ &obj0, &obj1, &obj2, &obj3, NULL... ]
++--------------------+      |       |       |       |
+                            v       v       v       v
+                         [10]    [20]    [30]    [40]
+              </div>
+              <p><b>Ключевой вывод:</b> Индексация <code>lst[i]</code> — строго <b>O(1)</b>. Срезы <code>lst[1:3]</code> выделяют новый массив и копируют указатели за <b>O(k)</b>.</p>`,
+      code: `# Замер емкости и срезы в памяти CPython
+import sys
+
+items = [10, 20, 30, 40]
+print("Длина len:", len(items))
+print("Размер в байтах:", sys.getsizeof(items))
+
+sub = items[1:3]
+print("Срез items[1:3]:", sub)
+print("Это разные объекты:", items is sub)`
+    },
+    {
+      num: 2,
+      title: "Стратегия овер-аллокации памяти (Over-allocation formula)",
+      prose: `<p>При добавлении элементов через <code>append()</code> CPython не выделяет память под 1 элемент каждый раз. Используется прогрессивная формула выделения:</p>
+              <div class="ascii-arch-box">new_allocated = (size_t)newsize + (newsize >> 3) + (newsize < 9 ? 3 : 6);</div>
+              <p>Размеры буфера растут дискретно: <b>0, 4, 8, 16, 24, 32, 40, 52...</b> Это обеспечивает амортизированную сложность <b>O(1)</b> для <code>append()</code>.</p>`,
+      code: `import sys
+
+lst = []
+print("Начальный размер:", sys.getsizeof(lst), "байт")
+
+for i in range(12):
+    lst.append(i)
+    print(f"len={len(lst):2d} | bytes={sys.getsizeof(lst)}")`
+    },
+    {
+      num: 3,
+      title: "Шаг среза: отрицательные индексы и разворот lst[::-1]",
+      prose: `<p>Синтаксис <code>lst[start:stop:step]</code> позволяет задавать отрицательный шаг. Выражение <code>lst[::-1]</code> разворачивает список за <b>O(n)</b>, создавая новый список.</p>
+              <p>Для разворота списка <i>на месте</i> без дополнительной памяти используйте метод <code>lst.reverse()</code> (O(1) по доп. памяти).</p>`,
+      code: `nums = [1, 2, 3, 4, 5]
+
+# Создание копии с обратным порядком:
+rev_copy = nums[::-1]
+print("nums[::-1]:", rev_copy)
+
+# Разворот на месте (in-place):
+nums.reverse()
+print("nums после reverse():", nums)`
+    }
+  ];
+
+  let currentStepIdx = 0;
+
+  function renderStep(idx) {
+    const s = STEPS[idx];
+    if (!s) return;
+    document.getElementById('step-counter-text').textContent = `Шаг ${s.num} из 8`;
+    document.getElementById('progress-bar-fill').style.width = `${(s.num / 8) * 100}%`;
+    document.getElementById('step-title').textContent = s.title;
+    document.getElementById('step-prose').innerHTML = s.prose;
+    document.getElementById('code-editor').value = s.code;
+    updateLineNumbers();
+
+    const prevBtn = document.getElementById('btn-prev-step');
+    prevBtn.style.visibility = idx > 0 ? 'visible' : 'hidden';
+
+    const termOut = document.getElementById('terminal-out');
+    termOut.textContent = 'Код обновлён для текущего шага. Нажмите «▶ Запустить».';
+  }
+
+  // Next / Prev step buttons
+  document.getElementById('btn-next-step').addEventListener('click', function() {
+    if (currentStepIdx < STEPS.length - 1) {
+      currentStepIdx++;
+      renderStep(currentStepIdx);
+      showToast('🎉 Шаг сдан! +10 XP начислено.');
+    } else {
+      showToast('🏆 Все шаги темы пройдены! Переходим к практике.');
+    }
+  });
+
+  document.getElementById('btn-prev-step').addEventListener('click', function() {
+    if (currentStepIdx > 0) {
+      currentStepIdx--;
+      renderStep(currentStepIdx);
+    }
+  });
+
+  // Code runner simulation
+  const runBtn = document.getElementById('run-btn');
+  const termOut = document.getElementById('terminal-out');
+  const termStatus = document.getElementById('terminal-status');
+
+  function executeCode() {
+    termStatus.textContent = '● Выполняется...';
+    termStatus.style.color = 'var(--amber)';
+    termOut.textContent = 'Запуск Brython 3.13.0...\n';
+
+    setTimeout(() => {
+      const code = document.getElementById('code-editor').value;
+      let output = '';
+
+      if (code.includes('items is sub')) {
+        output = 'Длина: 4\nРазмер в байтах: 88\nСрез items[1:3]: [20, 30]\nЭто разные объекты в памяти: False\n\n[Выполнено успешно за 8 мс]';
+      } else if (code.includes('over-allocation') || code.includes('new_allocated') || code.includes('sys.getsizeof(lst)')) {
+        output = 'Начальный размер: 56 байт\nlen= 1 | bytes=88\nlen= 2 | bytes=88\nlen= 3 | bytes=88\nlen= 4 | bytes=88\nlen= 5 | bytes=120\nlen= 9 | bytes=184\n\n[Выполнено успешно за 11 мс]';
+      } else if (code.includes('nums[::-1]')) {
+        output = 'nums[::-1]: [5, 4, 3, 2, 1]\nnums после reverse(): [5, 4, 3, 2, 1]\n\n[Выполнено успешно за 6 мс]';
+      } else {
+        output = 'Длина: 4\nРезультат: OK\n\n[Выполнено успешно за 7 мс]';
+      }
+
+      termOut.textContent = output;
+      termStatus.textContent = '● Выполнено (код 0)';
+      termStatus.style.color = 'var(--emerald)';
+      showToast('⚡ Сниппет успешно отработал!');
+    }, 280);
+  }
+
+  runBtn.addEventListener('click', executeCode);
+
+  // Keyboard shortcut Ctrl+Enter
+  window.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      executeCode();
+    }
+  });
+
+  // Line numbers sync
+  function updateLineNumbers() {
+    const lines = document.getElementById('code-editor').value.split('\n').length;
+    let nums = '';
+    for (let i = 1; i <= Math.max(lines, 8); i++) {
+      nums += i + '<br>';
+    }
+    document.getElementById('line-numbers').innerHTML = nums;
+  }
+  document.getElementById('code-editor').addEventListener('input', updateLineNumbers);
+
+  // Subtabs switching
+  const subtabs = document.querySelectorAll('.subtab-btn');
+  subtabs.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const target = this.getAttribute('data-view');
+      subtabs.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+
+      document.getElementById('view-theory').style.display = target === 'theory' ? 'flex' : 'none';
+      document.getElementById('view-cards').classList.toggle('active', target === 'cards');
+      document.getElementById('view-quiz').classList.toggle('active', target === 'quiz');
+    });
+  });
+
+  // 3D Card Flip
+  const card = document.getElementById('flashcard');
+  const cardScene = document.getElementById('card-scene');
+  if (cardScene && card) {
+    cardScene.addEventListener('click', function(e) {
+      if (!e.target.closest('.btn-rate')) {
+        card.classList.toggle('flipped');
+      }
+    });
+  }
+
+  // Card rating buttons
+  document.querySelectorAll('.btn-rate').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const r = this.getAttribute('data-rating');
+      showToast(`🃏 Карточка сохранена с интервалом: ${r}`);
+      setTimeout(() => {
+        if (card) card.classList.remove('flipped');
+      }, 500);
+    });
+  });
+
+  // Blitz Quiz interaction
+  document.querySelectorAll('#quiz-options button').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const isCorrect = this.getAttribute('data-quiz') === 'true';
+      const msg = document.getElementById('quiz-msg');
+      if (isCorrect) {
+        this.style.borderColor = 'var(--emerald)';
+        this.style.background = 'var(--emerald-soft)';
+        msg.style.display = 'block';
+        msg.style.background = 'var(--emerald-soft)';
+        msg.style.color = 'var(--moss)';
+        msg.textContent = '✓ Абсолютно верно! Срез копирует только ссылки первого уровня. Вложенный [1, 2] остаётся тем же самым объектом в куче.';
+        showToast('🎯 Верный ответ! +10 XP');
+      } else {
+        this.style.borderColor = 'var(--bordeaux)';
+        this.style.background = 'var(--bordeaux-soft)';
+        msg.style.display = 'block';
+        msg.style.background = 'var(--bordeaux-soft)';
+        msg.style.color = 'var(--bordeaux)';
+        msg.textContent = '❌ Неверно. Срез a[:] делает поверхностную копию (shallow copy), поэтому вложенные списки разделяются.';
+      }
+    });
+  });
+
+  // Toast
+  function showToast(text) {
+    const t = document.getElementById('toast-el');
+    const msg = document.getElementById('toast-msg');
+    if (!t || !msg) return;
+    msg.textContent = text;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // Theme Toggle
+  document.getElementById('theme-btn').addEventListener('click', function() {
+    const root = document.documentElement;
+    const cur = root.getAttribute('data-theme') || 'dark';
+    root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+  });
+
+  // Copy code
+  document.getElementById('copy-code-btn').addEventListener('click', function() {
+    const code = document.getElementById('code-editor').value;
+    navigator.clipboard.writeText(code).then(() => {
+      showToast('📋 Код скопирован в буфер обмена');
+    });
+  });
+
+  // Reset code
+  document.getElementById('reset-code-btn').addEventListener('click', function() {
+    renderStep(currentStepIdx);
+    showToast('↺ Код сброшен к исходному');
+  });
+
+  // Init
+  updateLineNumbers();
+})();
+</script>
+</body>
+</html>
