@@ -2083,6 +2083,128 @@
   box-shadow: var(--zen-shadow-island, 0 20px 48px -12px rgba(0, 0, 0, 0.5)) !important;
 }
 
+/* Settings Modal Zen Distillation */
+.settings-modal-card {
+  background: var(--zen-surface, rgba(18, 23, 33, 0.88)) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
+  border-radius: 26px !important;
+  box-shadow: var(--zen-shadow-island, 0 24px 64px -12px rgba(0, 0, 0, 0.65)) !important;
+  max-width: 580px !important;
+}
+
+.settings-section-title {
+  color: var(--zen-amber, #f59e0b) !important;
+  font-size: 0.84rem !important;
+  letter-spacing: 0.06em !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+}
+
+.settings-mode-card {
+  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.03)) !important;
+  border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.05)) !important;
+  border-radius: 18px !important;
+  transition: all 0.18s ease !important;
+}
+.settings-mode-card:hover {
+  background: var(--zen-surface-hover, rgba(255, 255, 255, 0.07)) !important;
+  border-color: var(--zen-hairline, rgba(255, 255, 255, 0.1)) !important;
+}
+.settings-mode-card.active {
+  background: var(--zen-amber-soft, rgba(245, 158, 11, 0.12)) !important;
+  border-color: var(--zen-amber-border, rgba(251, 191, 36, 0.4)) !important;
+  box-shadow: 0 0 0 1px var(--zen-amber, #f59e0b), 0 8px 20px -4px rgba(245, 158, 11, 0.25) !important;
+}
+
+.path-node-style-btn {
+  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.03)) !important;
+  border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.05)) !important;
+  border-radius: 12px !important;
+  transition: all 0.15s ease !important;
+}
+.path-node-style-btn:hover {
+  background: var(--zen-surface-hover, rgba(255, 255, 255, 0.07)) !important;
+  border-color: var(--zen-hairline, rgba(255, 255, 255, 0.1)) !important;
+}
+.path-node-style-btn.active {
+  background: var(--zen-amber-soft, rgba(245, 158, 11, 0.12)) !important;
+  border-color: var(--zen-amber-border, rgba(251, 191, 36, 0.4)) !important;
+  color: var(--zen-text-main, #f8fafc) !important;
+}
+
+.settings-tiles-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+@media (max-width: 520px) {
+  .settings-tiles-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.settings-tile {
+  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.03)) !important;
+  border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.05)) !important;
+  border-radius: 14px !important;
+  padding: 11px 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  cursor: pointer !important;
+  transition: all 0.18s ease !important;
+  color: var(--zen-text-main, #f8fafc) !important;
+  text-align: left !important;
+  width: 100% !important;
+  font-family: inherit !important;
+}
+.settings-tile:hover {
+  background: var(--zen-surface-hover, rgba(255, 255, 255, 0.07)) !important;
+  border-color: var(--zen-hairline, rgba(255, 255, 255, 0.12)) !important;
+  transform: translateY(-1px) !important;
+}
+.settings-tile:active {
+  transform: translateY(0) !important;
+}
+.settings-tile-info {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  font-weight: 600 !important;
+  font-size: 0.88rem !important;
+}
+.settings-tile-icon {
+  font-size: 1.15rem !important;
+  line-height: 1 !important;
+}
+.settings-pill-badge {
+  font-size: 0.74rem !important;
+  font-weight: 700 !important;
+  padding: 3px 8px !important;
+  border-radius: 999px !important;
+  white-space: nowrap !important;
+  letter-spacing: 0.02em !important;
+}
+.settings-pill-badge--emerald {
+  background: rgba(16, 185, 129, 0.14) !important;
+  color: #10b981 !important;
+  border: 1px solid rgba(16, 185, 129, 0.28) !important;
+}
+.settings-pill-badge--amber {
+  background: rgba(245, 158, 11, 0.14) !important;
+  color: #f59e0b !important;
+  border: 1px solid rgba(245, 158, 11, 0.28) !important;
+}
+.settings-pill-badge--muted {
+  background: rgba(148, 163, 184, 0.10) !important;
+  color: #94a3b8 !important;
+  border: 1px solid rgba(148, 163, 184, 0.18) !important;
+}
+
 
   /* ================= 3D TACTILE BUTTONS & CODDY AESTHETICS ================= */
   .btn-3d-orange {
@@ -13415,6 +13537,7 @@ function openSettingsModal(){
   const isGame = (state.pathViewMode !== 'pro');
   const isPro = (state.pathViewMode === 'pro');
   const pathNodeStyle = state.pathNodeStyle === 'button' ? 'button' : 'paw';
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
 
   const modal = document.createElement('div');
   modal.id = 'settings-modal';
@@ -13424,10 +13547,10 @@ function openSettingsModal(){
   modal.innerHTML = `
     <div class="modal-card settings-modal-card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
-        <h2 style="margin:0;font-size:1.35rem;display:flex;align-items:center;gap:10px;">
+        <h2 style="margin:0;font-size:1.3rem;display:flex;align-items:center;gap:10px;font-family:var(--font-h, 'Onest', sans-serif);font-weight:800;letter-spacing:-0.01em;">
           <span>⚙️</span> Настройки платформы
         </h2>
-        <button class="btn btn-ghost" style="padding:6px 12px;" data-close-settings-modal aria-label="Закрыть">✕ Закрыть</button>
+        <button class="btn btn-ghost" style="padding:6px 12px;border-radius:12px;background:var(--zen-surface-subtle, rgba(255,255,255,0.03));border:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));" data-close-settings-modal aria-label="Закрыть">✕ Закрыть</button>
       </div>
 
       <!-- Режим экрана обучения -->
@@ -13441,7 +13564,7 @@ function openSettingsModal(){
               <span class="settings-mode-name">Игровой режим</span>
               ${isGame ? '<span class="settings-mode-badge">Активен</span>' : ''}
             </div>
-            <div class="settings-mode-desc">Извилистая игровая тропа с анимированными узлами и карточками юнитов.</div>
+            <div class="settings-mode-desc">Извилистая тропа с анимированными узлами и карточками юнитов.</div>
           </button>
 
           <button type="button" class="settings-mode-card ${isPro ? 'active' : ''}" data-set-path-mode="pro">
@@ -13450,10 +13573,10 @@ function openSettingsModal(){
               <span class="settings-mode-name">Профессиональный</span>
               ${isPro ? '<span class="settings-mode-badge">Активен</span>' : ''}
             </div>
-            <div class="settings-mode-desc">Структурированный список уроков по главам с верхней Hero-карточкой фокуса и бейджами «Теория + Практика».</div>
+            <div class="settings-mode-desc">Структурированный список уроков по главам с карточкой фокуса.</div>
           </button>
         </div>
-        <div class="path-node-style-picker" role="group" aria-label="Форма узлов игровой тропы">
+        <div class="path-node-style-picker" role="group" aria-label="Форма узлов игровой тропы" style="margin-top:12px;">
           <div class="path-node-style-label">Форма узлов</div>
           <button type="button" class="path-node-style-btn ${pathNodeStyle === 'paw' ? 'active' : ''}" data-set-path-node-style="paw" aria-pressed="${pathNodeStyle === 'paw'}">🐾 Лапки</button>
           <button type="button" class="path-node-style-btn ${pathNodeStyle === 'button' ? 'active' : ''}" data-set-path-node-style="button" aria-pressed="${pathNodeStyle === 'button'}">◉ Кнопки</button>
@@ -13463,40 +13586,65 @@ function openSettingsModal(){
       <!-- Тема и звук -->
       <div class="settings-section" style="margin-top:20px;">
         <div class="settings-section-title">🎨 Интерфейс и звук</div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
-          <button type="button" class="btn btn-ghost" id="settings-theme-toggle" style="flex:1;min-width:140px;">
-            🌓 Тема: ${document.documentElement.getAttribute('data-theme') === 'light' ? 'Пергамент (Светлая)' : 'Обсидиан (Тёмная)'}
+        <div class="settings-tiles-grid">
+          <button type="button" class="settings-tile" id="settings-theme-toggle">
+            <div class="settings-tile-info">
+              <span class="settings-tile-icon">🌓</span>
+              <span>Тема оформления</span>
+            </div>
+            <span class="settings-pill-badge settings-pill-badge--amber">
+              ${isLight ? 'Пергамент (Светлая)' : 'Обсидиан (Тёмная)'}
+            </span>
           </button>
-          <button type="button" class="btn btn-ghost" id="settings-sound-toggle" style="flex:1;min-width:140px;">
-            ${state.soundEnabled ? '🔊 Звук: Включён' : '🔇 Звук: Выключен'}
+          <button type="button" class="settings-tile" id="settings-sound-toggle">
+            <div class="settings-tile-info">
+              <span class="settings-tile-icon">${state.soundEnabled ? '🔊' : '🔇'}</span>
+              <span>Звук эффектов</span>
+            </div>
+            <span class="settings-pill-badge ${state.soundEnabled ? 'settings-pill-badge--emerald' : 'settings-pill-badge--muted'}">
+              ${state.soundEnabled ? 'Включён' : 'Выключен'}
+            </span>
           </button>
         </div>
       </div>
-      <!-- Рубежные тесты: разбор и стартовая модалка -->
+
+      <!-- Рубежные тесты -->
       <div class="settings-section" style="margin-top:20px;">
         <div class="settings-section-title">🧪 Рубежные тесты</div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
-          <button type="button" class="btn btn-ghost" data-ut-toggle-explain style="flex:1;min-width:170px;">
-            ${state.utShowExplanations ? '📝 Разбор после ответа: Вкл' : '📝 Разбор после ответа: Выкл'}
+        <div class="settings-tiles-grid">
+          <button type="button" class="settings-tile" data-ut-toggle-explain>
+            <div class="settings-tile-info">
+              <span class="settings-tile-icon">📝</span>
+              <span>Разбор ответов</span>
+            </div>
+            <span class="settings-pill-badge ${state.utShowExplanations ? 'settings-pill-badge--emerald' : 'settings-pill-badge--muted'}">
+              ${state.utShowExplanations ? 'Включён' : 'Выключен'}
+            </span>
           </button>
-          <button type="button" class="btn btn-ghost" data-ut-toggle-skipmodal style="flex:1;min-width:170px;">
-            ${state.utSkipStartModal ? '⏭️ Открывать тест без модалки: Вкл' : '⏭️ Открывать тест без модалки: Выкл'}
+          <button type="button" class="settings-tile" data-ut-toggle-skipmodal>
+            <div class="settings-tile-info">
+              <span class="settings-tile-icon">⏭️</span>
+              <span>Старт без модалки</span>
+            </div>
+            <span class="settings-pill-badge ${state.utSkipStartModal ? 'settings-pill-badge--emerald' : 'settings-pill-badge--muted'}">
+              ${state.utSkipStartModal ? 'Включён' : 'Выключен'}
+            </span>
           </button>
         </div>
-        <p class="meta" style="margin:10px 0 0;font-size:0.78rem;">Стартовая модалка — окно «Готовы начать тест?» перед рубежным тестом. Дублирует тихую ссылку под её кнопками.</p>
+        <p class="meta" style="margin:8px 0 0;font-size:0.78rem;">Стартовая модалка — окно «Готовы начать тест?» перед рубежным тестом.</p>
       </div>
 
       <!-- Данные и сброс -->
-      <div class="settings-section" style="margin-top:20px;border-top:1px solid var(--line);padding-top:16px;">
+      <div class="settings-section" style="margin-top:20px;border-top:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));padding-top:16px;">
         <div class="settings-section-title">💾 Управление данными</div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
-          <button type="button" class="btn btn-ghost" data-open-handover style="font-size:0.85rem;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
+          <button type="button" class="btn btn-ghost" data-open-handover style="font-size:0.85rem;border-radius:12px;background:var(--zen-surface-subtle, rgba(255,255,255,0.03));border:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));">
             🔄 Перенос контекста
           </button>
-          <button type="button" class="btn btn-ghost" data-open-bug-modal style="font-size:0.85rem;">
+          <button type="button" class="btn btn-ghost" data-open-bug-modal style="font-size:0.85rem;border-radius:12px;background:var(--zen-surface-subtle, rgba(255,255,255,0.03));border:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));">
             🐞 Журнал замечаний
           </button>
-          <button type="button" class="btn btn-ghost" id="settings-reset-btn" style="font-size:0.85rem;color:var(--burgundy-bright);">
+          <button type="button" class="btn btn-ghost" id="settings-reset-btn" style="font-size:0.85rem;border-radius:12px;color:var(--burgundy-bright);border:1px solid rgba(225, 29, 72, 0.25);background:rgba(225, 29, 72, 0.06);margin-left:auto;">
             ⚠️ Сбросить прогресс
           </button>
         </div>
