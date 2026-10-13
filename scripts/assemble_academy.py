@@ -1744,26 +1744,199 @@ EXTRA_CSS = r"""
   .fc-story-seg.seg--hard, .fc-story-seg.fc-story-seg--r2{background:var(--amber);}
   .fc-story-seg.seg--again, .fc-story-seg.fc-story-seg--r1{background:var(--bordeaux);}
   .fc-story-seg.seg--current, .fc-story-seg.fc-story-seg--active{background:var(--ink);transform:scaleY(1.35);}
-  .fc-stage{perspective:1200px;margin:16px 0;}
+  .fc-stage{perspective:1400px;perspective-origin:center center;margin:14px 0;}
   .fc-card{
-    background:var(--surface);border:1.5px solid var(--line);border-radius:24px;padding:28px 26px;
-    min-height:215px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;
-    box-shadow:var(--shadow-1);transform-style:preserve-3d;
-    transition:border-color .22s,background .25s,box-shadow .25s;
+    background:var(--surface);border:1.5px solid var(--line);border-radius:22px;padding:26px 24px;
+    min-height:220px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;
+    box-shadow:0 4px 18px rgba(0,0,0,.15);
+    transform-origin:left center;
+    transform-style:preserve-3d;
+    transition:border-color .22s,background .25s,box-shadow .25s,transform .25s ease;
     position:relative;overflow:hidden;touch-action:pan-y;
+    will-change:transform,box-shadow;
   }
+  /* Корешок книги (Left Spine crease & book fold) */
+  .fc-card::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:16px;
+    pointer-events:none;border-radius:22px 0 0 22px;
+    background:linear-gradient(to right, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.08) 40%, rgba(0,0,0,0) 100%);
+    border-right:1px solid rgba(255,255,255,0.04);
+    z-index:2;
+  }
+  /* Скользящий световой блик по странице при листании */
   .fc-card::after{
-    content:"";position:absolute;inset:0;pointer-events:none;
-    background:linear-gradient(125deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 45%);
+    content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+    background:linear-gradient(115deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.02) 28%, rgba(0,0,0,0.12) 55%, rgba(255,255,255,0.06) 80%, rgba(255,255,255,0) 100%);
+    opacity:0.4;
+    transition:opacity .3s;
+    z-index:1;
   }
-  .fc-card:hover{border-color:var(--moss);box-shadow:0 10px 24px rgba(28,32,26,.12);}
+  .fc-card:hover{
+    border-color:var(--moss);
+    transform:perspective(1400px) rotateY(-3.5deg) translateY(-2px);
+    box-shadow:-10px 14px 28px rgba(0,0,0,.22), inset 12px 0 16px -8px rgba(0,0,0,.2);
+  }
+  /* Декоративный загнутый уголок книги (Dog-ear page curl) */
+  .fc-card .page-curl-corner{
+    position:absolute;right:0;bottom:0;width:30px;height:30px;
+    pointer-events:none;overflow:hidden;border-radius:0 0 22px 0;
+    z-index:3;
+  }
+  .fc-card .page-curl-corner::before{
+    content:"";position:absolute;right:-2px;bottom:-2px;width:24px;height:24px;
+    background:linear-gradient(135deg, transparent 50%, rgba(116,172,130,0.3) 50%, rgba(116,172,130,0.15) 75%, rgba(255,255,255,0.12) 100%);
+    box-shadow:-2px -2px 6px rgba(0,0,0,0.35);
+    border-radius:0 0 22px 0;
+    transition:all .25s ease;
+  }
+  .fc-card:hover .page-curl-corner::before{
+    transform:scale(1.18) translate(-1px,-1px);
+    background:linear-gradient(135deg, transparent 46%, rgba(116,172,130,0.55) 46%, rgba(116,172,130,0.25) 75%, rgba(255,255,255,0.22) 100%);
+    box-shadow:-4px -4px 9px rgba(0,0,0,0.45);
+  }
+
+  /* Состояние раскрытого ответа */
   .fc-card--Answer{
-    background:var(--moss-soft);border-color:var(--moss);
-    animation:cardFlipSpring .46s cubic-bezier(0.34,1.56,0.64,1);
+    background:var(--moss-soft);
+    border-color:var(--moss);
   }
-  @keyframes cardFlipSpring{
-    0%{transform:rotateY(-14deg) scale(0.98);}
-    100%{transform:rotateY(0deg) scale(1);}
+
+  /* Анимация перелистывания страницы на Ответ (Book Page Turn to Answer) */
+  .fc-card.fc-page-flip-answer,
+  .fc-card--Answer:not(.fc-page-turn-next):not(.fc-page-turn-prev):not(.fc-page-flip-question){
+    animation:bookPageTurnToAnswer .54s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .fc-card.fc-page-flip-answer::after,
+  .fc-card--Answer:not(.fc-page-turn-next):not(.fc-page-turn-prev):not(.fc-page-flip-question)::after{
+    animation:pageSheenGlance .54s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  /* Анимация перелистывания страницы обратно на Вопрос */
+  .fc-card.fc-page-flip-question{
+    animation:bookPageTurnToQuestion .50s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  /* Анимация перелистывания к следующей странице (Turn to Next Page) */
+  .fc-card.fc-page-turn-next{
+    animation:bookPageTurnNext .52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .fc-card.fc-page-turn-next::after{
+    animation:pageSheenGlance .52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  /* Анимация возврата к предыдущей странице (Turn to Prev Page) */
+  .fc-card.fc-page-turn-prev{
+    animation:bookPageTurnPrev .50s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  @keyframes bookPageTurnToAnswer{
+    0%{
+      transform:perspective(1400px) rotateY(0deg) translateZ(0) skewY(0deg);
+      box-shadow:0 4px 18px rgba(0,0,0,.2);
+    }
+    28%{
+      transform:perspective(1400px) rotateY(-24deg) translateZ(36px) skewY(-1.6deg);
+      box-shadow:-22px 14px 38px rgba(0,0,0,.45), inset 22px 0 28px -10px rgba(0,0,0,.45);
+    }
+    58%{
+      transform:perspective(1400px) rotateY(-8deg) translateZ(18px) skewY(-0.6deg);
+      box-shadow:-12px 8px 24px rgba(0,0,0,.3), inset 12px 0 18px -8px rgba(0,0,0,.3);
+    }
+    82%{
+      transform:perspective(1400px) rotateY(2.5deg) translateZ(4px) skewY(0.2deg);
+    }
+    100%{
+      transform:perspective(1400px) rotateY(0deg) translateZ(0) skewY(0deg);
+      box-shadow:0 4px 18px rgba(0,0,0,.2);
+    }
+  }
+
+  @keyframes bookPageTurnToQuestion{
+    0%{
+      transform:perspective(1400px) rotateY(0deg) translateZ(0) skewY(0deg);
+      box-shadow:0 4px 18px rgba(0,0,0,.2);
+    }
+    28%{
+      transform:perspective(1400px) rotateY(-18deg) translateZ(28px) skewY(-1.2deg);
+      box-shadow:-18px 10px 28px rgba(0,0,0,.38), inset 18px 0 22px -8px rgba(0,0,0,.35);
+    }
+    58%{
+      transform:perspective(1400px) rotateY(-5deg) translateZ(12px) skewY(-0.4deg);
+      box-shadow:-8px 5px 16px rgba(0,0,0,.25);
+    }
+    82%{
+      transform:perspective(1400px) rotateY(1.8deg) translateZ(3px) skewY(0.15deg);
+    }
+    100%{
+      transform:perspective(1400px) rotateY(0deg) translateZ(0) skewY(0deg);
+      box-shadow:0 4px 18px rgba(0,0,0,.2);
+    }
+  }
+
+  @keyframes bookPageTurnNext{
+    0%{
+      transform:perspective(1400px) rotateY(-34deg) translateZ(48px) skewY(-2deg);
+      opacity:0.55;
+      box-shadow:-26px 16px 42px rgba(0,0,0,.5), inset 28px 0 32px -10px rgba(0,0,0,.5);
+    }
+    38%{
+      transform:perspective(1400px) rotateY(-14deg) translateZ(24px) skewY(-1deg);
+      opacity:0.9;
+      box-shadow:-15px 10px 28px rgba(0,0,0,.35), inset 16px 0 20px -8px rgba(0,0,0,.35);
+    }
+    72%{
+      transform:perspective(1400px) rotateY(3deg) translateZ(6px) skewY(0.3deg);
+      opacity:1;
+      box-shadow:-5px 4px 16px rgba(0,0,0,.22);
+    }
+    100%{
+      transform:perspective(1400px) rotateY(0deg) translateZ(0) skewY(0deg);
+      opacity:1;
+      box-shadow:0 4px 18px rgba(0,0,0,.2);
+    }
+  }
+
+  @keyframes bookPageTurnPrev{
+    0%{
+      transform:perspective(1400px) rotateY(26deg) translateZ(40px) skewY(1.8deg);
+      opacity:0.55;
+      box-shadow:18px 12px 36px rgba(0,0,0,.45), inset -22px 0 28px -10px rgba(0,0,0,.45);
+    }
+    38%{
+      transform:perspective(1400px) rotateY(10deg) translateZ(18px) skewY(0.8deg);
+      opacity:0.9;
+      box-shadow:10px 7px 22px rgba(0,0,0,.3);
+    }
+    72%{
+      transform:perspective(1400px) rotateY(-2.5deg) translateZ(5px) skewY(-0.2deg);
+      opacity:1;
+    }
+    100%{
+      transform:perspective(1400px) rotateY(0deg) translateZ(0) skewY(0deg);
+      opacity:1;
+      box-shadow:0 4px 18px rgba(0,0,0,.2);
+    }
+  }
+
+  @keyframes pageSheenGlance{
+    0%{
+      opacity:0;
+      transform:translateX(-40%) skewX(-15deg);
+    }
+    35%{
+      opacity:0.75;
+    }
+    100%{
+      opacity:0.2;
+      transform:translateX(70%) skewX(-15deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .fc-card, .fc-card::after, .fc-card.fc-page-flip-answer, .fc-card.fc-page-flip-question, .fc-card.fc-page-turn-next, .fc-card.fc-page-turn-prev{
+      animation:none !important;
+      transform:none !important;
+    }
   }
   .fc-q{font-size:1.08rem;font-weight:600;line-height:1.55;white-space:pre-line;}
   .fc-a{font-size:1rem;line-height:1.65;white-space:pre-line;color:var(--ink);margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
@@ -6174,9 +6347,13 @@ function viewPythonSkill(sid){
       </div>
       <div class="fc-stage" style="margin:10px 0;">
         ${buildFcStoriesBarHTML(deckObj.id, cards.length, cIdx)}
-        <div class="fc-card ${pySkillViewState.cardFlipped?'fc-card--Answer':''}" data-py-flip-card>
-          <div>
-            <div class="topic-badge">${pySkillViewState.cardFlipped ? 'Ответ' : 'Вопрос'}</div>
+        <div class="fc-card ${pySkillViewState.cardFlipped?'fc-card--Answer':''} ${pySkillViewState.cardTurnAnim === 'flip-answer' ? 'fc-page-flip-answer' : (pySkillViewState.cardTurnAnim === 'flip-question' ? 'fc-page-flip-question' : (pySkillViewState.cardTurnAnim === 'turn-next' ? 'fc-page-turn-next' : (pySkillViewState.cardTurnAnim === 'turn-prev' ? 'fc-page-turn-prev' : (pySkillViewState.cardFlipped ? 'fc-page-flip-answer' : ''))))}" data-py-flip-card>
+          <div class="page-curl-corner" aria-hidden="true"></div>
+          <div style="flex:1;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <div class="topic-badge" style="font-weight:700;">${pySkillViewState.cardFlipped ? '📖 Ответ' : '❓ Вопрос'}</div>
+              <a href="#/docs" class="card-help-badge" onclick="event.stopPropagation();" title="Открыть справку по теме в боковой панели">💡 Шпаргалка</a>
+            </div>
             <div class="fc-q">${formatRichInlineText(curCard.q)}</div>
             ${pySkillViewState.cardFlipped ? `<div class="fc-a">${formatRichInlineText(curCard.a)}</div>` : ''}
           </div>
@@ -11269,6 +11446,7 @@ document.addEventListener('click', async function(e){
   }
   if(e.target.closest('[data-py-prev-card]')){
     if(pySkillViewState.cardIdx > 0){
+      pySkillViewState.cardTurnAnim = 'turn-prev';
       pySkillViewState.cardIdx--;
       pySkillViewState.cardFlipped = false;
       pySkillViewState.sprintCelebration = null;
@@ -11278,6 +11456,7 @@ document.addEventListener('click', async function(e){
     return;
   }
   if(e.target.closest('[data-py-flip-card]')){
+    pySkillViewState.cardTurnAnim = pySkillViewState.cardFlipped ? 'flip-question' : 'flip-answer';
     pySkillViewState.cardFlipped = !pySkillViewState.cardFlipped;
     pySkillViewState.sprintCelebration = null;
     render();
@@ -11301,6 +11480,7 @@ document.addEventListener('click', async function(e){
       else if(rating === 2) awardXp(2);
     }
     if(pySkillViewState.cardIdx + 1 < (deck.cards || []).length){
+      pySkillViewState.cardTurnAnim = 'turn-next';
       pySkillViewState.cardIdx++;
       pySkillViewState.cardFlipped = false;
     } else {
@@ -11827,6 +12007,7 @@ document.addEventListener('click', async function(e){
   // Global Flashcards Hub actions
   if(e.target.closest('[data-hub-prev]')){
     if(cardsHubState.cardIdx > 0){
+      cardsHubState.turnAnim = 'turn-prev';
       cardsHubState.cardIdx--;
       cardsHubState.flipped = false;
       saveCardsHubPosState();
@@ -11835,6 +12016,7 @@ document.addEventListener('click', async function(e){
     return;
   }
   if(e.target.closest('[data-hub-flip]')){
+    cardsHubState.turnAnim = cardsHubState.flipped ? 'flip-question' : 'flip-answer';
     cardsHubState.flipped = !cardsHubState.flipped;
     saveCardsHubPosState();
     render();
