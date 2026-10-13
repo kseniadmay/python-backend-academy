@@ -2585,6 +2585,115 @@ EXTRA_CSS = r"""
   border: 1px solid rgba(148, 163, 184, 0.18) !important;
 }
 
+/* Mock Interview Simulator Zen Distillation (#/mock) */
+.mock-control-panel {
+  background: var(--zen-surface, rgba(18, 23, 33, 0.84)) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
+  border-radius: 22px !important;
+  box-shadow: var(--zen-shadow-island, 0 20px 48px -12px rgba(0, 0, 0, 0.5)) !important;
+  padding: 16px 20px !important;
+  margin-bottom: 16px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 14px !important;
+}
+
+.mock-task-card,
+.mock-star-card {
+  background: var(--zen-surface, rgba(18, 23, 33, 0.84)) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
+  border-radius: 24px !important;
+  box-shadow: var(--zen-shadow-island, 0 20px 48px -12px rgba(0, 0, 0, 0.5)) !important;
+  padding: 22px 24px !important;
+}
+
+.mock-timer-ring-wrap {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+}
+
+.mock-timer-display {
+  font-family: var(--font-d, 'Onest', monospace) !important;
+  font-variant-numeric: tabular-nums !important;
+  font-size: 1.85rem !important;
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.star-matrix-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 12px !important;
+}
+@media (max-width: 720px) {
+  .star-matrix-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.star-quadrant-card {
+  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.03)) !important;
+  border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.05)) !important;
+  border-radius: 16px !important;
+  padding: 14px 16px !important;
+  transition: all 0.18s ease !important;
+}
+.star-quadrant-card:focus-within {
+  border-color: var(--zen-amber-border, rgba(251, 191, 36, 0.4)) !important;
+  background: var(--zen-surface-hover, rgba(255, 255, 255, 0.05)) !important;
+  box-shadow: 0 0 0 1px var(--zen-amber, #f59e0b) !important;
+}
+
+.star-pitch-bar {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  padding: 5px 12px !important;
+  border-radius: 999px !important;
+  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.04)) !important;
+  border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.06)) !important;
+}
+
+.socratic-chat-stream {
+  margin-top: 16px !important;
+  padding: 16px 18px !important;
+  border-radius: 18px !important;
+  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.025)) !important;
+  border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.05)) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+
+.chat-bubble--interviewer {
+  background: var(--zen-surface-card, rgba(22, 28, 40, 0.7)) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
+  border-radius: 16px !important;
+  padding: 12px 16px !important;
+  box-shadow: var(--zen-shadow-lift, 0 8px 24px -6px rgba(0, 0, 0, 0.35)) !important;
+}
+
+.chat-bubble__author {
+  font-size: 0.78rem !important;
+  font-weight: 800 !important;
+  color: var(--zen-emerald, #10b981) !important;
+  margin-bottom: 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
 
   /* ================= 3D TACTILE BUTTONS & CODDY AESTHETICS ================= */
   .btn-3d-orange {
@@ -8915,7 +9024,7 @@ function viewMockInterview(){
 
   const curScen = STAR_SCENARIOS.find(x => x.id === mockInterviewState.starScenarioId) || STAR_SCENARIOS[0];
   const starOpts = STAR_SCENARIOS.map(sc =>
-    `<button class="btn ${sc.id===curScen.id?'btn-primary':'btn-ghost'}" style="padding:7px 12px;font-size:.82rem;" data-star-scenario="${sc.id}">${sc.title}</button>`
+    `<button class="btn ${sc.id===curScen.id?'btn-primary':'btn-ghost'}" style="padding:7px 14px;font-size:.82rem;border-radius:999px;" data-star-scenario="${sc.id}">${sc.title}</button>`
   ).join('');
 
   let starEvalHTML = '';
@@ -8938,19 +9047,19 @@ function viewMockInterview(){
   const timerStateCls = isDangerTime ? ' mock-timer--danger' : (isWarningTime ? ' mock-timer--warn' : '');
 
   const bodyHTML = mockInterviewState.tab === 'live' ? `
-    <div class="panel" style="padding:14px 18px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+    <div class="mock-control-panel">
       <div class="mock-timer-ring-wrap mock-timer-wrap${timerStateCls}">
         <svg class="mock-timer-svg circular-progress-ring" width="54" height="54" viewBox="0 0 54 54" aria-hidden="true">
           <circle class="mock-timer-ring-bg mock-timer-circle-bg" cx="27" cy="27" r="22" fill="none" stroke-width="4"></circle>
           <circle id="mock-timer-ring-fg" class="mock-timer-ring-fg mock-timer-circle-fg" cx="27" cy="27" r="22" fill="none" stroke="${ringColor}" stroke-width="4" stroke-dasharray="${ringCircum}" stroke-dashoffset="${ringOffset}"></circle>
         </svg>
         <div>
-          <div class="meta">Таймер Live-Coding секции (регламент 20 минут)</div>
-          <div id="mock-timer-display" style="font-family:var(--font-d);font-size:1.85rem;font-weight:700;color:${ringColor};">${formatPomo(mockInterviewState.secondsLeft)}</div>
+          <div class="meta" style="font-size:0.78rem;font-weight:600;letter-spacing:0.02em;">Таймер Live-Coding секции (20 минут)</div>
+          <div id="mock-timer-display" class="mock-timer-display" style="color:${ringColor};">${formatPomo(mockInterviewState.secondsLeft)}</div>
         </div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-        <select id="mock-echelon-select" class="code-editor" style="min-height:auto;padding:8px 10px;width:auto;">
+        <select id="mock-echelon-select" class="code-editor" style="min-height:auto;padding:8px 12px;width:auto;border-radius:12px;">
           <option value="auto" ${mockInterviewState.echelonFilter==='auto'?'selected':''}>🎯 Авто-подбор раунда (сейчас: Эшелон ${effEchelon})</option>
           <option value="1" ${mockInterviewState.echelonFilter==='1'?'selected':''}>🚨 Раунд 1: Тех-скрининг (Эшелон 1)</option>
           <option value="2" ${mockInterviewState.echelonFilter==='2'?'selected':''}>🔥 Раунд 2: Ядро и стек (Эшелон 2)</option>
@@ -8962,9 +9071,9 @@ function viewMockInterview(){
       </div>
     </div>
     <div style="margin-bottom:14px;">
-      <select id="mock-task-select" class="code-editor" style="min-height:auto;padding:10px 12px;font-weight:600;">${taskOpts}</select>
+      <select id="mock-task-select" class="code-editor" style="min-height:auto;padding:10px 14px;font-weight:600;border-radius:12px;">${taskOpts}</select>
     </div>
-    <div class="microstep-card">
+    <div class="mock-task-card">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
           <span class="topic-badge" style="margin:0;">Live-Coding · ${curTask.tier} · ${curTask.topic}</span>
@@ -8975,14 +9084,14 @@ function viewMockInterview(){
       <h2 style="margin-bottom:10px;">${curTask.title}</h2>
       ${!mockDescRedundant ? `<div class="lesson-theory" style="margin-bottom:14px;">${curTask.desc}</div>` : ''}
       ${buildCodeEditorWithGutterHTML('mock-code-editor', mockInterviewState.codeDraft, 220)}
-      <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
         <button class="btn btn-primary" data-mock-run="${curTask.id}">${ICONS.play} Запустить решение (Ctrl+Enter)</button>
         <button class="btn btn-ghost" data-mock-hint ${mockInterviewState.hintLevel>=socraticHints.length?'disabled':''}>💡 Запросить наводку интервьюера&nbsp;(${mockInterviewState.hintLevel}/${socraticHints.length})</button>
         <button class="btn btn-ghost" data-mock-reset="${curTask.id}">Сбросить код</button>
       </div>
       ${runFeedback}
-      <div class="socratic-chat-stream" style="margin-top:12px;">
-        <div class="socratic-chat-header">
+      <div class="socratic-chat-stream">
+        <div class="socratic-chat-header" style="display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:0.85rem;margin-bottom:4px;">
           <span>💬 Лента Сократического диалога</span>
           <span class="meta" style="font-size:.73rem;">Использовано опор: ${mockInterviewState.hintLevel}/${socraticHints.length}</span>
         </div>
@@ -8994,38 +9103,38 @@ function viewMockInterview(){
       </div>
     </div>
   ` : `
-    <div class="microstep-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+    <div class="mock-star-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
         <div class="topic-badge" style="margin:0;">Поведенческое интервью · Методика STAR (Situation · Task · Action · Result)</div>
         <div class="star-pitch-bar">
-          <span class="meta">🎤 Таймер устного питча (2 мин):</span>
-          <strong id="star-pitch-display" class="pitch-timer-display" style="font-family:var(--font-m);color:var(--moss-deep);">${formatPomo(mockInterviewState.pitchSecondsLeft || 120)}</strong>
-          <button class="btn btn-ghost" style="padding:4px 10px;font-size:.76rem;" data-star-pitch-toggle>${mockInterviewState.pitchRunning ? '⏸ Пауза' : '▶ Репетиция 02:00'}</button>
-          <button class="btn btn-ghost" style="padding:4px 8px;font-size:.75rem;" data-star-pitch-reset>↺</button>
+          <span class="meta" style="font-size:0.78rem;">🎤 Таймер устного питча (2 мин):</span>
+          <strong id="star-pitch-display" class="pitch-timer-display" style="font-family:var(--font-m);font-variant-numeric:tabular-nums;color:var(--moss-deep);">${formatPomo(mockInterviewState.pitchSecondsLeft || 120)}</strong>
+          <button class="btn btn-ghost" style="padding:4px 10px;font-size:.76rem;border-radius:999px;" data-star-pitch-toggle>${mockInterviewState.pitchRunning ? '⏸ Пауза' : '▶ Репетиция 02:00'}</button>
+          <button class="btn btn-ghost" style="padding:4px 8px;font-size:.75rem;border-radius:999px;" data-star-pitch-reset>↺</button>
         </div>
       </div>
-      <h2 style="margin-bottom:10px;">Выбери сценарий и собери сильный инженерный ответ</h2>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">${starOpts}</div>
-      <div class="notice" style="margin-bottom:14px;"><strong>Вопрос интервьюера:</strong> ${curScen.prompt}</div>
+      <h2 style="margin-bottom:12px;">Выбери сценарий и собери сильный инженерный ответ</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">${starOpts}</div>
+      <div class="notice" style="margin-bottom:16px;border-radius:14px;background:var(--zen-surface-subtle, rgba(255,255,255,0.03));border:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));"><strong>Вопрос интервьюера:</strong> ${curScen.prompt}</div>
       <div class="star-matrix-grid">
         <div class="star-quadrant-card">
-          <label class="meta" style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:4px;"><span>S — Situation (Контекст, трафик, стек)</span><span>${String(mockInterviewState.starS||'').trim().length >= 25 ? '✓' : '≥25 симв.'}</span></label>
-          <textarea id="star-s-input" class="code-editor" style="min-height:76px;" placeholder="Например: В сервисе заказов на FastAPI + PostgreSQL при пиковой нагрузке 300 RPS время ответа выросло до 4 секунд…">${escapeHtmlStr(mockInterviewState.starS)}</textarea>
+          <label class="meta" style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:6px;"><span>S — Situation (Контекст, трафик, стек)</span><span>${String(mockInterviewState.starS||'').trim().length >= 25 ? '✓' : '≥25 симв.'}</span></label>
+          <textarea id="star-s-input" class="code-editor" style="min-height:76px;border-radius:10px;" placeholder="Например: В сервисе заказов на FastAPI + PostgreSQL при пиковой нагрузке 300 RPS время ответа выросло до 4 секунд…">${escapeHtmlStr(mockInterviewState.starS)}</textarea>
         </div>
         <div class="star-quadrant-card">
-          <label class="meta" style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:4px;"><span>T — Task (Инженерная цель и SLA)</span><span>${String(mockInterviewState.starT||'').trim().length >= 20 ? '✓' : '≥20 симв.'}</span></label>
-          <textarea id="star-t-input" class="code-editor" style="min-height:76px;" placeholder="Например: Нужно было снизить p95 латентность ниже 150 мс без остановки приёма платежей…">${escapeHtmlStr(mockInterviewState.starT)}</textarea>
+          <label class="meta" style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:6px;"><span>T — Task (Инженерная цель и SLA)</span><span>${String(mockInterviewState.starT||'').trim().length >= 20 ? '✓' : '≥20 симв.'}</span></label>
+          <textarea id="star-t-input" class="code-editor" style="min-height:76px;border-radius:10px;" placeholder="Например: Нужно было снизить p95 латентность ниже 150 мс без остановки приёма платежей…">${escapeHtmlStr(mockInterviewState.starT)}</textarea>
         </div>
         <div class="star-quadrant-card">
-          <label class="meta" style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:4px;"><span>A — Action (Личный вклад: «Я диагностировал…»)</span><span>${String(mockInterviewState.starA||'').trim().length >= 35 ? '✓' : 'глагол «Я»'}</span></label>
-          <textarea id="star-a-input" class="code-editor" style="min-height:84px;" placeholder="Например: Я снял план через EXPLAIN ANALYZE, обнаружил Seq Scan и N+1, добавил составной индекс и selectinload…">${escapeHtmlStr(mockInterviewState.starA)}</textarea>
+          <label class="meta" style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:6px;"><span>A — Action (Личный вклад: «Я диагностировал…»)</span><span>${String(mockInterviewState.starA||'').trim().length >= 35 ? '✓' : 'глагол «Я»'}</span></label>
+          <textarea id="star-a-input" class="code-editor" style="min-height:84px;border-radius:10px;" placeholder="Например: Я снял план через EXPLAIN ANALYZE, обнаружил Seq Scan и N+1, добавил составной индекс и selectinload…">${escapeHtmlStr(mockInterviewState.starA)}</textarea>
         </div>
         <div class="star-quadrant-card">
-          <label class="meta" style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:4px;"><span>R — Result (Метрики: мс, %, RPS, 0 ошибок)</span><span>${/(\d+|%|мс|ms|сек|раз|x)/i.test(String(mockInterviewState.starR||'')) ? '✓' : 'числа/%'}</span></label>
-          <textarea id="star-r-input" class="code-editor" style="min-height:76px;" placeholder="Например: Время ответа упало с 4000 мс до 45 мс (в 88 раз), нагрузка на CPU БД снизилась на 65%…">${escapeHtmlStr(mockInterviewState.starR)}</textarea>
+          <label class="meta" style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:6px;"><span>R — Result (Метрики: мс, %, RPS, 0 ошибок)</span><span>${/(\d+|%|мс|ms|сек|раз|x)/i.test(String(mockInterviewState.starR||'')) ? '✓' : 'числа/%'}</span></label>
+          <textarea id="star-r-input" class="code-editor" style="min-height:76px;border-radius:10px;" placeholder="Например: Время ответа упало с 4000 мс до 45 мс (в 88 раз), нагрузка на CPU БД снизилась на 65%…">${escapeHtmlStr(mockInterviewState.starR)}</textarea>
         </div>
       </div>
-      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
         <button class="btn btn-primary" data-star-evaluate>✓ Проверить ответ по чек-листу Senior-интервьюера</button>
         <button class="btn btn-ghost" data-star-fill-demo>Заполнить эталонный пример</button>
       </div>
