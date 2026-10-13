@@ -2052,6 +2052,38 @@
   box-shadow: 0 6px 0 #c2410c, 0 14px 24px rgba(234, 88, 12, 0.45) !important;
 }
 
+/* Tracks styling: Zen Unit Cards and Skill Rows */
+.unit-card {
+  background: var(--zen-surface-card, rgba(22, 28, 40, 0.65)) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
+  border-radius: 22px !important;
+  box-shadow: var(--zen-shadow-lift, 0 12px 28px -8px rgba(0, 0, 0, 0.4)) !important;
+  transition: transform .2s ease, border-color .2s ease !important;
+}
+
+.skill-row {
+  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.03)) !important;
+  border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.045)) !important;
+  border-radius: 12px !important;
+  transition: all 0.15s ease !important;
+}
+.skill-row:hover {
+  background: var(--zen-surface-hover, rgba(255, 255, 255, 0.07)) !important;
+  border-color: var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
+}
+
+.mastery-banner {
+  background: var(--zen-surface, rgba(18, 23, 33, 0.82)) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
+  border-radius: 24px !important;
+  box-shadow: var(--zen-shadow-island, 0 20px 48px -12px rgba(0, 0, 0, 0.5)) !important;
+}
+
+
   /* ================= 3D TACTILE BUTTONS & CODDY AESTHETICS ================= */
   .btn-3d-orange {
     background: #ff5722;
@@ -8860,6 +8892,8 @@ function viewPythonMastery(trackKey){
 
   const nextTrackSk = getFirstUnmasteredSkillInEchelon(null, tr.key) || trackSkills[0];
   const nextTrackKId = (nextTrackSk && nextTrackSk.kIds && nextTrackSk.kIds.find(k => !state.readNotes.includes(k))) || (nextTrackSk && nextTrackSk.kIds && nextTrackSk.kIds[0]) || '';
+  const nextTrackNoteObj = ALL_NOTES_COMBINED[nextTrackKId] || { title: (nextTrackSk ? nextTrackSk.title : 'Основы темы') };
+  const nextTrackNoteTitle = (nextTrackNoteObj.title || '').replace(/^К-\d+\s*[:·•\-]\s*/i, '');
 
   return `
     <div class="container">
@@ -8874,7 +8908,7 @@ function viewPythonMastery(trackKey){
       <div class="cocoon-focus-card" style="margin-bottom:10px;">
         <div class="cocoon-focus-eyebrow">✨ Фокус модуля · ${tr.courseUnitRange}<span class="sr-only"> ${tr.badge}</span></div>
         <div class="cocoon-focus-title">${nextTrackSk ? (nextTrackSk.id + ' · ' + nextTrackSk.title) : tr.title}</div>
-        <div class="cocoon-focus-desc">Следующий шаг: конспект <b>${nextTrackKId}</b> (1. Конспект → 2. Карточки Ф-xxx → 3. Практика в IDE) с разбором Junior vs Senior.</div>
+        <div class="cocoon-focus-desc">Следующий шаг: <b>${nextTrackNoteTitle || (nextTrackSk ? nextTrackSk.title : 'Основы темы')}</b> · теория с разбором Junior vs Senior, карточки и практика в IDE.</div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           <button class="btn-glass-emerald btn-sprint-cta" data-quick-microstep="${tr.key}">⚡ Быстрый микро-шаг (2 мин) ➔</button>
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
@@ -12329,7 +12363,7 @@ viewTopic = function(id){
             <span class="meta">${uMp}/${uMax} MP</span>
           </div>
           <div style="font-weight:700;font-size:.92rem;">Юнит ${u.id}: ${u.title}</div>
-          <div class="meta" style="font-size:.78rem;">Навыков: ${u.skills.length} · Тренажёр + К-конспекты + Ф-карточки</div>
+          <div class="meta" style="font-size:.78rem;">Навыков: ${u.skills.length} · Теория + Карточки + Задачи в IDE</div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
           ${firstSkill ? `<button class="btn btn-primary" style="padding:6px 10px;font-size:.78rem;" data-py-open-skill="${firstSkill.id}">Открыть юнит ${u.id}</button>` : ''}
@@ -12341,7 +12375,7 @@ viewTopic = function(id){
   const bridgeBlock = `
     <div class="panel" style="margin-top:18px;">
       <div class="topic-badge">Двусторонняя синхронизация с 7 модулями Мастерства</div>
-      <h3 style="margin-bottom:8px;">Связанные юниты (К-конспекты, 3D-карточки Ф-xxx и задачи IDE)</h3>
+      <h3 style="margin-bottom:8px;">Связанные юниты (теория, интервальные карточки и тренажёр IDE)</h3>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
         ${unitCards}
       </div>
