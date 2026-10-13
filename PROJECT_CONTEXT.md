@@ -432,22 +432,20 @@
 
 ```markdown
 1. Текущее состояние платформы (12.10.2026):
-- Платформа «Junior+ Python Backend Developer» (`academy.html` + `Практика кода — тренажёр с IDE.html` + база `RemNote_Python_Mastery_FIXED`) полностью стабильна.
-- Конвейер верификации `python verify_all.py --quick` проходит со строго 100% PASS (все 4 этапа: Platinum, E2E DOM 454 ассерта, PWA Offline, Headless Chrome 15 маршрутов).
-- В Git зафиксированы коммиты редизайна:
-  * `b90063f`: Прототип Дашборда (`design_mockups/dashboard_prototype.html`) в стиле «Функциональный минимализм + Красота».
-  * `7017fc2`: Прототип рабочего стола навыка и практики (`design_mockups/skill_practice_prototype.html`) с сохранением 100% существующего функционала.
+- Платформа «Junior+ Python Backend Developer» (`academy.html` + `Практика кода — тренажёр с IDE.html` + база `RemNote_Python_Mastery_FIXED`) полностью стабильна и выверена.
+- Конвейер верификации `python verify_all.py --quick` проходит со строго 100% PASS (все 4 этапа: Platinum, E2E DOM 454 ассерта, PWA Offline, Headless Chrome 15 маршрутов + клик по табу).
+- Визуальный регрессионный тест `node scripts/visual_test.js` проходит на 100% (42/42 PASS, 0 FAIL).
 
-2. Ключевые требования и инварианты:
-- Доктрина «Функциональный минимализм + Красота (Aesthetic Supremacy)»: вечерний обсидиан `#0d1016`, матовое стекло blur(20px), волосковые границы, воздух, 1 главное доминантное действие.
-- Железное правило структуры: «ОСТАВЛЯТЬ 90-100% ТОГО, ЧТО УЖЕ БЫЛО» — никакой синтетики с нуля и вырезания инженерных инструментов (анатомия срезов, I/O стрип, Сократ, Brython runner, счётчики, подсказки, тесты сохраняются полностью!).
-- Порядок полировки экранов рабочего стола навыка: строго ПО ОЧЕРЕДИ:
-  1) Конспект теории (scroll-feed, микро-шаги, формулы, подсветка, аудио-компаньон);
-  2) Флеш-карточки (интервальное повторение, 3D флип, кнопки самооценки, шпаргалка);
-  3) Практика кода (Coddy Split Studio, I/O стрип, анатомия среза, редактор с чипами, тесты).
-- Two-Tier Workflow: изолированный HTML-прототип в `design_mockups/` с открытием в Chrome -> сквозная интеграция в `academy.html` и `scripts/assemble_academy.py`.
-- Zero-Error Headless Chrome Pre-Flight: 0 ошибок консоли, 0 pageerror, 0 утечек undefined/null перед отчётом.
-- Папка гардероба `C:\Users\fury6\.gemini\antigravity\scratch\acloset_catalog` неприкосновенна.
+2. Ключевые изменения и зачистка:
+- Интегрирована новая Zen-карточка вечерней практики кода в `academy.html` и мастер-шаблон `scripts/assemble_academy.py`.
+- Исправлен контракт данных `buildTaskSpecDetails(tObj)`: гарантирован возврат `{ zenIoStrip, sliceVisual, quickTokens }` с 0 утечек `undefined` или `null` в DOM.
+- Устранено раздувание контекста (Context Bloat): отключены посторонние плагины (science, flutter, firebase, GCP), удалены теневые папки.
+- Синхронизированы правила: закреплён Two-Tier Workflow (прототип в `design_mockups/` -> немедленная сквозная интеграция в `academy.html` и `assemble_academy.py`) и Zero-Error Headless Chrome Pre-Flight (0 ошибок консоли, 0 pageerror).
+- Папка оцифрованного гардероба `scratch/acloset_catalog` надёжно защищена и нетронута.
+
+3. Где лежат файлы:
+- Облачная папка: `C:\Users\fury6\OneDrive\Python_Backend_Academy`.
+- Шаблон нового чата: `PROMPT_NEW_CHAT_2026-10-12.md`.
 ```
 
 ---
@@ -461,20 +459,13 @@
 1. C:\Users\fury6\OneDrive\Python_Backend_Academy\HANDOVER_CONTEXT.md (обновлён 12.10.2026).
 2. Локальные и глобальные правила AGENTS.md.
 
-Текущее состояние системы:
-- Прототип Дашборда утверждён (design_mockups/dashboard_prototype.html).
-- Рабочий стол навыка и практики зафиксирован в design_mockups/skill_practice_prototype.html со 100% оригинального функционала (инвариант «Оставь 90% от того, что уже там было»).
-- Конвейер python verify_all.py --quick: строго 100% PASS (все 4 этапа).
-- Действуют Two-Tier Workflow и Zero-Error Headless Chrome Pre-Flight.
-- Проектная папка гардероба C:\Users\fury6\.gemini\antigravity\scratch\acloset_catalog защищена и неприкосновенна.
+Текущий статус:
+- verify_all.py --quick: 100% PASS (4 этапа).
+- visual_test.js: 42/42 PASS (0 FAIL).
+- Two-Tier Workflow и Zero-Error Pre-Flight активированы.
+- Zen-практика синхронизирована с academy.html и scripts/assemble_academy.py.
 
-Задача на этот чат:
-Делаем по очереди премиальный дизайн экранов рабочего стола темы/навыка (#/python/skill/1.1.1):
-Шаг 1: Конспект теории (Micro-steps, Scroll-Feed, аудио-компаньон, навигация по чанкам).
-(После согласования перейдём к Шагу 2: Карточки, затем к Шагу 3: Практика).
-
-Подтверди готовность к реализации Шага 1: Конспект теории.
+Подтверди готовность к следующей задаче.
 ```
-
 
 

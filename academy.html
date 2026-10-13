@@ -8918,7 +8918,7 @@ function viewPythonSkill(sid){
     const activeTid = tIds.includes(pySkillViewState.taskId) ? pySkillViewState.taskId : tIds[0];
     const tObj = IDE_TASKS_BY_ID[activeTid] || IDE_TASKS[0];
     const curTaskIdx = Math.max(0, tIds.indexOf(activeTid));
-    topbarMetaLeft = `💻 Задача #${tObj.id} · <span style="font-weight:700;color:var(--amber);">${tObj.tier}</span> · ${tObj.title}`;
+    topbarMetaLeft = `💻 <span style="font-weight:700;color:var(--amber);">${tObj.tier}</span> · ${tObj.title}`;
     topbarMetaRight = `Задача ${curTaskIdx+1}/${tIds.length}`;
     sprintPct = Math.min(100, Math.max(10, Math.round(((curTaskIdx + 1) / Math.max(1, tIds.length)) * 100)));
   }
@@ -9058,7 +9058,7 @@ function viewPythonSkill(sid){
       const t = IDE_TASKS_BY_ID[tid];
       if(!t) return '';
       const solved = solvedMap[tid] === 'solved';
-      return `<button class="btn ${tid===activeTid?'btn-primary':'btn-ghost'}" style="padding:6px 11px;font-size:.78rem;" data-py-select-task="${tid}">${solved?'✓ ':''}#${tid} · ${t.title}</button>`;
+      return `<button class="btn ${tid===activeTid?'btn-primary':'btn-ghost'}" style="padding:6px 11px;font-size:.78rem;" data-py-select-task="${tid}">${solved?'✓ ':''}${t.title}</button>`;
     }).join('');
 
     const socraticHints = buildSocraticHintsForTask(tObj);
@@ -9079,7 +9079,7 @@ function viewPythonSkill(sid){
     else if(pySkillViewState.runStatus === 'pass') runFeedback = `
       <div class="result-box--pass correct-pulse-anim">${ICONS.check} Все тесты пройдены! (+25 XP, навык закреплён на практике!)\n${pySkillViewState.runOutput||''}</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
-        ${nextUnsolvedTid ? `<button class="btn btn-primary" data-py-select-task="${nextUnsolvedTid}">Следующая задача навыка (#${nextUnsolvedTid}) →</button>` : ''}
+        ${nextUnsolvedTid ? `<button class="btn btn-primary" data-py-select-task="${nextUnsolvedTid}">Следующая задача навыка →</button>` : ''}
         <a href="#${tr.routePrefix}/unittest/${sk.unitId}" class="btn btn-clay">⚡ Пройти рубежный Unit Test ${sk.unitId} (на 100 MP 👑)</a>
       </div>`;
     else if(pySkillViewState.runStatus === 'fail') runFeedback = `
@@ -9092,7 +9092,7 @@ function viewPythonSkill(sid){
         <div class="practice-desktop-grid">
           <div class="practice-left-pane">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-              <span class="topic-badge" style="margin:0;display:inline-flex;align-items:center;gap:6px;">Задача #${tObj.id} · <span class="badge" style="background:rgba(217,119,6,0.18);color:var(--amber);padding:1px 7px;border-radius:10px;font-weight:700;">${tObj.tier}</span> · ${tObj.topic}</span>
+              <span class="topic-badge" style="margin:0;display:inline-flex;align-items:center;gap:6px;"><span class="badge" style="background:rgba(217,119,6,0.18);color:var(--amber);padding:1px 7px;border-radius:10px;font-weight:700;">${tObj.tier}</span> · ${tObj.topic}</span>
               <div style="display:flex;gap:8px;align-items:center;">
                 <a href="#/docs" class="link-quiet" style="font-size:.78rem;">📚 Справка по методам Python</a>
                 ${solvedMap[tObj.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
