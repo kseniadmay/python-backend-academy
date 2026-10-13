@@ -2881,6 +2881,207 @@ EXTRA_CSS = r"""
   margin-top: 20px !important;
 }
 
+/* ================= CALIBRATION & DIAGNOSTIC ZEN GLASSMORPHISM (#/diagnostic) ================= */
+.diag-zen-card {
+  background: var(--zen-surface-card, rgba(18, 23, 33, 0.72)) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
+  border-radius: 24px !important;
+  box-shadow: var(--zen-shadow-island, 0 20px 48px -12px rgba(0, 0, 0, 0.5)) !important;
+  padding: 28px 24px !important;
+  transition: all 0.2s ease !important;
+}
+
+.diag-branch-panel {
+  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.035)) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
+  border-radius: 20px !important;
+  padding: 20px 22px !important;
+  margin-bottom: 22px !important;
+}
+
+.stack-branch-bar {
+  display: flex !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+  margin-top: 12px !important;
+}
+
+.stack-branch-bar .btn {
+  border-radius: 14px !important;
+  font-weight: 700 !important;
+  font-size: 0.86rem !important;
+  padding: 10px 16px !important;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.stack-branch-bar .btn.btn-ghost {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
+  color: var(--zen-text-subtle, #cbd5e1) !important;
+}
+.stack-branch-bar .btn.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.07) !important;
+  color: #ffffff !important;
+  transform: translateY(-1.5px) !important;
+}
+
+.stack-branch-bar .btn.btn-primary {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(16, 185, 129, 0.4) !important;
+  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35) !important;
+}
+
+.quiz-question-card {
+  background: var(--zen-surface-card, rgba(18, 23, 33, 0.72)) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
+  border-radius: 24px !important;
+  box-shadow: var(--zen-shadow-island, 0 20px 48px -12px rgba(0, 0, 0, 0.5)) !important;
+  padding: 28px 24px !important;
+  margin-top: 16px !important;
+}
+
+.quiz-question-prompt {
+  font-family: var(--font-b, 'Onest', sans-serif) !important;
+  font-size: 1.15rem !important;
+  font-weight: 700 !important;
+  line-height: 1.55 !important;
+  color: var(--zen-text, #f1f5f9) !important;
+  letter-spacing: -0.01em !important;
+  margin-bottom: 20px !important;
+}
+
+.quiz-opt {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  text-align: left !important;
+  padding: 14px 18px !important;
+  border-radius: 16px !important;
+  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
+  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.035)) !important;
+  backdrop-filter: blur(12px) !important;
+  color: var(--zen-text-subtle, #cbd5e1) !important;
+  font-size: 0.95rem !important;
+  line-height: 1.5 !important;
+  margin-bottom: 10px !important;
+  cursor: pointer !important;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.quiz-opt:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  transform: translateY(-1.5px) !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25) !important;
+  color: #ffffff !important;
+}
+
+.quiz-opt--selected {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border-color: var(--zen-emerald, #10b981) !important;
+  box-shadow: 0 0 0 1px var(--zen-emerald, #10b981), 0 8px 24px rgba(16, 185, 129, 0.2) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  transform: translateY(-1.5px) !important;
+}
+
+.quiz-opt--correct {
+  background: rgba(16, 185, 129, 0.18) !important;
+  border-color: #10b981 !important;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.32) !important;
+  color: #a7f3d0 !important;
+  font-weight: 700 !important;
+}
+
+.quiz-opt--wrong {
+  background: rgba(244, 63, 94, 0.14) !important;
+  border-color: #f43f5e !important;
+  box-shadow: 0 0 20px rgba(244, 63, 94, 0.26) !important;
+  color: #fecdd3 !important;
+  font-weight: 700 !important;
+}
+
+.quiz-opt b {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 26px !important;
+  height: 26px !important;
+  border-radius: 8px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: var(--zen-text, #f1f5f9) !important;
+  font-family: var(--font-m, 'JetBrains Mono', monospace) !important;
+  font-size: 0.85rem !important;
+  margin-right: 12px !important;
+  flex-shrink: 0 !important;
+}
+
+.quiz-opt--selected b {
+  background: var(--zen-emerald, #10b981) !important;
+  color: #ffffff !important;
+}
+
+.quiz-opt--correct b {
+  background: #10b981 !important;
+  color: #ffffff !important;
+}
+
+.quiz-opt--wrong b {
+  background: #f43f5e !important;
+  color: #ffffff !important;
+}
+
+.quiz-progress, .progress-bar {
+  height: 6px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+  margin-bottom: 20px !important;
+}
+
+.quiz-progress__bar, .progress-bar__fill {
+  height: 100% !important;
+  background: linear-gradient(90deg, #10b981 0%, #34d399 100%) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.45) !important;
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.diag-notice-calibrated {
+  background: rgba(16, 185, 129, 0.07) !important;
+  border: 1px solid rgba(16, 185, 129, 0.28) !important;
+  border-left: 4px solid var(--zen-emerald, #10b981) !important;
+  border-radius: 20px !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.5), 0 0 24px rgba(16, 185, 129, 0.12) !important;
+  padding: 24px 22px !important;
+  margin-top: 22px !important;
+}
+
+.diag-cat-card {
+  background: var(--zen-surface-card, rgba(18, 23, 33, 0.72)) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
+  border-radius: 20px !important;
+  padding: 22px 20px !important;
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.4) !important;
+  transition: transform 0.15s ease, border-color 0.15s ease !important;
+}
+
+.diag-cat-card:hover {
+  transform: translateY(-2px) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+}
+
 
   /* ================= 3D TACTILE BUTTONS & CODDY AESTHETICS ================= */
   .btn-3d-orange {
@@ -9505,7 +9706,7 @@ diagIntroHTML = function(){
         <li>Вопросы с ошибками формируют <b>Очередь приоритета №1 («Пробелы скрининга»)</b> на Дашборде и в модулях;</li>
         <li>В конце по желанию можно открыть продвинутый блок (${ADVANCED_QUESTIONS.length} вопросов по ООП и алгоритмам).</li>
       </ul>
-      <div class="panel" style="margin-bottom:18px;padding:14px 16px;">
+      <div class="panel diag-branch-panel" style="margin-bottom:18px;padding:14px 16px;">
         <div style="font-weight:700;margin-bottom:6px;">Выбери целевую ветку веб-стека (Этап 2 параллельных веток):</div>
         <p class="meta" style="margin-bottom:10px;">Выбранный стек остаётся в <b>🔥 Эшелоне 2</b>, а альтернативный фреймворк переносится в <b>👑 Эшелон 4 (Резерв)</b>, чтобы не распылять фокус перед оффером:</p>
         <div class="stack-branch-bar">
@@ -9621,7 +9822,7 @@ diagQuestionHTML = function(pool, label){
         <div class="topic-badge">${label} · вопрос ${diagState.idx+1} из ${pool.length}</div>
       </div>
       <div class="progress-bar"><div class="progress-bar__fill" style="width:${pct}%"></div></div>
-      <div class="panel">
+      <div class="panel quiz-question-card">
         <div class="quiz-question-prompt">${formatQuizQuestionPromptHTML(q.text)}</div>
         <div>${optsHTML}${idkBtnHTML}</div>
         ${!isRevealed ? actionRowHTML : ''}
@@ -9711,7 +9912,7 @@ diagResultsHTML = function(){
     else if(c.score === 0) action = `<p class="meta" style="color:var(--Danger);">🚨 Тема не пройдена (${c.score}/${c.total}) — добавлена в приоритет №1 с самого начала.</p>`;
     else if(c.optional) action = `<p class="meta">Частичное знакомство (${pctCat}%) — тема включена в программу с разбором пробелов.</p>`;
     else action = `<p class="meta">Есть пробелы (${c.score}/${c.total}) — добавлено в персональный маршрут Эшелона 1.</p>`;
-    return `<div class="panel" style="margin-bottom:0;"><h3>${c.title}</h3><p class="meta">${c.score} из ${c.total} верно (${pctCat}%)</p>${action}</div>`;
+    return `<div class="panel diag-cat-card" style="margin-bottom:0;"><h3>${c.title}</h3><p class="meta">${c.score} из ${c.total} верно (${pctCat}%)</p>${action}</div>`;
   }).join('');
 
   const gapButtons = (cal.gaps || []).slice(0, 8).map(sid => {
@@ -9721,7 +9922,7 @@ diagResultsHTML = function(){
   }).join('');
 
   const calibratedNotice = `
-    <div class="panel" style="margin-top:18px;border-left:4px solid var(--moss);">
+    <div class="panel diag-notice-calibrated" style="margin-top:18px;">
       <div class="topic-badge">Калибровка Матрицы Мастерства выполнена</div>
       <h3 style="margin-bottom:6px;">Зачтено базовое знакомство (50 MP): ${cal.passedSkills.length} · Пробелов в Очереди №1: ${cal.gaps.length}</h3>
       <p class="meta" style="margin-bottom:10px;">${cal.gaps.length > 0 ? 'Темы с ошибками или ответом «Не знаю» НЕ зачтены и поставлены в приоритет №1:' : 'Все проверенные навыки скрининга получили базовые 50 MP! Для полного мастерства (100 MP) нужно пройти практику кода и тесты.'}</p>
