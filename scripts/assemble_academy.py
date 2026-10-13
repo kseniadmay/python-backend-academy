@@ -3822,6 +3822,392 @@ EXTRA_CSS = r"""
   html:not([data-theme="dark"]) .path-gate-btn--locked text {
     fill: #be123c;
   }
+
+  /* ==========================================================================
+     UNIFIED STYLE DISTILLATION SYSTEM (Triad: Theory / Cards / Practice -> All Screens)
+     Formalized Tokens, Universal Primitives, and Harmonized Application Screens
+     ========================================================================== */
+  :root, :root[data-theme="light"] {
+    --zen-bg: #faf8f5;
+    --zen-surface: rgba(255, 255, 255, 0.88);
+    --zen-surface-card: rgba(255, 255, 255, 0.72);
+    --zen-surface-subtle: rgba(15, 23, 42, 0.04);
+    --zen-surface-hover: rgba(15, 23, 42, 0.06);
+    --zen-hairline: rgba(0, 0, 0, 0.07);
+    --zen-hairline-subtle: rgba(0, 0, 0, 0.045);
+    --zen-text-main: #0f172a;
+    --zen-text-soft: #334155;
+    --zen-text-muted: #64748b;
+    --zen-emerald: #145a46;
+    --zen-emerald-light: #10b981;
+    --zen-emerald-glow: rgba(20, 90, 70, 0.16);
+    --zen-emerald-soft: rgba(20, 90, 70, 0.09);
+    --zen-emerald-border: rgba(20, 90, 70, 0.28);
+    --zen-amber: #d97706;
+    --zen-amber-light: #f59e0b;
+    --zen-amber-soft: rgba(217, 119, 6, 0.10);
+    --zen-amber-border: rgba(217, 119, 6, 0.30);
+    --zen-bordeaux: #6b1d2f;
+    --zen-bordeaux-light: #be123c;
+    --zen-bordeaux-soft: rgba(107, 29, 47, 0.09);
+    --zen-bordeaux-border: rgba(107, 29, 47, 0.28);
+    --zen-shadow-island: 0 20px 48px -12px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+
+  :root[data-theme="dark"] {
+    --zen-bg: #0b0f15;
+    --zen-surface: rgba(18, 23, 33, 0.82);
+    --zen-surface-card: rgba(22, 28, 40, 0.65);
+    --zen-surface-subtle: rgba(255, 255, 255, 0.035);
+    --zen-surface-hover: rgba(255, 255, 255, 0.07);
+    --zen-hairline: rgba(255, 255, 255, 0.08);
+    --zen-hairline-subtle: rgba(255, 255, 255, 0.045);
+    --zen-text-main: #f8fafc;
+    --zen-text-soft: #cbd5e1;
+    --zen-text-muted: #8b9bb4;
+    --zen-emerald: #10b981;
+    --zen-emerald-light: #34d399;
+    --zen-emerald-glow: rgba(16, 185, 129, 0.22);
+    --zen-emerald-soft: rgba(16, 185, 129, 0.12);
+    --zen-emerald-border: rgba(52, 211, 153, 0.35);
+    --zen-amber: #f59e0b;
+    --zen-amber-light: #fbbf24;
+    --zen-amber-soft: rgba(245, 158, 11, 0.14);
+    --zen-amber-border: rgba(251, 191, 36, 0.35);
+    --zen-bordeaux: #fb7185;
+    --zen-bordeaux-light: #f43f5e;
+    --zen-bordeaux-soft: rgba(225, 29, 72, 0.16);
+    --zen-bordeaux-border: rgba(251, 113, 133, 0.45);
+    --zen-shadow-island: 0 24px 64px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--zen-hairline);
+  }
+
+  /* Universal Component Primitives */
+  .zen-card {
+    background: var(--zen-surface) !important;
+    border: 1px solid var(--zen-hairline) !important;
+    border-radius: 24px !important;
+    padding: 24px 26px !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    box-shadow: var(--zen-shadow-island) !important;
+  }
+  .zen-card-subtle {
+    background: var(--zen-surface-card);
+    border: 1px solid var(--zen-hairline-subtle);
+    border-radius: 18px;
+    padding: 16px 18px;
+  }
+  .zen-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 14px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--zen-hairline);
+    flex-wrap: wrap;
+  }
+  .zen-eyebrow {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--zen-text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .zen-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: var(--zen-text-main);
+  }
+
+  /* I/O Flow Contract Strip */
+  .dataflow-card {
+    background: var(--zen-surface-subtle);
+    border: 1px solid var(--zen-hairline);
+    border-radius: 16px;
+    padding: 12px 16px;
+    margin: 10px 0 14px;
+  }
+  .dataflow-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--zen-emerald);
+  }
+  :root[data-theme="dark"] .dataflow-header { color: var(--zen-emerald-light); }
+  .dataflow-stream {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .df-box {
+    flex: 1;
+    background: var(--zen-surface);
+    border: 1px solid var(--zen-hairline);
+    border-radius: 10px;
+    padding: 8px 12px;
+  }
+  .df-label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--zen-text-muted);
+    margin-bottom: 2px;
+  }
+  .df-val {
+    font-family: var(--font-m, 'JetBrains Mono', monospace);
+    font-size: 0.88rem;
+    color: var(--zen-text-main);
+  }
+  .df-arrow {
+    color: var(--zen-emerald);
+    font-size: 1.15rem;
+    flex: none;
+  }
+
+  /* Slice Anatomy Widget */
+  .slice-anatomy-widget {
+    background: var(--zen-amber-soft);
+    border: 1px solid var(--zen-amber-border);
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin: 10px 0;
+  }
+  .slice-anatomy-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--zen-amber);
+    margin-bottom: 8px;
+  }
+  .slice-grid {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding: 4px 0;
+  }
+  .slice-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    min-width: 42px;
+  }
+  .slice-pos-idx, .slice-neg-idx {
+    font-family: var(--font-m, 'JetBrains Mono', monospace);
+    font-size: 0.68rem;
+    color: var(--zen-text-muted);
+  }
+  .slice-cell {
+    width: 100%;
+    padding: 6px 0;
+    text-align: center;
+    background: var(--zen-surface);
+    border: 1px solid var(--zen-hairline);
+    border-radius: 8px;
+    font-family: var(--font-m, 'JetBrains Mono', monospace);
+    font-weight: 700;
+    font-size: 0.90rem;
+    color: var(--zen-text-main);
+  }
+  .slice-flow-cue {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--zen-amber);
+    margin-top: 6px;
+  }
+
+  /* Zero-Keyboard Token Chips */
+  .prac-chips-dock {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin: 8px 0 14px;
+  }
+  .token-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 11px;
+    border-radius: 8px;
+    background: var(--zen-surface);
+    border: 1px solid var(--zen-hairline);
+    color: var(--zen-text-soft);
+    font-family: var(--font-m, 'JetBrains Mono', monospace);
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    user-select: none;
+  }
+  .token-chip:hover {
+    background: var(--zen-emerald-soft);
+    border-color: var(--zen-emerald-border);
+    color: var(--zen-emerald);
+  }
+  :root[data-theme="dark"] .token-chip:hover { color: var(--zen-emerald-light); }
+
+  /* Buttons & Action Bars */
+  .btn-zen-emerald {
+    background: var(--zen-emerald) !important;
+    color: #ffffff !important;
+    border: 1px solid var(--zen-emerald-light) !important;
+    padding: 12px 22px !important;
+    border-radius: 14px !important;
+    font-family: var(--font-b, sans-serif) !important;
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    box-shadow: 0 4px 16px var(--zen-emerald-glow) !important;
+    text-decoration: none !important;
+  }
+  .btn-zen-ghost {
+    background: transparent !important;
+    border: 1px solid var(--zen-hairline) !important;
+    color: var(--zen-text-main) !important;
+    padding: 11px 18px !important;
+    border-radius: 14px !important;
+    font-family: var(--font-b, sans-serif) !important;
+    font-size: 0.88rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    text-decoration: none !important;
+  }
+
+  /* Harmonization of All Remaining Screens to the Zen Distillation */
+  /* 1. Dashboard & Serpentine Path (#/path) */
+  #view-root .hero {
+    background: var(--zen-surface) !important;
+    border: 1px solid var(--zen-hairline) !important;
+    border-radius: 24px !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    box-shadow: var(--zen-shadow-island) !important;
+  }
+  #view-root .panel {
+    background: var(--zen-surface) !important;
+    border: 1px solid var(--zen-hairline) !important;
+    border-radius: 20px !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    box-shadow: var(--zen-shadow-island) !important;
+  }
+  #view-root .dash-results-panel {
+    background: var(--zen-surface) !important;
+    border: 1px solid var(--zen-hairline) !important;
+    border-radius: 24px !important;
+    box-shadow: var(--zen-shadow-island) !important;
+  }
+  #view-root .dash-track-chip {
+    background: var(--zen-surface-card) !important;
+    border: 1px solid var(--zen-hairline) !important;
+    border-radius: 14px !important;
+  }
+
+  /* 2. Skill Tree & Map (#/map) */
+  #view-root .stage__dot {
+    background: var(--zen-surface) !important;
+    border: 2px solid var(--zen-emerald) !important;
+    color: var(--zen-emerald) !important;
+    box-shadow: 0 0 10px var(--zen-emerald-glow) !important;
+  }
+  #view-root .node-card {
+    background: var(--zen-surface) !important;
+    border: 1px solid var(--zen-hairline) !important;
+    border-radius: 18px !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    box-shadow: var(--zen-shadow-island) !important;
+    transition: border-color 0.15s, box-shadow 0.15s !important;
+  }
+  #view-root .node-card:hover {
+    border-color: var(--zen-emerald-border) !important;
+    box-shadow: 0 8px 24px var(--zen-emerald-glow) !important;
+  }
+  #view-root .node-card--available {
+    border-left: 3px solid var(--zen-emerald) !important;
+  }
+  #view-root .node-card--mastered {
+    border-left: 3px solid var(--zen-emerald-light) !important;
+  }
+  #view-root .node-card--locked {
+    opacity: 0.6 !important;
+    border-left: 3px solid var(--zen-hairline) !important;
+  }
+
+  /* 3. 7 Mastery Tracks (#/python..#/infra) */
+  #view-root .track-header, #view-root .unit-card, #view-root .echelon-banner {
+    background: var(--zen-surface) !important;
+    border: 1px solid var(--zen-hairline) !important;
+    border-radius: 20px !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    box-shadow: var(--zen-shadow-island) !important;
+  }
+
+  /* 4. Sandbox (#/sandbox) */
+  #view-root .sandbox-grid {
+    gap: 18px !important;
+  }
+  #view-root .sandbox-grid > div {
+    background: var(--zen-surface) !important;
+    border: 1px solid var(--zen-hairline) !important;
+    border-radius: 20px !important;
+    padding: 20px 22px !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    box-shadow: var(--zen-shadow-island) !important;
+  }
+
+  /* 5. Mock Interview (#/mock) & Unit Bosses */
+  #view-root .mock-interview-container, #view-root .boss-arena-card {
+    background: var(--zen-surface) !important;
+    border: 1px solid var(--zen-hairline) !important;
+    border-radius: 24px !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    box-shadow: var(--zen-shadow-island) !important;
+  }
+
+  /* 6. Documentation Hub (#/docs) */
+  #view-root .docs-hub, #view-root .doc-card {
+    background: var(--zen-surface) !important;
+    border: 1px solid var(--zen-hairline) !important;
+    border-radius: 20px !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    box-shadow: var(--zen-shadow-island) !important;
+  }
+
+  /* 7. Settings & Stats (#/settings) */
+  #view-root .settings-card, #view-root .stat-metric-box {
+    background: var(--zen-surface) !important;
+    border: 1px solid var(--zen-hairline) !important;
+    border-radius: 20px !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    box-shadow: var(--zen-shadow-island) !important;
+  }
+
 """
 
 # Let's define the injected JS upgrade block that extends the existing app cleanly
@@ -6842,7 +7228,7 @@ function viewCardsHub(){
     const d = ALL_DECKS_COMBINED[fid];
     const done = state.reviewedDecks.includes(fid);
     const dt = getDeckInterviewTier(fid);
-    return `<option value="${fid}" ${fid===cardsHubState.deckId?'selected':''}>${done?'✓ ':''}[Эшелон ${dt}] ${fid}: ${d.title} (${(d.cards||[]).length})</option>`;
+    return `<option value="${fid}" ${fid===cardsHubState.deckId?'selected':''}>${done?'✓ ':''}[Эшелон ${dt}] ${d.title} (${(d.cards||[]).length})</option>`;
   }).join('');
 
   if(cardsHubState.completed && cards.length > 0){
@@ -6901,7 +7287,7 @@ function viewCardsHub(){
         <select id="cards-deck-select" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.85rem;font-weight:600;">${deckOpts}</select>
       </div>
       <div class="microstep-bar">
-        <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><strong>${deck.id}: ${deck.title}</strong> ${renderEchelonBadge(curDeckTier)} · Карточка ${cIdx+1} из ${cards.length}</span>
+        <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><strong>${deck.title}</strong> ${renderEchelonBadge(curDeckTier)} · Карточка ${cIdx+1} из ${cards.length}</span>
         <div style="display:flex;gap:8px;align-items:center;">
           <button class="btn btn-ghost" style="padding:4px 10px;font-size:.76rem;" data-hub-prev ${cIdx===0?'disabled':''}>← Предыдущая</button>
           <span class="meta cards-kb-hint">Пробел — переворот · 1–4 — оценка</span>
@@ -7034,7 +7420,7 @@ function viewPracticeHub(){
 
   let runFeedback = '';
   if(practiceHubState.runStatus === 'running') runFeedback = `<div class="test-running-shimmer" style="margin-top:10px;">⚡ Выполняю pytest-проверки в браузере…</div>`;
-  else if(practiceHubState.runStatus === 'pass') runFeedback = `<div class="result-box--pass correct-pulse-anim">${ICONS.check} Задача #${curTask.id} решена верно! (+25 XP)\n${practiceHubState.runOutput||''}</div>`;
+  else if(practiceHubState.runStatus === 'pass') runFeedback = `<div class="result-box--pass correct-pulse-anim">${ICONS.check} Решение принято! (+25 XP)\n${practiceHubState.runOutput||''}</div>`;
   else if(practiceHubState.runStatus === 'fail') runFeedback = `
     <div class="result-box--fail">Тесты не прошли:\n${practiceHubState.runOutput||''}</div>
     <div style="margin-top:8px;"><button class="btn btn-ghost" style="padding:6px 12px;font-size:.78rem;" data-prac-hint>💡 Разобрать ошибку с Сократовским интервьюером (${practiceHubState.hintLevel}/${socraticHints.length})</button></div>`;
@@ -7221,7 +7607,7 @@ function viewPracticeHub(){
   const taskConditionHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-        <span class="topic-badge" style="margin:0;">Задача #${curTask.id} · ${curTask.tier} · ${curTask.topic}</span>
+        <span class="topic-badge" style="margin:0;">${curTask.tier} · ${curTask.topic}</span>
         ${renderEchelonBadge(curTaskEchelon)}
         ${solvedMap[curTask.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
       </div>
@@ -7988,7 +8374,7 @@ function viewMockInterview(){
     <div class="microstep-card">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-          <span class="topic-badge" style="margin:0;">Live-Coding #${curTask.id} · ${curTask.tier} · ${curTask.topic}</span>
+          <span class="topic-badge" style="margin:0;">Live-Coding · ${curTask.tier} · ${curTask.topic}</span>
           <span class="echelon-badge ${curEchMeta.badgeClass}">${curEchMeta.shortLabel}</span>
         </div>
         <span class="meta">Сократический интервьюер (4 уровня опор · 0 спойлеров кода)</span>
@@ -10057,7 +10443,7 @@ viewDashboard = function(){
       <div class="cocoon-focus-card">
         <div class="cocoon-focus-eyebrow"><span class="pulse-ring-dot"></span>✨ Фокус сейчас · 4 минуты<span class="sr-only"> · Правило 2 минут: Быстрый микро-шаг</span></div>
         <div class="cocoon-focus-title">${(() => { const ft = focusSk.title.match(/^(.*?)\s*\(([^()]*)\)\s*$/); return ft ? `${focusSk.id} · ${ft[1]} <span class="t-detail">(${ft[2]})</span>` : `${focusSk.id} · ${focusSk.title}`; })()}</div>
-        <div class="cocoon-focus-desc">Конспект <b>${focusKId}: ${focusNoteObj.title}</b> · ${focusStepsCount} ${(focusStepsCount % 10 === 1 && focusStepsCount % 100 !== 11) ? 'микро-шаг' : (focusStepsCount % 10 >= 2 && focusStepsCount % 10 <= 4 && (focusStepsCount % 100 < 10 || focusStepsCount % 100 >= 20) ? 'микро-шага' : 'микро-шагов')} · живой код · разбор Junior vs Senior</div>
+        <div class="cocoon-focus-desc"><b>${focusNoteObj.title}</b> · ${focusStepsCount} ${(focusStepsCount % 10 === 1 && focusStepsCount % 100 !== 11) ? 'микро-шаг' : (focusStepsCount % 10 >= 2 && focusStepsCount % 10 <= 4 && (focusStepsCount % 100 < 10 || focusStepsCount % 100 >= 20) ? 'микро-шага' : 'микро-шагов')} · живой код · разбор Junior vs Senior</div>
         <div style="display:flex;flex-direction:column;gap:7px;">
           <button class="btn-glass-emerald btn-sprint-cta" data-quick-microstep="">▶ Начать спринт (4 мин) ➔</button>
           <div class="focus-links">
@@ -10157,41 +10543,41 @@ viewDashboard = function(){
             <a href="#/python" class="node-card node-card--available" style="text-decoration:none;">
               <div class="node-card__top"><span class="node-card__num">МОДУЛЬ 01 · 2800 MP</span>${ICONS.python}</div>
               <h3 class="node-card__title">🐍 Python Mastery (1.1–1.9)</h3>
-              <p class="node-card__summary">28 навыков, все 68 конспектов К-xxx в микро-шагах, 9 Unit Tests, Course Challenge и Босс модуля.</p>
+              <p class="node-card__summary">28 навыков, все 68 конспектов в микро-шагах, 9 Unit Tests, Course Challenge и Босс модуля.</p>
             </a>
             <a href="#/web" class="node-card node-card--available" style="text-decoration:none;">
               <div class="node-card__top"><span class="node-card__num">МОДУЛЬ 02 · WEB · 1000 MP</span>${ICONS.globe}</div>
               <h3 class="node-card__title">🌐 Web Mastery (2.1–2.4)</h3>
-              <p class="node-card__summary">10 навыков, 23 конспекта К-xxx, 25 колод Ф-xxx (491 карточка): Сеть, HTTP/1.1–HTTP/3, REST, OpenAPI, CORS, CSRF, XSS, OWASP.</p>
+              <p class="node-card__summary">10 навыков, 23 конспекта, 25 колод (491 карточка): Сеть, HTTP/1.1–HTTP/3, REST, OpenAPI, CORS, CSRF, XSS, OWASP.</p>
             </a>
             <a href="#/backend" class="node-card node-card--available" style="text-decoration:none;">
               <div class="node-card__top"><span class="node-card__num">МОДУЛЬ 03 · BACKEND · 2400 MP</span>${ICONS.server}</div>
               <h3 class="node-card__title">⚙️ Backend Mastery (3.1–3.8)</h3>
-              <p class="node-card__summary">8 частей с нуля (FastAPI & Pydantic v2, Django & ORM, DRF, Flask, Auth, Архитектура/UoW, Очереди, Продакшен): 24 навыка, 40 конспектов К-xxx, 43 колоды Ф-xxx (890 карточек).</p>
+              <p class="node-card__summary">8 частей с нуля (FastAPI & Pydantic v2, Django & ORM, DRF, Flask, Auth, Архитектура/UoW, Очереди, Продакшен): 24 навыка, 40 конспектов, 43 колоды (890 карточек).</p>
             </a>
             <a href="#/algorithms" class="node-card node-card--available" style="text-decoration:none;">
               <div class="node-card__top"><span class="node-card__num">МОДУЛЬ 04 · АЛГОРИТМЫ · 1200 MP</span>${ICONS.bolt}</div>
               <h3 class="node-card__title">⚡ Algorithms Mastery (4.1–4.6)</h3>
-              <p class="node-card__summary">12 навыков, 14 конспектов К-xxx, 16 колод Ф-xxx (463 карточки): Big-O, Два указателя, Скользящее окно, Списки, Стек/Дек, BST, Куча, Хэш-таблица, Графы (DFS/BFS/Дейкстра), Timsort и DP.</p>
+              <p class="node-card__summary">12 навыков, 14 конспектов, 16 колод (463 карточки): Big-O, Два указателя, Скользящее окно, Списки, Стек/Дек, BST, Куча, Хэш-таблица, Графы (DFS/BFS/Дейкстра), Timsort и DP.</p>
             </a>
             <a href="#/databases" class="node-card node-card--available" style="text-decoration:none;">
               <div class="node-card__top"><span class="node-card__num">МОДУЛЬ 05 · БАЗЫ ДАННЫХ · 1700 MP</span>${ICONS.database}</div>
               <h3 class="node-card__title">🗄️ Databases Mastery (5.1–5.6)</h3>
-              <p class="node-card__summary">17 навыков, 32 конспекта К-xxx, 32 колоды Ф-xxx (927 карточек): Реляционная модель, 1NF–3NF, SQL, JOIN, CTE, Оконные функции, ACID, MVCC, Индексы, EXPLAIN, DB-API 2.0, ORM, N+1, Redis и кэширование.</p>
+              <p class="node-card__summary">17 навыков, 32 конспекта, 32 колоды (927 карточек): Реляционная модель, 1NF–3NF, SQL, JOIN, CTE, Оконные функции, ACID, MVCC, Индексы, EXPLAIN, DB-API 2.0, ORM, N+1, Redis и кэширование.</p>
             </a>
             <a href="#/architecture" class="node-card node-card--available" style="text-decoration:none;">
               <div class="node-card__top"><span class="node-card__num">МОДУЛЬ 06 · АРХИТЕКТУРА · 1400 MP</span>${ICONS.arch}</div>
               <h3 class="node-card__title">🏛️ Architecture Mastery (6.1–6.6)</h3>
-              <p class="node-card__summary">14 навыков, 14 конспектов К-xxx, 17 колод Ф-xxx (263 карточки): DRY/KISS/YAGNI, SOLID, DI, Чистая/Гексагональная архитектура, GoF, Repository, UoW, DDD, 12-Factor, gRPC, Circuit Breaker и Rate Limiting.</p>
+              <p class="node-card__summary">14 навыков, 14 конспектов, 17 колод (263 карточки): DRY/KISS/YAGNI, SOLID, DI, Чистая/Гексагональная архитектура, GoF, Repository, UoW, DDD, 12-Factor, gRPC, Circuit Breaker и Rate Limiting.</p>
             </a>
             <a href="#/infra" class="node-card node-card--available" style="text-decoration:none;">
               <div class="node-card__top"><span class="node-card__num">МОДУЛЬ 07 · ИНФРАСТРУКТУРА · 2100 MP</span>${ICONS.rocket}</div>
               <h3 class="node-card__title">🚀 Infrastructure Mastery (7.1–7.6)</h3>
-              <p class="node-card__summary">21 навык, 47 конспектов К-xxx, 45 колод Ф-xxx (1 286 карточек): Git, Docker, Multi-stage, Docker Compose, Kubernetes, CI/CD, Linux, SSH, Nginx, Celery, RabbitMQ/Kafka, pytest, logging, Sentry и Health checks.</p>
+              <p class="node-card__summary">21 навык, 47 конспектов, 45 колод (1 286 карточек): Git, Docker, Multi-stage, Docker Compose, Kubernetes, CI/CD, Linux, SSH, Nginx, Celery, RabbitMQ/Kafka, pytest, logging, Sentry и Health checks.</p>
             </a>
             <a href="#/cards" class="node-card node-card--available" style="text-decoration:none;">
               <div class="node-card__top"><span class="node-card__num">286 КОЛОД · 6 051 КАРТОЧКА</span>${ICONS.cards}</div>
-              <h3 class="node-card__title">🃏 3D Карточки Ф-xxx</h3>
+              <h3 class="node-card__title">🃏 3D Карточки темы</h3>
               <p class="node-card__summary">Интервальное повторение по всем юнитам Python, Web, Backend, Алгоритмов, Баз данных, Архитектуры и Инфраструктуры с переворотом по Пробелу и самооценкой 1–4.</p>
             </a>
             <a href="#/practice" class="node-card node-card--available" style="text-decoration:none;">
@@ -10593,8 +10979,8 @@ function buildHandoverMarkdown(){
 - **Пройдено Боссов модулей**: ${(state.passedBosses||[]).length} / 7 · **Раундов собеседования**: ${state.mockCompletedCount || 0}
 - **Всего XP**: ${state.xp} XP · **Стрик**: ${state.streak} дн.
 - **Пройдено уроков дерева**: ${state.completedLessons.length} / ${Object.keys(LESSONS).length}
-- **Изучено конспектов К-xxx**: ${state.readNotes.length} / ${Object.keys(ALL_NOTES_COMBINED).length}
-- **Пройдено колод Ф-xxx**: ${state.reviewedDecks.length} / ${Object.keys(ALL_DECKS_COMBINED).length}
+- **Изучено конспектов**: ${state.readNotes.length} / ${Object.keys(ALL_NOTES_COMBINED).length}
+- **Пройдено колод**: ${state.reviewedDecks.length} / ${Object.keys(ALL_DECKS_COMBINED).length}
 - **Решено задач IDE**: ${solvedCount} / 401
 `;
 }

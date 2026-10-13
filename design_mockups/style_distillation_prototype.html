@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Дистилляция стиля платформы — Design System & Tokens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  /* ==========================================================================
+     1. DESIGN SYSTEM TOKENS & EPHEMERAL THEMES (60/30/10 Ratio & WCAG AAA)
+     ========================================================================== */
+  :root, :root[data-theme="light"] {
+    /* 60% Atmosphere: Warm Parchment Base */
+    --zen-bg: #faf8f5;
+    --zen-bg-subtle: #f4efe8;
+    
+    /* 30% Surfaces: Pure Ephemeral Glass Islands */
+    --zen-surface: rgba(255, 255, 255, 0.88);
+    --zen-surface-card: rgba(255, 255, 255, 0.72);
+    --zen-surface-subtle: rgba(15, 23, 42, 0.04);
+    --zen-surface-hover: rgba(15, 23, 42, 0.06);
+    --zen-hairline: rgba(0, 0, 0, 0.07);
+    --zen-hairline-subtle: rgba(0, 0, 0, 0.04);
+    --zen-glass-blur: 24px;
+    
+    /* Text Hierarchy: High-Contrast AAA (#0f172a, >14:1) */
+    --zen-text-main: #0f172a;
+    --zen-text-soft: #334155;
+    --zen-text-muted: #64748b;
+    --zen-text-dim: #94a3b8;
+    
+    /* 10% Color Triangle (Chromatic Ephemeralization) */
+    /* Emerald: Progress, Mastery, Run CTA */
+    --zen-emerald: #145a46;
+    --zen-emerald-light: #10b981;
+    --zen-emerald-glow: rgba(20, 90, 70, 0.16);
+    --zen-emerald-soft: rgba(20, 90, 70, 0.09);
+    --zen-emerald-border: rgba(20, 90, 70, 0.28);
+    
+    /* Amber: Socratic Scaffolding, Warnings, XP */
+    --zen-amber: #d97706;
+    --zen-amber-light: #f59e0b;
+    --zen-amber-soft: rgba(217, 119, 6, 0.10);
+    --zen-amber-border: rgba(217, 119, 6, 0.30);
+    
+    /* Bordeaux / Ruby: Milestones, Boss Arena, Echelon 1 */
+    --zen-bordeaux: #6b1d2f;
+    --zen-bordeaux-light: #be123c;
+    --zen-bordeaux-soft: rgba(107, 29, 47, 0.09);
+    --zen-bordeaux-border: rgba(107, 29, 47, 0.28);
+    
+    /* Ambient Glows */
+    --zen-orb-burgundy: rgba(107, 29, 47, 0.07);
+    --zen-orb-emerald: rgba(20, 90, 70, 0.07);
+    
+    /* Elevation Shadows */
+    --zen-shadow-island: 0 20px 48px -12px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+    --zen-shadow-lift: 0 12px 28px -8px rgba(15, 23, 42, 0.07);
+    
+    /* Typography & Code */
+    --zen-font-sans: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+    --zen-font-mono: 'JetBrains Mono', monospace;
+  }
+
+  :root[data-theme="dark"] {
+    /* 60% Atmosphere: Evening Obsidian Dark Base */
+    --zen-bg: #0b0f15;
+    --zen-bg-subtle: #10151f;
+    
+    /* 30% Surfaces: Pure Ephemeral Glass Islands */
+    --zen-surface: rgba(18, 23, 33, 0.82);
+    --zen-surface-card: rgba(22, 28, 40, 0.65);
+    --zen-surface-subtle: rgba(255, 255, 255, 0.035);
+    --zen-surface-hover: rgba(255, 255, 255, 0.07);
+    --zen-hairline: rgba(255, 255, 255, 0.08);
+    --zen-hairline-subtle: rgba(255, 255, 255, 0.045);
+    --zen-glass-blur: 24px;
+    
+    /* Text Hierarchy: High-Contrast AAA (#f8fafc) */
+    --zen-text-main: #f8fafc;
+    --zen-text-soft: #cbd5e1;
+    --zen-text-muted: #8b9bb4;
+    --zen-text-dim: #55657e;
+    
+    /* 10% Color Triangle (Chromatic Ephemeralization) */
+    /* Emerald */
+    --zen-emerald: #10b981;
+    --zen-emerald-light: #34d399;
+    --zen-emerald-glow: rgba(16, 185, 129, 0.22);
+    --zen-emerald-soft: rgba(16, 185, 129, 0.12);
+    --zen-emerald-border: rgba(52, 211, 153, 0.35);
+    
+    /* Amber */
+    --zen-amber: #f59e0b;
+    --zen-amber-light: #fbbf24;
+    --zen-amber-soft: rgba(245, 158, 11, 0.14);
+    --zen-amber-border: rgba(251, 191, 36, 0.35);
+    
+    /* Bordeaux / Ruby */
+    --zen-bordeaux: #fb7185;
+    --zen-bordeaux-light: #f43f5e;
+    --zen-bordeaux-soft: rgba(225, 29, 72, 0.16);
+    --zen-bordeaux-border: rgba(251, 113, 133, 0.45);
+    
+    /* Ambient Glows */
+    --zen-orb-burgundy: rgba(190, 18, 60, 0.16);
+    --zen-orb-emerald: rgba(16, 185, 129, 0.14);
+    
+    /* Elevation Shadows */
+    --zen-shadow-island: 0 24px 64px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--zen-hairline);
+    --zen-shadow-lift: 0 16px 36px -8px rgba(0, 0, 0, 0.55);
+  }
+
+  /* Reset & Baseline */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    background: var(--zen-bg);
+    color: var(--zen-text-main);
+    font-family: var(--zen-font-sans);
+    line-height: 1.55;
+    min-height: 100vh;
+    padding: 0;
+    overflow-x: hidden;
+    position: relative;
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+
+  /* Fixed Ambient Glowing Orbs */
+  .zen-ambient-top {
+    position: fixed;
+    width: 480px; height: 480px;
+    top: -140px; left: -100px;
+    background: var(--zen-orb-burgundy);
+    filter: blur(100px);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    transition: background 0.3s ease;
+  }
+  .zen-ambient-bottom {
+    position: fixed;
+    width: 460px; height: 460px;
+    bottom: -120px; right: -90px;
+    background: var(--zen-orb-emerald);
+    filter: blur(100px);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    transition: background 0.3s ease;
+  }
+
+  /* Header Bar */
+  .zen-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--zen-surface);
+    backdrop-filter: blur(var(--zen-glass-blur));
+    -webkit-backdrop-filter: blur(var(--zen-glass-blur));
+    border-bottom: 1px solid var(--zen-hairline);
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .zen-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--zen-text-main);
+  }
+  .zen-brand-badge {
+    width: 32px; height: 32px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, var(--zen-emerald), var(--zen-bordeaux));
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.92rem;
+    box-shadow: 0 2px 8px var(--zen-emerald-glow);
+  }
+  .zen-brand-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .zen-brand-sub {
+    font-size: 0.72rem;
+    color: var(--zen-text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .zen-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .zen-theme-btn, .zen-chime-btn {
+    background: var(--zen-surface-subtle);
+    border: 1px solid var(--zen-hairline);
+    color: var(--zen-text-soft);
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+  }
+  .zen-theme-btn:hover, .zen-chime-btn:hover {
+    background: var(--zen-surface-hover);
+    color: var(--zen-text-main);
+    border-color: var(--zen-emerald-border);
+  }
+
+  /* Page Layout */
+  .zen-layout {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+
+  /* Hero Section */
+  .zen-hero {
+    margin-bottom: 32px;
+    text-align: center;
+  }
+  .zen-hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--zen-emerald-soft);
+    border: 1px solid var(--zen-emerald-border);
+    color: var(--zen-emerald);
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+  }
+  :root[data-theme="dark"] .zen-hero-eyebrow {
+    color: var(--zen-emerald-light);
+  }
+  .zen-hero-title {
+    font-size: clamp(1.8rem, 1.4rem + 1.8vw, 2.6rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+    color: var(--zen-text-main);
+  }
+  .zen-hero-lead {
+    font-size: 1.05rem;
+    color: var(--zen-text-soft);
+    max-width: 780px;
+    margin: 0 auto 24px;
+    line-height: 1.6;
+  }
+
+  /* Live Screen Nav Tabs */
+  .zen-tab-nav {
+    display: flex;
+    gap: 6px;
+    background: var(--zen-surface);
+    border: 1px solid var(--zen-hairline);
+    padding: 6px;
+    border-radius: 16px;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-bottom: 32px;
+    backdrop-filter: blur(var(--zen-glass-blur));
+    -webkit-backdrop-filter: blur(var(--zen-glass-blur));
+    box-shadow: var(--zen-shadow-island);
+  }
+  .zen-tab-nav::-webkit-scrollbar { display: none; }
+  .zen-tab-btn {
+    flex: 1 0 auto;
+    padding: 10px 16px;
+    border-radius: 11px;
+    border: none;
+    background: transparent;
+    color: var(--zen-text-muted);
+    font-family: var(--zen-font-sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.15s ease;
+  }
+  .zen-tab-btn:hover {
+    color: var(--zen-text-main);
+    background: var(--zen-surface-hover);
+  }
+  .zen-tab-btn.active {
+    background: var(--zen-emerald-soft);
+    color: var(--zen-emerald);
+    border: 1px solid var(--zen-emerald-border);
+    font-weight: 700;
+  }
+  :root[data-theme="dark"] .zen-tab-btn.active {
+    color: var(--zen-emerald-light);
+  }
+
+  /* Core Card Primitive: Zen Pure Glass Floating Island */
+  .zen-card {
+    position: relative;
+    background: var(--zen-surface);
+    border: 1px solid var(--zen-hairline);
+    border-radius: 24px;
+    padding: 26px 28px;
+    backdrop-filter: blur(var(--zen-glass-blur));
+    -webkit-backdrop-filter: blur(var(--zen-glass-blur));
+    box-shadow: var(--zen-shadow-island);
+    margin-bottom: 24px;
+  }
+  .zen-card-subtle {
+    background: var(--zen-surface-card);
+    border: 1px solid var(--zen-hairline-subtle);
+    border-radius: 18px;
+    padding: 18px 20px;
+  }
+
+  /* Eyebrow and Focus Header */
+  .zen-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--zen-hairline);
+    flex-wrap: wrap;
+  }
+  .zen-eyebrow {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--zen-text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .zen-title {
+    font-size: 1.28rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: var(--zen-text-main);
+  }
+
+  /* Continuous Atomic Dots Necklace */
+  .dots-necklace {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--zen-surface-subtle);
+    border: 1px solid var(--zen-hairline);
+  }
+  .dot-jewel {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--zen-hairline);
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  .dot-jewel.done {
+    background: var(--zen-emerald);
+    box-shadow: 0 0 6px var(--zen-emerald-glow);
+  }
+  .dot-jewel.active {
+    width: 11px; height: 11px;
+    background: var(--zen-emerald);
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 10px var(--zen-emerald);
+  }
+  :root[data-theme="dark"] .dot-jewel.active {
+    background: var(--zen-emerald-light);
+    border: 2px solid #ffffff;
+  }
+  .dots-stage-divider {
+    width: 1px; height: 12px;
+    background: var(--zen-hairline);
+    margin: 0 2px;
+  }
+  .dot-jewel.milestone {
+    border-radius: 3px;
+    background: var(--zen-amber);
+  }
+
+  /* I/O Flow Contract Strip */
+  .dataflow-card {
+    background: var(--zen-surface-subtle);
+    border: 1px solid var(--zen-hairline);
+    border-radius: 16px;
+    padding: 12px 16px;
+    margin: 12px 0 16px;
+  }
+  .dataflow-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--zen-emerald);
+  }
+  :root[data-theme="dark"] .dataflow-header {
+    color: var(--zen-emerald-light);
+  }
+  .dataflow-stream {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .df-box {
+    flex: 1;
+    background: var(--zen-surface);
+    border: 1px solid var(--zen-hairline);
+    border-radius: 10px;
+    padding: 8px 12px;
+  }
+  .df-label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--zen-text-muted);
+    margin-bottom: 2px;
+  }
+  .df-val {
+    font-family: var(--zen-font-mono);
+    font-size: 0.88rem;
+    color: var(--zen-text-main);
+  }
+  .df-val.output-val {
+    color: var(--zen-emerald);
+    font-weight: 700;
+  }
+  :root[data-theme="dark"] .df-val.output-val {
+    color: var(--zen-emerald-light);
+  }
+  .df-arrow {
+    color: var(--zen-emerald);
+    font-size: 1.15rem;
+    flex: none;
+  }
+
+  /* Interactive Slice / Structure Anatomy */
+  .slice-anatomy-widget {
+    background: var(--zen-amber-soft);
+    border: 1px solid var(--zen-amber-border);
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin: 10px 0;
+  }
+  .slice-anatomy-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--zen-amber);
+    margin-bottom: 8px;
+  }
+  .slice-grid {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding: 4px 0;
+  }
+  .slice-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    min-width: 44px;
+  }
+  .slice-pos-idx, .slice-neg-idx {
+    font-family: var(--zen-font-mono);
+    font-size: 0.68rem;
+    color: var(--zen-text-muted);
+  }
+  .slice-cell {
+    width: 100%;
+    padding: 6px 0;
+    text-align: center;
+    background: var(--zen-surface);
+    border: 1px solid var(--zen-hairline);
+    border-radius: 8px;
+    font-family: var(--zen-font-mono);
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: var(--zen-text-main);
+  }
+  .slice-flow-cue {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--zen-amber);
+    margin-top: 6px;
+  }
+
+  /* Zero-Keyboard Clickable Token Chips */
+  .prac-chips-dock {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin: 8px 0 14px;
+  }
+  .token-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 11px;
+    border-radius: 8px;
+    background: var(--zen-surface);
+    border: 1px solid var(--zen-hairline);
+    color: var(--zen-text-soft);
+    font-family: var(--zen-font-mono);
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    user-select: none;
+  }
+  .token-chip:hover {
+    background: var(--zen-emerald-soft);
+    border-color: var(--zen-emerald-border);
+    color: var(--zen-emerald);
+  }
+  :root[data-theme="dark"] .token-chip:hover {
+    color: var(--zen-emerald-light);
+  }
+
+  /* Buttons & CTAs */
+  .btn-zen-emerald {
+    background: var(--zen-emerald);
+    color: #ffffff;
+    border: 1px solid var(--zen-emerald-light);
+    padding: 12px 22px;
+    border-radius: 14px;
+    font-family: var(--zen-font-sans);
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 16px var(--zen-emerald-glow);
+    transition: opacity 0.15s ease, filter 0.15s ease;
+  }
+  .btn-zen-emerald:hover {
+    filter: brightness(1.08);
+  }
+  .btn-zen-emerald:active {
+    filter: brightness(0.95);
+  }
+  .btn-zen-ghost {
+    background: transparent;
+    border: 1px solid var(--zen-hairline);
+    color: var(--zen-text-main);
+    padding: 11px 18px;
+    border-radius: 14px;
+    font-family: var(--zen-font-sans);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s ease;
+  }
+  .btn-zen-ghost:hover {
+    background: var(--zen-surface-hover);
+  }
+
+  /* 3D Flashcard Stage */
+  .fc-stage-preview {
+    perspective: 1200px;
+    margin: 16px 0;
+  }
+  .fc-card-3d {
+    position: relative;
+    width: 100%;
+    min-height: 200px;
+    background: var(--zen-surface);
+    border: 1px solid var(--zen-hairline);
+    border-radius: 20px;
+    padding: 24px 26px;
+    cursor: pointer;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+    transform-style: preserve-3d;
+    box-shadow: var(--zen-shadow-island);
+  }
+  .fc-card-3d.flipped {
+    border-color: var(--zen-emerald-border);
+    box-shadow: 0 12px 36px var(--zen-emerald-glow);
+  }
+  .fc-card-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--zen-emerald-soft);
+    border: 1px solid var(--zen-emerald-border);
+    color: var(--zen-emerald);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 12px;
+  }
+  :root[data-theme="dark"] .fc-card-badge {
+    color: var(--zen-emerald-light);
+  }
+
+  /* Grid Layouts for Comparative Adaptation */
+  .zen-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 860px) {
+    .zen-grid-2 { grid-template-columns: 1fr; }
+  }
+
+  /* Code Editor Preview Box */
+  .zen-editor-box {
+    background: #0d1117;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 16px;
+    overflow: hidden;
+    font-family: var(--zen-font-mono);
+  }
+  .zen-editor-bar {
+    background: rgba(255, 255, 255, 0.04);
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.74rem;
+    color: #8b9bb4;
+  }
+  .zen-editor-code {
+    padding: 16px 18px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: #e6edf3;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .zen-kw { color: #ff7b72; font-weight: 600; }
+  .zen-fn { color: #d2a8ff; font-weight: 600; }
+  .zen-str { color: #a5d6ff; }
+  .zen-num { color: #79c0ff; }
+  .zen-comm { color: #8b949e; font-style: italic; }
+
+  /* Token Matrix Cards */
+  .token-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+  }
+  .token-table th, .token-table td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--zen-hairline);
+  }
+  .token-table th {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--zen-text-muted);
+    font-weight: 700;
+  }
+  .color-swatch {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    border: 1px solid var(--zen-hairline);
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+
+  /* Live Sections Container */
+  .screen-showcase-section {
+    display: none;
+    animation: fadeIn 0.25s ease;
+  }
+  .screen-showcase-section.active {
+    display: block;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Ambient Orbs -->
+<div class="zen-ambient-top"></div>
+<div class="zen-ambient-bottom"></div>
+
+<!-- Topbar -->
+<header class="zen-topbar">
+  <div class="zen-brand">
+    <div class="zen-brand-badge">DS</div>
+    <div>
+      <div class="zen-brand-title">Python Backend Academy · Дистилляция стиля</div>
+      <div class="zen-brand-sub">Design System & Architectural Standards</div>
+    </div>
+  </div>
+  <div class="zen-topbar-actions">
+    <button type="button" class="zen-chime-btn" id="chime-test-btn" title="Проверить гармоничный звук колокольчика 880Гц">
+      <span>🔔 880 Гц Чайм</span>
+    </button>
+    <button type="button" class="zen-theme-btn" id="theme-toggle-btn" title="Переключить светлую/тёмную тему">
+      <span id="theme-icon">☀️ Светлая</span>
+    </button>
+  </div>
+</header>
+
+<main class="zen-layout">
+  <!-- Hero -->
+  <section class="zen-hero">
+    <div class="zen-hero-eyebrow">✦ Единый визуальный стандарт платформы</div>
+    <h1 class="zen-hero-title">Дистилляция триады: Конспект · Карточка · Практика</h1>
+    <p class="zen-hero-lead">
+      Формализация безупречной эстетики отполированных экранов (Scroll-Feed микро-шагов, 3D-карточек с кинематографичным поворотом, Zen Split Studio с I/O стрипом и анатомией) в сквозную систему токенов и компонентов для гармонизации всех экранов платформы.
+    </p>
+  </section>
+
+  <!-- Navigation Tabs for All Screens -->
+  <nav class="zen-tab-nav" id="screen-tabs">
+    <button type="button" class="zen-tab-btn active" data-tab="tokens">📐 Токены и Триада</button>
+    <button type="button" class="zen-tab-btn" data-tab="path">🗺️ #/path · Тропа</button>
+    <button type="button" class="zen-tab-btn" data-tab="map">🌳 #/map · Дерево</button>
+    <button type="button" class="zen-tab-btn" data-tab="tracks">⚡ #/python..#infra · Треки</button>
+    <button type="button" class="zen-tab-btn" data-tab="mock">🎙️ #/mock · Собеседование</button>
+    <button type="button" class="zen-tab-btn" data-tab="sandbox">💻 #/sandbox · Песочница</button>
+    <button type="button" class="zen-tab-btn" data-tab="docs">📖 #/docs · Документация</button>
+    <button type="button" class="zen-tab-btn" data-tab="settings">⚙️ #/settings · Настройки</button>
+  </nav>
+
+  <!-- TAB 1: TOKENS & GOLDEN TRIAD REFERENCE -->
+  <div class="screen-showcase-section active" id="tab-tokens">
+    <div class="zen-card">
+      <div class="zen-header">
+        <div>
+          <div class="zen-eyebrow">Цветовой треугольник 60/30/10 & WCAG AAA</div>
+          <div class="zen-title">1. Канонические токены дизайн-системы</div>
+        </div>
+        <div class="dots-necklace">
+          <span class="dot-jewel done" title="Конспект готов"></span>
+          <span class="dot-jewel done" title="Карточки пройдены"></span>
+          <span class="dot-jewel active" title="Практика кода в фокусе"></span>
+          <span class="dots-stage-divider"></span>
+          <span class="dot-jewel milestone" title="Рубежный зачёт"></span>
+        </div>
+      </div>
+
+      <table class="token-table">
+        <thead>
+          <tr>
+            <th>Токен</th>
+            <th>Роль в UX</th>
+            <th>Светлая тема (Parchment)</th>
+            <th>Тёмная тема (Obsidian)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>--zen-bg</code></td>
+            <td>60% атмосферный фон страницы</td>
+            <td><span class="color-swatch" style="background:#faf8f5;"></span><code>#faf8f5</code> (Пергамент)</td>
+            <td><span class="color-swatch" style="background:#0b0f15;"></span><code>#0b0f15</code> (Обсидиан)</td>
+          </tr>
+          <tr>
+            <td><code>--zen-surface</code></td>
+            <td>30% парящие острова со стеклом 24px</td>
+            <td><span class="color-swatch" style="background:rgba(255,255,255,0.88);"></span><code>rgba(255,255,255,0.88)</code></td>
+            <td><span class="color-swatch" style="background:rgba(18,23,33,0.82);"></span><code>rgba(18,23,33,0.82)</code></td>
+          </tr>
+          <tr>
+            <td><code>--zen-emerald</code></td>
+            <td>10% Прогресс, успех, запуск решения</td>
+            <td><span class="color-swatch" style="background:#145a46;"></span><code>#145a46</code> (WCAG AAA)</td>
+            <td><span class="color-swatch" style="background:#10b981;"></span><code>#10b981</code> (Изумруд)</td>
+          </tr>
+          <tr>
+            <td><code>--zen-amber</code></td>
+            <td>10% Сократовский скаффолдинг L0..L3, XP</td>
+            <td><span class="color-swatch" style="background:#d97706;"></span><code>#d97706</code> (Тёплый янтарь)</td>
+            <td><span class="color-swatch" style="background:#f59e0b;"></span><code>#f59e0b</code> (Янтарный огонь)</td>
+          </tr>
+          <tr>
+            <td><code>--zen-bordeaux</code></td>
+            <td>10% Рубежные зачёты, Эшелон 1, Боссы</td>
+            <td><span class="color-swatch" style="background:#6b1d2f;"></span><code>#6b1d2f</code> (Бордовый велюр)</td>
+            <td><span class="color-swatch" style="background:#fb7185;"></span><code>#fb7185</code> / <code>#be123c</code></td>
+          </tr>
+          <tr>
+            <td><code>--zen-hairline</code></td>
+            <td>Волосковые границы без визуального шума</td>
+            <td><code>rgba(0, 0, 0, 0.07)</code></td>
+            <td><code>rgba(255, 255, 255, 0.08)</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Golden Triad Showcase -->
+    <div class="zen-grid-2">
+      <!-- 1. Theory Scroll-Feed -->
+      <div class="zen-card">
+        <div class="zen-header">
+          <div>
+            <div class="zen-eyebrow">Образец 1 · Конспект / Теория</div>
+            <div class="zen-title">Scroll-Feed с микро-шагами</div>
+          </div>
+          <span style="font-size:0.75rem;color:var(--zen-text-muted);">Шаг 1 из 3</span>
+        </div>
+        <div style="font-size:0.92rem;color:var(--zen-text-soft);line-height:1.6;margin-bottom:16px;">
+          Срезы в Python работают по формуле <code>seq[start:stop:step]</code>. Если <code>step = -1</code>, обход происходит в обратную сторону от конца к началу, создавая новый список или строку за $O(n)$ без мутации оригинала.
+        </div>
+        <div class="slice-anatomy-widget">
+          <div class="slice-anatomy-header">
+            <span>📐 Анатомия среза</span>
+            <span>step = -1</span>
+          </div>
+          <div class="slice-flow-cue">⟵ Обход справа налево: original[::-1]</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button type="button" class="btn-zen-emerald" style="flex:1;" onclick="playChime(880)">Понятно, дальше (+10 XP) ➔</button>
+        </div>
+      </div>
+
+      <!-- 2. 3D Flashcard -->
+      <div class="zen-card">
+        <div class="zen-header">
+          <div>
+            <div class="zen-eyebrow">Образец 2 · Карточки</div>
+            <div class="zen-title">3D Flashcard с кинематографичным переворотом</div>
+          </div>
+          <span style="font-size:0.75rem;color:var(--zen-text-muted);">Карточка 4 из 12</span>
+        </div>
+        <div class="fc-stage-preview">
+          <div class="fc-card-3d" id="demo-flip-card" onclick="toggleDemoCardFlip()">
+            <div class="fc-card-badge" id="demo-flip-badge">❓ Вопрос (нажми для переворота)</div>
+            <div id="demo-flip-text" style="font-size:1.02rem;font-weight:600;line-height:1.45;color:var(--zen-text-main);">
+              В чём разница между shallow copy и deepcopy при работе со вложенными списками?
+            </div>
+            <div id="demo-flip-answer" style="display:none;margin-top:12px;font-size:0.92rem;color:var(--zen-text-soft);line-height:1.55;border-top:1px solid var(--zen-hairline);padding-top:10px;">
+              <code>copy.copy()</code> дублирует только внешний контейнер, оставляя ссылки на вложенные списки общими. <code>copy.deepcopy()</code> рекурсивно клонирует всю структуру в памяти.
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button type="button" class="btn-zen-ghost" style="flex:1;">1 · Снова</button>
+          <button type="button" class="btn-zen-ghost" style="flex:1;">2 · Трудно</button>
+          <button type="button" class="btn-zen-ghost" style="flex:1;">3 · Хорошо</button>
+          <button type="button" class="btn-zen-emerald" style="flex:1;" onclick="playChime(880)">4 · Легко (+10 XP)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: #/path (Serpentine & Pro Path) -->
+  <div class="screen-showcase-section" id="tab-path">
+    <div class="zen-card">
+      <div class="zen-header">
+        <div>
+          <div class="zen-eyebrow">Тропа обучения · Главный экран (#/path)</div>
+          <div class="zen-title">3D Serpentine Journey с акцентом Single Dominant CTA</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="dots-necklace">🔥 7 дней стрик</span>
+          <span class="dots-necklace" style="color:var(--zen-emerald);">⚡ 520 XP</span>
+        </div>
+      </div>
+
+      <!-- Zen Next Step Banner -->
+      <div class="dataflow-card" style="padding:18px 20px;border-left:4px solid var(--zen-emerald);margin-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:0.75rem;font-weight:700;color:var(--zen-emerald);text-transform:uppercase;margin-bottom:4px;">
+              ⏱️ Правило 2 минут: Ваш следующий микро-шаг
+            </div>
+            <h2 style="font-size:1.22rem;font-weight:800;color:var(--zen-text-main);margin-bottom:6px;">
+              Юнит 1.2 · Срезы и индексация списков в Python
+            </h2>
+            <p style="font-size:0.86rem;color:var(--zen-text-soft);">
+              Всего 1 задача практики кода (#20: Реверс списка срезом). Займёт менее 2 минут!
+            </p>
+          </div>
+          <button type="button" class="btn-zen-emerald" style="padding:13px 24px;font-size:0.95rem;" onclick="playChime(880)">
+            <span>Начать микро-шаг ➔</span>
+            <span style="font-size:0.75rem;opacity:0.85;">+15 XP</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3D Serpentine Path Nodes Visualized -->
+      <div style="display:flex;flex-direction:column;gap:14px;max-width:700px;margin:0 auto;position:relative;padding:20px 0;">
+        <div style="position:absolute;left:28px;top:20px;bottom:20px;width:3px;background:linear-gradient(180deg, var(--zen-emerald), var(--zen-amber), var(--zen-bordeaux));border-radius:99px;opacity:0.4;"></div>
+
+        <!-- Node 1 -->
+        <div class="zen-card-subtle" style="display:flex;align-items:center;gap:18px;margin-left:0;border-left:3px solid var(--zen-emerald);">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--zen-emerald);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;box-shadow:0 0 12px var(--zen-emerald);">✓</div>
+          <div style="flex:1;">
+            <div style="font-size:0.72rem;font-weight:700;color:var(--zen-emerald);text-transform:uppercase;">Пройдено · 100 MP</div>
+            <div style="font-weight:700;font-size:1.02rem;color:var(--zen-text-main);">1.1 Память и переменные в CPython</div>
+          </div>
+          <span style="font-size:0.78rem;color:var(--zen-text-muted);font-weight:600;">3 конспекта · 18 карточек</span>
+        </div>
+
+        <!-- Node 2 (Active Focus) -->
+        <div class="zen-card-subtle" style="display:flex;align-items:center;gap:18px;margin-left:24px;border:1.5px solid var(--zen-emerald);background:var(--zen-surface);box-shadow:0 8px 24px var(--zen-emerald-glow);">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--zen-emerald);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;animation:pulse 2s infinite;">▶</div>
+          <div style="flex:1;">
+            <div style="font-size:0.72rem;font-weight:800;color:var(--zen-emerald);text-transform:uppercase;">В процессе · Активный фокус</div>
+            <div style="font-weight:800;font-size:1.06rem;color:var(--zen-text-main);">1.2 Встроенные структуры и срезы</div>
+          </div>
+          <button type="button" class="btn-zen-emerald" style="padding:8px 16px;font-size:0.82rem;" onclick="playChime(880)">К задаче ➔</button>
+        </div>
+
+        <!-- Node 3 -->
+        <div class="zen-card-subtle" style="display:flex;align-items:center;gap:18px;margin-left:48px;opacity:0.7;">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--zen-surface-subtle);border:1px solid var(--zen-hairline);color:var(--zen-text-muted);display:flex;align-items:center;justify-content:center;font-weight:700;">🔒</div>
+          <div style="flex:1;">
+            <div style="font-size:0.72rem;font-weight:600;color:var(--zen-text-muted);text-transform:uppercase;">Закрыто · Требует Юнит 1.2</div>
+            <div style="font-weight:700;font-size:1.02rem;color:var(--zen-text-muted);">1.3 Управление потоком и генераторы</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: #/map (Skill Tree) -->
+  <div class="screen-showcase-section" id="tab-map">
+    <div class="zen-card">
+      <div class="zen-header">
+        <div>
+          <div class="zen-eyebrow">Карта навыков · 18 узлов (#/map)</div>
+          <div class="zen-title">Ориентированный граф зависимостей в стиле Floating Islands</div>
+        </div>
+        <div class="dots-necklace">
+          <span class="dot-jewel done"></span> 14 освоено
+          <span class="dots-stage-divider"></span>
+          <span class="dot-jewel active"></span> 2 доступно
+          <span class="dots-stage-divider"></span>
+          <span class="dot-jewel" style="opacity:0.4;"></span> 2 закрыто
+        </div>
+      </div>
+
+      <div class="zen-grid-2">
+        <div class="zen-card-subtle" style="border-top:3px solid var(--zen-emerald);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span class="zen-eyebrow" style="color:var(--zen-emerald);">Эшелон 1 · База</span>
+            <span style="font-size:0.76rem;font-weight:700;color:var(--zen-emerald);">✓ Готово</span>
+          </div>
+          <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:6px;">Скрининг Python: Память & GIL</h3>
+          <p style="font-size:0.85rem;color:var(--zen-text-soft);margin-bottom:12px;">
+            Модели ссылок, подсчёт ссылок в CPython, сборщик мусора циклических ссылок.
+          </p>
+          <div class="dots-necklace" style="width:100%;justify-content:space-around;">
+            <span>К-001 ✓</span>
+            <span>К-002 ✓</span>
+            <span>Ф-001 (18) ✓</span>
+            <span>Задача #20 ✓</span>
+          </div>
+        </div>
+
+        <div class="zen-card-subtle" style="border-top:3px solid var(--zen-amber);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span class="zen-eyebrow" style="color:var(--zen-amber);">Эшелон 2 · Тех-ядро</span>
+            <span style="font-size:0.76rem;font-weight:700;color:var(--zen-amber);">● Доступно</span>
+          </div>
+          <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:6px;">FastAPI: Dependency Injection & Pydantic v2</h3>
+          <p style="font-size:0.85rem;color:var(--zen-text-soft);margin-bottom:12px;">
+            Провайдеры сессий БД через <code>yield</code>, валидация схем и сериализация JSON.
+          </p>
+          <button type="button" class="btn-zen-ghost" style="width:100%;justify-content:center;padding:8px 12px;font-size:0.82rem;">Открыть тему ➔</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: #/tracks (7 Modules / Tracks) -->
+  <div class="screen-showcase-section" id="tab-tracks">
+    <div class="zen-card">
+      <div class="zen-header">
+        <div>
+          <div class="zen-eyebrow">Матрицы мастерства (#/python..#/infra)</div>
+          <div class="zen-title">7 Продакшен-треков с эшелонами собеседования</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="token-chip" style="background:var(--zen-bordeaux-soft);color:var(--zen-bordeaux);border-color:var(--zen-bordeaux-border);font-weight:700;">🚨 Эшелон 1</span>
+          <span class="token-chip" style="background:var(--zen-amber-soft);color:var(--zen-amber);border-color:var(--zen-amber-border);font-weight:700;">🔥 Эшелон 2</span>
+          <span class="token-chip" style="background:var(--zen-emerald-soft);color:var(--zen-emerald);border-color:var(--zen-emerald-border);font-weight:700;">⚡ Эшелон 3</span>
+        </div>
+      </div>
+
+      <!-- Unit Item in Zen Style -->
+      <div class="zen-card-subtle" style="margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px;">
+          <div>
+            <div style="font-size:0.75rem;font-weight:700;color:var(--zen-text-muted);">ЮНИТ 1.1 · ЭШЕЛОН 1</div>
+            <div style="font-size:1.08rem;font-weight:800;color:var(--zen-text-main);">Память, переменные и базовые типы</div>
+          </div>
+          <div class="dots-necklace">
+            <span class="dot-jewel done" title="Конспект усвоен"></span>
+            <span class="dot-jewel done" title="Флеш-карточки 18/18"></span>
+            <span class="dot-jewel done" title="Задача #19 решена"></span>
+            <span class="dot-jewel done" title="Задача #20 решена"></span>
+            <span class="dots-stage-divider"></span>
+            <span class="dot-jewel milestone" title="Рубежный тест сдан"></span>
+          </div>
+        </div>
+        <p style="font-size:0.86rem;color:var(--zen-text-soft);margin-bottom:12px;">
+          Модель памяти CPython, изменяемость (mutability), разница между <code>is</code> и <code>==</code>, интернирование строк и малых чисел.
+        </p>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+          <span style="font-size:0.78rem;font-weight:700;color:var(--zen-emerald);">✓ Завершено (100 / 100 MP)</span>
+          <button type="button" class="btn-zen-ghost" style="padding:6px 14px;font-size:0.78rem;">Повторить Юнит →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 5: #/mock (Interview Simulator) -->
+  <div class="screen-showcase-section" id="tab-mock">
+    <div class="zen-card">
+      <div class="zen-header">
+        <div>
+          <div class="zen-eyebrow">Симулятор технического собеседования (#/mock)</div>
+          <div class="zen-title">Zen Split Studio: Live-Coding 20 мин + STAR Архитектура</div>
+        </div>
+        <div class="dots-necklace" style="color:var(--zen-amber);font-family:var(--zen-font-mono);">
+          ⏱️ 18:42 осталось
+        </div>
+      </div>
+
+      <div class="zen-grid-2">
+        <!-- Left Pane -->
+        <div>
+          <div class="zen-eyebrow" style="margin-bottom:6px;">Спецификация задачи от интервьюера</div>
+          <h3 style="font-size:1.12rem;font-weight:700;margin-bottom:10px;">Двухфакторный поиск анаграмм в потоке</h3>
+          <p style="font-size:0.88rem;color:var(--zen-text-soft);line-height:1.55;margin-bottom:14px;">
+            Реализуйте функцию <code>group_anagrams(words: list[str]) -> list[list[str]]</code>, группирующую анаграммы за оптимальное асимптотическое время без квадратичных вложенных циклов.
+          </p>
+
+          <div class="dataflow-card">
+            <div class="dataflow-header">
+              <span>⚡ Контракт задачи</span>
+              <span>O(N · K log K)</span>
+            </div>
+            <div class="dataflow-stream">
+              <div class="df-box">
+                <span class="df-label">Вход (words)</span>
+                <span class="df-val">["eat", "tea", "tan", "ate", "nat", "bat"]</span>
+              </div>
+              <div class="df-arrow">➔</div>
+              <div class="df-box">
+                <span class="df-label">Ожидание</span>
+                <span class="df-val output-val">[["eat","tea","ate"], ...]</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:var(--zen-amber-soft);border-left:3px solid var(--zen-amber);border-radius:12px;padding:12px 14px;margin-top:14px;">
+            <div style="font-size:0.74rem;font-weight:700;color:var(--zen-amber);text-transform:uppercase;margin-bottom:3px;">
+              💡 Сократовская подсказка L1 (Концепция)
+            </div>
+            <div style="font-size:0.84rem;color:var(--zen-text-main);">
+              Подумайте, какой неизменяемый инвариант объединяет все перестановки одного и того же слова, чтобы использовать его как ключ хэш-таблицы?
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Pane -->
+        <div>
+          <div class="zen-editor-box">
+            <div class="zen-editor-bar">
+              <span>solution.py</span>
+              <span>CPython 3.13 / Brython</span>
+            </div>
+            <div class="zen-editor-code"><span class="zen-kw">from</span> collections <span class="zen-kw">import</span> defaultdict
+
+<span class="zen-kw">def</span> <span class="zen-fn">group_anagrams</span>(words: list[str]) -> list[list[str]]:
+    groups = defaultdict(list)
+    <span class="zen-kw">for</span> w <span class="zen-kw">in</span> words:
+        key = <span class="zen-str">""</span>.join(sorted(w))
+        groups[key].append(w)
+    <span class="zen-kw">return</span> list(groups.values())</div>
+          </div>
+
+          <div class="prac-chips-dock">
+            <span class="token-chip">defaultdict(list)</span>
+            <span class="token-chip">"".join(sorted(w))</span>
+            <span class="token-chip">groups.values()</span>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:12px;">
+            <button type="button" class="btn-zen-ghost" style="padding:10px 14px;">↺ Сброс</button>
+            <button type="button" class="btn-zen-emerald" style="flex:1;" onclick="playChime(880)">
+              <span>▶ Проверить решение собеседования</span>
+              <span style="font-size:0.74rem;opacity:0.85;">(Ctrl+Enter)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 6: #/sandbox (Live Python Sandbox) -->
+  <div class="screen-showcase-section" id="tab-sandbox">
+    <div class="zen-card">
+      <div class="zen-header">
+        <div>
+          <div class="zen-eyebrow">Песочница Python (#/sandbox)</div>
+          <div class="zen-title">Интерактивный интерпретатор с чипами синтаксиса Zero-Keyboard</div>
+        </div>
+        <span class="dots-necklace">🐍 Brython 3.13.0 In-Browser</span>
+      </div>
+
+      <div class="zen-grid-2">
+        <div>
+          <div class="zen-editor-box">
+            <div class="zen-editor-bar">
+              <span>main.py</span>
+              <span>Готов к выполнению</span>
+            </div>
+            <div class="zen-editor-code"><span class="zen-comm"># Экспериментируйте с кодом в браузере</span>
+data = [<span class="zen-num">1</span>, <span class="zen-num">2</span>, <span class="zen-num">3</span>, <span class="zen-num">4</span>, <span class="zen-num">5</span>]
+reversed_data = data[::-<span class="zen-num">1</span>]
+print(<span class="zen-str">f"Результат среза: {reversed_data}"</span>)</div>
+          </div>
+
+          <div class="prac-chips-dock">
+            <span class="token-chip">print()</span>
+            <span class="token-chip">[start:stop:step]</span>
+            <span class="token-chip">[::-1]</span>
+            <span class="token-chip">enumerate()</span>
+            <span class="token-chip">zip()</span>
+          </div>
+
+          <button type="button" class="btn-zen-emerald" style="width:100%;margin-top:8px;" onclick="playChime(880)">
+            <span>▶ Выполнить код</span>
+            <span style="font-size:0.75rem;opacity:0.85;">(Ctrl+Enter)</span>
+          </button>
+        </div>
+
+        <div>
+          <div class="zen-eyebrow" style="margin-bottom:8px;">Терминал вывода (Stdout)</div>
+          <div style="background:#0d1117;border:1px solid rgba(255,255,255,0.10);border-radius:16px;padding:16px 18px;min-height:160px;font-family:var(--zen-font-mono);font-size:0.88rem;color:#7ee787;">
+            Результат среза: [5, 4, 3, 2, 1]<br>
+            <span style="color:#8b949e;">&gt;&gt;&gt; Код выполнен за 4мс без ошибок.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 7: #/docs (Documentation Hub) -->
+  <div class="screen-showcase-section" id="tab-docs">
+    <div class="zen-card">
+      <div class="zen-header">
+        <div>
+          <div class="zen-eyebrow">Справочник синтаксиса и методов (#/docs)</div>
+          <div class="zen-title">Быстрая шпаргалка по срезам, коллекциям и алгоритмам</div>
+        </div>
+        <div class="dots-necklace">Поиск по 401 теме</div>
+      </div>
+
+      <div class="zen-grid-2">
+        <div class="zen-card-subtle">
+          <div class="zen-eyebrow" style="color:var(--zen-emerald);">Срезы (Slicing)</div>
+          <h3 style="font-size:1.02rem;font-weight:700;margin:6px 0;">s[start:stop:step]</h3>
+          <p style="font-size:0.84rem;color:var(--zen-text-soft);">
+            Отрицательный шаг <code>step &lt; 0</code> переворачивает направление. <code>s[::-1]</code> разворачивает последовательность без изменения оригинала.
+          </p>
+        </div>
+        <div class="zen-card-subtle">
+          <div class="zen-eyebrow" style="color:var(--zen-amber);">Хэш-таблицы (Dict & Set)</div>
+          <h3 style="font-size:1.02rem;font-weight:700;margin:6px 0;">O(1) поиск по ключу</h3>
+          <p style="font-size:0.84rem;color:var(--zen-text-soft);">
+            Ключи обязаны реализовывать <code>__hash__</code> и <code>__eq__</code>. Изменяемые типы (списки, словари) не могут служить ключами.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 8: #/settings (Stats & Settings) -->
+  <div class="screen-showcase-section" id="tab-settings">
+    <div class="zen-card">
+      <div class="zen-header">
+        <div>
+          <div class="zen-eyebrow">Профиль, статистика и настройки (#/settings)</div>
+          <div class="zen-title">Статистика мастерства и резервное копирование</div>
+        </div>
+        <div class="dots-necklace">Синхронизировано локально</div>
+      </div>
+
+      <div class="zen-grid-2">
+        <div class="zen-card-subtle">
+          <div class="zen-eyebrow">Готовность к скринингу (Эшелон 1)</div>
+          <div style="font-size:1.8rem;font-weight:800;color:var(--zen-emerald);margin:6px 0;">85%</div>
+          <div style="height:6px;border-radius:99px;background:var(--zen-hairline);overflow:hidden;margin-bottom:8px;">
+            <div style="height:100%;width:85%;background:var(--zen-emerald);border-radius:99px;"></div>
+          </div>
+          <span style="font-size:0.78rem;color:var(--zen-text-muted);">12 из 14 ключевых тем скрининга сданы</span>
+        </div>
+
+        <div class="zen-card-subtle">
+          <div class="zen-eyebrow">Резервная копия прогресса</div>
+          <p style="font-size:0.84rem;color:var(--zen-text-soft);margin:8px 0 14px;">
+            Экспорт полного состояния (стрик, решённые задачи, прочитанные конспекты) в JSON-файл для переноса между устройствами.
+          </p>
+          <div style="display:flex;gap:8px;">
+            <button type="button" class="btn-zen-ghost" style="flex:1;padding:8px 12px;font-size:0.82rem;">📥 Импорт JSON</button>
+            <button type="button" class="btn-zen-emerald" style="flex:1;padding:8px 12px;font-size:0.82rem;" onclick="playChime(880)">💾 Экспорт JSON</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  // Web Audio API 880Hz Harmonious Chime
+  let audioCtx = null;
+  function playChime(freq = 880) {
+    try {
+      if(!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if(audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now);
+      osc.frequency.exponentialRampToValueAtTime(freq * 1.5, now + 0.08);
+      
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.22, now + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+      
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.start(now);
+      osc.stop(now + 0.46);
+    } catch(e) {
+      console.warn('Audio chime warning:', e);
+    }
+  }
+
+  document.getElementById('chime-test-btn').addEventListener('click', () => {
+    playChime(880);
+  });
+
+  // Theme Toggler
+  const themeBtn = document.getElementById('theme-toggle-btn');
+  const themeIcon = document.getElementById('theme-icon');
+  themeBtn.addEventListener('click', () => {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if(isDark) {
+      document.documentElement.setAttribute('data-theme', 'light');
+      themeIcon.textContent = '🌙 Тёмная';
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      themeIcon.textContent = '☀️ Светлая';
+    }
+  });
+
+  // Tab Switcher
+  const tabs = document.querySelectorAll('.zen-tab-btn');
+  const sections = document.querySelectorAll('.screen-showcase-section');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      sections.forEach(s => s.classList.remove('active'));
+      
+      tab.classList.add('active');
+      const targetId = 'tab-' + tab.getAttribute('data-tab');
+      const targetSection = document.getElementById(targetId);
+      if(targetSection) targetSection.classList.add('active');
+    });
+  });
+
+  // 3D Card Flip Interactive Demo
+  let isDemoFlipped = false;
+  function toggleDemoCardFlip() {
+    isDemoFlipped = !isDemoFlipped;
+    const card = document.getElementById('demo-flip-card');
+    const badge = document.getElementById('demo-flip-badge');
+    const ans = document.getElementById('demo-flip-answer');
+    
+    if(isDemoFlipped) {
+      card.classList.add('flipped');
+      badge.textContent = '📖 Ответ (нажми для вопроса)';
+      ans.style.display = 'block';
+      playChime(660);
+    } else {
+      card.classList.remove('flipped');
+      badge.textContent = '❓ Вопрос (нажми для ответа)';
+      ans.style.display = 'none';
+      playChime(550);
+    }
+  }
+</script>
+</body>
+</html>
