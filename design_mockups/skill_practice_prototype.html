@@ -1527,292 +1527,51 @@
   .fc-story-seg.seg--hard, .fc-story-seg.fc-story-seg--r2{background:var(--amber);}
   .fc-story-seg.seg--again, .fc-story-seg.fc-story-seg--r1{background:var(--bordeaux);}
   .fc-story-seg.seg--current, .fc-story-seg.fc-story-seg--active{background:var(--ink);transform:scaleY(1.35);}
-/* ================= 3D BOOK PAGE TURN & FLIP ANIMATION ================= */
-  .fc-stage{
-    perspective:1400px;
-    perspective-origin:center center;
-    margin:14px 0;
-  }
+  .fc-stage{perspective:1200px;margin:16px 0;}
   .fc-card{
-    background:var(--surface);
-    border:1.5px solid var(--line);
-    border-radius:22px;
-    padding:26px 24px;
-    min-height:220px;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    cursor:pointer;
-    box-shadow:0 4px 18px rgba(0,0,0,.18);
-    transform-origin:center center;
-    transform-style:preserve-3d;
-    transition:border-color .22s, background .25s, box-shadow .25s, transform .25s ease;
-    position:relative;
-    overflow:hidden;
-    touch-action:pan-y;
-    will-change:transform, box-shadow;
+    background:var(--surface);border:1.5px solid var(--line);border-radius:24px;padding:28px 26px;
+    min-height:215px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;
+    box-shadow:var(--shadow-1);transform-style:preserve-3d;
+    transition:border-color .22s,background .25s,box-shadow .25s,transform .25s ease;
+    position:relative;overflow:hidden;touch-action:pan-y;
   }
-
-  /* Переплёт / корешок книги слева (Left Spine crease & book fold) */
-  .fc-card::before{
-    content:"";
-    position:absolute;
-    left:0;
-    top:0;
-    bottom:0;
-    width:18px;
-    pointer-events:none;
-    border-radius:22px 0 0 22px;
-    background:linear-gradient(to right, rgba(0,0,0,0.32) 0%, rgba(0,0,0,0.12) 40%, rgba(0,0,0,0) 100%);
-    border-right:1px solid rgba(255,255,255,0.04);
-    z-index:4;
-  }
-
-  /* Скользящий световой блик по обсидиановой странице (Dynamic Sheen Glance) */
   .fc-card::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-    border-radius:inherit;
-    background:linear-gradient(115deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.02) 28%, rgba(0,0,0,0.14) 55%, rgba(255,255,255,0.08) 80%, rgba(255,255,255,0) 100%);
-    opacity:0;
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(125deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 45%);
     transition:opacity .3s;
-    z-index:3;
   }
-
   .fc-card:hover{
     border-color:var(--moss);
-    transform:perspective(1400px) rotateY(-4deg) translateY(-2px);
-    box-shadow:-12px 16px 30px rgba(0,0,0,.26), inset 14px 0 18px -8px rgba(0,0,0,.22);
+    box-shadow:0 12px 28px rgba(0,0,0,.22);
+    transform:translateY(-2px);
   }
-
-  /* Декоративный загнутый уголок книги (Dog-ear page curl) */
-  .fc-card .page-curl-corner{
-    position:absolute;
-    right:0;
-    bottom:0;
-    width:34px;
-    height:34px;
-    pointer-events:none;
-    overflow:hidden;
-    border-radius:0 0 22px 0;
-    z-index:5;
-  }
-  .fc-card .page-curl-corner::before{
-    content:"";
-    position:absolute;
-    right:-2px;
-    bottom:-2px;
-    width:28px;
-    height:28px;
-    background:linear-gradient(135deg, transparent 50%, rgba(16,185,129,0.35) 50%, rgba(16,185,129,0.18) 75%, rgba(255,255,255,0.15) 100%);
-    box-shadow:-3px -3px 8px rgba(0,0,0,0.4);
-    border-radius:0 0 22px 0;
-    transition:all .25s ease;
-  }
-  .fc-card:hover .page-curl-corner::before{
-    transform:scale(1.15) translate(-1px, -1px);
-    background:linear-gradient(135deg, transparent 46%, rgba(16,185,129,0.6) 46%, rgba(16,185,129,0.25) 75%, rgba(255,255,255,0.25) 100%);
-    box-shadow:-5px -5px 12px rgba(0,0,0,0.5);
-  }
-
-  /* Состояние раскрытого ответа */
   .fc-card--Answer{
-    background:var(--moss-soft);
-    border-color:var(--moss);
+    background:var(--moss-soft);border-color:var(--moss);
+    animation:cardFlipCinematic .52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
-
-  /* Анимация перелистывания страницы на Ответ (Flip to Answer) */
-  .fc-card.fc-page-flip-answer{
-    animation:bookPageFlipToAnswer .56s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-  .fc-card.fc-page-flip-answer::after{
-    animation:pageSheenGlance .56s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-  .fc-card.fc-page-flip-answer .page-curl-corner::before{
-    animation:cornerPeelFlex .56s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-  .fc-card.fc-page-flip-answer .fc-a{
-    animation:answerRevealFromTurn .56s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-
-  /* Анимация перелистывания страницы обратно на Вопрос (Flip to Question) */
-  .fc-card.fc-page-flip-question{
-    animation:bookPageFlipToQuestion .52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-  .fc-card.fc-page-flip-question::after{
-    animation:pageSheenGlance .52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-
-  /* Анимация перелистывания к следующей странице (Turn to Next Page) */
-  .fc-card.fc-page-turn-next{
-    animation:bookPageTurnNext .52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-  .fc-card.fc-page-turn-next::after{
-    animation:pageSheenGlance .52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-  .fc-card.fc-page-turn-next .page-curl-corner::before{
-    animation:cornerPeelFlex .52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-
-  /* Анимация возврата к предыдущей странице (Turn to Prev Page) */
-  .fc-card.fc-page-turn-prev{
-    animation:bookPageTurnPrev .50s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-
-  @keyframes bookPageFlipToAnswer{
+  @keyframes cardFlipCinematic{
     0%{
-      transform:perspective(1400px) rotateY(0deg) rotateZ(0deg) translateZ(0) scale(1);
-      box-shadow:0 4px 18px rgba(0,0,0,.2);
+      transform:perspective(1200px) rotateY(-36deg) scale(0.97) translateY(4px);
+      box-shadow:0 6px 14px rgba(0,0,0,.15);
     }
-    24%{
-      transform:perspective(1400px) rotateY(-30deg) rotateZ(-1.8deg) translateZ(36px) translateX(-8px) scale(1.015);
-      box-shadow:-26px 16px 44px rgba(0,0,0,.48), inset 24px 0 30px -10px rgba(0,0,0,.42);
+    45%{
+      transform:perspective(1200px) rotateY(6deg) scale(1.015) translateY(-2px);
+      box-shadow:0 18px 36px rgba(0,0,0,.28);
     }
-    50%{
-      transform:perspective(1400px) rotateY(-54deg) rotateZ(-2.8deg) translateZ(48px) translateX(-14px) scale(1.02);
-      box-shadow:-38px 22px 56px rgba(0,0,0,.55), inset 36px 0 38px -8px rgba(0,0,0,.5);
-    }
-    76%{
-      transform:perspective(1400px) rotateY(-12deg) rotateZ(-0.6deg) translateZ(16px) translateX(-4px);
-      box-shadow:-14px 10px 28px rgba(0,0,0,.3), inset 14px 0 18px -6px rgba(0,0,0,.3);
-    }
-    90%{
-      transform:perspective(1400px) rotateY(2.2deg) rotateZ(0.2deg) translateZ(4px);
+    75%{
+      transform:perspective(1200px) rotateY(-2deg) scale(1.005) translateY(0);
     }
     100%{
-      transform:perspective(1400px) rotateY(0deg) rotateZ(0deg) translateZ(0) translateX(0) scale(1);
-      box-shadow:0 4px 18px rgba(0,0,0,.2);
+      transform:perspective(1200px) rotateY(0deg) scale(1) translateY(0);
+      box-shadow:0 10px 24px rgba(28,32,26,.14);
     }
   }
-
-  @keyframes answerRevealFromTurn{
-    0%{
-      opacity:0;
-      transform:translateY(10px);
-      filter:blur(2px);
-    }
-    32%{
-      opacity:0;
-      transform:translateY(8px);
-      filter:blur(1.5px);
-    }
-    68%{
-      opacity:0.75;
-      transform:translateY(3px);
-      filter:blur(0);
-    }
-    100%{
-      opacity:1;
-      transform:translateY(0);
-      filter:blur(0);
-    }
+  .fc-card--Answer .fc-a{
+    animation:cardAnswerFade .42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
-
-  @keyframes bookPageFlipToQuestion{
-    0%{
-      transform:perspective(1400px) rotateY(0deg) rotateZ(0deg) translateZ(0);
-      box-shadow:0 4px 18px rgba(0,0,0,.2);
-    }
-    28%{
-      transform:perspective(1400px) rotateY(28deg) rotateZ(1.6deg) translateZ(32px) translateX(8px);
-      box-shadow:24px 16px 42px rgba(0,0,0,.45), inset -24px 0 30px -10px rgba(0,0,0,.4);
-    }
-    58%{
-      transform:perspective(1400px) rotateY(10deg) rotateZ(0.5deg) translateZ(14px) translateX(3px);
-      box-shadow:12px 8px 24px rgba(0,0,0,.28);
-    }
-    84%{
-      transform:perspective(1400px) rotateY(-2deg) rotateZ(-0.2deg) translateZ(3px);
-    }
-    100%{
-      transform:perspective(1400px) rotateY(0deg) rotateZ(0deg) translateZ(0) translateX(0);
-      box-shadow:0 4px 18px rgba(0,0,0,.2);
-    }
-  }
-
-  @keyframes bookPageTurnNext{
-    0%{
-      transform:perspective(1400px) rotateY(-46deg) rotateZ(-2.4deg) translateZ(52px) translateX(-24px);
-      opacity:0.4;
-      box-shadow:-34px 20px 48px rgba(0,0,0,.58), inset 34px 0 36px -10px rgba(0,0,0,.52);
-    }
-    38%{
-      transform:perspective(1400px) rotateY(-16deg) rotateZ(-0.9deg) translateZ(24px) translateX(-8px);
-      opacity:0.9;
-      box-shadow:-18px 12px 30px rgba(0,0,0,.36), inset 18px 0 22px -8px rgba(0,0,0,.32);
-    }
-    72%{
-      transform:perspective(1400px) rotateY(3deg) rotateZ(0.2deg) translateZ(6px);
-      opacity:1;
-      box-shadow:-6px 4px 16px rgba(0,0,0,.22);
-    }
-    100%{
-      transform:perspective(1400px) rotateY(0deg) rotateZ(0deg) translateZ(0) translateX(0);
-      opacity:1;
-      box-shadow:0 4px 18px rgba(0,0,0,.2);
-    }
-  }
-
-  @keyframes bookPageTurnPrev{
-    0%{
-      transform:perspective(1400px) rotateY(42deg) rotateZ(2.2deg) translateZ(48px) translateX(24px);
-      opacity:0.4;
-      box-shadow:28px 18px 44px rgba(0,0,0,.52), inset -28px 0 30px -10px rgba(0,0,0,.48);
-    }
-    38%{
-      transform:perspective(1400px) rotateY(15deg) rotateZ(0.8deg) translateZ(20px) translateX(8px);
-      opacity:0.9;
-      box-shadow:14px 9px 24px rgba(0,0,0,.32);
-    }
-    72%{
-      transform:perspective(1400px) rotateY(-2.8deg) rotateZ(-0.2deg) translateZ(5px);
-      opacity:1;
-    }
-    100%{
-      transform:perspective(1400px) rotateY(0deg) rotateZ(0deg) translateZ(0) translateX(0);
-      opacity:1;
-      box-shadow:0 4px 18px rgba(0,0,0,.2);
-    }
-  }
-
-  @keyframes pageSheenGlance{
-    0%{
-      opacity:0;
-      transform:translateX(-50%) skewX(-16deg);
-    }
-    32%{
-      opacity:0.8;
-    }
-    70%{
-      opacity:0.35;
-    }
-    100%{
-      opacity:0;
-      transform:translateX(80%) skewX(-16deg);
-    }
-  }
-
-  @keyframes cornerPeelFlex{
-    0%{
-      transform:scale(1) translate(0,0);
-    }
-    40%{
-      transform:scale(1.35) translate(-3px,-3px);
-      box-shadow:-7px -7px 14px rgba(0,0,0,.6);
-    }
-    100%{
-      transform:scale(1) translate(0,0);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    .fc-card, .fc-card::after, .fc-card.fc-page-flip-answer, .fc-card.fc-page-flip-question,
-    .fc-card.fc-page-turn-next, .fc-card.fc-page-turn-prev, .fc-card .fc-a, .fc-card .page-curl-corner::before{
-      animation:none !important;
-      transform:none !important;
-    }
+  @keyframes cardAnswerFade{
+    0%{opacity:0;transform:translateY(8px);}
+    100%{opacity:1;transform:translateY(0);}
   }
   .fc-q{font-size:1.08rem;font-weight:600;line-height:1.55;white-space:pre-line;}
   .fc-a{font-size:1rem;line-height:1.65;white-space:pre-line;color:var(--ink);margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
@@ -9621,43 +9380,19 @@ function viewPythonSkill(sid){
     const cIdx = Math.min(pySkillViewState.cardIdx, Math.max(0, cards.length - 1));
     const curCard = cards[cIdx] || {q: 'Карточки загружаются', a: ''};
 
-    let animClass = '';
-    if(pySkillViewState.cardTurnAnim === 'flip-answer'){
-      animClass = 'fc-page-flip-answer';
-    } else if(pySkillViewState.cardTurnAnim === 'flip-question'){
-      animClass = 'fc-page-flip-question';
-    } else if(pySkillViewState.cardTurnAnim === 'turn-next'){
-      animClass = 'fc-page-turn-next';
-    } else if(pySkillViewState.cardTurnAnim === 'turn-prev'){
-      animClass = 'fc-page-turn-prev';
-    } else if(pySkillViewState.cardFlipped){
-      animClass = 'fc-page-flip-answer';
-    }
-    pySkillViewState.cardTurnAnim = null;
-
     bodyHTML = `
       <div class="card" style="margin-top:0;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <span style="font-size:0.82rem;color:var(--ink-muted);font-weight:600;display:inline-flex;align-items:center;gap:6px;">
-            <span>📖 Карточка ${cards.length ? cIdx + 1 : 0} из ${cards.length}</span>
-          </span>
-          <span style="font-size:0.76rem;color:var(--ink-soft);opacity:0.75;display:inline-flex;align-items:center;gap:6px;">
-            <kbd style="padding:2px 6px;border-radius:5px;background:var(--surface-2);border:1px solid var(--line);font-size:0.70rem;font-family:var(--font-m);color:var(--ink);">Пробел</kbd>
-            <span>перевернуть</span>
-          </span>
+          <span style="font-size:0.80rem;color:var(--ink-muted);font-weight:600;">Карточка ${cards.length ? cIdx + 1 : 0} из ${cards.length}</span>
         </div>
-        ${typeof buildFcStoriesBarHTML === 'function' ? buildFcStoriesBarHTML(deckObj.id, cards.length, cIdx) : ''}
-        <div class="fc-stage" style="margin:12px 0;">
-          <div class="fc-card ${pySkillViewState.cardFlipped?'fc-card--Answer':''} ${animClass}" data-py-flip-card>
-            <div class="page-curl-corner" aria-hidden="true"></div>
-            <div style="flex:1;">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                <div class="topic-badge" style="font-weight:700;">${pySkillViewState.cardFlipped ? '📖 Ответ' : '❓ Вопрос'}</div>
-                <a href="#/docs" class="card-help-badge" onclick="event.stopPropagation();" title="Открыть справку по теме в боковой панели">💡 Шпаргалка</a>
-              </div>
-              <div class="fc-q">${formatRichInlineText(curCard.q)}</div>
-              ${pySkillViewState.cardFlipped ? `<div class="fc-a">${formatRichInlineText(curCard.a)}</div>` : ''}
+        <div class="fc-card ${pySkillViewState.cardFlipped?'fc-card--Answer':''}" data-py-flip-card>
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div class="topic-badge">${pySkillViewState.cardFlipped ? 'Ответ' : 'Вопрос'}</div>
+              <a href="#/docs" class="card-help-badge" onclick="event.stopPropagation();" title="Открыть справку по теме в боковой панели">💡 Шпаргалка</a>
             </div>
+            <div class="fc-q">${formatRichInlineText(curCard.q)}</div>
+            ${pySkillViewState.cardFlipped ? `<div class="fc-a">${formatRichInlineText(curCard.a)}</div>` : ''}
           </div>
         </div>
         ${pySkillViewState.cardFlipped ? `
@@ -9669,8 +9404,8 @@ function viewPythonSkill(sid){
           </div>` : `
           <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
             <button class="btn btn-ghost" data-py-prev-card ${cIdx===0?'disabled':''}>← Назад</button>
-            <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-flip-card>Показать ответ (Пробел)</button>
-            <button class="btn btn-ghost" data-py-next-card data-py-rate-card="3" ${cIdx + 1 >= cards.length ? 'disabled' : ''}>Дальше →</button>
+            <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-flip-card>Показать ответ</button>
+            <button class="btn btn-ghost" data-py-rate-card="3" ${cIdx + 1 >= cards.length ? 'disabled' : ''}>Дальше →</button>
           </div>`}
       </div>`;
   } else if(pySkillViewState.tab === 'code'){
@@ -10131,9 +9866,8 @@ function viewCardsHub(){
       </div>
       <div class="fc-stage" style="margin-top:16px;">
         ${buildFcStoriesBarHTML(deck.id, cards.length, cIdx)}
-        <div class="fc-card fc-card--3d ${cardsHubState.flipped ? 'fc-card--flipped fc-card--Answer' : ''} ${cardsHubState.turnAnim === 'flip-answer' ? 'fc-page-flip-answer' : (cardsHubState.turnAnim === 'flip-question' ? 'fc-page-flip-question' : (cardsHubState.turnAnim === 'turn-next' ? 'fc-page-turn-next' : (cardsHubState.turnAnim === 'turn-prev' ? 'fc-page-turn-prev' : (cardsHubState.flipped ? 'fc-page-flip-answer' : ''))))}" data-hub-flip style="margin-top:10px;">
-          <div class="page-curl-corner" aria-hidden="true"></div>
-          <div class="fc-card-inner" style="flex:1;">
+        <div class="fc-card fc-card--3d ${cardsHubState.flipped ? 'fc-card--flipped fc-card--Answer' : ''}" data-hub-flip style="margin-top:10px;">
+          <div class="fc-card-inner">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div class="topic-badge">${cardsHubState.flipped ? 'Ответ' : 'Вопрос'}</div>
               <a href="#/docs" class="card-help-badge" onclick="event.stopPropagation();" title="Открыть справку по теме в боковой панели">💡 Шпаргалка</a>
@@ -15046,7 +14780,6 @@ const psk = e.target.closest('[data-py-select-k]');
   }
   if(e.target.closest('[data-py-prev-card]')){
     if(pySkillViewState.cardIdx > 0){
-      pySkillViewState.cardTurnAnim = 'turn-prev';
       pySkillViewState.cardIdx--;
       pySkillViewState.cardFlipped = false;
       pySkillViewState.sprintCelebration = null;
@@ -15059,7 +14792,6 @@ const psk = e.target.closest('[data-py-select-k]');
     const fid = pySkillViewState.fId;
     const deck = ALL_DECKS_COMBINED[fid] || {cards:[]};
     if(pySkillViewState.cardIdx + 1 < (deck.cards || []).length){
-      pySkillViewState.cardTurnAnim = 'turn-next';
       pySkillViewState.cardIdx++;
       pySkillViewState.cardFlipped = false;
       pySkillViewState.sprintCelebration = null;
@@ -15069,7 +14801,6 @@ const psk = e.target.closest('[data-py-select-k]');
     return;
   }
   if(e.target.closest('[data-py-flip-card]')){
-    pySkillViewState.cardTurnAnim = pySkillViewState.cardFlipped ? 'flip-question' : 'flip-answer';
     pySkillViewState.cardFlipped = !pySkillViewState.cardFlipped;
     pySkillViewState.sprintCelebration = null;
     render();
@@ -15100,7 +14831,6 @@ const psk = e.target.closest('[data-py-select-k]');
       else if(rating === 2) awardXp(2);
     }
     if(pySkillViewState.cardIdx + 1 < (deck.cards || []).length){
-      pySkillViewState.cardTurnAnim = 'turn-next';
       pySkillViewState.cardIdx++;
       pySkillViewState.cardFlipped = false;
     } else {
@@ -15651,7 +15381,6 @@ const psk = e.target.closest('[data-py-select-k]');
   // Global Flashcards Hub actions
   if(e.target.closest('[data-hub-prev]')){
     if(cardsHubState.cardIdx > 0){
-      cardsHubState.turnAnim = 'turn-prev';
       cardsHubState.cardIdx--;
       cardsHubState.flipped = false;
       saveCardsHubPosState();
@@ -15660,7 +15389,6 @@ const psk = e.target.closest('[data-py-select-k]');
     return;
   }
   if(e.target.closest('[data-hub-flip]')){
-    cardsHubState.turnAnim = cardsHubState.flipped ? 'flip-question' : 'flip-answer';
     cardsHubState.flipped = !cardsHubState.flipped;
     saveCardsHubPosState();
     render();
@@ -15669,7 +15397,6 @@ const psk = e.target.closest('[data-py-select-k]');
   if(e.target.closest('[data-hub-next]')){
     const d = ALL_DECKS_COMBINED[cardsHubState.deckId] || {cards:[]};
     if(cardsHubState.cardIdx + 1 < (d.cards || []).length){
-      cardsHubState.turnAnim = 'turn-next';
       cardsHubState.cardIdx++;
       cardsHubState.flipped = false;
       saveCardsHubPosState();
