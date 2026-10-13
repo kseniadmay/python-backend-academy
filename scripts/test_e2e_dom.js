@@ -1466,10 +1466,9 @@ function fireClick(attrName, attrVal, extraAttrs = {}) {
   await fireClick('data-py-tab', 'code');
   assert(elementsById['view-root'].innerHTML.includes('Задача #'), 'Skill code tab must show task progress in topbar (REV-002)');
 
-  // 17.3. REV-003: Task selector without repeated egg emojis
   const skillCodeHtml = elementsById['view-root'].innerHTML;
   assert(!skillCodeHtml.includes('· 🥚'), 'Task selector buttons must not contain repeated egg emoji (REV-003)');
-  assert(skillCodeHtml.includes('#20 · Разворот списка срезом') || skillCodeHtml.includes('#20 · '), 'Task selector buttons must display clean #20 · Task Title format');
+  assert(skillCodeHtml.includes('Разворот списка срезом'), 'Task selector buttons must display clean task title format (REV-003)');
 
   // 17.4. REV-004: Task #20 text deduplication
   const t20 = sandbox.IDE_TASKS_BY_ID[20];
