@@ -577,6 +577,59 @@ brython_prelude_json = safe_js_json(full_env_code)
 print(f"JSON sizes: PY_MASTERY={len(py_mastery_json)//1024}KB, WEB_MASTERY={len(web_mastery_json)//1024}KB, BACKEND_MASTERY={len(backend_mastery_json)//1024}KB, ALGO_MASTERY={len(algo_mastery_json)//1024}KB, DB_MASTERY={len(db_mastery_json)//1024}KB, ARCH_MASTERY={len(arch_mastery_json)//1024}KB, INFRA_MASTERY={len(infra_mastery_json)//1024}KB, IDE_TASKS={len(ide_tasks_json)//1024}KB, NEW_LESSONS={len(new_lessons_json)//1024}KB, PRELUDE={len(brython_prelude_json)//1024}KB")
 
 EXTRA_CSS = r"""
+
+  /* ================= CANONICAL SPRINT FOCUS & SINGLE LESSON CARD ================= */
+  body.is-sprint-focus .sidebar { display: none !important; }
+  body.is-sprint-focus .topbar { display: none !important; }
+  body.is-sprint-focus .tabbar { display: none !important; }
+  body.is-sprint-focus #app { min-height: 100vh; display: block !important; }
+  body.is-sprint-focus main {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 36px 24px 64px !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+  body.is-sprint-focus .container {
+    max-width: 940px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+  }
+
+  .coddy-lesson-card {
+    background: var(--surface) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 20px !important;
+    padding: 26px 30px !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.5) !important;
+  }
+  .coddy-lesson-card .scroll-feed {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+  .coddy-lesson-card .feed-chunk {
+    padding: 0 !important;
+  }
+  .coddy-lesson-card .feed-chunk h4 {
+    margin: 0 0 14px 0 !important;
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    color: var(--ink) !important;
+  }
+  .coddy-lesson-card .feed-chunk p {
+    margin: 0 0 16px 0 !important;
+    font-size: 0.95rem !important;
+    line-height: 1.6 !important;
+    color: var(--ink-soft) !important;
+  }
+
   /* ---------- Ephemeral UI (60/30/10 Light & Evening Obsidian Dark) & Cocoon Redesign ---------- */
   :root, :root[data-theme="light"]{
     /* Canonical Zen Tokens (Light) */
@@ -5360,6 +5413,72 @@ EXTRA_CSS = r"""
     box-shadow: var(--zen-shadow-island) !important;
   }
 
+
+  /* ================= ZEN GLASSMORPHISM: MODALS & SANDBOX STUDIO ================= */
+  .zen-modal-card {
+    background: var(--zen-surface) !important;
+    backdrop-filter: blur(28px) !important;
+    -webkit-backdrop-filter: blur(28px) !important;
+    border: 1px solid var(--zen-hairline) !important;
+    box-shadow: var(--zen-shadow-island) !important;
+    border-radius: 24px !important;
+    color: var(--ink) !important;
+  }
+  
+  .zen-studio-card {
+    background: var(--zen-surface);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--zen-hairline);
+    box-shadow: var(--shadow-1);
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .zen-card-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));
+  }
+  
+  .zen-pane-title {
+    font-size: 0.84rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-soft);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  #code-output.zen-terminal-out {
+    min-height: 250px;
+    font-family: var(--font-m);
+    font-size: 0.88rem;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));
+    color: #86efac;
+    border-radius: 14px;
+    padding: 16px;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    line-height: 1.5;
+    margin: 0;
+    flex: 1;
+  }
+  
+  :root[data-theme="light"] #code-output.zen-terminal-out {
+    background: rgba(15, 23, 42, 0.04);
+    border-color: rgba(15, 23, 42, 0.1);
+    color: #065f46;
+  }
 """
 
 # Let's define the injected JS upgrade block that extends the existing app cleanly
@@ -7253,71 +7372,6 @@ async function runInlineSnippet(btnEl){
   }catch(err){
     outEl.textContent = 'Ошибка: ' + String(err);
   }
-}
-/* ================= ZEN GLASSMORPHISM: MODALS & SANDBOX STUDIO ================= */
-.zen-modal-card {
-  background: var(--zen-surface) !important;
-  backdrop-filter: blur(28px) !important;
-  -webkit-backdrop-filter: blur(28px) !important;
-  border: 1px solid var(--zen-hairline) !important;
-  box-shadow: var(--zen-shadow-island) !important;
-  border-radius: 24px !important;
-  color: var(--ink) !important;
-}
-
-.zen-studio-card {
-  background: var(--zen-surface);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--zen-hairline);
-  box-shadow: var(--shadow-1);
-  border-radius: 20px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.zen-card-header-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));
-}
-
-.zen-pane-title {
-  font-size: 0.84rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--ink-soft);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-#code-output.zen-terminal-out {
-  min-height: 250px;
-  font-family: var(--font-m);
-  font-size: 0.88rem;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));
-  color: #86efac;
-  border-radius: 14px;
-  padding: 16px;
-  white-space: pre-wrap;
-  overflow-x: auto;
-  line-height: 1.5;
-  margin: 0;
-  flex: 1;
-}
-
-:root[data-theme="light"] #code-output.zen-terminal-out {
-  background: rgba(15, 23, 42, 0.04);
-  border-color: rgba(15, 23, 42, 0.1);
-  color: #065f46;
 }
 
 """
