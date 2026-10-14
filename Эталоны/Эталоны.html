@@ -7413,9 +7413,27 @@ function setIdeTaskSolved(taskId, codeStr){
 function getIdeDraft(taskId, fallback){
   try{
     const dr = safeParseJsonObj(localStorage.getItem(IDE_DRAFTS_KEY)) || {};
-    if(dr[taskId] !== undefined) return dr[taskId];
-    const wn = readWindowNameBackup();
-    if(wn && wn.ideDrafts && wn.ideDrafts[taskId] !== undefined) return wn.ideDrafts[taskId];
+    let draft = (dr[taskId] !== undefined) ? dr[taskId] : undefined;
+    if(draft === undefined){
+      const wn = readWindowNameBackup();
+      if(wn && wn.ideDrafts && wn.ideDrafts[taskId] !== undefined) draft = wn.ideDrafts[taskId];
+    }
+    if(typeof draft === 'string'){
+      const isLegacyStub = draft.includes('# TODO') || draft.includes('# Заполните значения целевых переменных') || draft.includes('# Задача #');
+      const nonCommentLines = draft.split('\n').filter(l => l.trim() && !l.trim().startsWith('#'));
+      const isOnlyStubValues = nonCommentLines.length === 0 || nonCommentLines.every(l => l.includes('= None') || l.trim() === 'pass' || l.startsWith('import ') || l.startsWith('from '));
+      if(isLegacyStub && isOnlyStubValues){
+        return fallback;
+      }
+      let cleaned = draft
+        .replace(/^#\s*Задача\s*#\d+:.*$/gm, '')
+        .replace(/^#\s*Заполните значения.*$/gm, '')
+        .replace(/^#\s*Напишите ваше решение.*$/gm, '')
+        .replace(/^#\s*TODO:.*$/gm, '')
+        .replace(/\s*#\s*TODO\b/g, '');
+      cleaned = cleaned.replace(/^\n+/, '');
+      return cleaned;
+    }
     return fallback;
   }catch(e){ return fallback; }
 }
@@ -9442,9 +9460,9 @@ function viewPythonSkill(sid){
           return `
           <div class="fc-rate-row" style="margin-top:14px;">
             <button class="btn btn-ghost" data-py-rate-card="1" title="Повторить завтра (1 день)">Снова <span class="srs-btn-sub">(${srsPrev.again.days}д)</span></button>
-            <button class="btn btn-burgundy" data-py-rate-card="2" title="Повторить через ${srsPrev.hard.days} дн (+2 XP)">Трудно <span class="srs-btn-sub">(${srsPrev.hard.days}д)</span> <span class="srs-btn-xp">+2XP</span></button>
-            <button class="btn btn-clay" data-py-rate-card="3" title="Повторить через ${srsPrev.good.days} дн (+5 XP)">Хорошо <span class="srs-btn-sub">(${srsPrev.good.days}д)</span> <span class="srs-btn-xp">+5XP</span></button>
-            <button class="btn btn-primary" data-py-rate-card="4" title="Повторить через ${srsPrev.easy.days} дн (+10 XP)">Легко <span class="srs-btn-sub">(${srsPrev.easy.days}д)</span> <span class="srs-btn-xp">+10XP</span></button>
+            <button class="btn btn-burgundy" data-py-rate-card="2" title="Повторить через ${srsPrev.hard.days} дн (+2 XP)">Трудно (+2 XP) <span class="srs-btn-sub">(${srsPrev.hard.days}д)</span></button>
+            <button class="btn btn-clay" data-py-rate-card="3" title="Повторить через ${srsPrev.good.days} дн (+5 XP)">Хорошо (+5 XP) <span class="srs-btn-sub">(${srsPrev.good.days}д)</span></button>
+            <button class="btn btn-primary" data-py-rate-card="4" title="Повторить через ${srsPrev.easy.days} дн (+10 XP)">Легко (+10 XP) <span class="srs-btn-sub">(${srsPrev.easy.days}д)</span></button>
           </div>`;
         })() : `
           <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
@@ -9935,9 +9953,9 @@ function viewCardsHub(){
           return `
           <div class="fc-rate-row" style="margin-top:12px;">
             <button class="btn btn-ghost" data-hub-rate="1" title="Повторить завтра (1 день)">Снова <span class="srs-btn-sub">(${srsPrev.again.days}д)</span></button>
-            <button class="btn btn-burgundy" data-hub-rate="2" title="Повторить через ${srsPrev.hard.days} дн (+2 XP)">Трудно <span class="srs-btn-sub">(${srsPrev.hard.days}д)</span> <span class="srs-btn-xp">+2XP</span></button>
-            <button class="btn btn-clay" data-hub-rate="3" title="Повторить через ${srsPrev.good.days} дн (+5 XP)">Хорошо <span class="srs-btn-sub">(${srsPrev.good.days}д)</span> <span class="srs-btn-xp">+5XP</span></button>
-            <button class="btn btn-primary" data-hub-rate="4" title="Повторить через ${srsPrev.easy.days} дн (+10 XP)">Легко <span class="srs-btn-sub">(${srsPrev.easy.days}д)</span> <span class="srs-btn-xp">+10XP</span></button>
+            <button class="btn btn-burgundy" data-hub-rate="2" title="Повторить через ${srsPrev.hard.days} дн (+2 XP)">Трудно (+2 XP) <span class="srs-btn-sub">(${srsPrev.hard.days}д)</span></button>
+            <button class="btn btn-clay" data-hub-rate="3" title="Повторить через ${srsPrev.good.days} дн (+5 XP)">Хорошо (+5 XP) <span class="srs-btn-sub">(${srsPrev.good.days}д)</span></button>
+            <button class="btn btn-primary" data-hub-rate="4" title="Повторить через ${srsPrev.easy.days} дн (+10 XP)">Легко (+10 XP) <span class="srs-btn-sub">(${srsPrev.easy.days}д)</span></button>
           </div>`;
         })() : `
           <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
