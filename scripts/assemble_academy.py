@@ -2313,99 +2313,187 @@ EXTRA_CSS = r"""
     box-shadow: 0 0 10px rgba(16, 185, 129, 0.45);
     transition: width .35s ease;
   }
+  /* ================= ЕДИНЫЙ ПЕДАГОГИЧЕСКИЙ ТРЕКЕР: CONTINUOUS ATOMIC DOTS ================= */
   .topic-eyebrow-track {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 12px;
-    padding: 0 2px;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 22px;
+    width: 100%;
   }
   .topic-eyebrow-tags {
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+  }
+  .unit-breadcrumb {
+    display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-size: 0.76rem;
-    font-weight: 400;
-    color: var(--ink-muted);
   }
-  .topic-eyebrow-unit {
+  .unit-breadcrumb-title {
     color: var(--ink);
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 0.88rem;
+    letter-spacing: -0.01em;
   }
-  .topic-eyebrow-num {
-    background: rgba(16, 185, 129, 0.12);
-    border: 1px solid rgba(16, 185, 129, 0.25);
-    color: var(--moss);
-    padding: 2px 8px;
-    border-radius: 999px;
-    font-size: 0.70rem;
-    font-weight: 500;
-  }
+
   .dots-necklace {
     display: flex;
     align-items: center;
-    gap: 9px;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
     position: relative;
-    padding: 4px 6px;
+    padding: 6px 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
   }
-  .dots-necklace-wire {
-    position: absolute;
-    left: 8px;
-    right: 28px;
-    height: 1.5px;
-    background: rgba(255, 255, 255, 0.10);
-    z-index: 1;
+  .dots-stage-divider {
+    width: 2px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.15);
+    margin: 0 5px;
   }
-  .dots-necklace-wire-active {
-    position: absolute;
-    left: 8px;
-    height: 1.5px;
-    background: #10b981;
-    box-shadow: 0 0 6px #10b981;
-    z-index: 2;
-    transition: width .3s ease;
-  }
+
   .dot-jewel {
-    width: 10px;
-    height: 10px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background: #0d1016;
-    border: 1.5px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     position: relative;
     z-index: 3;
-    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.4, 1);
     cursor: pointer;
   }
   .dot-jewel:hover {
-    transform: scale(1.4);
+    transform: scale(1.5);
+    background: rgba(255, 255, 255, 0.5);
   }
   .dot-jewel.done {
     background: #10b981;
-    border-color: #34d399;
-    box-shadow: 0 0 7px rgba(16, 185, 129, 0.75);
+    box-shadow: 0 0 4px rgba(16, 185, 129, 0.5);
   }
   .dot-jewel.active {
-    width: 14px;
-    height: 14px;
-    background: #34d399;
-    border: 2px solid #ffffff;
-    box-shadow: 0 0 12px #10b981, 0 0 24px rgba(52, 211, 153, 0.9);
-    animation: jewel-pulse 2s infinite ease-in-out;
+    width: 7.5px;
+    height: 7.5px;
+    background: #ffffff;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.8), 0 0 12px rgba(255, 255, 255, 0.35);
+    animation: radar-breathe-white 4.4s infinite ease-in-out;
+  }
+  .dot-jewel.active::before,
+  .dot-jewel.active::after {
+    content: '';
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    pointer-events: none;
+    animation: radar-ripple-white 4.4s infinite cubic-bezier(0.2, 0.8, 0.4, 1);
+  }
+  .dot-jewel.active::after {
+    animation-delay: 2.2s;
   }
   .dot-jewel.milestone {
-    border-color: rgba(245, 158, 11, 0.6);
-    background: rgba(245, 158, 11, 0.15);
+    border-radius: 2px;
+    transform: rotate(45deg);
+    background: rgba(255, 255, 255, 0.25);
   }
-  .dots-necklace-label {
-    font-size: 0.72rem;
-    font-family: var(--font-m);
-    font-weight: 500;
-    color: var(--moss);
-    margin-left: 2px;
-    position: relative;
-    z-index: 3;
+  .dot-jewel.milestone:hover {
+    transform: rotate(45deg) scale(1.4);
   }
+
+  /* Точки трекера для Светлой темы (Пергамент) */
+  :root[data-theme="light"] .dot-jewel {
+    background: rgba(15, 23, 42, 0.08);
+    border: 1px solid rgba(15, 23, 42, 0.12);
+  }
+  :root[data-theme="light"] .dot-jewel:hover {
+    background: rgba(15, 23, 42, 0.22);
+    transform: scale(1.3);
+  }
+  :root[data-theme="light"] .dot-jewel.done {
+    background: rgba(16, 185, 129, 0.7);
+    border: 1px solid rgba(5, 150, 105, 0.4);
+    box-shadow: 0 0 3px rgba(16, 185, 129, 0.25);
+  }
+  :root[data-theme="light"] .dot-jewel.active {
+    width: 7.5px;
+    height: 7.5px;
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.25) !important;
+    box-shadow: 0 0 0 2px rgba(20, 90, 70, 0.28), 0 1px 3px rgba(15, 23, 42, 0.08) !important;
+  }
+  :root[data-theme="light"] .dots-stage-divider {
+    width: 1px;
+    height: 6px;
+    background: rgba(15, 23, 42, 0.12);
+    margin: 0 4px;
+  }
+  :root[data-theme="light"] .dot-jewel.milestone {
+    background: rgba(217, 119, 6, 0.15);
+    border: 1px solid rgba(217, 119, 6, 0.35);
+  }
+  :root[data-theme="light"] .dot-jewel.milestone.active {
+    width: 7.5px;
+    height: 7.5px;
+    background: #ffffff !important;
+    border: 1px solid rgba(217, 119, 6, 0.5) !important;
+    box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.25), 0 1px 3px rgba(15, 23, 42, 0.08) !important;
+  }
+
+
+
+  @keyframes radar-breathe-white {
+    0%, 100% {
+      box-shadow: 0 0 4px rgba(255, 255, 255, 0.7), 0 0 8px rgba(255, 255, 255, 0.25);
+    }
+    50% {
+      box-shadow: 0 0 6px rgba(255, 255, 255, 0.9), 0 0 14px rgba(255, 255, 255, 0.4);
+    }
+  }
+  @keyframes radar-ripple-white {
+    0% { width: 7.5px; height: 7.5px; opacity: 0.8; border-color: rgba(255, 255, 255, 0.6); }
+    100% { width: 18px; height: 18px; opacity: 0; border-color: rgba(255, 255, 255, 0); }
+  }
+
+/* ===== Topbar Help Button & Mobile Clean Adaptation ===== */
+.topbar-help-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: .8rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+.topbar-help-btn:hover {
+  border-color: var(--moss);
+  color: var(--moss-deep);
+  box-shadow: 0 0 12px rgba(116, 172, 130, 0.25);
+}
+
+@media (max-width: 560px) {
+  .echelon-topbar-clean { padding: 8px 12px !important; margin-bottom: 14px !important; }
+  .echelon-topbar-clean .topbar-help-btn { display: none !important; }
+  .echelon-clean-meta { font-size: 0.69rem !important; gap: 4px !important; }
+  .echelon-topbar-clean .sprint-xp-pill { font-size: 0.70rem !important; padding: 3px 8px !important; }
+  .echelon-topbar-clean > div:last-child { margin-left: 8px !important; }
+}
+
+
 
   .echelon-badge{
     display:inline-flex;align-items:center;gap:4px;font-size:.73rem;font-weight:700;
@@ -7907,7 +7995,6 @@ function viewPythonSkill(sid){
       <div style="display:flex;gap:10px;align-items:center;margin-left:14px;flex:none;">
         <div class="sprint-xp-pill" style="display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:999px;background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.35);color:#fbbf24;font-size:0.75rem;font-weight:700;white-space:nowrap;letter-spacing:0.01em;" title="Заработано за сутки: ${dayXpVal} XP">⚡ +${dayXpVal || 55} XP за сутки</div>
         <a href="#/docs" class="topbar-help-btn" style="padding:6px 14px;border-radius:10px;" title="Справочник синтаксиса и методов Python"><span class="topbar-help-text">📖 Справка</span></a>
-        <button type="button" class="topbar-help-btn" data-toggle-audio data-audio-toggle style="padding:6px 14px;border-radius:10px;cursor:pointer;" title="Слушать аудио / Аудио-компаньон"><span class="topbar-audio-text">🎧 Озвучить</span></button>
       </div>
     </div>
     <div id="theory-audio-bar" class="theory-audio-bar" style="display:${state.audioBarOpen ? 'flex' : 'none'};">
@@ -7928,7 +8015,7 @@ function viewPythonSkill(sid){
     const n = ALL_NOTES_COMBINED[kId] || { title: kId };
     const isDone = state.readNotes.includes(kId);
     const isActive = (pySkillViewState.tab === 'theory' && kId === activeK);
-    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" data-py-select-k="${kId}" data-py-skill-id="${sk.id}"></span>`;
+    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="📖 Конспект: ${escapeHtmlStr(n.title)}" data-py-select-k="${kId}" data-py-skill-id="${sk.id}"></span>`;
   }).join('');
 
   // 2. Флеш-карточки текущего навыка
@@ -7937,7 +8024,7 @@ function viewPythonSkill(sid){
     const d = ALL_DECKS_COMBINED[fid] || {};
     const isDone = state.reviewedDecks.includes(fid);
     const isActive = (pySkillViewState.tab === 'cards' && (activeF === fid || (!activeF && idx === 0)));
-    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" data-py-select-f="${fid}"></span>`;
+    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="🗂️ Карточки: ${escapeHtmlStr(d.title || fid)}" data-py-select-f="${fid}"></span>`;
   }).join('');
 
   // 3. Задачи практики кода текущего навыка
@@ -7947,21 +8034,21 @@ function viewPythonSkill(sid){
     const t = IDE_TASKS_BY_ID[tid] || {};
     const isDone = (solvedMap[tid] === 'solved');
     const isActive = (pySkillViewState.tab === 'code' && (activeTid === tid || (!activeTid && idx === 0)));
-    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" data-py-select-task="${tid}"></span>`;
+    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="⚡ Задача #${tid}: ${escapeHtmlStr(t.title || '')}" data-py-select-task="${tid}"></span>`;
   }).join('');
 
   // 4. Рубежный зачёт Юнита
   const examActive = (pySkillViewState.tab === 'exam');
-  const examDot = `<span class="dot-jewel milestone ${examActive ? 'active' : ''}" data-py-select-exam="${sk.unitId}"></span>`;
+  const examDot = `<span class="dot-jewel milestone ${examActive ? 'active' : ''}" title="👑 Рубежный зачёт Юнита ${sk.unitId}" data-py-select-exam="${sk.unitId}"></span>`;
 
   const dotsNecklaceHTML = `
-    <div class="dots-necklace" id="radar-dots-necklace">
+    <div class="dots-necklace" id="radar-dots-necklace" title="Конспекты → Карточки → Практика → Зачёт">
       ${noteDots}
-      <span class="dots-stage-divider"></span>
+      <span class="dots-stage-divider" title="Переход к карточкам"></span>
       ${cardDots}
-      <span class="dots-stage-divider"></span>
+      <span class="dots-stage-divider" title="Переход к практике"></span>
       ${taskDots}
-      <span class="dots-stage-divider"></span>
+      <span class="dots-stage-divider" title="Рубежный зачёт"></span>
       ${examDot}
     </div>`;
 
@@ -7982,11 +8069,11 @@ function viewPythonSkill(sid){
 
   // Деликатный двухстрочный заголовок: название юнита приглушено и не кричит (Refined Eyebrow), активная тема — выразительный элегантный фокус
   const eyebrowDotsHTML = `
-    <div class="topic-eyebrow-track" style="max-width:100%;margin:16px 0 22px;padding:0 2px;">
+    <div class="topic-eyebrow-track" style="max-width:780px;margin:14px auto 20px;">
       <div style="display:flex;flex-direction:column;gap:12px;width:100%;">
-        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;">
-          <div style="font-family:var(--font-b);font-size:0.80rem;font-weight:500;color:var(--ink-muted);letter-spacing:0.01em;line-height:1.2;">${escapeHtmlStr(cleanUnitTitle)}</div>
-          ${activeItemTitle ? `<div style="font-family:var(--font-b);font-size:1.06rem;font-weight:600;color:var(--ink);line-height:1.35;letter-spacing:-0.01em;">${escapeHtmlStr(activeItemTitle)}</div>` : ''}
+        <div style="display:flex;flex-direction:column;align-items:flex-start;padding-left:2px;gap:2px;">
+          <div style="font-family:var(--font-b);font-size:0.75rem;font-weight:500;color:var(--ink-muted);letter-spacing:0.01em;line-height:1.2;">${escapeHtmlStr(cleanUnitTitle)}</div>
+          ${activeItemTitle ? `<div style="font-family:var(--font-d);font-size:0.98rem;font-weight:500;color:var(--ink-soft);line-height:1.35;letter-spacing:-0.01em;">${escapeHtmlStr(activeItemTitle)}</div>` : ''}
         </div>
         <div style="display:flex;justify-content:center;width:100%;">
           ${dotsNecklaceHTML}
@@ -8004,26 +8091,24 @@ function viewPythonSkill(sid){
 
     const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
     const canGoBack = (curChunkIdx > 0 || stepIdx > 0);
-    const backBtnHTML = `<button type="button" class="btn btn-ghost" data-chunk-prev="py" style="padding:11px 16px;border-radius:14px;font-size:.88rem;white-space:nowrap;${canGoBack ? 'display:inline-flex;' : 'display:none;'}" ${canGoBack ? '' : 'disabled aria-hidden="true"'}>← Назад</button>`;
+    const backBtnHTML = canGoBack ? `<button type="button" class="btn btn-ghost" data-chunk-prev="py" style="padding:11px 16px;border-radius:14px;font-size:.88rem;">← Назад</button>` : '';
 
     let primaryActionHTML = '';
     if(hasMoreChunks){
       primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-chunk-more="py">Понятно, дальше (+10 XP) ➔</button>`;
     } else if(stepIdx + 1 < steps.length){
-      const activeK = pySkillViewState.kId || 'unknown';
-      const stepKey = `${activeK}:${stepIdx+1}`;
-      const stepAlreadyDone = isRead || (state.completedNoteSteps && state.completedNoteSteps[stepKey]);
-      primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-next-step="${stepIdx+1}">Понятно, дальше${stepAlreadyDone ? '' : ' (+10 XP)'} ➔</button>`;
+      primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-next-step="${stepIdx+1}">Понятно, дальше (+10 XP) ➔</button>`;
     } else {
       primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-finish-note="${activeK}">${isRead ? '✓ Конспект усвоен' : '✓ Завершить конспект (+10 MP)'}</button>`;
     }
 
     bodyHTML = `
-      <div class="card coddy-lesson-card" style="margin-top:0;display:flex;flex-direction:column;justify-content:space-between;min-height:280px;">
-        <div style="flex:1;">${feedHTML}</div>
-        <div class="sprint-actions-bar" style="display:flex;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--glass-border);flex-wrap:nowrap;flex:none;">
-          ${backBtnHTML}
-          <div style="display:flex;gap:10px;align-items:center;flex:1;justify-content:center;">
+      <div class="card coddy-lesson-card" style="margin-top:0;">
+        ${feedHTML}
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--glass-border);flex-wrap:wrap;">
+          <div>${backBtnHTML}</div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <button type="button" class="btn btn-ghost" data-audio-toggle style="padding:11px 14px;border-radius:14px;font-size:.88rem;" title="Слушать аудио">🎧 Озвучить</button>
             ${primaryActionHTML}
           </div>
         </div>
@@ -8031,37 +8116,29 @@ function viewPythonSkill(sid){
   } else if(pySkillViewState.tab === 'cards'){
     const deckObj = ALL_DECKS_COMBINED[activeF] || {id: activeF, title: activeF, cards: []};
     const cards = deckObj.cards || [];
-    const cIdx = Math.min(pySkillViewState.cardIdx, Math.max(0, cards.length - 1));
-    const curCard = cards[cIdx] || {q: 'Карточки загружаются', a: ''};
+    const cardIdx = Math.min(pySkillViewState.cardIdx, Math.max(0, cards.length - 1));
+    const curCard = cards[cardIdx] || {q: 'Карточек пока нет', a: ''};
+    const isFlipped = pySkillViewState.cardFlipped;
 
     bodyHTML = `
       <div class="card" style="margin-top:0;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <span style="font-size:0.80rem;color:var(--ink-muted);font-weight:600;">Карточка ${cards.length ? cIdx + 1 : 0} из ${cards.length}</span>
-          <span style="font-size:0.75rem;padding:2px 8px;border-radius:999px;background:rgba(20,90,70,0.1);color:var(--moss);font-weight:600;">Интервальное повторение</span>
+          <span style="font-size:0.80rem;color:var(--ink-muted);font-weight:600;">Карточка ${cards.length ? cardIdx + 1 : 0} из ${cards.length}</span>
+          
         </div>
-        <div class="fc-card ${pySkillViewState.cardFlipped?'fc-card--Answer':''}" data-py-flip-card>
-          <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-              <div class="topic-badge">${pySkillViewState.cardFlipped ? 'Ответ' : 'Вопрос'}</div>
-              <a href="#/docs" class="card-help-badge" onclick="event.stopPropagation();" title="Открыть справку по теме в боковой панели">💡 Шпаргалка</a>
-            </div>
-            <div class="fc-q">${formatRichInlineText(curCard.q)}</div>
-            ${pySkillViewState.cardFlipped ? `<div class="fc-a">${formatRichInlineText(curCard.a)}</div>` : ''}
+        <div class="py-flashcard ${isFlipped ? 'flipped' : ''}" data-py-flip-card style="min-height:180px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:26px 20px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);transition:all .25s ease;">
+          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-muted);margin-bottom:8px;">${isFlipped ? 'Ответ' : 'Вопрос (нажмите или пробел)'}</div>
+          <div style="font-size:1.08rem;font-weight:600;line-height:1.45;color:var(--ink);">${isFlipped ? curCard.a : curCard.q}</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;">
+          <button class="btn btn-ghost" data-py-prev-card ${cardIdx === 0 ? 'disabled' : ''}>← Назад</button>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost" data-py-rate-card="hard" title="Повторить скоро">Сложно</button>
+            <button class="btn btn-ghost" data-py-rate-card="good" title="В пределах нормы">Нормально</button>
+            <button class="btn btn-emerald" data-py-rate-card="easy" title="Отлично знаю">Легко (+5 MP)</button>
           </div>
+          <button class="btn btn-ghost" data-py-next-card ${cardIdx + 1 >= cards.length ? 'disabled' : ''}>Дальше →</button>
         </div>
-        ${pySkillViewState.cardFlipped ? `
-          <div class="fc-rate-row" style="margin-top:14px;">
-            <button class="btn btn-ghost" data-py-rate-card="1">Снова</button>
-            <button class="btn btn-burgundy" data-py-rate-card="2">Трудно (+2 XP)</button>
-            <button class="btn btn-clay" data-py-rate-card="3">Хорошо (+5 XP)</button>
-            <button class="btn btn-primary" data-py-rate-card="4">Легко (+10 XP)</button>
-          </div>` : `
-          <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn btn-ghost" data-py-prev-card ${cIdx===0?'disabled':''}>← Назад</button>
-            <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-flip-card>Показать ответ (Пробел)</button>
-            <button class="btn btn-ghost" data-py-rate-card="3" ${cIdx + 1 >= cards.length ? 'disabled' : ''}>Дальше →</button>
-          </div>`}
       </div>`;
   } else if(pySkillViewState.tab === 'code'){
     const tObj = IDE_TASKS_BY_ID[activeTid] || {id: activeTid, title: 'Задача #' + activeTid, desc: '', initialCode: ''};
@@ -8070,19 +8147,10 @@ function viewPythonSkill(sid){
       `<div class="socratic-hint" style="margin:8px 0;padding:10px 14px;border-radius:12px;background:rgba(217,119,6,0.08);border-left:3px solid var(--amber);font-size:0.86rem;line-height:1.45;"><strong>💡 Наводка ${i+1}:</strong> ${h}</div>`
     ).join('');
 
-    const spec = buildTaskSpecDetails(tObj);
-    const taskIdx = tIds.indexOf(activeTid);
-    const isLastTask = (taskIdx >= tIds.length - 1);
-    const nextBtnLabel = isLastTask ? 'Рубежный зачёт ➔' : 'Следующая задача ➔';
-
     let runFeedback = '';
     if(pySkillViewState.runStatus === 'pass') runFeedback = `
-      <div class="result-feedback result-feedback--pass" style="margin-top:12px;padding:12px 16px;border-radius:14px;background:rgba(16,185,129,0.12);border:1px solid #10b981;color:#10b981;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-        <div>
-          <div style="font-weight:700;">✓ Все тесты пройдены! (+15 MP)</div>
-          <div style="font-size:0.78rem;opacity:0.85;margin-top:2px;">Задача #${tObj.id} успешно решена и закреплена.</div>
-        </div>
-        <button type="button" class="btn-glass-emerald" style="padding:8px 16px;border-radius:10px;font-size:0.84rem;white-space:nowrap;" data-py-next-task-btn="${tObj.id}">${nextBtnLabel}</button>
+      <div class="result-feedback result-feedback--pass" style="margin-top:12px;padding:12px;border-radius:12px;background:rgba(16,185,129,0.12);border:1px solid #10b981;color:#10b981;">
+        <div style="font-weight:700;">✓ Все тесты пройдены! (+15 MP)</div>
       </div>`;
     else if(pySkillViewState.runStatus === 'fail') runFeedback = `
       <div class="result-feedback result-feedback--fail" style="margin-top:12px;padding:12px;border-radius:12px;background:rgba(239,68,68,0.12);border:1px solid #ef4444;color:#ef4444;">
@@ -8090,63 +8158,29 @@ function viewPythonSkill(sid){
         <pre style="margin-top:6px;font-size:0.80rem;white-space:pre-wrap;">${escapeHtmlStr(pySkillViewState.runOutput)}</pre>
       </div>`;
 
-    let cleanDesc = String(tObj.desc || '');
-    cleanDesc = cleanDesc.replace(/^<p>\s*<strong>\s*Задание\s*[:.-]?\s*<\/strong>\s*/i, '<p>');
-    cleanDesc = cleanDesc.replace(/^<p>\s*Задание\s*[:.-]?\s*/i, '<p>');
-    cleanDesc = cleanDesc.replace(/^<strong>\s*Задание\s*[:.-]?\s*<\/strong>\s*/i, '');
-    cleanDesc = cleanDesc.replace(/^Задание\s*[:.-]?\s*/i, '').trim();
-    cleanDesc = cleanDesc.replace(/^<p>/i, '').replace(/<\/p>$/i, '').trim();
-
     bodyHTML = `
       <div class="card" style="margin-top:0;">
-        <div class="practice-layout practice-coddy-split">
-          <div class="practice-left-pane practice-spec-pane">
-            <div>
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;">
-                <div style="display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;font-weight:700;">
-                  <span style="color:var(--ink-muted);">Задача #${tObj.id}</span>
-                  <span class="badge" style="background:rgba(217,119,6,0.18);color:var(--amber);padding:2px 8px;border-radius:8px;font-weight:700;white-space:nowrap;">${tObj.tier}</span>
-                </div>
-                <div style="display:flex;gap:8px;align-items:center;">
-                  <span style="font-size:0.78rem;color:var(--ink-muted);font-weight:600;">${taskIdx >= 0 ? taskIdx + 1 : 1} из ${tIds.length}</span>
-                  ${solvedMap[tObj.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
-                </div>
+        <div class="practice-layout">
+          <div class="practice-left-pane">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+              <span class="topic-badge" style="margin:0;display:inline-flex;align-items:center;gap:6px;">Задача #${tObj.id} · <span class="badge" style="background:rgba(217,119,6,0.18);color:var(--amber);padding:1px 7px;border-radius:10px;font-weight:700;">${tObj.tier}</span> · ${tObj.topic}</span>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <a href="#/docs" class="link-quiet" style="font-size:.78rem;">📚 Справка по методам Python</a>
+                ${solvedMap[tObj.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
               </div>
-              <div class="lesson-theory" style="font-size:0.89rem;color:var(--ink-soft);line-height:1.55;margin-bottom:12px;">
-                <strong>Задание:</strong> ${cleanDesc}
-              </div>
-              ${spec.ioCard}
             </div>
-            <div style="margin-top:auto;padding-top:12px;border-top:1px solid var(--glass-border);">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                <span style="font-size:0.75rem;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:0.04em;">💡 Наставник Сократ</span>
-                <span style="font-size:0.72rem;color:var(--ink-muted);">💡 Сократовская наводка (${pySkillViewState.hintLevel}/${socraticHints.length})</span>
-              </div>
-              <button type="button" class="btn btn-ghost" data-py-task-hint style="width:100%;justify-content:center;font-size:0.82rem;padding:9px 12px;border-radius:12px;border:1px dashed rgba(217,119,6,0.35);background:rgba(217,119,6,0.04);" ${pySkillViewState.hintLevel>=socraticHints.length?'disabled':''}>
-                ${pySkillViewState.hintLevel>=socraticHints.length ? '✓ Все наводки раскрыты' : 'Получить наводку без готового кода ➔'}
-              </button>
-              ${shownHints}
-            </div>
+            <h2 style="margin-bottom:10px;">${tObj.title}</h2>
+            <div class="lesson-theory" style="margin-bottom:12px;">${tObj.desc}</div>
+            ${shownHints}
           </div>
-          <div class="practice-right-pane" style="display:flex;flex-direction:column;justify-content:space-between;">
-            <div>
-              ${buildCodeEditorWithGutterHTML('py-skill-editor', pySkillViewState.codeDraft, 220, spec.quickTokens)}
-              <div class="practice-kbd-dock">
-                <span><kbd>Ctrl</kbd>+<kbd>Enter</kbd> Запустить тесты</span>
-                <span><kbd>Tab</kbd> Отступ</span>
-              </div>
+          <div class="practice-right-pane">
+            ${buildCodeEditorWithGutterHTML('py-skill-editor', pySkillViewState.codeDraft, 220)}
+            <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <button class="btn-glass-emerald" data-py-run-task="${tObj.id}">${ICONS.play} Проверить решение (Ctrl+Enter)</button>
+              <button class="btn btn-ghost" data-py-task-hint ${pySkillViewState.hintLevel>=socraticHints.length?'disabled':''}>💡 Сократовская наводка (${pySkillViewState.hintLevel}/${socraticHints.length})</button>
+              <button class="btn btn-ghost" data-py-reset-task="${tObj.id}">Сбросить код</button>
             </div>
-            <div style="margin-top:10px;">
-              <div style="display:flex;gap:10px;align-items:center;">
-                <button type="button" class="btn btn-ghost" data-py-reset-task="${tObj.id}" style="padding:12px 14px;border-radius:14px;flex:none;opacity:0.8;" title="Сбросить код к исходному шаблону">↺</button>
-                <button type="button" class="btn-check-solution" data-py-run-task="${tObj.id}">
-                  <span>${ICONS.play} Проверить решение</span>
-                  <span class="xp-tag">+15 XP</span>
-                  <span style="font-size:0.75rem;opacity:0.85;font-weight:500;">(Ctrl+Enter)</span>
-                </button>
-              </div>
-              ${runFeedback}
-            </div>
+            ${runFeedback}
           </div>
         </div>
       </div>`;
@@ -8155,9 +8189,9 @@ function viewPythonSkill(sid){
   return `
     <div class="container" style="max-width:880px;">
       ${focusTopbarHTML}
+      ${celebrationBanner}
       ${eyebrowDotsHTML}
       ${bodyHTML}
-      ${celebrationBanner}
     </div>`;
 }
 
