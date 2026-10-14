@@ -4041,6 +4041,54 @@
     100% { width: 18px; height: 18px; opacity: 0; border-color: rgba(255, 255, 255, 0); }
   }
 
+  /* ---------- RemNote Spaced Repetition (SRS) Badges & Interval Previews ---------- */
+  .srs-card-status-badge{
+    font-size:0.72rem;
+    padding:2px 8px;
+    border-radius:999px;
+    font-weight:700;
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    white-space:nowrap;
+  }
+  .srs-status-new{
+    background:rgba(148,163,184,0.14);
+    color:var(--ink-muted);
+    border:1px solid rgba(148,163,184,0.28);
+  }
+  .srs-status-due{
+    background:rgba(225,29,72,0.16);
+    color:#fb7185;
+    border:1px solid rgba(251,113,133,0.40);
+    animation:srsPulse 2s infinite ease-in-out;
+  }
+  .srs-status-scheduled{
+    background:rgba(217,119,6,0.12);
+    color:#fbbf24;
+    border:1px solid rgba(245,158,11,0.35);
+  }
+  .srs-status-mastered{
+    background:rgba(16,185,129,0.16);
+    color:#34d399;
+    border:1px solid rgba(52,211,153,0.40);
+  }
+  .srs-btn-sub{
+    font-size:0.72rem;
+    opacity:0.85;
+    font-weight:400;
+    margin-left:2px;
+  }
+  .srs-btn-xp{
+    font-size:0.72rem;
+    opacity:0.95;
+    font-weight:700;
+  }
+  @keyframes srsPulse{
+    0%,100%{transform:scale(1);opacity:1;}
+    50%{transform:scale(1.03);opacity:0.85;}
+  }
+
 </style>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0d1016" media="(prefers-color-scheme: dark)">
@@ -6780,6 +6828,7 @@ function ensureExtendedState(target){
   if(!s.passedBosses || !Array.isArray(s.passedBosses)) s.passedBosses = [];
   if(typeof s.mockCompletedCount !== 'number') s.mockCompletedCount = 0;
   if(!s.cardRatings || typeof s.cardRatings !== 'object') s.cardRatings = {};
+  if(!s.cardSrs || typeof s.cardSrs !== 'object') s.cardSrs = {};
   // Migrate legacy cards map -> cardRatings & reviewedDecks
   if(s.cards && typeof s.cards === 'object' && !Array.isArray(s.cards)){
     const ratingMap = { again: 1, hard: 2, good: 3, easy: 4 };
@@ -9376,7 +9425,7 @@ function viewPythonSkill(sid){
       <div class="card" style="margin-top:0;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
           <span style="font-size:0.80rem;color:var(--ink-muted);font-weight:600;">Карточка ${cards.length ? cIdx + 1 : 0} из ${cards.length}</span>
-          <span style="font-size:0.75rem;padding:2px 8px;border-radius:999px;background:rgba(20,90,70,0.1);color:var(--moss);font-weight:600;">Интервальное повторение</span>
+          ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(activeF + ':' + cIdx) : '<span style="font-size:0.75rem;padding:2px 8px;border-radius:999px;background:rgba(20,90,70,0.1);color:var(--moss);font-weight:600;">Интервальное повторение</span>'}
         </div>
         <div class="fc-card ${pySkillViewState.cardFlipped?'fc-card--Answer':''}" data-py-flip-card>
           <div>
@@ -9388,13 +9437,16 @@ function viewPythonSkill(sid){
             ${pySkillViewState.cardFlipped ? `<div class="fc-a">${formatRichInlineText(curCard.a)}</div>` : ''}
           </div>
         </div>
-        ${pySkillViewState.cardFlipped ? `
+        ${pySkillViewState.cardFlipped ? (() => {
+          const srsPrev = typeof computeRemNoteIntervals === 'function' ? computeRemNoteIntervals(activeF + ':' + cIdx) : {again:{days:1},hard:{days:2},good:{days:3},easy:{days:7}};
+          return `
           <div class="fc-rate-row" style="margin-top:14px;">
-            <button class="btn btn-ghost" data-py-rate-card="1">Снова</button>
-            <button class="btn btn-burgundy" data-py-rate-card="2">Трудно (+2 XP)</button>
-            <button class="btn btn-clay" data-py-rate-card="3">Хорошо (+5 XP)</button>
-            <button class="btn btn-primary" data-py-rate-card="4">Легко (+10 XP)</button>
-          </div>` : `
+            <button class="btn btn-ghost" data-py-rate-card="1" title="Повторить завтра (1 день)">Снова <span class="srs-btn-sub">(${srsPrev.again.days}д)</span></button>
+            <button class="btn btn-burgundy" data-py-rate-card="2" title="Повторить через ${srsPrev.hard.days} дн (+2 XP)">Трудно <span class="srs-btn-sub">(${srsPrev.hard.days}д)</span> <span class="srs-btn-xp">+2XP</span></button>
+            <button class="btn btn-clay" data-py-rate-card="3" title="Повторить через ${srsPrev.good.days} дн (+5 XP)">Хорошо <span class="srs-btn-sub">(${srsPrev.good.days}д)</span> <span class="srs-btn-xp">+5XP</span></button>
+            <button class="btn btn-primary" data-py-rate-card="4" title="Повторить через ${srsPrev.easy.days} дн (+10 XP)">Легко <span class="srs-btn-sub">(${srsPrev.easy.days}д)</span> <span class="srs-btn-xp">+10XP</span></button>
+          </div>`;
+        })() : `
           <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
             <button class="btn btn-ghost" data-py-prev-card ${cIdx===0?'disabled':''}>← Назад</button>
             <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-flip-card>Показать ответ (Пробел)</button>
@@ -9814,7 +9866,12 @@ function viewCardsHub(){
           <h1 style="margin:0;">🎉 Колода изучена!</h1>
         </div>
         <div style="display:flex;gap:8px;align-items:center;">
-          <span class="cocoon-pill">Изучено колод: <b>${state.reviewedDecks.length} / ${allDeckIds.length}</b></span>
+          ${(() => {
+            const srsStats = typeof getSpacedRepetitionStats === 'function' ? getSpacedRepetitionStats() : {dueTodayCardsCount:0, masteredCardsCount:0};
+            return `<span class="cocoon-pill">Изучено: <b>${state.reviewedDecks.length}/${allDeckIds.length}</b></span>
+            ${srsStats.dueTodayCardsCount > 0 ? `<span class="cocoon-pill" style="border-color:rgba(251,113,133,0.45);color:#fb7185;">🔥 К повторению: <b>${srsStats.dueTodayCardsCount}</b></span>` : `<span class="cocoon-pill" style="color:var(--moss);">✓ Повторено на сегодня</span>`}
+            <span class="cocoon-pill" style="color:#34d399;">👑 Закреплено: <b>${srsStats.masteredCardsCount || 0}</b></span>`;
+          })()}
           ${primarySkill ? `<a href="#${primarySkill.routePrefix}/skill/${primarySkill.id}" class="btn btn-ghost" style="padding:6px 11px;font-size:.78rem;">💻 К практике темы (${primarySkill.id}) →</a>` : ''}
         </div>
       </div>
@@ -9862,7 +9919,10 @@ function viewCardsHub(){
         <div class="fc-card fc-card--3d ${cardsHubState.flipped ? 'fc-card--flipped fc-card--Answer' : ''}" data-hub-flip style="margin-top:10px;">
           <div class="fc-card-inner">
             <div style="display:flex;justify-content:space-between;align-items:center;">
-              <div class="topic-badge">${cardsHubState.flipped ? 'Ответ' : 'Вопрос'}</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="topic-badge">${cardsHubState.flipped ? 'Ответ' : 'Вопрос'}</div>
+                ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(cardsHubState.deckId + ':' + cIdx) : ''}
+              </div>
               <a href="#/docs" class="card-help-badge" onclick="event.stopPropagation();" title="Открыть справку по теме в боковой панели">💡 Шпаргалка</a>
             </div>
             <div class="fc-q">${typeof formatRichInlineText === 'function' ? formatRichInlineText(cur.q) : cur.q}</div>
@@ -9870,13 +9930,16 @@ function viewCardsHub(){
           </div>
           <div class="meta" style="margin-top:12px;text-align:center;">Карточка ${cards.length ? cIdx + 1 : 0} из ${cards.length}</div>
         </div>
-        ${cardsHubState.flipped ? `
+        ${cardsHubState.flipped ? (() => {
+          const srsPrev = typeof computeRemNoteIntervals === 'function' ? computeRemNoteIntervals(cardsHubState.deckId + ':' + cIdx) : {again:{days:1},hard:{days:2},good:{days:3},easy:{days:7}};
+          return `
           <div class="fc-rate-row" style="margin-top:12px;">
-            <button class="btn btn-ghost" data-hub-rate="1">Снова</button>
-            <button class="btn btn-burgundy" data-hub-rate="2">Трудно (+2 XP)</button>
-            <button class="btn btn-clay" data-hub-rate="3">Хорошо (+5 XP)</button>
-            <button class="btn btn-primary" data-hub-rate="4">Легко (+10 XP)</button>
-          </div>` : `
+            <button class="btn btn-ghost" data-hub-rate="1" title="Повторить завтра (1 день)">Снова <span class="srs-btn-sub">(${srsPrev.again.days}д)</span></button>
+            <button class="btn btn-burgundy" data-hub-rate="2" title="Повторить через ${srsPrev.hard.days} дн (+2 XP)">Трудно <span class="srs-btn-sub">(${srsPrev.hard.days}д)</span> <span class="srs-btn-xp">+2XP</span></button>
+            <button class="btn btn-clay" data-hub-rate="3" title="Повторить через ${srsPrev.good.days} дн (+5 XP)">Хорошо <span class="srs-btn-sub">(${srsPrev.good.days}д)</span> <span class="srs-btn-xp">+5XP</span></button>
+            <button class="btn btn-primary" data-hub-rate="4" title="Повторить через ${srsPrev.easy.days} дн (+10 XP)">Легко <span class="srs-btn-sub">(${srsPrev.easy.days}д)</span> <span class="srs-btn-xp">+10XP</span></button>
+          </div>`;
+        })() : `
           <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
             <button class="btn btn-ghost" data-hub-prev ${cIdx===0?'disabled':''}>← Назад</button>
             <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-hub-flip>Показать ответ (Пробел)</button>
@@ -12833,12 +12896,111 @@ function buildSevenDayHeatmapHTML(){
   return `<div class="heat-row">${html}</div>`;
 }
 
-// Compute Spaced Repetition Queue (SRS: weak cards rated 1..2 + reviewed decks due for review)
+
+// ================= REMNOTE SPACED REPETITION ENGINE (SRS) =================
+function addDaysToDateKey(baseDateKey, days){
+  try{
+    const base = String(baseDateKey || dateIsoKey());
+    const parts = base.split('-').map(Number);
+    const dt = new Date(parts[0], parts[1] - 1, parts[2] + (Number(days) || 0));
+    return dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
+  }catch(e){
+    return dateIsoKey();
+  }
+}
+
+function computeRemNoteIntervals(cardKey){
+  ensureExtendedState();
+  const entry = (state.cardSrs && state.cardSrs[cardKey]) || null;
+  const reps = entry ? (Number(entry.reps) || 0) : 0;
+  const curI = entry ? (Number(entry.interval) || 0) : 0;
+  const ease = entry ? (Number(entry.ease) || 2.50) : 2.50;
+  const lapses = entry ? (Number(entry.lapses) || 0) : 0;
+
+  // Grade 1: Снова (Again) -> интервал 1 день, сброс серии, ease -0.20
+  const againDays = 1;
+
+  // Grade 2: Трудно (Hard) -> рост интервала с коэффициентом 1.2, ease -0.15
+  let hardDays;
+  if(reps === 0) hardDays = 1;
+  else if(reps === 1) hardDays = 2;
+  else hardDays = Math.max(curI + 1, Math.round(curI * 1.2));
+
+  // Grade 3: Хорошо (Good) -> стандартная прогрессия SuperMemo-2 / RemNote
+  let goodDays;
+  if(reps === 0) goodDays = 1;
+  else if(reps === 1) goodDays = 3;
+  else goodDays = Math.max(hardDays + 1, Math.round(curI * ease));
+
+  // Grade 4: Легко (Easy) -> ускоренная прогрессия с бонусом
+  let easyDays;
+  if(reps === 0) easyDays = 3;
+  else if(reps === 1) easyDays = 7;
+  else easyDays = Math.max(goodDays + 2, Math.round(curI * ease * 1.35));
+
+  return {
+    again: { days: againDays, ease: Math.max(1.30, +(ease - 0.20).toFixed(2)), reps: 0, lapses: lapses + 1 },
+    hard:  { days: hardDays,  ease: Math.max(1.30, +(ease - 0.15).toFixed(2)), reps: Math.max(1, reps), lapses: lapses },
+    good:  { days: goodDays,  ease: +ease.toFixed(2),                         reps: reps + 1, lapses: lapses },
+    easy:  { days: easyDays,  ease: Math.min(3.50, +(ease + 0.15).toFixed(2)), reps: reps + 1, lapses: lapses }
+  };
+}
+
+function applyRemNoteCardRating(cardKey, grade){
+  ensureExtendedState();
+  if(!state.cardSrs) state.cardSrs = {};
+  const g = Number(grade) || 3;
+  const intervals = computeRemNoteIntervals(cardKey);
+  const gradeKey = g === 1 ? 'again' : (g === 2 ? 'hard' : (g === 4 ? 'easy' : 'good'));
+  const nextInfo = intervals[gradeKey];
+  const today = dateIsoKey();
+  const nextDueDate = addDaysToDateKey(today, nextInfo.days);
+
+  state.cardSrs[cardKey] = {
+    reps: nextInfo.reps,
+    interval: nextInfo.days,
+    ease: nextInfo.ease,
+    lapses: nextInfo.lapses,
+    lastReview: today,
+    dueDate: nextDueDate,
+    lastGrade: g
+  };
+
+  // Поддерживаем совместимость с cardRatings
+  state.cardRatings[cardKey] = Math.max(Number(state.cardRatings[cardKey]) || 0, g);
+  saveState(state);
+}
+
+function getRemNoteCardStatusBadgeHTML(cardKey){
+  ensureExtendedState();
+  const entry = state.cardSrs && state.cardSrs[cardKey];
+  if(!entry || !entry.dueDate){
+    return `<span class="srs-card-status-badge srs-status-new" title="Карточка ещё не изучалась">🌱 Новая</span>`;
+  }
+  const today = dateIsoKey();
+  const daysDiff = Math.round((new Date(entry.dueDate + 'T00:00:00') - new Date(today + 'T00:00:00')) / (1000 * 60 * 60 * 24));
+  if(daysDiff <= 0){
+    return `<span class="srs-card-status-badge srs-status-due" title="По расписанию RemNote нужно повторить сегодня">🔥 Повторить сегодня</span>`;
+  } else if(entry.interval >= 21){
+    return `<span class="srs-card-status-badge srs-status-mastered" title="Интервал ${entry.interval} дн. Следующее повторение: ${entry.dueDate}">👑 Закреплено (${entry.interval} дн)</span>`;
+  } else {
+    return `<span class="srs-card-status-badge srs-status-scheduled" title="Следующее повторение: ${entry.dueDate} (${daysDiff} дн)">📅 Через ${daysDiff} дн (${entry.dueDate})</span>`;
+  }
+}
+
+// Compute Spaced Repetition Queue (SRS: weak cards rated 1..2 + RemNote calendar schedule due today)
 function getSpacedRepetitionStats(){
   ensureExtendedState();
   const ratings = state.cardRatings || {};
+  const srsMap = state.cardSrs || {};
+  const today = (typeof dateIsoKey === 'function') ? dateIsoKey() : new Date().toISOString().slice(0,10);
+
   const weakDecks = new Set();
+  const dueTodayDecks = new Set();
   let weakCardsCount = 0;
+  let dueTodayCardsCount = 0;
+  let masteredCardsCount = 0;
+
   Object.keys(ratings).forEach(k => {
     const r = Number(ratings[k]);
     if(r >= 1 && r <= 2){
@@ -12847,8 +13009,21 @@ function getSpacedRepetitionStats(){
       if(ALL_DECKS_COMBINED[did]) weakDecks.add(did);
     }
   });
+
+  Object.keys(srsMap).forEach(k => {
+    const item = srsMap[k];
+    if(item && item.dueDate){
+      if(item.dueDate <= today){
+        dueTodayCardsCount++;
+        const did = k.split(':')[0];
+        if(ALL_DECKS_COMBINED[did]) dueTodayDecks.add(did);
+      }
+      if(item.interval >= 21) masteredCardsCount++;
+    }
+  });
+
   const reviewed = (state.reviewedDecks || []).filter(did => ALL_DECKS_COMBINED[did]);
-  const dueDecks = Array.from(weakDecks);
+  const dueDecks = Array.from(new Set([...dueTodayDecks, ...weakDecks]));
   reviewed.forEach(did => {
     if(dueDecks.length < 4 && !dueDecks.includes(did)) dueDecks.push(did);
   });
@@ -12858,6 +13033,8 @@ function getSpacedRepetitionStats(){
   return {
     weakCardsCount: weakCardsCount,
     reviewedDecksCount: reviewed.length,
+    dueTodayCardsCount: dueTodayCardsCount,
+    masteredCardsCount: masteredCardsCount,
     dueDecks: dueDecks
   };
 }
@@ -13095,7 +13272,7 @@ viewDashboard = function(){
           </svg>
           <div>
             <div style="font-weight:700;font-size:.86rem;">🔁 Интервальное повторение (SRS)</div>
-            <div class="meta" style="font-size:.76rem;">Повторено колод: <b>${srs.reviewedDecksCount}</b> · Сложных карточек на закрепление: <b>${srs.weakCardsCount}</b></div>
+            <div class="meta" style="font-size:.76rem;">Повторено колод: <b>${srs.reviewedDecksCount}</b> · ${srs.dueTodayCardsCount > 0 ? `<span style="color:#fb7185;font-weight:700;">🔥 К повторению сегодня: ${srs.dueTodayCardsCount}</span>` : '<span style="color:var(--moss);">✓ На сегодня повторено</span>'} · Сложных карточек: <b>${srs.weakCardsCount}</b> · Закреплено: <b>${srs.masteredCardsCount || 0}</b></div>
           </div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">${srsDeckButtons}</div>
@@ -14892,7 +15069,11 @@ const psk = e.target.closest('[data-py-select-k]');
     if(fid){
       const ck = fid + ':' + (pySkillViewState.cardIdx || 0);
       wasStudied = (state.cardRatings[ck] !== undefined && state.cardRatings[ck] > 0);
-      state.cardRatings[ck] = Math.max(Number(state.cardRatings[ck]) || 0, rating || 0);
+      if(typeof applyRemNoteCardRating === 'function'){
+        applyRemNoteCardRating(ck, rating);
+      } else {
+        state.cardRatings[ck] = Math.max(Number(state.cardRatings[ck]) || 0, rating || 0);
+      }
     }
     if(!wasStudied){
       if(rating >= 3) awardXp(rating === 4 ? 10 : 5);
@@ -15487,7 +15668,11 @@ const psk = e.target.closest('[data-py-select-k]');
     if(cardsHubState.deckId){
       const ck = cardsHubState.deckId + ':' + (cardsHubState.cardIdx || 0);
       wasStudied = (state.cardRatings[ck] !== undefined && state.cardRatings[ck] > 0);
-      state.cardRatings[ck] = Math.max(Number(state.cardRatings[ck]) || 0, r || 0);
+      if(typeof applyRemNoteCardRating === 'function'){
+        applyRemNoteCardRating(ck, r);
+      } else {
+        state.cardRatings[ck] = Math.max(Number(state.cardRatings[ck]) || 0, r || 0);
+      }
     }
     if(!wasStudied){
       if(r >= 3) awardXp(r === 4 ? 10 : 5);
