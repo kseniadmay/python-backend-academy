@@ -99,6 +99,11 @@ function serve() {
   return new Promise(resolve => {
     const srv = http.createServer((req, res) => {
       let u = decodeURIComponent(req.url.split('?')[0]);
+      if (u === '/api/sync') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, revision: 0 }));
+        return;
+      }
       let fp = u === '/' ? path.join(ROOT, 'academy.html') : path.join(ROOT, u);
       if (u.endsWith('/')) fp = path.join(ROOT, u, 'index.html');
       fs.readFile(fp, (err, data) => {

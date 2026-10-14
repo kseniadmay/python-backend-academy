@@ -587,9 +587,13 @@ EXTRA_CSS = r"""
     --zen-surface-hover:rgba(15, 23, 42, 0.07);
     --zen-hairline:rgba(0, 0, 0, 0.08);
     --zen-hairline-subtle:rgba(0, 0, 0, 0.045);
+    --zen-hairline-strong:rgba(0, 0, 0, 0.14);
     --zen-text-main:#0f172a;
     --zen-text-soft:#334155;
     --zen-text-muted:#64748b;
+    --zen-text:#0f172a;
+    --zen-text-subtle:#334155;
+    --zen-surface-input:rgba(15, 23, 42, 0.04);
     --zen-emerald:#145a46;
     --zen-emerald-light:#10b981;
     --zen-emerald-soft:rgba(20, 90, 70, 0.09);
@@ -603,6 +607,7 @@ EXTRA_CSS = r"""
     --zen-bordeaux-soft:rgba(107, 29, 47, 0.09);
     --zen-bordeaux-border:rgba(107, 29, 47, 0.28);
     --zen-shadow-island:0 20px 48px -12px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+    --zen-shadow-lift:0 12px 28px -8px rgba(15, 23, 42, 0.08);
 
     --paper:#faf8f5;
     --surface:rgba(255,255,255,0.88);
@@ -636,9 +641,13 @@ EXTRA_CSS = r"""
       --zen-surface-hover:rgba(255, 255, 255, 0.075);
       --zen-hairline:rgba(255, 255, 255, 0.08);
       --zen-hairline-subtle:rgba(255, 255, 255, 0.045);
+      --zen-hairline-strong:rgba(255, 255, 255, 0.16);
       --zen-text-main:#f8fafc;
       --zen-text-soft:#cbd5e1;
       --zen-text-muted:#8b9bb4;
+      --zen-text:#f8fafc;
+      --zen-text-subtle:#cbd5e1;
+      --zen-surface-input:rgba(15, 20, 30, 0.6);
       --zen-emerald:#10b981;
       --zen-emerald-light:#34d399;
       --zen-emerald-soft:rgba(16, 185, 129, 0.12);
@@ -652,6 +661,7 @@ EXTRA_CSS = r"""
       --zen-bordeaux-soft:rgba(225, 29, 72, 0.16);
       --zen-bordeaux-border:rgba(251, 113, 133, 0.45);
       --zen-shadow-island:0 24px 64px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--zen-hairline);
+      --zen-shadow-lift:0 12px 28px -8px rgba(0, 0, 0, 0.4);
 
       --paper:#0d1016;
       --surface:rgba(22,27,36,0.74);
@@ -681,9 +691,13 @@ EXTRA_CSS = r"""
     --zen-surface-hover:rgba(255, 255, 255, 0.075);
     --zen-hairline:rgba(255, 255, 255, 0.08);
     --zen-hairline-subtle:rgba(255, 255, 255, 0.045);
+    --zen-hairline-strong:rgba(255, 255, 255, 0.16);
     --zen-text-main:#f8fafc;
     --zen-text-soft:#cbd5e1;
     --zen-text-muted:#8b9bb4;
+    --zen-text:#f8fafc;
+    --zen-text-subtle:#cbd5e1;
+    --zen-surface-input:rgba(15, 20, 30, 0.6);
     --zen-emerald:#10b981;
     --zen-emerald-light:#34d399;
     --zen-emerald-soft:rgba(16, 185, 129, 0.12);
@@ -697,6 +711,7 @@ EXTRA_CSS = r"""
     --zen-bordeaux-soft:rgba(225, 29, 72, 0.16);
     --zen-bordeaux-border:rgba(251, 113, 133, 0.45);
     --zen-shadow-island:0 24px 64px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--zen-hairline);
+    --zen-shadow-lift:0 12px 28px -8px rgba(0, 0, 0, 0.4);
 
     --paper:#0d1016;
     --surface:rgba(22,27,36,0.74);
@@ -2789,27 +2804,31 @@ EXTRA_CSS = r"""
 
 /* 3D Flashcards SRS Zen Distillation (#/cards) */
 .fc-card--3d {
-  background: var(--zen-surface, rgba(18, 23, 33, 0.84)) !important;
+  background: var(--zen-surface-card) !important;
   backdrop-filter: blur(24px) !important;
   -webkit-backdrop-filter: blur(24px) !important;
-  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
+  border: 1px solid var(--zen-hairline) !important;
   border-radius: 24px !important;
-  box-shadow: var(--zen-shadow-island, 0 20px 48px -12px rgba(0, 0, 0, 0.5)) !important;
-  padding: 28px 28px !important;
+  box-shadow: var(--zen-shadow-island) !important;
+  padding: 30px 28px !important;
   min-height: 240px !important;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  color: var(--zen-text-main, var(--ink)) !important;
 }
 
 .fc-card--3d:hover {
-  transform: perspective(1400px) rotateY(-3deg) translateY(-2px) !important;
-  border-color: var(--zen-hairline-strong, rgba(255, 255, 255, 0.16)) !important;
-  box-shadow: var(--zen-shadow-island, 0 24px 54px -10px rgba(0, 0, 0, 0.55)), 0 0 28px -6px rgba(16, 185, 129, 0.14) !important;
+  transform: perspective(1400px) rotateY(-2deg) translateY(-2px) !important;
+  border-color: var(--zen-emerald-border, rgba(16, 185, 129, 0.35)) !important;
+  box-shadow: var(--zen-shadow-island), 0 0 28px -6px var(--zen-emerald-glow) !important;
 }
 
 .fc-card--3d.fc-card--Answer {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.07) 0%, rgba(18, 23, 33, 0.86) 100%) !important;
-  border-color: rgba(16, 185, 129, 0.32) !important;
-  box-shadow: var(--zen-shadow-island, 0 20px 48px -12px rgba(0, 0, 0, 0.5)), 0 0 32px -4px rgba(16, 185, 129, 0.18) !important;
+  background: var(--zen-surface-card) !important;
+  border-color: var(--zen-emerald-border, rgba(16, 185, 129, 0.35)) !important;
+  box-shadow: var(--zen-shadow-island), 0 0 32px -4px var(--zen-emerald-glow) !important;
+}
+:root[data-theme="dark"] .fc-card--3d.fc-card--Answer {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(22, 28, 40, 0.85) 100%) !important;
 }
 
 .fc-q {
@@ -2817,7 +2836,7 @@ EXTRA_CSS = r"""
   font-size: 1.15rem !important;
   font-weight: 700 !important;
   line-height: 1.55 !important;
-  color: var(--zen-text, #f1f5f9) !important;
+  color: var(--zen-text-main, var(--ink)) !important;
   letter-spacing: -0.01em !important;
 }
 
@@ -2825,10 +2844,10 @@ EXTRA_CSS = r"""
   font-family: var(--font-b, 'Onest', sans-serif) !important;
   font-size: 1.02rem !important;
   line-height: 1.6 !important;
-  color: var(--zen-text-subtle, #cbd5e1) !important;
+  color: var(--zen-text-soft, var(--ink-soft)) !important;
   margin-top: 14px !important;
   padding-top: 14px !important;
-  border-top: 1px dashed var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
+  border-top: 1px dashed var(--zen-hairline) !important;
 }
 
 .cards-flip-prompt {
@@ -2837,18 +2856,18 @@ EXTRA_CSS = r"""
   gap: 6px !important;
   font-size: 0.78rem !important;
   font-weight: 600 !important;
-  color: var(--zen-text-muted, #94a3b8) !important;
+  color: var(--zen-text-muted, var(--ink-muted)) !important;
   padding: 5px 12px !important;
-  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.04)) !important;
-  border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.05)) !important;
+  background: var(--zen-surface-subtle) !important;
+  border: 1px solid var(--zen-hairline-subtle) !important;
   border-radius: 999px !important;
 }
 
 .cards-hub-controls select {
   border-radius: 14px !important;
-  background: var(--zen-surface-input, rgba(15, 20, 30, 0.6)) !important;
-  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
-  color: var(--zen-text, #f1f5f9) !important;
+  background: var(--zen-surface-subtle) !important;
+  border: 1px solid var(--zen-hairline) !important;
+  color: var(--zen-text-main, var(--ink)) !important;
   backdrop-filter: blur(12px) !important;
   transition: all 0.15s ease !important;
 }
@@ -2871,11 +2890,14 @@ EXTRA_CSS = r"""
   background: rgba(255, 255, 255, 0.08) !important;
   transition: all 0.2s ease !important;
 }
+:root, :root[data-theme="light"] .fc-story-seg {
+  background: rgba(15, 23, 42, 0.10) !important;
+}
 
 .fc-story-seg.seg--current,
 .fc-story-seg.fc-story-seg--active {
-  background: #ffffff !important;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8) !important;
+  background: var(--zen-emerald-light, #10b981) !important;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.8) !important;
   transform: scaleY(1.4) !important;
 }
 
@@ -2924,8 +2946,8 @@ EXTRA_CSS = r"""
 }
 .fc-rate-btn--again {
   background: rgba(244, 63, 94, 0.10) !important;
-  color: #fb7185 !important;
-  border: 1px solid rgba(244, 63, 94, 0.22) !important;
+  color: #be123c !important;
+  border: 1px solid rgba(244, 63, 94, 0.25) !important;
 }
 .fc-rate-btn--again:hover {
   background: rgba(244, 63, 94, 0.20) !important;
@@ -2934,8 +2956,8 @@ EXTRA_CSS = r"""
 
 .fc-rate-btn--hard {
   background: rgba(245, 158, 11, 0.10) !important;
-  color: #fbbf24 !important;
-  border: 1px solid rgba(245, 158, 11, 0.22) !important;
+  color: #b45309 !important;
+  border: 1px solid rgba(245, 158, 11, 0.28) !important;
 }
 .fc-rate-btn--hard:hover {
   background: rgba(245, 158, 11, 0.20) !important;
@@ -2943,12 +2965,12 @@ EXTRA_CSS = r"""
 }
 
 .fc-rate-btn--good {
-  background: rgba(59, 130, 246, 0.12) !important;
-  color: #60a5fa !important;
-  border: 1px solid rgba(59, 130, 246, 0.24) !important;
+  background: rgba(59, 130, 246, 0.10) !important;
+  color: #1d4ed8 !important;
+  border: 1px solid rgba(59, 130, 246, 0.25) !important;
 }
 .fc-rate-btn--good:hover {
-  background: rgba(59, 130, 246, 0.22) !important;
+  background: rgba(59, 130, 246, 0.20) !important;
   box-shadow: 0 6px 18px rgba(59, 130, 246, 0.25) !important;
 }
 
@@ -2962,16 +2984,33 @@ EXTRA_CSS = r"""
   box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45) !important;
 }
 
+:root[data-theme="dark"] .fc-rate-btn--again {
+  color: #fb7185 !important;
+}
+:root[data-theme="dark"] .fc-rate-btn--hard {
+  color: #fbbf24 !important;
+}
+:root[data-theme="dark"] .fc-rate-btn--good {
+  color: #60a5fa !important;
+}
+
 .cards-completed-panel {
-  background: var(--zen-surface, rgba(18, 23, 33, 0.84)) !important;
+  background: var(--zen-surface-card) !important;
   backdrop-filter: blur(24px) !important;
   -webkit-backdrop-filter: blur(24px) !important;
-  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
+  border: 1px solid var(--zen-hairline) !important;
   border-radius: 24px !important;
-  box-shadow: var(--zen-shadow-island, 0 20px 48px -12px rgba(0, 0, 0, 0.5)) !important;
+  box-shadow: var(--zen-shadow-island) !important;
   padding: 36px 28px !important;
   text-align: center !important;
   margin-top: 20px !important;
+  color: var(--zen-text-main, var(--ink)) !important;
+}
+.cards-completed-panel h2 {
+  color: var(--zen-text-main, var(--ink)) !important;
+}
+.cards-completed-panel p {
+  color: var(--zen-text-soft, var(--ink-soft)) !important;
 }
 
 /* ================= CALIBRATION & DIAGNOSTIC ZEN GLASSMORPHISM (#/diagnostic) ================= */
