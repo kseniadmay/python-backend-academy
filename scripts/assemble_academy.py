@@ -7853,12 +7853,15 @@ function splitStepHtmlIntoChunks(htmlStr){
     const tail = s.slice(lastEnd).trim();
     if(tail) rawBlocks.push(tail);
   }
+  const isCodeOrList = (str) => /<(?:pre|ul|ol|table|blockquote)\b|snippet-wrap|code-snippet/i.test(str);
+
   const merged = [];
   let pending = '';
   for(let i = 0; i < rawBlocks.length; i++){
     const b = rawBlocks[i];
     const isHeading = /^<h[1-6]\b/i.test(b);
-    const isLeadInColon = /^<p\b/i.test(b) && /:\s*(?:<\/(?:strong|b|em|i|code)>\s*)*<\/p>\s*$/i.test(b) && b.length < 260 && (i + 1 < rawBlocks.length);
+    const nextIsCode = (i + 1 < rawBlocks.length) && isCodeOrList(rawBlocks[i+1]);
+    const isLeadInColon = /^<p\b/i.test(b) && (/:\s*(?:<\/(?:strong|b|em|i|code)>\s*)*<\/p>\s*$/i.test(b) || nextIsCode) && (i + 1 < rawBlocks.length);
     if(isHeading || isLeadInColon){
       pending = pending ? (pending + '\n' + b) : b;
     } else if(pending){
@@ -8095,8 +8098,8 @@ function viewPythonSkill(sid){
 
   const curEchTier = effTier || 1;
   const echProg = (typeof getEchelonProgress === 'function') ? getEchelonProgress(curEchTier) : { pct: 35 };
-  const echPct = echProg.pct || 0;
-  const dayXpVal = (typeof todayXp === 'function') ? todayXp() : 0;
+  const echPct = (echProg && typeof echProg.pct === 'number' && echProg.pct > 0) ? echProg.pct : 35;
+  const dayXpVal = (typeof todayXp === 'function') ? (todayXp() || 55) : 55;
 
   const focusTopbarHTML = `
     <div class="echelon-topbar-clean sprint-focus-topbar sprint-topbar" style="padding: 12px 20px;">
@@ -8192,8 +8195,8 @@ function viewPythonSkill(sid){
     <div class="topic-eyebrow-track" style="max-width:780px;margin:14px auto 20px;">
       <div style="display:flex;flex-direction:column;gap:12px;width:100%;">
         <div style="display:flex;flex-direction:column;align-items:flex-start;padding-left:2px;gap:2px;">
-          <div style="font-family:var(--font-b);font-size:0.75rem;font-weight:500;color:var(--ink-muted);letter-spacing:0.01em;line-height:1.2;">${escapeHtmlStr(cleanUnitTitle)}</div>
-          ${activeItemTitle ? `<div style="font-family:var(--font-d);font-size:0.98rem;font-weight:500;color:var(--ink-soft);line-height:1.35;letter-spacing:-0.01em;">${escapeHtmlStr(activeItemTitle)}</div>` : ''}
+          <div style="font-family:var(--font-b);font-size:0.80rem;font-weight:500;color:var(--ink-muted);letter-spacing:0.01em;line-height:1.2;">${escapeHtmlStr(cleanUnitTitle)}</div>
+          ${activeItemTitle ? `<div style="font-family:var(--font-b);font-size:1.06rem;font-weight:600;color:var(--ink);line-height:1.35;letter-spacing:-0.01em;">${escapeHtmlStr(activeItemTitle)}</div>` : ''}
         </div>
         <div style="display:flex;justify-content:center;width:100%;">
           ${dotsNecklaceHTML}
@@ -8211,7 +8214,9 @@ function viewPythonSkill(sid){
 
     const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
     const canGoBack = (curChunkIdx > 0 || stepIdx > 0);
-    const backBtnHTML = canGoBack ? `<button type="button" class="btn btn-ghost" data-chunk-prev="py" style="padding:11px 16px;border-radius:14px;font-size:.88rem;">← Назад</button>` : '';
+    const backBtnHTML = canGoBack ? 
+      `<button type="button" class="btn btn-ghost" data-chunk-prev="py" style="padding:11px 16px;border-radius:14px;font-size:.88rem;">← Назад</button>` : 
+      `<a href="#${tr.routePrefix || '/python'}" class="btn btn-ghost" style="padding:11px 16px;border-radius:14px;font-size:.88rem;text-decoration:none;display:inline-flex;align-items:center;">← Назад</a>`;
 
     let primaryActionHTML = '';
     if(hasMoreChunks){
