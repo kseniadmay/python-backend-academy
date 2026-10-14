@@ -25,6 +25,8 @@ HANDOVER_MD_PATH = os.path.join(_TG_DIR, 'HANDOVER_CONTEXT.md') if os.path.isdir
 
 with open(ORIG_HTML_PATH, encoding='utf-8') as f:
     orig_html = f.read().replace('<html lang="ru">', '<html lang="ru" data-theme="dark">', 1)
+    _orbs = '<div class="ambient-orb ambient-orb--burgundy" aria-hidden="true"></div>\n<div class="ambient-orb ambient-orb--emerald" aria-hidden="true"></div>'
+    orig_html = orig_html.replace('<body>', '<body>\n' + _orbs, 1)
 
 # 1. Build UNIT_TESTS for the 9 Python Units (1.1..1.9), 4 Web Units (2.1..2.4), and 8 Backend Units (3.1..3.8)
 UNIT_TESTS = {
@@ -586,7 +588,7 @@ EXTRA_CSS = r"""
   body.is-sprint-focus main {
     width: 100% !important;
     max-width: 100% !important;
-    padding: 36px 24px 64px !important;
+    padding: 14px 20px 48px !important;
     margin: 0 auto !important;
     box-sizing: border-box !important;
     display: flex !important;
@@ -599,13 +601,13 @@ EXTRA_CSS = r"""
   }
 
   .coddy-lesson-card {
-    background: var(--surface) !important;
-    border: 1px solid var(--glass-border) !important;
-    border-radius: 20px !important;
+    background: rgba(18, 23, 33, 0.72) !important;
+    border: 1px solid rgba(255, 255, 255, 0.09) !important;
+    border-radius: 24px !important;
     padding: 26px 30px !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.5) !important;
+    backdrop-filter: blur(24px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+    box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
   }
   .coddy-lesson-card .scroll-feed {
     background: transparent !important;
@@ -811,13 +813,13 @@ EXTRA_CSS = r"""
 
   /* Ambient background orbs for Evening Obsidian / Ephemeral Parchment */
   .ambient-orb{
-    position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(68px);
+    position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(80px);
   }
   .ambient-orb--burgundy{
-    width:380px;height:380px;top:-90px;left:-80px;background:var(--orb-burgundy);
+    width:480px;height:480px;top:-120px;left:-100px;background:radial-gradient(circle, rgba(190, 18, 60, 0.32) 0%, rgba(190, 18, 60, 0) 70%) !important;
   }
   .ambient-orb--emerald{
-    width:360px;height:360px;bottom:-80px;right:-70px;background:var(--orb-emerald);
+    width:480px;height:480px;bottom:-80px;right:-60px;background:radial-gradient(circle, rgba(16, 185, 129, 0.28) 0%, rgba(16, 185, 129, 0) 70%) !important;
   }
   html,body{max-width:100vw;overflow-x:hidden;}
   #app{position:relative;z-index:1;max-width:100vw;overflow-x:hidden;}
@@ -2331,11 +2333,11 @@ EXTRA_CSS = r"""
     padding: 10px 18px;
     margin-bottom: 20px;
     border-radius: 18px;
-    background: var(--surface);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    box-shadow: var(--shadow-1);
+    background: rgba(18, 23, 33, 0.72) !important;
+    border: 1px solid rgba(255, 255, 255, 0.09) !important;
+    backdrop-filter: blur(24px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+    box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.4) !important;
   }
   .echelon-clean-wrap {
     flex: 1;
@@ -8192,8 +8194,8 @@ function viewPythonSkill(sid){
 
   // Деликатный двухстрочный заголовок: название юнита приглушено и не кричит (Refined Eyebrow), активная тема — выразительный элегантный фокус
   const eyebrowDotsHTML = `
-    <div class="topic-eyebrow-track" style="max-width:780px;margin:14px auto 20px;">
-      <div style="display:flex;flex-direction:column;gap:12px;width:100%;">
+    <div class="topic-eyebrow-track" style="max-width:780px;margin:10px auto 14px;">
+      <div style="display:flex;flex-direction:column;gap:10px;width:100%;">
         <div style="display:flex;flex-direction:column;align-items:flex-start;padding-left:2px;gap:2px;">
           <div style="font-family:var(--font-b);font-size:0.80rem;font-weight:500;color:var(--ink-muted);letter-spacing:0.01em;line-height:1.2;">${escapeHtmlStr(cleanUnitTitle)}</div>
           ${activeItemTitle ? `<div style="font-family:var(--font-b);font-size:1.06rem;font-weight:600;color:var(--ink);line-height:1.35;letter-spacing:-0.01em;">${escapeHtmlStr(activeItemTitle)}</div>` : ''}
