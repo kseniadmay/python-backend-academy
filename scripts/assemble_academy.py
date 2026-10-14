@@ -7254,6 +7254,72 @@ async function runInlineSnippet(btnEl){
     outEl.textContent = 'Ошибка: ' + String(err);
   }
 }
+/* ================= ZEN GLASSMORPHISM: MODALS & SANDBOX STUDIO ================= */
+.zen-modal-card {
+  background: var(--zen-surface) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border: 1px solid var(--zen-hairline) !important;
+  box-shadow: var(--zen-shadow-island) !important;
+  border-radius: 24px !important;
+  color: var(--ink) !important;
+}
+
+.zen-studio-card {
+  background: var(--zen-surface);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--zen-hairline);
+  box-shadow: var(--shadow-1);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.zen-card-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));
+}
+
+.zen-pane-title {
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#code-output.zen-terminal-out {
+  min-height: 250px;
+  font-family: var(--font-m);
+  font-size: 0.88rem;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));
+  color: #86efac;
+  border-radius: 14px;
+  padding: 16px;
+  white-space: pre-wrap;
+  overflow-x: auto;
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
+}
+
+:root[data-theme="light"] #code-output.zen-terminal-out {
+  background: rgba(15, 23, 42, 0.04);
+  border-color: rgba(15, 23, 42, 0.1);
+  color: #065f46;
+}
+
 """
 
 UPGRADE_VIEWS_JS = r"""
@@ -11973,35 +12039,39 @@ function openBugReportModal(){
   if(existing) existing.remove();
   const ctxStr = getCurrentBugContextString();
   const listHtml = state.bugReports.length === 0
-    ? `<p class="meta">Пока нет сохранённых заметок об ошибках.</p>`
+    ? `<p class="meta" style="font-size:0.84rem;">Пока нет сохранённых заметок об ошибках.</p>`
     : state.bugReports.slice().reverse().map((b, idx) =>
-        `<div class="panel" style="padding:10px 12px;margin-bottom:8px;">
+        `<div class="panel" style="padding:10px 14px;margin-bottom:8px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));">
           <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:.75rem;" class="meta">
-            <span><b>${escapeHtmlStr(b.context || '')}</b></span>
+            <span style="color:var(--zen-amber, #f59e0b);font-weight:700;">${escapeHtmlStr(b.context || '')}</span>
             <span>${escapeHtmlStr(b.createdAt || '')}</span>
           </div>
-          <div style="margin-top:4px;font-size:.88rem;white-space:pre-wrap;">${escapeHtmlStr(b.text || '')}</div>
+          <div style="margin-top:4px;font-size:.88rem;white-space:pre-wrap;color:var(--ink-soft);">${escapeHtmlStr(b.text || '')}</div>
         </div>`
       ).join('');
   const mdExport = state.bugReports.map((b, i) => `${i+1}. [${b.context}] (${b.createdAt}): ${b.text}`).join('\n');
   const modal = document.createElement('div');
   modal.id = 'bug-report-modal';
   modal.className = 'modal-backdrop';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
   modal.innerHTML = `
-    <div class="modal-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <h2>🐞 Журнал замечаний и багов (${state.bugReports.length})</h2>
-        <button class="btn btn-ghost" style="padding:6px 12px;" data-close-bug-modal>✕ Закрыть</button>
+    <div class="modal-card zen-modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h2 style="margin:0;font-size:1.25rem;display:flex;align-items:center;gap:10px;font-family:var(--font-h, 'Onest', sans-serif);font-weight:800;letter-spacing:-0.01em;">
+          <span>🐞</span> Журнал замечаний и багов (${state.bugReports.length})
+        </h2>
+        <button class="btn btn-ghost" style="padding:6px 12px;border-radius:12px;background:var(--zen-surface-subtle, rgba(255,255,255,0.03));border:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));" data-close-bug-modal aria-label="Закрыть">✕ Закрыть</button>
       </div>
-      <p class="meta" style="margin-bottom:8px;">Текущий экран зафиксирован автоматически: <code>${escapeHtmlStr(ctxStr)}</code></p>
-      <textarea id="bug-report-input" class="code-editor" style="min-height:88px;font-family:var(--font-b);" placeholder="Опиши ошибку, опечатку или неудобство на этом экране…"></textarea>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px;">
-        <button class="btn btn-primary" data-save-bug-report>💾 Сохранить замечание</button>
-        ${state.bugReports.length > 0 ? `<button class="btn btn-clay" data-copy-bug-reports>📋 Скопировать все (${state.bugReports.length})</button>` : ''}
-        ${state.bugReports.length > 0 ? `<button class="btn btn-ghost" data-download-bug-reports>⬇️ Скачать .json</button>` : ''}
+      <p class="meta" style="margin-bottom:8px;font-size:0.84rem;">Текущий экран зафиксирован автоматически: <code style="padding:2px 6px;border-radius:6px;background:rgba(255,255,255,0.06);">${escapeHtmlStr(ctxStr)}</code></p>
+      <textarea id="bug-report-input" class="code-editor" style="min-height:96px;font-family:var(--font-b);border-radius:12px;background:rgba(0,0,0,0.25);border:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));padding:12px;" placeholder="Опиши ошибку, опечатку или неудобство на этом экране…"></textarea>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 16px;">
+        <button class="btn-glass-emerald" style="padding:8px 16px;border-radius:12px;font-weight:700;" data-save-bug-report>💾 Сохранить замечание</button>
+        ${state.bugReports.length > 0 ? `<button class="btn btn-clay" style="padding:8px 14px;border-radius:12px;" data-copy-bug-reports>📋 Скопировать все (${state.bugReports.length})</button>` : ''}
+        ${state.bugReports.length > 0 ? `<button class="btn btn-ghost" style="padding:8px 14px;border-radius:12px;" data-download-bug-reports>⬇️ Скачать .json</button>` : ''}
       </div>
       <textarea id="bug-reports-export-box" class="sr-only" readonly>${escapeHtmlStr(mdExport)}</textarea>
-      <div style="max-height:240px;overflow-y:auto;">${listHtml}</div>
+      <div style="max-height:240px;overflow-y:auto;padding-right:4px;">${listHtml}</div>
     </div>`;
   document.body.appendChild(modal);
 }
@@ -12331,26 +12401,30 @@ function openHandoverModal(){
   const modal = document.createElement('div');
   modal.id = 'handover-modal';
   modal.className = 'modal-backdrop';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
   modal.innerHTML = `
-    <div class="modal-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <h2>🔄 Контекст для переноса в новый чат и бэкап</h2>
-        <button class="btn btn-ghost" style="padding:6px 12px;" data-close-handover>✕ Закрыть</button>
+    <div class="modal-card zen-modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h2 style="margin:0;font-size:1.25rem;display:flex;align-items:center;gap:10px;font-family:var(--font-h, 'Onest', sans-serif);font-weight:800;letter-spacing:-0.01em;">
+          <span>🔄</span> Контекст для переноса в новый чат и бэкап
+        </h2>
+        <button class="btn btn-ghost" style="padding:6px 12px;border-radius:12px;background:var(--zen-surface-subtle, rgba(255,255,255,0.03));border:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));" data-close-handover aria-label="Закрыть">✕ Закрыть</button>
       </div>
-      <p class="meta">Скопируй этот блок и вставь в начале нового чата с ИИ-ассистентом, чтобы он мгновенно понял архитектуру курса и твой текущий прогресс:</p>
-      <textarea id="handover-md-box" class="code-editor" style="min-height:190px;font-size:.8rem;" readonly>${escapeHtmlStr(md)}</textarea>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 18px;">
-        <button class="btn btn-primary" data-copy-handover>📋 Скопировать промпт для нового чата</button>
+      <p class="meta" style="font-size:0.84rem;line-height:1.45;margin-bottom:10px;">Скопируй этот блок и вставь в начале нового чата с ИИ-ассистентом, чтобы он мгновенно понял архитектуру курса и твой текущий прогресс (Контекст для продолжения работы в новом чате):</p>
+      <textarea id="handover-md-box" class="code-editor" style="min-height:190px;font-size:.8rem;border-radius:12px;background:rgba(0,0,0,0.25);border:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));padding:12px;" readonly>${escapeHtmlStr(md)}</textarea>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 20px;">
+        <button class="btn-glass-emerald" style="padding:10px 18px;border-radius:12px;font-weight:700;" data-copy-handover>📋 Скопировать промпт для нового чата</button>
       </div>
-      <h3 style="margin-bottom:6px;">Экспорт / Импорт прогресса (JSON · безопасное слияние без потери данных)</h3>
-      <textarea id="handover-json-box" class="code-editor" style="min-height:80px;font-size:.78rem;">${escapeHtmlStr(jsonStr)}</textarea>
-      <div id="handover-import-status" class="meta" style="margin-top:6px;min-height:1.2em;"></div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;align-items:center;">
-        <button class="btn btn-clay" data-import-json>📥 Восстановить / объединить из JSON</button>
-        <button class="btn btn-ghost" data-download-backup>💾 Скачать .json файл бэкапа</button>
-        <button class="btn btn-ghost" data-upload-backup-btn>📂 Загрузить .json файл</button>
+      <h3 style="margin-bottom:6px;font-size:1rem;font-weight:700;">Экспорт / Импорт прогресса (JSON · безопасное слияние без потери данных)</h3>
+      <textarea id="handover-json-box" class="code-editor" style="min-height:80px;font-size:.78rem;border-radius:12px;background:rgba(0,0,0,0.25);border:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));padding:10px;">${escapeHtmlStr(jsonStr)}</textarea>
+      <div id="handover-import-status" class="meta" style="margin-top:6px;min-height:1.2em;font-weight:600;"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;align-items:center;">
+        <button class="btn btn-clay" style="padding:8px 14px;border-radius:12px;" data-import-json>📥 Восстановить / объединить из JSON</button>
+        <button class="btn btn-ghost" style="padding:8px 14px;border-radius:12px;" data-download-backup>💾 Скачать .json файл бэкапа</button>
+        <button class="btn btn-ghost" style="padding:8px 14px;border-radius:12px;" data-upload-backup-btn>📂 Загрузить .json файл</button>
         <input type="file" id="handover-file-input" accept=".json,application/json" style="display:none;">
-        ${hasPreReset ? `<button class="btn btn-ghost" data-restore-pre-reset>🛟 Восстановить до последнего сброса</button>` : ''}
+        ${hasPreReset ? `<button class="btn btn-ghost" style="padding:8px 14px;border-radius:12px;" data-restore-pre-reset>🛟 Восстановить до последнего сброса</button>` : ''}
       </div>
     </div>`;
   document.body.appendChild(modal);
@@ -12552,18 +12626,29 @@ viewSandbox = function(){
   ensureExtendedState();
   const savedCode = (typeof state.sandboxDraft === 'string' && state.sandboxDraft.length > 0) ? state.sandboxDraft : SANDBOX_DEFAULT;
   return `
-    <div class="container">
-      <h1 style="margin-bottom:6px;">Песочница</h1>
-      <p class="meta" style="margin-bottom:18px;">Настоящий Python прямо в браузере, без установки — на этом будет держаться вся практика с кодом. Удобнее за компьютером, но можно и с телефона.</p>
-      <div class="sandbox-grid">
-        <div>
-          ${buildCodeEditorWithGutterHTML('code-input', savedCode, 'min-height:240px;', '')}
-          <div style="margin-top:10px;display:flex;gap:10px;align-items:center;">
-            <button class="btn btn-primary" id="run-btn">${ICONS.play} Запустить</button>
-            <span class="meta" id="run-status"></span>
+    <div class="container" style="max-width:1100px;">
+      <div class="topic-badge" style="margin-bottom:12px;">Инструменты · Настоящий Python в браузере (Brython 3.13)</div>
+      <h1 style="margin-bottom:6px;font-family:var(--font-h, 'Onest', sans-serif);font-weight:800;letter-spacing:-0.02em;">Песочница Python</h1>
+      <p class="meta" style="margin-bottom:20px;max-width:720px;font-size:0.92rem;line-height:1.5;">Настоящий интерпретатор Python прямо в браузере, без установки окружения — на этом базируется вся практика с кодом. Удобнее за компьютером, но полностью адаптировано и для смартфона.</p>
+      <div class="sandbox-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:18px;">
+        <div class="card zen-studio-card" style="margin:0;">
+          <div class="zen-card-header-bar">
+            <span class="zen-pane-title">📝 Редактор кода</span>
+            <span style="font-size:0.75rem;color:var(--ink-muted);font-weight:600;"><kbd>Ctrl</kbd>+<kbd>Enter</kbd> запуск</span>
+          </div>
+          ${buildCodeEditorWithGutterHTML('code-input', savedCode, 'min-height:260px;', '')}
+          <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <button class="btn-glass-emerald" id="run-btn" style="padding:10px 18px;border-radius:12px;font-weight:700;">${ICONS.play} Запустить (Ctrl+Enter)</button>
+            <span class="meta" id="run-status" style="font-weight:600;font-size:0.84rem;"></span>
           </div>
         </div>
-        <pre id="code-output">Нажми «Запустить» — при первом разе Python-движок грузится 5–15 секунд.</pre>
+        <div class="card zen-studio-card" style="margin:0;">
+          <div class="zen-card-header-bar">
+            <span class="zen-pane-title">🖥️ Терминал вывода</span>
+            <span style="font-size:0.75rem;color:var(--ink-muted);font-weight:600;">stdout / stderr</span>
+          </div>
+          <pre id="code-output" class="zen-terminal-out">Нажми «Запустить» — при первом разе Python-движок грузится 5–15 секунд.</pre>
+        </div>
       </div>
     </div>`;
 };
