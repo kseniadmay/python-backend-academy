@@ -579,6 +579,31 @@ print(f"JSON sizes: PY_MASTERY={len(py_mastery_json)//1024}KB, WEB_MASTERY={len(
 EXTRA_CSS = r"""
   /* ---------- Ephemeral UI (60/30/10 Light & Evening Obsidian Dark) & Cocoon Redesign ---------- */
   :root, :root[data-theme="light"]{
+    /* Canonical Zen Tokens (Light) */
+    --zen-bg:#FAF8F5;
+    --zen-surface:rgba(255, 255, 255, 0.88);
+    --zen-surface-card:rgba(255, 255, 255, 0.72);
+    --zen-surface-subtle:rgba(15, 23, 42, 0.04);
+    --zen-surface-hover:rgba(15, 23, 42, 0.07);
+    --zen-hairline:rgba(0, 0, 0, 0.08);
+    --zen-hairline-subtle:rgba(0, 0, 0, 0.045);
+    --zen-text-main:#0f172a;
+    --zen-text-soft:#334155;
+    --zen-text-muted:#64748b;
+    --zen-emerald:#145a46;
+    --zen-emerald-light:#10b981;
+    --zen-emerald-soft:rgba(20, 90, 70, 0.09);
+    --zen-emerald-border:rgba(20, 90, 70, 0.28);
+    --zen-amber:#d97706;
+    --zen-amber-light:#f59e0b;
+    --zen-amber-soft:rgba(217, 119, 6, 0.10);
+    --zen-amber-border:rgba(217, 119, 6, 0.30);
+    --zen-bordeaux:#6b1d2f;
+    --zen-bordeaux-light:#be123c;
+    --zen-bordeaux-soft:rgba(107, 29, 47, 0.09);
+    --zen-bordeaux-border:rgba(107, 29, 47, 0.28);
+    --zen-shadow-island:0 20px 48px -12px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+
     --paper:#faf8f5;
     --surface:rgba(255,255,255,0.88);
     --surface-2:rgba(15,23,42,0.045);
@@ -603,6 +628,31 @@ EXTRA_CSS = r"""
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
+      /* Canonical Zen Tokens (Dark) */
+      --zen-bg:#0b0f15;
+      --zen-surface:rgba(18, 23, 33, 0.84);
+      --zen-surface-card:rgba(22, 28, 40, 0.70);
+      --zen-surface-subtle:rgba(255, 255, 255, 0.04);
+      --zen-surface-hover:rgba(255, 255, 255, 0.075);
+      --zen-hairline:rgba(255, 255, 255, 0.08);
+      --zen-hairline-subtle:rgba(255, 255, 255, 0.045);
+      --zen-text-main:#f8fafc;
+      --zen-text-soft:#cbd5e1;
+      --zen-text-muted:#8b9bb4;
+      --zen-emerald:#10b981;
+      --zen-emerald-light:#34d399;
+      --zen-emerald-soft:rgba(16, 185, 129, 0.12);
+      --zen-emerald-border:rgba(52, 211, 153, 0.35);
+      --zen-amber:#f59e0b;
+      --zen-amber-light:#fbbf24;
+      --zen-amber-soft:rgba(245, 158, 11, 0.14);
+      --zen-amber-border:rgba(251, 191, 36, 0.35);
+      --zen-bordeaux:#fb7185;
+      --zen-bordeaux-light:#f43f5e;
+      --zen-bordeaux-soft:rgba(225, 29, 72, 0.16);
+      --zen-bordeaux-border:rgba(251, 113, 133, 0.45);
+      --zen-shadow-island:0 24px 64px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--zen-hairline);
+
       --paper:#0d1016;
       --surface:rgba(22,27,36,0.74);
       --surface-2:rgba(30,37,49,0.66);
@@ -623,6 +673,31 @@ EXTRA_CSS = r"""
     }
   }
   :root[data-theme="dark"]{
+    /* Canonical Zen Tokens (Dark) */
+    --zen-bg:#0b0f15;
+    --zen-surface:rgba(18, 23, 33, 0.84);
+    --zen-surface-card:rgba(22, 28, 40, 0.70);
+    --zen-surface-subtle:rgba(255, 255, 255, 0.04);
+    --zen-surface-hover:rgba(255, 255, 255, 0.075);
+    --zen-hairline:rgba(255, 255, 255, 0.08);
+    --zen-hairline-subtle:rgba(255, 255, 255, 0.045);
+    --zen-text-main:#f8fafc;
+    --zen-text-soft:#cbd5e1;
+    --zen-text-muted:#8b9bb4;
+    --zen-emerald:#10b981;
+    --zen-emerald-light:#34d399;
+    --zen-emerald-soft:rgba(16, 185, 129, 0.12);
+    --zen-emerald-border:rgba(52, 211, 153, 0.35);
+    --zen-amber:#f59e0b;
+    --zen-amber-light:#fbbf24;
+    --zen-amber-soft:rgba(245, 158, 11, 0.14);
+    --zen-amber-border:rgba(251, 191, 36, 0.35);
+    --zen-bordeaux:#fb7185;
+    --zen-bordeaux-light:#f43f5e;
+    --zen-bordeaux-soft:rgba(225, 29, 72, 0.16);
+    --zen-bordeaux-border:rgba(251, 113, 133, 0.45);
+    --zen-shadow-island:0 24px 64px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--zen-hairline);
+
     --paper:#0d1016;
     --surface:rgba(22,27,36,0.74);
     --surface-2:rgba(30,37,49,0.66);
@@ -640,6 +715,24 @@ EXTRA_CSS = r"""
     --glass-border:rgba(255,255,255,0.10);
     --orb-burgundy:rgba(190,18,60,0.24);
     --orb-emerald:rgba(16,185,129,0.20);
+  }
+
+  /* Universal Ambient Background with Multi-Layered Mesh Gradient */
+  body {
+    background: var(--zen-bg, var(--paper)) !important;
+    background-image:
+      radial-gradient(at 15% 15%, rgba(16, 185, 129, 0.08) 0px, transparent 55%),
+      radial-gradient(at 85% 85%, rgba(245, 158, 11, 0.06) 0px, transparent 55%),
+      radial-gradient(at 50% 50%, rgba(190, 18, 60, 0.04) 0px, transparent 60%) !important;
+    background-attachment: fixed !important;
+    background-size: 100% 100% !important;
+    color: var(--zen-text-main, var(--ink)) !important;
+  }
+  :root[data-theme="light"] body {
+    background-image:
+      radial-gradient(at 15% 15%, rgba(20, 90, 70, 0.06) 0px, transparent 55%),
+      radial-gradient(at 85% 85%, rgba(217, 119, 6, 0.05) 0px, transparent 55%),
+      radial-gradient(at 50% 50%, rgba(107, 29, 47, 0.03) 0px, transparent 60%) !important;
   }
 
   /* WCAG AAA Keyboard Focus Ring */
@@ -2883,24 +2976,34 @@ EXTRA_CSS = r"""
 
 /* ================= CALIBRATION & DIAGNOSTIC ZEN GLASSMORPHISM (#/diagnostic) ================= */
 .diag-zen-card {
-  background: var(--zen-surface-card, rgba(18, 23, 33, 0.72)) !important;
+  background: var(--zen-surface-card) !important;
   backdrop-filter: blur(24px) !important;
   -webkit-backdrop-filter: blur(24px) !important;
-  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
+  border: 1px solid var(--zen-hairline) !important;
   border-radius: 24px !important;
-  box-shadow: var(--zen-shadow-island, 0 20px 48px -12px rgba(0, 0, 0, 0.5)) !important;
-  padding: 28px 24px !important;
+  box-shadow: var(--zen-shadow-island) !important;
+  padding: 32px 28px !important;
   transition: all 0.2s ease !important;
+  color: var(--zen-text-main, var(--ink)) !important;
+}
+
+.diag-zen-card h1 {
+  color: var(--zen-text-main, var(--ink)) !important;
+}
+
+.diag-zen-card p, .diag-zen-card li {
+  color: var(--zen-text-soft, var(--ink-soft)) !important;
 }
 
 .diag-branch-panel {
-  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.035)) !important;
+  background: var(--zen-surface-subtle) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
-  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
+  border: 1px solid var(--zen-hairline) !important;
   border-radius: 20px !important;
   padding: 20px 22px !important;
   margin-bottom: 22px !important;
+  color: var(--zen-text-main, var(--ink)) !important;
 }
 
 .stack-branch-bar {
@@ -2919,13 +3022,13 @@ EXTRA_CSS = r"""
 }
 
 .stack-branch-bar .btn.btn-ghost {
-  background: rgba(255, 255, 255, 0.03) !important;
-  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
-  color: var(--zen-text-subtle, #cbd5e1) !important;
+  background: var(--zen-surface-subtle) !important;
+  border: 1px solid var(--zen-hairline) !important;
+  color: var(--zen-text-soft, var(--ink-soft)) !important;
 }
 .stack-branch-bar .btn.btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.07) !important;
-  color: #ffffff !important;
+  background: var(--zen-surface-hover) !important;
+  color: var(--zen-text-main, var(--ink)) !important;
   transform: translateY(-1.5px) !important;
 }
 
@@ -2937,14 +3040,15 @@ EXTRA_CSS = r"""
 }
 
 .quiz-question-card {
-  background: var(--zen-surface-card, rgba(18, 23, 33, 0.72)) !important;
+  background: var(--zen-surface-card) !important;
   backdrop-filter: blur(24px) !important;
   -webkit-backdrop-filter: blur(24px) !important;
-  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
+  border: 1px solid var(--zen-hairline) !important;
   border-radius: 24px !important;
-  box-shadow: var(--zen-shadow-island, 0 20px 48px -12px rgba(0, 0, 0, 0.5)) !important;
-  padding: 28px 24px !important;
+  box-shadow: var(--zen-shadow-island) !important;
+  padding: 30px 26px !important;
   margin-top: 16px !important;
+  color: var(--zen-text-main, var(--ink)) !important;
 }
 
 .quiz-question-prompt {
@@ -2952,7 +3056,7 @@ EXTRA_CSS = r"""
   font-size: 1.15rem !important;
   font-weight: 700 !important;
   line-height: 1.55 !important;
-  color: var(--zen-text, #f1f5f9) !important;
+  color: var(--zen-text-main, var(--ink)) !important;
   letter-spacing: -0.01em !important;
   margin-bottom: 20px !important;
 }
@@ -2964,10 +3068,10 @@ EXTRA_CSS = r"""
   text-align: left !important;
   padding: 14px 18px !important;
   border-radius: 16px !important;
-  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
-  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.035)) !important;
+  border: 1px solid var(--zen-hairline) !important;
+  background: var(--zen-surface-subtle) !important;
   backdrop-filter: blur(12px) !important;
-  color: var(--zen-text-subtle, #cbd5e1) !important;
+  color: var(--zen-text-soft, var(--ink-soft)) !important;
   font-size: 0.95rem !important;
   line-height: 1.5 !important;
   margin-bottom: 10px !important;
@@ -2976,18 +3080,18 @@ EXTRA_CSS = r"""
 }
 
 .quiz-opt:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.07) !important;
-  border-color: rgba(255, 255, 255, 0.18) !important;
+  background: var(--zen-surface-hover) !important;
+  border-color: var(--zen-emerald-light, rgba(16, 185, 129, 0.5)) !important;
   transform: translateY(-1.5px) !important;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25) !important;
-  color: #ffffff !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15) !important;
+  color: var(--zen-text-main, var(--ink)) !important;
 }
 
 .quiz-opt--selected {
-  background: rgba(16, 185, 129, 0.12) !important;
-  border-color: var(--zen-emerald, #10b981) !important;
-  box-shadow: 0 0 0 1px var(--zen-emerald, #10b981), 0 8px 24px rgba(16, 185, 129, 0.2) !important;
-  color: #ffffff !important;
+  background: rgba(16, 185, 129, 0.14) !important;
+  border-color: var(--zen-emerald-light, #10b981) !important;
+  box-shadow: 0 0 0 1px var(--zen-emerald-light, #10b981), 0 8px 24px rgba(16, 185, 129, 0.22) !important;
+  color: var(--zen-text-main, var(--ink)) !important;
   font-weight: 600 !important;
   transform: translateY(-1.5px) !important;
 }
@@ -2996,7 +3100,7 @@ EXTRA_CSS = r"""
   background: rgba(16, 185, 129, 0.18) !important;
   border-color: #10b981 !important;
   box-shadow: 0 0 20px rgba(16, 185, 129, 0.32) !important;
-  color: #a7f3d0 !important;
+  color: var(--zen-text-main, #10b981) !important;
   font-weight: 700 !important;
 }
 
@@ -3004,7 +3108,7 @@ EXTRA_CSS = r"""
   background: rgba(244, 63, 94, 0.14) !important;
   border-color: #f43f5e !important;
   box-shadow: 0 0 20px rgba(244, 63, 94, 0.26) !important;
-  color: #fecdd3 !important;
+  color: var(--zen-text-main, #f43f5e) !important;
   font-weight: 700 !important;
 }
 
@@ -3015,8 +3119,8 @@ EXTRA_CSS = r"""
   min-width: 26px !important;
   height: 26px !important;
   border-radius: 8px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  color: var(--zen-text, #f1f5f9) !important;
+  background: var(--zen-surface-hover) !important;
+  color: var(--zen-text-main, var(--ink)) !important;
   font-family: var(--font-m, 'JetBrains Mono', monospace) !important;
   font-size: 0.85rem !important;
   margin-right: 12px !important;
@@ -3024,7 +3128,7 @@ EXTRA_CSS = r"""
 }
 
 .quiz-opt--selected b {
-  background: var(--zen-emerald, #10b981) !important;
+  background: var(--zen-emerald-light, #10b981) !important;
   color: #ffffff !important;
 }
 
@@ -3040,7 +3144,7 @@ EXTRA_CSS = r"""
 
 .quiz-progress, .progress-bar {
   height: 6px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
+  background: var(--zen-surface-subtle) !important;
   border-radius: 999px !important;
   overflow: hidden !important;
   margin-bottom: 20px !important;
@@ -3055,31 +3159,31 @@ EXTRA_CSS = r"""
 }
 
 .diag-notice-calibrated {
-  background: rgba(16, 185, 129, 0.07) !important;
-  border: 1px solid rgba(16, 185, 129, 0.28) !important;
-  border-left: 4px solid var(--zen-emerald, #10b981) !important;
+  background: var(--zen-emerald-soft, rgba(16, 185, 129, 0.08)) !important;
+  border: 1px solid var(--zen-emerald-border, rgba(16, 185, 129, 0.28)) !important;
+  border-left: 4px solid var(--zen-emerald-light, #10b981) !important;
   border-radius: 20px !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.5), 0 0 24px rgba(16, 185, 129, 0.12) !important;
   padding: 24px 22px !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  box-shadow: var(--zen-shadow-island) !important;
   margin-top: 22px !important;
+  color: var(--zen-text-main, var(--ink)) !important;
 }
 
 .diag-cat-card {
-  background: var(--zen-surface-card, rgba(18, 23, 33, 0.72)) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
-  border-radius: 20px !important;
+  background: var(--zen-surface-card) !important;
+  border: 1px solid var(--zen-hairline) !important;
+  border-radius: 18px !important;
   padding: 22px 20px !important;
-  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: var(--zen-shadow-island) !important;
   transition: transform 0.15s ease, border-color 0.15s ease !important;
+  color: var(--zen-text-main, var(--ink)) !important;
 }
 
 .diag-cat-card:hover {
   transform: translateY(-2px) !important;
-  border-color: rgba(255, 255, 255, 0.16) !important;
+  border-color: var(--zen-emerald-border, rgba(16, 185, 129, 0.35)) !important;
 }
 
 
@@ -9695,29 +9799,31 @@ diagIntroHTML = function(){
   const branch = state.stackBranch || 'fastapi';
   return `
     <div class="container">
-      <div class="diag-header-row">
-        <a href="#/" class="back-link">${ICONS.chevronLeft} К результатам</a>
-        <div class="topic-badge">Этап 0 · Калибровочная диагностика Эшелона 1 (Скрининг)</div>
-      </div>
-      <h1 style="margin-bottom:10px;">Калибровка приоритетов перед стартом</h1>
-      <p>${CORE_QUESTIONS.length} вопросов по темам <b>🚨 Эшелона 1 (Скрининг и база)</b> — Python Core, словари/хеширование, типизация/GIL, Git, базовый SQL/JOIN, HTTP/REST и Big-O. Это не экзамен, а умная калибровка твоего маршрута:</p>
-      <ul style="margin:8px 0 16px 20px;line-height:1.55;">
-        <li>За каждый верный блок связанные навыки автоматически получают <b>50 MP (Знакомство)</b> — ты не тратишь время на очевидное;</li>
-        <li>Вопросы с ошибками формируют <b>Очередь приоритета №1 («Пробелы скрининга»)</b> на Дашборде и в модулях;</li>
-        <li>В конце по желанию можно открыть продвинутый блок (${ADVANCED_QUESTIONS.length} вопросов по ООП и алгоритмам).</li>
-      </ul>
-      <div class="panel diag-branch-panel" style="margin-bottom:18px;padding:14px 16px;">
-        <div style="font-weight:700;margin-bottom:6px;">Выбери целевую ветку веб-стека (Этап 2 параллельных веток):</div>
-        <p class="meta" style="margin-bottom:10px;">Выбранный стек остаётся в <b>🔥 Эшелоне 2</b>, а альтернативный фреймворк переносится в <b>👑 Эшелон 4 (Резерв)</b>, чтобы не распылять фокус перед оффером:</p>
-        <div class="stack-branch-bar">
-          <button class="btn ${branch==='fastapi'?'btn-primary':'btn-ghost'}" style="padding:7px 14px;font-size:.84rem;" data-stack-branch="fastapi">⚡ FastAPI + SQLAlchemy (Рекомендуется)</button>
-          <button class="btn ${branch==='django'?'btn-primary':'btn-ghost'}" style="padding:7px 14px;font-size:.84rem;" data-stack-branch="django">🎸 Django + DRF</button>
-          <button class="btn ${branch==='both'?'btn-primary':'btn-ghost'}" style="padding:7px 14px;font-size:.84rem;" data-stack-branch="both">🔥 Оба стека</button>
+      <div class="diag-zen-card">
+        <div class="diag-header-row">
+          <a href="#/" class="back-link">${ICONS.chevronLeft} К результатам</a>
+          <div class="topic-badge">Этап 0 · Калибровочная диагностика Эшелона 1 (Скрининг)</div>
         </div>
-      </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;">
-        <button class="btn btn-primary" data-diag-start>Начать калибровку (${CORE_QUESTIONS.length} вопросов)</button>
-        <a href="#/" class="btn btn-ghost">Пропустить, вернусь позже</a>
+        <h1 style="margin-bottom:12px;">Калибровка приоритетов перед стартом</h1>
+        <p style="color:var(--zen-text-soft, var(--ink-soft));font-size:1.02rem;line-height:1.6;">${CORE_QUESTIONS.length} вопросов по темам <b>🚨 Эшелона 1 (Скрининг и база)</b> — Python Core, словари/хеширование, типизация/GIL, Git, базовый SQL/JOIN, HTTP/REST и Big-O. Это не экзамен, а умная калибровка твоего маршрута:</p>
+        <ul style="margin:12px 0 20px 22px;line-height:1.65;color:var(--zen-text-soft, var(--ink-soft));">
+          <li>За каждый верный блок связанные навыки автоматически получают <b>50 MP (Знакомство)</b> — ты не тратишь время на очевидное;</li>
+          <li>Вопросы с ошибками формируют <b>Очередь приоритета №1 («Пробелы скрининга»)</b> на Дашборде и в модулях;</li>
+          <li>В конце по желанию можно открыть продвинутый блок (${ADVANCED_QUESTIONS.length} вопросов по ООП и алгоритмам).</li>
+        </ul>
+        <div class="panel diag-branch-panel" style="margin-bottom:20px;padding:16px 18px;">
+          <div style="font-weight:700;margin-bottom:6px;color:var(--zen-text-main, var(--ink));">Выбери целевую ветку веб-стека (Этап 2 параллельных веток):</div>
+          <p class="meta" style="margin-bottom:12px;color:var(--zen-text-muted, var(--ink-muted));">Выбранный стек остаётся в <b>🔥 Эшелоне 2</b>, а альтернативный фреймворк переносится в <b>👑 Эшелон 4 (Резерв)</b>, чтобы не распылять фокус перед оффером:</p>
+          <div class="stack-branch-bar">
+            <button class="btn ${branch==='fastapi'?'btn-primary':'btn-ghost'}" style="padding:8px 16px;font-size:.85rem;" data-stack-branch="fastapi">⚡ FastAPI + SQLAlchemy (Рекомендуется)</button>
+            <button class="btn ${branch==='django'?'btn-primary':'btn-ghost'}" style="padding:8px 16px;font-size:.85rem;" data-stack-branch="django">🎸 Django + DRF</button>
+            <button class="btn ${branch==='both'?'btn-primary':'btn-ghost'}" style="padding:8px 16px;font-size:.85rem;" data-stack-branch="both">🔥 Оба стека</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;">
+          <button class="btn btn-primary" data-diag-start>Начать калибровку (${CORE_QUESTIONS.length} вопросов)</button>
+          <a href="#/" class="btn btn-ghost">Пропустить, вернусь позже</a>
+        </div>
       </div>
     </div>`;
 };
