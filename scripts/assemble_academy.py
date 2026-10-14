@@ -25,8 +25,6 @@ HANDOVER_MD_PATH = os.path.join(_TG_DIR, 'HANDOVER_CONTEXT.md') if os.path.isdir
 
 with open(ORIG_HTML_PATH, encoding='utf-8') as f:
     orig_html = f.read().replace('<html lang="ru">', '<html lang="ru" data-theme="dark">', 1)
-    _orbs = '<div class="ambient-orb ambient-orb--burgundy" aria-hidden="true"></div>\n<div class="ambient-orb ambient-orb--emerald" aria-hidden="true"></div>'
-    orig_html = orig_html.replace('<body>', '<body>\n' + _orbs, 1)
 
 # 1. Build UNIT_TESTS for the 9 Python Units (1.1..1.9), 4 Web Units (2.1..2.4), and 8 Backend Units (3.1..3.8)
 UNIT_TESTS = {
@@ -579,255 +577,8 @@ brython_prelude_json = safe_js_json(full_env_code)
 print(f"JSON sizes: PY_MASTERY={len(py_mastery_json)//1024}KB, WEB_MASTERY={len(web_mastery_json)//1024}KB, BACKEND_MASTERY={len(backend_mastery_json)//1024}KB, ALGO_MASTERY={len(algo_mastery_json)//1024}KB, DB_MASTERY={len(db_mastery_json)//1024}KB, ARCH_MASTERY={len(arch_mastery_json)//1024}KB, INFRA_MASTERY={len(infra_mastery_json)//1024}KB, IDE_TASKS={len(ide_tasks_json)//1024}KB, NEW_LESSONS={len(new_lessons_json)//1024}KB, PRELUDE={len(brython_prelude_json)//1024}KB")
 
 EXTRA_CSS = r"""
-
-  /* ================= CANONICAL SPRINT FOCUS & BENCHMARK SCREENS (САЙДБАР ВСЕГДА ВИДЕН НА ДЕСКТОПЕ) ================= */
-  body.is-sprint-focus .topbar { display: none !important; }
-  body.is-sprint-focus .tabbar { display: none !important; }
-
-  @media (max-width: 899px) {
-    body.is-sprint-focus .sidebar { display: none !important; }
-    body.is-sprint-focus #app { min-height: 100vh; display: block !important; }
-    body.is-sprint-focus main {
-      width: 100% !important;
-      max-width: 100% !important;
-      padding: 10px 12px 36px !important;
-      margin: 0 auto !important;
-      box-sizing: border-box !important;
-      display: flex !important;
-      justify-content: center !important;
-    }
-  }
-
-  @media (min-width: 900px) {
-    body.is-sprint-focus #app {
-      display: flex !important;
-      flex-direction: row !important;
-      min-height: 100vh;
-    }
-    body.is-sprint-focus .sidebar {
-      display: flex !important;
-      flex: 0 0 280px !important;
-      max-width: 280px !important;
-    }
-    body.is-sprint-focus.zen-mode .sidebar {
-      display: none !important;
-    }
-    body.is-sprint-focus main {
-      flex: 1 1 auto !important;
-      min-width: 0 !important;
-      max-width: calc(100% - 280px) !important;
-      padding: 14px 24px 48px !important;
-      margin: 0 !important;
-      box-sizing: border-box !important;
-      display: flex !important;
-      justify-content: center !important;
-    }
-  }
-
-  body.is-sprint-focus .container {
-    max-width: 940px !important;
-    width: 100% !important;
-    margin: 0 auto !important;
-  }
-
-  /* ================= CANONICAL PRACTICE BENCHMARK (SPLIT VIEW) ================= */
-  .practice-coddy-split {
-    display: grid !important;
-    grid-template-columns: 1.05fr 1fr;
-    gap: 18px;
-    align-items: stretch;
-  }
-  @media (max-width: 860px) {
-    .practice-coddy-split {
-      grid-template-columns: 1fr !important;
-    }
-  }
-  .practice-spec-pane {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background: rgba(15, 23, 42, 0.45);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 18px;
-    padding: 16px 18px;
-  }
-  .practice-right-pane {
-    background: rgba(15, 23, 42, 0.45);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 18px;
-    padding: 16px 18px;
-  }
-  .practice-kbd-dock {
-    display: flex;
-    gap: 14px;
-    font-size: 0.74rem;
-    color: var(--ink-muted);
-    margin-top: 8px;
-  }
-  .practice-kbd-dock kbd {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 4px;
-    padding: 1px 5px;
-    font-size: 0.70rem;
-    color: var(--ink);
-  }
-  .btn-check-solution {
-    flex: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 14px;
-    padding: 12px 18px;
-    font-weight: 700;
-    font-size: 0.92rem;
-    cursor: pointer;
-    box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35);
-    transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
-  }
-  .btn-check-solution:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 22px rgba(16, 185, 129, 0.45);
-    filter: brightness(1.06);
-  }
-  .btn-check-solution:active {
-    transform: translateY(0);
-  }
-  .btn-check-solution .xp-tag {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 2px 7px;
-    border-radius: 6px;
-    font-size: 0.76rem;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-  }
-
-  /* ================= CANONICAL FLASHCARD BENCHMARK (VIDEO RECORDING) ================= */
-  .fc-card {
-    background: var(--surface) !important;
-    border: 1px solid rgba(16, 185, 129, 0.4) !important;
-    border-radius: 22px !important;
-    padding: 26px 24px !important;
-    min-height: 220px !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), 0 0 20px rgba(16, 185, 129, 0.08) !important;
-    transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease !important;
-  }
-  .fc-card:hover {
-    border-color: rgba(16, 185, 129, 0.6) !important;
-    box-shadow: 0 10px 36px rgba(0, 0, 0, 0.3), 0 0 26px rgba(16, 185, 129, 0.14) !important;
-  }
-  .fc-card .topic-badge {
-    background: rgba(255, 255, 255, 0.06);
-    color: var(--ink-muted);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    font-weight: 700;
-    text-transform: uppercase;
-    font-size: 0.72rem;
-    letter-spacing: 0.04em;
-    padding: 3px 10px;
-    border-radius: 8px;
-  }
-  .fc-card.fc-card--Answer .topic-badge {
-    background: rgba(16, 185, 129, 0.15) !important;
-    color: #10b981 !important;
-    border-color: rgba(16, 185, 129, 0.4) !important;
-  }
-  .card-help-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 0.75rem;
-    color: var(--ink-muted);
-    text-decoration: none;
-    padding: 3px 10px;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.15s ease;
-  }
-  .card-help-badge:hover {
-    color: var(--ink);
-    background: rgba(255, 255, 255, 0.1);
-  }
-  .fc-rate-row {
-    display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important;
-    gap: 10px !important;
-  }
-  @media (max-width: 600px) {
-    .fc-rate-row {
-      grid-template-columns: repeat(2, 1fr) !important;
-    }
-  }
-
-  .coddy-lesson-card {
-    background: rgba(18, 23, 33, 0.72) !important;
-    border: 1px solid rgba(255, 255, 255, 0.09) !important;
-    border-radius: 24px !important;
-    padding: 26px 30px !important;
-    backdrop-filter: blur(24px) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
-    box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
-  }
-  .coddy-lesson-card .scroll-feed {
-    background: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
-    padding: 0 !important;
-    box-shadow: none !important;
-  }
-  .coddy-lesson-card .feed-chunk {
-    padding: 0 !important;
-  }
-  .coddy-lesson-card .feed-chunk h4 {
-    margin: 0 0 14px 0 !important;
-    font-size: 1.25rem !important;
-    font-weight: 700 !important;
-    color: var(--ink) !important;
-  }
-  .coddy-lesson-card .feed-chunk p {
-    margin: 0 0 16px 0 !important;
-    font-size: 0.95rem !important;
-    line-height: 1.6 !important;
-    color: var(--ink-soft) !important;
-  }
-
   /* ---------- Ephemeral UI (60/30/10 Light & Evening Obsidian Dark) & Cocoon Redesign ---------- */
   :root, :root[data-theme="light"]{
-    /* Canonical Zen Tokens (Light) */
-    --zen-bg:#FAF8F5;
-    --zen-surface:rgba(255, 255, 255, 0.88);
-    --zen-surface-card:rgba(255, 255, 255, 0.72);
-    --zen-surface-subtle:rgba(15, 23, 42, 0.04);
-    --zen-surface-hover:rgba(15, 23, 42, 0.07);
-    --zen-hairline:rgba(0, 0, 0, 0.08);
-    --zen-hairline-subtle:rgba(0, 0, 0, 0.045);
-    --zen-hairline-strong:rgba(0, 0, 0, 0.14);
-    --zen-text-main:#0f172a;
-    --zen-text-soft:#334155;
-    --zen-text-muted:#64748b;
-    --zen-text:#0f172a;
-    --zen-text-subtle:#334155;
-    --zen-surface-input:rgba(15, 23, 42, 0.04);
-    --zen-emerald:#145a46;
-    --zen-emerald-light:#10b981;
-    --zen-emerald-soft:rgba(20, 90, 70, 0.09);
-    --zen-emerald-border:rgba(20, 90, 70, 0.28);
-    --zen-amber:#d97706;
-    --zen-amber-light:#f59e0b;
-    --zen-amber-soft:rgba(217, 119, 6, 0.10);
-    --zen-amber-border:rgba(217, 119, 6, 0.30);
-    --zen-bordeaux:#6b1d2f;
-    --zen-bordeaux-light:#be123c;
-    --zen-bordeaux-soft:rgba(107, 29, 47, 0.09);
-    --zen-bordeaux-border:rgba(107, 29, 47, 0.28);
-    --zen-shadow-island:0 20px 48px -12px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
-    --zen-shadow-lift:0 12px 28px -8px rgba(15, 23, 42, 0.08);
-
     --paper:#faf8f5;
     --surface:rgba(255,255,255,0.88);
     --surface-2:rgba(15,23,42,0.045);
@@ -852,36 +603,6 @@ EXTRA_CSS = r"""
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      /* Canonical Zen Tokens (Dark) */
-      --zen-bg:#0b0f15;
-      --zen-surface:rgba(18, 23, 33, 0.84);
-      --zen-surface-card:rgba(22, 28, 40, 0.70);
-      --zen-surface-subtle:rgba(255, 255, 255, 0.04);
-      --zen-surface-hover:rgba(255, 255, 255, 0.075);
-      --zen-hairline:rgba(255, 255, 255, 0.08);
-      --zen-hairline-subtle:rgba(255, 255, 255, 0.045);
-      --zen-hairline-strong:rgba(255, 255, 255, 0.16);
-      --zen-text-main:#f8fafc;
-      --zen-text-soft:#cbd5e1;
-      --zen-text-muted:#8b9bb4;
-      --zen-text:#f8fafc;
-      --zen-text-subtle:#cbd5e1;
-      --zen-surface-input:rgba(15, 20, 30, 0.6);
-      --zen-emerald:#10b981;
-      --zen-emerald-light:#34d399;
-      --zen-emerald-soft:rgba(16, 185, 129, 0.12);
-      --zen-emerald-border:rgba(52, 211, 153, 0.35);
-      --zen-amber:#f59e0b;
-      --zen-amber-light:#fbbf24;
-      --zen-amber-soft:rgba(245, 158, 11, 0.14);
-      --zen-amber-border:rgba(251, 191, 36, 0.35);
-      --zen-bordeaux:#fb7185;
-      --zen-bordeaux-light:#f43f5e;
-      --zen-bordeaux-soft:rgba(225, 29, 72, 0.16);
-      --zen-bordeaux-border:rgba(251, 113, 133, 0.45);
-      --zen-shadow-island:0 24px 64px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--zen-hairline);
-      --zen-shadow-lift:0 12px 28px -8px rgba(0, 0, 0, 0.4);
-
       --paper:#0d1016;
       --surface:rgba(22,27,36,0.74);
       --surface-2:rgba(30,37,49,0.66);
@@ -902,36 +623,6 @@ EXTRA_CSS = r"""
     }
   }
   :root[data-theme="dark"]{
-    /* Canonical Zen Tokens (Dark) */
-    --zen-bg:#0b0f15;
-    --zen-surface:rgba(18, 23, 33, 0.84);
-    --zen-surface-card:rgba(22, 28, 40, 0.70);
-    --zen-surface-subtle:rgba(255, 255, 255, 0.04);
-    --zen-surface-hover:rgba(255, 255, 255, 0.075);
-    --zen-hairline:rgba(255, 255, 255, 0.08);
-    --zen-hairline-subtle:rgba(255, 255, 255, 0.045);
-    --zen-hairline-strong:rgba(255, 255, 255, 0.16);
-    --zen-text-main:#f8fafc;
-    --zen-text-soft:#cbd5e1;
-    --zen-text-muted:#8b9bb4;
-    --zen-text:#f8fafc;
-    --zen-text-subtle:#cbd5e1;
-    --zen-surface-input:rgba(15, 20, 30, 0.6);
-    --zen-emerald:#10b981;
-    --zen-emerald-light:#34d399;
-    --zen-emerald-soft:rgba(16, 185, 129, 0.12);
-    --zen-emerald-border:rgba(52, 211, 153, 0.35);
-    --zen-amber:#f59e0b;
-    --zen-amber-light:#fbbf24;
-    --zen-amber-soft:rgba(245, 158, 11, 0.14);
-    --zen-amber-border:rgba(251, 191, 36, 0.35);
-    --zen-bordeaux:#fb7185;
-    --zen-bordeaux-light:#f43f5e;
-    --zen-bordeaux-soft:rgba(225, 29, 72, 0.16);
-    --zen-bordeaux-border:rgba(251, 113, 133, 0.45);
-    --zen-shadow-island:0 24px 64px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--zen-hairline);
-    --zen-shadow-lift:0 12px 28px -8px rgba(0, 0, 0, 0.4);
-
     --paper:#0d1016;
     --surface:rgba(22,27,36,0.74);
     --surface-2:rgba(30,37,49,0.66);
@@ -951,24 +642,6 @@ EXTRA_CSS = r"""
     --orb-emerald:rgba(16,185,129,0.20);
   }
 
-  /* Universal Ambient Background with Multi-Layered Mesh Gradient */
-  body {
-    background: var(--zen-bg, var(--paper)) !important;
-    background-image:
-      radial-gradient(at 15% 15%, rgba(16, 185, 129, 0.08) 0px, transparent 55%),
-      radial-gradient(at 85% 85%, rgba(245, 158, 11, 0.06) 0px, transparent 55%),
-      radial-gradient(at 50% 50%, rgba(190, 18, 60, 0.04) 0px, transparent 60%) !important;
-    background-attachment: fixed !important;
-    background-size: 100% 100% !important;
-    color: var(--zen-text-main, var(--ink)) !important;
-  }
-  :root[data-theme="light"] body {
-    background-image:
-      radial-gradient(at 15% 15%, rgba(20, 90, 70, 0.06) 0px, transparent 55%),
-      radial-gradient(at 85% 85%, rgba(217, 119, 6, 0.05) 0px, transparent 55%),
-      radial-gradient(at 50% 50%, rgba(107, 29, 47, 0.03) 0px, transparent 60%) !important;
-  }
-
   /* WCAG AAA Keyboard Focus Ring */
   button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible, .m-sq:focus-visible{
     outline:2px solid var(--emerald) !important;
@@ -977,13 +650,13 @@ EXTRA_CSS = r"""
 
   /* Ambient background orbs for Evening Obsidian / Ephemeral Parchment */
   .ambient-orb{
-    position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(80px);
+    position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(68px);
   }
   .ambient-orb--burgundy{
-    width:480px;height:480px;top:-120px;left:-100px;background:radial-gradient(circle, rgba(190, 18, 60, 0.32) 0%, rgba(190, 18, 60, 0) 70%) !important;
+    width:380px;height:380px;top:-90px;left:-80px;background:var(--orb-burgundy);
   }
   .ambient-orb--emerald{
-    width:480px;height:480px;bottom:-80px;right:-60px;background:radial-gradient(circle, rgba(16, 185, 129, 0.28) 0%, rgba(16, 185, 129, 0) 70%) !important;
+    width:360px;height:360px;bottom:-80px;right:-70px;background:var(--orb-emerald);
   }
   html,body{max-width:100vw;overflow-x:hidden;}
   #app{position:relative;z-index:1;max-width:100vw;overflow-x:hidden;}
@@ -1036,7 +709,48 @@ EXTRA_CSS = r"""
   }
   .topbar-pomo-pill:hover{border-color:var(--moss);transform:translateY(-1px);}
   .topbar-pomo-pill.is-running{background:var(--emerald-soft);border-color:var(--emerald);color:var(--moss-deep);}
-  .bug-fab-btn{display:none !important;}
+    /* ---------- Section 1.1 & 9.1: Global Topbar Pomodoro Pill & Bug Button (Mobile Tactile FAB & Hotkey) ---------- */
+  .bug-fab-btn{
+    position:fixed;
+    bottom:calc(74px + env(safe-area-inset-bottom, 12px));
+    right:16px;
+    z-index:860;
+    width:42px;
+    height:42px;
+    border-radius:13px;
+    background:rgba(22,27,36,0.92);
+    border:1.5px solid rgba(244,63,94,0.55);
+    box-shadow:0 6px 20px rgba(0,0,0,0.45), 0 0 12px rgba(225,29,72,0.25);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    font-size:1.20rem;
+    cursor:pointer;
+    transition:transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  :root[data-theme="light"] .bug-fab-btn{
+    background:rgba(255,255,255,0.94);
+    border:1.5px solid rgba(190,18,60,0.40);
+    box-shadow:0 6px 18px rgba(107,29,47,0.18);
+  }
+  .bug-fab-btn:hover{
+    transform:translateY(-2px) scale(1.05);
+    border-color:rgba(251,113,133,0.90);
+    box-shadow:0 8px 24px rgba(225,29,72,0.40), 0 0 16px rgba(244,63,94,0.30);
+  }
+  .bug-fab-btn:active{
+    transform:translateY(1px) scale(0.95);
+  }
+  @media (max-width: 880px){
+    .bug-fab-btn{display:flex !important;}
+  }
+  body.has-jump-btn .bug-fab-btn,
+  .path-serpentine-wrap ~ .bug-fab-btn{
+    bottom:calc(132px + env(safe-area-inset-bottom, 16px)) !important;
+  }
   .bug-topbar-btn, #bug-report-btn-m, #bug-report-btn-d{
     font-size:1.05rem;line-height:1;width:34px;height:34px;padding:0;
     display:inline-flex;align-items:center;justify-content:center;
@@ -1069,6 +783,54 @@ EXTRA_CSS = r"""
     .topbar{padding:8px 10px !important;}
     .topbar > div:last-child{gap:6px !important;}
     .topbar .streak-pill{padding:5px 8px !important;font-size:.80rem !important;}
+    /* Anti-collision & zero-overlap layout for Echelon sprint topbars on mobile */
+    .echelon-topbar-clean{
+      flex-wrap:wrap !important;
+      padding:9px 12px !important;
+      gap:8px !important;
+      margin-bottom:14px !important;
+    }
+    .echelon-clean-wrap{
+      flex:1 1 100% !important;
+      min-width:100% !important;
+      width:100% !important;
+    }
+    .echelon-topbar-actions{
+      width:100% !important;
+      margin-left:0 !important;
+      display:flex !important;
+      align-items:center !important;
+      justify-content:space-between !important;
+      gap:6px !important;
+    }
+    .echelon-topbar-actions .sprint-xp-pill{
+      padding:4px 8px !important;
+      font-size:0.72rem !important;
+      flex-shrink:1 !important;
+    }
+    .echelon-topbar-actions .sprint-xp-subtext{
+      display:none !important;
+    }
+    .echelon-topbar-actions .topbar-help-btn{
+      padding:4px 8px !important;
+      font-size:0.72rem !important;
+      flex-shrink:0 !important;
+    }
+    .echelon-topbar-actions .topbar-help-text,
+    .echelon-topbar-actions .topbar-audio-text{
+      font-size:0.72rem !important;
+    }
+    .sprint-focus-topbar{
+      flex-wrap:wrap !important;
+      padding:8px 10px !important;
+      gap:6px !important;
+    }
+    .sprint-progress-wrap{
+      min-width:120px !important;
+    }
+    .shell{
+      padding-bottom:calc(76px + env(safe-area-inset-bottom, 16px)) !important;
+    }
   }
   .prac-chip--echelon{border-color:rgba(107,29,47,0.20);transition:all .15s ease;}
   .prac-chip--echelon:hover{border-color:#6b1d2f !important;transform:translateY(-1px);}
@@ -1191,21 +953,6 @@ EXTRA_CSS = r"""
   .cocoon-focus-desc{
     font-size:.86rem;line-height:1.44;color:var(--ink-soft);margin-bottom:11px;overflow-wrap:anywhere;
   }
-  /* Приглушённая скобочная часть заголовков юнитов: убирает «крик» длинных техдеталей */
-  .t-detail{font-size:.76em;font-weight:600;opacity:.62;letter-spacing:.01em;}
-  /* Тихие вторичные ссылки в фокус-карточке: один главный CTA на экран */
-  .focus-links{display:flex;gap:16px;justify-content:center;padding-top:1px;}
-  .focus-links a{font-size:.79rem;font-weight:600;color:var(--ink-soft);opacity:.78;text-decoration:none;border-bottom:1px dashed rgba(148,163,184,0.45);padding-bottom:1px;}
-  .focus-links a:hover{opacity:1;color:var(--ink);}
-  /* Песочница: сетка редактор+вывод и тёмная панель вывода (раньше был белый <pre>) */
-  .sandbox-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;align-items:start;}
-  #code-output{
-    background:rgba(2,6,23,0.55);border:1px solid var(--line);border-radius:14px;
-    color:var(--ink-soft);font-family:var(--font-m);font-size:.82rem;line-height:1.55;
-    padding:14px 16px;min-height:240px;white-space:pre-wrap;overflow-wrap:anywhere;
-    margin:0;box-sizing:border-box;
-  }
-  @media(max-width:1040px){.sandbox-grid{grid-template-columns:1fr;}}
 
   /* Translucent Glass Buttons with Glowing Borders (60/30/10 Harmony) */
   .btn-glass-emerald{
@@ -1253,50 +1000,6 @@ EXTRA_CSS = r"""
   .dash-track-chip__top{display:flex;justify-content:space-between;align-items:center;gap:3px;white-space:nowrap;overflow:hidden;}
   .dash-track-chip__bar{height:4px;border-radius:99px;background:var(--surface-2);overflow:hidden;}
   .dash-track-chip__fill{height:100%;border-radius:99px;background:linear-gradient(90deg, var(--emerald), var(--amber));}
-
-  /* Section 2.5: Dashboard «Мои результаты» — настоящий дашборд: цифры, проценты навыков, матрица */
-  /* V31 (Coddy-ref): вторая итерация компактности — матрица в 2 колонки на desktop, плотные плитки */
-  .dash-results-panel{
-    background:var(--surface);border:1px solid var(--glass-border);border-radius:24px;padding:14px 16px;
-    margin-bottom:11px;box-shadow:var(--shadow-1);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
-  }
-  .dash-results-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
-  .dash-results-head > span:first-child{font-weight:800;font-size:.94rem;color:var(--ink);}
-  .dash-results-head .meta{font-weight:600;font-size:.74rem;}
-  .dash-result-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:12px;}
-  @media (max-width:680px){
-    .dash-result-tiles{grid-template-columns:repeat(2,1fr);}
-    .dash-results-panel{padding:13px 13px;border-radius:18px;}
-  }
-  .dash-result-tile{
-    background:var(--surface-2);border:1px solid var(--line-soft);border-radius:14px;padding:8px 11px;
-    display:flex;flex-direction:column;gap:2px;min-width:0;
-  }
-  .dash-result-tile__num{
-    font-family:var(--font-d);font-size:1.28rem;font-weight:800;color:var(--ink);line-height:1.15;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  }
-  .dash-result-tile__num em{font-style:normal;font-size:.74rem;font-weight:700;color:var(--ink-muted);}
-  .dash-result-tile__label{font-size:.7rem;font-weight:600;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .dash-skill-matrix{display:grid;grid-template-columns:1fr;gap:7px;}
-  @media (min-width:900px){
-    .dash-skill-matrix{grid-template-columns:1fr 1fr;gap:8px;}
-  }
-  .dash-skill-row{
-    display:flex;flex-direction:column;gap:4px;padding:8px 10px;border-radius:14px;
-    background:var(--surface-2);border:1px solid var(--line-soft);text-decoration:none;color:var(--ink);
-    transition:border-color .15s,transform .12s;
-  }
-  .dash-skill-row:hover{border-color:var(--moss);transform:translateY(-1px);}
-  .dash-skill-row__top{display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;}
-  .dash-skill-row__icon{flex:none;font-size:.86rem;}
-  .dash-skill-row__name{font-weight:700;font-size:.78rem;overflow:hidden;text-overflow:ellipsis;}
-  .dash-skill-row__mp{font-size:.66rem;font-weight:600;color:var(--ink-muted);overflow:hidden;text-overflow:ellipsis;}
-  .dash-skill-row__pct{margin-left:auto;font-size:.73rem;font-weight:800;color:var(--ink-soft);flex:none;}
-  .dash-skill-row__sqs{display:flex;flex-wrap:wrap;gap:2.5px;}
-  .dash-skill-row .m-sq{width:13px;height:13px;border-radius:4px;font-size:.5rem;}
-  .dash-goal-line{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
-  .dash-results-foot{margin-top:13px;padding-top:11px;border-top:1px solid var(--line-soft);}
 
   /* 4 Interview Stages Switcher & Compact 1-Line Topic Checklist */
   .stage-pills{
@@ -1393,15 +1096,12 @@ EXTRA_CSS = r"""
     position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
   }
   .subtabs--compact{
-    display:flex;gap:2px;overflow-x:auto;flex-wrap:nowrap !important;margin-bottom:8px !important;padding:3px !important;border:1px solid var(--line) !important;border-radius:999px !important;background:var(--surface-2) !important;
+    display:flex;gap:4px;overflow-x:auto;flex-wrap:nowrap !important;margin-bottom:8px !important;padding-bottom:1px !important;border-bottom:none !important;
     scrollbar-width:none;-webkit-overflow-scrolling:touch;
   }
   .subtabs--compact::-webkit-scrollbar{display:none;}
   .subtabs--compact .subtab{
-    padding:5px 10px;font-size:.74rem;border-radius:999px;white-space:nowrap;flex:1 1 auto;text-align:center;border:none !important;background:transparent;color:var(--ink-muted);font-weight:600;transition:all .18s ease;
-  }
-  .subtabs--compact .subtab.active{
-    background:var(--surface) !important;color:var(--moss-deep) !important;box-shadow:0 1px 3px rgba(0,0,0,0.08);font-weight:700;
+    padding:5px 6px;font-size:.72rem;border-radius:10px;white-space:nowrap;flex:1 1 auto;text-align:center;
   }
   .sprint-step-header{
     display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:nowrap;margin-bottom:8px;
@@ -1496,15 +1196,15 @@ EXTRA_CSS = r"""
     transition:opacity .35s ease,color .35s ease;
   }
   .feed-chunk-new{
-    border-left:none;
-    background:transparent;
-    border-radius:0;
-    padding:6px 0;
+    border-left:3px solid var(--moss);
+    background:rgba(20,90,70,0.07);
+    border-radius:0 16px 16px 0;
+    padding:12px 14px;
     margin-top:6px;
     animation:fogReveal .45s cubic-bezier(0.22,1,0.36,1) forwards;
   }
   html:not([data-theme="dark"]) .feed-chunk-new{
-    background:transparent;
+    background:rgba(20,90,70,0.04);
   }
   @keyframes fogReveal{
     0%{opacity:0;filter:blur(7px);transform:translateY(10px);}
@@ -1547,25 +1247,14 @@ EXTRA_CSS = r"""
     line-height:1.55;overflow-x:auto;border:1px solid rgba(52,211,153,0.28);
   }
   .math-formula{
-    font-family:var(--font-m);font-size:.86em;font-weight:600;font-style:normal;
-    padding:2px 6px;border-radius:6px;background:rgba(20,90,70,0.08);color:var(--moss-deep);
-    border:1px solid rgba(20,90,70,0.22);white-space:nowrap;
+    font-family:'Cambria Math','Times New Roman',serif;font-style:italic;font-weight:700;
+    padding:1px 6px;border-radius:6px;background:var(--amber-soft);color:var(--clay-deep);
+    border:1px solid rgba(245,158,11,0.28);white-space:nowrap;
   }
   .inline-code-pill, .fc-q code, .fc-a code, .quiz-opt code, .notice code{
     font-family:var(--font-m);font-size:.86em;padding:2px 6px;border-radius:6px;
     background:var(--surface-2);color:var(--moss-deep);border:1px solid var(--line);
   }
-  .tok-kw{color:#f472b6;font-weight:700;}
-  .tok-str{color:#34d399;}
-  .tok-com{color:#64748b;font-style:italic;}
-  .tok-num{color:#fbbf24;}
-  .tok-builtin{color:#38bdf8;font-weight:600;}
-  .f-deck-chip-bar{
-    display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;
-    scrollbar-width:none;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;
-  }
-  .f-deck-chip-bar::-webkit-scrollbar{display:none;}
-  .f-deck-chip-bar .btn{flex-shrink:0;white-space:nowrap;}
 
   /* ---------- Tactile Bottom Sheet Drawer (Coddy Mobile Feedback) ---------- */
   .academy-bottom-sheet{
@@ -1649,40 +1338,6 @@ EXTRA_CSS = r"""
   }
   .btn-coddy-ruby:hover{filter:brightness(1.15);transform:translateY(-1px);}
   html:not([data-theme="dark"]) .btn-coddy-ruby{background:#be123c;border-color:#9f1239;color:#ffffff;}
-
-  .coddy-code-block{
-    background:rgba(0,0,0,0.45);
-    border:1px solid rgba(255,255,255,0.1);
-    border-radius:16px;
-    padding:12px 14px;
-    font-family:var(--font-m);
-    font-size:0.82rem;
-    line-height:1.5;
-    color:#e2e8f0;
-  }
-  html:not([data-theme="dark"]) .coddy-code-block{background:#f1f5f9;border-color:#cbd5e1;color:#0f172a;}
-
-  .coddy-table{
-    width:100%;
-    border-collapse:collapse;
-    font-size:0.8rem;
-    border-radius:14px;
-    overflow:hidden;
-    border:1px solid rgba(255,255,255,0.1);
-    background:rgba(255,255,255,0.03);
-  }
-  .coddy-table th, .coddy-table td{
-    padding:8px 10px;
-    border:1px solid rgba(255,255,255,0.07);
-    text-align:left;
-  }
-  .coddy-table th{
-    color:#fda4af;
-    font-weight:700;
-    background:rgba(190,18,60,0.12);
-  }
-  html:not([data-theme="dark"]) .coddy-table th{color:#9f1239;background:rgba(190,18,60,0.08);}
-  html:not([data-theme="dark"]) .coddy-table td{border-color:#e2e8f0;}
 
   /* ---------- Zero-Keyboard Scaffolding: Tap-to-Fill Chips ---------- */
   .tap-chip-card{
@@ -2001,7 +1656,6 @@ EXTRA_CSS = r"""
   }
   .code-editor-shell textarea.code-editor, .editor-with-gutter textarea.code-editor{
     border:none !important;border-radius:0 !important;flex:1;min-width:0;margin:0 !important;padding:14px 14px !important;line-height:1.5 !important;
-    white-space:pre !important;overflow-x:auto !important;word-wrap:normal !important;overflow-wrap:normal !important;
   }
   @media (max-width:768px){
     .code-editor-shell textarea.code-editor, .editor-with-gutter textarea.code-editor{
@@ -2071,299 +1725,33 @@ EXTRA_CSS = r"""
   .fc-story-seg.seg--hard, .fc-story-seg.fc-story-seg--r2{background:var(--amber);}
   .fc-story-seg.seg--again, .fc-story-seg.fc-story-seg--r1{background:var(--bordeaux);}
   .fc-story-seg.seg--current, .fc-story-seg.fc-story-seg--active{background:var(--ink);transform:scaleY(1.35);}
-/* ================= 3D BOOK PAGE TURN & FLIP ANIMATION ================= */
-  .fc-stage{
-    perspective:1400px;
-    perspective-origin:center center;
-    margin:14px 0;
-  }
+  .fc-stage{perspective:1200px;margin:16px 0;}
   .fc-card{
-    background:var(--surface);
-    border:1.5px solid var(--line);
-    border-radius:22px;
-    padding:26px 24px;
-    min-height:220px;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    cursor:pointer;
-    box-shadow:0 4px 18px rgba(0,0,0,.18);
-    transform-origin:center center;
-    transform-style:preserve-3d;
-    transition:border-color .22s, background .25s, box-shadow .25s, transform .25s ease;
-    position:relative;
-    overflow:hidden;
-    touch-action:pan-y;
-    will-change:transform, box-shadow;
+    background:var(--surface);border:1.5px solid var(--line);border-radius:24px;padding:28px 26px;
+    min-height:215px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;
+    box-shadow:var(--shadow-1);transform-style:preserve-3d;
+    transition:transform .52s cubic-bezier(0.34,1.56,0.64,1),border-color .22s,background .25s;
+    position:relative;overflow:hidden;touch-action:pan-y;
   }
-
-  /* Переплёт / корешок книги слева (Left Spine crease & book fold) */
-  .fc-card::before{
-    content:"";
-    position:absolute;
-    left:0;
-    top:0;
-    bottom:0;
-    width:18px;
-    pointer-events:none;
-    border-radius:22px 0 0 22px;
-    background:linear-gradient(to right, rgba(0,0,0,0.32) 0%, rgba(0,0,0,0.12) 40%, rgba(0,0,0,0) 100%);
-    border-right:1px solid rgba(255,255,255,0.04);
-    z-index:4;
-  }
-
-  /* Скользящий световой блик по обсидиановой странице (Dynamic Sheen Glance) */
   .fc-card::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-    border-radius:inherit;
-    background:linear-gradient(115deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.02) 28%, rgba(0,0,0,0.14) 55%, rgba(255,255,255,0.08) 80%, rgba(255,255,255,0) 100%);
-    opacity:0;
-    transition:opacity .3s;
-    z-index:3;
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(125deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 45%);
   }
-
-  .fc-card:hover{
-    border-color:var(--moss);
-    transform:perspective(1400px) rotateY(-4deg) translateY(-2px);
-    box-shadow:-12px 16px 30px rgba(0,0,0,.26), inset 14px 0 18px -8px rgba(0,0,0,.22);
-  }
-
-  /* Декоративный загнутый уголок книги (Dog-ear page curl) */
-  .fc-card .page-curl-corner{
-    position:absolute;
-    right:0;
-    bottom:0;
-    width:34px;
-    height:34px;
-    pointer-events:none;
-    overflow:hidden;
-    border-radius:0 0 22px 0;
-    z-index:5;
-  }
-  .fc-card .page-curl-corner::before{
-    content:"";
-    position:absolute;
-    right:-2px;
-    bottom:-2px;
-    width:28px;
-    height:28px;
-    background:linear-gradient(135deg, transparent 50%, rgba(16,185,129,0.35) 50%, rgba(16,185,129,0.18) 75%, rgba(255,255,255,0.15) 100%);
-    box-shadow:-3px -3px 8px rgba(0,0,0,0.4);
-    border-radius:0 0 22px 0;
-    transition:all .25s ease;
-  }
-  .fc-card:hover .page-curl-corner::before{
-    transform:scale(1.15) translate(-1px, -1px);
-    background:linear-gradient(135deg, transparent 46%, rgba(16,185,129,0.6) 46%, rgba(16,185,129,0.25) 75%, rgba(255,255,255,0.25) 100%);
-    box-shadow:-5px -5px 12px rgba(0,0,0,0.5);
-  }
-
-  /* Состояние раскрытого ответа */
+  .fc-card:hover{border-color:var(--moss);transform:translateY(-2px) rotateX(1.5deg);}
   .fc-card--Answer{
-    background:var(--moss-soft);
-    border-color:var(--moss);
+    background:var(--moss-soft);border-color:var(--moss);
+    animation:cardFlipSpring .46s cubic-bezier(0.34,1.56,0.64,1);
   }
-
-  /* Анимация перелистывания страницы на Ответ (Flip to Answer) */
-  .fc-card.fc-page-flip-answer{
-    animation:bookPageFlipToAnswer .56s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-  .fc-card.fc-page-flip-answer::after{
-    animation:pageSheenGlance .56s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-  .fc-card.fc-page-flip-answer .page-curl-corner::before{
-    animation:cornerPeelFlex .56s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-  .fc-card.fc-page-flip-answer .fc-a{
-    animation:answerRevealFromTurn .56s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-
-  /* Анимация перелистывания страницы обратно на Вопрос (Flip to Question) */
-  .fc-card.fc-page-flip-question{
-    animation:bookPageFlipToQuestion .52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-  .fc-card.fc-page-flip-question::after{
-    animation:pageSheenGlance .52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-
-  /* Анимация перелистывания к следующей странице (Turn to Next Page) */
-  .fc-card.fc-page-turn-next{
-    animation:bookPageTurnNext .52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-  .fc-card.fc-page-turn-next::after{
-    animation:pageSheenGlance .52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-  .fc-card.fc-page-turn-next .page-curl-corner::before{
-    animation:cornerPeelFlex .52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-
-  /* Анимация возврата к предыдущей странице (Turn to Prev Page) */
-  .fc-card.fc-page-turn-prev{
-    animation:bookPageTurnPrev .50s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-
-  @keyframes bookPageFlipToAnswer{
-    0%{
-      transform:perspective(1400px) rotateY(0deg) rotateZ(0deg) translateZ(0) scale(1);
-      box-shadow:0 4px 18px rgba(0,0,0,.2);
-    }
-    24%{
-      transform:perspective(1400px) rotateY(-30deg) rotateZ(-1.8deg) translateZ(36px) translateX(-8px) scale(1.015);
-      box-shadow:-26px 16px 44px rgba(0,0,0,.48), inset 24px 0 30px -10px rgba(0,0,0,.42);
-    }
-    50%{
-      transform:perspective(1400px) rotateY(-54deg) rotateZ(-2.8deg) translateZ(48px) translateX(-14px) scale(1.02);
-      box-shadow:-38px 22px 56px rgba(0,0,0,.55), inset 36px 0 38px -8px rgba(0,0,0,.5);
-    }
-    76%{
-      transform:perspective(1400px) rotateY(-12deg) rotateZ(-0.6deg) translateZ(16px) translateX(-4px);
-      box-shadow:-14px 10px 28px rgba(0,0,0,.3), inset 14px 0 18px -6px rgba(0,0,0,.3);
-    }
-    90%{
-      transform:perspective(1400px) rotateY(2.2deg) rotateZ(0.2deg) translateZ(4px);
-    }
-    100%{
-      transform:perspective(1400px) rotateY(0deg) rotateZ(0deg) translateZ(0) translateX(0) scale(1);
-      box-shadow:0 4px 18px rgba(0,0,0,.2);
-    }
-  }
-
-  @keyframes answerRevealFromTurn{
-    0%{
-      opacity:0;
-      transform:translateY(10px);
-      filter:blur(2px);
-    }
-    32%{
-      opacity:0;
-      transform:translateY(8px);
-      filter:blur(1.5px);
-    }
-    68%{
-      opacity:0.75;
-      transform:translateY(3px);
-      filter:blur(0);
-    }
-    100%{
-      opacity:1;
-      transform:translateY(0);
-      filter:blur(0);
-    }
-  }
-
-  @keyframes bookPageFlipToQuestion{
-    0%{
-      transform:perspective(1400px) rotateY(0deg) rotateZ(0deg) translateZ(0);
-      box-shadow:0 4px 18px rgba(0,0,0,.2);
-    }
-    28%{
-      transform:perspective(1400px) rotateY(28deg) rotateZ(1.6deg) translateZ(32px) translateX(8px);
-      box-shadow:24px 16px 42px rgba(0,0,0,.45), inset -24px 0 30px -10px rgba(0,0,0,.4);
-    }
-    58%{
-      transform:perspective(1400px) rotateY(10deg) rotateZ(0.5deg) translateZ(14px) translateX(3px);
-      box-shadow:12px 8px 24px rgba(0,0,0,.28);
-    }
-    84%{
-      transform:perspective(1400px) rotateY(-2deg) rotateZ(-0.2deg) translateZ(3px);
-    }
-    100%{
-      transform:perspective(1400px) rotateY(0deg) rotateZ(0deg) translateZ(0) translateX(0);
-      box-shadow:0 4px 18px rgba(0,0,0,.2);
-    }
-  }
-
-  @keyframes bookPageTurnNext{
-    0%{
-      transform:perspective(1400px) rotateY(-46deg) rotateZ(-2.4deg) translateZ(52px) translateX(-24px);
-      opacity:0.4;
-      box-shadow:-34px 20px 48px rgba(0,0,0,.58), inset 34px 0 36px -10px rgba(0,0,0,.52);
-    }
-    38%{
-      transform:perspective(1400px) rotateY(-16deg) rotateZ(-0.9deg) translateZ(24px) translateX(-8px);
-      opacity:0.9;
-      box-shadow:-18px 12px 30px rgba(0,0,0,.36), inset 18px 0 22px -8px rgba(0,0,0,.32);
-    }
-    72%{
-      transform:perspective(1400px) rotateY(3deg) rotateZ(0.2deg) translateZ(6px);
-      opacity:1;
-      box-shadow:-6px 4px 16px rgba(0,0,0,.22);
-    }
-    100%{
-      transform:perspective(1400px) rotateY(0deg) rotateZ(0deg) translateZ(0) translateX(0);
-      opacity:1;
-      box-shadow:0 4px 18px rgba(0,0,0,.2);
-    }
-  }
-
-  @keyframes bookPageTurnPrev{
-    0%{
-      transform:perspective(1400px) rotateY(42deg) rotateZ(2.2deg) translateZ(48px) translateX(24px);
-      opacity:0.4;
-      box-shadow:28px 18px 44px rgba(0,0,0,.52), inset -28px 0 30px -10px rgba(0,0,0,.48);
-    }
-    38%{
-      transform:perspective(1400px) rotateY(15deg) rotateZ(0.8deg) translateZ(20px) translateX(8px);
-      opacity:0.9;
-      box-shadow:14px 9px 24px rgba(0,0,0,.32);
-    }
-    72%{
-      transform:perspective(1400px) rotateY(-2.8deg) rotateZ(-0.2deg) translateZ(5px);
-      opacity:1;
-    }
-    100%{
-      transform:perspective(1400px) rotateY(0deg) rotateZ(0deg) translateZ(0) translateX(0);
-      opacity:1;
-      box-shadow:0 4px 18px rgba(0,0,0,.2);
-    }
-  }
-
-  @keyframes pageSheenGlance{
-    0%{
-      opacity:0;
-      transform:translateX(-50%) skewX(-16deg);
-    }
-    32%{
-      opacity:0.8;
-    }
-    70%{
-      opacity:0.35;
-    }
-    100%{
-      opacity:0;
-      transform:translateX(80%) skewX(-16deg);
-    }
-  }
-
-  @keyframes cornerPeelFlex{
-    0%{
-      transform:scale(1) translate(0,0);
-    }
-    40%{
-      transform:scale(1.35) translate(-3px,-3px);
-      box-shadow:-7px -7px 14px rgba(0,0,0,.6);
-    }
-    100%{
-      transform:scale(1) translate(0,0);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    .fc-card, .fc-card::after, .fc-card.fc-page-flip-answer, .fc-card.fc-page-flip-question,
-    .fc-card.fc-page-turn-next, .fc-card.fc-page-turn-prev, .fc-card .fc-a, .fc-card .page-curl-corner::before{
-      animation:none !important;
-      transform:none !important;
-    }
+  @keyframes cardFlipSpring{
+    0%{transform:rotateY(-14deg) scale(0.98);}
+    100%{transform:rotateY(0deg) scale(1);}
   }
   .fc-q{font-size:1.08rem;font-weight:600;line-height:1.55;white-space:pre-line;}
   .fc-a{font-size:1rem;line-height:1.65;white-space:pre-line;color:var(--ink);margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
   .fc-rate-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px;}
   @media (max-width:600px){.fc-rate-row{grid-template-columns:1fr 1fr;}}
   .fc-swipe-hint{
-    display:none !important;
+    font-size:.73rem;color:var(--ink-muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:10px;
   }
 
   /* ---------- Section 8: Module Boss Arena & Segmented Boss HP Bar ---------- */
@@ -2489,2714 +1877,8 @@ EXTRA_CSS = r"""
     .fc-rate-row .btn{padding:8px 6px !important;font-size:.78rem !important;}
   }
 
-  /* ================= CLEAN ECHELON TOPBAR & JEWEL DOTS NECKLACE ================= */
-  .echelon-topbar-clean {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 10px 18px;
-    margin-bottom: 20px;
-    border-radius: 18px;
-    background: rgba(18, 23, 33, 0.72) !important;
-    border: 1px solid rgba(255, 255, 255, 0.09) !important;
-    backdrop-filter: blur(24px) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
-    box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.4) !important;
-  }
-  .echelon-clean-wrap {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
-  .echelon-clean-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.76rem;
-    font-weight: 400;
-    white-space: nowrap;
-  }
-  .echelon-clean-track {
-    height: 6px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.08);
-    overflow: hidden;
-    position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-  }
-  .echelon-clean-fill {
-    height: 100%;
-    border-radius: 999px;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.45);
-    transition: width .35s ease;
-  }
-  /* ================= ЕДИНЫЙ ПЕДАГОГИЧЕСКИЙ ТРЕКЕР: CONTINUOUS ATOMIC DOTS ================= */
-  .topic-eyebrow-track {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    margin-bottom: 22px;
-    width: 100%;
-  }
-  .topic-eyebrow-tags {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    width: 100%;
-  }
-  .unit-breadcrumb {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .unit-breadcrumb-title {
-    color: var(--ink);
-    font-weight: 600;
-    font-size: 0.88rem;
-    letter-spacing: -0.01em;
-  }
-
-  .dots-necklace {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    position: relative;
-    padding: 6px 0;
-    background: transparent;
-    border: none;
-    box-shadow: none;
-  }
-  .dots-stage-divider {
-    width: 2px;
-    height: 8px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.15);
-    margin: 0 5px;
-  }
-
-  .dot-jewel {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.14);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    position: relative;
-    z-index: 3;
-    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.4, 1);
-    cursor: pointer;
-  }
-  .dot-jewel:hover {
-    transform: scale(1.5);
-    background: rgba(255, 255, 255, 0.5);
-  }
-  .dot-jewel.done {
-    background: #10b981;
-    box-shadow: 0 0 4px rgba(16, 185, 129, 0.5);
-  }
-  .dot-jewel.active {
-    width: 7.5px;
-    height: 7.5px;
-    background: #ffffff;
-    box-shadow: 0 0 5px rgba(255, 255, 255, 0.8), 0 0 12px rgba(255, 255, 255, 0.35);
-    animation: radar-breathe-white 4.4s infinite ease-in-out;
-  }
-  .dot-jewel.active::before,
-  .dot-jewel.active::after {
-    content: '';
-    position: absolute;
-    left: 50%; top: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    pointer-events: none;
-    animation: radar-ripple-white 4.4s infinite cubic-bezier(0.2, 0.8, 0.4, 1);
-  }
-  .dot-jewel.active::after {
-    animation-delay: 2.2s;
-  }
-  .dot-jewel.milestone {
-    border-radius: 2px;
-    transform: rotate(45deg);
-    background: rgba(255, 255, 255, 0.25);
-  }
-  .dot-jewel.milestone:hover {
-    transform: rotate(45deg) scale(1.4);
-  }
-
-  /* Точки трекера для Светлой темы (Пергамент) */
-  :root[data-theme="light"] .dot-jewel {
-    background: rgba(15, 23, 42, 0.08);
-    border: 1px solid rgba(15, 23, 42, 0.12);
-  }
-  :root[data-theme="light"] .dot-jewel:hover {
-    background: rgba(15, 23, 42, 0.22);
-    transform: scale(1.3);
-  }
-  :root[data-theme="light"] .dot-jewel.done {
-    background: rgba(16, 185, 129, 0.7);
-    border: 1px solid rgba(5, 150, 105, 0.4);
-    box-shadow: 0 0 3px rgba(16, 185, 129, 0.25);
-  }
-  :root[data-theme="light"] .dot-jewel.active {
-    width: 7.5px;
-    height: 7.5px;
-    background: #ffffff !important;
-    border: 1px solid rgba(15, 23, 42, 0.25) !important;
-    box-shadow: 0 0 0 2px rgba(20, 90, 70, 0.28), 0 1px 3px rgba(15, 23, 42, 0.08) !important;
-  }
-  :root[data-theme="light"] .dots-stage-divider {
-    width: 1px;
-    height: 6px;
-    background: rgba(15, 23, 42, 0.12);
-    margin: 0 4px;
-  }
-  :root[data-theme="light"] .dot-jewel.milestone {
-    background: rgba(217, 119, 6, 0.15);
-    border: 1px solid rgba(217, 119, 6, 0.35);
-  }
-  :root[data-theme="light"] .dot-jewel.milestone.active {
-    width: 7.5px;
-    height: 7.5px;
-    background: #ffffff !important;
-    border: 1px solid rgba(217, 119, 6, 0.5) !important;
-    box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.25), 0 1px 3px rgba(15, 23, 42, 0.08) !important;
-  }
-
-
-
-  @keyframes radar-breathe-white {
-    0%, 100% {
-      box-shadow: 0 0 4px rgba(255, 255, 255, 0.7), 0 0 8px rgba(255, 255, 255, 0.25);
-    }
-    50% {
-      box-shadow: 0 0 6px rgba(255, 255, 255, 0.9), 0 0 14px rgba(255, 255, 255, 0.4);
-    }
-  }
-  @keyframes radar-ripple-white {
-    0% { width: 7.5px; height: 7.5px; opacity: 0.8; border-color: rgba(255, 255, 255, 0.6); }
-    100% { width: 18px; height: 18px; opacity: 0; border-color: rgba(255, 255, 255, 0); }
-  }
-
-/* ===== Topbar Help Button & Mobile Clean Adaptation ===== */
-.topbar-help-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  color: var(--ink-soft);
-  font-size: .8rem;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all .2s ease;
-}
-.topbar-help-btn:hover {
-  border-color: var(--moss);
-  color: var(--moss-deep);
-  box-shadow: 0 0 12px rgba(116, 172, 130, 0.25);
-}
-
-@media (max-width: 560px) {
-  .echelon-topbar-clean { padding: 8px 12px !important; margin-bottom: 14px !important; }
-  .echelon-topbar-clean .topbar-help-btn { display: none !important; }
-  .echelon-clean-meta { font-size: 0.69rem !important; gap: 4px !important; }
-  .echelon-topbar-clean .sprint-xp-pill { font-size: 0.70rem !important; padding: 3px 8px !important; }
-  .echelon-topbar-clean > div:last-child { margin-left: 8px !important; }
-}
-
-
-
-  .echelon-badge{
-    display:inline-flex;align-items:center;gap:4px;font-size:.73rem;font-weight:700;
-    padding:3px 9px;border-radius:999px;border:1px solid var(--line);line-height:1.25;white-space:nowrap;
-    max-width:100%;overflow:hidden;text-overflow:ellipsis;
-  }
-  .echelon-badge--t1{background:var(--bordeaux-soft);color:var(--bordeaux);border-color:rgba(251,113,133,0.35);}
-  .echelon-badge--t2{background:var(--amber-soft);color:var(--amber);border-color:rgba(245,158,11,0.35);}
-  .echelon-badge--t3{background:var(--emerald-soft);color:var(--emerald);border-color:rgba(52,211,153,0.35);}
-  .echelon-badge--t4{background:var(--surface-2);color:var(--ink-soft);border-color:var(--line);}
-  .echelon-badge--gap{background:rgba(185,28,28,0.16);color:#ef4444;border-color:rgba(239,68,68,0.4);}
-  .priority-roadmap-card{
-    background:linear-gradient(135deg, rgba(20,90,70,0.07), rgba(217,119,6,0.06));
-    border:1.5px solid var(--line);border-radius:24px;padding:18px 20px;margin-bottom:20px;
-    box-shadow:var(--shadow-1);
-  }
-  .echelon-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:12px;}
-  .echelon-card{
-    background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px;
-    display:flex;flex-direction:column;justify-content:space-between;gap:6px;transition:border-color .18s,transform .18s;
-    min-width:0;
-  }
-  .echelon-card:hover{border-color:var(--moss);transform:translateY(-1px);}
-  .echelon-card__header{
-    display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:nowrap;margin-bottom:5px;min-width:0;
-  }
-  .echelon-pct-chip{
-    flex:none;font-size:.76rem;font-weight:800;padding:2px 8px;border-radius:999px;
-    background:var(--surface-2);border:1px solid var(--line);color:var(--ink);
-  }
-  .stack-branch-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
-  .node-card--available{
-    border-color:rgba(16,185,129,0.45) !important;
-    box-shadow:0 0 0 1px rgba(16,185,129,0.20), var(--shadow-1);
-  }
-  .node-parallel-badge{
-    display:inline-flex;align-items:center;gap:4px;font-size:.71rem;font-weight:700;
-    padding:2px 8px;border-radius:999px;background:var(--emerald-soft);color:var(--moss-deep);
-    border:1px solid rgba(16,185,129,0.3);margin-top:4px;
-  }
-  .stage__spine{position:relative;}
-  .stage:not(:last-child) .stage__spine::after{
-    content:"";position:absolute;top:36px;bottom:-22px;left:50%;transform:translateX(-50%);
-    width:2px;background:linear-gradient(180deg, var(--emerald), rgba(217,119,6,0.35));
-    border-radius:99px;opacity:0.65;pointer-events:none;
-  }
-  /* Compact cards hub filter styling for mobile viewports (REV-005) */
-  .cards-hub-controls{
-    display:grid;
-    grid-template-columns:1fr 1fr 1.6fr;
-    gap:8px;
-    margin-bottom:12px;
-  }
-  .cards-hub-subfilters{
-    display:contents;
-  }
-  @media(max-width:640px){
-    .cards-hub-header{margin-bottom:8px !important;}
-    .cards-hub-header h1{font-size:1.25rem !important;}
-    .cards-hub-controls{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
-    .cards-hub-subfilters{display:grid !important;grid-template-columns:1fr 1fr;gap:6px;}
-    .cards-hub-subfilters select{font-size:.75rem !important;padding:6px 8px !important;}
-    .cards-hub-controls #cards-deck-select{font-size:.82rem !important;padding:7px 10px !important;}
-    .fc-stage{margin:6px 0 !important;}
-    .microstep-bar{padding:6px 10px !important;font-size:.82rem !important;margin-bottom:6px !important;}
-    .fc-card{min-height:220px !important;padding:16px 18px !important;}
-    .fc-rate-row{margin-top:8px !important;gap:6px !important;}
-    .fc-rate-row .btn{padding:8px 6px !important;font-size:.78rem !important;}
-  }
-
-  
-/* ==========================================================================
-   ZEN DISTILLATION: PATH & DASHBOARD AESTHETIC ENHANCEMENTS
-   ========================================================================== */
-.pro-hero-card,
-.panel.coddy-rail-card,
-.pro-chapter-box,
-.dash-results-panel {
-  background: var(--zen-surface, rgba(18, 23, 33, 0.82)) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
-  box-shadow: var(--zen-shadow-island, 0 20px 48px -12px rgba(0, 0, 0, 0.5)) !important;
-  border-radius: 22px !important;
-}
-
-.pro-lesson-row {
-  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.03)) !important;
-  border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.045)) !important;
-  border-radius: 14px !important;
-  transition: all 0.15s ease !important;
-}
-.pro-lesson-row:hover {
-  background: var(--zen-surface-hover, rgba(255, 255, 255, 0.07)) !important;
-  border-color: var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
-}
-
-.dash-tile {
-  background: var(--zen-surface-card, rgba(22, 28, 40, 0.65)) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
-  border-radius: 18px !important;
-  padding: 16px 18px !important;
-  box-shadow: var(--zen-shadow-lift, 0 12px 28px -8px rgba(0, 0, 0, 0.4)) !important;
-}
-
-.dash-skill-row,
-.dash-track-chip {
-  border-radius: 14px !important;
-  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.03)) !important;
-  border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.045)) !important;
-}
-.dash-track-chip:hover {
-  background: var(--zen-surface-hover, rgba(255, 255, 255, 0.07)) !important;
-}
-
-.m-sq {
-  border-radius: 4px !important;
-  transition: all 0.15s ease !important;
-}
-
-.btn-3d-orange.pro-hero-cta {
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
-  border-radius: 14px !important;
-  box-shadow: 0 4px 0 #c2410c, 0 10px 20px rgba(234, 88, 12, 0.35) !important;
-  font-weight: 800 !important;
-  letter-spacing: 0.02em !important;
-}
-.btn-3d-orange.pro-hero-cta:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 6px 0 #c2410c, 0 14px 24px rgba(234, 88, 12, 0.45) !important;
-}
-
-/* Tracks styling: Zen Unit Cards and Skill Rows */
-.unit-card {
-  background: var(--zen-surface-card, rgba(22, 28, 40, 0.65)) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
-  border-radius: 22px !important;
-  box-shadow: var(--zen-shadow-lift, 0 12px 28px -8px rgba(0, 0, 0, 0.4)) !important;
-  transition: transform .2s ease, border-color .2s ease !important;
-}
-
-.skill-row {
-  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.03)) !important;
-  border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.045)) !important;
-  border-radius: 12px !important;
-  transition: all 0.15s ease !important;
-}
-.skill-row:hover {
-  background: var(--zen-surface-hover, rgba(255, 255, 255, 0.07)) !important;
-  border-color: var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
-}
-
-.mastery-banner {
-  background: var(--zen-surface, rgba(18, 23, 33, 0.82)) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
-  border-radius: 24px !important;
-  box-shadow: var(--zen-shadow-island, 0 20px 48px -12px rgba(0, 0, 0, 0.5)) !important;
-}
-
-/* Settings Modal Zen Distillation */
-.settings-modal-card {
-  background: var(--zen-surface, rgba(18, 23, 33, 0.88)) !important;
-  backdrop-filter: blur(28px) !important;
-  -webkit-backdrop-filter: blur(28px) !important;
-  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
-  border-radius: 26px !important;
-  box-shadow: var(--zen-shadow-island, 0 24px 64px -12px rgba(0, 0, 0, 0.65)) !important;
-  max-width: 580px !important;
-}
-
-.settings-section-title {
-  color: var(--zen-amber, #f59e0b) !important;
-  font-size: 0.84rem !important;
-  letter-spacing: 0.06em !important;
-  font-weight: 800 !important;
-  text-transform: uppercase !important;
-}
-
-.settings-mode-card {
-  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.03)) !important;
-  border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.05)) !important;
-  border-radius: 18px !important;
-  transition: all 0.18s ease !important;
-}
-.settings-mode-card:hover {
-  background: var(--zen-surface-hover, rgba(255, 255, 255, 0.07)) !important;
-  border-color: var(--zen-hairline, rgba(255, 255, 255, 0.1)) !important;
-}
-.settings-mode-card.active {
-  background: var(--zen-amber-soft, rgba(245, 158, 11, 0.12)) !important;
-  border-color: var(--zen-amber-border, rgba(251, 191, 36, 0.4)) !important;
-  box-shadow: 0 0 0 1px var(--zen-amber, #f59e0b), 0 8px 20px -4px rgba(245, 158, 11, 0.25) !important;
-}
-
-.path-node-style-btn {
-  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.03)) !important;
-  border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.05)) !important;
-  border-radius: 12px !important;
-  transition: all 0.15s ease !important;
-}
-.path-node-style-btn:hover {
-  background: var(--zen-surface-hover, rgba(255, 255, 255, 0.07)) !important;
-  border-color: var(--zen-hairline, rgba(255, 255, 255, 0.1)) !important;
-}
-.path-node-style-btn.active {
-  background: var(--zen-amber-soft, rgba(245, 158, 11, 0.12)) !important;
-  border-color: var(--zen-amber-border, rgba(251, 191, 36, 0.4)) !important;
-  color: var(--zen-text-main, #f8fafc) !important;
-}
-
-.settings-tiles-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 8px;
-}
-@media (max-width: 520px) {
-  .settings-tiles-grid {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-.settings-tile {
-  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.03)) !important;
-  border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.05)) !important;
-  border-radius: 14px !important;
-  padding: 11px 14px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 10px !important;
-  cursor: pointer !important;
-  transition: all 0.18s ease !important;
-  color: var(--zen-text-main, #f8fafc) !important;
-  text-align: left !important;
-  width: 100% !important;
-  font-family: inherit !important;
-}
-.settings-tile:hover {
-  background: var(--zen-surface-hover, rgba(255, 255, 255, 0.07)) !important;
-  border-color: var(--zen-hairline, rgba(255, 255, 255, 0.12)) !important;
-  transform: translateY(-1px) !important;
-}
-.settings-tile:active {
-  transform: translateY(0) !important;
-}
-.settings-tile-info {
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  font-weight: 600 !important;
-  font-size: 0.88rem !important;
-}
-.settings-tile-icon {
-  font-size: 1.15rem !important;
-  line-height: 1 !important;
-}
-.settings-pill-badge {
-  font-size: 0.74rem !important;
-  font-weight: 700 !important;
-  padding: 3px 8px !important;
-  border-radius: 999px !important;
-  white-space: nowrap !important;
-  letter-spacing: 0.02em !important;
-}
-.settings-pill-badge--emerald {
-  background: rgba(16, 185, 129, 0.14) !important;
-  color: #10b981 !important;
-  border: 1px solid rgba(16, 185, 129, 0.28) !important;
-}
-.settings-pill-badge--amber {
-  background: rgba(245, 158, 11, 0.14) !important;
-  color: #f59e0b !important;
-  border: 1px solid rgba(245, 158, 11, 0.28) !important;
-}
-.settings-pill-badge--muted {
-  background: rgba(148, 163, 184, 0.10) !important;
-  color: #94a3b8 !important;
-  border: 1px solid rgba(148, 163, 184, 0.18) !important;
-}
-
-/* Mock Interview Simulator Zen Distillation (#/mock) */
-.mock-control-panel {
-  background: var(--zen-surface, rgba(18, 23, 33, 0.84)) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
-  border-radius: 22px !important;
-  box-shadow: var(--zen-shadow-island, 0 20px 48px -12px rgba(0, 0, 0, 0.5)) !important;
-  padding: 16px 20px !important;
-  margin-bottom: 16px !important;
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  flex-wrap: wrap !important;
-  gap: 14px !important;
-}
-
-.mock-task-card,
-.mock-star-card {
-  background: var(--zen-surface, rgba(18, 23, 33, 0.84)) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
-  border-radius: 24px !important;
-  box-shadow: var(--zen-shadow-island, 0 20px 48px -12px rgba(0, 0, 0, 0.5)) !important;
-  padding: 22px 24px !important;
-}
-
-.mock-timer-ring-wrap {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 14px !important;
-}
-
-.mock-timer-display {
-  font-family: var(--font-d, 'Onest', monospace) !important;
-  font-variant-numeric: tabular-nums !important;
-  font-size: 1.85rem !important;
-  font-weight: 800 !important;
-  line-height: 1.1 !important;
-  letter-spacing: -0.02em !important;
-}
-
-.star-matrix-grid {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  gap: 12px !important;
-}
-@media (max-width: 720px) {
-  .star-matrix-grid {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-.star-quadrant-card {
-  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.03)) !important;
-  border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.05)) !important;
-  border-radius: 16px !important;
-  padding: 14px 16px !important;
-  transition: all 0.18s ease !important;
-}
-.star-quadrant-card:focus-within {
-  border-color: var(--zen-amber-border, rgba(251, 191, 36, 0.4)) !important;
-  background: var(--zen-surface-hover, rgba(255, 255, 255, 0.05)) !important;
-  box-shadow: 0 0 0 1px var(--zen-amber, #f59e0b) !important;
-}
-
-.star-pitch-bar {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  flex-wrap: wrap !important;
-  padding: 5px 12px !important;
-  border-radius: 999px !important;
-  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.04)) !important;
-  border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.06)) !important;
-}
-
-.socratic-chat-stream {
-  margin-top: 16px !important;
-  padding: 16px 18px !important;
-  border-radius: 18px !important;
-  background: var(--zen-surface-subtle, rgba(255, 255, 255, 0.025)) !important;
-  border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.05)) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 12px !important;
-}
-
-.chat-bubble--interviewer {
-  background: var(--zen-surface-card, rgba(22, 28, 40, 0.7)) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  border: 1px solid var(--zen-hairline, rgba(255, 255, 255, 0.08)) !important;
-  border-radius: 16px !important;
-  padding: 12px 16px !important;
-  box-shadow: var(--zen-shadow-lift, 0 8px 24px -6px rgba(0, 0, 0, 0.35)) !important;
-}
-
-.chat-bubble__author {
-  font-size: 0.78rem !important;
-  font-weight: 800 !important;
-  color: var(--zen-emerald, #10b981) !important;
-  margin-bottom: 4px !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-}
-
-/* 3D Flashcards SRS Zen Distillation (#/cards) */
-.fc-card--3d {
-  background: var(--zen-surface-card) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border: 1px solid var(--zen-hairline) !important;
-  border-radius: 24px !important;
-  box-shadow: var(--zen-shadow-island) !important;
-  padding: 30px 28px !important;
-  min-height: 240px !important;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  color: var(--zen-text-main, var(--ink)) !important;
-}
-
-.fc-card--3d:hover {
-  transform: perspective(1400px) rotateY(-2deg) translateY(-2px) !important;
-  border-color: var(--zen-emerald-border, rgba(16, 185, 129, 0.35)) !important;
-  box-shadow: var(--zen-shadow-island), 0 0 28px -6px var(--zen-emerald-glow) !important;
-}
-
-.fc-card--3d.fc-card--Answer {
-  background: var(--zen-surface-card) !important;
-  border-color: var(--zen-emerald-border, rgba(16, 185, 129, 0.35)) !important;
-  box-shadow: var(--zen-shadow-island), 0 0 32px -4px var(--zen-emerald-glow) !important;
-}
-:root[data-theme="dark"] .fc-card--3d.fc-card--Answer {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(22, 28, 40, 0.85) 100%) !important;
-}
-
-.fc-q {
-  font-family: var(--font-b, 'Onest', sans-serif) !important;
-  font-size: 1.15rem !important;
-  font-weight: 700 !important;
-  line-height: 1.55 !important;
-  color: var(--zen-text-main, var(--ink)) !important;
-  letter-spacing: -0.01em !important;
-}
-
-.fc-a {
-  font-family: var(--font-b, 'Onest', sans-serif) !important;
-  font-size: 1.02rem !important;
-  line-height: 1.6 !important;
-  color: var(--zen-text-soft, var(--ink-soft)) !important;
-  margin-top: 14px !important;
-  padding-top: 14px !important;
-  border-top: 1px dashed var(--zen-hairline) !important;
-}
-
-.cards-flip-prompt {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  font-size: 0.78rem !important;
-  font-weight: 600 !important;
-  color: var(--zen-text-muted, var(--ink-muted)) !important;
-  padding: 5px 12px !important;
-  background: var(--zen-surface-subtle) !important;
-  border: 1px solid var(--zen-hairline-subtle) !important;
-  border-radius: 999px !important;
-}
-
-.cards-hub-controls select {
-  border-radius: 14px !important;
-  background: var(--zen-surface-subtle) !important;
-  border: 1px solid var(--zen-hairline) !important;
-  color: var(--zen-text-main, var(--ink)) !important;
-  backdrop-filter: blur(12px) !important;
-  transition: all 0.15s ease !important;
-}
-
-.cards-hub-controls select:focus {
-  border-color: var(--zen-emerald, #10b981) !important;
-  box-shadow: 0 0 0 1px var(--zen-emerald, #10b981) !important;
-  outline: none !important;
-}
-
-.fc-stories-bar {
-  height: 6px !important;
-  gap: 4px !important;
-  margin-bottom: 14px !important;
-  padding: 2px !important;
-}
-
-.fc-story-seg {
-  border-radius: 999px !important;
-  background: rgba(255, 255, 255, 0.08) !important;
-  transition: all 0.2s ease !important;
-}
-:root, :root[data-theme="light"] .fc-story-seg {
-  background: rgba(15, 23, 42, 0.10) !important;
-}
-
-.fc-story-seg.seg--current,
-.fc-story-seg.fc-story-seg--active {
-  background: var(--zen-emerald-light, #10b981) !important;
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.8) !important;
-  transform: scaleY(1.4) !important;
-}
-
-.fc-story-seg.seg--easy,
-.fc-story-seg.fc-story-seg--r4,
-.fc-story-seg.fc-story-seg--r3 {
-  background: var(--zen-emerald, #10b981) !important;
-}
-
-.fc-story-seg.seg--hard,
-.fc-story-seg.fc-story-seg--r2 {
-  background: var(--zen-amber, #f59e0b) !important;
-}
-
-.fc-story-seg.seg--again,
-.fc-story-seg.fc-story-seg--r1 {
-  background: #f43f5e !important;
-}
-
-.fc-rate-row {
-  display: grid !important;
-  grid-template-columns: repeat(4, 1fr) !important;
-  gap: 10px !important;
-  margin-top: 14px !important;
-}
-
-@media (max-width: 600px) {
-  .fc-rate-row {
-    grid-template-columns: 1fr 1fr !important;
-  }
-}
-
-.fc-rate-btn {
-  border-radius: 14px !important;
-  font-weight: 700 !important;
-  font-size: 0.86rem !important;
-  padding: 12px 14px !important;
-  transition: transform 0.12s ease, box-shadow 0.15s ease, background 0.15s ease !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 6px !important;
-}
-.fc-rate-btn:hover {
-  transform: translateY(-2px) !important;
-}
-.fc-rate-btn--again {
-  background: rgba(244, 63, 94, 0.10) !important;
-  color: #be123c !important;
-  border: 1px solid rgba(244, 63, 94, 0.25) !important;
-}
-.fc-rate-btn--again:hover {
-  background: rgba(244, 63, 94, 0.20) !important;
-  box-shadow: 0 6px 18px rgba(244, 63, 94, 0.25) !important;
-}
-
-.fc-rate-btn--hard {
-  background: rgba(245, 158, 11, 0.10) !important;
-  color: #b45309 !important;
-  border: 1px solid rgba(245, 158, 11, 0.28) !important;
-}
-.fc-rate-btn--hard:hover {
-  background: rgba(245, 158, 11, 0.20) !important;
-  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.25) !important;
-}
-
-.fc-rate-btn--good {
-  background: rgba(59, 130, 246, 0.10) !important;
-  color: #1d4ed8 !important;
-  border: 1px solid rgba(59, 130, 246, 0.25) !important;
-}
-.fc-rate-btn--good:hover {
-  background: rgba(59, 130, 246, 0.20) !important;
-  box-shadow: 0 6px 18px rgba(59, 130, 246, 0.25) !important;
-}
-
-.fc-rate-btn--easy {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-  color: #ffffff !important;
-  border: 1px solid rgba(16, 185, 129, 0.4) !important;
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35) !important;
-}
-.fc-rate-btn--easy:hover {
-  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45) !important;
-}
-
-:root[data-theme="dark"] .fc-rate-btn--again {
-  color: #fb7185 !important;
-}
-:root[data-theme="dark"] .fc-rate-btn--hard {
-  color: #fbbf24 !important;
-}
-:root[data-theme="dark"] .fc-rate-btn--good {
-  color: #60a5fa !important;
-}
-
-.cards-completed-panel {
-  background: var(--zen-surface-card) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border: 1px solid var(--zen-hairline) !important;
-  border-radius: 24px !important;
-  box-shadow: var(--zen-shadow-island) !important;
-  padding: 36px 28px !important;
-  text-align: center !important;
-  margin-top: 20px !important;
-  color: var(--zen-text-main, var(--ink)) !important;
-}
-.cards-completed-panel h2 {
-  color: var(--zen-text-main, var(--ink)) !important;
-}
-.cards-completed-panel p {
-  color: var(--zen-text-soft, var(--ink-soft)) !important;
-}
-
-/* ================= CALIBRATION & DIAGNOSTIC ZEN GLASSMORPHISM (#/diagnostic) ================= */
-.diag-zen-card {
-  background: var(--zen-surface-card) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border: 1px solid var(--zen-hairline) !important;
-  border-radius: 24px !important;
-  box-shadow: var(--zen-shadow-island) !important;
-  padding: 32px 28px !important;
-  transition: all 0.2s ease !important;
-  color: var(--zen-text-main, var(--ink)) !important;
-}
-
-.diag-zen-card h1 {
-  color: var(--zen-text-main, var(--ink)) !important;
-}
-
-.diag-zen-card p, .diag-zen-card li {
-  color: var(--zen-text-soft, var(--ink-soft)) !important;
-}
-
-.diag-branch-panel {
-  background: var(--zen-surface-subtle) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  border: 1px solid var(--zen-hairline) !important;
-  border-radius: 20px !important;
-  padding: 20px 22px !important;
-  margin-bottom: 22px !important;
-  color: var(--zen-text-main, var(--ink)) !important;
-}
-
-.stack-branch-bar {
-  display: flex !important;
-  gap: 10px !important;
-  flex-wrap: wrap !important;
-  margin-top: 12px !important;
-}
-
-.stack-branch-bar .btn {
-  border-radius: 14px !important;
-  font-weight: 700 !important;
-  font-size: 0.86rem !important;
-  padding: 10px 16px !important;
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-.stack-branch-bar .btn.btn-ghost {
-  background: var(--zen-surface-subtle) !important;
-  border: 1px solid var(--zen-hairline) !important;
-  color: var(--zen-text-soft, var(--ink-soft)) !important;
-}
-.stack-branch-bar .btn.btn-ghost:hover {
-  background: var(--zen-surface-hover) !important;
-  color: var(--zen-text-main, var(--ink)) !important;
-  transform: translateY(-1.5px) !important;
-}
-
-.stack-branch-bar .btn.btn-primary {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-  color: #ffffff !important;
-  border: 1px solid rgba(16, 185, 129, 0.4) !important;
-  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35) !important;
-}
-
-.quiz-question-card {
-  background: var(--zen-surface-card) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border: 1px solid var(--zen-hairline) !important;
-  border-radius: 24px !important;
-  box-shadow: var(--zen-shadow-island) !important;
-  padding: 30px 26px !important;
-  margin-top: 16px !important;
-  color: var(--zen-text-main, var(--ink)) !important;
-}
-
-.quiz-question-prompt {
-  font-family: var(--font-b, 'Onest', sans-serif) !important;
-  font-size: 1.15rem !important;
-  font-weight: 700 !important;
-  line-height: 1.55 !important;
-  color: var(--zen-text-main, var(--ink)) !important;
-  letter-spacing: -0.01em !important;
-  margin-bottom: 20px !important;
-}
-
-.quiz-opt {
-  display: flex !important;
-  align-items: center !important;
-  width: 100% !important;
-  text-align: left !important;
-  padding: 14px 18px !important;
-  border-radius: 16px !important;
-  border: 1px solid var(--zen-hairline) !important;
-  background: var(--zen-surface-subtle) !important;
-  backdrop-filter: blur(12px) !important;
-  color: var(--zen-text-soft, var(--ink-soft)) !important;
-  font-size: 0.95rem !important;
-  line-height: 1.5 !important;
-  margin-bottom: 10px !important;
-  cursor: pointer !important;
-  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
-}
-
-.quiz-opt:hover:not(:disabled) {
-  background: var(--zen-surface-hover) !important;
-  border-color: var(--zen-emerald-light, rgba(16, 185, 129, 0.5)) !important;
-  transform: translateY(-1.5px) !important;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15) !important;
-  color: var(--zen-text-main, var(--ink)) !important;
-}
-
-.quiz-opt--selected {
-  background: rgba(16, 185, 129, 0.14) !important;
-  border-color: var(--zen-emerald-light, #10b981) !important;
-  box-shadow: 0 0 0 1px var(--zen-emerald-light, #10b981), 0 8px 24px rgba(16, 185, 129, 0.22) !important;
-  color: var(--zen-text-main, var(--ink)) !important;
-  font-weight: 600 !important;
-  transform: translateY(-1.5px) !important;
-}
-
-.quiz-opt--correct {
-  background: rgba(16, 185, 129, 0.18) !important;
-  border-color: #10b981 !important;
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.32) !important;
-  color: var(--zen-text-main, #10b981) !important;
-  font-weight: 700 !important;
-}
-
-.quiz-opt--wrong {
-  background: rgba(244, 63, 94, 0.14) !important;
-  border-color: #f43f5e !important;
-  box-shadow: 0 0 20px rgba(244, 63, 94, 0.26) !important;
-  color: var(--zen-text-main, #f43f5e) !important;
-  font-weight: 700 !important;
-}
-
-.quiz-opt b {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  min-width: 26px !important;
-  height: 26px !important;
-  border-radius: 8px !important;
-  background: var(--zen-surface-hover) !important;
-  color: var(--zen-text-main, var(--ink)) !important;
-  font-family: var(--font-m, 'JetBrains Mono', monospace) !important;
-  font-size: 0.85rem !important;
-  margin-right: 12px !important;
-  flex-shrink: 0 !important;
-}
-
-.quiz-opt--selected b {
-  background: var(--zen-emerald-light, #10b981) !important;
-  color: #ffffff !important;
-}
-
-.quiz-opt--correct b {
-  background: #10b981 !important;
-  color: #ffffff !important;
-}
-
-.quiz-opt--wrong b {
-  background: #f43f5e !important;
-  color: #ffffff !important;
-}
-
-.quiz-progress, .progress-bar {
-  height: 6px !important;
-  background: var(--zen-surface-subtle) !important;
-  border-radius: 999px !important;
-  overflow: hidden !important;
-  margin-bottom: 20px !important;
-}
-
-.quiz-progress__bar, .progress-bar__fill {
-  height: 100% !important;
-  background: linear-gradient(90deg, #10b981 0%, #34d399 100%) !important;
-  border-radius: 999px !important;
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.45) !important;
-  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-.diag-notice-calibrated {
-  background: var(--zen-emerald-soft, rgba(16, 185, 129, 0.08)) !important;
-  border: 1px solid var(--zen-emerald-border, rgba(16, 185, 129, 0.28)) !important;
-  border-left: 4px solid var(--zen-emerald-light, #10b981) !important;
-  border-radius: 20px !important;
-  padding: 24px 22px !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  box-shadow: var(--zen-shadow-island) !important;
-  margin-top: 22px !important;
-  color: var(--zen-text-main, var(--ink)) !important;
-}
-
-.diag-cat-card {
-  background: var(--zen-surface-card) !important;
-  border: 1px solid var(--zen-hairline) !important;
-  border-radius: 18px !important;
-  padding: 22px 20px !important;
-  box-shadow: var(--zen-shadow-island) !important;
-  transition: transform 0.15s ease, border-color 0.15s ease !important;
-  color: var(--zen-text-main, var(--ink)) !important;
-}
-
-.diag-cat-card:hover {
-  transform: translateY(-2px) !important;
-  border-color: var(--zen-emerald-border, rgba(16, 185, 129, 0.35)) !important;
-}
-
-
-  /* ================= 3D TACTILE BUTTONS & CODDY AESTHETICS ================= */
-  .btn-3d-orange {
-    background: #ff5722;
-    color: #ffffff !important;
-    font-weight: 800;
-    border: none;
-    border-radius: 14px;
-    padding: 14px 22px;
-    font-size: 0.95rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    box-shadow: 0 6px 0 #d84315, 0 10px 20px rgba(255, 87, 34, 0.4);
-    cursor: pointer;
-    transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    text-decoration: none;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .btn-3d-orange:hover {
-    background: #ff6e40;
-    box-shadow: 0 7px 0 #d84315, 0 12px 24px rgba(255, 87, 34, 0.5);
-  }
-  .btn-3d-orange:active {
-    transform: translateY(4px);
-    box-shadow: 0 2px 0 #d84315, 0 4px 10px rgba(255, 87, 34, 0.3);
-  }
-  .btn-3d-emerald {
-    background: #10b981;
-    color: #ffffff !important;
-    font-weight: 800;
-    border: none;
-    border-radius: 14px;
-    padding: 14px 22px;
-    font-size: 0.95rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    box-shadow: 0 6px 0 #059669, 0 10px 20px rgba(16, 185, 129, 0.35);
-    cursor: pointer;
-    transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    text-decoration: none;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .btn-3d-emerald:hover {
-    background: #34d399;
-    box-shadow: 0 7px 0 #059669, 0 12px 24px rgba(16, 185, 129, 0.45);
-  }
-  .btn-3d-emerald:active {
-    transform: translateY(4px);
-    box-shadow: 0 2px 0 #059669, 0 4px 10px rgba(16, 185, 129, 0.25);
-  }
-  .btn-3d-ruby {
-    background: #e11d48;
-    color: #ffffff !important;
-    font-weight: 800;
-    border: none;
-    border-radius: 14px;
-    padding: 14px 22px;
-    font-size: 0.95rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    box-shadow: 0 6px 0 #9f1239, 0 10px 20px rgba(225, 29, 72, 0.35);
-    cursor: pointer;
-    transition: transform 0.08s ease, box-shadow 0.08s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    text-decoration: none;
-  }
-  .btn-3d-ruby:active {
-    transform: translateY(4px);
-    box-shadow: 0 2px 0 #9f1239, 0 4px 10px rgba(225, 29, 72, 0.25);
-  }
-  .btn-3d-locked {
-    background: #334155;
-    color: #94a3b8 !important;
-    font-weight: 800;
-    border: none;
-    border-radius: 14px;
-    padding: 14px 22px;
-    font-size: 0.95rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    box-shadow: 0 4px 0 #1e293b;
-    cursor: not-allowed;
-    opacity: 0.65;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-
-  /* ================= 3D SERPENTINE S-CURVE TRAIL (#/path) ================= */
-  .path-serpentine-wrap {
-    position: relative;
-    max-width: 520px;
-    margin: 0 auto;
-    padding: 16px 12px 140px;
-    user-select: none;
-  }
-  .path-serpentine-svg {
-    display: block;
-    width: 100%;
-    height: auto;
-    overflow: visible;
-  }
-  .hex-3d-node {
-    cursor: pointer;
-    outline: none;
-    transform-box: fill-box;
-    transform-origin: center;
-    transition: transform 0.24s ease;
-  }
-  .hex-3d-node:hover {
-    transform: scale(1.035);
-  }
-  .hex-3d-node:active {
-    transform: scale(0.985);
-  }
-  .hex-3d-node:active .path-button-face,
-  .hex-3d-node:active .path-button-icon,
-  .hex-challenge-node:active .path-button-face,
-  .hex-challenge-node:active .path-button-icon { transform: translateY(4px); }
-  .path-button-face, .path-button-icon { transition: transform 0.16s ease; transform-box: fill-box; transform-origin: center; }
-  .hex-3d-node:hover .path-button-face, .hex-challenge-node:hover .path-button-face { filter: brightness(1.08); }
-  .hex-3d-node:focus-visible .path-node-face,
-  .hex-challenge-node:focus-visible .path-challenge-face,
-  .hex-3d-node:focus-visible .path-button-face,
-  .hex-challenge-node:focus-visible .path-button-face,
-  .hex-3d-node:focus-visible .path-paw-face,
-  .hex-challenge-node:focus-visible .path-paw-face {
-    stroke: #ffffff !important;
-    stroke-width: 3 !important;
-    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
-  }
-  .hex-node-underlabel {
-    font-size: 10.5px;
-    font-weight: 600;
-    letter-spacing: 0.01em;
-    fill: #97a1b2;
-    stroke: rgba(13, 16, 22, 0.85);
-    stroke-width: 3px;
-    stroke-linejoin: round;
-    paint-order: stroke;
-    pointer-events: none;
-  }
-  html:not([data-theme="dark"]) .hex-node-underlabel {
-    fill: #5a6678;
-    stroke: rgba(250, 248, 245, 0.92);
-  }
-  .hex-active-tooltip {
-    pointer-events: none;
-  }
-  .hex-active-tooltip__inner {
-    animation: hexBubbleBounce 1.8s ease-in-out infinite alternate;
-  }
-  @keyframes hexBubbleBounce {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(-4px); }
-  }
-  .hex-pulse-halo, .hex-challenge-pulse {
-    pointer-events: none;
-  }
-  .hex-pulse-halo { animation: hexPulse 2.2s infinite ease-in-out; }
-  @keyframes hexPulse {
-    0%, 100% { r: 38px; opacity: 0.85; stroke-width: 2.5px; }
-    50% { r: 48px; opacity: 0.2; stroke-width: 5px; }
-  }
-  @keyframes hexChallengePulse {
-    0%, 100% { r: 26px; opacity: 0.8; stroke-width: 2.5px; }
-    50% { r: 34px; opacity: 0.15; stroke-width: 5px; }
-  }
-  /* «Челлендж мастерства» — боковые ветви-гексагоны (по референсу Coddy) */
-  .hex-challenge-node {
-    cursor: pointer;
-    outline: none;
-    transform-box: fill-box;
-    transform-origin: center;
-    transition: transform 0.24s ease;
-  }
-  .hex-challenge-node:hover {
-    transform: scale(1.035);
-  }
-  .hex-challenge-node:active {
-    transform: scale(0.985);
-  }
-  .hex-challenge-node--locked {
-    cursor: not-allowed;
-  }
-  .hex-challenge-pulse {
-    animation: hexChallengePulse 2.6s infinite ease-in-out;
-    pointer-events: none;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .hex-3d-node, .hex-challenge-node, .path-popover { transition: none !important; animation: none !important; }
-    .hex-active-tooltip__inner, .hex-pulse-halo, .hex-challenge-pulse { animation: none !important; }
-  }
-  .hex-branch-label {
-    font-size: 9.5px;
-    font-weight: 800;
-    letter-spacing: 0.14em;
-    fill: #fbbf24;
-    opacity: 0.9;
-    pointer-events: none;
-  }
-  html:not([data-theme="dark"]) .hex-branch-label {
-    fill: #9f1239;
-  }
-  .hex-challenge-branch path {
-    pointer-events: none;
-  }
-
-  /* Anchored Popover */
-  .path-popover {
-    position: absolute;
-    z-index: 1000;
-    box-sizing: border-box;
-    width: min(340px, calc(100vw - 32px));
-    background: linear-gradient(155deg, rgba(28, 34, 45, 0.98), rgba(18, 22, 30, 0.98));
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    border-radius: 22px;
-    padding: 18px;
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.42), 0 2px 8px rgba(0, 0, 0, 0.22);
-    transform: translateX(-50%);
-    animation: popoverFadeIn 0.16s ease-out;
-    color: #f8fafc;
-  }
-  .path-popover:focus-visible {
-    outline: 1px solid rgba(245, 158, 11, 0.55);
-    outline-offset: 3px;
-  }
-  html:not([data-theme="dark"]) .path-popover {
-    background: linear-gradient(155deg, rgba(255, 255, 255, 0.99), rgba(246, 247, 250, 0.99));
-    border: 1px solid rgba(20, 28, 40, 0.10);
-    box-shadow: 0 20px 48px rgba(15, 23, 42, 0.18), 0 2px 8px rgba(15, 23, 42, 0.08);
-    color: #0f172a;
-  }
-  @keyframes popoverFadeIn {
-    from { opacity: 0; transform: translate(-50%, 5px); }
-    to { opacity: 1; transform: translate(-50%, 0); }
-  }
-  .path-popover-arrow {
-    position: absolute;
-    width: 0; height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  .path-popover-arrow--down {
-    bottom: -10px;
-    border-top: 10px solid rgba(22, 27, 36, 0.96);
-  }
-  html:not([data-theme="dark"]) .path-popover-arrow--down {
-    border-top: 10px solid rgba(255, 255, 255, 0.96);
-  }
-  .path-popover-arrow--up {
-    top: -10px;
-    border-bottom: 10px solid rgba(22, 27, 36, 0.96);
-  }
-  html:not([data-theme="dark"]) .path-popover-arrow--up {
-    border-bottom: 10px solid rgba(255, 255, 255, 0.96);
-  }
-  .path-popover-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-  .path-popover-badge {
-    min-width: 0;
-    max-width: calc(100% - 36px);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 0.68rem;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-    padding: 6px 10px;
-    border-radius: 999px;
-    background: rgba(245, 158, 11, 0.12);
-    color: #f5bd4f;
-  }
-  html:not([data-theme="dark"]) .path-popover-badge {
-    background: rgba(180, 112, 21, 0.10);
-    color: #8a5614;
-  }
-  .path-popover-close {
-    background: none;
-    border: none;
-    color: #9da7b6;
-    font-size: 1rem;
-    cursor: pointer;
-    padding: 0;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    flex: 0 0 auto;
-    transition: background 0.16s ease, color 0.16s ease;
-  }
-  .path-popover-close:hover {
-    background: rgba(148, 163, 184, 0.12);
-    color: var(--ink);
-  }
-  .path-popover-title {
-    font-size: 1.16rem;
-    font-weight: 800;
-    line-height: 1.3;
-    letter-spacing: -0.02em;
-    margin: 0 0 9px;
-  }
-  .path-popover-status {
-    display: inline-flex;
-    align-items: center;
-    min-height: 28px;
-    padding: 4px 10px;
-    border-radius: 999px;
-    background: rgba(148, 163, 184, 0.10);
-    font-size: 0.76rem;
-    font-weight: 650;
-    color: #b1bdcc;
-    margin-bottom: 14px;
-  }
-  html:not([data-theme="dark"]) .path-popover-status {
-    color: #526174;
-    background: rgba(71, 85, 105, 0.08);
-  }
-  .path-popover-skills-label {
-    margin-bottom: 8px;
-    font-size: 0.68rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #8793a4;
-  }
-  .path-popover-skills-list {
-    display: grid;
-    gap: 7px;
-  }
-  .path-popover-skill {
-    position: relative;
-    padding: 8px 10px 8px 28px;
-    border: 1px solid rgba(148, 163, 184, 0.10);
-    border-radius: 11px;
-    background: rgba(148, 163, 184, 0.055);
-    color: #c5ceda;
-    font-size: 0.76rem;
-    line-height: 1.42;
-  }
-  .path-popover-skill::before {
-    content: '';
-    position: absolute;
-    left: 12px;
-    top: 14px;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: #f3b447;
-  }
-  html:not([data-theme="dark"]) .path-popover-skill {
-    color: #405064;
-    border-color: rgba(71, 85, 105, 0.10);
-    background: rgba(71, 85, 105, 0.035);
-  }
-  .path-popover-actions {
-    margin-top: 16px;
-  }
-  .path-popover .path-popover-cta {
-    min-height: 48px;
-    border-radius: 14px;
-    box-shadow: 0 5px 16px rgba(249, 115, 22, 0.22);
-    transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
-  }
-  .path-popover .path-popover-cta:hover {
-    filter: brightness(1.04);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.27);
-  }
-  .path-popover .path-popover-cta:active {
-    transform: translateY(0);
-    box-shadow: 0 3px 9px rgba(249, 115, 22, 0.18);
-  }
-  .path-node-style-picker {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 14px;
-  }
-  .path-node-style-label {
-    width: 100%;
-    margin-bottom: 1px;
-    font-size: 0.76rem;
-    font-weight: 750;
-    color: var(--ink-soft);
-  }
-  .path-node-style-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    background: var(--surface-2);
-    color: var(--ink-soft);
-    padding: 8px 12px;
-    font: inherit;
-    font-size: 0.78rem;
-    font-weight: 750;
-    cursor: pointer;
-    transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
-  }
-  .path-node-style-btn.active {
-    border-color: rgba(245, 158, 11, 0.48);
-    background: rgba(245, 158, 11, 0.10);
-    color: var(--ink);
-  }
-  .path-node-style-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-  .path-popover-cta {
-    width: 100%;
-    padding: 12px;
-    font-size: 0.88rem;
-  }
-
-  /* Top Chapter Banner */
-  .path-chapter-banner {
-    position: sticky;
-    top: 56px;
-    z-index: 100;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(22, 27, 36, 0.90);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 16px;
-    padding: 12px 18px;
-    margin-bottom: 20px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-  }
-  html:not([data-theme="dark"]) .path-chapter-banner {
-    background: rgba(255, 255, 255, 0.92);
-    border: 1px solid rgba(0, 0, 0, 0.07);
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
-  }
-  .path-chapter-banner-left {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    min-width: 0;
-  }
-  .path-chapter-breadcrumb {
-    font-size: 0.70rem;
-    font-weight: 800;
-    color: #f59e0b;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-  .path-chapter-title {
-    font-size: 0.96rem;
-    font-weight: 800;
-    color: #f8fafc;
-    letter-spacing: -0.01em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  html:not([data-theme="dark"]) .path-chapter-title {
-    color: #0f172a;
-  }
-  .path-chapter-sub {
-    font-size: 0.78rem;
-    color: #94a3b8;
-  }
-  .path-chapter-progress-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .path-chapter-target-icon {
-    font-size: 0.92rem;
-    line-height: 1;
-  }
-  .path-chapter-segments {
-    display: flex;
-    gap: 4px;
-    align-items: center;
-  }
-  .path-seg-bar {
-    width: 22px;
-    height: 8px;
-    border-radius: 999px;
-    background: rgba(190, 18, 60, 0.30);
-    transition: background 0.2s ease, box-shadow 0.2s ease;
-  }
-  /* Light theme tint only for empty segments: (0,2,1)-specificity override must not
-     beat .done/.active fills, so state classes are excluded via :not() */
-  html:not([data-theme="dark"]) .path-seg-bar:not(.done):not(.active) {
-    background: rgba(107, 29, 47, 0.16);
-  }
-  .path-seg-bar.done {
-    background: linear-gradient(180deg, #fcd34d, #f59e0b);
-  }
-  .path-seg-bar.active {
-    background: linear-gradient(180deg, #fb923c, #ea580c);
-    box-shadow: 0 0 10px rgba(249, 115, 22, 0.55);
-  }
-  .path-chapter-count {
-    font-size: 0.78rem;
-    font-weight: 800;
-    color: #94a3b8;
-    white-space: nowrap;
-    margin-left: 4px;
-  }
-
-  /* Coddy-style ПРОДОЛЖИТЬ CTA in the game-mode chapter banner */
-  .path-chapter-banner {
-    flex-wrap: wrap;
-    row-gap: 10px;
-  }
-  .path-chapter-banner-main {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    flex: 1 1 100%;
-    min-width: 0;
-  }
-  .path-chapter-banner-right {
-    flex: 1 1 100%;
-    min-width: 0;
-  }
-  .path-banner-cta {
-    padding: 10px 18px;
-    font-size: 0.8rem;
-    border-radius: 12px;
-    flex-shrink: 0;
-  }
-  .path-chapter-banner .path-chapter-progress-row {
-    padding-top: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.07);
-  }
-  html:not([data-theme="dark"]) .path-chapter-banner .path-chapter-progress-row {
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
-  }
-  @media (max-width: 768px) {
-    .path-chapter-banner-main {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 10px;
-    }
-    .path-banner-cta {
-      width: 100%;
-    }
-  }
-
-  /* Mobile compact stats strip (Coddy/SoloLearn top bar) — replaces the hidden right rail on <=1040px */
-  .path-mobile-stats {
-    display: none;
-  }
-  @media (max-width: 1040px) {
-    .path-mobile-stats {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      margin: 0 auto 14px;
-      padding: 9px 14px;
-      width: fit-content;
-      max-width: 100%;
-      background: rgba(22, 27, 36, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      border-radius: 999px;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-    }
-    html:not([data-theme="dark"]) .path-mobile-stats {
-      background: rgba(255, 255, 255, 0.88);
-      border: 1px solid rgba(0, 0, 0, 0.06);
-      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
-    }
-  }
-  .path-mobile-stats .pms-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: var(--ink-soft, #cbd5e1);
-    white-space: nowrap;
-  }
-  .path-mobile-stats .pms-item b {
-    color: var(--ink, #f8fafc);
-    font-weight: 800;
-  }
-
-  /* Floating Jump-to-Active Button (Coddy dark rounded square with amber arrow) */
-  .path-jump-btn {
-    position: fixed;
-    bottom: 24px;
-    right: 28px;
-    z-index: 850;
-    width: 44px;
-    height: 44px;
-    border-radius: 13px;
-    background: rgba(22, 27, 36, 0.92);
-    border: 1.5px solid rgba(255, 255, 255, 0.12);
-    color: #f59e0b;
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, color 0.16s ease;
-  }
-  html:not([data-theme="dark"]) .path-jump-btn {
-    background: rgba(255, 255, 255, 0.94);
-    border: 1.5px solid rgba(0, 0, 0, 0.10);
-    color: #d97706;
-    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.15);
-  }
-  .path-jump-btn:hover {
-    transform: translateY(-2px);
-    border-color: rgba(245, 158, 11, 0.5);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55), 0 0 16px rgba(245, 158, 11, 0.25);
-    color: #fbbf24;
-  }
-  .path-jump-btn:active {
-    transform: translateY(1px);
-  }
-  @media (max-width: 768px) {
-    .path-jump-btn {
-      bottom: calc(84px + env(safe-area-inset-bottom, 16px));
-      right: 16px;
-      width: 42px;
-      height: 42px;
-    }
-  }
-
-  /* Desktop 3-column Layout & Coddy Right Rail */
-  .coddy-path-layout {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 32px;
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 0 16px;
-  }
-  .coddy-right-rail {
-    width: 300px;
-    flex-shrink: 0;
-    position: sticky;
-    top: 80px;
-    max-height: calc(100vh - 96px);
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(148, 163, 184, 0.28) transparent;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    padding-top: 16px;
-  }
-  @media (max-width: 1040px) {
-    .coddy-right-rail { display: none !important; }
-    .coddy-path-layout { display: block; padding: 0; }
-  }
-  .coddy-rail-stats-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    background: rgba(22, 27, 36, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 14px;
-    backdrop-filter: blur(16px);
-  }
-  html:not([data-theme="dark"]) .coddy-rail-stats-row {
-    background: rgba(255, 255, 255, 0.85);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-  }
-  .coddy-rail-stat {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.78rem;
-    font-weight: 700;
-  }
-  .coddy-rail-card {
-    padding: 16px 18px;
-    border-radius: 16px;
-    margin: 0;
-    background: rgba(22, 27, 36, 0.65);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-  }
-  html:not([data-theme="dark"]) .coddy-rail-card {
-    background: rgba(255, 255, 255, 0.80);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-  }
-  .coddy-rail-card-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-  .coddy-rail-card--row {
-    padding: 10px 12px;
-  }
-  .coddy-rail-card--row .coddy-rail-card-head {
-    margin-bottom: 0;
-  }
-  .coddy-rail-link {
-    display: inline-flex;
-    align-items: center;
-    min-height: 26px;
-    padding: 3px 9px;
-    border-radius: 8px;
-    background: rgba(245, 158, 11, 0.09);
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #f59e0b;
-    text-decoration: none;
-    transition: opacity 0.15s ease;
-  }
-  .coddy-rail-link:hover {
-    opacity: 0.8;
-    background: rgba(245, 158, 11, 0.15);
-  }
-  .coddy-rail-link:focus-visible {
-    outline: 2px solid var(--focus);
-    outline-offset: 2px;
-  }
-  .coddy-rail-badge {
-    font-size: 0.70rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: #94a3b8;
-  }
-  .coddy-rail-title {
-    font-size: 0.95rem;
-    font-weight: 700;
-    margin: 0 0 4px;
-    color: #f8fafc;
-  }
-  html:not([data-theme="dark"]) .coddy-rail-title {
-    color: #0f172a;
-  }
-  .coddy-rail-desc {
-    font-size: 0.80rem;
-    color: #94a3b8;
-    line-height: 1.45;
-    margin: 0;
-  }
-  /* Widget: course chapters with mini progress bars (Coddy right-rail unit cards) */
-  .coddy-rail-chapters-list {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    margin-top: 4px;
-  }
-  .crc-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 6px 8px;
-    border-radius: 10px;
-    text-decoration: none;
-    transition: background 0.15s ease;
-  }
-  .crc-row:hover {
-    background: rgba(255, 255, 255, 0.05);
-  }
-  html:not([data-theme="dark"]) .crc-row:hover {
-    background: rgba(15, 23, 42, 0.05);
-  }
-  .crc-row--current {
-    background: rgba(245, 158, 11, 0.10);
-    box-shadow: inset 2.5px 0 0 #f59e0b;
-    padding-top: 8px;
-    padding-bottom: 8px;
-  }
-  html:not([data-theme="dark"]) .crc-row--current {
-    background: rgba(217, 119, 6, 0.08);
-  }
-  .crc-num {
-    flex-shrink: 0;
-    width: 24px;
-    height: 24px;
-    border-radius: 8px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.72rem;
-    font-weight: 900;
-    background: rgba(16, 185, 129, 0.14);
-    color: #34d399;
-  }
-  html:not([data-theme="dark"]) .crc-num {
-    background: rgba(20, 90, 70, 0.12);
-    color: #145a46;
-  }
-  .crc-row--current .crc-num {
-    background: rgba(245, 158, 11, 0.18);
-    color: #fbbf24;
-  }
-  html:not([data-theme="dark"]) .crc-row--current .crc-num {
-    color: #b45309;
-  }
-  .crc-body {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  .crc-title {
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: var(--ink, #f1f5f9);
-    line-height: 1.25;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
-  }
-  .crc-row--current .crc-title {
-    font-size: 0.80rem;
-    -webkit-line-clamp: 2;
-  }
-  .crc-bar {
-    height: 5px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.08);
-    overflow: hidden;
-  }
-  html:not([data-theme="dark"]) .crc-bar {
-    background: rgba(0, 0, 0, 0.08);
-  }
-  .crc-bar-fill {
-    display: block;
-    height: 100%;
-    border-radius: 999px;
-    background: linear-gradient(90deg, #10b981, #34d399);
-    transition: width 0.35s ease;
-  }
-  .crc-pct {
-    flex-shrink: 0;
-    font-size: 0.70rem;
-    font-weight: 800;
-    color: #94a3b8;
-    min-width: 34px;
-    text-align: right;
-  }
-  .coddy-rail-meter {
-    display: flex;
-    align-items: baseline;
-    gap: 9px;
-    margin: 5px 0 8px;
-  }
-  .coddy-rail-meter-value {
-    font-size: 1.85rem;
-    line-height: 1;
-    font-weight: 900;
-    color: var(--ink);
-    letter-spacing: -0.04em;
-  }
-  .coddy-rail-daily-summary {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-    font-size: 0.75rem;
-    color: var(--ink-soft);
-  }
-
-  @media (max-width: 640px) {
-    .cards-kb-hint { display: none !important; }
-  }
-
-  /* ================= CODDY PATH MODE SWITCHER ================= */
-  .path-mode-switcher-wrap {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-    position: relative;
-    z-index: 50;
-  }
-  .path-mode-switcher {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px;
-    background: rgba(22, 27, 36, 0.92);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 999px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-  }
-  html:not([data-theme="dark"]) .path-mode-switcher {
-    background: rgba(255, 255, 255, 0.94);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
-  }
-  .path-mode-btn {
-    border: none;
-    background: transparent;
-    color: #94a3b8;
-    font-size: 0.82rem;
-    font-weight: 700;
-    padding: 7px 18px;
-    border-radius: 999px;
-    cursor: pointer;
-    transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    user-select: none;
-  }
-  html:not([data-theme="dark"]) .path-mode-btn {
-    color: #64748b;
-  }
-  .path-mode-btn:hover:not(.active) {
-    color: #f8fafc;
-    background: rgba(255, 255, 255, 0.06);
-  }
-  html:not([data-theme="dark"]) .path-mode-btn:hover:not(.active) {
-    color: #0f172a;
-    background: rgba(0, 0, 0, 0.05);
-  }
-  .path-mode-btn.active {
-    background: linear-gradient(135deg, #ff7a00, #ea580c);
-    color: #ffffff;
-    box-shadow: 0 4px 14px rgba(255, 122, 0, 0.45);
-    transform: scale(1.02);
-  }
-
-  /* ================= PRO MODE (#/path - 'pro') ================= */
-  .path-pro-wrap {
-    width: 100%;
-    max-width: 620px;
-    margin: 0 auto;
-    padding: 16px 12px 140px;
-  }
-  .pro-hero-card {
-    background: rgba(22, 27, 36, 0.94);
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    border-radius: 20px;
-    padding: 22px 24px;
-    margin-bottom: 22px;
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    position: relative;
-    overflow: hidden;
-  }
-  html:not([data-theme="dark"]) .pro-hero-card {
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 12px 36px rgba(15, 23, 42, 0.07);
-  }
-  .pro-hero-card-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
-  }
-  .pro-hero-card-left {
-    min-width: 0;
-    flex: 1;
-  }
-  .pro-hero-breadcrumb {
-    font-size: 0.72rem;
-    font-weight: 800;
-    color: #f59e0b;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 4px;
-  }
-  .pro-hero-title {
-    font-size: 1.25rem;
-    font-weight: 800;
-    line-height: 1.32;
-    color: #f8fafc;
-    margin: 0 0 4px;
-  }
-  html:not([data-theme="dark"]) .pro-hero-title {
-    color: #0f172a;
-  }
-  .pro-hero-meta {
-    font-size: 0.80rem;
-    color: #94a3b8;
-    margin-bottom: 12px;
-  }
-  .pro-hero-cta {
-    flex-shrink: 0;
-    padding: 10px 22px;
-    font-size: 0.88rem;
-    font-weight: 900;
-    letter-spacing: 0.04em;
-  }
-  /* Pro-hero на узких экранах: CTA полноширинный ПОД заголовком, а не справа
-     (иначе на 390px заголовок сжимается до 3 строк — дефект с mobile 390) */
-  @media (max-width: 640px) {
-    .pro-hero-card { padding: 18px 18px 16px; }
-    .pro-hero-card-head { flex-direction: column; align-items: stretch; gap: 12px; }
-    .pro-hero-meta { margin-bottom: 2px; }
-    .pro-hero-cta { width: 100%; text-align: center; padding: 13px 22px; }
-  }
-  .pro-hero-progress-track {
-    width: 100%;
-    height: 5px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.10);
-    overflow: hidden;
-    margin-bottom: 12px;
-  }
-  html:not([data-theme="dark"]) .pro-hero-progress-track {
-    background: rgba(0, 0, 0, 0.08);
-  }
-  .pro-hero-progress-fill {
-    height: 100%;
-    border-radius: 999px;
-    background: linear-gradient(90deg, #ff7a00, #f59e0b);
-    transition: width 0.3s ease;
-  }
-  .pro-chapter-box {
-    background: rgba(22, 27, 36, 0.88);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 18px;
-    margin-bottom: 18px;
-    overflow: hidden;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  }
-  html:not([data-theme="dark"]) .pro-chapter-box {
-    background: rgba(255, 255, 255, 0.90);
-    border: 1px solid rgba(0, 0, 0, 0.07);
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
-  }
-  .pro-chapter-box--active {
-    border-color: rgba(245, 158, 11, 0.45);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(245, 158, 11, 0.25);
-  }
-  .pro-chapter-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 20px;
-    cursor: pointer;
-    user-select: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    background: rgba(255, 255, 255, 0.02);
-  }
-  html:not([data-theme="dark"]) .pro-chapter-header {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    background: rgba(0, 0, 0, 0.01);
-  }
-  .pro-chapter-header:hover {
-    background: rgba(255, 255, 255, 0.04);
-  }
-  html:not([data-theme="dark"]) .pro-chapter-header:hover {
-    background: rgba(0, 0, 0, 0.03);
-  }
-  .pro-chapter-num {
-    font-size: 0.70rem;
-    font-weight: 800;
-    color: #94a3b8;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-  .pro-chapter-title {
-    font-size: 1.18rem;
-    font-weight: 800;
-    color: #f8fafc;
-    margin-top: 2px;
-  }
-  html:not([data-theme="dark"]) .pro-chapter-title {
-    color: #0f172a;
-  }
-  .pro-chapter-header-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: #94a3b8;
-  }
-  .pro-chapter-chevron {
-    font-size: 0.70rem;
-    transition: transform 0.2s ease;
-  }
-  .pro-lesson-list {
-    display: flex;
-    flex-direction: column;
-  }
-  .pro-lesson-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 14px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    transition: background 0.15s ease;
-    cursor: pointer;
-    text-decoration: none;
-    color: inherit;
-  }
-  html:not([data-theme="dark"]) .pro-lesson-row {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-  }
-  .pro-lesson-row:last-child {
-    border-bottom: none;
-  }
-  .pro-lesson-row:hover:not(.pro-lesson-row--locked) {
-    background: rgba(255, 255, 255, 0.05);
-  }
-  html:not([data-theme="dark"]) .pro-lesson-row:hover:not(.pro-lesson-row--locked) {
-    background: rgba(0, 0, 0, 0.03);
-  }
-  .pro-lesson-row--active {
-    background: rgba(245, 158, 11, 0.08);
-    box-shadow: inset 3px 0 0 #f59e0b;
-  }
-  html:not([data-theme="dark"]) .pro-lesson-row--active {
-    background: rgba(245, 158, 11, 0.07);
-    box-shadow: inset 3px 0 0 #d97706;
-  }
-  .pro-lesson-row--locked {
-    opacity: 0.55;
-    cursor: not-allowed;
-  }
-  .pro-lesson-status-icon {
-    width: 36px;
-    height: 36px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .pro-icon-play {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ff7a00, #ea580c);
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    padding-left: 2px;
-    box-shadow: 0 4px 12px rgba(255, 122, 0, 0.45);
-    animation: proPlayPulse 2s infinite ease-in-out;
-  }
-  @keyframes proPlayPulse {
-    0%, 100% { transform: scale(1); box-shadow: 0 4px 12px rgba(255, 122, 0, 0.45); }
-    50% { transform: scale(1.06); box-shadow: 0 6px 18px rgba(255, 122, 0, 0.65); }
-  }
-  .pro-icon-done {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: #059669;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 15px;
-    font-weight: 900;
-    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.35);
-  }
-  .pro-icon-locked {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #64748b;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-  }
-  html:not([data-theme="dark"]) .pro-icon-locked {
-    background: rgba(0, 0, 0, 0.04);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-  }
-  .pro-lesson-info {
-    flex: 1;
-    min-width: 0;
-  }
-  .pro-lesson-title {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #f8fafc;
-    line-height: 1.35;
-    margin-bottom: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  html:not([data-theme="dark"]) .pro-lesson-title {
-    color: #0f172a;
-  }
-  .pro-lesson-tags {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .pro-lesson-badge {
-    font-size: 0.70rem;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.07);
-    color: #94a3b8;
-  }
-  html:not([data-theme="dark"]) .pro-lesson-badge {
-    background: rgba(0, 0, 0, 0.06);
-    color: #64748b;
-  }
-  .pro-lesson-badge--challenge {
-    background: rgba(244, 63, 94, 0.15);
-    color: #fb7185;
-  }
-  .pro-lesson-tail {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-  }
-  .pro-arrow {
-    color: #f59e0b;
-    font-weight: 800;
-    font-size: 1.15rem;
-  }
-  .pro-done-check {
-    color: #10b981;
-    font-weight: 800;
-    font-size: 0.95rem;
-  }
-
-  /* ================= SETTINGS MODAL ================= */
-  .settings-modal-card {
-    max-width: 560px;
-  }
-  .settings-section-title {
-    font-size: 0.88rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: #f59e0b;
-    margin-bottom: 8px;
-  }
-  .settings-mode-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-  @media (max-width: 520px) {
-    .settings-mode-grid { grid-template-columns: 1fr; }
-  }
-  .settings-mode-card {
-    border: 1.5px solid rgba(255, 255, 255, 0.10);
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.03);
-    padding: 14px 16px;
-    text-align: left;
-    cursor: pointer;
-    transition: all 0.18s ease;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    color: inherit;
-  }
-  html:not([data-theme="dark"]) .settings-mode-card {
-    border: 1.5px solid rgba(0, 0, 0, 0.08);
-    background: rgba(0, 0, 0, 0.02);
-  }
-  .settings-mode-card:hover {
-    border-color: rgba(245, 158, 11, 0.4);
-    background: rgba(255, 255, 255, 0.05);
-  }
-  html:not([data-theme="dark"]) .settings-mode-card:hover {
-    background: rgba(0, 0, 0, 0.04);
-  }
-  .settings-mode-card.active {
-    border-color: #f59e0b;
-    background: rgba(245, 158, 11, 0.10);
-    box-shadow: 0 0 0 1px #f59e0b, 0 4px 14px rgba(245, 158, 11, 0.2);
-  }
-  .settings-mode-card-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .settings-mode-icon {
-    font-size: 1.2rem;
-  }
-  .settings-mode-name {
-    font-size: 0.94rem;
-    font-weight: 800;
-    color: #f8fafc;
-  }
-  html:not([data-theme="dark"]) .settings-mode-name {
-    color: #0f172a;
-  }
-  .settings-mode-badge {
-    margin-left: auto;
-    font-size: 0.68rem;
-    font-weight: 800;
-    padding: 2px 6px;
-    border-radius: 6px;
-    background: #f59e0b;
-    color: #000;
-  }
-  .settings-mode-desc {
-    font-size: 0.78rem;
-    color: #94a3b8;
-    line-height: 1.4;
-  }
-
-  /* ================= 4-TAB MOBILE IDE (#/practice) ================= */
-  .prac-mobile-tabs {
-    display: flex;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 4px;
-    gap: 4px;
-    margin-bottom: 14px;
-  }
-  .prac-mob-tab {
-    flex: 1;
-    padding: 10px 6px;
-    text-align: center;
-    font-size: 0.84rem;
-    font-weight: 700;
-    border-radius: 12px;
-    border: none;
-    background: transparent;
-    color: var(--ink-soft);
-    cursor: pointer;
-    transition: all 0.15s ease;
-  }
-  .prac-mob-tab.active {
-    background: var(--surface-2);
-    color: var(--ink);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  }
-  .prac-signature-box {
-    background: rgba(0, 0, 0, 0.25);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 10px 14px;
-    margin: 12px 0;
-    font-family: var(--font-m);
-    font-size: 0.84rem;
-    color: #e2e8f0;
-  }
-  html:not([data-theme="dark"]) .prac-signature-box {
-    background: rgba(15, 23, 42, 0.05);
-    color: #0f172a;
-  }
-  .sig-badge {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--amber);
-    margin-bottom: 4px;
-    letter-spacing: 0.04em;
-  }
-  .prac-testcases-wrapper {
-    min-width: 0;
-    overflow-x: auto;
-  }
-  .prac-testcases-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.82rem;
-    margin-bottom: 12px;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 1px solid var(--line);
-  }
-  .prac-testcases-table code {
-    word-break: break-word;
-    white-space: normal;
-  }
-  .prac-testcases-table th, .prac-testcases-table td {
-    padding: 8px 10px;
-    border: 1px solid var(--line-soft);
-    text-align: left;
-  }
-  .prac-testcases-table th {
-    background: var(--surface-2);
-    color: var(--ink-soft);
-    font-weight: 700;
-  }
-  .prac-solution-locked {
-    text-align: center;
-    padding: 28px 20px;
-    background: var(--surface);
-    border: 1.5px dashed var(--line);
-    border-radius: 20px;
-    margin: 12px 0;
-  }
-  .prac-solution-locked .lock-orb {
-    font-size: 2.2rem;
-    margin-bottom: 10px;
-  }
-  .prac-solution-locked h3 {
-    margin-bottom: 8px;
-    font-size: 1.15rem;
-  }
-  .prac-solution-locked p {
-    font-size: 0.88rem;
-    color: var(--ink-soft);
-    max-width: 440px;
-    margin: 0 auto 16px;
-    line-height: 1.5;
-  }
-
-  /* Mobile vs Desktop responsive controls for 4-Tab IDE */
-  @media (max-width: 768px) {
-    .prac-mobile-tabs {
-      display: flex !important;
-    }
-    .practice-desktop-grid {
-      display: flex !important;
-      flex-direction: column !important;
-    }
-    .prac-pane--hidden-mobile {
-      display: none !important;
-    }
-  }
-  @media (min-width: 769px) {
-    .prac-mobile-tabs {
-      display: none !important;
-    }
-    .prac-pane--hidden-mobile {
-      display: block !important;
-    }
-  }
-
-  /* ================= THEORY AUDIO COMPANION ================= */
-  .theory-audio-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(22, 27, 36, 0.94);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 14px;
-    padding: 8px 14px;
-    margin: 10px 0 14px;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
-  }
-  html:not([data-theme="dark"]) .theory-audio-bar {
-    background: rgba(255, 255, 255, 0.94);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.08);
-  }
-  .theory-audio-btn {
-    background: var(--surface-2);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 6px 10px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--ink);
-    cursor: pointer;
-  }
-  .theory-audio-btn:hover {
-    background: var(--line);
-  }
-  .audio-status-text {
-    font-size: 0.82rem;
-    color: var(--ink-soft);
-    font-weight: 600;
-  }
-  .sprint-audio-btn {
-    background: none;
-    border: none;
-    font-size: 1rem;
-    cursor: pointer;
-    padding: 4px 6px;
-    color: var(--ink-soft);
-    border-radius: 8px;
-  }
-  .sprint-audio-btn:hover {
-    color: var(--ink);
-  }
-  .lesson-drawer {
-    /* alias for academy-bottom-sheet */
-  }
-
-  /* ================= VISUAL AUDIT FIXES (2026-10-07) ================= */
-  /* V20: элементам с классом .hidden действительно скрываемся (раньше класс не имел CSS,
-     и пустая консоль-полоса skill-лаборатории была видна всегда) */
-  .hidden{display:none !important;}
-  /* V15/V20: светлые темы консолей вывода — пергаментная палитра вместо тёмного квадрата */
-  html:not([data-theme="dark"]) .inline-code-out,
-  html:not([data-theme="dark"]) .snippet-out{
-    background:#f1f5f9;border-color:#cbd5e1;color:#0f172a;
-  }
-  html:not([data-theme="dark"]) #code-output{
-    background:#f1f5f9;border-color:#cbd5e1;color:#0f172a;
-  }
-  /* V9: на mobile в спринт-топбаре убираем тихую ссылку «Справка» — заголовку «К-…» нужен воздух */
-  @media (max-width:560px){
-    .sprint-focus-topbar .sprint-xp-pill[href="#/docs"]{display:none;}
-    .sprint-progress-meta{font-size:.68rem;}
-  }
-  /* V11: модалки на mobile прижаты к верху, карточки режима без длинных описаний —
-     секция «Управление данными» со «Сбросить прогресс» влезает в первый экран */
-  @media (max-width:560px){
-    .modal-backdrop{align-items:flex-start;padding:8px;}
-    .modal-card{max-height:calc(100vh - 16px);padding:14px;}
-    .settings-mode-desc{display:none;}
-    .settings-section{margin-top:10px !important;padding-top:8px !important;}
-    .settings-section p.meta{display:none;}
-  }
-  /* V14: docs-таблицы на mobile — панель скроллится по горизонтали, колонки не сжимаются в вертикаль */
-  @media (max-width:760px){
-    .docs-hub .panel{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-    .docs-hub table{min-width:100%;}
-    .docs-hub th,.docs-hub td:first-child,.docs-hub td code{white-space:nowrap;}
-    .docs-hub td{word-break:break-word;}
-  }
-  /* V25: подсказки свайпов переносятся целиком, а не посреди фразы */
-  .fc-swipe-hint span{white-space:nowrap;}
-  /* V26: «100% HP» босса не переносится на две строки */
-  .boss-hp-val,.boss-hp-bar__label > span:last-child{white-space:nowrap;}
-  /* V23: в карточках эшелонов чип не прилипает к «N%» */
-  .echelon-card__header{gap:10px;}
-  .echelon-card__header .echelon-badge{flex:1 1 auto;min-width:0;}
-  /* V16: mono-чип юнита на треках не переносит «(P%)» на вторую строку */
-  .unit-card .topic-badge{white-space:nowrap;}
-  /* V8: экспресс-песочница навыка не срезает последнюю строку кода */
-  #skill-lab-scratchpad{min-height:112px !important;padding-bottom:14px !important;line-height:1.55 !important;}
-
-  /* ================= CODDY-REFERENCE DESIGNER BATCH (2026-10-07, согласовано с Ксенией) ================= */
-  /* V6/V7-компаньон: инлайн-код в теории — цветные чипы-«ключевые слова» как в Coddy,
-     снимают тяжесть сплошных кодовых вставок (цвета платформы не меняем) */
-  .lesson-theory p > code:not(pre code),
-  .lesson-theory li > code:not(pre code){
-    background:var(--emerald-soft);border:1px solid var(--line);border-radius:7px;
-    padding:1px 6px;font-size:.82em;white-space:nowrap;
-  }
-  html:not([data-theme="dark"]) .lesson-theory p > code:not(pre code),
-  html:not([data-theme="dark"]) .lesson-theory li > code:not(pre code){
-    background:rgba(20,90,70,0.08);
-  }
-  /* V10: practice mobile — контент вкладки доходит до таб-бара, действие прижато вниз (как CTA у Coddy) */
-  @media (max-width:768px){
-    .practice-left-pane:not(.prac-pane--hidden-mobile){
-      display:flex;flex-direction:column;min-height:calc(100dvh - 340px);
-    }
-    .practice-left-pane:not(.prac-pane--hidden-mobile) > *:last-child{
-      margin-top:auto !important;padding-bottom:6px;
-    }
-  }
-  /* Docs: типографика приведена к паре шрифтов платформы (Onest + JetBrains Mono) — без смены структуры */
-  .docs-hub h1{font-family:var(--font-d);font-weight:800;font-size:1.42rem;letter-spacing:-0.01em;margin-bottom:8px;}
-  .docs-hub .panel h2{font-family:var(--font-d);font-weight:800;font-size:1.02rem;letter-spacing:-0.005em;margin:2px 0 10px;}
-  .docs-hub .panel p, .docs-hub .panel td, .docs-hub .panel li{font-family:var(--font-b);font-size:.84rem;line-height:1.5;}
-  .docs-hub .panel code{font-family:var(--font-m);font-size:.8em;}
-  .docs-hub th{font-family:var(--font-b);font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);}
-  .docs-hub td{font-family:var(--font-b);}
-  .docs-hub .math-formula{font-family:var(--font-m);font-size:.78em;}
-
-  /* ================= UT START MODAL «Готовы начать тест?» (Coddy-референс; стекло и цвета платформы не меняем) ================= */
-  .ut-start-backdrop{z-index:100;}
-  .ut-start-card{
-    background:var(--surface);
-    -webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);
-    border:1px solid var(--line);border-radius:26px;
-    max-width:400px;width:100%;padding:26px 26px 18px;text-align:center;
-    box-shadow:0 18px 56px rgba(0,0,0,0.30), inset 0 0 0 1px rgba(16,185,129,0.06);
-    display:flex;flex-direction:column;gap:12px;box-sizing:border-box;
-  }
-  .ut-start-emoji{font-size:2rem;line-height:1;}
-  .ut-start-title{margin:2px 0 0;font-family:var(--font-d);font-weight:800;font-size:1.3rem;letter-spacing:-0.01em;color:var(--ink);}
-  .ut-start-sub{margin:0;color:var(--ink-soft);font-size:.88rem;}
-  .ut-start-btn{width:100%;padding:13px 16px;font-size:1rem;margin-top:4px;}
-  .ut-skip-btn{width:100%;}
-  .ut-toggle-row{
-    display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;
-    background:transparent;border:1px solid var(--line);border-radius:14px;
-    padding:10px 14px;cursor:pointer;color:var(--ink);font-family:var(--font-b);font-size:.85rem;text-align:left;box-sizing:border-box;
-  }
-  .ut-switch{position:relative;width:36px;height:20px;border-radius:999px;background:rgba(148,163,184,0.40);transition:background .2s;flex:0 0 auto;}
-  .ut-switch--on{background:var(--emerald);}
-  .ut-switch-knob{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.35);transition:transform .2s;}
-  .ut-switch--on .ut-switch-knob{transform:translateX(16px);}
-  .ut-start-card .link-quiet{font-size:.78rem;font-family:var(--font-b);background:none;border:none;cursor:pointer;color:var(--ink-soft);text-decoration:underline;text-underline-offset:3px;}
-  .ut-start-hint{margin:0;font-size:.72rem;color:var(--ink-soft);opacity:.85;}
-
-  /* ================= PATH SECTION GATE CARDS (Coddy-референс v1; Hard Gate) ================= */
-  .path-section-gate {
-    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .path-section-gate-bg {
-    transition: filter 0.22s ease, stroke 0.22s ease, fill 0.22s ease;
-  }
-  .path-gate-btn {
-    cursor: pointer;
-    outline: none;
-    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .path-gate-btn--unlocked:hover .path-gate-btn-rect {
-    filter: brightness(1.15) drop-shadow(0 6px 16px rgba(16, 185, 129, 0.55));
-  }
-  .path-gate-btn--unlocked:active {
-    transform: scale(0.98);
-  }
-  .path-gate-btn--locked {
-    cursor: not-allowed;
-  }
-  .path-gate-btn:focus-visible rect {
-    stroke: #ffffff !important;
-    stroke-width: 2.5 !important;
-    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
-  }
-  html:not([data-theme="dark"]) .path-section-gate-bg {
-    fill: rgba(255, 255, 255, 0.95);
-    stroke: rgba(190, 18, 60, 0.30);
-  }
-  html:not([data-theme="dark"]) .path-gate-title {
-    fill: #0f172a;
-  }
-  html:not([data-theme="dark"]) .path-gate-sub {
-    fill: #475569;
-  }
-  html:not([data-theme="dark"]) .path-gate-btn--locked rect {
-    fill: rgba(241, 245, 249, 0.95);
-    stroke: rgba(190, 18, 60, 0.30);
-  }
-  html:not([data-theme="dark"]) .path-gate-btn--locked text {
-    fill: #be123c;
-  }
-
   /* ==========================================================================
      UNIFIED STYLE DISTILLATION SYSTEM (Triad: Theory / Cards / Practice -> All Screens)
-     Formalized Tokens, Universal Primitives, and Harmonized Application Screens
      ========================================================================== */
   :root, :root[data-theme="light"] {
     --zen-bg: #faf8f5;
@@ -5446,7 +2128,6 @@ EXTRA_CSS = r"""
     justify-content: center !important;
     gap: 8px !important;
     box-shadow: 0 4px 16px var(--zen-emerald-glow) !important;
-    text-decoration: none !important;
   }
   .btn-zen-ghost {
     background: transparent !important;
@@ -5461,7 +2142,6 @@ EXTRA_CSS = r"""
     display: inline-flex !important;
     align-items: center !important;
     gap: 6px !important;
-    text-decoration: none !important;
   }
 
   /* Harmonization of All Remaining Screens to the Zen Distillation */
@@ -5481,17 +2161,6 @@ EXTRA_CSS = r"""
     backdrop-filter: blur(20px) !important;
     -webkit-backdrop-filter: blur(20px) !important;
     box-shadow: var(--zen-shadow-island) !important;
-  }
-  #view-root .dash-results-panel {
-    background: var(--zen-surface) !important;
-    border: 1px solid var(--zen-hairline) !important;
-    border-radius: 24px !important;
-    box-shadow: var(--zen-shadow-island) !important;
-  }
-  #view-root .dash-track-chip {
-    background: var(--zen-surface-card) !important;
-    border: 1px solid var(--zen-hairline) !important;
-    border-radius: 14px !important;
   }
 
   /* 2. Skill Tree & Map (#/map) */
@@ -5525,17 +2194,7 @@ EXTRA_CSS = r"""
     border-left: 3px solid var(--zen-hairline) !important;
   }
 
-  /* 3. 7 Mastery Tracks (#/python..#/infra) */
-  #view-root .track-header, #view-root .unit-card, #view-root .echelon-banner {
-    background: var(--zen-surface) !important;
-    border: 1px solid var(--zen-hairline) !important;
-    border-radius: 20px !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    box-shadow: var(--zen-shadow-island) !important;
-  }
-
-  /* 4. Sandbox (#/sandbox) */
+  /* 3. Sandbox (#/sandbox) */
   #view-root .sandbox-grid {
     gap: 18px !important;
   }
@@ -5549,7 +2208,7 @@ EXTRA_CSS = r"""
     box-shadow: var(--zen-shadow-island) !important;
   }
 
-  /* 5. Mock Interview (#/mock) & Unit Bosses */
+  /* 4. Mock Interview (#/mock) & Unit Bosses */
   #view-root .mock-interview-container, #view-root .boss-arena-card {
     background: var(--zen-surface) !important;
     border: 1px solid var(--zen-hairline) !important;
@@ -5559,92 +2218,6 @@ EXTRA_CSS = r"""
     box-shadow: var(--zen-shadow-island) !important;
   }
 
-  /* 6. Documentation Hub (#/docs) */
-  #view-root .docs-hub, #view-root .doc-card {
-    background: var(--zen-surface) !important;
-    border: 1px solid var(--zen-hairline) !important;
-    border-radius: 20px !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    box-shadow: var(--zen-shadow-island) !important;
-  }
-
-  /* 7. Settings & Stats (#/settings) */
-  #view-root .settings-card, #view-root .stat-metric-box {
-    background: var(--zen-surface) !important;
-    border: 1px solid var(--zen-hairline) !important;
-    border-radius: 20px !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    box-shadow: var(--zen-shadow-island) !important;
-  }
-
-
-  /* ================= ZEN GLASSMORPHISM: MODALS & SANDBOX STUDIO ================= */
-  .zen-modal-card {
-    background: var(--zen-surface) !important;
-    backdrop-filter: blur(28px) !important;
-    -webkit-backdrop-filter: blur(28px) !important;
-    border: 1px solid var(--zen-hairline) !important;
-    box-shadow: var(--zen-shadow-island) !important;
-    border-radius: 24px !important;
-    color: var(--ink) !important;
-  }
-  
-  .zen-studio-card {
-    background: var(--zen-surface);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid var(--zen-hairline);
-    box-shadow: var(--shadow-1);
-    border-radius: 20px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .zen-card-header-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 14px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));
-  }
-  
-  .zen-pane-title {
-    font-size: 0.84rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--ink-soft);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-  
-  #code-output.zen-terminal-out {
-    min-height: 250px;
-    font-family: var(--font-m);
-    font-size: 0.88rem;
-    background: rgba(0, 0, 0, 0.35);
-    border: 1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));
-    color: #86efac;
-    border-radius: 14px;
-    padding: 16px;
-    white-space: pre-wrap;
-    overflow-x: auto;
-    line-height: 1.5;
-    margin: 0;
-    flex: 1;
-  }
-  
-  :root[data-theme="light"] #code-output.zen-terminal-out {
-    background: rgba(15, 23, 42, 0.04);
-    border-color: rgba(15, 23, 42, 0.1);
-    color: #065f46;
-  }
 """
 
 # Let's define the injected JS upgrade block that extends the existing app cleanly
@@ -5670,155 +2243,6 @@ window.ARCH_MASTERY = ARCH_MASTERY;
 window.INFRA_MASTERY = INFRA_MASTERY;
 window.IDE_TASKS = IDE_TASKS;
 window.IDE_TASKS_BY_ID = IDE_TASKS_BY_ID;
-window.LESSONS = LESSONS;
-
-/* ================= THEORY AUDIO COMPANION (WEB SPEECH API) ================= */
-window.theoryAudioPlayer = {
-  isPlaying: false,
-  isPaused: false,
-  rate: 1.0,
-  currentText: '',
-  utterance: null,
-  normalizePythonTerms: function(text) {
-    if(!text) return '';
-    let t = String(text);
-    t = t.replace(/<[^>]*>/g, ' ');
-    t = t.replace(/`([^`]+)`/g, '$1');
-    t = t.replace(/\*\*([^*]+)\*\*/g, '$1');
-    t = t.replace(/\*([^*]+)\*/g, '$1');
-    const dict = [
-      [/\bCPython\b/gi, 'Си-Пайтон'],
-      [/\bPython\b/gi, 'Пайтон'],
-      [/\basyncio\b/gi, 'асинк-и-о'],
-      [/\basync\s+def\b/gi, 'асинк дэф'],
-      [/\bdef\b/g, 'дэф'],
-      [/\bGIL\b/g, 'Гил'],
-      [/\b__init__\b/g, 'дандер инит'],
-      [/\b__enter__\b/g, 'дандер энтер'],
-      [/\b__exit__\b/g, 'дандер экзит'],
-      [/\b__slots__\b/g, 'дандер слотс'],
-      [/\b__dict__\b/g, 'дандер дикт'],
-      [/\b__repr__\b/g, 'дандер репре'],
-      [/\b__len__\b/g, 'дандер лен'],
-      [/\bkwargs\b/gi, 'кварги'],
-      [/\bargs\b/gi, 'арги'],
-      [/\bO\(1\)/g, 'О от одного'],
-      [/\bO\(n\)/g, 'О от эн'],
-      [/\bO\(log\s*n\)/gi, 'О от лог эн'],
-      [/\bO\(n\s*log\s*n\)/gi, 'О от эн лог эн'],
-      [/\bdict\b/g, 'дикт'],
-      [/\blist\b/g, 'лист'],
-      [/\btuple\b/g, 'тюпл'],
-      [/\bset\b/g, 'сет'],
-      [/\bdeque\b/gi, 'дэк'],
-      [/\bNone\b/g, 'Нан'],
-      [/\bTrue\b/g, 'Тру'],
-      [/\bFalse\b/g, 'Фолс'],
-      [/\byield\b/g, 'йилд'],
-      [/\bFastAPI\b/gi, 'Фаст-А-Пи-Ай'],
-      [/\bPydantic\b/gi, 'Пайдантик'],
-      [/\bDocker\b/gi, 'Докер'],
-      [/\bPostgreSQL\b/gi, 'Постгрес'],
-      [/\bRedis\b/gi, 'Редис'],
-      [/\bpytest\b/gi, 'пайтест'],
-      [/\bSQL\b/g, 'Эс-Кью-Эль'],
-      [/\bAPI\b/g, 'А-Пи-Ай'],
-      [/\bHTTP\b/gi, 'Эйч-Ти-Ти-Пи'],
-      [/\bJSON\b/gi, 'Джейсон'],
-      [/\bawait\b/g, 'эвейт'],
-      [/\blambda\b/g, 'лямбда'],
-      [/\bself\b/g, 'селф'],
-      [/\bcls\b/g, 'класс'],
-      [/\b__str__\b/g, 'дандер стр'],
-      [/\b__getitem__\b/g, 'дандер гет-айтем'],
-      [/\b__setitem__\b/g, 'дандер сет-айтем'],
-      [/\b__call__\b/g, 'дандер колл'],
-      [/\b__iter__\b/g, 'дандер итер'],
-      [/\b__next__\b/g, 'дандер некст']
-    ];
-    for(const [pat, repl] of dict){
-      t = t.replace(pat, repl);
-    }
-    return t.replace(/\s+/g, ' ').trim();
-  },
-  play: function(text) {
-    if(typeof window === 'undefined' || !window.speechSynthesis) return;
-    try{ window.speechSynthesis.cancel(); }catch(e){}
-    const cleanText = this.normalizePythonTerms(text || this.currentText);
-    if(!cleanText) return;
-    this.currentText = cleanText;
-    try {
-      const utt = (typeof SpeechSynthesisUtterance !== 'undefined') ? new SpeechSynthesisUtterance(cleanText) : { text: cleanText };
-      utt.lang = 'ru-RU';
-      utt.rate = this.rate;
-      utt.onend = () => { this.isPlaying = false; this.isPaused = false; this.updateUI(); };
-      utt.onerror = () => { this.isPlaying = false; this.isPaused = false; this.updateUI(); };
-      this.utterance = utt;
-      window.speechSynthesis.speak(utt);
-    }catch(e){}
-    this.isPlaying = true;
-    this.isPaused = false;
-    this.updateUI();
-  },
-  pause: function() {
-    if(typeof window === 'undefined' || !window.speechSynthesis) return;
-    if(this.isPlaying && !this.isPaused){
-      try{ window.speechSynthesis.pause(); }catch(e){}
-      this.isPaused = true;
-      this.updateUI();
-    }
-  },
-  resume: function() {
-    if(typeof window === 'undefined' || !window.speechSynthesis) return;
-    if(this.isPlaying && this.isPaused){
-      try{ window.speechSynthesis.resume(); }catch(e){}
-      this.isPaused = false;
-      this.updateUI();
-    }
-  },
-  togglePlay: function(text) {
-    if(this.isPlaying){
-      if(this.isPaused) this.resume();
-      else this.pause();
-    } else {
-      this.play(text);
-    }
-  },
-  stop: function() {
-    if(typeof window === 'undefined' || !window.speechSynthesis) return;
-    try{ window.speechSynthesis.cancel(); }catch(e){}
-    this.isPlaying = false;
-    this.isPaused = false;
-    this.updateUI();
-  },
-  rewind10: function() {
-    if(this.currentText){ this.stop(); this.play(this.currentText); }
-  },
-  forward10: function() {
-    if(this.currentText){ this.stop(); }
-  },
-  toggleRate: function() {
-    const rates = [1.0, 1.25, 1.5];
-    const curIdx = rates.indexOf(this.rate);
-    this.rate = rates[(curIdx + 1) % rates.length];
-    if(this.isPlaying && !this.isPaused){
-      this.play(this.currentText);
-    } else {
-      this.updateUI();
-    }
-  },
-  updateUI: function() {
-    const bar = document.getElementById('theory-audio-bar');
-    if(!bar) return;
-    const playBtn = bar.querySelector('[data-audio-play]');
-    const rateBtn = bar.querySelector('[data-audio-rate]');
-    const statusText = bar.querySelector('.audio-status-text');
-    if(playBtn) playBtn.innerHTML = (this.isPlaying && !this.isPaused) ? '⏸' : '▶';
-    if(rateBtn) rateBtn.textContent = `${this.rate}x`;
-    if(statusText) statusText.textContent = (this.isPlaying && !this.isPaused) ? 'Озвучивание…' : (this.isPaused ? 'Пауза' : 'Аудио-компаньон');
-  }
-};
-
 
 // Add icons for new sections
 ICONS.python = '<svg class="icon" viewBox="0 0 24 24"><path d="M12 2c-4 0-4 2-4 4v2h4v1H6c-2.5 0-4 1.8-4 4.5S3.5 18 6 18h2v-2.5c0-1.7 1.3-3 3-3h5c1.4 0 2.5-1.1 2.5-2.5V6c0-2-1.5-4-6.5-4z"/><path d="M12 22c4 0 4-2 4-4v-2h-4v-1h6c2.5 0 4-1.8 4-4.5S20.5 6 18 6h-2v2.5c0 1.7-1.3 3-3 3H8c-1.4 0-2.5 1.1-2.5 2.5V18c0 2 1.5 4 6.5 4z"/></svg>';
@@ -5995,12 +2419,8 @@ function ensureExtendedState(target){
   if(!s.completedNoteSteps || typeof s.completedNoteSteps !== 'object') s.completedNoteSteps = {};
   if(!s.unlockedChunks || typeof s.unlockedChunks !== 'object') s.unlockedChunks = {};
   if(typeof s.soundEnabled !== 'boolean') s.soundEnabled = true;
-  if(typeof s.utShowExplanations !== 'boolean') s.utShowExplanations = true; // тумблер «Показывать разбор после ответа»
-  if(typeof s.utSkipStartModal !== 'boolean') s.utSkipStartModal = false; // «Всегда открывать тест без этой модалки»
   if(!s.stackBranch || !['fastapi','django','both'].includes(s.stackBranch)) s.stackBranch = 'fastapi';
   if(!s.unitSortMode || !['priority','number'].includes(s.unitSortMode)) s.unitSortMode = 'priority';
-  if(!s.pathViewMode || !['game','pro'].includes(s.pathViewMode)) s.pathViewMode = 'game';
-  if(!s.pathNodeStyle || !['paw','button'].includes(s.pathNodeStyle)) s.pathNodeStyle = 'button'; // выбор Ксении: по умолчанию «Кнопки» (ближе к Coddy)
   if(!s.diagnosticGaps || !Array.isArray(s.diagnosticGaps)) s.diagnosticGaps = [];
   if(typeof s.diagCompleted !== 'boolean') s.diagCompleted = false;
   if(typeof s.diagScore !== 'number') s.diagScore = 0;
@@ -6146,10 +2566,6 @@ function mergeProgressStates(baseRaw, incomingRaw){
   merged.theme = bNewer ? (b.theme || a.theme) : (a.theme || b.theme);
   merged.stackBranch = bNewer ? (b.stackBranch || a.stackBranch) : (a.stackBranch || b.stackBranch);
   merged.unitSortMode = bNewer ? (b.unitSortMode || a.unitSortMode) : (a.unitSortMode || b.unitSortMode);
-  // Предпочтения рубежных тестов: явное булево сильнее дефолта, более свежий источник сильнее старого
-  const pickUtPref = (x, y, dflt) => (typeof x === 'boolean' ? x : (typeof y === 'boolean' ? y : dflt));
-  merged.utShowExplanations = bNewer ? pickUtPref(b.utShowExplanations, a.utShowExplanations, true) : pickUtPref(a.utShowExplanations, b.utShowExplanations, true);
-  merged.utSkipStartModal = bNewer ? pickUtPref(b.utSkipStartModal, a.utSkipStartModal, false) : pickUtPref(a.utSkipStartModal, b.utSkipStartModal, false);
   return ensureExtendedState(merged);
 }
 window.mergeProgressStates = mergeProgressStates;
@@ -6722,7 +3138,7 @@ function todayXp(){
 }
 
 // Helper: Build Code Editor with synchronized Line-Numbers Gutter and Sticky Python Accessory Bar
-function buildCodeEditorWithGutterHTML(editorId, codeStr, minHeightPx, customTokens){
+function buildCodeEditorWithGutterHTML(editorId, codeStr, minHeightPx){
   const raw = String(codeStr || '');
   const lineCount = Math.max(1, raw.split('\n').length);
   const nums = [];
@@ -6730,24 +3146,10 @@ function buildCodeEditorWithGutterHTML(editorId, codeStr, minHeightPx, customTok
   const mh = typeof minHeightPx === 'number'
     ? minHeightPx
     : (parseInt(String(minHeightPx || '').replace(/\D+/g, ''), 10) || 200);
-
-  const baseTokens = [
-    { label: 'Tab ➔', val: '    ' },
+  const tokens = [
+    { label: 'Tab ⇥', val: '    ' },
     { label: ':', val: ':' },
-    { label: '_', val: '_' }
-  ];
-
-  const extra = [];
-  if(Array.isArray(customTokens)){
-    customTokens.forEach(t => {
-      const s = String(t || '').trim();
-      if(s && !baseTokens.some(b => b.val === s)){
-        extra.push({ label: s, val: s });
-      }
-    });
-  }
-
-  const standardTokens = [
+    { label: '_', val: '_' },
     { label: '( )', val: '()' },
     { label: '[ ]', val: '[]' },
     { label: '{ }', val: '{}' },
@@ -6755,11 +3157,10 @@ function buildCodeEditorWithGutterHTML(editorId, codeStr, minHeightPx, customTok
     { label: 'return', val: 'return ' },
     { label: 'self.', val: 'self.' },
     { label: 'in', val: 'in ' },
-    { label: '==', val: ' == ' }
+    { label: '==', val: ' == ' },
+    { label: '->', val: ' -> ' }
   ];
-
-  const allTokens = [...baseTokens, ...extra, ...standardTokens];
-  const barBtns = allTokens.map(t =>
+  const barBtns = tokens.map(t =>
     `<button type="button" class="py-key-btn py-acc-btn" data-insert-token="${escapeHtmlStr(t.val)}" data-target-editor="${editorId}">${escapeHtmlStr(t.label)}</button>`
   ).join('');
   return `
@@ -7464,24 +3865,14 @@ async function getFastPythonRunner(){
       setStdout: function(o){ stdoutFn = o && o.batched; },
       setStderr: function(o){ stderrFn = o && o.batched; },
       runPython: function(src){
-        window.pba_stdout_cb = function(s){
-          if(typeof s !== 'string'){
-            try { s = (s && typeof s.$js === 'function') ? String(s.$js()) : String(s); } catch(e){ s = String(s); }
-          }
-          if(stdoutFn) stdoutFn(String(s));
-        };
-        window.pba_stderr_cb = function(s){
-          if(typeof s !== 'string'){
-            try { s = (s && typeof s.$js === 'function') ? String(s.$js()) : String(s); } catch(e){ s = String(s); }
-          }
-          if(stderrFn) stderrFn(String(s));
-        };
-        window.pba_result_bridge = {};
-        const wrapped = BRYTHON_PRELUDE + `\nimport sys, io as _io\nfrom browser import window as _bw\nclass _PBAOut:\n    def write(self, s):\n        if s is not None:\n            _bw.pba_stdout_cb(str(s))\n    def flush(self): pass\nclass _PBAErr:\n    def write(self, s):\n        if s is not None:\n            _bw.pba_stderr_cb(str(s))\n    def flush(self): pass\nsys.stdout = _PBAOut()\nsys.stderr = _PBAErr()\n` + src + `\ntry:\n    _bw.pba_result_bridge.res = bool(__result__)\n    _bw.pba_result_bridge.msg = str(__message__)\nexcept Exception:\n    pass\n`;
+        window.__py_stdout_cb = function(s){ if(stdoutFn) stdoutFn(s); };
+        window.__py_stderr_cb = function(s){ if(stderrFn) stderrFn(s); };
+        window.__py_result_Bridge = {};
+        const wrapped = BRYTHON_PRELUDE + `\nimport sys, io as _io\nfrom browser import window as _bw\nclass _WOut:\n    def write(self, s):\n        if s:\n            _bw.__py_stdout_cb(str(s))\n    def flush(self): pass\nsys.stdout = _WOut()\nsys.stderr = _WOut()\n` + src + `\ntry:\n    _bw.__py_result_Bridge.res = bool(__result__)\n    _bw.__py_result_Bridge.msg = str(__message__)\nexcept Exception:\n    pass\n`;
         window.__BRYTHON__.runPythonSource(wrapped, '__main_' + Math.random().toString(36).slice(2));
         lastGlobals = {
-          __result__: window.pba_result_bridge.res,
-          __message__: window.pba_result_bridge.msg || ''
+          __result__: window.__py_result_Bridge.res,
+          __message__: window.__py_result_Bridge.msg || ''
         };
       },
       globals: {
@@ -7554,7 +3945,6 @@ async function runInlineSnippet(btnEl){
     outEl.textContent = 'Ошибка: ' + String(err);
   }
 }
-
 """
 
 UPGRADE_VIEWS_JS = r"""
@@ -7574,8 +3964,7 @@ let pySkillViewState = {
   codeDraft: '',
   hintLevel: 0,
   runStatus: null,
-  runOutput: '',
-  labDrafts: {}
+  runOutput: ''
 };
 
 function saveReadingPosition(){
@@ -7605,7 +3994,6 @@ function ensurePySkillState(sid){
     const firstF = (saved.fId && sk.fIds.includes(saved.fId)) ? saved.fId : (sk.fIds[0] || null);
     const firstT = (saved.taskId && sk.taskIds && sk.taskIds.includes(saved.taskId)) ? saved.taskId : ((sk.taskIds && sk.taskIds[0]) || 240);
     const tObj = IDE_TASKS_BY_ID[firstT];
-    const oldDrafts = (pySkillViewState && pySkillViewState.labDrafts) ? pySkillViewState.labDrafts : {};
     pySkillViewState = {
       sid: sk.id,
       tab: (isInitialBoot && ['theory','cards','code'].includes(saved.tab)) ? saved.tab : 'theory',
@@ -7621,8 +4009,7 @@ function ensurePySkillState(sid){
       codeDraft: tObj ? getIdeDraft(firstT, tObj.initialCode) : '',
       hintLevel: 0,
       runStatus: null,
-      runOutput: '',
-      labDrafts: oldDrafts
+      runOutput: ''
     };
   }
   return sk;
@@ -7796,10 +4183,31 @@ function viewPythonMastery(trackKey){
     const uPct = Math.round(uMp / (uMax || 1) * 100);
     const utPassed = state.passedUnitTests.includes(u.id);
     const effTier = getEffectiveUnitTier(u.id);
+    const echMeta = getEchelonMeta(effTier);
+    const uMeta = UNIT_INTERVIEW_META[u.id] || { tier: 2, stackTag: 'core' };
+    const isDeferredStack = (branch === 'fastapi' && uMeta.stackTag === 'django') || (branch === 'django' && u.id === '3.1') || uMeta.stackTag === 'flask';
+    const stackPill = isDeferredStack
+      ? `<span class="echelon-badge echelon-badge--t4">Вторая очередь / Доп. стек</span>`
+      : (uMeta.stackTag === 'fastapi' ? `<span class="echelon-badge echelon-badge--t2">⚡ Ветка FastAPI + SQLAlchemy</span>`
+        : (uMeta.stackTag === 'django' ? `<span class="echelon-badge echelon-badge--t2">🎸 Ветка Django + DRF</span>` : ''));
 
     const skillsRows = u.skills.map(s => {
       const mp = getSkillMP(s.id);
       const isGap = (state.diagnosticGaps || []).includes(s.id) && mp < 100;
+      const fDoneCount = s.fIds.filter(fid => state.reviewedDecks.includes(fid)).length;
+      const tSolvedCount = (s.taskIds||[]).filter(tid => solvedMap[tid] === 'solved').length;
+      const isSkillFullyConsolidated = (fDoneCount >= Math.min(1, s.fIds.length)) && (tSolvedCount >= Math.min(1, (s.taskIds||[]).length || 1));
+      const kBadges = s.kIds.map(kid => {
+        const isNoteRead = state.readNotes.includes(kid);
+        const isFullDone = isNoteRead && isSkillFullyConsolidated;
+        const noteMeta = ALL_NOTES_COMBINED[kid] || {};
+        const cls = isFullDone ? 'pill-mini pill-mini--done' : (isNoteRead ? 'pill-mini pill-mini--partial' : 'pill-mini');
+        const prefix = isFullDone ? '✓ ' : (isNoteRead ? '⏳ ' : '');
+        const tip = isFullDone
+          ? `${noteMeta.title||kid} — полностью закреплено (теория + карточки + код)`
+          : (isNoteRead ? `${noteMeta.title||kid} — теория прочитана! Закрепи карточками и задачей IDE для ✓` : (noteMeta.title||kid));
+        return `<span class="${cls}" data-py-jump-note="${s.id}:${kid}" title="${escapeHtmlStr(tip)}">${prefix}${kid}</span>`;
+      }).join('');
 
       return `
         <div class="skill-row">
@@ -7808,11 +4216,14 @@ function viewPythonMastery(trackKey){
             <div style="min-width:0;flex:1;">
               <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;min-width:0;">
                 <a href="#${tr.routePrefix}/skill/${s.id}" class="skill-row__title" style="font-weight:600;text-decoration:none;font-size:.96rem;">${s.id} · ${s.title}</a>
+                <span class="skill-row__meta-detail">${renderEchelonBadge(effTier)}</span>
                 ${isGap ? `<span class="echelon-badge echelon-badge--gap">🎯 Пробел диагностики</span>` : ''}
               </div>
+              <div class="meta skill-row__meta-detail" style="font-size:.77rem;">${mpLabel(mp)} · Конспектов: ${s.kIds.length} · Колод: ${fDoneCount}/${s.fIds.length} · Задач IDE: ${tSolvedCount}/${(s.taskIds||[]).length}</div>
             </div>
           </div>
           <div class="skill-row__badges">
+            ${kBadges}
             <a href="#${tr.routePrefix}/skill/${s.id}" class="btn btn-ghost skill-row__open-btn" style="padding:6px 12px;font-size:.8rem;">Открыть →</a>
           </div>
         </div>`;
@@ -7823,9 +4234,12 @@ function viewPythonMastery(trackKey){
         <div class="unit-card__head">
           <div style="min-width:0;flex:1;">
             <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">
-              <span class="topic-badge" style="margin:0;">Юнит ${u.id} · ${uMp}/${uMax} MP · ${uPct}%</span>
+              <span class="topic-badge" style="margin:0;">Юнит ${u.id} · ${uMp} / ${uMax} MP (${uPct}%)</span>
+              <span class="echelon-badge echelon-badge--t${effTier}">${echMeta.label}</span>
+              ${stackPill}
             </div>
             <h2>${u.title}</h2>
+            <p class="meta unit-card__desc" style="margin:4px 0 0;">${u.desc}</p>
           </div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex:none;">
             <a href="#${tr.routePrefix}/unittest/${u.id}" class="btn ${utPassed?'btn-primary':'btn-clay unit-test-btn'}" style="padding:7px 11px;font-size:.78rem;white-space:nowrap;">
@@ -7841,14 +4255,12 @@ function viewPythonMastery(trackKey){
   const firstUnitHTML = unitsHTML.length > 0 ? unitsHTML[0] : '';
   const restUnitsHTML = unitsHTML.length > 1 ? `
     <details class="cocoon-details">
-      <summary><span>📚 Остальные юниты (${unitsHTML.length - 1} из ${unitsHTML.length}) · раскрыть ▾</span></summary>
+      <summary><span>📚 Остальные юниты модуля (${unitsHTML.length - 1} из ${unitsHTML.length})</span><span class="meta">Раскрыть список ▾</span></summary>
       ${unitsHTML.slice(1).join('')}
     </details>` : '';
 
   const nextTrackSk = getFirstUnmasteredSkillInEchelon(null, tr.key) || trackSkills[0];
   const nextTrackKId = (nextTrackSk && nextTrackSk.kIds && nextTrackSk.kIds.find(k => !state.readNotes.includes(k))) || (nextTrackSk && nextTrackSk.kIds && nextTrackSk.kIds[0]) || '';
-  const nextTrackNoteObj = ALL_NOTES_COMBINED[nextTrackKId] || { title: (nextTrackSk ? nextTrackSk.title : 'Основы темы') };
-  const nextTrackNoteTitle = (nextTrackNoteObj.title || '').replace(/^К-\d+\s*[:·•\-]\s*/i, '');
 
   return `
     <div class="container">
@@ -7863,7 +4275,7 @@ function viewPythonMastery(trackKey){
       <div class="cocoon-focus-card" style="margin-bottom:10px;">
         <div class="cocoon-focus-eyebrow">✨ Фокус модуля · ${tr.courseUnitRange}<span class="sr-only"> ${tr.badge}</span></div>
         <div class="cocoon-focus-title">${nextTrackSk ? (nextTrackSk.id + ' · ' + nextTrackSk.title) : tr.title}</div>
-        <div class="cocoon-focus-desc">Следующий шаг: <b>${nextTrackNoteTitle || (nextTrackSk ? nextTrackSk.title : 'Основы темы')}</b> · теория с разбором Junior vs Senior, карточки и практика в IDE.</div>
+        <div class="cocoon-focus-desc">Следующий шаг: конспект <b>${nextTrackKId}</b> (1. Конспект → 2. Карточки Ф-xxx → 3. Практика в IDE) с разбором Junior vs Senior.</div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           <button class="btn-glass-emerald btn-sprint-cta" data-quick-microstep="${tr.key}">⚡ Быстрый микро-шаг (2 мин) ➔</button>
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
@@ -7923,19 +4335,14 @@ function formatRichInlineText(rawStr){
     s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
     s = s.replace(/\b(d\[key\]|d\.get\(key\)|\.get\(\)|\.append\(\)|x in seen|x in collection|range\(\d+\)|Dog\(\)\.speak\(\)|raise ValueError\([^)]*\)|DELETE FROM users;|PRIMARY KEY|FOREIGN KEY|GROUP BY|ORDER BY|HAVING|WHERE|JOIN|UNION|COMMIT|ROLLBACK|git commit|git push|git clone|git init|Content-Type|application\/json|@property|@staticmethod|@cached_property|@lru_cache|KeyError|IndexError|TypeError|SyntaxError|UnboundLocalError|RecursionError|__defaults__|sys\.getrecursionlimit\(\))\b/g, '<code>$1</code>');
   }
-  // Format Big-O notation and mathematical styling
-  s = s.replace(/\$([^\$\n]+)\$/g, '<span class="math-formula">$1</span>');
-  s = s.replace(/\bO\((?:n\^2|n²)\)/g, '<span class="math-formula">O(n²)</span>');
+  // Format Big-O notation with mathematical styling
+  s = s.replace(/\bO\(n\^2\)/g, '<span class="math-formula">O(n²)</span>');
+  s = s.replace(/\bO\(n²\)/g, '<span class="math-formula">O(n²)</span>');
   s = s.replace(/\bO\(1\)/g, '<span class="math-formula">O(1)</span>');
   s = s.replace(/\bO\(n\)/g, '<span class="math-formula">O(n)</span>');
   s = s.replace(/\bO\(log\s*n\)/g, '<span class="math-formula">O(log n)</span>');
   s = s.replace(/\bO\(n\s*log\s*n\)/g, '<span class="math-formula">O(n log n)</span>');
   s = s.replace(/\bO\(V\s*\+\s*E\)/g, '<span class="math-formula">O(V + E)</span>');
-  s = s.replace(/\bO\(min\([^)]+\)\)/gi, '<span class="math-formula">O(min(n, m))</span>');
-  s = s.replace(/\bO\(max\([^)]+\)\)/gi, '<span class="math-formula">O(max(n, m))</span>');
-  s = s.replace(/\bO\(len\([^)]+\)\)/gi, function(m){ return '<span class="math-formula">' + m + '</span>'; });
-  s = s.replace(/\bO\(n\s*\+\s*m\)/gi, '<span class="math-formula">O(n + m)</span>');
-  s = s.replace(/<span class="math-formula"><span class="math-formula">([^<]+)<\/span><\/span>/g, '<span class="math-formula">$1</span>');
   return s;
 }
 window.formatRichInlineText = formatRichInlineText;
@@ -7956,32 +4363,14 @@ function formatQuizQuestionPromptHTML(rawText){
 }
 window.formatQuizQuestionPromptHTML = formatQuizQuestionPromptHTML;
 
-// Lightweight client-side Python syntax highlighter (keywords, strings, comments, numbers, built-in calls)
-function highlightPythonTokens(codeInner){
-  if(codeInner.indexOf('tok-') !== -1) return codeInner;
-  let out = codeInner;
-  // 1. Comments
-  out = out.replace(/(#.*?)(?=\n|$)/g, '<span class="tok-com">$1</span>');
-  // 2. Strings
-  out = out.replace(/(['"][^'"\n]*['"])/g, '<span class="tok-str">$1</span>');
-  // 3. Keywords
-  out = out.replace(/\b(def|return|for|in|if|else|elif|while|class|import|from|as|try|except|finally|with|lambda|yield|raise|pass|break|continue|and|or|not|is|True|False|None)\b/g, '<span class="tok-kw">$1</span>');
-  // 4. Builtins & Methods
-  out = out.replace(/\b(print|len|range|list|dict|set|tuple|int|str|float|bool|min|max|sum|sorted|enumerate|zip|map|filter|all|any|open|isinstance|type|super|append|extend|pop|remove|add|update|get|keys|values|items)\b(?=\s*\()/g, '<span class="tok-builtin">$1</span>');
-  // 5. Numbers
-  out = out.replace(/\b(\d+)\b(?![^<]*>)/g, '<span class="tok-num">$1</span>');
-  return out;
-}
-
 // Helper to decorate <pre><code> blocks with inline "▶ Запустить в Python" button (skips already-decorated RemNote K-note blocks)
 function decorateCodeBlocksWithRunBtn(htmlStr){
   const s = String(htmlStr || '');
   if(s.indexOf('snippet-wrap') !== -1 || s.indexOf('code-snippet-wrap') !== -1) return s;
   return s.replace(/<pre><code>([\s\S]*?)<\/code><\/pre>/g, function(full, codeInner){
     const looksLikePython = !(/^(SELECT|INSERT|UPDATE|DELETE|CREATE|FROM|docker|git|GET|POST|PATCH|PUT|paths:)/i.test(codeInner.trim()));
-    const highlighted = looksLikePython ? highlightPythonTokens(codeInner) : codeInner;
-    if(!looksLikePython) return `<pre><code>${highlighted}</code></pre>`;
-    return `<div class="code-snippet-wrap"><button type="button" class="run-inline-btn" data-run-inline>▶ Запустить код</button><pre><code>${highlighted}</code></pre></div>`;
+    if(!looksLikePython) return full;
+    return `<div class="code-snippet-wrap"><button type="button" class="run-inline-btn" data-run-inline>▶ Запустить код</button><pre><code>${codeInner}</code></pre></div>`;
   });
 }
 
@@ -8039,7 +4428,7 @@ function splitStepHtmlIntoChunks(htmlStr){
   for(let i = 0; i < rawBlocks.length; i++){
     const b = rawBlocks[i];
     const isHeading = /^<h[1-6]\b/i.test(b);
-    const isLeadInColon = /^<p\b/i.test(b) && /:\s*(?:<\/(?:strong|b|em|i|code)>\s*)*<\/p>\s*$/i.test(b) && b.length < 300 && (i + 1 < rawBlocks.length);
+    const isLeadInColon = /^<p\b/i.test(b) && /:\s*(?:<\/(?:strong|b|em|i|code)>\s*)*<\/p>\s*$/i.test(b) && b.length < 260 && (i + 1 < rawBlocks.length);
     if(isHeading || isLeadInColon){
       pending = pending ? (pending + '\n' + b) : b;
     } else if(pending){
@@ -8053,24 +4442,14 @@ function splitStepHtmlIntoChunks(htmlStr){
     if(merged.length > 0) merged[merged.length - 1] += '\n' + pending;
     else merged.push(pending);
   }
-  const finalChunks = [];
-  for(let i = 0; i < merged.length; i++){
-    const c = merged[i];
-    const plainLen = c.replace(/<[^>]+>/g, '').trim().length;
-    if(finalChunks.length > 0 && plainLen < 75 && !/^<h[1-6]\b/i.test(c)){
-      finalChunks[finalChunks.length - 1] += '\n' + c;
-    } else {
-      finalChunks.push(c);
-    }
-  }
   if(merged.length === 1){
     const only = merged[0];
-    const pm = only.match(/^([\s\S]*?<p[^>]*>)([\s\S]*?)(<\/p>[\s\S]*?)$/i);
-    if(pm && !/<(pre|table|ul|ol)/i.test(only)){
+    const pm = only.match(/^([\s\S]*?<p[^>]*>)([\s\S]*?)(<\/p>\s*)$/i);
+    if(pm && !/<(pre|table|ul|ol)\b/i.test(only)){
       const prefix = pm[1];
       const inner = pm[2];
       const suffix = pm[3];
-      const sentRe = /([.!?])\s+(?=[А-ЯЁA-Z«"“]|<(?:strong|code|b|em|i))/g;
+      const sentRe = /([.!?])\s+(?=[А-ЯЁA-Z«"“]|<(?:strong|code|b|em|i)\b)/g;
       let sm;
       let splitPos = -1;
       while((sm = sentRe.exec(inner)) !== null){
@@ -8086,7 +4465,7 @@ function splitStepHtmlIntoChunks(htmlStr){
       }
     }
   }
-  return finalChunks.length > 0 ? finalChunks : [s];
+  return merged.length > 0 ? merged : [s];
 }
 window.splitStepHtmlIntoChunks = splitStepHtmlIntoChunks;
 
@@ -8101,166 +4480,60 @@ function pluralRuTopics(n){
 
 function buildSprintFinishCelebrationHTML(cel){
   if(!cel) return '';
+  const streakVal = (typeof state !== 'undefined' && state && state.streak) ? state.streak : 1;
+  const activeCount = Math.min(6, Math.max(1, streakVal % 6 || 6));
   const remaining = (cel.remainingTopics !== undefined) ? cel.remainingTopics : 7;
   const prevP = (cel.prevPct !== undefined) ? cel.prevPct : 0;
   const newP = (cel.newPct !== undefined) ? cel.newPct : 2;
   return `
-    <div class="sprint-finish-card" style="max-width:560px;margin:12px auto;text-align:center;">
-      <div class="sprint-finish-orb" style="font-size:2rem;margin-bottom:6px;">🎯</div>
-      <div class="cocoon-focus-eyebrow" style="margin-bottom:6px;">Теория закреплена · +15 XP за конспект</div>
-      <h2 style="font-size:1.35rem;margin-bottom:8px;">Конспект ${escapeHtmlStr(cel.kid || 'темы')} изучен!</h2>
-      <p class="meta" style="max-width:480px;margin:0 auto 12px;font-size:.88rem;">Материал пройден! Закрепи тему на карточках или переходи к коду в IDE:</p>
+    <div class="sprint-finish-card">
+      <div class="sprint-finish-orb">👑</div>
+      <div class="cocoon-focus-eyebrow" style="margin-bottom:8px;">Этап 1 (Теория) пройден · +15 XP · Переходим к закреплению!</div>
+      <h2 style="font-size:1.45rem;margin-bottom:6px;">Спринт завершён! Конспект ${escapeHtmlStr(cel.kid || 'темы')} изучен!<span class="sr-only"> Минус 1 тема до скрининга!</span></h2>
+      <p class="meta" style="max-width:540px;margin:0 auto 10px;">Минус 1 тема до скрининга! Чтобы навык получил полную галочку <b>✓</b> и запомнился надолго, пройди 3D-карточки и реши практическую задачу в IDE:</p>
 
-      <div class="countdown-shift-card" style="margin:12px 0;padding:12px 16px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-weight:700;font-size:.88rem;">
-          <span>🎯 Прогресс юнита: ${prevP}% ➔ ${newP}%</span>
-          <span style="color:var(--moss);">⏳ До скрининга: ${remaining} ${pluralRuTopics(remaining)}</span>
+      <div class="daily-activity-strip">
+        <div class="daily-activity-head">
+          <span>✓ Дневная активность выполнена!</span>
+          <span class="active-accent">${activeCount} / 6</span>
+        </div>
+        <div class="daily-week-segments">
+          ${[1,2,3,4,5,6].map(i => `<div class="day-seg ${i <= activeCount ? 'done' : ''}"></div>`).join('')}
+        </div>
+      </div>
+
+      <div class="stats-grid-2x2">
+        <div class="stat-card">
+          <div class="stat-head">XP ЗАРАБОТАНО</div>
+          <div class="stat-val">+15 XP</div>
+        </div>
+        <div class="stat-card emerald">
+          <div class="stat-head">ДО СКРИНИНГА</div>
+          <div class="stat-val">${remaining} ${pluralRuTopics(remaining)} (-1)</div>
+        </div>
+        <div class="stat-card emerald">
+          <div class="stat-head">ТОЧНОСТЬ</div>
+          <div class="stat-val">100 %</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-head">ВРЕМЯ СЕССИИ</div>
+          <div class="stat-val">02:15</div>
+        </div>
+      </div>
+
+      <div class="countdown-shift-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-weight:800;font-size:.92rem;">
+          <span>🎯 Готовность: ${prevP}% ➔ ${newP}%</span>
+          <span style="color:var(--moss);">⏳ Осталось ${remaining} ${pluralRuTopics(remaining)}!</span>
         </div>
         <div class="cd-bar cd-bar-track"><div class="cd-fill cd-bar-fill" style="width:${Math.max(8, newP)}%;"></div></div>
       </div>
-
-      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px;">
-        <button class="btn-glass-emerald" data-py-tab="cards" data-dismiss-celebration>🃏 Закрепить на карточках ➔</button>
-        <button class="btn-glass-ruby" data-py-tab="code" data-dismiss-celebration>💻 Решить задачу в IDE ➔</button>
-        <button class="btn btn-ghost" data-quick-microstep="" data-dismiss-celebration>Следующая тема</button>
+      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:16px;">
+        <button class="btn-glass-emerald" data-py-tab="cards" data-dismiss-celebration>🃏 Этап 2: Закрепить на 3D-карточках ➔</button>
+        <button class="btn-glass-ruby" data-py-tab="code" data-dismiss-celebration>💻 Этап 3: Решить задачу в IDE ➔</button>
+        <button class="btn btn-ghost" data-quick-microstep="" data-dismiss-celebration>🚀 Следующая тема спринта</button>
       </div>
     </div>`;
-}
-
-function getStepDefaultScratchpadCode(activeK, sid, curStep, stepIdx){
-  if(curStep && curStep.html){
-    const m = curStep.html.match(/<pre><code>([\s\S]*?)<\/code><\/pre>/i);
-    if(m && m[1]){
-      const raw = m[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').trim();
-      const lines = raw.split('\n');
-      if(lines.length >= 1 && lines.length <= 15 && !/^(SELECT|INSERT|docker|git)/i.test(lines[0])){
-        return raw;
-      }
-    }
-  }
-  if(/1\.1\.[1-4]|К-00[1-4]/.test(String(sid) + ' ' + String(activeK))){
-    if(stepIdx === 0 || stepIdx === 1){
-      return `# Быстрый эксперимент со списками (Шаг ${stepIdx+1})\nitems = [1, 2, 3, 4, 5]\nitems.append(6)\nprint("Список:", items, "Срез:", items[1:4])`;
-    } else if(stepIdx === 2){
-      return `# Быстрый эксперимент со словарем (Шаг 3)\nuser = {"id": 42, "role": "admin"}\nprint("Ключи:", list(user.keys()), "Значения:", list(user.values()))`;
-    } else if(stepIdx === 3){
-      return `# Быстрый эксперимент с множеством (Шаг 4)\na = {1, 2, 3}\nb = {3, 4, 5}\nprint("Пересечение:", a & b, "Объединение:", a | b)`;
-    }
-  }
-  return `# Проверь идею из конспекта ${activeK} (Шаг ${stepIdx+1})\nitems = [10, 20, 30]\nprint("Длина:", len(items), "Первый элемент:", items[0])`;
-}
-
-function buildTaskSpecDetails(tObj){
-  if(!tObj) return { ioCard: '', quickTokens: [] };
-  let inputVal = '';
-  let outputVal = '';
-  const desc = String(tObj.desc || '');
-  const sol = String(tObj.solution || '');
-
-  const printCommentMatch = sol.match(/print\([^)]+\)\s*#\s*([^\n]+)/);
-  const commentMatch = sol.match(/#\s*(?:Результат|Вывод|Output|Реверс|Пример|Expected|Ожидание)?\s*[:=-]?\s*([\[\{"'\d].*)$/m);
-  if(printCommentMatch && printCommentMatch[1]){
-    outputVal = printCommentMatch[1].trim();
-  } else if(commentMatch && commentMatch[1]){
-    outputVal = commentMatch[1].trim();
-  }
-
-  const inputAssignMatch = sol.match(/(?:original|numbers|nums|items|data|lst|s|text|a|b|val)\s*=\s*([\[\{"'\d].*?)(?:\n|$)/);
-  if(inputAssignMatch && inputAssignMatch[1]){
-    inputVal = inputAssignMatch[1].trim().replace(/#.*$/, '').trim();
-  }
-
-  if(!inputVal && !outputVal){
-    if(/реверс|срез|\[::-1\]/i.test(tObj.title + ' ' + desc)){
-      inputVal = '[1, 2, 3, 4, 5]';
-      outputVal = '[5, 4, 3, 2, 1]';
-    } else if(/join|inner join/i.test(tObj.title)){
-      inputVal = 'users JOIN orders';
-      outputVal = 'id, name, order_id';
-    }
-  }
-
-  let ioCard = '';
-  if(inputVal || outputVal){
-    let sliceVisual = '';
-    if(/реверс|срез|\[::-1\]|reverse/i.test(tObj.title + ' ' + desc) || (sol && sol.includes('[::-1]'))){
-      sliceVisual = `
-        <div class="slice-anatomy-widget">
-          <div class="slice-anatomy-header">
-            <span>📐 Анатомия среза [start:stop:step]</span>
-            <span class="slice-step-badge">step = -1 (реверс)</span>
-          </div>
-          <div class="slice-grid">
-            <div class="slice-col"><span class="slice-pos-idx">0</span><span class="slice-cell">1</span><span class="slice-neg-idx">-5</span></div>
-            <div class="slice-col"><span class="slice-pos-idx">1</span><span class="slice-cell">2</span><span class="slice-neg-idx">-4</span></div>
-            <div class="slice-col"><span class="slice-pos-idx">2</span><span class="slice-cell">3</span><span class="slice-neg-idx">-3</span></div>
-            <div class="slice-col"><span class="slice-pos-idx">3</span><span class="slice-cell">4</span><span class="slice-neg-idx">-2</span></div>
-            <div class="slice-col"><span class="slice-pos-idx">4</span><span class="slice-cell">5</span><span class="slice-neg-idx">-1</span></div>
-          </div>
-          <div class="slice-flow-cue">⟵ Обход справа налево от конца списка: original[::-1]</div>
-        </div>`;
-    }
-
-    if(inputVal && outputVal){
-      ioCard = `
-        <div class="dataflow-card">
-          <div class="dataflow-header">
-            <span>⚡ Поток данных (I/O Flow)</span>
-            <span style="font-family:var(--font-mono, monospace);font-size:0.75rem;color:#93c5fd;">step: -1</span>
-          </div>
-          <div class="dataflow-stream">
-            <div class="df-box">
-              <span class="df-label">Вход (original)</span>
-              <span class="df-val input-val">${escapeHtmlStr(inputVal)}</span>
-            </div>
-            <div class="df-arrow">➔</div>
-            <div class="df-box">
-              <span class="df-label">Ожидание (результат)</span>
-              <span class="df-val">${escapeHtmlStr(outputVal)}</span>
-            </div>
-          </div>
-        </div>
-        ${sliceVisual}`;
-    } else {
-      ioCard = `
-        <div class="dataflow-card">
-          <div class="dataflow-header">
-            <span>⚡ Контракт задачи</span>
-          </div>
-          <div class="dataflow-stream">
-            <div class="df-box">
-              <span class="df-label">${inputVal ? 'Входные данные' : 'Ожидаемый результат'}</span>
-              <span class="df-val">${escapeHtmlStr(inputVal || outputVal)}</span>
-            </div>
-          </div>
-        </div>
-        ${sliceVisual}`;
-    }
-  }
-
-  const tokens = [];
-  if(sol){
-    if(sol.includes('[::-1]')) tokens.push('[::-1]');
-    if(sol.includes('original[::-1]')) tokens.push('original[::-1]');
-    if(sol.includes('reversed_list')) tokens.push('reversed_list');
-    const sliceMatches = sol.match(/\[[^\]]+\]/g);
-    if(sliceMatches){
-      sliceMatches.forEach(sm => {
-        if(sm.length <= 16 && !sm.includes(',') && !tokens.includes(sm)) tokens.push(sm);
-      });
-    }
-    const methodMatches = sol.match(/\.[a-zA-Z_][a-zA-Z0-9_]*\(\)/g);
-    if(methodMatches){
-      methodMatches.forEach(mm => {
-        if(!tokens.includes(mm)) tokens.push(mm);
-      });
-    }
-  }
-  if(tokens.length === 0){
-    tokens.push('[::-1]', 'original', 'reversed()', 'list()');
-  }
-  const cleanTokens = Array.from(new Set(tokens)).slice(0, 5);
-  return { ioCard, quickTokens: cleanTokens };
 }
 
 function viewPythonSkill(sid){
@@ -8272,7 +4545,7 @@ function viewPythonSkill(sid){
   const solvedMap = getIdeSolvedMap();
   const celebrationBanner = buildSprintFinishCelebrationHTML(pySkillViewState.sprintCelebration);
 
-  const activeK = pySkillViewState.kId || (sk.kIds && sk.kIds[0]);
+  const activeK = pySkillViewState.kId || sk.kIds[0];
   const noteObj = ALL_NOTES_COMBINED[activeK] || {id: activeK, title: activeK, steps: [{title: activeK, html: '<p>Конспект загружается.</p>'}]};
   const steps = noteObj.steps || [];
   const stepIdx = Math.min(pySkillViewState.stepIdx, Math.max(0, steps.length - 1));
@@ -8284,279 +4557,282 @@ function viewPythonSkill(sid){
   const totalChunks = chunks.length;
   const curChunkIdx = Math.min(pySkillViewState.chunkIdx || 0, Math.max(0, totalChunks - 1));
 
-  const curEchTier = effTier || 1;
-  const echProg = (typeof getEchelonProgress === 'function') ? getEchelonProgress(curEchTier) : { pct: 35 };
-  const echPct = echProg.pct || 0;
-  const dayXpVal = (typeof todayXp === 'function') ? todayXp() : 0;
+  let topbarMetaLeft = `${activeK} · Навык ${sk.id}`;
+  let topbarMetaRight = `Шаг ${stepIdx+1}/${steps.length}`;
+  let sprintPct = Math.min(100, Math.max(10, Math.round(((stepIdx + (curChunkIdx + 1) / Math.max(1, totalChunks)) / Math.max(1, steps.length)) * 100)));
 
-  const focusTopbarHTML = `
-    <div class="echelon-topbar-clean sprint-focus-topbar sprint-topbar" style="padding: 12px 20px;">
-      <a href="#${tr.routePrefix}" class="sprint-close-btn sr-only" title="${tr.backLabel}">${tr.backLabel}</a>
-      <div class="echelon-clean-wrap">
-        <div class="echelon-clean-meta" style="font-size: 0.78rem; justify-content: flex-start; gap: 8px; align-items: center;">
-          <span class="echelon-bordeaux-title">Эшелон ${curEchTier}</span>
-          <span style="color:var(--ink-muted);font-weight:400;opacity:0.6;">·</span>
-          <span class="echelon-readiness-emerald">${echPct}% готовности ${echMeta.targetLabel || 'к скринингу'}</span>
-          <span class="sr-only">Шаг ${stepIdx+1}/${steps.length}</span>
-        </div>
-        <div class="echelon-clean-track" style="height: 6px; margin-top: 3px;">
-          <div class="echelon-clean-fill" style="width: ${echPct}%;"></div>
-        </div>
-      </div>
-      <div style="display:flex;gap:10px;align-items:center;margin-left:14px;flex:none;">
-        <div class="sprint-xp-pill" style="display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:999px;background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.35);color:#fbbf24;font-size:0.75rem;font-weight:700;white-space:nowrap;letter-spacing:0.01em;" title="Заработано за сутки: ${dayXpVal} XP">⚡ +${dayXpVal || 55} XP за сутки</div>
-        <a href="#/docs" class="topbar-help-btn" style="padding:6px 14px;border-radius:10px;" title="Справочник синтаксиса и методов Python"><span class="topbar-help-text">📖 Справка</span></a>
-        <button type="button" class="topbar-help-btn" data-toggle-audio data-audio-toggle style="padding:6px 14px;border-radius:10px;cursor:pointer;" title="Слушать аудио / Аудио-компаньон"><span class="topbar-audio-text">🎧 Озвучить</span></button>
-      </div>
-    </div>
-    <div id="theory-audio-bar" class="theory-audio-bar" style="display:${state.audioBarOpen ? 'flex' : 'none'};">
-      <button type="button" class="theory-audio-btn" data-audio-play title="Воспроизвести / Пауза">▶</button>
-      <button type="button" class="theory-audio-btn" data-audio-rewind title="Перемотка назад на 10 сек">⏪ -10с</button>
-      <button type="button" class="theory-audio-btn" data-audio-rate title="Скорость чтения">1.0x</button>
-      <span class="audio-status-text">Аудио-компаньон</span>
-      <button type="button" class="theory-audio-btn" data-audio-close style="margin-left:auto;" title="Скрыть аудио-бар">✕</button>
-    </div>`;
-
-  // Расчёт непрерывной нити точек (Continuous Atomic Dots) строго для текущего навыка
-  const curUnit = (typeof ALL_UNITS_COMBINED !== 'undefined') ? (ALL_UNITS_COMBINED.find(u => u.id === sk.unitId) || { skills: [sk], title: sk.title || '' }) : { skills: [sk], title: sk.title || '' };
-  const rawUnitTitle = curUnit.title || sk.title || '';
-  const cleanUnitTitle = rawUnitTitle.replace(/^Юнит\s+[\d.]+\s*[·•\-:]\s*/i, '').trim() || rawUnitTitle;
-
-  // 1. Конспекты теории текущего навыка
-  const noteDots = (sk.kIds || []).map((kId, idx) => {
-    const n = ALL_NOTES_COMBINED[kId] || { title: kId };
-    const isDone = state.readNotes.includes(kId);
-    const isActive = (pySkillViewState.tab === 'theory' && kId === activeK);
-    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" data-py-select-k="${kId}" data-py-skill-id="${sk.id}"></span>`;
-  }).join('');
-
-  // 2. Флеш-карточки текущего навыка
-  const activeF = pySkillViewState.fId || (sk.fIds && sk.fIds[0]);
-  const cardDots = (sk.fIds || []).map((fid, idx) => {
-    const d = ALL_DECKS_COMBINED[fid] || {};
-    const isDone = state.reviewedDecks.includes(fid);
-    const isActive = (pySkillViewState.tab === 'cards' && (activeF === fid || (!activeF && idx === 0)));
-    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" data-py-select-f="${fid}"></span>`;
-  }).join('');
-
-  // 3. Задачи практики кода текущего навыка
-  const tIds = (sk.taskIds && sk.taskIds.length) ? sk.taskIds : [20, 19, 39, 255, 258];
-  const activeTid = tIds.includes(pySkillViewState.taskId) ? pySkillViewState.taskId : tIds[0];
-  const taskDots = tIds.map((tid, idx) => {
-    const t = IDE_TASKS_BY_ID[tid] || {};
-    const isDone = (solvedMap[tid] === 'solved');
-    const isActive = (pySkillViewState.tab === 'code' && (activeTid === tid || (!activeTid && idx === 0)));
-    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" data-py-select-task="${tid}"></span>`;
-  }).join('');
-
-  // 4. Рубежный зачёт Юнита
-  const examActive = (pySkillViewState.tab === 'exam');
-  const examDot = `<span class="dot-jewel milestone ${examActive ? 'active' : ''}" data-py-select-exam="${sk.unitId}"></span>`;
-
-  const dotsNecklaceHTML = `
-    <div class="dots-necklace" id="radar-dots-necklace">
-      ${noteDots}
-      <span class="dots-stage-divider"></span>
-      ${cardDots}
-      <span class="dots-stage-divider"></span>
-      ${taskDots}
-      <span class="dots-stage-divider"></span>
-      ${examDot}
-    </div>`;
-
-  let activeItemTitle = '';
-  if(pySkillViewState.tab === 'theory'){
-    const rawNoteTitle = (noteObj && noteObj.title) || activeK || '';
-    activeItemTitle = rawNoteTitle.replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-  } else if(pySkillViewState.tab === 'cards'){
-    const curDeck = ALL_DECKS_COMBINED[activeF] || {};
-    const rawDeckTitle = curDeck.title || activeF || '';
-    activeItemTitle = rawDeckTitle.replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
+  if(pySkillViewState.tab === 'cards'){
+    const activeF = pySkillViewState.fId || sk.fIds[0];
+    const deckObj = ALL_DECKS_COMBINED[activeF] || {id: activeF, cards: []};
+    const cIdx = Math.min(pySkillViewState.cardIdx, Math.max(0, (deckObj.cards||[]).length - 1));
+    topbarMetaLeft = `🃏 ${activeF || 'Колода'} · Навык ${sk.id}`;
+    topbarMetaRight = `Карточка ${cIdx+1}/${Math.max(1, (deckObj.cards||[]).length)}`;
+    sprintPct = Math.min(100, Math.max(10, Math.round(((cIdx + 1) / Math.max(1, (deckObj.cards||[]).length)) * 100)));
   } else if(pySkillViewState.tab === 'code'){
-    const curTask = IDE_TASKS_BY_ID[activeTid] || {};
-    activeItemTitle = curTask.title || ('Задача #' + activeTid);
-  } else if(pySkillViewState.tab === 'exam'){
-    activeItemTitle = 'Рубежный зачёт Юнита ' + sk.unitId;
+    const tIds = (sk.taskIds && sk.taskIds.length) ? sk.taskIds : [240, 241, 242];
+    const activeTid = tIds.includes(pySkillViewState.taskId) ? pySkillViewState.taskId : tIds[0];
+    const tObj = IDE_TASKS_BY_ID[activeTid] || IDE_TASKS[0];
+    const curTaskIdx = Math.max(0, tIds.indexOf(activeTid));
+    topbarMetaLeft = `💻 Задача #${tObj.id} · <span style="font-weight:700;color:var(--amber);">${tObj.tier}</span> · Навык ${sk.id}`;
+    topbarMetaRight = `Задача ${curTaskIdx+1}/${tIds.length}`;
+    sprintPct = Math.min(100, Math.max(10, Math.round(((curTaskIdx + 1) / Math.max(1, tIds.length)) * 100)));
   }
 
-  // Деликатный двухстрочный заголовок: название юнита приглушено и не кричит (Refined Eyebrow), активная тема — выразительный элегантный фокус
-  const eyebrowDotsHTML = `
-    <div class="topic-eyebrow-track" style="max-width:100%;margin:16px 0 22px;padding:0 2px;">
-      <div style="display:flex;flex-direction:column;gap:12px;width:100%;">
-        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;">
-          <div style="font-family:var(--font-b);font-size:0.80rem;font-weight:500;color:var(--ink-muted);letter-spacing:0.01em;line-height:1.2;">${escapeHtmlStr(cleanUnitTitle)}</div>
-          ${activeItemTitle ? `<div style="font-family:var(--font-b);font-size:1.06rem;font-weight:600;color:var(--ink);line-height:1.35;letter-spacing:-0.01em;">${escapeHtmlStr(activeItemTitle)}</div>` : ''}
+  const focusTopbarHTML = `
+    <div class="sprint-focus-topbar sprint-topbar">
+      <a href="#${tr.routePrefix}" class="sprint-close-btn" title="${tr.backLabel}">✕<span class="sr-only"> ${tr.backLabel}</span></a>
+      <div class="sprint-progress-wrap">
+        <div class="sprint-progress-meta">
+          <span>${topbarMetaLeft}</span>
+          <span>${topbarMetaRight}<span class="sr-only"> Прогресс</span></span>
         </div>
-        <div style="display:flex;justify-content:center;width:100%;">
-          ${dotsNecklaceHTML}
-        </div>
+        <div class="sprint-progress-track"><div class="sprint-progress-fill" style="width:${sprintPct}%;"></div></div>
       </div>
+      <a href="#/docs" class="sprint-xp-pill" style="text-decoration:none;" title="Справочник синтаксиса и методов Python">📚 Справка</a>
+      <span class="sprint-xp-pill">⚡ +10 XP<span class="sr-only"> ${mpLabel(mp)}</span></span>
+    </div>`;
+
+  // Sequential 3-stage pipeline Sub-tabs: 1. Theory (К-xxx) -> 2. Flashcards (Ф-xxx) -> 3. Code Practice (IDE Tasks)
+  const notesDoneCount = sk.kIds.filter(k => state.readNotes.includes(k)).length;
+  const decksDoneCount = sk.fIds.filter(f => state.reviewedDecks.includes(f)).length;
+  const tasksDoneCount = (sk.taskIds||[]).filter(tid => solvedMap[tid] === 'solved').length;
+  const tabsHTML = `
+    <div class="subtabs subtabs--compact">
+      <button class="subtab ${pySkillViewState.tab==='theory'?'active':''}" data-py-tab="theory">${notesDoneCount>=sk.kIds.length?'✓ ':'1. '}📖 Конспект (${notesDoneCount}/${sk.kIds.length})</button>
+      <button class="subtab ${pySkillViewState.tab==='cards'?'active':''}" data-py-tab="cards">${decksDoneCount>=sk.fIds.length && sk.fIds.length>0?'✓ ':'2. '}🃏 Карточки (${decksDoneCount}/${sk.fIds.length})<span class="sr-only"> 3D Карточки</span></button>
+      <button class="subtab ${pySkillViewState.tab==='code'?'active':''}" data-py-tab="code">${tasksDoneCount>0?'✓ ':'3. '}💻 Практика (${tasksDoneCount}/${(sk.taskIds||[]).length})</button>
+      <a href="#${tr.routePrefix}/unittest/${sk.unitId}" class="subtab" style="text-decoration:none;">⚡ Тест<span class="sr-only"> ${sk.unitId}</span></a>
     </div>`;
 
   let bodyHTML = '';
+  let showTopTabs = true;
   if(pySkillViewState.tab === 'theory'){
     const isRead = state.readNotes.includes(activeK);
 
-    const feedHTML = `<div class="scroll-feed" id="py-theory-text">` + chunks.slice(0, curChunkIdx + 1).map((ch, ci) =>
+    const kSelector = sk.kIds.map(kid => {
+      const n = ALL_NOTES_COMBINED[kid] || {title: kid};
+      const done = state.readNotes.includes(kid);
+      return `<button class="btn ${kid===activeK?'btn-primary':'btn-ghost'}" style="padding:6px 11px;font-size:.8rem;" data-py-select-k="${kid}">${done?'✓ ':''}${kid}: ${n.title}</button>`;
+    }).join('');
+
+    const dotsHTML = steps.map((st, idx) =>
+      `<button class="microstep-dot ${idx===stepIdx?'active':(idx<stepIdx?'done':'')}" data-py-step="${idx}" title="Шаг ${idx+1}: ${st.title}"></button>`
+    ).join('');
+
+    const feedHTML = `<div class="scroll-feed">` + chunks.slice(0, curChunkIdx + 1).map((ch, ci) =>
       `<div class="feed-chunk ${ci < curChunkIdx ? 'feed-chunk-prev' : 'feed-chunk-new'} lesson-theory" data-chunk-idx="${ci}">${ch}</div>`
     ).join('') + `</div>`;
 
     const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
-    const canGoBack = (curChunkIdx > 0 || stepIdx > 0);
-    const backBtnHTML = `<button type="button" class="btn btn-ghost" data-chunk-prev="py" style="padding:11px 16px;border-radius:14px;font-size:.88rem;white-space:nowrap;${canGoBack ? 'display:inline-flex;' : 'display:none;'}" ${canGoBack ? '' : 'disabled aria-hidden="true"'}>← Назад</button>`;
 
-    let primaryActionHTML = '';
-    if(hasMoreChunks){
-      primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-chunk-more="py">Понятно, дальше (+10 XP) ➔</button>`;
-    } else if(stepIdx + 1 < steps.length){
-      const activeK = pySkillViewState.kId || 'unknown';
-      const stepKey = `${activeK}:${stepIdx+1}`;
-      const stepAlreadyDone = isRead || (state.completedNoteSteps && state.completedNoteSteps[stepKey]);
-      primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-next-step="${stepIdx+1}">Понятно, дальше${stepAlreadyDone ? '' : ' (+10 XP)'} ➔</button>`;
-    } else {
-      primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-finish-note="${activeK}">${isRead ? '✓ Конспект усвоен' : '✓ Завершить конспект (+10 MP)'}</button>`;
-    }
-
-    bodyHTML = `
-      <div class="card coddy-lesson-card" style="margin-top:0;display:flex;flex-direction:column;justify-content:space-between;min-height:280px;">
-        <div style="flex:1;">${feedHTML}</div>
-        <div class="sprint-actions-bar" style="display:flex;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--glass-border);flex-wrap:nowrap;flex:none;">
-          ${backBtnHTML}
-          <div style="display:flex;gap:10px;align-items:center;flex:1;justify-content:center;">
-            ${primaryActionHTML}
-          </div>
+    const primaryActionHTML = hasMoreChunks ? `
+      <div style="margin-top:12px;">
+        <button class="btn-glass-emerald btn-sprint-cta" data-chunk-more="py">Понятно, дальше (+10 XP) ➔</button>
+        <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:6px;">
+          <span class="sr-only">Кусочек ${curChunkIdx + 1} из ${totalChunks} · <button class="link-quiet" data-chunk-reveal-step="py">Открыть шаг целиком</button></span>
+          <button class="link-quiet" data-chunk-reveal-step="py">Весь шаг сразу</button>
+        </div>
+      </div>` : `
+      <div style="margin-top:12px;">
+        ${stepIdx + 1 < steps.length
+          ? `<button class="btn-glass-emerald btn-sprint-cta" data-py-next-step="${stepIdx+1}">Понятно, дальше (+10 XP) ➔</button>`
+          : `<button class="btn-glass-emerald btn-sprint-cta" data-py-finish-note="${activeK}">✓ Конспект изучен — перейти к карточкам (+15 XP) ${ICONS.arrowRight}</button>`}
+        <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:6px;">
+          <span class="meta">${isRead ? '✓ Теория прочитана (закрепи карточками и кодом!)' : 'Этап 1 из 3: Теория → Карточки → Код'}</span>
         </div>
       </div>`;
+
+    const floatingStepNavHTML = `
+      <div class="floating-step-nav">
+        <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;">
+          ${sk.kIds.map(kid => `<button class="btn ${kid===activeK?'btn-primary':'btn-ghost'}" style="padding:4px 9px;font-size:.73rem;" data-py-select-k="${kid}">${state.readNotes.includes(kid)?'✓ ':''}${kid}</button>`).join('')}
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <button class="btn btn-ghost" style="padding:4px 9px;font-size:.73rem;" data-py-step="${Math.max(0, stepIdx-1)}" ${stepIdx===0?'disabled':''}>← Шаг ${stepIdx}</button>
+          <span class="meta" style="font-size:.73rem;font-weight:700;">Шаг ${stepIdx+1}/${steps.length}</span>
+          ${stepIdx + 1 < steps.length
+            ? `<button class="btn btn-ghost" style="padding:4px 9px;font-size:.73rem;" data-py-next-step="${stepIdx+1}">Шаг ${stepIdx+2} →</button>`
+            : `<button class="btn btn-primary" style="padding:4px 9px;font-size:.73rem;" data-py-finish-note="${activeK}">К карточкам →</button>`}
+        </div>
+      </div>`;
+
+    const navDrawerHTML = `
+      <details class="cocoon-details cocoon-details--compact" style="margin-top:12px;">
+        <summary><span>🧭 Навигация по теме (${activeK})</span><span class="meta">Конспекты (${sk.kIds.length}) ▾</span></summary>
+        <div class="sprint-step-header">
+          <div class="microstep-dots">${dotsHTML}</div>
+          <span class="meta" style="font-size:.73rem;white-space:nowrap;">Шаг ${stepIdx+1}/${steps.length}<span class="sr-only"> Микро-шаг ${stepIdx+1} из ${steps.length}</span></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+          <div>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">
+              <span class="topic-badge" style="margin:0;">Юнит ${sk.unitId} · Навык ${sk.id}</span>
+              <span class="echelon-badge echelon-badge--t${effTier}">${echMeta.label}</span>
+            </div>
+            <h1 style="font-size:1.15rem;margin:0;">${sk.title}</h1>
+          </div>
+          <div class="state-tag ${mp>=80?'state-tag--mastered':'state-tag--available'}">${mpLabel(mp)}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">${kSelector}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+          <a href="#${tr.routePrefix}" class="back-link" style="margin:0;">${ICONS.chevronLeft} ${tr.backLabel}</a>
+          <button class="link-quiet" data-py-toggle-fullnote>${pySkillViewState.fullNoteMode ? 'По кусочкам' : 'Показать весь конспект'}</button>
+        </div>
+      </details>`;
+
+    const previewDeckId = sk.fIds && sk.fIds[0];
+    const previewDeck = (previewDeckId && ALL_DECKS_COMBINED[previewDeckId]) || null;
+    const previewCard = (previewDeck && previewDeck.cards && previewDeck.cards[0]) || null;
+    const labAsideHTML = `
+      <aside class="skill-lab-aside" aria-label="Лаборатория закрепления">
+        <div class="skill-lab-card">
+          <h4>🧪 Лаборатория закрепления (${sk.id})</h4>
+          ${buildCPythonMemoryDiagramHTML(activeK, sk.id)}
+          ${buildTapToFillExerciseHTML(activeK, sk.id)}
+          <div class="meta" style="font-size:.74rem;margin:8px 0 4px;font-weight:600;">⚡ Экспресс-песочница Python 3.13:</div>
+          <textarea id="skill-lab-scratchpad" class="code-editor" spellcheck="false" style="min-height:92px;font-size:.78rem;padding:8px 10px;"># Проверь идею из конспекта ${activeK}\nimport sys\ndata = {"a": 1, "b": 2}\nprint("size:", sys.getsizeof(data), "keys:", list(data.keys()))</textarea>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-top:6px;">
+            <button type="button" class="btn btn-primary" style="padding:5px 10px;font-size:.75rem;" data-run-lab-scratchpad>▶ Запустить код</button>
+            <button type="button" class="link-quiet" style="font-size:.73rem;" data-py-tab="code">К задаче IDE →</button>
+          </div>
+          <pre id="skill-lab-output" class="inline-code-out hidden" style="margin-top:6px;font-size:.76rem;"></pre>
+        </div>
+        ${previewCard ? `
+        <div class="skill-lab-card">
+          <h4>🃏 Блиц-карточка (${previewDeckId})</h4>
+          <div style="font-size:.82rem;font-weight:600;margin-bottom:6px;">${formatRichInlineText(previewCard.q)}</div>
+          <button type="button" class="btn btn-ghost" style="width:100%;justify-content:center;padding:6px 10px;font-size:.76rem;" data-py-tab="cards">Открыть колоду ${previewDeckId} (${previewDeck.cards.length}) →</button>
+        </div>` : ''}
+      </aside>`;
+
+    bodyHTML = pySkillViewState.fullNoteMode
+      ? `${navDrawerHTML}` + steps.map((st, i) => `<div class="microstep-card"><div class="topic-badge">Шаг ${i+1} из ${steps.length}</div><h3>${st.title}</h3><div class="lesson-theory">${decorateCodeBlocksWithRunBtn(st.html)}</div></div>`).join('')
+      : `<div class="skill-split-layout"><div class="skill-theory-col">${feedHTML}${primaryActionHTML}${floatingStepNavHTML}${navDrawerHTML}</div>${labAsideHTML}</div>`;
   } else if(pySkillViewState.tab === 'cards'){
+    const activeF = pySkillViewState.fId || sk.fIds[0];
     const deckObj = ALL_DECKS_COMBINED[activeF] || {id: activeF, title: activeF, cards: []};
     const cards = deckObj.cards || [];
     const cIdx = Math.min(pySkillViewState.cardIdx, Math.max(0, cards.length - 1));
     const curCard = cards[cIdx] || {q: 'Карточки загружаются', a: ''};
 
+    const fSelector = sk.fIds.map(fid => {
+      const d = ALL_DECKS_COMBINED[fid] || {title: fid, cards: []};
+      const done = state.reviewedDecks.includes(fid);
+      return `<button class="btn ${fid===activeF?'btn-primary':'btn-ghost'}" style="padding:6px 11px;font-size:.78rem;" data-py-select-f="${fid}">${done?'✓ ':''}${fid} (${(d.cards||[]).length})</button>`;
+    }).join('');
+
     bodyHTML = `
-      <div class="card" style="margin-top:0;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <span style="font-size:0.80rem;color:var(--ink-muted);font-weight:600;">Карточка ${cards.length ? cIdx + 1 : 0} из ${cards.length}</span>
-          <span style="font-size:0.75rem;padding:2px 8px;border-radius:999px;background:rgba(20,90,70,0.1);color:var(--moss);font-weight:600;">Интервальное повторение</span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">${fSelector}</div>
+      <div class="microstep-bar" style="padding:8px 12px;margin-bottom:10px;">
+        <span><strong>${deckObj.id}: ${deckObj.title}</strong> · Карточка ${cIdx+1} из ${cards.length}</span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="btn btn-ghost" style="padding:4px 10px;font-size:.76rem;" data-py-prev-card ${cIdx===0?'disabled':''}>← Предыдущая</button>
+          <span class="meta">Пробел — переворот</span>
         </div>
+      </div>
+      <div class="fc-stage" style="margin:10px 0;">
+        ${buildFcStoriesBarHTML(deckObj.id, cards.length, cIdx)}
         <div class="fc-card ${pySkillViewState.cardFlipped?'fc-card--Answer':''}" data-py-flip-card>
           <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-              <div class="topic-badge">${pySkillViewState.cardFlipped ? 'Ответ' : 'Вопрос'}</div>
-              <a href="#/docs" class="card-help-badge" onclick="event.stopPropagation();" title="Открыть справку по теме в боковой панели">💡 Шпаргалка</a>
-            </div>
+            <div class="topic-badge">${pySkillViewState.cardFlipped ? 'Ответ (нажми или Пробел)' : 'Вопрос (нажми или Пробел, чтобы увидеть ответ)'}</div>
             <div class="fc-q">${formatRichInlineText(curCard.q)}</div>
             ${pySkillViewState.cardFlipped ? `<div class="fc-a">${formatRichInlineText(curCard.a)}</div>` : ''}
           </div>
+          <div class="meta" style="margin-top:14px;">Нажми на карточку для переворота · Карточка ${cIdx+1}/${cards.length}</div>
         </div>
+        <div class="fc-swipe-hint"><span>⬅️ Свайп влево: 1 · Снова</span><span>⬆️ Свайп вверх: 3 · Хорошо</span><span>Свайп вправо: 4 · Легко ➡️</span></div>
         ${pySkillViewState.cardFlipped ? `
-          <div class="fc-rate-row" style="margin-top:14px;">
-            <button class="btn btn-ghost" data-py-rate-card="1">Снова</button>
-            <button class="btn btn-burgundy" data-py-rate-card="2">Трудно (+2 XP)</button>
-            <button class="btn btn-clay" data-py-rate-card="3">Хорошо (+5 XP)</button>
-            <button class="btn btn-primary" data-py-rate-card="4">Легко (+10 XP)</button>
+          <div class="fc-rate-row">
+            <button class="btn btn-ghost" data-py-rate-card="1">1 · Снова (в повтор)</button>
+            <button class="btn btn-ghost" data-py-rate-card="2">2 · Трудно (+2 XP)</button>
+            <button class="btn btn-clay" data-py-rate-card="3">3 · Хорошо (+5 XP)</button>
+            <button class="btn btn-primary" data-py-rate-card="4">4 · Легко (+10 XP)</button>
           </div>` : `
           <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
             <button class="btn btn-ghost" data-py-prev-card ${cIdx===0?'disabled':''}>← Назад</button>
             <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-flip-card>Показать ответ (Пробел)</button>
-            <button class="btn btn-ghost" data-py-rate-card="3" ${cIdx + 1 >= cards.length ? 'disabled' : ''}>Дальше →</button>
+            <button class="btn btn-ghost" data-py-rate-card="3">Дальше →</button>
           </div>`}
+        <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <button class="link-quiet" data-py-tab="theory">← Вернуться к конспекту</button>
+          <button class="link-quiet" style="font-weight:700;color:var(--moss);" data-py-tab="code">Этап 3: Практика кода в IDE (${(sk.taskIds||[]).length} задач) ➔</button>
+        </div>
       </div>`;
-  } else if(pySkillViewState.tab === 'code'){
-    const tObj = IDE_TASKS_BY_ID[activeTid] || {id: activeTid, title: 'Задача #' + activeTid, desc: '', initialCode: ''};
+  } else {
+    // Code Practice tab for this skill
+    const tIds = (sk.taskIds && sk.taskIds.length) ? sk.taskIds : [240, 241, 242];
+    const activeTid = tIds.includes(pySkillViewState.taskId) ? pySkillViewState.taskId : tIds[0];
+    pySkillViewState.taskId = activeTid;
+    const tObj = IDE_TASKS_BY_ID[activeTid] || IDE_TASKS[0];
+    if(!pySkillViewState.codeDraft) pySkillViewState.codeDraft = getIdeDraft(activeTid, tObj.initialCode);
+
+    const tSelector = tIds.map(tid => {
+      const t = IDE_TASKS_BY_ID[tid];
+      if(!t) return '';
+      const solved = solvedMap[tid] === 'solved';
+      return `<button class="btn ${tid===activeTid?'btn-primary':'btn-ghost'}" style="padding:6px 11px;font-size:.78rem;" data-py-select-task="${tid}">${solved?'✓ ':''}#${tid} · ${t.title}</button>`;
+    }).join('');
+
     const socraticHints = buildSocraticHintsForTask(tObj);
-    const shownHints = socraticHints.slice(0, pySkillViewState.hintLevel).map((h, i) =>
-      `<div class="socratic-hint" style="margin:8px 0;padding:10px 14px;border-radius:12px;background:rgba(217,119,6,0.08);border-left:3px solid var(--amber);font-size:0.86rem;line-height:1.45;"><strong>💡 Наводка ${i+1}:</strong> ${h}</div>`
+    const socraticLabels = [
+      'Уровень 0 (Zero Hint — Граничные условия)',
+      'Уровень 1 (Conceptual Hint — Концепция)',
+      'Уровень 2 (Structural Hint — Декомпозиция)',
+      'Уровень 3 (Tactical Hint — Сигнатура и контракт)'
+    ];
+    const shownHints = socraticHints.slice(0, pySkillViewState.hintLevel).map((h, idx) =>
+      `<div class="hint-box"><strong>${socraticLabels[idx] || ('Уровень опоры ' + idx)}:</strong> ${h}</div>`
     ).join('');
 
-    const spec = buildTaskSpecDetails(tObj);
-    const taskIdx = tIds.indexOf(activeTid);
-    const isLastTask = (taskIdx >= tIds.length - 1);
-    const nextBtnLabel = isLastTask ? 'Рубежный зачёт ➔' : 'Следующая задача ➔';
-
+    const curTaskIdx = tIds.indexOf(activeTid);
+    const nextUnsolvedTid = tIds.find(tid => tid !== activeTid && solvedMap[tid] !== 'solved') || (curTaskIdx >= 0 && curTaskIdx + 1 < tIds.length ? tIds[curTaskIdx + 1] : null);
     let runFeedback = '';
-    if(pySkillViewState.runStatus === 'pass') runFeedback = `
-      <div class="result-feedback result-feedback--pass" style="margin-top:12px;padding:12px 16px;border-radius:14px;background:rgba(16,185,129,0.12);border:1px solid #10b981;color:#10b981;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-        <div>
-          <div style="font-weight:700;">✓ Все тесты пройдены! (+15 MP)</div>
-          <div style="font-size:0.78rem;opacity:0.85;margin-top:2px;">Задача #${tObj.id} успешно решена и закреплена.</div>
-        </div>
-        <button type="button" class="btn-glass-emerald" style="padding:8px 16px;border-radius:10px;font-size:0.84rem;white-space:nowrap;" data-py-next-task-btn="${tObj.id}">${nextBtnLabel}</button>
+    if(pySkillViewState.runStatus === 'running') runFeedback = `<div class="test-running-shimmer" style="margin-top:10px;">⚡ Выполняю тесты в Python…</div>`;
+    else if(pySkillViewState.runStatus === 'pass') runFeedback = `
+      <div class="result-box--pass correct-pulse-anim">${ICONS.check} Все тесты пройдены! (+25 XP, навык закреплён на практике!)\n${pySkillViewState.runOutput||''}</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+        ${nextUnsolvedTid ? `<button class="btn btn-primary" data-py-select-task="${nextUnsolvedTid}">Следующая задача навыка (#${nextUnsolvedTid}) →</button>` : ''}
+        <a href="#${tr.routePrefix}/unittest/${sk.unitId}" class="btn btn-clay">⚡ Пройти рубежный Unit Test ${sk.unitId} (на 100 MP 👑)</a>
       </div>`;
     else if(pySkillViewState.runStatus === 'fail') runFeedback = `
-      <div class="result-feedback result-feedback--fail" style="margin-top:12px;padding:12px;border-radius:12px;background:rgba(239,68,68,0.12);border:1px solid #ef4444;color:#ef4444;">
-        <div style="font-weight:700;">✗ Ошибка выполнения или неверный результат</div>
-        <pre style="margin-top:6px;font-size:0.80rem;white-space:pre-wrap;">${escapeHtmlStr(pySkillViewState.runOutput)}</pre>
-      </div>`;
-
-    let cleanDesc = String(tObj.desc || '');
-    cleanDesc = cleanDesc.replace(/^<p>\s*<strong>\s*Задание\s*[:.-]?\s*<\/strong>\s*/i, '<p>');
-    cleanDesc = cleanDesc.replace(/^<p>\s*Задание\s*[:.-]?\s*/i, '<p>');
-    cleanDesc = cleanDesc.replace(/^<strong>\s*Задание\s*[:.-]?\s*<\/strong>\s*/i, '');
-    cleanDesc = cleanDesc.replace(/^Задание\s*[:.-]?\s*/i, '').trim();
-    cleanDesc = cleanDesc.replace(/^<p>/i, '').replace(/<\/p>$/i, '').trim();
+      <div class="result-box--fail">Пока не проходит:\n${pySkillViewState.runOutput||''}</div>
+      <div style="margin-top:8px;"><button class="btn btn-ghost" style="padding:6px 12px;font-size:.78rem;" data-py-task-hint>💡 Разобрать ошибку с Сократовским интервьюером (${pySkillViewState.hintLevel}/${socraticHints.length})</button></div>`;
 
     bodyHTML = `
-      <div class="card" style="margin-top:0;">
-        <div class="practice-layout practice-coddy-split">
-          <div class="practice-left-pane practice-spec-pane">
-            <div>
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;">
-                <div style="display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;font-weight:700;">
-                  <span style="color:var(--ink-muted);">Задача #${tObj.id}</span>
-                  <span class="badge" style="background:rgba(217,119,6,0.18);color:var(--amber);padding:2px 8px;border-radius:8px;font-weight:700;white-space:nowrap;">${tObj.tier}</span>
-                </div>
-                <div style="display:flex;gap:8px;align-items:center;">
-                  <span style="font-size:0.78rem;color:var(--ink-muted);font-weight:600;">${taskIdx >= 0 ? taskIdx + 1 : 1} из ${tIds.length}</span>
-                  ${solvedMap[tObj.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
-                </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">${tSelector}</div>
+      <div class="microstep-card">
+        <div class="practice-desktop-grid">
+          <div class="practice-left-pane">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+              <span class="topic-badge" style="margin:0;display:inline-flex;align-items:center;gap:6px;">Задача #${tObj.id} · <span class="badge" style="background:rgba(217,119,6,0.18);color:var(--amber);padding:1px 7px;border-radius:10px;font-weight:700;">${tObj.tier}</span> · ${tObj.topic}</span>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <a href="#/docs" class="link-quiet" style="font-size:.78rem;">📚 Справка по методам Python</a>
+                ${solvedMap[tObj.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
               </div>
-              <div class="lesson-theory" style="font-size:0.89rem;color:var(--ink-soft);line-height:1.55;margin-bottom:12px;">
-                <strong>Задание:</strong> ${cleanDesc}
-              </div>
-              ${spec.ioCard}
             </div>
-            <div style="margin-top:auto;padding-top:12px;border-top:1px solid var(--glass-border);">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                <span style="font-size:0.75rem;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:0.04em;">💡 Наставник Сократ</span>
-                <span style="font-size:0.72rem;color:var(--ink-muted);">Уровень скаффолдинга: <strong>${pySkillViewState.hintLevel} / ${socraticHints.length}</strong></span>
-              </div>
-              <button type="button" class="btn btn-ghost" data-py-task-hint style="width:100%;justify-content:center;font-size:0.82rem;padding:9px 12px;border-radius:12px;border:1px dashed rgba(217,119,6,0.35);background:rgba(217,119,6,0.04);" ${pySkillViewState.hintLevel>=socraticHints.length?'disabled':''}>
-                ${pySkillViewState.hintLevel>=socraticHints.length ? '✓ Все наводки раскрыты' : 'Получить наводку без готового кода ➔'}
-              </button>
-              ${shownHints}
-            </div>
+            <h2 style="margin-bottom:10px;">${tObj.title}</h2>
+            <div class="lesson-theory" style="margin-bottom:12px;">${tObj.desc}</div>
+            ${shownHints}
           </div>
-          <div class="practice-right-pane" style="display:flex;flex-direction:column;justify-content:space-between;">
-            <div>
-              ${buildCodeEditorWithGutterHTML('py-skill-editor', pySkillViewState.codeDraft, 220, spec.quickTokens)}
-              <div class="practice-kbd-dock">
-                <span><kbd>Ctrl</kbd>+<kbd>Enter</kbd> Запустить тесты</span>
-                <span><kbd>Tab</kbd> Отступ</span>
-              </div>
+          <div class="practice-right-pane">
+            ${buildCodeEditorWithGutterHTML('py-skill-editor', pySkillViewState.codeDraft, 220)}
+            <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <button class="btn-glass-emerald" data-py-run-task="${tObj.id}">${ICONS.play} Проверить решение (Ctrl+Enter)</button>
+              <button class="btn btn-ghost" data-py-task-hint ${pySkillViewState.hintLevel>=socraticHints.length?'disabled':''}>💡 Сократовская наводка (${pySkillViewState.hintLevel}/${socraticHints.length})</button>
+              <button class="btn btn-ghost" data-py-reset-task="${tObj.id}">Сбросить код</button>
             </div>
-            <div style="margin-top:10px;">
-              <div style="display:flex;gap:10px;align-items:center;">
-                <button type="button" class="btn btn-ghost" data-py-reset-task="${tObj.id}" style="padding:12px 14px;border-radius:14px;flex:none;opacity:0.8;" title="Сбросить код к исходному шаблону">↺</button>
-                <button type="button" class="btn-check-solution" data-py-run-task="${tObj.id}">
-                  <span>${ICONS.play} Проверить решение</span>
-                  <span class="xp-tag">+15 XP</span>
-                  <span style="font-size:0.75rem;opacity:0.85;font-weight:500;">(Ctrl+Enter)</span>
-                </button>
-              </div>
-              ${runFeedback}
-            </div>
+            ${runFeedback}
           </div>
         </div>
       </div>`;
   }
 
   return `
-    <div class="container" style="max-width:880px;">
+    <div class="container ${pySkillViewState.tab==='theory' && !pySkillViewState.fullNoteMode ? 'container--wide' : ''}">
       ${focusTopbarHTML}
-      ${eyebrowDotsHTML}
-      ${bodyHTML}
       ${celebrationBanner}
+      ${showTopTabs ? tabsHTML : ''}
+      ${bodyHTML}
     </div>`;
 }
 
@@ -8616,7 +4892,6 @@ function buildSocraticHintsForTask(tObj){
   return [h0, h1, h2, h3];
 }
 window.buildSocraticHintsForTask = buildSocraticHintsForTask;
-window.getSkillMP = getSkillMP;
 
 async function runIdeTaskVerification(taskObj, codeStr){
   let buf = '';
@@ -8704,12 +4979,6 @@ function viewPythonUnitTest(unitId, trackKey){
     }
   }
 
-  // Стартовая модалка «Готовы начать тест?» — только на открытии «с нуля»:
-  // ни одного ответа, не ретейк, настройка «без модалки» не включена, тест ещё не начат в этой сессии.
-  const answeredCount = (unitTestState.answers || []).filter(a => a !== undefined && a !== null).length;
-  const isRetake = !isCourse && (state.passedUnitTests || []).includes(unitId);
-  const showStartModal = !unitTestState.finished && !unitTestState.started && answeredCount === 0 && !isRetake && !state.utSkipStartModal;
-
   if(unitTestState.finished){
     const score = questions.filter((q, i) => unitTestState.answers[i] === q.correct).length;
     const pct = Math.round(score / questions.length * 100);
@@ -8747,10 +5016,7 @@ function viewPythonUnitTest(unitId, trackKey){
     <div class="container">
       <div class="diag-header-row">
         <a href="#${tr.routePrefix}" class="back-link">${ICONS.chevronLeft} ${tr.backLabel}</a>
-        <div style="display:flex;gap:6px;align-items:center;flex-wrap:nowrap;min-width:0;">
-          ${(state.passedUnitTests || []).includes(unitId) && !isCourse ? `<span class="topic-badge" style="margin:0;background:var(--moss-soft);border-color:rgba(52,211,153,0.4);color:var(--moss-deep);white-space:nowrap;">✓ Сдано · ретейк</span>` : ''}
-          <div class="topic-badge">${title} · Вопрос ${unitTestState.idx+1} из ${questions.length}</div>
-        </div>
+        <div class="topic-badge">${title} · Вопрос ${unitTestState.idx+1} из ${questions.length}</div>
       </div>
       <div class="quiz-progress"><div class="quiz-progress__bar" style="width:${Math.round(unitTestState.idx/questions.length*100)}%;"></div></div>
       <div class="microstep-card">
@@ -8760,28 +5026,9 @@ function viewPythonUnitTest(unitId, trackKey){
           ${unitTestState.idx > 0 ? `<button class="btn btn-ghost" data-ut-prev>← Предыдущий вопрос</button>` : `<span></span>`}
           ${rev ? `<button class="btn btn-primary" data-ut-next>${unitTestState.idx+1>=questions.length?'Завершить тест':'Следующий вопрос'} ${ICONS.arrowRight}</button>` : ''}
         </div>
-        ${rev && state.utShowExplanations ? `<div class="notice" style="margin-top:14px;">${sel===q.correct?'✓ Верно! ':'✗ Обрати внимание: '}${formatRichInlineText(q.explain)}</div>` : ''}
-      </div>
-    </div>` + (!showStartModal ? '' : (() => {
-      const qn = questions.length;
-      const qWord = (qn % 10 === 1 && qn % 100 !== 11) ? 'вопрос' : ([2,3,4].includes(qn % 10) && ![12,13,14].includes(qn % 100)) ? 'вопроса' : 'вопросов';
-      return `
-    <div class="modal-backdrop ut-start-backdrop" role="dialog" aria-modal="true" aria-label="Готовы начать тест?">
-      <div class="ut-start-card">
-        <div class="ut-start-emoji" aria-hidden="true">🧪</div>
-        <h2 class="ut-start-title">Готовы начать тест?</h2>
-        <p class="ut-start-sub">${qn} ${qWord} · порог 75% · +50 XP</p>
-        <button type="button" class="btn-glass-emerald ut-start-btn" data-ut-start>▶ Начать тест</button>
-        <a href="#${tr.routePrefix}" class="btn btn-ghost ut-skip-btn">Пропустить</a>
-        <button type="button" class="ut-toggle-row" data-ut-toggle-explain aria-pressed="${state.utShowExplanations ? 'true' : 'false'}">
-          <span>Показывать разбор после ответа</span>
-          <span class="ut-switch ${state.utShowExplanations ? 'ut-switch--on' : ''}" aria-hidden="true"><span class="ut-switch-knob"></span></span>
-        </button>
-        <button type="button" class="link-quiet" data-ut-always-skip>Всегда открывать тест без этой модалки</button>
-        <p class="ut-start-hint">Это можно изменить в «⚙️ Настройки платформы»</p>
+        ${rev ? `<div class="notice" style="margin-top:14px;">${sel===q.correct?'✓ Верно! ':'✗ Обрати внимание: '}${formatRichInlineText(q.explain)}</div>` : ''}
       </div>
     </div>`;
-    })());
 }
 
 /* ================= GLOBAL FLASHCARDS HUB (#/cards) ================= */
@@ -8860,7 +5107,7 @@ function viewCardsHub(){
     const d = ALL_DECKS_COMBINED[fid];
     const done = state.reviewedDecks.includes(fid);
     const dt = getDeckInterviewTier(fid);
-    return `<option value="${fid}" ${fid===cardsHubState.deckId?'selected':''}>${done?'✓ ':''}[Эшелон ${dt}] ${d.title} (${(d.cards||[]).length})</option>`;
+    return `<option value="${fid}" ${fid===cardsHubState.deckId?'selected':''}>${done?'✓ ':''}[Эшелон ${dt}] ${fid}: ${d.title} (${(d.cards||[]).length})</option>`;
   }).join('');
 
   if(cardsHubState.completed && cards.length > 0){
@@ -8886,8 +5133,8 @@ function viewCardsHub(){
         </div>
         <select id="cards-deck-select" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.85rem;font-weight:600;">${deckOpts}</select>
       </div>
-      <div class="cards-completed-panel panel">
-        <div style="font-size:3.2rem;margin-bottom:14px;filter:drop-shadow(0 6px 16px rgba(245,158,11,0.35));">🏆</div>
+      <div class="panel" style="padding:32px 24px;text-align:center;margin-top:20px;">
+        <div style="font-size:3rem;margin-bottom:12px;">🏆</div>
         <h2 style="margin:0 0 10px;">Все ${cards.length} карточек колоды «${deck.title}» пройдены!</h2>
         <p class="meta" style="max-width:540px;margin:0 auto 24px;line-height:1.55;">Колода успешно добавлена в интервальное повторение. Теперь закрепите теорию практическим написанием кода в тренажёре или переходите к следующей теме.</p>
         <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
@@ -8919,10 +5166,10 @@ function viewCardsHub(){
         <select id="cards-deck-select" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.85rem;font-weight:600;">${deckOpts}</select>
       </div>
       <div class="microstep-bar">
-        <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><strong>${deck.title}</strong> ${renderEchelonBadge(curDeckTier)} · Карточка ${cIdx+1} из ${cards.length}</span>
+        <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><strong>${deck.id}: ${deck.title}</strong> ${renderEchelonBadge(curDeckTier)} · Карточка ${cIdx+1} из ${cards.length}</span>
         <div style="display:flex;gap:8px;align-items:center;">
           <button class="btn btn-ghost" style="padding:4px 10px;font-size:.76rem;" data-hub-prev ${cIdx===0?'disabled':''}>← Предыдущая</button>
-          <span class="meta cards-kb-hint">Пробел — переворот · 1–4 — оценка</span>
+          <span class="meta">Пробел — переворот · 1–4 — оценка</span>
         </div>
       </div>
       <div class="fc-stage">
@@ -8930,18 +5177,19 @@ function viewCardsHub(){
         <div class="fc-card fc-card--3d ${cardsHubState.flipped?'fc-card--flipped fc-card--Answer':''}" data-hub-flip>
           <div class="fc-card-inner">
             <div>
-              <div class="topic-badge">${cardsHubState.flipped ? 'Ответ' : 'Вопрос'}</div>
+              <div class="topic-badge">${cardsHubState.flipped ? 'Ответ' : 'Вопрос (нажми или Пробел)'}</div>
               <div class="fc-q">${formatRichInlineText(cur.q)}</div>
               ${cardsHubState.flipped ? `<div class="fc-a">${formatRichInlineText(cur.a)}</div>` : ''}
             </div>
-            <div class="meta cards-flip-prompt" style="margin-top:16px;">${cardsHubState.flipped ? '🎯 Оцени лёгкость ответа 1–4' : '💡 Нажми на карточку для переворота (или Пробел)'}</div>
+            <div class="meta" style="margin-top:16px;">Нажми на карточку или клавишу Пробел</div>
           </div>
         </div>
+        <div class="fc-swipe-hint"><span>⬅️ Свайп влево: 1 · Снова</span><span>⬆️ Свайп вверх: 3 · Хорошо</span><span>Свайп вправо: 4 · Легко ➡️</span></div>
         <div class="fc-rate-row">
-          <button class="btn btn-ghost fc-rate-btn fc-rate-btn--again" data-hub-rate="1">1 · Снова</button>
-          <button class="btn btn-ghost fc-rate-btn fc-rate-btn--hard" data-hub-rate="2">2 · Трудно (+2 XP)</button>
-          <button class="btn btn-clay fc-rate-btn fc-rate-btn--good" data-hub-rate="3">3 · Хорошо (+5 XP)</button>
-          <button class="btn btn-primary fc-rate-btn fc-rate-btn--easy" data-hub-rate="4">4 · Легко (+10 XP)</button>
+          <button class="btn btn-ghost" data-hub-rate="1">1 · Снова</button>
+          <button class="btn btn-ghost" data-hub-rate="2">2 · Трудно (+2 XP)</button>
+          <button class="btn btn-clay" data-hub-rate="3">3 · Хорошо (+5 XP)</button>
+          <button class="btn btn-primary" data-hub-rate="4">4 · Легко (+10 XP)</button>
         </div>
       </div>
     </div>`;
@@ -9052,13 +5300,16 @@ function viewPracticeHub(){
 
   let runFeedback = '';
   if(practiceHubState.runStatus === 'running') runFeedback = `<div class="test-running-shimmer" style="margin-top:10px;">⚡ Выполняю pytest-проверки в браузере…</div>`;
-  else if(practiceHubState.runStatus === 'pass') runFeedback = `<div class="result-box--pass correct-pulse-anim">${ICONS.check} Решение принято! (+25 XP)\n${practiceHubState.runOutput||''}</div>`;
+  else if(practiceHubState.runStatus === 'pass') runFeedback = `<div class="result-box--pass correct-pulse-anim">${ICONS.check} Задача #${curTask.id} решена верно! (+25 XP)\n${practiceHubState.runOutput||''}</div>`;
   else if(practiceHubState.runStatus === 'fail') runFeedback = `
     <div class="result-box--fail">Тесты не прошли:\n${practiceHubState.runOutput||''}</div>
     <div style="margin-top:8px;"><button class="btn btn-ghost" style="padding:6px 12px;font-size:.78rem;" data-prac-hint>💡 Разобрать ошибку с Сократовским интервьюером (${practiceHubState.hintLevel}/${socraticHints.length})</button></div>`;
 
-  // V7 (Coddy-ref): один механизм навигации по задачам — инлайн-свайпер в шапке задачи (‹ N/M ›);
-  // селект-список и дубль «Пред/След» из дравера фильтров сняты, поиск остался
+  const taskOptions = filtered.length > 0
+    ? filtered.slice(0, 500).map(t =>
+        `<option value="${t.id}" ${t.id===curTask.id?'selected':''}>${solvedMap[t.id]==='solved'?'✓ ':''}[Эшелон ${getTaskInterviewTier(t.id)}] #${t.id} [${t.tier}] ${t.title} (${t.topic})</option>`
+      ).join('')
+    : '<option disabled selected>Нет задач по выбранным фильтрам</option>';
 
   let echelonLabel = '🎯 Все эшелоны';
   if(practiceHubState.echelonFilter === '1') echelonLabel = '🎯 Эшелон 1';
@@ -9121,6 +5372,8 @@ function viewPracticeHub(){
         </select>
         <span class="prac-chip-display">${statusLabel} ▾</span>
       </label>
+
+      <button type="button" class="prac-chip-btn prac-chip prac-filters-toggle ${practiceHubState.mobileFiltersOpen?'is-active active':''}" data-toggle-prac-filters title="Все фильтры и выбор задачи">⚙️ Фильтры ▾</button>
     </div>`;
 
   const searchBarHTML = (practiceHubState.searchOpen || practiceHubState.search) ? `
@@ -9129,145 +5382,23 @@ function viewPracticeHub(){
       ${practiceHubState.search ? `<button type="button" class="btn btn-ghost" style="padding:4px 9px;font-size:.78rem;" data-clear-prac-search>✕ Очистить</button>` : ''}
     </div>` : '';
 
-  practiceHubState.mobileTab = practiceHubState.mobileTab || 'task';
-  const curMobTab = practiceHubState.mobileTab;
-  const mobileTabsHTML = `
-    <div class="prac-mobile-tabs" role="tablist">
-      <button type="button" class="prac-mob-tab ${curMobTab==='docs'?'active':''}" data-prac-mob-tab="docs" role="tab">📖 Справка</button>
-      <button type="button" class="prac-mob-tab ${curMobTab==='task'?'active':''}" data-prac-mob-tab="task" role="tab">🎯 Задача</button>
-      <button type="button" class="prac-mob-tab ${curMobTab==='code'?'active':''}" data-prac-mob-tab="code" role="tab">💻 Код</button>
-      <button type="button" class="prac-mob-tab ${curMobTab==='solution'?'active':''}" data-prac-mob-tab="solution" role="tab">💡 Решение</button>
+  const taskSwiperHTML = `
+    <div class="prac-task-swiper">
+      <button type="button" class="btn btn-ghost" style="padding:5px 12px;font-size:.76rem;" data-prac-step="-1" ${filtered.length<=1?'disabled':''}>‹ Пред.</button>
+      <span style="font-size:.8rem;font-weight:700;text-align:center;">${filtered.length>0 ? `Задача #${curTask.id} (${curFilteredIdx + 1} из ${filtered.length})` : 'Нет задач по фильтру'}</span>
+      <button type="button" class="btn btn-ghost" style="padding:5px 12px;font-size:.76rem;" data-prac-step="1" ${filtered.length<=1?'disabled':''}>След. ›</button>
     </div>`;
 
-  let sigCode = 'def solution():';
-  const sigMatch = (curTask.initialCode || '').match(/def\s+[a-zA-Z0-9_]+\s*\([^)]*\)(?:\s*->\s*[^:]+)?:/);
-  if(sigMatch) sigCode = sigMatch[0];
-  const signatureBoxHTML = `<div class="prac-signature-box"><div class="sig-badge">Сигнатура функции:</div><code>${escapeHtmlStr(sigCode)}</code></div>`;
-
-  const plainExplainBtnHTML = `
-    <div style="margin:8px 0 10px;">
-      <button type="button" class="btn btn-ghost" style="padding:6px 12px;font-size:.78rem;" data-prac-toggle-explain>
-        🤖 ${practiceHubState.showPlainExplain ? 'Скрыть пояснение' : 'Объяснить задание'}
-      </button>
-    </div>`;
-  const plainExplainBoxHTML = practiceHubState.showPlainExplain ? `
-    <div class="panel" style="padding:12px 14px;margin-bottom:12px;border-left:3px solid var(--amber);">
-      <div style="font-size:0.8rem;font-weight:700;color:var(--amber);margin-bottom:4px;">Суть задания простыми словами:</div>
-      <p style="font-size:0.86rem;line-height:1.5;margin:0;">${escapeHtmlStr(curTask.hint || curTask.title)}</p>
-    </div>` : '';
-
-  let testCasesRowsHTML = '';
-  if(curTask.tests && curTask.tests.includes('assert ')){
-    const assertLines = curTask.tests.split('\n').filter(l => l.trim().startsWith('assert ')).slice(0, 4);
-    testCasesRowsHTML = assertLines.map((al, idx) => {
-      let clean = al.trim().replace(/^assert\s+/, '');
-      let parts = clean.split('==');
-      let inp = parts[0] ? parts[0].trim() : `Тест #${idx+1}`;
-      let exp = parts[1] ? parts[1].split(',')[0].trim() : 'True';
-      const clip = (v, n) => v.length > n ? v.slice(0, n) + '…' : v;
-      return `<tr><td><code title="${escapeHtmlStr(inp)}">${escapeHtmlStr(clip(inp, 36))}</code></td><td><code title="${escapeHtmlStr(exp)}">${escapeHtmlStr(clip(exp, 24))}</code></td><td><span style="color:var(--ink-muted);">Ожидает</span></td></tr>`;
-    }).join('');
-  }
-  if(!testCasesRowsHTML){
-    testCasesRowsHTML = `
-      <tr><td><code>solution(sample_input)</code></td><td><code>expected_result</code></td><td><span style="color:var(--ink-muted);">Ожидает</span></td></tr>
-      <tr><td><code>solution(edge_case)</code></td><td><code>expected_edge</code></td><td><span style="color:var(--ink-muted);">Ожидает</span></td></tr>`;
-  }
-  const testCasesTableHTML = `
-    <div class="prac-testcases-wrapper" style="margin-bottom:12px;">
-      <div style="font-size:0.76rem;font-weight:700;color:var(--ink-soft);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">Тестовые случаи:</div>
-      <table class="prac-testcases-table">
-        <thead><tr><th>Входные данные</th><th>Ожидаемый результат</th><th>Статус</th></tr></thead>
-        <tbody>${testCasesRowsHTML}</tbody>
-      </table>
-    </div>`;
-
-  const isSolved = (solvedMap[curTask.id] === 'solved') || !!practiceHubState.solutionUnlocked;
-  const solutionPaneHTML = isSolved ? `
-    <div class="prac-solution-pane">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <span class="state-tag state-tag--mastered">✓ Эталонное авторское решение</span>
-        <span class="topic-badge" style="margin:0;">Сложность: O(n) / O(1)</span>
-      </div>
-      <h3 style="margin-bottom:8px;">Код решения:</h3>
-      <div class="coddy-code-block" style="margin-bottom:12px;white-space:pre-wrap;font-family:var(--font-m);font-size:0.84rem;">${escapeHtmlStr(curTask.solution || '# Эталонное решение принято!')}</div>
-      <p class="meta"><strong>Разбор инварианта:</strong> ${escapeHtmlStr(curTask.hint || 'Решение оптимизировано под технический скрининг.')}</p>
-    </div>` : `
-    <div class="prac-solution-locked">
-      <div class="lock-orb">🔒</div>
-      <h3>Эталонное решение защищено</h3>
-      <p>По Сократовскому регламенту решение открывается после успешной сдачи тестов. Если вы застряли — используйте подсказки во вкладке «Задача».</p>
-      <button type="button" class="btn btn-ghost" data-prac-unlock-solution>🔓 Всё равно открыть эталонное решение</button>
-    </div>`;
-
-  const docsSearchVal = (practiceHubState.docsSearch || '').toLowerCase();
-  const docsCards = [
-    { title: 'Функции & Сигнатуры', code: 'def func(arg, *args, default=0, **kwargs) -> int:\n    return default + arg', desc: 'Позиционные и именованные аргументы, дефолтные параметры.' },
-    { title: 'Словари dict (O(1))', code: 'val = d.get(key, "default")\nfor k, v in d.items(): pass', desc: 'Хеш-таблица. Поиск, вставка, удаление в среднем O(1).' },
-    { title: 'Списки list & Срезы', code: 'rev = lst[::-1]  # разворот срезом\nlst.append(x)    # O(1) амортизированно\nlst.pop()        # O(1) с конца', desc: 'Динамический массив. Вставка в начало O(n).' },
-    { title: 'Множества set (O(1))', code: 'union = s1 | s2      # объединение\nintersect = s1 & s2  # пересечение', desc: 'Уникальные неизменяемые элементы. Проверка in за O(1).' },
-    { title: 'Очередь collections.deque', code: 'from collections import deque\nq = deque([1, 2, 3])\nq.appendleft(0)  # O(1)', desc: 'Двусвязный список блоков, O(1) с обоих концов.' },
-    { title: 'Исключения try..except', code: 'try:\n    risky_operation()\nexcept ValueError as err:\n    pass', desc: 'Перехват конкретных подклассов Exception, raise from.' },
-    { title: 'Контекстный менеджер with', code: 'with open("file.txt") as f:\n    content = f.read()', desc: 'Гарантированное освобождение ресурсов.' },
-    { title: 'Датаклассы dataclass', code: 'from dataclasses import dataclass\n\n@dataclass\nclass Item:\n    id: int; title: str', desc: 'Автогенерация __init__, __repr__, __eq__.' }
-  ].filter(c => !docsSearchVal || c.title.toLowerCase().includes(docsSearchVal) || c.desc.toLowerCase().includes(docsSearchVal) || c.code.toLowerCase().includes(docsSearchVal));
-
-  const docsPaneHTML = `
-    <div class="prac-docs-pane">
-      <div style="margin-bottom:12px;">
-        <input id="prac-docs-search-input" type="text" class="code-editor" style="min-height:auto;padding:8px 12px;font-size:0.84rem;width:100%;" placeholder="Поиск по синтаксису (def, dict, list, deque, with)…" value="${escapeHtmlStr(practiceHubState.docsSearch || '')}">
-      </div>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        ${docsCards.map(c => `
-          <div class="panel" style="padding:12px 14px;">
-            <div style="font-weight:700;font-size:0.88rem;margin-bottom:4px;color:var(--emerald);">${escapeHtmlStr(c.title)}</div>
-            <p style="font-size:0.78rem;color:var(--ink-soft);margin-bottom:6px;">${escapeHtmlStr(c.desc)}</p>
-            <pre class="coddy-code-block" style="padding:8px 10px;font-size:0.78rem;margin:0;"><code>${escapeHtmlStr(c.code)}</code></pre>
-          </div>
-        `).join('')}
+  const filtersDrawerHTML = `
+    <div id="prac-filters-drawer" class="prac-filters-drawer prac-filters-collapsible ${practiceHubState.mobileFiltersOpen?'is-open':''}">
+      <div class="panel" style="padding:14px 16px;margin-bottom:12px;">
+        <div style="font-size:.82rem;font-weight:700;margin-bottom:8px;color:var(--ink-soft);">Полный список задач (${filtered.length} доступно):</div>
+        <select id="prac-task-select" class="code-editor" style="min-height:auto;padding:10px 12px;font-weight:600;font-size:.85rem;width:100%;margin-bottom:10px;">
+          ${taskOptions}
+        </select>
+        ${taskSwiperHTML}
       </div>
     </div>`;
-
-  const cleanDescText = (curTask.desc || '')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/^[\s\r\n]*(?:Задание|Задача)\s*[:·\-–—]?\s*/i, '')
-    .trim()
-    .replace(/\s+/g, ' ');
-  const cleanTitleText = (curTask.title || '').trim().replace(/\s+/g, ' ');
-  const isDescRedundant = !cleanDescText || cleanDescText === cleanTitleText || cleanDescText === (cleanTitleText + '.');
-
-  const taskConditionHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-        <span class="topic-badge" style="margin:0;">${curTask.tier} · ${curTask.topic}</span>
-        ${renderEchelonBadge(curTaskEchelon)}
-        ${solvedMap[curTask.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
-      </div>
-      <div style="display:inline-flex;gap:4px;align-items:center;" class="prac-inline-swiper">
-        <button type="button" class="btn btn-ghost" style="padding:3px 8px;font-size:.74rem;" data-prac-step="-1" ${filtered.length<=1?'disabled':''} title="Предыдущая задача">‹</button>
-        <span style="font-size:.75rem;font-weight:700;color:var(--ink-muted);">${filtered.length>0 ? `${curFilteredIdx + 1}/${filtered.length}` : '0/0'}</span>
-        <button type="button" class="btn btn-ghost" style="padding:3px 8px;font-size:.74rem;" data-prac-step="1" ${filtered.length<=1?'disabled':''} title="Следующая задача">›</button>
-      </div>
-    </div>
-    <h2 class="prac-task-title">${escapeHtmlStr(curTask.title)}</h2>
-    ${signatureBoxHTML}
-    ${(!isDescRedundant && curTask.desc) ? `<div class="lesson-theory" style="margin-bottom:10px;">${curTask.desc}</div>` : ''}
-    ${plainExplainBtnHTML}
-    ${plainExplainBoxHTML}
-    <div style="margin-top:10px;">
-      <button class="btn btn-ghost" style="padding:6px 12px;font-size:.78rem;" data-prac-hint ${practiceHubState.hintLevel>=socraticHints.length?'disabled':''}>💡 Сократовская подсказка (${practiceHubState.hintLevel}/${socraticHints.length})</button>
-    </div>
-    ${shownHints}`;
-
-  const codePaneHTML = `
-    ${testCasesTableHTML}
-    ${buildCodeEditorWithGutterHTML('prac-code-editor', practiceHubState.codeDraft, 240)}
-    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-      <button class="btn btn-3d-orange btn-primary prac-run-btn" data-prac-run="${curTask.id}">▶ Запустить код</button>
-      <button class="btn btn-ghost" data-prac-ask-ai>🤖 Спросить ИИ</button>
-      <button class="btn btn-ghost" data-prac-reset="${curTask.id}">Сбросить</button>
-    </div>
-    ${runFeedback}`;
 
   return `
     <div class="container">
@@ -9281,16 +5412,35 @@ function viewPracticeHub(){
 
       ${chipsBarHTML}
       ${searchBarHTML}
+      ${filtersDrawerHTML}
 
       <div class="microstep-card">
-        ${mobileTabsHTML}
-        <!-- Practice IDE Grid: 4-Tab on Mobile (<768px), 2-Column Split on Desktop (>=769px) -->
         <div class="practice-desktop-grid">
-          <div class="practice-left-pane ${curMobTab === 'code' ? 'prac-pane--hidden-mobile' : ''}">
-            ${curMobTab === 'docs' ? docsPaneHTML : (curMobTab === 'solution' ? solutionPaneHTML : taskConditionHTML)}
+          <div class="practice-left-pane">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                <span class="topic-badge" style="margin:0;">Задача #${curTask.id} · ${curTask.tier} · ${curTask.topic}</span>
+                ${renderEchelonBadge(curTaskEchelon)}
+                ${solvedMap[curTask.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
+              </div>
+              <div style="display:inline-flex;gap:4px;align-items:center;">
+                <button type="button" class="btn btn-ghost" style="padding:3px 8px;font-size:.74rem;" data-prac-step="-1" ${filtered.length<=1?'disabled':''} title="Предыдущая задача">‹</button>
+                <span style="font-size:.75rem;font-weight:700;color:var(--ink-muted);">${filtered.length>0 ? `${curFilteredIdx + 1}/${filtered.length}` : '0/0'}</span>
+                <button type="button" class="btn btn-ghost" style="padding:3px 8px;font-size:.74rem;" data-prac-step="1" ${filtered.length<=1?'disabled':''} title="Следующая задача">›</button>
+              </div>
+            </div>
+            <h2 class="prac-task-title">Задача #${curTask.id}: ${curTask.title}</h2>
+            <div class="lesson-theory" style="margin-bottom:14px;">${curTask.desc}</div>
+            ${shownHints}
           </div>
-          <div class="practice-right-pane ${curMobTab !== 'code' ? 'prac-pane--hidden-mobile' : ''}">
-            ${codePaneHTML}
+          <div class="practice-right-pane">
+            ${buildCodeEditorWithGutterHTML('prac-code-editor', practiceHubState.codeDraft, 240)}
+            <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+              <button class="btn btn-primary prac-run-btn" data-prac-run="${curTask.id}">▶ Запустить тесты</button>
+              <button class="btn btn-ghost" data-prac-hint ${practiceHubState.hintLevel>=socraticHints.length?'disabled':''}>💡 Сократовская подсказка (${practiceHubState.hintLevel}/${socraticHints.length})</button>
+              <button class="btn btn-ghost" data-prac-reset="${curTask.id}">Сбросить</button>
+            </div>
+            ${runFeedback}
           </div>
         </div>
       </div>
@@ -9760,14 +5910,6 @@ function getMockCandidateTasks(){
 }
 
 function syncActiveEditorDrafts(){
-  const labEd = document.getElementById('skill-lab-scratchpad');
-  if(labEd && typeof labEd.value === 'string' && pySkillViewState && pySkillViewState.sid){
-    if(!pySkillViewState.labDrafts) pySkillViewState.labDrafts = {};
-    const activeK = pySkillViewState.kId || 'unknown';
-    const stepIdx = pySkillViewState.stepIdx || 0;
-    const dKey = `${pySkillViewState.sid}:${activeK}:${stepIdx}`;
-    pySkillViewState.labDrafts[dKey] = labEd.value;
-  }
   const pyEd = document.getElementById('py-skill-editor');
   if(pyEd && typeof pyEd.value === 'string' && pyEd.value.length > 0){
     pySkillViewState.codeDraft = pyEd.value;
@@ -9944,17 +6086,10 @@ function viewMockInterview(){
 
   const curTaskTier = getTaskInterviewTier(curTask.id);
   const curEchMeta = INTERVIEW_ECHELONS[curTaskTier] || INTERVIEW_ECHELONS[2];
-  // V24: desc вида «Задание: <заголовок>» дословно дублирует h2 — не выводим такой дубль.
-  // desc приходит HTML-ом (<p><strong>Задание:</strong> …</p>) — сравниваем очищенный текст.
-  const mockDescRaw = String(curTask.desc || '');
-  const mockDescText = mockDescRaw.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-  const mockDescClean = mockDescText.replace(/^(?:Задание|Задача)\s*[:·\-–—]?\s*/i, '').replace(/[.]\s*$/, '');
-  const mockTitleClean = String(curTask.title || '').replace(/[.]\s*$/, '');
-  const mockDescRedundant = !mockDescClean || mockDescClean === mockTitleClean;
 
   const curScen = STAR_SCENARIOS.find(x => x.id === mockInterviewState.starScenarioId) || STAR_SCENARIOS[0];
   const starOpts = STAR_SCENARIOS.map(sc =>
-    `<button class="btn ${sc.id===curScen.id?'btn-primary':'btn-ghost'}" style="padding:7px 14px;font-size:.82rem;border-radius:999px;" data-star-scenario="${sc.id}">${sc.title}</button>`
+    `<button class="btn ${sc.id===curScen.id?'btn-primary':'btn-ghost'}" style="padding:7px 12px;font-size:.82rem;" data-star-scenario="${sc.id}">${sc.title}</button>`
   ).join('');
 
   let starEvalHTML = '';
@@ -9977,19 +6112,19 @@ function viewMockInterview(){
   const timerStateCls = isDangerTime ? ' mock-timer--danger' : (isWarningTime ? ' mock-timer--warn' : '');
 
   const bodyHTML = mockInterviewState.tab === 'live' ? `
-    <div class="mock-control-panel">
+    <div class="panel" style="padding:14px 18px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
       <div class="mock-timer-ring-wrap mock-timer-wrap${timerStateCls}">
         <svg class="mock-timer-svg circular-progress-ring" width="54" height="54" viewBox="0 0 54 54" aria-hidden="true">
           <circle class="mock-timer-ring-bg mock-timer-circle-bg" cx="27" cy="27" r="22" fill="none" stroke-width="4"></circle>
           <circle id="mock-timer-ring-fg" class="mock-timer-ring-fg mock-timer-circle-fg" cx="27" cy="27" r="22" fill="none" stroke="${ringColor}" stroke-width="4" stroke-dasharray="${ringCircum}" stroke-dashoffset="${ringOffset}"></circle>
         </svg>
         <div>
-          <div class="meta" style="font-size:0.78rem;font-weight:600;letter-spacing:0.02em;">Таймер Live-Coding секции (20 минут)</div>
-          <div id="mock-timer-display" class="mock-timer-display" style="color:${ringColor};">${formatPomo(mockInterviewState.secondsLeft)}</div>
+          <div class="meta">Таймер Live-Coding секции (регламент 20 минут)</div>
+          <div id="mock-timer-display" style="font-family:var(--font-d);font-size:1.85rem;font-weight:700;color:${ringColor};">${formatPomo(mockInterviewState.secondsLeft)}</div>
         </div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-        <select id="mock-echelon-select" class="code-editor" style="min-height:auto;padding:8px 12px;width:auto;border-radius:12px;">
+        <select id="mock-echelon-select" class="code-editor" style="min-height:auto;padding:8px 10px;width:auto;">
           <option value="auto" ${mockInterviewState.echelonFilter==='auto'?'selected':''}>🎯 Авто-подбор раунда (сейчас: Эшелон ${effEchelon})</option>
           <option value="1" ${mockInterviewState.echelonFilter==='1'?'selected':''}>🚨 Раунд 1: Тех-скрининг (Эшелон 1)</option>
           <option value="2" ${mockInterviewState.echelonFilter==='2'?'selected':''}>🔥 Раунд 2: Ядро и стек (Эшелон 2)</option>
@@ -10001,27 +6136,27 @@ function viewMockInterview(){
       </div>
     </div>
     <div style="margin-bottom:14px;">
-      <select id="mock-task-select" class="code-editor" style="min-height:auto;padding:10px 14px;font-weight:600;border-radius:12px;">${taskOpts}</select>
+      <select id="mock-task-select" class="code-editor" style="min-height:auto;padding:10px 12px;font-weight:600;">${taskOpts}</select>
     </div>
-    <div class="mock-task-card">
+    <div class="microstep-card">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-          <span class="topic-badge" style="margin:0;">Live-Coding · ${curTask.tier} · ${curTask.topic}</span>
+          <span class="topic-badge" style="margin:0;">Live-Coding #${curTask.id} · ${curTask.tier} · ${curTask.topic}</span>
           <span class="echelon-badge ${curEchMeta.badgeClass}">${curEchMeta.shortLabel}</span>
         </div>
         <span class="meta">Сократический интервьюер (4 уровня опор · 0 спойлеров кода)</span>
       </div>
       <h2 style="margin-bottom:10px;">${curTask.title}</h2>
-      ${!mockDescRedundant ? `<div class="lesson-theory" style="margin-bottom:14px;">${curTask.desc}</div>` : ''}
+      <div class="lesson-theory" style="margin-bottom:14px;">${curTask.desc}</div>
       ${buildCodeEditorWithGutterHTML('mock-code-editor', mockInterviewState.codeDraft, 220)}
-      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
         <button class="btn btn-primary" data-mock-run="${curTask.id}">${ICONS.play} Запустить решение (Ctrl+Enter)</button>
-        <button class="btn btn-ghost" data-mock-hint ${mockInterviewState.hintLevel>=socraticHints.length?'disabled':''}>💡 Запросить наводку интервьюера&nbsp;(${mockInterviewState.hintLevel}/${socraticHints.length})</button>
+        <button class="btn btn-ghost" data-mock-hint ${mockInterviewState.hintLevel>=socraticHints.length?'disabled':''}>💡 Запросить наводку интервьюера (${mockInterviewState.hintLevel}/${socraticHints.length})</button>
         <button class="btn btn-ghost" data-mock-reset="${curTask.id}">Сбросить код</button>
       </div>
       ${runFeedback}
-      <div class="socratic-chat-stream">
-        <div class="socratic-chat-header" style="display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:0.85rem;margin-bottom:4px;">
+      <div class="socratic-chat-stream" style="margin-top:12px;">
+        <div class="socratic-chat-header">
           <span>💬 Лента Сократического диалога</span>
           <span class="meta" style="font-size:.73rem;">Использовано опор: ${mockInterviewState.hintLevel}/${socraticHints.length}</span>
         </div>
@@ -10033,38 +6168,38 @@ function viewMockInterview(){
       </div>
     </div>
   ` : `
-    <div class="mock-star-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+    <div class="microstep-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
         <div class="topic-badge" style="margin:0;">Поведенческое интервью · Методика STAR (Situation · Task · Action · Result)</div>
         <div class="star-pitch-bar">
-          <span class="meta" style="font-size:0.78rem;">🎤 Таймер устного питча (2 мин):</span>
-          <strong id="star-pitch-display" class="pitch-timer-display" style="font-family:var(--font-m);font-variant-numeric:tabular-nums;color:var(--moss-deep);">${formatPomo(mockInterviewState.pitchSecondsLeft || 120)}</strong>
-          <button class="btn btn-ghost" style="padding:4px 10px;font-size:.76rem;border-radius:999px;" data-star-pitch-toggle>${mockInterviewState.pitchRunning ? '⏸ Пауза' : '▶ Репетиция 02:00'}</button>
-          <button class="btn btn-ghost" style="padding:4px 8px;font-size:.75rem;border-radius:999px;" data-star-pitch-reset>↺</button>
+          <span class="meta">🎤 Таймер устного питча (2 мин):</span>
+          <strong id="star-pitch-display" class="pitch-timer-display" style="font-family:var(--font-m);color:var(--moss-deep);">${formatPomo(mockInterviewState.pitchSecondsLeft || 120)}</strong>
+          <button class="btn btn-ghost" style="padding:4px 10px;font-size:.76rem;" data-star-pitch-toggle>${mockInterviewState.pitchRunning ? '⏸ Пауза' : '▶ Репетиция 02:00'}</button>
+          <button class="btn btn-ghost" style="padding:4px 8px;font-size:.75rem;" data-star-pitch-reset>↺</button>
         </div>
       </div>
-      <h2 style="margin-bottom:12px;">Выбери сценарий и собери сильный инженерный ответ</h2>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">${starOpts}</div>
-      <div class="notice" style="margin-bottom:16px;border-radius:14px;background:var(--zen-surface-subtle, rgba(255,255,255,0.03));border:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));"><strong>Вопрос интервьюера:</strong> ${curScen.prompt}</div>
+      <h2 style="margin-bottom:10px;">Выбери сценарий и собери сильный инженерный ответ</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">${starOpts}</div>
+      <div class="notice" style="margin-bottom:14px;"><strong>Вопрос интервьюера:</strong> ${curScen.prompt}</div>
       <div class="star-matrix-grid">
         <div class="star-quadrant-card">
-          <label class="meta" style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:6px;"><span>S — Situation (Контекст, трафик, стек)</span><span>${String(mockInterviewState.starS||'').trim().length >= 25 ? '✓' : '≥25 симв.'}</span></label>
-          <textarea id="star-s-input" class="code-editor" style="min-height:76px;border-radius:10px;" placeholder="Например: В сервисе заказов на FastAPI + PostgreSQL при пиковой нагрузке 300 RPS время ответа выросло до 4 секунд…">${escapeHtmlStr(mockInterviewState.starS)}</textarea>
+          <label class="meta" style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:4px;"><span>S — Situation (Контекст, трафик, стек)</span><span>${String(mockInterviewState.starS||'').trim().length >= 25 ? '✓' : '≥25 симв.'}</span></label>
+          <textarea id="star-s-input" class="code-editor" style="min-height:76px;" placeholder="Например: В сервисе заказов на FastAPI + PostgreSQL при пиковой нагрузке 300 RPS время ответа выросло до 4 секунд…">${escapeHtmlStr(mockInterviewState.starS)}</textarea>
         </div>
         <div class="star-quadrant-card">
-          <label class="meta" style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:6px;"><span>T — Task (Инженерная цель и SLA)</span><span>${String(mockInterviewState.starT||'').trim().length >= 20 ? '✓' : '≥20 симв.'}</span></label>
-          <textarea id="star-t-input" class="code-editor" style="min-height:76px;border-radius:10px;" placeholder="Например: Нужно было снизить p95 латентность ниже 150 мс без остановки приёма платежей…">${escapeHtmlStr(mockInterviewState.starT)}</textarea>
+          <label class="meta" style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:4px;"><span>T — Task (Инженерная цель и SLA)</span><span>${String(mockInterviewState.starT||'').trim().length >= 20 ? '✓' : '≥20 симв.'}</span></label>
+          <textarea id="star-t-input" class="code-editor" style="min-height:76px;" placeholder="Например: Нужно было снизить p95 латентность ниже 150 мс без остановки приёма платежей…">${escapeHtmlStr(mockInterviewState.starT)}</textarea>
         </div>
         <div class="star-quadrant-card">
-          <label class="meta" style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:6px;"><span>A — Action (Личный вклад: «Я диагностировал…»)</span><span>${String(mockInterviewState.starA||'').trim().length >= 35 ? '✓' : 'глагол «Я»'}</span></label>
-          <textarea id="star-a-input" class="code-editor" style="min-height:84px;border-radius:10px;" placeholder="Например: Я снял план через EXPLAIN ANALYZE, обнаружил Seq Scan и N+1, добавил составной индекс и selectinload…">${escapeHtmlStr(mockInterviewState.starA)}</textarea>
+          <label class="meta" style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:4px;"><span>A — Action (Личный вклад: «Я диагностировал…»)</span><span>${String(mockInterviewState.starA||'').trim().length >= 35 ? '✓' : 'глагол «Я»'}</span></label>
+          <textarea id="star-a-input" class="code-editor" style="min-height:84px;" placeholder="Например: Я снял план через EXPLAIN ANALYZE, обнаружил Seq Scan и N+1, добавил составной индекс и selectinload…">${escapeHtmlStr(mockInterviewState.starA)}</textarea>
         </div>
         <div class="star-quadrant-card">
-          <label class="meta" style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:6px;"><span>R — Result (Метрики: мс, %, RPS, 0 ошибок)</span><span>${/(\d+|%|мс|ms|сек|раз|x)/i.test(String(mockInterviewState.starR||'')) ? '✓' : 'числа/%'}</span></label>
-          <textarea id="star-r-input" class="code-editor" style="min-height:76px;border-radius:10px;" placeholder="Например: Время ответа упало с 4000 мс до 45 мс (в 88 раз), нагрузка на CPU БД снизилась на 65%…">${escapeHtmlStr(mockInterviewState.starR)}</textarea>
+          <label class="meta" style="font-weight:700;display:flex;justify-content:space-between;margin-bottom:4px;"><span>R — Result (Метрики: мс, %, RPS, 0 ошибок)</span><span>${/(\d+|%|мс|ms|сек|раз|x)/i.test(String(mockInterviewState.starR||'')) ? '✓' : 'числа/%'}</span></label>
+          <textarea id="star-r-input" class="code-editor" style="min-height:76px;" placeholder="Например: Время ответа упало с 4000 мс до 45 мс (в 88 раз), нагрузка на CPU БД снизилась на 65%…">${escapeHtmlStr(mockInterviewState.starR)}</textarea>
         </div>
       </div>
-      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
         <button class="btn btn-primary" data-star-evaluate>✓ Проверить ответ по чек-листу Senior-интервьюера</button>
         <button class="btn btn-ghost" data-star-fill-demo>Заполнить эталонный пример</button>
       </div>
@@ -10237,31 +6372,29 @@ diagIntroHTML = function(){
   const branch = state.stackBranch || 'fastapi';
   return `
     <div class="container">
-      <div class="diag-zen-card">
-        <div class="diag-header-row">
-          <a href="#/" class="back-link">${ICONS.chevronLeft} К результатам</a>
-          <div class="topic-badge">Этап 0 · Калибровочная диагностика Эшелона 1 (Скрининг)</div>
+      <div class="diag-header-row">
+        <a href="#/map" class="back-link">${ICONS.chevronLeft} К карте навыков</a>
+        <div class="topic-badge">Этап 0 · Калибровочная диагностика Эшелона 1 (Скрининг)</div>
+      </div>
+      <h1 style="margin-bottom:10px;">Калибровка приоритетов перед стартом</h1>
+      <p>${CORE_QUESTIONS.length} вопросов по темам <b>🚨 Эшелона 1 (Скрининг и база)</b> — Python Core, словари/хеширование, типизация/GIL, Git, базовый SQL/JOIN, HTTP/REST и Big-O. Это не экзамен, а умная калибровка твоего маршрута:</p>
+      <ul style="margin:8px 0 16px 20px;line-height:1.55;">
+        <li>За каждый верный блок связанные навыки автоматически получают <b>50 MP (Знакомство)</b> — ты не тратишь время на очевидное;</li>
+        <li>Вопросы с ошибками формируют <b>Очередь приоритета №1 («Пробелы скрининга»)</b> на Дашборде и в модулях;</li>
+        <li>В конце по желанию можно открыть продвинутый блок (${ADVANCED_QUESTIONS.length} вопросов по ООП и алгоритмам).</li>
+      </ul>
+      <div class="panel" style="margin-bottom:18px;padding:14px 16px;">
+        <div style="font-weight:700;margin-bottom:6px;">Выбери целевую ветку веб-стека (Этап 2 параллельных веток):</div>
+        <p class="meta" style="margin-bottom:10px;">Выбранный стек остаётся в <b>🔥 Эшелоне 2</b>, а альтернативный фреймворк переносится в <b>👑 Эшелон 4 (Резерв)</b>, чтобы не распылять фокус перед оффером:</p>
+        <div class="stack-branch-bar">
+          <button class="btn ${branch==='fastapi'?'btn-primary':'btn-ghost'}" style="padding:7px 14px;font-size:.84rem;" data-stack-branch="fastapi">⚡ FastAPI + SQLAlchemy (Рекомендуется)</button>
+          <button class="btn ${branch==='django'?'btn-primary':'btn-ghost'}" style="padding:7px 14px;font-size:.84rem;" data-stack-branch="django">🎸 Django + DRF</button>
+          <button class="btn ${branch==='both'?'btn-primary':'btn-ghost'}" style="padding:7px 14px;font-size:.84rem;" data-stack-branch="both">🔥 Оба стека</button>
         </div>
-        <h1 style="margin-bottom:12px;">Калибровка приоритетов перед стартом</h1>
-        <p style="color:var(--zen-text-soft, var(--ink-soft));font-size:1.02rem;line-height:1.6;">${CORE_QUESTIONS.length} вопросов по темам <b>🚨 Эшелона 1 (Скрининг и база)</b> — Python Core, словари/хеширование, типизация/GIL, Git, базовый SQL/JOIN, HTTP/REST и Big-O. Это не экзамен, а умная калибровка твоего маршрута:</p>
-        <ul style="margin:12px 0 20px 22px;line-height:1.65;color:var(--zen-text-soft, var(--ink-soft));">
-          <li>За каждый верный блок связанные навыки автоматически получают <b>50 MP (Знакомство)</b> — ты не тратишь время на очевидное;</li>
-          <li>Вопросы с ошибками формируют <b>Очередь приоритета №1 («Пробелы скрининга»)</b> на Дашборде и в модулях;</li>
-          <li>В конце по желанию можно открыть продвинутый блок (${ADVANCED_QUESTIONS.length} вопросов по ООП и алгоритмам).</li>
-        </ul>
-        <div class="panel diag-branch-panel" style="margin-bottom:20px;padding:16px 18px;">
-          <div style="font-weight:700;margin-bottom:6px;color:var(--zen-text-main, var(--ink));">Выбери целевую ветку веб-стека (Этап 2 параллельных веток):</div>
-          <p class="meta" style="margin-bottom:12px;color:var(--zen-text-muted, var(--ink-muted));">Выбранный стек остаётся в <b>🔥 Эшелоне 2</b>, а альтернативный фреймворк переносится в <b>👑 Эшелон 4 (Резерв)</b>, чтобы не распылять фокус перед оффером:</p>
-          <div class="stack-branch-bar">
-            <button class="btn ${branch==='fastapi'?'btn-primary':'btn-ghost'}" style="padding:8px 16px;font-size:.85rem;" data-stack-branch="fastapi">⚡ FastAPI + SQLAlchemy (Рекомендуется)</button>
-            <button class="btn ${branch==='django'?'btn-primary':'btn-ghost'}" style="padding:8px 16px;font-size:.85rem;" data-stack-branch="django">🎸 Django + DRF</button>
-            <button class="btn ${branch==='both'?'btn-primary':'btn-ghost'}" style="padding:8px 16px;font-size:.85rem;" data-stack-branch="both">🔥 Оба стека</button>
-          </div>
-        </div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;">
-          <button class="btn btn-primary" data-diag-start>Начать калибровку (${CORE_QUESTIONS.length} вопросов)</button>
-          <a href="#/" class="btn btn-ghost">Пропустить, вернусь позже</a>
-        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;">
+        <button class="btn btn-primary" data-diag-start>Начать калибровку (${CORE_QUESTIONS.length} вопросов)</button>
+        <a href="#/map" class="btn btn-ghost">Пропустить, вернусь позже</a>
       </div>
     </div>`;
 };
@@ -10362,11 +6495,11 @@ diagQuestionHTML = function(pool, label){
   return `
     <div class="container" style="padding-bottom:${isRevealed ? '200px' : '32px'};">
       <div class="diag-header-row">
-        <a href="#/" class="back-link">${ICONS.chevronLeft} К результатам</a>
+        <a href="#/map" class="back-link">${ICONS.chevronLeft} Выйти к карте</a>
         <div class="topic-badge">${label} · вопрос ${diagState.idx+1} из ${pool.length}</div>
       </div>
       <div class="progress-bar"><div class="progress-bar__fill" style="width:${pct}%"></div></div>
-      <div class="panel quiz-question-card">
+      <div class="panel">
         <div class="quiz-question-prompt">${formatQuizQuestionPromptHTML(q.text)}</div>
         <div>${optsHTML}${idkBtnHTML}</div>
         ${!isRevealed ? actionRowHTML : ''}
@@ -10456,7 +6589,7 @@ diagResultsHTML = function(){
     else if(c.score === 0) action = `<p class="meta" style="color:var(--Danger);">🚨 Тема не пройдена (${c.score}/${c.total}) — добавлена в приоритет №1 с самого начала.</p>`;
     else if(c.optional) action = `<p class="meta">Частичное знакомство (${pctCat}%) — тема включена в программу с разбором пробелов.</p>`;
     else action = `<p class="meta">Есть пробелы (${c.score}/${c.total}) — добавлено в персональный маршрут Эшелона 1.</p>`;
-    return `<div class="panel diag-cat-card" style="margin-bottom:0;"><h3>${c.title}</h3><p class="meta">${c.score} из ${c.total} верно (${pctCat}%)</p>${action}</div>`;
+    return `<div class="panel" style="margin-bottom:0;"><h3>${c.title}</h3><p class="meta">${c.score} из ${c.total} верно (${pctCat}%)</p>${action}</div>`;
   }).join('');
 
   const gapButtons = (cal.gaps || []).slice(0, 8).map(sid => {
@@ -10466,7 +6599,7 @@ diagResultsHTML = function(){
   }).join('');
 
   const calibratedNotice = `
-    <div class="panel diag-notice-calibrated" style="margin-top:18px;">
+    <div class="panel" style="margin-top:18px;border-left:4px solid var(--moss);">
       <div class="topic-badge">Калибровка Матрицы Мастерства выполнена</div>
       <h3 style="margin-bottom:6px;">Зачтено базовое знакомство (50 MP): ${cal.passedSkills.length} · Пробелов в Очереди №1: ${cal.gaps.length}</h3>
       <p class="meta" style="margin-bottom:10px;">${cal.gaps.length > 0 ? 'Темы с ошибками или ответом «Не знаю» НЕ зачтены и поставлены в приоритет №1:' : 'Все проверенные навыки скрининга получили базовые 50 MP! Для полного мастерства (100 MP) нужно пройти практику кода и тесты.'}</p>
@@ -10477,7 +6610,7 @@ diagResultsHTML = function(){
   return `
     <div class="container">
       <div class="diag-header-row">
-        <a href="#/" class="back-link">${ICONS.chevronLeft} К результатам</a>
+        <a href="#/map" class="back-link">${ICONS.chevronLeft} К карте навыков</a>
         <div class="topic-badge">Диагностика · результат калибровки</div>
       </div>
       <h1 style="margin-bottom:6px;">Результат: ${totalScore} из ${totalQ} верно</h1>
@@ -10485,7 +6618,7 @@ diagResultsHTML = function(){
       <div class="node-grid">${catsHTML}</div>
       ${calibratedNotice}
       <div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap;">
-        <a href="#/" class="btn btn-primary">К результатам ${ICONS.arrowRight}</a>
+        <a href="#/map" class="btn btn-primary">К карте навыков ${ICONS.arrowRight}</a>
         <button class="btn btn-ghost" data-diag-restart>Пройти ещё раз</button>
       </div>
     </div>`;
@@ -10519,748 +6652,6 @@ nodeCardHTML = function(n){
     </button>`;
 };
 
-let mapViewState = { mode: 'tree' };
-
-const cleanUnitTitle = function(id, title){
-  if(!title) return '';
-  return String(title).replace(new RegExp(`^(?:Юнит\\s*)?${String(id).replace('.', '\\.')}\\s*[:·\\-–—]?\\s*`, 'i'), '').trim();
-};
-
-function renderPathModeSwitcherHTML(){
-  const mode = (state && state.pathViewMode === 'pro') ? 'pro' : 'game';
-  return `
-    <div class="path-mode-switcher" role="radiogroup" aria-label="Режим плана обучения">
-      <button type="button" class="path-mode-btn ${mode==='game'?'active':''}" data-set-path-mode="game" role="radio" aria-checked="${mode==='game'}" title="Игровой режим с 3D-тропой">🎮 Игровой</button>
-      <button type="button" class="path-mode-btn ${mode==='pro'?'active':''}" data-set-path-mode="pro" role="radio" aria-checked="${mode==='pro'}" title="Профессиональный режим со списком глав">💼 Профессиональный</button>
-    </div>
-  `;
-}
-
-function getPathChaptersMeta(allUnits){
-  return [
-    { num: 1, title: 'Python Core', units: allUnits.slice(0, 9) },
-    { num: 2, title: 'Web & HTTP', units: allUnits.slice(9, 13) },
-    { num: 3, title: 'Backend & Архитектура', units: allUnits.slice(13, 21) },
-    { num: 4, title: 'Алгоритмы и структуры данных', units: allUnits.slice(21, 27) },
-    { num: 5, title: 'Базы данных и SQL', units: allUnits.slice(27, 33) },
-    { num: 6, title: 'Системный дизайн', units: allUnits.slice(33, 39) },
-    { num: 7, title: 'Инфраструктура и DevOps', units: allUnits.slice(39, 45) }
-  ];
-}
-
-function isUnitCompleted(u){
-  return (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80));
-}
-
-function renderPathMobileStatsHTML(totalCompletedUnits, streakText){
-  return `
-    <div class="path-mobile-stats" role="status" aria-label="Статистика обучения">
-      <span class="pms-item" title="Пройдено юнитов">📘 <b>${totalCompletedUnits}/45</b></span>
-      <span class="pms-item" title="Стрик активности">🔥 <b>${state.streak || 0}</b> ${streakText}</span>
-      <span class="pms-item" title="Накопленный опыт">💎 <b>${state.xp || 0} XP</b></span>
-    </div>`;
-}
-
-function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum){
-  const chaptersMeta = getPathChaptersMeta(ALL_UNITS_COMBINED);
-  const e1 = (typeof getEchelonProgress === 'function') ? getEchelonProgress(1) : null;
-  const e1Pct = e1 ? e1.pct : 0;
-  const e1Remaining = e1 ? e1.skills.filter(s => getSkillMP(s.id) < 100).length : 0;
-  const dailyGoal = Math.max(1, Number(state.dailyGoal) || 50);
-  const dailyXp = (typeof todayXp === 'function') ? todayXp() : 0;
-  const dailyPct = Math.min(100, Math.round(dailyXp / dailyGoal * 100));
-  const chaptersListHTML = chaptersMeta.map(ch => {
-    const chCompleted = ch.units.filter(isUnitCompleted).length;
-    const chPct = Math.round(chCompleted / ch.units.length * 100);
-    const route = (typeof getTrackForUnit === 'function' && ch.units[0]) ? getTrackForUnit(ch.units[0].id).routePrefix : 'python';
-    const isCurrent = (ch.num === activeChapterNum);
-    return `
-      <a class="crc-row ${isCurrent ? 'crc-row--current' : 'crc-row--compact'}" href="#/${route}" ${isCurrent ? 'aria-current="location"' : ''} title="Глава ${ch.num}: ${escapeHtmlStr(ch.title)} — перейти к модулю">
-        <span class="crc-num">${ch.num}</span>
-        <span class="crc-body">
-          <span class="crc-title">${escapeHtmlStr(ch.title)}</span>
-          ${isCurrent ? `<span class="crc-bar"><span class="crc-bar-fill" style="width:${chPct}%;"></span></span>` : ''}
-        </span>
-        <span class="crc-pct">${chCompleted}/${ch.units.length}</span>
-      </a>`;
-  }).join('');
-
-  return `
-    <aside class="coddy-right-rail">
-      <!-- Top Stats Row (Coddy style) -->
-      <div class="coddy-rail-stats-row">
-        <div class="coddy-rail-stat" title="Пройдено юнитов">
-          <span class="coddy-rail-stat-icon">📘</span>
-          <span class="coddy-rail-stat-val">${totalCompletedUnits}/45</span>
-        </div>
-        <div class="coddy-rail-stat" title="Стрик активности">
-          <span class="coddy-rail-stat-icon">🔥</span>
-          <span class="coddy-rail-stat-val">${state.streak || 0} ${streakText}</span>
-        </div>
-        <div class="coddy-rail-stat" title="Накопленный опыт">
-          <span class="coddy-rail-stat-icon">💎</span>
-          <span class="coddy-rail-stat-val">${state.xp || 0} XP</span>
-        </div>
-      </div>
-
-      <!-- Widget 1: Screening Readiness — мотивирующая графа «До 1-го скрининга %» (по ТЗ) -->
-      <div class="panel coddy-rail-card">
-        <div class="coddy-rail-card-head">
-          <div class="coddy-rail-badge">🎯 До 1-го скрининга</div>
-          <a href="#/mock" class="coddy-rail-link">Симулятор →</a>
-        </div>
-        <div class="coddy-rail-meter">
-          <span class="coddy-rail-meter-value">${e1Pct}%</span>
-          <span class="meta">готовности к тех-скринингу</span>
-        </div>
-        <div class="cd-bar cd-bar-track" role="progressbar" aria-label="Готовность к техническому скринингу" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${e1Pct}"><div class="cd-fill cd-bar-fill" style="width:${Math.max(6, e1Pct)}%;"></div></div>
-        <div class="meta" style="font-size:.75rem;margin-top:7px;">⏳ Осталось ${e1Remaining} ${pluralRuTopics(e1Remaining)} Эшелона 1</div>
-      </div>
-
-      <!-- Widget 0: Course chapters progress (Coddy right-rail unit cards) -->
-      <div class="panel coddy-rail-card">
-        <div class="coddy-rail-card-head">
-          <div class="coddy-rail-badge">📚 Главы курса</div>
-          <span class="coddy-rail-link">${totalCompletedUnits}/45</span>
-        </div>
-        <div class="coddy-rail-chapters-list">
-          ${chaptersListHTML}
-        </div>
-      </div>
-
-      <!-- Widget 3: Daily goal (streak lives in the topbar pill, no duplicate) -->
-      <div class="panel coddy-rail-card">
-        <div class="coddy-rail-badge">🎯 Цель дня</div>
-        <div class="progress-bar-wrap" style="height:6px;margin:10px 0 8px;">
-          <div class="progress-bar-fill" style="width:${dailyPct}%;background:linear-gradient(90deg,#fbbf24,#f59e0b);"></div>
-        </div>
-        <div class="coddy-rail-daily-summary"><span>Сегодня: <strong>${dailyXp}/${dailyGoal} XP</strong></span><span>${dailyXp >= dailyGoal ? 'Цель выполнена' : `Осталось ${dailyGoal - dailyXp} XP`}</span></div>
-      </div>
-      <!-- Widget 2: SRS Cards Review (compact one-row card) -->
-      <div class="panel coddy-rail-card coddy-rail-card--row">
-        <div class="coddy-rail-badge">🃏 Повторение карточек</div>
-        <a href="#/cards" class="coddy-rail-link">Повторить →</a>
-      </div>
-    </aside>`;
-}
-
-// Набор контурных иконок для узлов тропы (референс: тёмно-серый гекс + светлая иконка вместо замка)
-const TRAIL_ICON_PATHS = {
-  star: '<path d="M12 3l2.7 5.5 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.8 1-6.1L3.2 9.4l6.1-.9z"/>',
-  book: '<path d="M6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5v-13A2.5 2.5 0 0 1 6.5 3z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20"/>',
-  code: '<path d="M8 7l-5 5 5 5"/><path d="M16 7l5 5-5 5"/>',
-  terminal: '<path d="M4 17l6-5-6-5"/><path d="M12 19h8"/>',
-  globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15.3 15.3 0 0 1 0 18 15.3 15.3 0 0 1 0-18z"/>',
-  layers: '<path d="M12 2l10 6-10 6L2 8z"/><path d="M2 14l10 6 10-6"/>',
-  zap: '<path d="M13 2L4 14h6l-1 8 9-12h-6z"/>',
-  database: '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
-  cloud: '<path d="M17.5 19a4.5 4.5 0 0 0 0-9 6.5 6.5 0 0 0-12.6 1.7A4.2 4.2 0 0 0 6.8 19z"/>',
-  wrench: '<path d="M14.7 6.3a4.8 4.8 0 0 0-6 6L3 18l3 3 5.7-5.7a4.8 4.8 0 0 0 6-6L14 13l-3-3z"/>',
-  branch: '<circle cx="6" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><path d="M6 15V3"/><path d="M18 9a9 9 0 0 1-9 9"/>',
-  shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
-  trophy: '<path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 5H4v1a3 3 0 0 0 3 3"/><path d="M17 5h3v1a3 3 0 0 1-3 3"/>'
-};
-function trailIconCenter(x, y, name, size, color){
-  const d = TRAIL_ICON_PATHS[name] || TRAIL_ICON_PATHS.star;
-  return `<g transform="translate(${x - size/2} ${y - size/2}) scale(${(size/24).toFixed(3)})" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" pointer-events="none">${d}</g>`;
-}
-function trailPawShape(x, y, fill, stroke, strokeWidth){
-  const parts = '<circle cx="-15" cy="-14" r="6.2"/><circle cx="-5" cy="-22" r="6.2"/><circle cx="5" cy="-22" r="6.2"/><circle cx="15" cy="-14" r="6.2"/><path d="M-18 6c-1-7 3-16 9-17 4-.7 6 3 9 3s5-3.7 9-3c6 1 10 10 9 17-1 7-8 11-16 6-2-1-3-1-5 0-8 5-15 1-16-6z"/>';
-  return `<g class="path-node-paw" transform="translate(${x} ${y})"><g transform="translate(0 2)" fill="rgba(0,0,0,0.30)" stroke="none">${parts}</g><g class="path-paw-face" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linejoin="round">${parts}</g></g>`;
-}
-function trailIsometricButton(x, y, fill, stroke, strokeWidth){
-  const top = `M${x} ${y-25} L${x+24} ${y-12} L${x+24} ${y+10} L${x} ${y+23} L${x-24} ${y+10} L${x-24} ${y-12} Z`;
-  const side = `M${x-24} ${y+10} L${x} ${y+23} L${x+24} ${y+10} L${x+24} ${y+18} L${x} ${y+31} L${x-24} ${y+18} Z`;
-  const shadow = `M${x} ${y-19} L${x+24} ${y-6} L${x+24} ${y+16} L${x} ${y+29} L${x-24} ${y+16} L${x-24} ${y-6} Z`;
-  const inset = `M${x} ${y-18} L${x+17} ${y-9} L${x+17} ${y+7} L${x} ${y+16} L${x-17} ${y+7} L${x-17} ${y-9} Z`;
-  return `<path d="${shadow}" fill="rgba(0,0,0,0.34)" transform="translate(0 4)"/><g class="path-button-face"><path d="${side}" fill="url(#pathButtonSide)" stroke="rgba(255,255,255,0.12)" stroke-width="1" stroke-linejoin="round"/><path d="${top}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linejoin="round"/><path d="${inset}" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="1" stroke-linejoin="round"/><path d="M${x-15} ${y-12} L${x} ${y-20} L${x+15} ${y-12}" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></g>`;
-}
-// Тематические иконки по главам (циклятся внутри главы)
-const TRAIL_CHAPTER_ICONS = [
-  ['terminal', 'code', 'star', 'book'],
-  ['globe', 'code', 'book', 'star'],
-  ['layers', 'code', 'shield', 'book'],
-  ['branch', 'zap', 'code', 'book'],
-  ['database', 'terminal', 'book', 'star'],
-  ['cloud', 'layers', 'book', 'star'],
-  ['wrench', 'cloud', 'shield', 'book']
-];
-
-function viewPathSerpentine(options){
-  options = options || {};
-  ensureExtendedState();
-  const allUnits = ALL_UNITS_COMBINED;
-  const usePawNodes = state.pathNodeStyle !== 'button';
-  
-  // Find which units are completed vs active vs locked
-  let activeUnitIndex = -1;
-  allUnits.forEach((u, idx) => {
-    const isUnitTestPassed = (state.passedUnitTests || []).includes(u.id);
-    const allSkillsMastered = (u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80);
-    const isCompleted = isUnitTestPassed || allSkillsMastered;
-    if(!isCompleted && activeUnitIndex === -1){
-      activeUnitIndex = idx;
-    }
-  });
-  if(activeUnitIndex === -1) activeUnitIndex = allUnits.length - 1;
-
-  // Track coordinates for each of the 45 nodes
-  // Account for chapter spacing: Chapter 1 starts at y=130 (with Chapter 1 ribbon at y=48)
-  // Each chapter transition adds +150px of breathing room for Coddy-style Section Gate Cards!
-  const chapterStartSet = new Set([9, 13, 21, 27, 33, 39]);
-  let curY = 130;
-  const coords = allUnits.map((u, i) => {
-    if(i > 0){
-      curY += 115;
-      if(chapterStartSet.has(i)){
-        curY += 150; // Dedicated gap for Coddy Section Gate Card (Variant C)
-      }
-    }
-    const x = Math.round(210 + 110 * Math.sin((i * Math.PI) / 2.2));
-    return { x, y: curY };
-  });
-
-  const totalH = coords[coords.length - 1].y + 120;
-
-  // Build smooth Bezier path
-  let dPath = `M ${coords[0].x} ${coords[0].y}`;
-  for(let i = 0; i < coords.length - 1; i++){
-    const p1 = coords[i];
-    const p2 = coords[i+1];
-    const midY = (p1.y + p2.y) / 2;
-    dPath += ` C ${p1.x} ${midY}, ${p2.x} ${midY}, ${p2.x} ${p2.y}`;
-  }
-
-  // Build progress sub-path up to active unit
-  let dProgress = '';
-  if(activeUnitIndex > 0){
-    dProgress = `M ${coords[0].x} ${coords[0].y}`;
-    for(let i = 0; i < Math.min(activeUnitIndex, coords.length - 1); i++){
-      const p1 = coords[i];
-      const p2 = coords[i+1];
-      const midY = (p1.y + p2.y) / 2;
-      dProgress += ` C ${p1.x} ${midY}, ${p2.x} ${midY}, ${p2.x} ${p2.y}`;
-    }
-  }
-
-  // Dotted "path ahead" overlay from the active unit to the end (Coddy-style)
-  let dFuture = '';
-  if(activeUnitIndex < coords.length - 1){
-    dFuture = `M ${coords[activeUnitIndex].x} ${coords[activeUnitIndex].y}`;
-    for(let i = activeUnitIndex; i < coords.length - 1; i++){
-      const p1 = coords[i];
-      const p2 = coords[i+1];
-      const midY = (p1.y + p2.y) / 2;
-      dFuture += ` C ${p1.x} ${midY}, ${p2.x} ${midY}, ${p2.x} ${p2.y}`;
-    }
-  }
-
-  // Active unit metadata for top chapter banner
-  const curActiveUnit = allUnits[activeUnitIndex] || allUnits[0];
-  const activeTrack = getTrackForUnit(curActiveUnit.id);
-  const chapterUnits = allUnits.filter(u => getTrackForUnit(u.id).routePrefix === activeTrack.routePrefix);
-  const totalInChapter = chapterUnits.length;
-  const completedInChapter = chapterUnits.filter(u => (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80))).length;
-  const chapterSegmentsHTML = chapterUnits.map(u => {
-    const isPassed = (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80));
-    const isActive = u.id === curActiveUnit.id;
-    return `<div class="path-seg-bar ${isPassed ? 'done' : (isActive ? 'active' : '')}" title="Юнит ${u.id}: ${escapeHtmlStr(u.title)}"></div>`;
-  }).join('');
-  const chapterProgressLabel = completedInChapter === 0
-    ? `Начни · ${totalInChapter}`
-    : `${completedInChapter} / ${totalInChapter}`;
-
-  // Chapter markers: Chapter 1 has top ribbon, Chapters 2..7 have Coddy Section Gate Cards (Variant C, Hard Gate)
-  const chapterBreakpoints = [
-    { startIdx: 0, title: 'Глава 1: Python Core', chapterNum: 1, track: 'python', shortTitle: 'Python Core', unitsCount: 9 },
-    { startIdx: 9, title: 'Глава 2: Web & HTTP', chapterNum: 2, track: 'web', shortTitle: 'Web & HTTP', unitsCount: 4 },
-    { startIdx: 13, title: 'Глава 3: Backend & Архитектура', chapterNum: 3, track: 'backend', shortTitle: 'Backend & Архитектура', unitsCount: 8 },
-    { startIdx: 21, title: 'Глава 4: Алгоритмы и структуры данных', chapterNum: 4, track: 'algorithms', shortTitle: 'Алгоритмы и структуры', unitsCount: 6 },
-    { startIdx: 27, title: 'Глава 5: Базы данных и SQL', chapterNum: 5, track: 'databases', shortTitle: 'Базы данных и SQL', unitsCount: 6 },
-    { startIdx: 33, title: 'Глава 6: Системный дизайн', chapterNum: 6, track: 'architecture', shortTitle: 'Системный дизайн', unitsCount: 6 },
-    { startIdx: 39, title: 'Глава 7: Инфраструктура и DevOps', chapterNum: 7, track: 'infra', shortTitle: 'Инфраструктура и DevOps', unitsCount: 6 }
-  ];
-  // Последний юнит главы получает отдельную иконку трофея.
-  const chapterLastIdxSet = new Set(chapterBreakpoints.slice(1).map(cb => cb.startIdx - 1));
-  chapterLastIdxSet.add(allUnits.length - 1);
-
-  let markersSVG = '';
-  chapterBreakpoints.forEach((cb, ci) => {
-    if(coords[cb.startIdx]){
-      if(cb.startIdx === 0){
-        // Chapter 1 retains clean top ribbon
-        const cy = 48;
-        markersSVG += `
-          <g class="path-chapter-ribbon" transform="translate(210, ${cy})">
-            <line x1="-190" y1="0" x2="-130" y2="0" stroke="rgba(190, 18, 60, 0.40)" stroke-width="1.5" stroke-dasharray="4 4"/>
-            <line x1="130" y1="0" x2="190" y2="0" stroke="rgba(190, 18, 60, 0.40)" stroke-width="1.5" stroke-dasharray="4 4"/>
-            <rect x="-120" y="-14" width="240" height="28" rx="14" fill="rgba(22, 27, 36, 0.88)" stroke="rgba(190, 18, 60, 0.50)" stroke-width="1.2"/>
-            <text x="0" y="4" text-anchor="middle" font-size="11" font-weight="800" fill="#fbbf24" letter-spacing="0.04em">${escapeHtmlStr(cb.title)}</text>
-          </g>`;
-      } else {
-        // Chapters 2..7 get Coddy-style Section Gate Cards (Variant C, Hard Gate)
-        const prevCb = chapterBreakpoints[ci - 1];
-        const prevUnits = allUnits.slice(prevCb.startIdx, cb.startIdx);
-        const isPrevChapterDone = prevUnits.length > 0 && prevUnits.every(isUnitCompleted);
-
-        const nextStartIdx = (ci + 1 < chapterBreakpoints.length) ? chapterBreakpoints[ci + 1].startIdx : allUnits.length;
-        const curUnits = allUnits.slice(cb.startIdx, nextStartIdx);
-        const curCompletedCount = curUnits.filter(isUnitCompleted).length;
-        const isCurChapterDone = curUnits.length > 0 && curCompletedCount === curUnits.length;
-        const isCurChapterActive = isPrevChapterDone && !isCurChapterDone;
-
-        const gateStatus = !isPrevChapterDone ? 'locked' : (isCurChapterDone ? 'completed' : 'active');
-        const isLocked = (gateStatus === 'locked');
-
-        const prevY = coords[cb.startIdx - 1].y;
-        const nextY = coords[cb.startIdx].y;
-        const cy = Math.round((prevY + nextY) / 2);
-
-        let hexFill = 'url(#pathButtonActive)';
-        let hexStroke = 'rgba(251, 191, 36, 0.95)';
-        let hexGlow = 'filter="drop-shadow(0 0 10px rgba(245, 158, 11, 0.65))"';
-        let hexText = `<text x="0" y="-48" text-anchor="middle" font-size="14" font-weight="900" fill="#ffffff">${cb.chapterNum}</text>`;
-
-        if(isLocked){
-          hexFill = 'url(#pathButtonLocked)';
-          hexStroke = 'rgba(190, 18, 60, 0.60)';
-          hexGlow = '';
-          hexText = `<text x="0" y="-49" text-anchor="middle" font-size="12" font-weight="900" fill="#fda4af">🔒</text>`;
-        } else if(isCurChapterDone){
-          hexFill = 'url(#pathButtonCompleted)';
-          hexStroke = 'rgba(52, 211, 153, 0.85)';
-          hexGlow = 'filter="drop-shadow(0 0 10px rgba(16, 185, 129, 0.55))"';
-          hexText = `<text x="0" y="-48" text-anchor="middle" font-size="15" font-weight="900" fill="#ffffff">✓</text>`;
-        }
-
-        const hexBadge = `
-          <g class="path-gate-hex-badge" ${hexGlow}>
-            <polygon points="0,-72 16,-63 16,-44 0,-35 -16,-44 -16,-63" fill="${hexFill}" stroke="${hexStroke}" stroke-width="1.8" stroke-linejoin="round"/>
-            <polygon points="0,-68 13,-60 13,-46 0,-38 -13,-46 -13,-60" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1" stroke-linejoin="round"/>
-            ${hexText}
-          </g>`;
-
-        let subText = '';
-        if(isLocked){
-          subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10.5" font-weight="600" fill="#fda4af">🔒 ${cb.unitsCount} ${pluralizeRu(cb.unitsCount, 'юнит', 'юнита', 'юнитов')} · Откроется после «${escapeHtmlStr(prevCb.shortTitle)}»</text>`;
-        } else if(isCurChapterDone){
-          subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10.5" font-weight="600" fill="#6ee7b7">✓ Все ${cb.unitsCount} из ${cb.unitsCount} юнитов сданы · 100%</text>`;
-        } else {
-          const pct = Math.round(curCompletedCount / cb.unitsCount * 100);
-          subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10.5" font-weight="600" fill="#fcd34d">${curCompletedCount} из ${cb.unitsCount} ${pluralizeRu(cb.unitsCount, 'юнита', 'юнитов', 'юнитов')} сдано · ${pct}%</text>`;
-        }
-
-        let btnContent = '';
-        if(isLocked){
-          btnContent = `
-            <g class="path-gate-btn path-gate-btn--locked" data-gate-track="${cb.track}" data-gate-locked="1" data-gate-prev-title="${escapeHtmlStr(prevCb.shortTitle)}" role="button" tabindex="0" aria-label="Раздел ${cb.chapterNum} заблокирован. Завершите темы «${escapeHtmlStr(prevCb.shortTitle)}»." aria-disabled="true">
-              <rect x="-110" y="18" width="220" height="28" rx="14" fill="rgba(65, 12, 26, 0.75)" stroke="rgba(190, 18, 60, 0.55)" stroke-width="1.2"/>
-              <text x="0" y="36" text-anchor="middle" font-size="10.5" font-weight="800" fill="#fda4af" letter-spacing="0.06em">🔒 РАЗДЕЛ ЗАКРЫТ</text>
-            </g>`;
-        } else {
-          const btnLabel = isCurChapterDone ? 'ОБЗОР РАЗДЕЛА ➔' : 'ПЕРЕЙТИ К РАЗДЕЛУ ➔';
-          btnContent = `
-            <g class="path-gate-btn path-gate-btn--unlocked" data-gate-track="${cb.track}" data-gate-locked="0" role="button" tabindex="0" aria-label="Перейти к разделу ${cb.chapterNum}: ${escapeHtmlStr(cb.shortTitle)}" aria-keyshortcuts="Enter Space">
-              <rect class="path-gate-btn-rect" x="-110" y="18" width="220" height="28" rx="14" fill="url(#hexGradCompleted)" stroke="rgba(52, 211, 153, 0.60)" stroke-width="1.2" filter="drop-shadow(0 4px 12px rgba(16,185,129,0.40))"/>
-              <text x="0" y="36" text-anchor="middle" font-size="10.5" font-weight="900" fill="#ffffff" letter-spacing="0.06em">${btnLabel}</text>
-            </g>`;
-        }
-
-        markersSVG += `
-          <g class="path-section-gate path-chapter-ribbon path-section-gate--${gateStatus}" transform="translate(210, ${cy})">
-            <line x1="-195" y1="0" x2="-160" y2="0" stroke="rgba(190, 18, 60, 0.40)" stroke-width="1.5" stroke-dasharray="4 4"/>
-            <line x1="160" y1="0" x2="195" y2="0" stroke="rgba(190, 18, 60, 0.40)" stroke-width="1.5" stroke-dasharray="4 4"/>
-            <rect class="path-section-gate-bg" x="-155" y="-53" width="310" height="112" rx="18" fill="rgba(19, 24, 34, 0.94)" stroke="${isLocked ? 'rgba(190, 18, 60, 0.45)' : (isCurChapterDone ? 'rgba(16, 185, 129, 0.50)' : 'rgba(245, 158, 11, 0.60)')}" stroke-width="1.5" filter="drop-shadow(0 12px 28px rgba(0,0,0,0.65))"/>
-            ${hexBadge}
-            <text class="path-gate-title" x="0" y="-14" text-anchor="middle" font-size="12" font-weight="900" fill="#f8fafc" letter-spacing="0.08em">РАЗДЕЛ ${cb.chapterNum}: ${escapeHtmlStr(cb.shortTitle.toUpperCase())}</text>
-            ${subText}
-            ${btnContent}
-          </g>`;
-      }
-    }
-  });
-
-  // Flat-topped hexagon SVG points calculation
-  let nodesSVG = '';
-  allUnits.forEach((u, i) => {
-    const { x, y } = coords[i];
-    let status = 'locked';
-    if(i < activeUnitIndex || (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80))){
-      status = 'completed';
-    } else if(i === activeUnitIndex){
-      status = 'active';
-    }
-
-    const isCompleted = (status === 'completed');
-    const isActive = (status === 'active');
-
-    const topGrad = isCompleted ? 'url(#hexGradCompleted)' : (isActive ? 'url(#hexGradActive)' : 'url(#hexGradLocked)');
-    const buttonGrad = isCompleted ? 'url(#pathButtonCompleted)' : (isActive ? 'url(#pathButtonActive)' : 'url(#pathButtonLocked)');
-    const strokeColor = isCompleted ? 'rgba(255,255,255,0.3)' : (isActive ? '#fef08a' : 'rgba(148,163,184,0.28)');
-    const strokeWidth = isActive ? 2 : 1.5;
-
-    let centerIcon = '';
-    let pulseHalo = '';
-    let activeBubble = '';
-    const cbIdx = chapterBreakpoints.reduce((acc, cb, ci) => (i >= cb.startIdx ? ci : acc), 0);
-    const iconSet = TRAIL_CHAPTER_ICONS[cbIdx] || TRAIL_CHAPTER_ICONS[0];
-    const iconName = chapterLastIdxSet.has(i) ? 'trophy' : iconSet[(i - chapterBreakpoints[cbIdx].startIdx) % iconSet.length];
-    if(isCompleted){
-      centerIcon = `<text x="${x}" y="${y+(usePawNodes?10:7)}" text-anchor="middle" font-size="${usePawNodes?18:22}" font-weight="900" fill="#ffffff">✓</text>`;
-    } else if(isActive){
-      pulseHalo = `<circle class="hex-pulse-halo" cx="${x}" cy="${y}" r="40" fill="none" stroke="rgba(245, 158, 11, 0.6)"/>`;
-      centerIcon = trailIconCenter(x, y + (usePawNodes ? 5 : 1), iconName, usePawNodes ? 20 : 26, '#ffffff');
-      const unitStarted = (u.skills || []).some(s => (getSkillMP(s.id) || 0) > 0);
-      const bubbleTxt = unitStarted ? 'ПРОДОЛЖИТЬ' : 'НАЧАТЬ';
-      const bubbleW = unitStarted ? 104 : 72;
-      const bubbleY = y - 44;
-      activeBubble = `
-        <g class="hex-active-tooltip" transform="translate(${x}, ${bubbleY})">
-          <g class="hex-active-tooltip__inner">
-            <rect x="${-bubbleW/2}" y="-16" width="${bubbleW}" height="22" rx="11" fill="#ff7a00" filter="drop-shadow(0 4px 10px rgba(255,122,0,0.45))"/>
-            <polygon points="-5,6 5,6 0,11" fill="#ff7a00"/>
-            <text x="0" y="-1" text-anchor="middle" font-size="10.5" font-weight="900" fill="#ffffff" letter-spacing="0.08em">${bubbleTxt}</text>
-          </g>
-        </g>`;
-    } else {
-      centerIcon = trailIconCenter(x, y + (usePawNodes ? 5 : 0), iconName, usePawNodes ? 18 : 24, '#a9b3c3');
-    }
-
-    const nodeShape = usePawNodes
-      ? trailPawShape(x, y, topGrad, strokeColor, strokeWidth)
-      : trailIsometricButton(x, y, buttonGrad, isActive ? 'rgba(255,230,160,0.95)' : (isCompleted ? 'rgba(167,243,208,0.75)' : 'rgba(203,213,225,0.42)'), isActive ? 1.8 : 1.3);
-
-    const buttonContent = usePawNodes ? centerIcon : `<g class="path-button-icon">${centerIcon}</g>`;
-    // Подпись темы под активным узлом и двумя следующими (видно «что дальше» без клика)
-    const showUnderLabel = (i >= activeUnitIndex && i <= activeUnitIndex + 2);
-    const underTitleFull = cleanUnitTitle(u.id, u.title);
-    const shortTitle = (underTitleFull.length > 24) ? underTitleFull.slice(0, 22) + '…' : underTitleFull;
-    // у финишных юнитов главы снизу-сбоку висит ветка челленджа — уводим подпись в противоположную сторону
-    const hasBranchBelow = chapterLastIdxSet.has(i);
-    const branchDir = (x >= 210) ? 1 : -1;
-    const underLabelX = hasBranchBelow ? (x - branchDir * 44) : x;
-    const underLabelAnchor = hasBranchBelow ? (branchDir === 1 ? 'end' : 'start') : 'middle';
-    const nodeStateLabel = isCompleted ? 'Пройден' : (isActive ? 'Текущий юнит, доступен для продолжения' : 'Заблокирован: сначала пройдите предыдущие юниты');
-    const nodeAccessibleLabel = `Юнит ${u.id}: ${cleanUnitTitle(u.id, u.title)}. ${nodeStateLabel}. Нажмите Enter или пробел, чтобы открыть.`;
-
-    nodesSVG += `
-      <g class="hex-3d-node hex-node--${status}" data-unit-id="${u.id}" data-node-idx="${i}" data-cx="${x}" data-cy="${y}" role="button" tabindex="0" aria-label="${escapeHtmlStr(nodeAccessibleLabel)}" aria-keyshortcuts="Enter Space ArrowUp ArrowDown Home End" title="${escapeHtmlStr(nodeAccessibleLabel)}">
-        ${pulseHalo}
-        <circle cx="${x}" cy="${y}" r="34" fill="transparent" pointer-events="all"/>
-        ${nodeShape}
-        ${buttonContent}
-        ${showUnderLabel ? `<text class="hex-node-underlabel" x="${underLabelX}" y="${y + 52}" text-anchor="${underLabelAnchor}">${escapeHtmlStr(shortTitle)}</text>` : ''}
-        ${activeBubble}
-      </g>`;
-  });
-
-  // «Челлендж мастерства» — боковые ветви-гексагоны на финишных юнитах глав (по референсу Coddy)
-  let branchesSVG = '';
-  chapterBreakpoints.forEach((cb, cIdx) => {
-    const endIdx = (cIdx < chapterBreakpoints.length - 1) ? (chapterBreakpoints[cIdx + 1].startIdx - 1) : (allUnits.length - 1);
-    const u = allUnits[endIdx];
-    if(!u) return;
-    const { x, y } = coords[endIdx];
-    const track = getTrackForUnit(u.id);
-    const chDone = (state.passedUnitTests || []).includes(u.id);
-    const chUnlocked = endIdx <= activeUnitIndex;
-    const chStatus = chDone ? 'done' : (chUnlocked ? 'open' : 'locked');
-    const bx = Math.max(64, Math.min(356, x + (x >= 210 ? 66 : -66)));
-    const by = y + 56;
-    const chGrad = chDone ? 'url(#hexGradCompleted)' : (chStatus === 'open' ? 'url(#hexGradChallenge)' : 'url(#hexGradLocked)');
-    const chButtonGrad = chDone ? 'url(#pathButtonCompleted)' : (chStatus === 'open' ? 'url(#pathButtonChallenge)' : 'url(#pathButtonLocked)');
-    const chStroke = chDone ? 'rgba(255,255,255,0.3)' : (chStatus === 'open' ? 'rgba(251,113,133,0.6)' : 'rgba(148,163,184,0.28)');
-    let chIcon = '';
-    let chHalo = '';
-    if(chDone){
-      chIcon = `<text x="${bx}" y="${by+(usePawNodes?8:6)}" text-anchor="middle" font-size="${usePawNodes?15:16}" font-weight="900" fill="#ffffff">✓</text>`;
-    } else if(chStatus === 'open'){
-      chHalo = `<circle class="hex-challenge-pulse" cx="${bx}" cy="${by}" r="28" fill="none" stroke="rgba(190,18,60,0.55)"/>`;
-      chIcon = trailIconCenter(bx, by + (usePawNodes?4:1), 'zap', usePawNodes?17:22, '#ffffff');
-    } else {
-      chIcon = trailIconCenter(bx, by + (usePawNodes?4:0), 'zap', usePawNodes?16:20, '#a9b3c3');
-    }
-    const challengeShape = usePawNodes
-      ? trailPawShape(bx, by, chGrad, chStroke, chStatus === 'open' ? 1.8 : 1.3)
-      : trailIsometricButton(bx, by, chButtonGrad, chStatus === 'open' ? 'rgba(253,164,175,0.9)' : 'rgba(203,213,225,0.42)', chStatus === 'open' ? 1.7 : 1.2);
-    const challengeContent = usePawNodes ? chIcon : `<g class="path-button-icon">${chIcon}</g>`;
-    const connectorStroke = chDone ? 'rgba(16,185,129,0.55)' : (chStatus === 'open' ? 'rgba(190,18,60,0.60)' : 'rgba(148,163,184,0.25)');
-
-    branchesSVG += `
-      <g class="hex-challenge-branch">
-        <path d="M ${x},${y + 30} Q ${x},${(y + by) / 2} ${bx},${by - 22}" fill="none" stroke="${connectorStroke}" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="1 8"/>
-        <g class="hex-challenge-node hex-challenge-node--${chStatus}" data-challenge-route="#${track.routePrefix}/unittest/${u.id}" data-challenge-status="${chStatus}" data-cx="${bx}" data-cy="${by}" role="button" tabindex="0" aria-label="Челлендж мастерства, проверка юнита ${u.id}. ${chDone ? 'Пройдено' : (chUnlocked ? 'Доступно' : 'Заблокировано до прохождения предыдущих юнитов')}. Нажмите Enter или пробел, чтобы открыть." aria-keyshortcuts="Enter Space" aria-disabled="${chStatus === 'locked' ? 'true' : 'false'}">
-          ${chHalo}
-          <circle cx="${bx}" cy="${by}" r="24" fill="transparent" pointer-events="all"/>
-          ${challengeShape}
-          ${challengeContent}
-          <text class="hex-branch-label" x="${bx}" y="${by + 44}" text-anchor="middle">ЧЕЛЛЕНДЖ<tspan x="${bx}" dy="13">МАСТЕРСТВА</tspan></text>
-        </g>
-      </g>`;
-  });
-
-  const totalCompletedUnits = allUnits.filter(isUnitCompleted).length;
-  const streakText = (typeof pluralizeRu === 'function') ? pluralizeRu(state.streak || 0, 'день', 'дня', 'дней') : 'дн.';
-  const activeChapterNum = (getPathChaptersMeta(allUnits).find(c => c.units.some(u => u.id === curActiveUnit.id)) || { num: 1 }).num;
-
-  return `
-    <div class="coddy-path-layout">
-      <div class="container path-serpentine-wrap">
-        <!-- Переключатель режимов game/pro перенесён в «⚙️ Настройки платформы» (по ТЗ — тех.информация не в топбаре) -->
-
-        <!-- Mobile compact stats strip (visible when the right rail is hidden) -->
-        ${renderPathMobileStatsHTML(totalCompletedUnits, streakText)}
-
-        <!-- Top Chapter Banner -->
-        <div class="path-chapter-banner">
-          <div class="path-chapter-banner-main">
-            <div class="path-chapter-banner-left">
-              <div class="path-chapter-breadcrumb">ПРОГРАММА › РАЗДЕЛ ${activeChapterNum} · ГЛАВА ${activeChapterNum}</div>
-              <div class="path-chapter-title">Юнит ${curActiveUnit.id} · ${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</div>
-            </div>
-          </div>
-          <div class="path-chapter-banner-right">
-            <div class="path-chapter-progress-row">
-              <span class="path-chapter-target-icon">🎯</span>
-              <div class="path-chapter-segments">
-                ${chapterSegmentsHTML}
-              </div>
-              <span class="path-chapter-count" title="${completedInChapter === 0 ? `Начни главу: в ней ${totalInChapter} ${pluralizeRu(totalInChapter, 'юнит', 'юнита', 'юнитов')}` : `Завершено юнитов: ${completedInChapter} из ${totalInChapter}`}" aria-label="${completedInChapter === 0 ? `Начни главу: ${totalInChapter} ${pluralizeRu(totalInChapter, 'юнит', 'юнита', 'юнитов')}` : `Завершено юнитов: ${completedInChapter} из ${totalInChapter}`}">${chapterProgressLabel}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- S-Curve SVG Trail -->
-        <div class="path-serpentine" style="position:relative;">
-          <svg class="path-serpentine-svg" viewBox="0 0 420 ${totalH}" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Путь обучения: ${allUnits.length} юнитов и челленджи">
-            <defs>
-              <linearGradient id="hexGradCompleted" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#34d399"/>
-                <stop offset="100%" stop-color="#059669"/>
-              </linearGradient>
-              <linearGradient id="hexGradActive" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#fbbf24"/>
-                <stop offset="100%" stop-color="#d97706"/>
-              </linearGradient>
-              <linearGradient id="hexGradLocked" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#3a4150"/>
-                <stop offset="100%" stop-color="#15181f"/>
-              </linearGradient>
-              <linearGradient id="hexGradChallenge" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#fb7185"/>
-                <stop offset="100%" stop-color="#be123c"/>
-              </linearGradient>
-              <linearGradient id="pathButtonActive" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffd166"/><stop offset="0.52" stop-color="#f59e0b"/><stop offset="1" stop-color="#c65a08"/></linearGradient>
-              <linearGradient id="pathButtonCompleted" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#6ee7b7"/><stop offset="0.52" stop-color="#10b981"/><stop offset="1" stop-color="#047857"/></linearGradient>
-              <linearGradient id="pathButtonLocked" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#566174"/><stop offset="0.55" stop-color="#303949"/><stop offset="1" stop-color="#1b2230"/></linearGradient>
-              <linearGradient id="pathButtonSide" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#303a4b"/><stop offset="1" stop-color="#111722"/></linearGradient>
-              <linearGradient id="pathButtonChallenge" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fda4af"/><stop offset="0.55" stop-color="#e11d48"/><stop offset="1" stop-color="#9f1239"/></linearGradient>
-              <linearGradient id="pathProgressGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#10b981"/>
-                <stop offset="100%" stop-color="#f59e0b"/>
-              </linearGradient>
-            </defs>
-
-            <!-- Outer trail shadow -->
-            <path d="${dPath}" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="22" stroke-linecap="round"/>
-            <!-- Burgundy under-glow of the trail -->
-            <path d="${dPath}" fill="none" stroke="rgba(190,18,60,0.12)" stroke-width="30" stroke-linecap="round"/>
-            <!-- Background trail -->
-            <path class="path-track-bg" d="${dPath}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="14" stroke-linecap="round"/>
-            ${dProgress ? `<path class="path-track-progress" d="${dProgress}" fill="none" stroke="url(#pathProgressGrad)" stroke-width="8" stroke-linecap="round"/>` : ''}
-            ${dFuture ? `<path class="path-track-future" d="${dFuture}" fill="none" stroke="rgba(154,161,175,0.45)" stroke-width="4" stroke-linecap="round" stroke-dasharray="0.1 16"/>` : ''}
-
-            <!-- Chapter ribbons -->
-            ${markersSVG}
-
-            <!-- 45 3D Hexagonal Nodes -->
-            ${nodesSVG}
-
-            <!-- «Челлендж мастерства» side branches -->
-            ${branchesSVG}
-          </svg>
-
-          <!-- Anchored Popover Modal -->
-          <div id="path-anchored-popover" class="path-popover" style="display:none;" role="dialog" tabindex="-1" aria-labelledby="popover-title" aria-describedby="popover-status">
-            <div class="path-popover-arrow path-popover-arrow--down" id="popover-arrow"></div>
-            <div class="path-popover-content">
-              <div class="path-popover-header">
-                <div class="path-popover-badge" id="popover-badge">🎯 Модуль 1 · Python</div>
-                <button type="button" class="path-popover-close" id="popover-close-btn" aria-label="Закрыть">✕</button>
-              </div>
-              <h3 class="path-popover-title" id="popover-title">Юнит 1.1: Переменные и память</h3>
-              <div class="path-popover-status" id="popover-status">В процессе изучения</div>
-              <div class="path-popover-skills" id="popover-skills"></div>
-              <div class="path-popover-actions">
-                <button type="button" class="btn-3d-orange path-popover-cta" id="popover-cta-btn">НАЧАТЬ ➔</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Floating Jump Button to active lesson -->
-        <button type="button" class="path-jump-btn" id="path-jump-btn" title="Перейти к текущему уроку" aria-label="Перейти к текущему уроку">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
-        </button>
-      </div>
-
-      ${renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)}
-    </div>`;
-}
-
-let proCollapsedChapters = new Set();
-
-function viewProPath(options){
-  options = options || {};
-  ensureExtendedState();
-  const allUnits = ALL_UNITS_COMBINED;
-
-  // Find active unit
-  let activeUnitIndex = -1;
-  allUnits.forEach((u, idx) => {
-    const isUnitTestPassed = (state.passedUnitTests || []).includes(u.id);
-    const allSkillsMastered = (u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80);
-    const isCompleted = isUnitTestPassed || allSkillsMastered;
-    if(!isCompleted && activeUnitIndex === -1){
-      activeUnitIndex = idx;
-    }
-  });
-  if(activeUnitIndex === -1) activeUnitIndex = allUnits.length - 1;
-
-  const curActiveUnit = allUnits[activeUnitIndex] || allUnits[0];
-  const activeTrack = getTrackForUnit(curActiveUnit.id);
-  const totalCompletedUnits = allUnits.filter(isUnitCompleted).length;
-  const streakText = (typeof pluralizeRu === 'function') ? pluralizeRu(state.streak || 0, 'день', 'дня', 'дней') : 'дн.';
-
-  // 7 Chapters
-  const chapters = getPathChaptersMeta(allUnits);
-
-  const activeChap = chapters.find(c => c.units.some(u => u.id === curActiveUnit.id)) || chapters[0];
-  const activeChapCompleted = activeChap.units.filter(u => (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80))).length;
-  const activeChapTotal = activeChap.units.length;
-  const activeChapPct = Math.round(activeChapCompleted / activeChapTotal * 100);
-  const activeChapSummary = activeChapCompleted === 0
-    ? `Начни главу · ${activeChapTotal} ${pluralizeRu(activeChapTotal, 'юнит', 'юнита', 'юнитов')}`
-    : `Глава ${activeChap.num}: ${escapeHtmlStr(activeChap.title)} · ${activeChapCompleted}/${activeChapTotal} уроков · ${activeChapPct}%`;
-
-  // Segments for active chapter
-  const activeChapSegmentsHTML = activeChap.units.map(u => {
-    const isPassed = (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80));
-    const isActive = u.id === curActiveUnit.id;
-    return `<div class="path-seg-bar ${isPassed ? 'done' : (isActive ? 'active' : '')}" title="Юнит ${u.id}: ${escapeHtmlStr(u.title)}"></div>`;
-  }).join('');
-
-  // Hero Card HTML (exactly matching Coddy screenshot #2)
-  const heroCardHTML = `
-    <div class="pro-hero-card">
-      <div class="pro-hero-card-head">
-        <div class="pro-hero-card-left">
-          <div class="pro-hero-breadcrumb">ПРОГРАММА › РАЗДЕЛ ${activeChap.num} · ГЛАВА ${activeChap.num}</div>
-          <h2 class="pro-hero-title">Юнит ${curActiveUnit.id} · ${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</h2>
-          <div class="pro-hero-meta">${activeChapSummary}</div>
-        </div>
-        <button type="button" class="btn-3d-orange pro-hero-cta" data-pro-start="${curActiveUnit.id}">ПРОДОЛЖИТЬ</button>
-      </div>
-
-      <div class="pro-hero-progress-track">
-        <div class="pro-hero-progress-fill" style="width:${activeChapPct}%;"></div>
-      </div>
-
-      <div class="path-chapter-progress-row" style="margin-top:4px;">
-        <span class="path-chapter-target-icon">🎯</span>
-        <div class="path-chapter-segments">
-          ${activeChapSegmentsHTML}
-        </div>
-        <span class="path-chapter-count" title="${activeChapCompleted === 0 ? `Начни главу: в ней ${activeChapTotal} ${pluralizeRu(activeChapTotal, 'юнит', 'юнита', 'юнитов')}` : `Завершено юнитов: ${activeChapCompleted} из ${activeChapTotal}`}" aria-label="${activeChapCompleted === 0 ? `Начни главу: ${activeChapTotal} ${pluralizeRu(activeChapTotal, 'юнит', 'юнита', 'юнитов')}` : `Завершено юнитов: ${activeChapCompleted} из ${activeChapTotal}`}">${activeChapCompleted === 0 ? `Начни · ${activeChapTotal}` : `${activeChapCompleted} / ${activeChapTotal}`}</span>
-      </div>
-    </div>
-  `;
-
-  // Chapters list HTML (structured chapter box and lesson rows with icons and badges)
-  const chaptersHTML = chapters.map(ch => {
-    const isCurChap = (ch.num === activeChap.num);
-    const chCompleted = ch.units.filter(u => (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80))).length;
-    const chTotal = ch.units.length;
-    const chPct = Math.round(chCompleted / chTotal * 100);
-    const isExpanded = isCurChap ? !proCollapsedChapters.has(ch.num) : proCollapsedChapters.has(ch.num);
-
-    const lessonsListHTML = ch.units.map(u => {
-      const isUnitTestPassed = (state.passedUnitTests || []).includes(u.id);
-      const allSkillsMastered = (u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80);
-      const isCompleted = isUnitTestPassed || allSkillsMastered;
-      const globalIdx = allUnits.findIndex(x => x.id === u.id);
-      const isActive = (globalIdx === activeUnitIndex);
-      const isLocked = (globalIdx > activeUnitIndex && !isCompleted);
-
-      let statusClass = isCompleted ? 'pro-lesson-row--completed' : (isActive ? 'pro-lesson-row--active' : 'pro-lesson-row--locked');
-      let iconHtml = '';
-      if(isActive){
-        iconHtml = '<div class="pro-icon-play" aria-label="Текущий урок">▶</div>';
-      } else if(isCompleted){
-        iconHtml = '<div class="pro-icon-done" aria-label="Пройден">✓</div>';
-      } else {
-        iconHtml = '<div class="pro-icon-locked" aria-label="Заблокирован">🔒</div>';
-      }
-
-      const isChallenge = u.id.endsWith('.9') || u.id.endsWith('.6') || u.id.endsWith('.8');
-      const badgeClass = isChallenge ? 'pro-lesson-badge pro-lesson-badge--challenge' : 'pro-lesson-badge';
-      const badgeText = isChallenge ? 'Испытание' : 'Теория + Практика';
-
-      return `
-        <div class="pro-lesson-row ${statusClass}" data-unit-id="${u.id}" role="button" tabindex="${isLocked ? '-1' : '0'}">
-          <div class="pro-lesson-status-icon">${iconHtml}</div>
-          <div class="pro-lesson-info">
-            <div class="pro-lesson-title">Юнит ${u.id}: ${escapeHtmlStr(cleanUnitTitle(u.id, u.title))}</div>
-            <div class="pro-lesson-tags">
-              <span class="${badgeClass}">${badgeText}</span>
-            </div>
-          </div>
-          <div class="pro-lesson-tail">
-            ${isActive ? '<span class="pro-arrow">→</span>' : ''}
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    return `
-      <div class="pro-chapter-box ${isCurChap ? 'pro-chapter-box--active' : ''}">
-        <div class="pro-chapter-header" data-toggle-chapter="${ch.num}">
-          <div class="pro-chapter-header-left">
-            <div class="pro-chapter-num">ГЛАВА ${ch.num}</div>
-            <div class="pro-chapter-title">${escapeHtmlStr(ch.title)}</div>
-          </div>
-          <div class="pro-chapter-header-right">
-            <span class="pro-chapter-stat" style="white-space:nowrap;">${chCompleted}/${chTotal} · ${chPct}%</span>
-            <span class="pro-chapter-chevron" style="transform:${isExpanded ? 'rotate(180deg)' : 'none'};">▼</span>
-          </div>
-        </div>
-        ${isExpanded ? `<div class="pro-lesson-list">${lessonsListHTML}</div>` : ''}
-      </div>
-    `;
-  }).join('');
-
-  return `
-    <div class="coddy-path-layout">
-      <div class="container path-pro-wrap">
-        <!-- Переключатель режимов game/pro перенесён в «⚙️ Настройки платформы» (по ТЗ — тех.информация не в топбаре) -->
-
-        <!-- Mobile compact stats strip (visible when the right rail is hidden) -->
-        ${renderPathMobileStatsHTML(totalCompletedUnits, streakText)}
-
-        <!-- Top Hero Card of Current Lesson -->
-        ${heroCardHTML}
-
-        <!-- Structured Chapters List -->
-        ${chaptersHTML}
-      </div>
-
-      ${renderCoddyRightRail(totalCompletedUnits, streakText, activeChap.num)}
-    </div>
-  `;
-}
-window.viewPathSerpentine = viewPathSerpentine;
-window.viewProPath = viewProPath;
-
 viewMap = function(){
   const stagesHTML = STAGES.map((s,i)=>{
     const nodes = NODES.filter(n=>n.stage===i);
@@ -11277,30 +6668,10 @@ viewMap = function(){
         </div>
       </div>`;
   }).join('');
-
-  const mode = (mapViewState && mapViewState.mode) ? mapViewState.mode : 'tree';
-
-  const modeSwitcherHTML = `
-    <div class="subtabs subtabs--compact" style="margin-bottom:16px;">
-      <button class="subtab ${mode==='path'?'active':''}" data-map-mode="path">🏔 3D-Тропа курса (Serpentine)</button>
-      <button class="subtab ${mode==='tree'?'active':''}" data-map-mode="tree">🗺 Дерево и Эшелоны собеседования</button>
-    </div>`;
-
-  if(mode === 'path'){
-    return `
-      <div class="container" style="padding-bottom:10px;">
-        <h1 style="margin-bottom:6px;">Карта навыков: Интерактивная 3D-Тропа обучения</h1>
-        <p class="meta" style="margin-bottom:14px;">Математическая извилистая S-трасса соединяет все 45 юнитов курса в единое непрерывное приключение.</p>
-        ${modeSwitcherHTML}
-      </div>
-      ${(state.pathViewMode === 'pro') ? viewProPath() : viewPathSerpentine()}`;
-  }
-
   return `
     <div class="container">
       <h1 style="margin-bottom:6px;">Карта навыков и Эшелоны собеседования</h1>
-      <p class="meta" style="margin-bottom:14px;">Единая архитектура: 4 сквозных эшелона приоритета (от 100% обязательного тех-скрининга до архитектурного резерва) синхронизированы с 18 узлами дерева навыков и 45 юнитами в 7 модулях.</p>
-      ${modeSwitcherHTML}
+      <p class="meta" style="margin-bottom:18px;">Единая архитектура: 4 сквозных эшелона приоритета (от 100% обязательного тех-скрининга до архитектурного резерва) синхронизированы с 18 узлами дерева навыков и 45 юнитами в 7 модулях.</p>
       ${buildPriorityRoadmapWidgetHTML({ compact: false })}
       ${stagesHTML}
     </div>`;
@@ -11330,7 +6701,7 @@ viewTopic = function(id){
             <span class="meta">${uMp}/${uMax} MP</span>
           </div>
           <div style="font-weight:700;font-size:.92rem;">Юнит ${u.id}: ${u.title}</div>
-          <div class="meta" style="font-size:.78rem;">Навыков: ${u.skills.length} · Теория + Карточки + Задачи в IDE</div>
+          <div class="meta" style="font-size:.78rem;">Навыков: ${u.skills.length} · Тренажёр + К-конспекты + Ф-карточки</div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
           ${firstSkill ? `<button class="btn btn-primary" style="padding:6px 10px;font-size:.78rem;" data-py-open-skill="${firstSkill.id}">Открыть юнит ${u.id}</button>` : ''}
@@ -11342,7 +6713,7 @@ viewTopic = function(id){
   const bridgeBlock = `
     <div class="panel" style="margin-top:18px;">
       <div class="topic-badge">Двусторонняя синхронизация с 7 модулями Мастерства</div>
-      <h3 style="margin-bottom:8px;">Связанные юниты (теория, интервальные карточки и тренажёр IDE)</h3>
+      <h3 style="margin-bottom:8px;">Связанные юниты (К-конспекты, 3D-карточки Ф-xxx и задачи IDE)</h3>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
         ${unitCards}
       </div>
@@ -11433,16 +6804,12 @@ ensureLessonState = function(id){
 
 const _origAnswerLessonCheck = answerLessonCheck;
 answerLessonCheck = function(i){
-  if(!lessonState || lessonState.checkRevealed) return;
   const l = (typeof LESSONS !== 'undefined' && lessonState) ? LESSONS[lessonState.lessonId] : null;
   const checks = (l && l.checks) ? l.checks : [];
   const c = checks[lessonState ? (lessonState.checkIdx || 0) : 0];
-  const isCorrect = c ? (i === c.correct) : false;
+  const isCorrect = c ? (i === c.correct) : true;
   if(navigator && navigator.vibrate) try{ navigator.vibrate(isCorrect ? [15] : [30, 40, 30]); }catch(e){}
   _origAnswerLessonCheck(i);
-  if(isCorrect){
-    awardXp(15);
-  }
   saveLessonDraftState();
 };
 
@@ -11598,13 +6965,6 @@ lessonTheoryHTML = function(){
         </div>
         <span class="sprint-xp-pill">⚡ +10 XP</span>
       </div>
-      <div id="theory-audio-bar" class="theory-audio-bar" style="display:${state.audioBarOpen ? 'flex' : 'none'};">
-        <button type="button" class="theory-audio-btn" data-audio-play title="Воспроизвести / Пауза">▶</button>
-        <button type="button" class="theory-audio-btn" data-audio-rewind title="Перемотка назад на 10 сек">⏪ -10с</button>
-        <button type="button" class="theory-audio-btn" data-audio-rate title="Скорость чтения">1.0x</button>
-        <span class="audio-status-text">Аудио-компаньон</span>
-        <button type="button" class="theory-audio-btn" data-audio-close style="margin-left:auto;" title="Скрыть аудио-бар">✕</button>
-      </div>
       ${body}
     </div>`;
 };
@@ -11630,13 +6990,6 @@ function buildLessonStageTopbarHTML(l, rightLabel, pct, xpLabel){
         <div class="sprint-progress-track"><div class="sprint-progress-fill" style="width:${pct}%;"></div></div>
       </div>
       <span class="sprint-xp-pill">${xpLabel}</span>
-    </div>
-    <div id="theory-audio-bar" class="theory-audio-bar" style="display:${state.audioBarOpen ? 'flex' : 'none'};">
-      <button type="button" class="theory-audio-btn" data-audio-play title="Воспроизвести / Пауза">▶</button>
-      <button type="button" class="theory-audio-btn" data-audio-rewind title="Перемотка назад на 10 сек">⏪ -10с</button>
-      <button type="button" class="theory-audio-btn" data-audio-rate title="Скорость чтения">1.0x</button>
-      <span class="audio-status-text">Аудио-компаньон</span>
-      <button type="button" class="theory-audio-btn" data-audio-close style="margin-left:auto;" title="Скрыть аудио-бар">✕</button>
     </div>`;
 }
 
@@ -11709,14 +7062,14 @@ lessonCheckHTML = function(){
   const nextLabel = isLast ? 'Дальше: практика' : 'Следующий вопрос';
 
   const bottomSheetHTML = revealed ? `
-    <div class="academy-bottom-sheet lesson-drawer ${isCorrect ? 'academy-bottom-sheet--correct' : 'academy-bottom-sheet--wrong'}">
+    <div class="academy-bottom-sheet ${isCorrect ? 'academy-bottom-sheet--correct' : 'academy-bottom-sheet--wrong'}">
       <div class="bs-title-row">
-        <span>${isCorrect ? '✓ Правильно! +15 XP' : '✕ Не совсем.'}</span>
-        <span class="bs-badge">${isCorrect ? '⚡ +15 XP' : 'Разбор'}</span>
+        <span>${isCorrect ? '✓ Правильно! (Ответ принят)' : '✕ Не совсем.'}</span>
+        <span class="bs-badge">${isCorrect ? '⚡ +10 XP' : 'Разбор'}</span>
       </div>
       <div class="bs-explain-text">${formatRichInlineText(c.explain)}</div>
-      <button class="${isCorrect ? 'btn-3d-emerald btn-coddy-emerald' : 'btn-3d-ruby btn-coddy-ruby'} btn-sprint-cta" data-lesson-next="${nextTarget}">
-        ${isCorrect ? 'ПРОДОЛЖИТЬ ➔' : (isLast ? 'ПРОДОЛЖИТЬ (ПРАКТИКА) ➔' : 'ПРОДОЛЖИТЬ ➔')}
+      <button class="${isCorrect ? 'btn-coddy-emerald' : 'btn-coddy-ruby'} btn-sprint-cta" data-lesson-next="${nextTarget}">
+        ${nextLabel} ➔
       </button>
     </div>` : '';
 
@@ -11851,7 +7204,7 @@ function buildSevenDayHeatmapHTML(){
     const k = dateIsoKey(d);
     const xp = (state.dailyXpByDate && state.dailyXpByDate[k]) || 0;
     const cls = xp >= state.dailyGoal ? 'heat-cell high' : (xp > 0 ? 'heat-cell active' : 'heat-cell');
-    html += `<div class="${cls}" title="${k}: ${xp} XP"><span>${days[d.getDay()]}</span><b>${xp > 0 ? xp : '—'}</b></div>`;
+    html += `<div class="${cls}" title="${k}: ${xp} XP"><span>${days[d.getDay()]}</span><b>${xp}</b></div>`;
   }
   return `<div class="heat-row">${html}</div>`;
 }
@@ -11888,7 +7241,7 @@ function getSpacedRepetitionStats(){
 // Reference Hub View (#/docs) — Complete Cheat Sheet & Set/Dict/List/SQL/Git Reference
 function viewDocsHub(){
   return `
-    <div class="container docs-hub">
+    <div class="container">
       <div class="topic-badge">Инженерный справочник · Шпаргалка по структурам данных, Big-O, SQL и Git</div>
       <h1 style="margin-bottom:8px;">📚 Справочник Python Backend</h1>
       <p class="meta" style="margin-bottom:18px;">Полные таблицы операций, асимптотики <span class="math-formula">O(1)</span> / <span class="math-formula">O(n)</span> и синтаксиса, чтобы всегда держать под рукой во время практики и повторения карточек.</p>
@@ -11950,10 +7303,22 @@ function viewDocsHub(){
 
 // Override Dashboard with Variant A Mobile-First Cocoon Focus Screen + Trajectory Countdown + Spaced Repetition + 7-Track Mini-Matrix + Collapsible Modules Drawer
 viewDashboard = function(){
+  const p = stageProgress();
+  const curMp = totalPythonMP();
+  const maxMp = maxPythonMP();
+  const mpPct = Math.round(curMp / maxMp * 100);
+  const webMp = totalWebMP();
+  const backendMp = totalBackendMP();
+  const algoMp = totalAlgoMP();
+  const dbMp = totalDbMP();
+  const archMp = totalArchMP();
+  const infraMp = totalInfraMP();
   const tXp = todayXp();
   const goalPct = Math.min(100, Math.round(tXp / (state.dailyGoal || 50) * 100));
   const solvedMap = getIdeSolvedMap();
   const totalSolvedIde = countSolvedIdeTasks(solvedMap);
+  const totalCompletedLessons = state.completedLessons.length;
+  const totalLessonsCount = Object.keys(LESSONS).length;
 
   const e1 = getEchelonProgress(1);
   const e2 = getEchelonProgress(2);
@@ -11961,57 +7326,6 @@ viewDashboard = function(){
   const e4 = getEchelonProgress(4);
   const e1Remaining = e1.skills.filter(s => getSkillMP(s.id) < 100).length;
   const e1DoneUnits = Math.min(14, Math.max(1, 14 - Math.floor((e1Remaining / Math.max(1, e1.skills.length)) * 14)));
-
-  // --- Real dashboard: results across all 7 tracks (tiles + full skill matrix) ---
-  const TRACK_DASH_META = {
-    python: { icon: '🐍', name: 'Python' },
-    web: { icon: '🌐', name: 'Web' },
-    backend: { icon: '⚙️', name: 'Backend' },
-    algorithms: { icon: '⚡', name: 'Алгоритмы' },
-    databases: { icon: '🗄️', name: 'Базы данных' },
-    architecture: { icon: '🏛️', name: 'Архитектура' },
-    infra: { icon: '🚀', name: 'Инфраструктура' }
-  };
-  let masteredAll = 0;
-  let skillsAll = 0;
-  const trackMatrixRows = Object.keys(MASTERY_TRACKS).map(tk => {
-    const t = MASTERY_TRACKS[tk];
-    const meta = TRACK_DASH_META[tk] || { icon: '📘', name: tk };
-    const mp = totalTrackMP(tk);
-    const mx = maxTrackMP(tk) || 1;
-    const tpct = Math.round(mp / mx * 100);
-    const sqs = t.skills.map(s => {
-      const smp = getSkillMP(s.id);
-      if(smp >= 100) masteredAll++;
-      skillsAll++;
-      return `<button class="m-sq m-sq--${smp}" data-py-open-skill="${s.id}" title="${s.id} ${s.title} — ${mpLabel(smp)}"></button>`;
-    }).join('');
-    return { key: tk, route: t.routePrefix, icon: meta.icon, name: meta.name, pct: tpct, mp, mx, sqs };
-  });
-  const totalUnitsAll = trackMatrixRows.reduce((a, r) => a + (MASTERY_TRACKS[r.key].data.units || []).length, 0);
-  const passedUnitsCount = (state.passedUnitTests || []).filter(id => !String(id).includes('course')).length;
-  // V18: у свежей недели история XP пуста, но стрик честно говорит об активности — не показываем провальные «0 дней»
-  const historyActiveDays = Object.keys(state.dailyXpByDate || {}).filter(k => state.dailyXpByDate[k] > 0).length;
-  const activeDaysCount = Math.max(historyActiveDays, state.streak || 0);
-
-  const resultsTilesHTML = [
-    { num: `${state.xp}`, label: '💎 XP всего' },
-    { num: `${totalSolvedIde}<em> / 401</em>`, label: '💻 задач в IDE' },
-    { num: `${masteredAll}<em> / ${skillsAll}</em>`, label: '🧠 навыков 👑' },
-    { num: `${passedUnitsCount}<em> / ${totalUnitsAll}</em>`, label: '🏆 юнитов сдано' }
-  ].map(t => `<div class="dash-result-tile"><span class="dash-result-tile__num">${t.num}</span><span class="dash-result-tile__label">${t.label}</span></div>`).join('');
-
-  const resultsMatrixHTML = trackMatrixRows.map(m => `
-    <a href="#${m.route}" class="dash-skill-row" title="${m.name}: ${m.mp} / ${m.mx} MP (${m.pct}%)" aria-label="${m.name}: ${m.pct}%">
-      <div class="dash-skill-row__top">
-        <span class="dash-skill-row__icon">${m.icon}</span>
-        <span class="dash-skill-row__name">${m.name}</span>
-        <span class="dash-skill-row__mp">${m.mp} / ${m.mx} MP</span>
-        <span class="dash-skill-row__pct">${m.pct}%</span>
-      </div>
-      <div class="dash-track-chip__bar"><div class="dash-track-chip__fill" style="width:${Math.max(3, m.pct)}%;"></div></div>
-      <div class="dash-skill-row__sqs">${m.sqs}</div>
-    </a>`).join('');
 
   // Determine the next priority skill for the 4-minute Cocoon Focus Card
   const openGaps = (state.diagnosticGaps || []).filter(sid => PY_SKILLS_BY_ID[sid] && getSkillMP(sid) < 100);
@@ -12036,9 +7350,8 @@ viewDashboard = function(){
     let badgeHtml = `<span class="st-next">⏳ Далее</span>`;
     if(smp >= 100) badgeHtml = `<span class="st-done">✓ 100 MP</span>`;
     else if(isNow || smp >= 50) badgeHtml = `<span class="st-now">${smp > 0 ? '🔥 ' + smp + ' MP' : '🔥 Сейчас'}</span>`;
-    const sm = s.title.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
     return `<a href="#${s.routePrefix}/skill/${s.id}" class="mini-item ${isNow ? 'now' : ''}" data-py-open-skill="${s.id}">
-      <span>${s.id} · ${sm ? `${sm[1]} <span class="t-detail">(${sm[2]})</span>` : s.title}</span>
+      <span>${s.id} · ${s.title}</span>
       ${badgeHtml}
     </a>`;
   }).join('');
@@ -12053,6 +7366,24 @@ viewDashboard = function(){
   const srsRingCircum = 94.2;
   const srsPct = Math.min(100, Math.max(8, Math.round((srs.reviewedDecksCount / srsTotalDecks) * 100)));
   const srsRingOffset = (srsRingCircum * (1 - srsPct / 100)).toFixed(1);
+
+  const miniMatrixItems = [
+    { route: '/python', icon: '🐍', name: 'Python', pct: Math.round(curMp / maxMp * 100) },
+    { route: '/web', icon: '🌐', name: 'Web', pct: Math.round(webMp / 1000 * 100) },
+    { route: '/backend', icon: '⚙️', name: 'Backend', pct: Math.round(backendMp / 2400 * 100) },
+    { route: '/algorithms', icon: '⚡', name: 'Алго', pct: Math.round(algoMp / 1200 * 100) },
+    { route: '/databases', icon: '🗄️', name: 'БД', pct: Math.round(dbMp / 1700 * 100) },
+    { route: '/architecture', icon: '🏛️', name: 'Архит.', pct: Math.round(archMp / 1400 * 100) },
+    { route: '/infra', icon: '🚀', name: 'Инфра', pct: Math.round(infraMp / 2100 * 100) }
+  ].map(m => `
+    <a href="#${m.route}" class="dash-mini-track dash-track-chip" title="${m.name}: ${m.pct}%" style="flex-direction:column;align-items:stretch;gap:4px;">
+      <div class="dash-track-chip__top" style="display:flex;align-items:center;justify-content:space-between;gap:5px;">
+        <span class="dash-mini-track__icon">${m.icon}</span>
+        <span class="dash-mini-track__name">${m.name}</span>
+        <span class="dash-mini-track__pct">${m.pct}%</span>
+      </div>
+      <div class="dash-track-chip__bar"><div class="dash-track-chip__fill" style="width:${Math.max(4, Math.min(100, m.pct))}%;"></div></div>
+    </a>`).join('');
 
   return `
     <div class="container">
@@ -12076,36 +7407,14 @@ viewDashboard = function(){
       <!-- Active 4-Minute Sprint Focus Card -->
       <div class="cocoon-focus-card">
         <div class="cocoon-focus-eyebrow"><span class="pulse-ring-dot"></span>✨ Фокус сейчас · 4 минуты<span class="sr-only"> · Правило 2 минут: Быстрый микро-шаг</span></div>
-        <div class="cocoon-focus-title">${(() => { const ft = focusSk.title.match(/^(.*?)\s*\(([^()]*)\)\s*$/); return ft ? `${focusSk.id} · ${ft[1]} <span class="t-detail">(${ft[2]})</span>` : `${focusSk.id} · ${focusSk.title}`; })()}</div>
-        <div class="cocoon-focus-desc"><b>${focusNoteObj.title}</b> · ${focusStepsCount} ${(focusStepsCount % 10 === 1 && focusStepsCount % 100 !== 11) ? 'микро-шаг' : (focusStepsCount % 10 >= 2 && focusStepsCount % 10 <= 4 && (focusStepsCount % 100 < 10 || focusStepsCount % 100 >= 20) ? 'микро-шага' : 'микро-шагов')} · живой код · разбор Junior vs Senior</div>
+        <div class="cocoon-focus-title">${focusSk.id} · ${focusSk.title}</div>
+        <div class="cocoon-focus-desc">Конспект <b>${focusKId}: ${focusNoteObj.title}</b> (${focusStepsCount} ${(focusStepsCount % 10 === 1 && focusStepsCount % 100 !== 11) ? 'короткий микро-шаг' : (focusStepsCount % 10 >= 2 && focusStepsCount % 10 <= 4 && (focusStepsCount % 100 < 10 || focusStepsCount % 100 >= 20) ? 'коротких микро-шага' : 'коротких микро-шагов')} с живым кодом и разбором Junior vs Senior).</div>
         <div style="display:flex;flex-direction:column;gap:7px;">
           <button class="btn-glass-emerald btn-sprint-cta" data-quick-microstep="">▶ Начать спринт (4 мин) ➔</button>
-          <div class="focus-links">
-            <a href="#/mock">🎙️ Собеседование</a>
-            <a href="#/docs">📚 Справочник</a>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="#/mock" class="btn-glass-ruby btn-glass-bordeaux" style="flex:1;padding:7px 12px;font-size:.81rem;text-align:center;">🎙️ Собеседование</a>
+            <a href="#/docs" class="btn btn-ghost" style="padding:7px 12px;font-size:.81rem;">📚 Справочник</a>
           </div>
-        </div>
-      </div>
-
-      <!-- Real Dashboard: Results Tiles + Full 126-Skill Matrix + Activity -->
-      <div class="dash-results-panel">
-        <div class="dash-results-head">
-          <span>📊 Мои результаты</span>
-          <span class="meta">${skillsAll} навыков · ${totalUnitsAll} юнитов · 💎 ${activeDaysCount} ${(activeDaysCount % 10 === 1 && activeDaysCount % 100 !== 11) ? 'день' : ((activeDaysCount % 10 >= 2 && activeDaysCount % 10 <= 4 && (activeDaysCount % 100 < 10 || activeDaysCount % 100 >= 20)) ? 'дня' : 'дней')} активности</span>
-        </div>
-        <div class="dash-result-tiles">
-          ${resultsTilesHTML}
-        </div>
-        <div class="dash-skill-matrix">
-          ${resultsMatrixHTML}
-        </div>
-        <div class="dash-results-foot">
-          <div class="dash-goal-line">
-            <span class="meta" style="font-weight:600;">🎯 Дневная цель: ${tXp} / ${state.dailyGoal || 50} XP</span>
-            <span class="meta" style="font-weight:800;color:var(--moss);">${goalPct}%</span>
-          </div>
-          <div class="mp-progress-track" style="margin:5px 0 9px;"><div class="mp-progress-fill" style="width:${goalPct}%;"></div></div>
-          ${buildSevenDayHeatmapHTML()}
         </div>
       </div>
 
@@ -12135,39 +7444,68 @@ viewDashboard = function(){
         ${miniListHTML}
       </div>
 
+      <!-- 7-Track Mini-Matrix Bar directly on Dashboard -->
+      <div class="dash-mini-matrix">
+        ${miniMatrixItems}
+      </div>
+
       <!-- Collapsible Drawer for All Modules, Echelons, Pomodoro & Global Stats -->
       <details class="cocoon-details">
         <summary>Все модули, эшелоны и статистика ▾</summary>
 
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
-          <a href="#/python" class="btn btn-primary">🐍 Python (1.1–1.9) ${ICONS.arrowRight}</a>
-          <a href="#/web" class="btn btn-clay">🌐 Web (2.1–2.4)</a>
-          <a href="#/backend" class="btn btn-clay">⚙️ Backend (3.1–3.8)</a>
-          <a href="#/algorithms" class="btn btn-clay">⚡ Алгоритмы (4.1–4.6)</a>
-          <a href="#/databases" class="btn btn-clay">🗄️ Базы данных (5.1–5.6)</a>
-          <a href="#/architecture" class="btn btn-clay">🏛️ Архитектура (6.1–6.6)</a>
-          <a href="#/infra" class="btn btn-clay">🚀 Инфраструктура (7.1–7.6)</a>
-          <a href="#/practice" class="btn btn-ghost">💻 Тренажёр 401 задачи</a>
-          <a href="#/mock" class="btn btn-ghost">🎙️ Симулятор собеседования</a>
-          <a href="#/docs" class="btn btn-ghost">📚 Справочник</a>
+        <div class="hero" style="margin-bottom:16px;">
+          <div class="hero__row">
+            <div><div class="hero__stat-num">${curMp}</div><div class="hero__stat-label">из ${maxMp} MP Python (${mpPct}%)</div></div>
+            <div><div class="hero__stat-num" style="color:var(--clay-deep);">${state.xp}</div><div class="hero__stat-label">всего XP · Web: ${webMp}/1000 · Backend: ${backendMp}/2400 · Алгоритмы: ${algoMp}/1200 · БД: ${dbMp}/1700 · Архитектура: ${archMp}/1400 · Инфра: ${infraMp}/2100</div></div>
+            <div class="stat-row">
+              <div class="stat-chip">${ICONS.check}<b>${p.mastered}/${p.total}</b>&nbsp;модулей карты</div>
+              <div class="stat-chip">${ICONS.dot}<b>${totalCompletedLessons}/${totalLessonsCount}</b>&nbsp;уроков</div>
+              <div class="stat-chip">${ICONS.code}<b>${totalSolvedIde}/401</b>&nbsp;задач IDE</div>
+              <div class="stat-chip">${ICONS.cards}<b>${state.reviewedDecks.length}/${Object.keys(ALL_DECKS_COMBINED).length}</b>&nbsp;колод Ф-xxx</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <a href="#/python" class="btn btn-primary">🐍 Python (1.1–1.9) ${ICONS.arrowRight}</a>
+            <a href="#/web" class="btn btn-clay">🌐 Web (2.1–2.4)</a>
+            <a href="#/backend" class="btn btn-clay">⚙️ Backend (3.1–3.8)</a>
+            <a href="#/algorithms" class="btn btn-clay">⚡ Алгоритмы (4.1–4.6)</a>
+            <a href="#/databases" class="btn btn-clay">🗄️ Базы данных (5.1–5.6)</a>
+            <a href="#/architecture" class="btn btn-clay">🏛️ Архитектура (6.1–6.6)</a>
+            <a href="#/infra" class="btn btn-clay">🚀 Инфраструктура (7.1–7.6)</a>
+            <a href="#/practice" class="btn btn-ghost">💻 Тренажёр 401 задачи</a>
+            <a href="#/mock" class="btn btn-ghost">🎙️ Симулятор собеседования</a>
+            <a href="#/docs" class="btn btn-ghost">📚 Справочник</a>
+          </div>
         </div>
 
         ${buildPriorityRoadmapWidgetHTML({ compact: true })}
 
-        <div class="panel" style="margin-bottom:16px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <h3>⏱ Фокус-спринт (Помодоро)</h3>
-            <button class="link-quiet" data-toggle-zen>${document.body.classList.contains('zen-mode') ? 'Выйти из Дзен' : '🧘 Дзен-режим'}</button>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin:12px 0;">
-            <span id="pomo-time-display" style="font-family:var(--font-d);font-size:2rem;font-weight:700;color:var(--moss-deep);">${formatPomo(pomoState.secondsLeft)}</span>
-            <div style="display:flex;gap:6px;">
-              <button class="btn ${pomoState.running?'btn-clay':'btn-primary'}" style="padding:8px 14px;font-size:.84rem;" data-pomo-toggle>${pomoState.running ? 'Пауза' : 'Старт'}</button>
-              <button class="btn btn-ghost" style="padding:8px 10px;font-size:.8rem;" data-pomo-set="15">15м</button>
-              <button class="btn btn-ghost" style="padding:8px 10px;font-size:.8rem;" data-pomo-set="25">25м</button>
+        <div class="anti-proc-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:20px;">
+          <div class="panel" style="margin:0;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <h3>🎯 Дневная цель (${tXp} / ${state.dailyGoal} XP)</h3>
+              <span class="topic-badge" style="margin:0;">${goalPct}%</span>
             </div>
+            <div class="mp-progress-track" style="margin:10px 0;"><div class="mp-progress-fill" style="width:${goalPct}%;"></div></div>
+            <div class="meta">Активность за 7 дней (XP по дням):</div>
+            ${buildSevenDayHeatmapHTML()}
           </div>
-          <p class="meta" style="margin:0;">Завершённый спринт приносит +25 XP. Звук: <button class="link-quiet" data-toggle-sound>${state.soundEnabled ? '🔊 Вкл' : '🔇 Выкл'}</button></p>
+
+          <div class="panel" style="margin:0;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <h3>⏱ Фокус-спринт (Помодоро)</h3>
+              <button class="link-quiet" data-toggle-zen>${document.body.classList.contains('zen-mode') ? 'Выйти из Дзен' : '🧘 Дзен-режим'}</button>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin:12px 0;">
+              <span id="pomo-time-display" style="font-family:var(--font-d);font-size:2rem;font-weight:700;color:var(--moss-deep);">${formatPomo(pomoState.secondsLeft)}</span>
+              <div style="display:flex;gap:6px;">
+                <button class="btn ${pomoState.running?'btn-clay':'btn-primary'}" style="padding:8px 14px;font-size:.84rem;" data-pomo-toggle>${pomoState.running ? 'Пауза' : 'Старт'}</button>
+                <button class="btn btn-ghost" style="padding:8px 10px;font-size:.8rem;" data-pomo-set="15">15м</button>
+                <button class="btn btn-ghost" style="padding:8px 10px;font-size:.8rem;" data-pomo-set="25">25м</button>
+              </div>
+            </div>
+            <p class="meta" style="margin:0;">Завершённый спринт приносит +25 XP. Звук: <button class="link-quiet" data-toggle-sound>${state.soundEnabled ? '🔊 Вкл' : '🔇 Выкл'}</button></p>
+          </div>
         </div>
 
         <div class="panel" style="margin-bottom:0;">
@@ -12177,41 +7515,41 @@ viewDashboard = function(){
             <a href="#/python" class="node-card node-card--available" style="text-decoration:none;">
               <div class="node-card__top"><span class="node-card__num">МОДУЛЬ 01 · 2800 MP</span>${ICONS.python}</div>
               <h3 class="node-card__title">🐍 Python Mastery (1.1–1.9)</h3>
-              <p class="node-card__summary">28 навыков, все 68 конспектов в микро-шагах, 9 Unit Tests, Course Challenge и Босс модуля.</p>
+              <p class="node-card__summary">28 навыков, все 68 конспектов К-xxx в микро-шагах, 9 Unit Tests, Course Challenge и Босс модуля.</p>
             </a>
             <a href="#/web" class="node-card node-card--available" style="text-decoration:none;">
               <div class="node-card__top"><span class="node-card__num">МОДУЛЬ 02 · WEB · 1000 MP</span>${ICONS.globe}</div>
               <h3 class="node-card__title">🌐 Web Mastery (2.1–2.4)</h3>
-              <p class="node-card__summary">10 навыков, 23 конспекта, 25 колод (491 карточка): Сеть, HTTP/1.1–HTTP/3, REST, OpenAPI, CORS, CSRF, XSS, OWASP.</p>
+              <p class="node-card__summary">10 навыков, 23 конспекта К-xxx, 25 колод Ф-xxx (491 карточка): Сеть, HTTP/1.1–HTTP/3, REST, OpenAPI, CORS, CSRF, XSS, OWASP.</p>
             </a>
             <a href="#/backend" class="node-card node-card--available" style="text-decoration:none;">
               <div class="node-card__top"><span class="node-card__num">МОДУЛЬ 03 · BACKEND · 2400 MP</span>${ICONS.server}</div>
               <h3 class="node-card__title">⚙️ Backend Mastery (3.1–3.8)</h3>
-              <p class="node-card__summary">8 частей с нуля (FastAPI & Pydantic v2, Django & ORM, DRF, Flask, Auth, Архитектура/UoW, Очереди, Продакшен): 24 навыка, 40 конспектов, 43 колоды (890 карточек).</p>
+              <p class="node-card__summary">8 частей с нуля (FastAPI & Pydantic v2, Django & ORM, DRF, Flask, Auth, Архитектура/UoW, Очереди, Продакшен): 24 навыка, 40 конспектов К-xxx, 43 колоды Ф-xxx (890 карточек).</p>
             </a>
             <a href="#/algorithms" class="node-card node-card--available" style="text-decoration:none;">
               <div class="node-card__top"><span class="node-card__num">МОДУЛЬ 04 · АЛГОРИТМЫ · 1200 MP</span>${ICONS.bolt}</div>
               <h3 class="node-card__title">⚡ Algorithms Mastery (4.1–4.6)</h3>
-              <p class="node-card__summary">12 навыков, 14 конспектов, 16 колод (463 карточки): Big-O, Два указателя, Скользящее окно, Списки, Стек/Дек, BST, Куча, Хэш-таблица, Графы (DFS/BFS/Дейкстра), Timsort и DP.</p>
+              <p class="node-card__summary">12 навыков, 14 конспектов К-xxx, 16 колод Ф-xxx (463 карточки): Big-O, Два указателя, Скользящее окно, Списки, Стек/Дек, BST, Куча, Хэш-таблица, Графы (DFS/BFS/Дейкстра), Timsort и DP.</p>
             </a>
             <a href="#/databases" class="node-card node-card--available" style="text-decoration:none;">
               <div class="node-card__top"><span class="node-card__num">МОДУЛЬ 05 · БАЗЫ ДАННЫХ · 1700 MP</span>${ICONS.database}</div>
               <h3 class="node-card__title">🗄️ Databases Mastery (5.1–5.6)</h3>
-              <p class="node-card__summary">17 навыков, 32 конспекта, 32 колоды (927 карточек): Реляционная модель, 1NF–3NF, SQL, JOIN, CTE, Оконные функции, ACID, MVCC, Индексы, EXPLAIN, DB-API 2.0, ORM, N+1, Redis и кэширование.</p>
+              <p class="node-card__summary">17 навыков, 32 конспекта К-xxx, 32 колоды Ф-xxx (927 карточек): Реляционная модель, 1NF–3NF, SQL, JOIN, CTE, Оконные функции, ACID, MVCC, Индексы, EXPLAIN, DB-API 2.0, ORM, N+1, Redis и кэширование.</p>
             </a>
             <a href="#/architecture" class="node-card node-card--available" style="text-decoration:none;">
               <div class="node-card__top"><span class="node-card__num">МОДУЛЬ 06 · АРХИТЕКТУРА · 1400 MP</span>${ICONS.arch}</div>
               <h3 class="node-card__title">🏛️ Architecture Mastery (6.1–6.6)</h3>
-              <p class="node-card__summary">14 навыков, 14 конспектов, 17 колод (263 карточки): DRY/KISS/YAGNI, SOLID, DI, Чистая/Гексагональная архитектура, GoF, Repository, UoW, DDD, 12-Factor, gRPC, Circuit Breaker и Rate Limiting.</p>
+              <p class="node-card__summary">14 навыков, 14 конспектов К-xxx, 17 колод Ф-xxx (263 карточки): DRY/KISS/YAGNI, SOLID, DI, Чистая/Гексагональная архитектура, GoF, Repository, UoW, DDD, 12-Factor, gRPC, Circuit Breaker и Rate Limiting.</p>
             </a>
             <a href="#/infra" class="node-card node-card--available" style="text-decoration:none;">
               <div class="node-card__top"><span class="node-card__num">МОДУЛЬ 07 · ИНФРАСТРУКТУРА · 2100 MP</span>${ICONS.rocket}</div>
               <h3 class="node-card__title">🚀 Infrastructure Mastery (7.1–7.6)</h3>
-              <p class="node-card__summary">21 навык, 47 конспектов, 45 колод (1 286 карточек): Git, Docker, Multi-stage, Docker Compose, Kubernetes, CI/CD, Linux, SSH, Nginx, Celery, RabbitMQ/Kafka, pytest, logging, Sentry и Health checks.</p>
+              <p class="node-card__summary">21 навык, 47 конспектов К-xxx, 45 колод Ф-xxx (1 286 карточек): Git, Docker, Multi-stage, Docker Compose, Kubernetes, CI/CD, Linux, SSH, Nginx, Celery, RabbitMQ/Kafka, pytest, logging, Sentry и Health checks.</p>
             </a>
             <a href="#/cards" class="node-card node-card--available" style="text-decoration:none;">
               <div class="node-card__top"><span class="node-card__num">286 КОЛОД · 6 051 КАРТОЧКА</span>${ICONS.cards}</div>
-              <h3 class="node-card__title">🃏 3D Карточки темы</h3>
+              <h3 class="node-card__title">🃏 3D Карточки Ф-xxx</h3>
               <p class="node-card__summary">Интервальное повторение по всем юнитам Python, Web, Backend, Алгоритмов, Баз данных, Архитектуры и Инфраструктуры с переворотом по Пробелу и самооценкой 1–4.</p>
             </a>
             <a href="#/practice" class="node-card node-card--available" style="text-decoration:none;">
@@ -12223,6 +7561,11 @@ viewDashboard = function(){
               <div class="node-card__top"><span class="node-card__num">LIVE-CODING · STAR</span>${ICONS.crown}</div>
               <h3 class="node-card__title">🎙️ Симулятор собеседования</h3>
               <p class="node-card__summary">Live-Coding с 20-минутным таймером, сократическим интервьюером (4 уровня опор) и тренажёром поведенческих ответов STAR.</p>
+            </a>
+            <a href="#/map" class="node-card node-card--available" style="text-decoration:none;">
+              <div class="node-card__top"><span class="node-card__num">18 МОДУЛЕЙ · 64 УРОКА</span>${ICONS.map}</div>
+              <h3 class="node-card__title">🗺️ Полная карта Backend</h3>
+              <p class="node-card__summary">Python, Git, SQL, HTTP, ООП, Алгоритмы, ORM, Asyncio, FastAPI, pytest, Redis, Docker, OWASP, System Design, LLM и Финальный проект.</p>
             </a>
             <a href="#/docs" class="node-card node-card--available" style="text-decoration:none;">
               <div class="node-card__top"><span class="node-card__num">ШПАРГАЛКА · ТАБЛИЦЫ</span>${ICONS.book || ICONS.map}</div>
@@ -12237,18 +7580,18 @@ viewDashboard = function(){
 
 // Update Navigation items cleanly (1-line labels without redundant parenthetical numbers or duplicate emojis)
 NAV_ITEMS.splice(0, NAV_ITEMS.length,
-  {route:'/path', icon:'map', label:'3D-Тропа', shortLabel:'Тропа', mobileTab:true, group:'learn'},
-  {route:'/practice', icon:'code', label:'Практика IDE', shortLabel:'IDE', mobileTab:true, group:'trainer'},
-  {route:'/cards', icon:'cards', label:'Карточки', shortLabel:'Карточки', mobileTab:true, group:'trainer'},
-  {route:'/mock', icon:'crown', label:'Собеседование', shortLabel:'Собес', mobileTab:true, group:'trainer'},
   {route:'/', icon:'home', label:'Дашборд', shortLabel:'Дашборд', mobileTab:true, group:'learn'},
-  {route:'/python', icon:'python', label:'Python Core', shortLabel:'Python', group:'module'},
+  {route:'/python', icon:'python', label:'Python', shortLabel:'Python', mobileTab:true, group:'module'},
   {route:'/web', icon:'globe', label:'Web и HTTP', shortLabel:'Web', group:'module'},
   {route:'/backend', icon:'server', label:'Backend', shortLabel:'Backend', group:'module'},
   {route:'/algorithms', icon:'bolt', label:'Алгоритмы', shortLabel:'Алгоритмы', group:'module'},
   {route:'/databases', icon:'database', label:'Базы данных', shortLabel:'БД', group:'module'},
   {route:'/architecture', icon:'arch', label:'Архитектура', shortLabel:'Архит.', group:'module'},
   {route:'/infra', icon:'rocket', label:'Инфраструктура', shortLabel:'Инфра', group:'module'},
+  {route:'/mock', icon:'crown', label:'Собеседование', shortLabel:'Собес', mobileTab:true, group:'trainer'},
+  {route:'/map', icon:'map', label:'Карта навыков', shortLabel:'Карта', group:'learn'},
+  {route:'/practice', icon:'code', label:'Практика IDE', shortLabel:'IDE', mobileTab:true, group:'trainer'},
+  {route:'/cards', icon:'cards', label:'Карточки', shortLabel:'Карточки', mobileTab:true, group:'trainer'},
   {route:'/docs', icon:'map', label:'Справочник', shortLabel:'Справочник', group:'tool'},
   {route:'/sandbox', icon:'terminal', label:'Песочница', shortLabel:'Песочница', group:'tool'}
 );
@@ -12280,7 +7623,7 @@ renderNav = function(){
     desk.innerHTML = `
       <div class="nav-group-label">Обучение</div>
       ${learnLinks}
-      <details class="nav-modules-accordion">
+      <details class="nav-modules-accordion" open>
         <summary class="nav-modules-summary"><span>📚 Модули 01–07</span><span class="navlink__pct">${overallPct}%</span></summary>
         <div class="nav-modules-list">${modLinks}</div>
       </details>
@@ -12338,180 +7681,39 @@ function openBugReportModal(){
   if(existing) existing.remove();
   const ctxStr = getCurrentBugContextString();
   const listHtml = state.bugReports.length === 0
-    ? `<p class="meta" style="font-size:0.84rem;">Пока нет сохранённых заметок об ошибках.</p>`
+    ? `<p class="meta">Пока нет сохранённых заметок об ошибках.</p>`
     : state.bugReports.slice().reverse().map((b, idx) =>
-        `<div class="panel" style="padding:10px 14px;margin-bottom:8px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));">
+        `<div class="panel" style="padding:10px 12px;margin-bottom:8px;">
           <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:.75rem;" class="meta">
-            <span style="color:var(--zen-amber, #f59e0b);font-weight:700;">${escapeHtmlStr(b.context || '')}</span>
+            <span><b>${escapeHtmlStr(b.context || '')}</b></span>
             <span>${escapeHtmlStr(b.createdAt || '')}</span>
           </div>
-          <div style="margin-top:4px;font-size:.88rem;white-space:pre-wrap;color:var(--ink-soft);">${escapeHtmlStr(b.text || '')}</div>
+          <div style="margin-top:4px;font-size:.88rem;white-space:pre-wrap;">${escapeHtmlStr(b.text || '')}</div>
         </div>`
       ).join('');
   const mdExport = state.bugReports.map((b, i) => `${i+1}. [${b.context}] (${b.createdAt}): ${b.text}`).join('\n');
   const modal = document.createElement('div');
   modal.id = 'bug-report-modal';
   modal.className = 'modal-backdrop';
-  modal.setAttribute('role', 'dialog');
-  modal.setAttribute('aria-modal', 'true');
   modal.innerHTML = `
-    <div class="modal-card zen-modal-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-        <h2 style="margin:0;font-size:1.25rem;display:flex;align-items:center;gap:10px;font-family:var(--font-h, 'Onest', sans-serif);font-weight:800;letter-spacing:-0.01em;">
-          <span>🐞</span> Журнал замечаний и багов (${state.bugReports.length})
-        </h2>
-        <button class="btn btn-ghost" style="padding:6px 12px;border-radius:12px;background:var(--zen-surface-subtle, rgba(255,255,255,0.03));border:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));" data-close-bug-modal aria-label="Закрыть">✕ Закрыть</button>
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <h2>🐞 Журнал замечаний и багов (${state.bugReports.length})</h2>
+        <button class="btn btn-ghost" style="padding:6px 12px;" data-close-bug-modal>✕ Закрыть</button>
       </div>
-      <p class="meta" style="margin-bottom:8px;font-size:0.84rem;">Текущий экран зафиксирован автоматически: <code style="padding:2px 6px;border-radius:6px;background:rgba(255,255,255,0.06);">${escapeHtmlStr(ctxStr)}</code></p>
-      <textarea id="bug-report-input" class="code-editor" style="min-height:96px;font-family:var(--font-b);border-radius:12px;background:rgba(0,0,0,0.25);border:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));padding:12px;" placeholder="Опиши ошибку, опечатку или неудобство на этом экране…"></textarea>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 16px;">
-        <button class="btn-glass-emerald" style="padding:8px 16px;border-radius:12px;font-weight:700;" data-save-bug-report>💾 Сохранить замечание</button>
-        ${state.bugReports.length > 0 ? `<button class="btn btn-clay" style="padding:8px 14px;border-radius:12px;" data-copy-bug-reports>📋 Скопировать все (${state.bugReports.length})</button>` : ''}
-        ${state.bugReports.length > 0 ? `<button class="btn btn-ghost" style="padding:8px 14px;border-radius:12px;" data-download-bug-reports>⬇️ Скачать .json</button>` : ''}
+      <p class="meta" style="margin-bottom:8px;">Текущий экран зафиксирован автоматически: <code>${escapeHtmlStr(ctxStr)}</code></p>
+      <textarea id="bug-report-input" class="code-editor" style="min-height:88px;font-family:var(--font-b);" placeholder="Опиши ошибку, опечатку или неудобство на этом экране…"></textarea>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px;">
+        <button class="btn btn-primary" data-save-bug-report>💾 Сохранить замечание</button>
+        ${state.bugReports.length > 0 ? `<button class="btn btn-clay" data-copy-bug-reports>📋 Скопировать все (${state.bugReports.length})</button>` : ''}
+        ${state.bugReports.length > 0 ? `<button class="btn btn-ghost" data-download-bug-reports>⬇️ Скачать .json</button>` : ''}
       </div>
       <textarea id="bug-reports-export-box" class="sr-only" readonly>${escapeHtmlStr(mdExport)}</textarea>
-      <div style="max-height:240px;overflow-y:auto;padding-right:4px;">${listHtml}</div>
+      <div style="max-height:240px;overflow-y:auto;">${listHtml}</div>
     </div>`;
   document.body.appendChild(modal);
 }
 window.openBugReportModal = openBugReportModal;
-
-let isSettingsModalOpen = false;
-
-function openSettingsModal(){
-  ensureExtendedState();
-  isSettingsModalOpen = true;
-  const existing = document.getElementById('settings-modal');
-  if(existing) existing.remove();
-
-  const isGame = (state.pathViewMode !== 'pro');
-  const isPro = (state.pathViewMode === 'pro');
-  const pathNodeStyle = state.pathNodeStyle === 'button' ? 'button' : 'paw';
-  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-
-  const modal = document.createElement('div');
-  modal.id = 'settings-modal';
-  modal.className = 'modal-backdrop';
-  modal.setAttribute('role', 'dialog');
-  modal.setAttribute('aria-modal', 'true');
-  modal.innerHTML = `
-    <div class="modal-card settings-modal-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
-        <h2 style="margin:0;font-size:1.3rem;display:flex;align-items:center;gap:10px;font-family:var(--font-h, 'Onest', sans-serif);font-weight:800;letter-spacing:-0.01em;">
-          <span>⚙️</span> Настройки платформы
-        </h2>
-        <button class="btn btn-ghost" style="padding:6px 12px;border-radius:12px;background:var(--zen-surface-subtle, rgba(255,255,255,0.03));border:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));" data-close-settings-modal aria-label="Закрыть">✕ Закрыть</button>
-      </div>
-
-      <!-- Режим экрана обучения -->
-      <div class="settings-section">
-        <div class="settings-section-title">🎓 Режим экрана «Путь»</div>
-        <p class="meta" style="margin-bottom:12px;font-size:0.82rem;">Выберите предпочтительный стиль отображения программы обучения:</p>
-        <div class="settings-mode-grid">
-          <button type="button" class="settings-mode-card ${isGame ? 'active' : ''}" data-set-path-mode="game">
-            <div class="settings-mode-card-header">
-              <span class="settings-mode-icon">🎮</span>
-              <span class="settings-mode-name">Игровой режим</span>
-              ${isGame ? '<span class="settings-mode-badge">Активен</span>' : ''}
-            </div>
-            <div class="settings-mode-desc">Извилистая тропа с анимированными узлами и карточками юнитов.</div>
-          </button>
-
-          <button type="button" class="settings-mode-card ${isPro ? 'active' : ''}" data-set-path-mode="pro">
-            <div class="settings-mode-card-header">
-              <span class="settings-mode-icon">💼</span>
-              <span class="settings-mode-name">Профессиональный</span>
-              ${isPro ? '<span class="settings-mode-badge">Активен</span>' : ''}
-            </div>
-            <div class="settings-mode-desc">Структурированный список уроков по главам с карточкой фокуса.</div>
-          </button>
-        </div>
-        <div class="path-node-style-picker" role="group" aria-label="Форма узлов игровой тропы" style="margin-top:12px;">
-          <div class="path-node-style-label">Форма узлов</div>
-          <button type="button" class="path-node-style-btn ${pathNodeStyle === 'paw' ? 'active' : ''}" data-set-path-node-style="paw" aria-pressed="${pathNodeStyle === 'paw'}">🐾 Лапки</button>
-          <button type="button" class="path-node-style-btn ${pathNodeStyle === 'button' ? 'active' : ''}" data-set-path-node-style="button" aria-pressed="${pathNodeStyle === 'button'}">◉ Кнопки</button>
-        </div>
-      </div>
-
-      <!-- Тема и звук -->
-      <div class="settings-section" style="margin-top:20px;">
-        <div class="settings-section-title">🎨 Интерфейс и звук</div>
-        <div class="settings-tiles-grid">
-          <button type="button" class="settings-tile" id="settings-theme-toggle">
-            <div class="settings-tile-info">
-              <span class="settings-tile-icon">🌓</span>
-              <span>Тема оформления</span>
-            </div>
-            <span class="settings-pill-badge settings-pill-badge--amber">
-              ${isLight ? 'Пергамент (Светлая)' : 'Обсидиан (Тёмная)'}
-            </span>
-          </button>
-          <button type="button" class="settings-tile" id="settings-sound-toggle">
-            <div class="settings-tile-info">
-              <span class="settings-tile-icon">${state.soundEnabled ? '🔊' : '🔇'}</span>
-              <span>Звук эффектов</span>
-            </div>
-            <span class="settings-pill-badge ${state.soundEnabled ? 'settings-pill-badge--emerald' : 'settings-pill-badge--muted'}">
-              ${state.soundEnabled ? 'Включён' : 'Выключен'}
-            </span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Рубежные тесты -->
-      <div class="settings-section" style="margin-top:20px;">
-        <div class="settings-section-title">🧪 Рубежные тесты</div>
-        <div class="settings-tiles-grid">
-          <button type="button" class="settings-tile" data-ut-toggle-explain>
-            <div class="settings-tile-info">
-              <span class="settings-tile-icon">📝</span>
-              <span>Разбор ответов</span>
-            </div>
-            <span class="settings-pill-badge ${state.utShowExplanations ? 'settings-pill-badge--emerald' : 'settings-pill-badge--muted'}">
-              ${state.utShowExplanations ? 'Включён' : 'Выключен'}
-            </span>
-          </button>
-          <button type="button" class="settings-tile" data-ut-toggle-skipmodal>
-            <div class="settings-tile-info">
-              <span class="settings-tile-icon">⏭️</span>
-              <span>Старт без модалки</span>
-            </div>
-            <span class="settings-pill-badge ${state.utSkipStartModal ? 'settings-pill-badge--emerald' : 'settings-pill-badge--muted'}">
-              ${state.utSkipStartModal ? 'Включён' : 'Выключен'}
-            </span>
-          </button>
-        </div>
-        <p class="meta" style="margin:8px 0 0;font-size:0.78rem;">Стартовая модалка — окно «Готовы начать тест?» перед рубежным тестом.</p>
-      </div>
-
-      <!-- Данные и сброс -->
-      <div class="settings-section" style="margin-top:20px;border-top:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));padding-top:16px;">
-        <div class="settings-section-title">💾 Управление данными</div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
-          <button type="button" class="btn btn-ghost" data-open-handover style="font-size:0.85rem;border-radius:12px;background:var(--zen-surface-subtle, rgba(255,255,255,0.03));border:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));">
-            🔄 Перенос контекста
-          </button>
-          <button type="button" class="btn btn-ghost" data-open-bug-modal style="font-size:0.85rem;border-radius:12px;background:var(--zen-surface-subtle, rgba(255,255,255,0.03));border:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));">
-            🐞 Журнал замечаний
-          </button>
-          <button type="button" class="btn btn-ghost" id="settings-reset-btn" style="font-size:0.85rem;border-radius:12px;color:var(--burgundy-bright);border:1px solid rgba(225, 29, 72, 0.25);background:rgba(225, 29, 72, 0.06);margin-left:auto;">
-            ⚠️ Сбросить прогресс
-          </button>
-        </div>
-      </div>
-    </div>`;
-
-  document.body.appendChild(modal);
-}
-
-function closeSettingsModal(){
-  isSettingsModalOpen = false;
-  const m = document.getElementById('settings-modal');
-  if(m) m.remove();
-}
-window.openSettingsModal = openSettingsModal;
-window.closeSettingsModal = closeSettingsModal;
-
 
 // Inject Ambient Background Orbs (.ambient-orb--burgundy & .ambient-orb--emerald), Onest Font, Bug Logger FAB, Global Pomodoro Pill & Sidebar Footer Quick Start
 (function initCocoonAtmosphereAndSidebar(){
@@ -12542,6 +7744,19 @@ window.closeSettingsModal = closeSettingsModal;
       orb2.className = 'ambient-orb ambient-orb--emerald';
       document.body.insertBefore(orb2, document.body.firstChild);
     }
+    const themeToggleM = document.getElementById('theme-toggle-m');
+    if(themeToggleM && !document.getElementById('bug-report-btn-m')){
+      const bugTopBtn = document.createElement('button');
+      bugTopBtn.id = 'bug-report-btn-m';
+      bugTopBtn.className = 'icon-btn bug-topbar-btn';
+      bugTopBtn.setAttribute('data-open-bug-modal', '');
+      bugTopBtn.setAttribute('aria-label', 'Зафиксировать ошибку или замечание');
+      bugTopBtn.setAttribute('title', 'Зафиксировать ошибку или замечание');
+      bugTopBtn.innerHTML = '🐞';
+      if(themeToggleM.parentNode){
+        themeToggleM.parentNode.insertBefore(bugTopBtn, themeToggleM.nextSibling);
+      }
+    }
   }catch(e){}
   const foot = document.querySelector('.sidebar-foot');
   if(!foot) return;
@@ -12569,26 +7784,6 @@ window.closeSettingsModal = closeSettingsModal;
   bugBtn.setAttribute('data-open-bug-modal', '');
   bugBtn.textContent = '🐞 Журнал замечаний';
   foot.appendChild(bugBtn);
-
-  const setBtn = document.createElement('button');
-  setBtn.className = 'link-quiet';
-  setBtn.setAttribute('data-open-settings-modal', '');
-  setBtn.innerHTML = '⚙️ Настройки';
-  foot.appendChild(setBtn);
-
-  const topbar = document.querySelector('.topbar');
-  if(topbar && !topbar.querySelector('[data-open-settings-modal]')){
-    const topSettingsBtn = document.createElement('button');
-    topSettingsBtn.className = 'icon-btn';
-    topSettingsBtn.setAttribute('data-open-settings-modal', '');
-    topSettingsBtn.setAttribute('title', 'Настройки');
-    topSettingsBtn.setAttribute('aria-label', 'Настройки');
-    topSettingsBtn.innerHTML = '⚙️';
-    const rightContainer = topbar.querySelector('div[style*="display:flex"]');
-    if(rightContainer){
-      rightContainer.insertBefore(topSettingsBtn, rightContainer.firstChild);
-    }
-  }
 })();
 
 // Context Handover Modal ("Контекст для переноса в новый чат")
@@ -12643,8 +7838,8 @@ function buildHandoverMarkdown(){
 - **Пройдено Боссов модулей**: ${(state.passedBosses||[]).length} / 7 · **Раундов собеседования**: ${state.mockCompletedCount || 0}
 - **Всего XP**: ${state.xp} XP · **Стрик**: ${state.streak} дн.
 - **Пройдено уроков дерева**: ${state.completedLessons.length} / ${Object.keys(LESSONS).length}
-- **Изучено конспектов**: ${state.readNotes.length} / ${Object.keys(ALL_NOTES_COMBINED).length}
-- **Пройдено колод**: ${state.reviewedDecks.length} / ${Object.keys(ALL_DECKS_COMBINED).length}
+- **Изучено конспектов К-xxx**: ${state.readNotes.length} / ${Object.keys(ALL_NOTES_COMBINED).length}
+- **Пройдено колод Ф-xxx**: ${state.reviewedDecks.length} / ${Object.keys(ALL_DECKS_COMBINED).length}
 - **Решено задач IDE**: ${solvedCount} / 401
 `;
 }
@@ -12700,30 +7895,26 @@ function openHandoverModal(){
   const modal = document.createElement('div');
   modal.id = 'handover-modal';
   modal.className = 'modal-backdrop';
-  modal.setAttribute('role', 'dialog');
-  modal.setAttribute('aria-modal', 'true');
   modal.innerHTML = `
-    <div class="modal-card zen-modal-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-        <h2 style="margin:0;font-size:1.25rem;display:flex;align-items:center;gap:10px;font-family:var(--font-h, 'Onest', sans-serif);font-weight:800;letter-spacing:-0.01em;">
-          <span>🔄</span> Контекст для переноса в новый чат и бэкап
-        </h2>
-        <button class="btn btn-ghost" style="padding:6px 12px;border-radius:12px;background:var(--zen-surface-subtle, rgba(255,255,255,0.03));border:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));" data-close-handover aria-label="Закрыть">✕ Закрыть</button>
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <h2>🔄 Контекст для переноса в новый чат и бэкап</h2>
+        <button class="btn btn-ghost" style="padding:6px 12px;" data-close-handover>✕ Закрыть</button>
       </div>
-      <p class="meta" style="font-size:0.84rem;line-height:1.45;margin-bottom:10px;">Скопируй этот блок и вставь в начале нового чата с ИИ-ассистентом, чтобы он мгновенно понял архитектуру курса и твой текущий прогресс (Контекст для продолжения работы в новом чате):</p>
-      <textarea id="handover-md-box" class="code-editor" style="min-height:190px;font-size:.8rem;border-radius:12px;background:rgba(0,0,0,0.25);border:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));padding:12px;" readonly>${escapeHtmlStr(md)}</textarea>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 20px;">
-        <button class="btn-glass-emerald" style="padding:10px 18px;border-radius:12px;font-weight:700;" data-copy-handover>📋 Скопировать промпт для нового чата</button>
+      <p class="meta">Скопируй этот блок и вставь в начале нового чата с ИИ-ассистентом, чтобы он мгновенно понял архитектуру курса и твой текущий прогресс:</p>
+      <textarea id="handover-md-box" class="code-editor" style="min-height:190px;font-size:.8rem;" readonly>${escapeHtmlStr(md)}</textarea>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 18px;">
+        <button class="btn btn-primary" data-copy-handover>📋 Скопировать промпт для нового чата</button>
       </div>
-      <h3 style="margin-bottom:6px;font-size:1rem;font-weight:700;">Экспорт / Импорт прогресса (JSON · безопасное слияние без потери данных)</h3>
-      <textarea id="handover-json-box" class="code-editor" style="min-height:80px;font-size:.78rem;border-radius:12px;background:rgba(0,0,0,0.25);border:1px solid var(--zen-hairline-subtle, rgba(255,255,255,0.06));padding:10px;">${escapeHtmlStr(jsonStr)}</textarea>
-      <div id="handover-import-status" class="meta" style="margin-top:6px;min-height:1.2em;font-weight:600;"></div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;align-items:center;">
-        <button class="btn btn-clay" style="padding:8px 14px;border-radius:12px;" data-import-json>📥 Восстановить / объединить из JSON</button>
-        <button class="btn btn-ghost" style="padding:8px 14px;border-radius:12px;" data-download-backup>💾 Скачать .json файл бэкапа</button>
-        <button class="btn btn-ghost" style="padding:8px 14px;border-radius:12px;" data-upload-backup-btn>📂 Загрузить .json файл</button>
+      <h3 style="margin-bottom:6px;">Экспорт / Импорт прогресса (JSON · безопасное слияние без потери данных)</h3>
+      <textarea id="handover-json-box" class="code-editor" style="min-height:80px;font-size:.78rem;">${escapeHtmlStr(jsonStr)}</textarea>
+      <div id="handover-import-status" class="meta" style="margin-top:6px;min-height:1.2em;"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;align-items:center;">
+        <button class="btn btn-clay" data-import-json>📥 Восстановить / объединить из JSON</button>
+        <button class="btn btn-ghost" data-download-backup>💾 Скачать .json файл бэкапа</button>
+        <button class="btn btn-ghost" data-upload-backup-btn>📂 Загрузить .json файл</button>
         <input type="file" id="handover-file-input" accept=".json,application/json" style="display:none;">
-        ${hasPreReset ? `<button class="btn btn-ghost" style="padding:8px 14px;border-radius:12px;" data-restore-pre-reset>🛟 Восстановить до последнего сброса</button>` : ''}
+        ${hasPreReset ? `<button class="btn btn-ghost" data-restore-pre-reset>🛟 Восстановить до последнего сброса</button>` : ''}
       </div>
     </div>`;
   document.body.appendChild(modal);
@@ -12731,9 +7922,6 @@ function openHandoverModal(){
 
 // Override render() to handle all routes (#/python, #/web, #/backend, #/algorithms, #/databases, #/architecture, #/infra, #/<track>/boss, #/mock, #/cards, #/practice, #/docs, #/map, #/sandbox, #/diagnostic)
 render = function(){
-  if(window.theoryAudioPlayer && window.theoryAudioPlayer.isPlaying){
-    window.theoryAudioPlayer.stop();
-  }
   ensureExtendedState();
   const route = currentRoute();
   if(route && state.lastRoute !== route){
@@ -12860,53 +8048,24 @@ render = function(){
   } else if(route === '/docs' || route === '/reference'){
     root.innerHTML = viewDocsHub();
     navRoute = '/docs';
-  } else if(route === '/path'){
-    root.innerHTML = (state.pathViewMode === 'pro') ? viewProPath() : viewPathSerpentine();
-    navRoute = '/path';
-    // V12: активная нода тропы не должна оставаться под таб-баром — мягкий автоскролл к ней
-    setTimeout(function(){
-      try{
-        const activeNode = document.querySelector('.hex-node--active');
-        if(activeNode && typeof activeNode.scrollIntoView === 'function'){
-          const r = activeNode.getBoundingClientRect();
-          if(r.top < 90 || r.bottom > (window.innerHeight || 800) - 110){
-            activeNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-        }
-      }catch(err){}
-    }, 60);
   } else if(route === '/map'){
-    // Coddy-ref: один экран «Путь» — карта дублер дашборда; старые ссылки на #/map ведут на результаты
-    root.innerHTML = viewDashboard();
-    navRoute = '/';
+    root.innerHTML = viewMap();
   } else if(route === '/sandbox'){
     root.innerHTML = viewSandbox();
   } else if(route === '/diagnostic' || route === '/lesson/quiz'){
     root.innerHTML = viewDiagnostic();
-    navRoute = '/';
+    navRoute = '/map';
   } else if(route.indexOf('/topic/') === 0){
     root.innerHTML = viewTopic(route.slice(7));
-    navRoute = '/';
+    navRoute = '/map';
   } else if(route.indexOf('/lesson/') === 0){
     root.innerHTML = viewLesson(route.slice(8));
-    navRoute = '/';
+    navRoute = '/map';
   } else {
     root.innerHTML = viewDashboard();
     navRoute = '/';
   }
-  markActiveNav(isSprintFocus ? null : navRoute);
-  // V8: экспресс-песочница навыка растёт по контенту — последняя строка кода не срезается
-  setTimeout(function(){
-    try{
-      const growTa = document.getElementById('skill-lab-scratchpad');
-      if(growTa && !growTa.dataset.autogrow){
-        growTa.dataset.autogrow = '1';
-        const fitTa = () => { growTa.style.height = 'auto'; growTa.style.height = Math.max(112, growTa.scrollHeight + 2) + 'px'; };
-        fitTa();
-        growTa.addEventListener('input', fitTa);
-      }
-    }catch(err){}
-  }, 60);
+  markActiveNav(navRoute);
   document.getElementById('streak-num-d').textContent = state.streak;
   document.getElementById('streak-num-m').textContent = state.streak;
   const swEl = document.getElementById('streak-word-d');
@@ -12925,29 +8084,18 @@ viewSandbox = function(){
   ensureExtendedState();
   const savedCode = (typeof state.sandboxDraft === 'string' && state.sandboxDraft.length > 0) ? state.sandboxDraft : SANDBOX_DEFAULT;
   return `
-    <div class="container" style="max-width:1100px;">
-      <div class="topic-badge" style="margin-bottom:12px;">Инструменты · Настоящий Python в браузере (Brython 3.13)</div>
-      <h1 style="margin-bottom:6px;font-family:var(--font-h, 'Onest', sans-serif);font-weight:800;letter-spacing:-0.02em;">Песочница Python</h1>
-      <p class="meta" style="margin-bottom:20px;max-width:720px;font-size:0.92rem;line-height:1.5;">Настоящий интерпретатор Python прямо в браузере, без установки окружения — на этом базируется вся практика с кодом. Удобнее за компьютером, но полностью адаптировано и для смартфона.</p>
-      <div class="sandbox-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:18px;">
-        <div class="card zen-studio-card" style="margin:0;">
-          <div class="zen-card-header-bar">
-            <span class="zen-pane-title">📝 Редактор кода</span>
-            <span style="font-size:0.75rem;color:var(--ink-muted);font-weight:600;"><kbd>Ctrl</kbd>+<kbd>Enter</kbd> запуск</span>
-          </div>
-          ${buildCodeEditorWithGutterHTML('code-input', savedCode, 'min-height:260px;', '')}
-          <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-            <button class="btn-glass-emerald" id="run-btn" style="padding:10px 18px;border-radius:12px;font-weight:700;">${ICONS.play} Запустить (Ctrl+Enter)</button>
-            <span class="meta" id="run-status" style="font-weight:600;font-size:0.84rem;"></span>
+    <div class="container">
+      <h1 style="margin-bottom:6px;">Песочница</h1>
+      <p class="meta" style="margin-bottom:18px;">Настоящий Python прямо в браузере, без установки — на этом будет держаться вся практика с кодом. Удобнее за компьютером, но можно и с телефона.</p>
+      <div class="sandbox-grid">
+        <div>
+          ${buildCodeEditorWithGutterHTML('code-input', savedCode, 'min-height:240px;', '')}
+          <div style="margin-top:10px;display:flex;gap:10px;align-items:center;">
+            <button class="btn btn-primary" id="run-btn">${ICONS.play} Запустить</button>
+            <span class="meta" id="run-status"></span>
           </div>
         </div>
-        <div class="card zen-studio-card" style="margin:0;">
-          <div class="zen-card-header-bar">
-            <span class="zen-pane-title">🖥️ Терминал вывода</span>
-            <span style="font-size:0.75rem;color:var(--ink-muted);font-weight:600;">stdout / stderr</span>
-          </div>
-          <pre id="code-output" class="zen-terminal-out">Нажми «Запустить» — при первом разе Python-движок грузится 5–15 секунд.</pre>
-        </div>
+        <pre id="code-output">Нажми «Запустить» — при первом разе Python-движок грузится 5–15 секунд.</pre>
       </div>
     </div>`;
 };
@@ -13004,104 +8152,6 @@ document.addEventListener('click', async function(e){
       render();
       return;
     }
-  }
-
-  if(e.target.closest('[data-open-settings-modal]')){ openSettingsModal(); return; }
-  if(e.target.closest('[data-close-settings-modal]') || e.target.id === 'settings-modal'){ closeSettingsModal(); return; }
-  if(e.target.closest('#settings-theme-toggle')){
-    toggleTheme();
-    openSettingsModal();
-    return;
-  }
-  if(e.target.closest('#settings-sound-toggle')){
-    state.soundEnabled = !state.soundEnabled;
-    saveState(state);
-    openSettingsModal();
-    return;
-  }
-  if(e.target.closest('#settings-reset-btn')){
-    closeSettingsModal();
-    const rBtn = document.getElementById('reset-btn-d');
-    if(rBtn) rBtn.click();
-    return;
-  }
-
-  // Path Mode Switcher ('game' | 'pro')
-  const modeBtn = e.target.closest('[data-set-path-mode]');
-  if(modeBtn){
-    const targetMode = modeBtn.getAttribute('data-set-path-mode');
-    if(targetMode === 'game' || targetMode === 'pro'){
-      ensureExtendedState();
-      state.pathViewMode = targetMode;
-      saveState(state);
-      if(typeof isSettingsModalOpen !== 'undefined' && isSettingsModalOpen){
-        openSettingsModal();
-      }
-      render();
-      if(typeof showTactileToast === 'function'){
-        showTactileToast(targetMode === 'pro' ? '💼 Включён профессиональный режим' : '🎮 Включён игровой режим 3D-тропы');
-      }
-    }
-    return;
-  }
-
-  const nodeStyleBtn = e.target.closest('[data-set-path-node-style]');
-  if(nodeStyleBtn){
-    const nodeStyle = nodeStyleBtn.getAttribute('data-set-path-node-style');
-    if(nodeStyle === 'paw' || nodeStyle === 'button'){
-      ensureExtendedState();
-      state.pathNodeStyle = nodeStyle;
-      saveState(state);
-      render();
-      if(typeof isSettingsModalOpen !== 'undefined' && isSettingsModalOpen) openSettingsModal();
-      if(typeof showTactileToast === 'function') showTactileToast(nodeStyle === 'paw' ? '🐾 Стиль карты: лапки' : '◉ Стиль карты: кнопки');
-    }
-    return;
-  }
-
-  // Pro Mode CTA start
-  const proStartBtn = e.target.closest('[data-pro-start]');
-  if(proStartBtn){
-    const uid = proStartBtn.getAttribute('data-pro-start');
-    const u = ALL_UNITS_COMBINED.find(x => x.id === uid);
-    if(u){
-      const track = getTrackForUnit(uid);
-      const firstSkillId = (u.skills && u.skills[0]) ? u.skills[0].id : '';
-      location.hash = `#${track.routePrefix}/skill/${firstSkillId}`;
-    }
-    return;
-  }
-
-  // Pro Mode lesson row click
-  const proRow = e.target.closest('.pro-lesson-row');
-  if(proRow){
-    if((proRow.className && proRow.className.includes('pro-lesson-row--locked')) || (proRow.classList && proRow.classList.contains('pro-lesson-row--locked'))){
-      if(typeof showTactileToast === 'function'){
-        showTactileToast('🔒 Завершите предыдущие уроки для открытия');
-      }
-      return;
-    }
-    const uid = proRow.getAttribute('data-unit-id');
-    const u = ALL_UNITS_COMBINED.find(x => x.id === uid);
-    if(u){
-      const track = getTrackForUnit(uid);
-      const firstSkillId = (u.skills && u.skills[0]) ? u.skills[0].id : '';
-      location.hash = `#${track.routePrefix}/skill/${firstSkillId}`;
-    }
-    return;
-  }
-
-  // Pro Mode chapter expand/collapse toggle
-  const togChap = e.target.closest('[data-toggle-chapter]');
-  if(togChap){
-    const cNum = parseInt(togChap.getAttribute('data-toggle-chapter'), 10);
-    if(proCollapsedChapters.has(cNum)){
-      proCollapsedChapters.delete(cNum);
-    } else {
-      proCollapsedChapters.add(cNum);
-    }
-    render();
-    return;
   }
 
   if(e.target.closest('[data-open-bug-modal]')){ openBugReportModal(); return; }
@@ -13230,30 +8280,6 @@ document.addEventListener('click', async function(e){
         }
       });
     }catch(err){}
-    return;
-  }
-
-  const chunkPrevBtn = e.target.closest('[data-chunk-prev]');
-  if(chunkPrevBtn){
-    const mode = chunkPrevBtn.getAttribute('data-chunk-prev');
-    if(mode === 'lesson'){
-      if(lessonMicroState.chunkIdx > 0){
-        lessonMicroState.chunkIdx -= 1;
-      } else if(lessonMicroState.stepIdx > 0){
-        lessonMicroState.stepIdx -= 1;
-        lessonMicroState.chunkIdx = 0;
-      }
-      saveLessonDraftState();
-    } else {
-      if(pySkillViewState.chunkIdx > 0){
-        pySkillViewState.chunkIdx -= 1;
-      } else if(pySkillViewState.stepIdx > 0){
-        pySkillViewState.stepIdx -= 1;
-        pySkillViewState.chunkIdx = 0;
-      }
-      saveReadingPosition();
-    }
-    render();
     return;
   }
 
@@ -13604,7 +8630,6 @@ document.addEventListener('click', async function(e){
   }
   if(e.target.closest('[data-py-prev-card]')){
     if(pySkillViewState.cardIdx > 0){
-      pySkillViewState.cardTurnAnim = 'turn-prev';
       pySkillViewState.cardIdx--;
       pySkillViewState.cardFlipped = false;
       pySkillViewState.sprintCelebration = null;
@@ -13614,7 +8639,6 @@ document.addEventListener('click', async function(e){
     return;
   }
   if(e.target.closest('[data-py-flip-card]')){
-    pySkillViewState.cardTurnAnim = pySkillViewState.cardFlipped ? 'flip-question' : 'flip-answer';
     pySkillViewState.cardFlipped = !pySkillViewState.cardFlipped;
     pySkillViewState.sprintCelebration = null;
     render();
@@ -13638,7 +8662,6 @@ document.addEventListener('click', async function(e){
       else if(rating === 2) awardXp(2);
     }
     if(pySkillViewState.cardIdx + 1 < (deck.cards || []).length){
-      pySkillViewState.cardTurnAnim = 'turn-next';
       pySkillViewState.cardIdx++;
       pySkillViewState.cardFlipped = false;
     } else {
@@ -13728,39 +8751,6 @@ document.addEventListener('click', async function(e){
     return;
   }
 
-  const pnextTask = e.target.closest('[data-py-next-task-btn]');
-  if(pnextTask){
-    const tid = parseInt(pnextTask.getAttribute('data-py-next-task-btn'), 10);
-    const sk = PY_SKILLS_BY_ID[pySkillViewState.sid];
-    const tIds = (sk && sk.taskIds && sk.taskIds.length) ? sk.taskIds : [20, 19, 39, 255, 258];
-    const curIdx = tIds.indexOf(tid);
-    if(curIdx >= 0 && curIdx + 1 < tIds.length){
-      const nextTid = tIds[curIdx + 1];
-      const nextObj = IDE_TASKS_BY_ID[nextTid];
-      pySkillViewState.taskId = nextTid;
-      pySkillViewState.codeDraft = nextObj ? getIdeDraft(nextTid, nextObj.initialCode) : '';
-      pySkillViewState.hintLevel = 0;
-      pySkillViewState.runStatus = null;
-      pySkillViewState.runOutput = '';
-      saveReadingPosition();
-      render();
-    } else {
-      const tr = sk ? getTrackForSkill(sk.id) : (MASTERY_TRACKS.python || { key: 'python' });
-      const unitId = (sk && sk.unitId) || '1.1';
-      location.hash = `#/${tr.key}/unittest/${unitId}`;
-    }
-    return;
-  }
-
-  const psexam = e.target.closest('[data-py-select-exam]');
-  if(psexam){
-    const unitId = psexam.getAttribute('data-py-select-exam') || '1.1';
-    const sk = PY_SKILLS_BY_ID[pySkillViewState.sid];
-    const tr = sk ? getTrackForSkill(sk.id) : (MASTERY_TRACKS.python || { key: 'python' });
-    location.hash = `#/${tr.key}/unittest/${unitId}`;
-    return;
-  }
-
   // Module Boss Challenge actions
   if(e.target.closest('[data-boss-hint]')){
     const ed = document.getElementById('boss-code-editor');
@@ -13824,17 +8814,9 @@ document.addEventListener('click', async function(e){
       const end = typeof ta.selectionEnd === 'number' ? ta.selectionEnd : ta.value.length;
       const before = ta.value.slice(0, start);
       const after = ta.value.slice(end);
+      ta.value = before + token + after;
       const isPair = (token === '()' || token === '[]' || token === '{}');
-      const hasSelection = start !== end;
-      let nextPos;
-      if(isPair && hasSelection){
-        const selected = ta.value.slice(start, end);
-        ta.value = before + token[0] + selected + token[1] + after;
-        nextPos = start + 1 + selected.length + 1;
-      } else {
-        ta.value = before + token + after;
-        nextPos = start + (isPair ? 1 : token.length);
-      }
+      const nextPos = start + (isPair ? 1 : token.length);
       try{
         ta.focus();
         ta.setSelectionRange(nextPos, nextPos);
@@ -13858,12 +8840,9 @@ document.addEventListener('click', async function(e){
 
   const labRunBtn = e.target.closest('[data-run-lab-scratchpad]');
   if(labRunBtn){
-    syncActiveEditorDrafts();
     const ta = document.getElementById('skill-lab-scratchpad');
-    const outBox = document.getElementById('skill-lab-output-box');
     const out = document.getElementById('skill-lab-output');
     if(ta && out){
-      if(outBox) outBox.classList.remove('hidden');
       out.classList.remove('hidden');
       out.textContent = '⏳ Выполняю в Python 3.13…';
       labRunBtn.setAttribute('disabled', 'disabled');
@@ -13884,68 +8863,6 @@ document.addEventListener('click', async function(e){
       }
       labRunBtn.removeAttribute('disabled');
     }
-    return;
-  }
-
-  if(e.target.closest('[data-copy-lab-code]')){
-    const ta = document.getElementById('skill-lab-scratchpad');
-    if(ta && navigator.clipboard){
-      navigator.clipboard.writeText(ta.value);
-      const btn = e.target.closest('[data-copy-lab-code]');
-      if(btn){
-        const orig = btn.textContent;
-        btn.textContent = '✓';
-        setTimeout(() => { btn.textContent = orig; }, 1200);
-      }
-    }
-    return;
-  }
-
-  if(e.target.closest('[data-reset-lab-code]')){
-    const ta = document.getElementById('skill-lab-scratchpad');
-    if(ta && pySkillViewState && pySkillViewState.sid){
-      const activeK = pySkillViewState.kId || 'unknown';
-      const stepIdx = pySkillViewState.stepIdx || 0;
-      const noteObj = ALL_NOTES_COMBINED[activeK] || {};
-      const steps = noteObj.steps || [];
-      const curStep = steps[stepIdx] || {};
-      const defCode = getStepDefaultScratchpadCode(activeK, pySkillViewState.sid, curStep, stepIdx);
-      ta.value = defCode;
-      const dKey = `${pySkillViewState.sid}:${activeK}:${stepIdx}`;
-      if(!pySkillViewState.labDrafts) pySkillViewState.labDrafts = {};
-      pySkillViewState.labDrafts[dKey] = defCode;
-      const gut = document.getElementById('skill-lab-scratchpad-gutter');
-      if(gut){
-        const lc = Math.max(1, defCode.split('\n').length);
-        const nums = [];
-        for(let i = 1; i <= lc; i++) nums.push(i);
-        gut.textContent = nums.join('\n');
-      }
-      const outBox = document.getElementById('skill-lab-output-box');
-      if(outBox) outBox.classList.add('hidden');
-    }
-    return;
-  }
-
-  if(e.target.closest('[data-copy-lab-out]')){
-    const out = document.getElementById('skill-lab-output');
-    if(out && navigator.clipboard){
-      navigator.clipboard.writeText(out.textContent);
-      const btn = e.target.closest('[data-copy-lab-out]');
-      if(btn){
-        const orig = btn.textContent;
-        btn.textContent = '✓ Скопировано';
-        setTimeout(() => { btn.textContent = orig; }, 1200);
-      }
-    }
-    return;
-  }
-
-  if(e.target.closest('[data-clear-lab-out]')){
-    const outBox = document.getElementById('skill-lab-output-box');
-    const out = document.getElementById('skill-lab-output');
-    if(out) out.textContent = '';
-    if(outBox) outBox.classList.add('hidden');
     return;
   }
 
@@ -14101,37 +9018,6 @@ document.addEventListener('click', async function(e){
     return;
   }
 
-  // Unit Test start modal actions («Готовы начать тест?»)
-  if(e.target.closest('[data-ut-start]') && unitTestState){
-    unitTestState.started = true;
-    render();
-    return;
-  }
-  if(e.target.closest('[data-ut-always-skip]')){
-    ensureExtendedState();
-    state.utSkipStartModal = true;
-    saveState(state);
-    if(unitTestState) unitTestState.started = true;
-    render();
-    return;
-  }
-  if(e.target.closest('[data-ut-toggle-explain]')){
-    ensureExtendedState();
-    state.utShowExplanations = !state.utShowExplanations;
-    saveState(state);
-    if(typeof isSettingsModalOpen !== 'undefined' && isSettingsModalOpen) openSettingsModal();
-    render();
-    return;
-  }
-  if(e.target.closest('[data-ut-toggle-skipmodal]')){
-    ensureExtendedState();
-    state.utSkipStartModal = !state.utSkipStartModal;
-    saveState(state);
-    if(typeof isSettingsModalOpen !== 'undefined' && isSettingsModalOpen) openSettingsModal();
-    render();
-    return;
-  }
-
   // Unit Test actions
   const utAns = e.target.closest('[data-ut-ans]');
   if(utAns && unitTestState){
@@ -14198,7 +9084,6 @@ document.addEventListener('click', async function(e){
   // Global Flashcards Hub actions
   if(e.target.closest('[data-hub-prev]')){
     if(cardsHubState.cardIdx > 0){
-      cardsHubState.turnAnim = 'turn-prev';
       cardsHubState.cardIdx--;
       cardsHubState.flipped = false;
       saveCardsHubPosState();
@@ -14207,7 +9092,6 @@ document.addEventListener('click', async function(e){
     return;
   }
   if(e.target.closest('[data-hub-flip]')){
-    cardsHubState.turnAnim = cardsHubState.flipped ? 'flip-question' : 'flip-answer';
     cardsHubState.flipped = !cardsHubState.flipped;
     saveCardsHubPosState();
     render();
@@ -14309,6 +9193,12 @@ document.addEventListener('click', async function(e){
     render();
     return;
   }
+  if(e.target.closest('[data-toggle-prac-filters]')){
+    practiceHubState.mobileFiltersOpen = !practiceHubState.mobileFiltersOpen;
+    savePracticeHubPosState();
+    render();
+    return;
+  }
   if(e.target.closest('[data-toggle-prac-search]')){
     practiceHubState.searchOpen = !practiceHubState.searchOpen;
     savePracticeHubPosState();
@@ -14362,273 +9252,6 @@ document.addEventListener('click', async function(e){
       selectPracticeTask(curFiltered[nextIdx].id);
       render();
     }
-    return;
-  }
-
-  // Map view mode toggle (Serpentine vs Tree)
-  const mapModeBtn = e.target.closest('[data-map-mode]');
-  if(mapModeBtn){
-    const mode = mapModeBtn.getAttribute('data-map-mode');
-    if(typeof mapViewState !== 'undefined'){
-      mapViewState.mode = mode;
-      render();
-    }
-    return;
-  }
-
-  // 4-Tab Mobile IDE tabs
-  const pracMobTab = e.target.closest('[data-prac-mob-tab]');
-  if(pracMobTab){
-    const tab = pracMobTab.getAttribute('data-prac-mob-tab');
-    if(typeof practiceHubState !== 'undefined'){
-      practiceHubState.mobileTab = tab;
-      savePracticeHubPosState();
-      render();
-    }
-    return;
-  }
-
-  // Practice plain explanation toggle
-  if(e.target.closest('[data-prac-toggle-explain]')){
-    if(typeof practiceHubState !== 'undefined'){
-      practiceHubState.showPlainExplain = !practiceHubState.showPlainExplain;
-      savePracticeHubPosState();
-      render();
-    }
-    return;
-  }
-
-  // Practice solution unlock gate
-  if(e.target.closest('[data-prac-unlock-solution]')){
-    if(typeof practiceHubState !== 'undefined'){
-      practiceHubState.solutionUnlocked = true;
-      savePracticeHubPosState();
-      render();
-    }
-    return;
-  }
-
-  // Practice Socratic hint advance
-  if(e.target.closest('[data-prac-ask-ai]')){
-    if(typeof practiceHubState !== 'undefined'){
-      practiceHubState.hintLevel = Math.min(4, (practiceHubState.hintLevel || 0) + 1);
-      savePracticeHubPosState();
-      render();
-    }
-    return;
-  }
-
-  // Section Gate button click (navigate to track or show locked toast)
-  const gateBtn = e.target.closest('[data-gate-track]');
-  if(gateBtn){
-    const isLocked = gateBtn.getAttribute('data-gate-locked') === '1';
-    const track = gateBtn.getAttribute('data-gate-track');
-    const prevTitle = gateBtn.getAttribute('data-gate-prev-title') || 'предыдущего раздела';
-    if(isLocked){
-      if(typeof showTactileToast === 'function'){
-        showTactileToast(`🔒 Завершите все темы «${prevTitle}», чтобы открыть этот раздел!`);
-      }
-      return;
-    }
-    if(track) location.hash = `#/${track}`;
-    return;
-  }
-
-  // «Челлендж мастерства» branch node click (navigate to the unit test route)
-  const challengeNode = e.target.closest('.hex-challenge-node');
-  if(challengeNode){
-    const chStatus = challengeNode.getAttribute('data-challenge-status');
-    const chRoute = challengeNode.getAttribute('data-challenge-route');
-    if(chStatus === 'locked'){
-      if(typeof showTactileToast === 'function') showTactileToast('🔒 Челлендж откроется после прохождения предыдущих юнитов');
-      return;
-    }
-    if(chRoute) location.hash = chRoute;
-    return;
-  }
-
-  // 3D Serpentine Path node click (Open anchored popover)
-  const hexNode = e.target.closest('.hex-3d-node');
-  if(hexNode){
-    const openedByKeyboard = e.detail === 0;
-    const uid = hexNode.getAttribute('data-unit-id');
-    const popover = document.getElementById('path-anchored-popover');
-    if(popover && uid && typeof ALL_UNITS_COMBINED !== 'undefined'){
-      popover.setAttribute('data-return-focus-unit', uid);
-      const u = ALL_UNITS_COMBINED.find(x => x.id === uid);
-      if(u){
-        const track = getTrackForUnit(uid);
-        const pBadge = document.getElementById('popover-badge');
-        const pTitle = document.getElementById('popover-title');
-        const pStatus = document.getElementById('popover-status');
-        const pSkills = document.getElementById('popover-skills');
-        const pCta = document.getElementById('popover-cta-btn');
-
-        if(pBadge) pBadge.textContent = `ТРЕК · ${track.title.split('Матрица Мастерства').pop().trim() || track.title}`;
-        if(pTitle) pTitle.textContent = `Юнит ${u.id}: ${u.title.replace(/^Юнит\s+[\d.]+\s*·\s*/, '')}`;
-
-        const isPassed = (state.passedUnitTests || []).includes(u.id) || ((u.skills||[]).length > 0 && (u.skills||[]).every(s => getSkillMP(s.id) >= 80));
-        const uIdx = ALL_UNITS_COMBINED.findIndex(x => x.id === uid);
-        let activeIdx = ALL_UNITS_COMBINED.findIndex(x => {
-          const pass = (state.passedUnitTests || []).includes(x.id) || ((x.skills||[]).length > 0 && (x.skills||[]).every(s => getSkillMP(s.id) >= 80));
-          return !pass;
-        });
-        if(activeIdx === -1) activeIdx = ALL_UNITS_COMBINED.length - 1;
-        const isActive = (uIdx === activeIdx);
-        const isLocked = (uIdx > activeIdx && !isPassed);
-
-        if(pStatus){
-          if(isPassed) pStatus.textContent = '✅ Юнит завершён (освоен на 100%)';
-          else if(isActive) pStatus.textContent = '🏆 Текущая цель курса';
-          else if(isLocked) pStatus.textContent = 'Пройдите уроки выше, чтобы открыть это!';
-          else pStatus.textContent = '📖 Доступен для изучения';
-        }
-
-        if(pSkills){
-          const skillItems = (u.skills || []).slice(0, 3);
-          pSkills.innerHTML = skillItems.length
-            ? `<div class="path-popover-skills-label">В этом юните</div><div class="path-popover-skills-list">${skillItems.map(s => `<div class="path-popover-skill">${escapeHtmlStr(s.title)}</div>`).join('')}</div>`
-            : '';
-        }
-
-        if(pCta){
-          const unitStarted = (u.skills || []).some(s => (getSkillMP(s.id) || 0) > 0);
-          pCta.className = isPassed ? 'btn-3d-emerald path-popover-cta' : (isLocked ? 'btn-3d-locked path-popover-cta' : 'btn-3d-orange path-popover-cta');
-          pCta.textContent = isPassed ? 'ОБЗОР ➔' : (isLocked ? 'ЗАБЛОКИРОВАНО' : (unitStarted ? 'ПРОДОЛЖИТЬ ➔' : 'НАЧАТЬ ➔'));
-          pCta.disabled = isLocked;
-          pCta.setAttribute('data-target-route', `#${track.routePrefix}/skill/${(u.skills && u.skills[0]) ? u.skills[0].id : ''}`);
-        }
-
-        const parent = popover.offsetParent || popover.parentElement;
-        if(parent){
-          const pRect = (parent.getBoundingClientRect && parent.getBoundingClientRect()) || { left: 0, top: 0, width: 420 };
-          const nRect = (hexNode.getBoundingClientRect && hexNode.getBoundingClientRect()) || { left: 210, right: 210, top: 100, bottom: 160 };
-          const pWidth = pRect.width || 420;
-          let cx = (nRect.left + nRect.right) / 2 - pRect.left;
-          let cy = nRect.top - pRect.top;
-          if(!cx || isNaN(cx)){
-            cx = parseFloat(hexNode.getAttribute('data-cx')) || 210;
-            cy = parseFloat(hexNode.getAttribute('data-cy')) || 100;
-          }
-          const popoverWidth = parseFloat(window.getComputedStyle(popover).width) || 340;
-          const popoverHalfWidth = popoverWidth / 2;
-          const clampedCx = Math.max(popoverHalfWidth + 8, Math.min(pWidth - popoverHalfWidth - 8, cx));
-          popover.style.left = `${Math.round(clampedCx)}px`;
-          const arrow = document.getElementById('popover-arrow');
-          if(arrow){
-            const arrowX = Math.max(20, Math.min(popoverWidth - 20, popoverHalfWidth + (cx - clampedCx)));
-            arrow.style.left = `${Math.round(arrowX)}px`;
-          }
-          if(cy > 240){
-            popover.style.top = `${Math.round(cy - 220)}px`;
-            if(arrow) arrow.className = 'path-popover-arrow path-popover-arrow--down';
-          } else {
-            popover.style.top = `${Math.round((nRect.bottom || (cy + 60)) - pRect.top + 16)}px`;
-            if(arrow) arrow.className = 'path-popover-arrow path-popover-arrow--up';
-          }
-        }
-        popover.style.display = 'block';
-        if(openedByKeyboard && typeof popover.focus === 'function') popover.focus();
-        // Clamp to the viewport; disable the scale-in animation while measuring its full size.
-        try{
-          const prevAnim = popover.style.animation;
-          popover.style.animation = 'none';
-          const vh = window.innerHeight || 900;
-          let pr = popover.getBoundingClientRect();
-          if(pr.height > 0){
-            const curTop = parseFloat(popover.style.top) || 0;
-            let delta = 0;
-            if(pr.bottom > vh - 12) delta = -(pr.bottom - (vh - 12));
-            popover.style.top = `${Math.round(curTop + delta)}px`;
-            pr = popover.getBoundingClientRect();
-            if(pr.top < 12) popover.style.top = `${Math.round(parseFloat(popover.style.top) + (12 - pr.top))}px`;
-          }
-          popover.style.animation = prevAnim;
-        }catch(err){}
-        return;
-      }
-    }
-  }
-
-  // Popover close and CTA button
-  if(e.target.closest('#popover-close-btn')){
-    const popover = document.getElementById('path-anchored-popover');
-    if(popover){
-      popover.style.display = 'none';
-      const returnId = popover.getAttribute('data-return-focus-unit');
-      const returnNode = Array.from(document.querySelectorAll('.hex-3d-node')).find(node => node.getAttribute('data-unit-id') === returnId);
-      if(returnNode && typeof returnNode.focus === 'function') returnNode.focus();
-    }
-    return;
-  }
-  const popCta = e.target.closest('#popover-cta-btn');
-  if(popCta){
-    const tr = popCta.getAttribute('data-target-route');
-    const popover = document.getElementById('path-anchored-popover');
-    if(popover) popover.style.display = 'none';
-    if(tr && !popCta.disabled){
-      location.hash = tr;
-    }
-    return;
-  }
-  if(!e.target.closest('#path-anchored-popover') && !e.target.closest('.hex-3d-node')){
-    const popover = document.getElementById('path-anchored-popover');
-    if(popover && popover.style && popover.style.display !== 'none'){
-      popover.style.display = 'none';
-    }
-  }
-
-  // Jump to active unit button
-  if(e.target.closest('#path-jump-btn')){
-    const targetNode = document.querySelector('.hex-node--active') || document.querySelector('.hex-3d-node');
-    if(targetNode){
-      targetNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      try{ targetNode.focus(); }catch(err){}
-    }
-    return;
-  }
-
-  // Theory audio companion controls
-  if(e.target.closest('[data-toggle-audio]')){
-    state.audioBarOpen = !state.audioBarOpen;
-    saveState(state);
-    const bar = document.getElementById('theory-audio-bar');
-    if(bar) bar.style.display = state.audioBarOpen ? 'flex' : 'none';
-    if(state.audioBarOpen && window.theoryAudioPlayer && !window.theoryAudioPlayer.isPlaying){
-      const theoryElem = document.getElementById('py-theory-container') || document.getElementById('lesson-theory-content') || document.querySelector('.lesson-theory') || document.querySelector('.k-note-card');
-      const textToRead = theoryElem ? (theoryElem.innerText || theoryElem.textContent || '') : '';
-      if(textToRead) window.theoryAudioPlayer.play(textToRead);
-    } else if(!state.audioBarOpen && window.theoryAudioPlayer){
-      window.theoryAudioPlayer.stop();
-    }
-    return;
-  }
-  if(e.target.closest('[data-audio-play]')){
-    if(window.theoryAudioPlayer){
-      if(!window.theoryAudioPlayer.isPlaying && !window.theoryAudioPlayer.currentText){
-        const theoryElem = document.getElementById('py-theory-container') || document.getElementById('lesson-theory-content') || document.querySelector('.lesson-theory') || document.querySelector('.k-note-card');
-        const textToRead = theoryElem ? (theoryElem.innerText || theoryElem.textContent || '') : '';
-        window.theoryAudioPlayer.play(textToRead);
-      } else {
-        window.theoryAudioPlayer.togglePlay();
-      }
-    }
-    return;
-  }
-  if(e.target.closest('[data-audio-rewind]')){
-    if(window.theoryAudioPlayer) window.theoryAudioPlayer.rewind10();
-    return;
-  }
-  if(e.target.closest('[data-audio-rate]')){
-    if(window.theoryAudioPlayer) window.theoryAudioPlayer.toggleRate();
-    return;
-  }
-  if(e.target.closest('[data-audio-close]')){
-    state.audioBarOpen = false;
-    saveState(state);
-    if(window.theoryAudioPlayer) window.theoryAudioPlayer.stop();
-    const bar = document.getElementById('theory-audio-bar');
-    if(bar) bar.style.display = 'none';
     return;
   }
 });
@@ -14697,6 +9320,10 @@ document.addEventListener('change', function(e){
     practiceHubState.statusFilter = e.target.value;
     savePracticeHubPosState();
     render();
+  } else if(e.target.id === 'prac-task-select'){
+    selectPracticeTask(parseInt(e.target.value, 10));
+    savePracticeHubPosState();
+    render();
   } else if(e.target.id === 'mock-echelon-select'){
     syncActiveEditorDrafts();
     mockInterviewState.echelonFilter = e.target.value;
@@ -14744,12 +9371,6 @@ document.addEventListener('input', function(e){
     savePracticeHubPosState();
     render();
     const inp = document.getElementById('prac-search-input');
-    if(inp){ inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
-  } else if(e.target.id === 'prac-docs-search-input'){
-    practiceHubState.docsSearch = e.target.value;
-    savePracticeHubPosState();
-    render();
-    const inp = document.getElementById('prac-docs-search-input');
     if(inp){ inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
   } else if(e.target.id === 'code-input'){
     ensureExtendedState();
@@ -14801,6 +9422,40 @@ document.addEventListener('scroll', function(e){
   }
 }, true);
 
+// Touch swipe gestures for 3D Flashcards (swipe left -> rate 1, swipe right -> rate 4, swipe up -> rate 3)
+let _fcTouchStartX = null;
+let _fcTouchStartY = null;
+document.addEventListener('touchstart', function(e){
+  const card = e.target && e.target.closest ? e.target.closest('.fc-card, .fc-scene') : null;
+  if(!card || !e.changedTouches || !e.changedTouches[0]) return;
+  _fcTouchStartX = e.changedTouches[0].clientX;
+  _fcTouchStartY = e.changedTouches[0].clientY;
+}, { passive: true });
+
+document.addEventListener('touchend', function(e){
+  if(_fcTouchStartX === null || _fcTouchStartY === null) return;
+  const card = e.target && e.target.closest ? e.target.closest('.fc-card, .fc-scene') : null;
+  if(!card || !e.changedTouches || !e.changedTouches[0]){
+    _fcTouchStartX = null;
+    _fcTouchStartY = null;
+    return;
+  }
+  const dx = e.changedTouches[0].clientX - _fcTouchStartX;
+  const dy = e.changedTouches[0].clientY - _fcTouchStartY;
+  _fcTouchStartX = null;
+  _fcTouchStartY = null;
+  let rateVal = null;
+  if(Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)){
+    rateVal = dx < 0 ? 1 : 4;
+  } else if(dy < -45 && Math.abs(dy) > Math.abs(dx)){
+    rateVal = 3;
+  }
+  if(rateVal !== null){
+    const btn = document.querySelector(`[data-hub-rate="${rateVal}"], [data-py-rate-card="${rateVal}"]`);
+    if(btn) btn.click();
+  }
+}, { passive: true });
+
 // Keyboard shortcuts: Ctrl+Enter to run/verify code, Space to flip card, 1..4 to rate card
 document.addEventListener('keydown', function(e){
   if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
@@ -14818,62 +9473,12 @@ document.addEventListener('keydown', function(e){
     if(mr){ e.preventDefault(); mr.click(); return; }
     const sb = document.getElementById('run-btn');
     if(sb){ e.preventDefault(); sb.click(); return; }
-    const slr = document.querySelector('[data-run-lab-scratchpad]');
-    if(slr){ e.preventDefault(); slr.click(); return; }
   }
   const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
-  if(e.key === 'Tab' && e.target && e.target.id === 'skill-lab-scratchpad'){
-    e.preventDefault();
-    const ta = e.target;
-    const s = ta.selectionStart;
-    const end = ta.selectionEnd;
-    ta.value = ta.value.substring(0, s) + '    ' + ta.value.substring(end);
-    ta.selectionStart = ta.selectionEnd = s + 4;
-    try { ta.dispatchEvent(new Event('input', { bubbles: true })); } catch(err){}
-    return;
-  }
   if(tag === 'textarea' || tag === 'input' || tag === 'select') return;
-  if(e.key === 'Escape'){
-    if(typeof isSettingsModalOpen !== 'undefined' && isSettingsModalOpen){
-      closeSettingsModal();
-      return;
-    }
-    const popover = document.getElementById('path-anchored-popover');
-    if(popover && popover.style && popover.style.display !== 'none'){
-      popover.style.display = 'none';
-      const returnId = popover.getAttribute('data-return-focus-unit');
-      const returnNode = Array.from(document.querySelectorAll('.hex-3d-node')).find(node => node.getAttribute('data-unit-id') === returnId);
-      if(returnNode && typeof returnNode.focus === 'function') returnNode.focus();
-      return;
-    }
-  }
-  const focusedPathNode = e.target && e.target.closest ? e.target.closest('.hex-3d-node') : null;
-  if(focusedPathNode && (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Home' || e.key === 'End')){
-    const nodes = Array.from(document.querySelectorAll('.hex-3d-node'));
-    const currentIndex = nodes.indexOf(focusedPathNode);
-    let nextIndex = currentIndex;
-    if(e.key === 'ArrowDown') nextIndex = Math.min(nodes.length - 1, currentIndex + 1);
-    else if(e.key === 'ArrowUp') nextIndex = Math.max(0, currentIndex - 1);
-    else if(e.key === 'Home') nextIndex = 0;
-    else if(e.key === 'End') nextIndex = nodes.length - 1;
-    if(nextIndex !== currentIndex && nodes[nextIndex]){
-      e.preventDefault();
-      nodes[nextIndex].focus();
-      nodes[nextIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
-  }
-  if((e.key === 'Enter' || e.code === 'Space') && e.target && e.target.closest && (e.target.closest('.hex-3d-node') || e.target.closest('.hex-challenge-node') || e.target.closest('[data-gate-track]'))){
-    e.preventDefault();
-    const clickEv = (typeof MouseEvent !== 'undefined') ? new MouseEvent('click', { bubbles: true, cancelable: true }) : { type: 'click', bubbles: true };
-    (e.target.closest('[data-gate-track]') || e.target.closest('.hex-challenge-node') || e.target.closest('.hex-3d-node')).dispatchEvent(clickEv);
-    return;
-  }
   if(e.code === 'Space'){
     const flipBtn = document.querySelector('[data-py-flip-card], [data-hub-flip]');
     if(flipBtn){ e.preventDefault(); flipBtn.click(); return; }
-    const pyNextBtn = document.querySelector('[data-chunk-more="py"], [data-py-next-step]');
-    if(pyNextBtn){ e.preventDefault(); pyNextBtn.click(); return; }
   }
   if(e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4'){
     const rateBtn = document.querySelector(`[data-py-rate-card="${e.key}"], [data-hub-rate="${e.key}"]`);
@@ -14882,8 +9487,6 @@ document.addEventListener('keydown', function(e){
   if(e.key === 'Enter' && !e.ctrlKey && !e.metaKey){
     const bsNext = document.querySelector('.academy-bottom-sheet [data-lesson-next], .academy-bottom-sheet [data-diag-next]');
     if(bsNext){ e.preventDefault(); bsNext.click(); return; }
-    const pyNextBtn = document.querySelector('[data-chunk-more="py"], [data-py-next-step]');
-    if(pyNextBtn){ e.preventDefault(); pyNextBtn.click(); return; }
   }
 });
 
@@ -14913,11 +9516,17 @@ brython_scripts = """<script src="https://cdnjs.cloudflare.com/ajax/libs/brython
 <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.13.0/brython_stdlib.js"></script>"""
 html_out = html_out.replace('</style>\n</head>', EXTRA_CSS + '\n</style>\n' + pwa_meta + '\n' + brython_scripts + '\n</head>', 1)
 
-# 1b. Wrap desktop sidebar streak word for Russian pluralization (avoid "1 дней подряд")
-if '<span id="streak-num-d">0</span> дней подряд' in html_out:
+# 1b. Inject bug report button in mobile topbar next to #theme-toggle-m and desktop sidebar foot
+if '<button class="icon-btn" id="theme-toggle-m"' in html_out:
     html_out = html_out.replace(
-        '<span id="streak-num-d">0</span> дней подряд',
-        '<span id="streak-num-d">0</span> <span id="streak-word-d">дней подряд</span>',
+        '<button class="icon-btn" id="theme-toggle-m" aria-label="Переключить тему"></button>',
+        '<button class="icon-btn" id="theme-toggle-m" aria-label="Переключить тему"></button>\n        <button class="icon-btn bug-topbar-btn" id="bug-report-btn-m" data-open-bug-modal aria-label="Зафиксировать ошибку или замечание" title="Зафиксировать ошибку или замечание">🐞</button>',
+        1
+    )
+if '<button class="icon-btn" id="theme-toggle-d"' in html_out:
+    html_out = html_out.replace(
+        '<button class="icon-btn" id="theme-toggle-d" aria-label="Переключить тему"></button>',
+        '<button class="icon-btn" id="theme-toggle-d" aria-label="Переключить тему"></button>\n      <button class="icon-btn bug-topbar-btn" id="bug-report-btn-d" data-open-bug-modal aria-label="Зафиксировать ошибку или замечание" title="Зафиксировать ошибку или замечание">🐞</button>',
         1
     )
 
@@ -14993,151 +9602,6 @@ init_marker = "/* ================= INIT ================= */\nrenderNav();\napp
 assert init_marker in html_out, "Could not find INIT marker"
 html_out = html_out.replace(init_marker, full_upgrade_js, 1)
 
-# Cross-device progress sync is kept in this canonical build step so rebuilds retain it.
-sync_init_marker = 'hydrateAndMergeAllProgressSources();\nbumpStreak();\nrestoreFromIndexedDBIfNeeded();\nsaveState(state);'
-assert sync_init_marker in html_out, "Could not find progress hydration marker"
-sync_client_js = r'''
-const PROGRESS_SYNC_ENDPOINT = window.ACADEMY_SYNC_ENDPOINT || '/api/sync';
-const PROGRESS_SYNC_TOKEN_KEY = 'academy_sync_access_code';
-const PROGRESS_SYNC_DEVICE_KEY = 'academy_sync_device_id';
-const PROGRESS_SYNC_REVISION_KEY = 'academy_sync_server_revision';
-const PROGRESS_SYNC_INTERVAL_MS = 20000;
-let progressSyncTimer = null;
-let progressSyncInFlight = false;
-let progressSyncDirty = false;
-let progressSyncLastSignature = '';
-let progressSyncPromptOpen = false;
-let progressSyncAuthPrompted = false;
-
-function progressSyncClientId(){
-  try{
-    let id = localStorage.getItem(PROGRESS_SYNC_DEVICE_KEY);
-    if(!id){ id = 'device-' + (window.crypto && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36)); localStorage.setItem(PROGRESS_SYNC_DEVICE_KEY, id); }
-    return id;
-  }catch(e){ return 'device-' + Math.random().toString(36).slice(2); }
-}
-function progressSyncBundle(){
-  return {
-    academyState: state,
-    ideStatus: (typeof getIdeSolvedMap === 'function') ? getIdeSolvedMap() : {},
-    ideDrafts: safeParseJsonObj(localStorage.getItem(IDE_DRAFTS_KEY)) || {}
-  };
-}
-function progressSyncMergeBundle(bundle){
-  if(!bundle || typeof bundle !== 'object') return false;
-  let changed = false;
-  if(bundle.academyState && typeof bundle.academyState === 'object'){
-    const before = JSON.stringify(state);
-    state = mergeProgressStates(state, bundle.academyState);
-    changed = changed || before !== JSON.stringify(state);
-  }
-  if(bundle.ideStatus && typeof bundle.ideStatus === 'object'){
-    const current = getIdeSolvedMap();
-    const merged = mergeIdeStatusMaps(current, bundle.ideStatus);
-    if(JSON.stringify(current) !== JSON.stringify(merged)) changed = true;
-    try{ localStorage.setItem('practice-ide-status', JSON.stringify(merged)); localStorage.setItem('practice-ide-status-backup', JSON.stringify(merged)); }catch(e){}
-  }
-  if(bundle.ideDrafts && typeof bundle.ideDrafts === 'object'){
-    const current = safeParseJsonObj(localStorage.getItem(IDE_DRAFTS_KEY)) || {};
-    const merged = mergeIdeDraftMaps(current, bundle.ideDrafts);
-    if(JSON.stringify(current) !== JSON.stringify(merged)) changed = true;
-    try{ localStorage.setItem(IDE_DRAFTS_KEY, JSON.stringify(merged)); }catch(e){}
-  }
-  if(changed){ saveState(state); writeWindowNameBackup(state); }
-  return changed;
-}
-function progressSyncSaveRevision(revision){
-  try{ localStorage.setItem(PROGRESS_SYNC_REVISION_KEY, String(Number(revision) || 0)); }catch(e){}
-}
-async function progressSyncRequest(method, payload){
-  const token = localStorage.getItem(PROGRESS_SYNC_TOKEN_KEY) || '';
-  const response = await fetch(PROGRESS_SYNC_ENDPOINT, {
-    method,
-    headers: Object.assign(method === 'POST' ? {'Content-Type':'application/json'} : {}, token ? {Authorization:'Bearer ' + token} : {}),
-    cache: 'no-store',
-    body: method === 'POST' ? JSON.stringify(payload) : undefined
-  });
-  const data = await response.json();
-  if(!response.ok && response.status !== 409){ const error = new Error(data.error || ('HTTP ' + response.status)); error.status = response.status; throw error; }
-  return {data, status: response.status};
-}
-async function runProgressSync(){
-  if(progressSyncInFlight || location.protocol === 'file:') return;
-  progressSyncInFlight = true;
-  progressSyncDirty = false;
-  try{
-    const remote = await progressSyncRequest('GET');
-    const revision = Number(remote.data.updatedAt) || 0;
-    const knownRevision = Number(localStorage.getItem(PROGRESS_SYNC_REVISION_KEY)) || 0;
-    if(remote.data.bundle && revision > knownRevision){
-      if(progressSyncMergeBundle(remote.data.bundle) && typeof render === 'function') render();
-      progressSyncSaveRevision(revision);
-    }
-    const bundle = progressSyncBundle();
-    const signature = JSON.stringify(bundle);
-    if(signature !== progressSyncLastSignature || progressSyncDirty || !revision){
-      const pushed = await progressSyncRequest('POST', {
-        bundle,
-        baseUpdatedAt: Number(localStorage.getItem(PROGRESS_SYNC_REVISION_KEY)) || revision,
-        clientId: progressSyncClientId(),
-        device: /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'mobile' : 'desktop'
-      });
-      if(pushed.status === 409){
-        if(progressSyncMergeBundle(pushed.data.bundle) && typeof render === 'function') render();
-        progressSyncSaveRevision(pushed.data.updatedAt);
-        progressSyncDirty = true;
-      }else{
-        progressSyncSaveRevision(pushed.data.updatedAt);
-        if(pushed.data.bundle && progressSyncMergeBundle(pushed.data.bundle) && typeof render === 'function') render();
-        progressSyncLastSignature = JSON.stringify(progressSyncBundle());
-      }
-    }
-  }catch(e){
-    if(e && e.status === 401 && !progressSyncPromptOpen && !progressSyncAuthPrompted){
-      progressSyncPromptOpen = true;
-      progressSyncAuthPrompted = true;
-      try{
-        const code = window.prompt('Введите код синхронизации с Render (одинаковый на ПК и телефоне):');
-        if(code && code.trim()){ localStorage.setItem(PROGRESS_SYNC_TOKEN_KEY, code.trim()); progressSyncDirty = true; }
-      }catch(ignore){}
-      finally{ progressSyncPromptOpen = false; }
-    }
-    // Network may be unavailable while the local multi-layer backup remains active.
-  }finally{
-    progressSyncInFlight = false;
-    if(progressSyncDirty) setTimeout(runProgressSync, 250);
-  }
-}
-function scheduleProgressSync(){
-  progressSyncDirty = true;
-  if(progressSyncTimer) clearTimeout(progressSyncTimer);
-  progressSyncTimer = setTimeout(runProgressSync, 800);
-}
-const localSaveState = saveState;
-saveState = function(s){ localSaveState(s); scheduleProgressSync(); };
-const localSaveIdeDraft = saveIdeDraft;
-saveIdeDraft = function(taskId, codeStr){ localSaveIdeDraft(taskId, codeStr); scheduleProgressSync(); };
-const localSetIdeTaskSolved = setIdeTaskSolved;
-setIdeTaskSolved = function(taskId, codeStr){ localSetIdeTaskSolved(taskId, codeStr); scheduleProgressSync(); };
-window.addEventListener('storage', function(e){
-  if(e && (e.key === 'practice-ide-status' || e.key === 'practice-ide-status-backup' || e.key === IDE_DRAFTS_KEY)) scheduleProgressSync();
-});
-window.addEventListener('focus', runProgressSync);
-window.addEventListener('online', runProgressSync);
-document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') runProgressSync(); });
-window.addEventListener('pagehide', function(){
-  if(location.protocol === 'file:') return;
-  try{
-    const body = JSON.stringify({bundle: progressSyncBundle(), baseUpdatedAt: Number(localStorage.getItem(PROGRESS_SYNC_REVISION_KEY)) || 0, clientId: progressSyncClientId(), device: 'pagehide'});
-    const token = localStorage.getItem(PROGRESS_SYNC_TOKEN_KEY) || '';
-    fetch(PROGRESS_SYNC_ENDPOINT, {method:'POST', headers:Object.assign({'Content-Type':'application/json'}, token ? {Authorization:'Bearer ' + token} : {}), body, keepalive:true}).catch(function(){});
-  }catch(e){}
-});
-progressSyncTimer = setInterval(runProgressSync, PROGRESS_SYNC_INTERVAL_MS);
-setTimeout(runProgressSync, 1200);
-'''
-html_out = html_out.replace(sync_init_marker, sync_init_marker + '\n' + sync_client_js, 1)
-
 with open(OUT_HTML_PATH, 'w', encoding='utf-8', newline='\n') as f:
     f.write(html_out)
 
@@ -15149,16 +9613,6 @@ if _IS_UNPACKED_ARCHIVE:
     unpacked_html = os.path.join(_UNPACKED_ROOT, 'academy.html')
     if os.path.abspath(unpacked_html) != os.path.abspath(OUT_HTML_PATH):
         with open(unpacked_html, 'w', encoding='utf-8', newline='\n') as f:
-            f.write(html_out)
-
-# Canonical Benchmark: sync Эталоны.html with assembled academy.html
-etalon_path = os.path.join(_UNPACKED_ROOT, 'Эталоны.html')
-with open(etalon_path, 'w', encoding='utf-8', newline='\n') as f:
-    f.write(html_out)
-if os.path.isdir(_CLOUD_DIR):
-    cloud_etalon = os.path.join(_CLOUD_DIR, 'Эталоны.html')
-    if os.path.abspath(cloud_etalon) != os.path.abspath(etalon_path):
-        with open(cloud_etalon, 'w', encoding='utf-8', newline='\n') as f:
             f.write(html_out)
 
 _inline_scripts = re.findall(r'<script>([\s\S]*?)</script>', html_out)
@@ -15244,6 +9698,18 @@ if os.path.isdir(_CLOUD_DIR) and os.path.isdir(BASE_REMNOTE) and os.path.isfile(
                 with open(pf_full, 'rb') as src_f, open(dst_pf, 'wb') as dst_f:
                     dst_f.write(src_f.read())
 
+    scratch_mockups_dir = os.path.join(_HERE, 'design_mockups')
+    if os.path.isdir(scratch_mockups_dir):
+        cloud_mockups_dir = os.path.join(_CLOUD_DIR, 'design_mockups')
+        os.makedirs(cloud_mockups_dir, exist_ok=True)
+        for mf in os.listdir(scratch_mockups_dir):
+            mf_full = os.path.join(scratch_mockups_dir, mf)
+            if os.path.isfile(mf_full):
+                dst_mf = os.path.join(cloud_mockups_dir, mf)
+                if os.path.abspath(mf_full) != os.path.abspath(dst_mf):
+                    with open(mf_full, 'rb') as src_f, open(dst_mf, 'wb') as dst_f:
+                        dst_f.write(src_f.read())
+
     tmp_zip_path = ARCHIVE_ZIP_PATH + '.tmp'
     with zipfile.ZipFile(tmp_zip_path, 'w', compression=zipfile.ZIP_DEFLATED) as zf:
         handover_src = SCRATCH_HANDOVER_PATH if os.path.isfile(SCRATCH_HANDOVER_PATH) else CLOUD_HANDOVER_PATH
@@ -15256,7 +9722,6 @@ if os.path.isdir(_CLOUD_DIR) and os.path.isdir(BASE_REMNOTE) and os.path.isfile(
         zf.write(html_src, 'academy.html')
         zf.write(IDE_HTML_PATH, 'Практика кода — тренажёр с IDE.html')
         extra_root_files = [
-            'Эталоны.html',
             'manifest.json',
             'icon.svg',
             'sw.js',
@@ -15270,7 +9735,7 @@ if os.path.isdir(_CLOUD_DIR) and os.path.isdir(BASE_REMNOTE) and os.path.isfile(
             'RemNote_Python_Mastery_FIXED.zip'
         ]
         for erf in extra_root_files:
-            erf_full = os.path.join(_CLOUD_DIR, erf) if os.path.isfile(os.path.join(_CLOUD_DIR, erf)) else os.path.join(_UNPACKED_ROOT, erf)
+            erf_full = os.path.join(_CLOUD_DIR, erf)
             if os.path.isfile(erf_full):
                 zf.write(erf_full, erf)
         for root, dirs, files in os.walk(BASE_REMNOTE):
@@ -15287,3 +9752,7 @@ if os.path.isdir(_CLOUD_DIR) and os.path.isdir(BASE_REMNOTE) and os.path.isfile(
                 zf.write(pf_full, f'scripts/{pf}')
     os.replace(tmp_zip_path, ARCHIVE_ZIP_PATH)
     print(f"Successfully rebuilt {ARCHIVE_ZIP_PATH} ({os.path.getsize(ARCHIVE_ZIP_PATH):,} bytes)")
+
+
+
+

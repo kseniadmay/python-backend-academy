@@ -351,7 +351,52 @@
   }
   .topbar-pomo-pill:hover{border-color:var(--moss);transform:translateY(-1px);}
   .topbar-pomo-pill.is-running{background:var(--emerald-soft);border-color:var(--emerald);color:var(--moss-deep);}
-  .bug-fab-btn{display:none !important;}
+      /* ---------- Section 1.1 & 9.1: Global Topbar Pomodoro Pill & Bug Button (Mobile Tactile FAB & Hotkey) ---------- */
+  .bug-fab-btn{
+    position:fixed;
+    bottom:calc(74px + env(safe-area-inset-bottom, 12px));
+    right:16px;
+    z-index:90;
+    width:42px;
+    height:42px;
+    border-radius:13px;
+    background:rgba(22,27,36,0.92);
+    border:1.5px solid rgba(244,63,94,0.55);
+    box-shadow:0 6px 20px rgba(0,0,0,0.45), 0 0 12px rgba(225,29,72,0.25);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    font-size:1.20rem;
+    cursor:pointer;
+    transition:transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  :root[data-theme="light"] .bug-fab-btn{
+    background:rgba(255,255,255,0.94);
+    border:1.5px solid rgba(190,18,60,0.40);
+    box-shadow:0 6px 18px rgba(107,29,47,0.18);
+  }
+  .bug-fab-btn:hover{
+    transform:translateY(-2px) scale(1.05);
+    border-color:rgba(251,113,133,0.90);
+    box-shadow:0 8px 24px rgba(225,29,72,0.40), 0 0 16px rgba(244,63,94,0.30);
+  }
+  .bug-fab-btn:active{
+    transform:translateY(1px) scale(0.95);
+  }
+  @media (max-width: 880px){
+    .bug-fab-btn{display:flex !important;}
+  }
+  body.has-jump-btn .bug-fab-btn,
+  .path-serpentine-wrap ~ .bug-fab-btn{
+    bottom:calc(132px + env(safe-area-inset-bottom, 16px)) !important;
+  }
+  body:has(.modal-backdrop) .bug-fab-btn,
+  .modal-backdrop ~ .bug-fab-btn{
+    display:none !important;
+  }
   .bug-topbar-btn, #bug-report-btn-m, #bug-report-btn-d{
     font-size:1.05rem;line-height:1;width:34px;height:34px;padding:0;
     display:inline-flex;align-items:center;justify-content:center;
@@ -384,6 +429,54 @@
     .topbar{padding:8px 10px !important;}
     .topbar > div:last-child{gap:6px !important;}
     .topbar .streak-pill{padding:5px 8px !important;font-size:.80rem !important;}
+    /* Anti-collision & zero-overlap layout for Echelon sprint topbars on mobile */
+    .echelon-topbar-clean{
+      flex-wrap:wrap !important;
+      padding:9px 12px !important;
+      gap:8px !important;
+      margin-bottom:14px !important;
+    }
+    .echelon-clean-wrap{
+      flex:1 1 100% !important;
+      min-width:100% !important;
+      width:100% !important;
+    }
+    .echelon-topbar-actions{
+      width:100% !important;
+      margin-left:0 !important;
+      display:flex !important;
+      align-items:center !important;
+      justify-content:space-between !important;
+      gap:6px !important;
+    }
+    .echelon-topbar-actions .sprint-xp-pill{
+      padding:4px 8px !important;
+      font-size:0.72rem !important;
+      flex-shrink:1 !important;
+    }
+    .echelon-topbar-actions .sprint-xp-subtext{
+      display:none !important;
+    }
+    .echelon-topbar-actions .topbar-help-btn{
+      padding:4px 8px !important;
+      font-size:0.72rem !important;
+      flex-shrink:0 !important;
+    }
+    .echelon-topbar-actions .topbar-help-text,
+    .echelon-topbar-actions .topbar-audio-text{
+      font-size:0.72rem !important;
+    }
+    .sprint-focus-topbar{
+      flex-wrap:wrap !important;
+      padding:8px 10px !important;
+      gap:6px !important;
+    }
+    .sprint-progress-wrap{
+      min-width:120px !important;
+    }
+    .shell{
+      padding-bottom:calc(84px + env(safe-area-inset-bottom, 16px)) !important;
+    }
   }
   .prac-chip--echelon{border-color:rgba(107,29,47,0.20);transition:all .15s ease;}
   .prac-chip--echelon:hover{border-color:#6b1d2f !important;transform:translateY(-1px);}
@@ -3978,9 +4071,10 @@
   <div class="shell">
     <header class="topbar">
       <div class="brand" style="font-size:1.02rem;"><svg class="icon" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M7.8 7.6 10.5 16M16.2 7.6 13.5 16M8.3 6h7.4"/></svg>Academy</div>
-      <div style="display:flex;align-items:center;gap:10px;">
+      <div style="display:flex;align-items:center;gap:6px;">
         <div class="streak-pill"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3c-.5 3-3 4-3 7.5A3.5 3.5 0 0 0 12 14a3.5 3.5 0 0 0 3-5c1.5 1 2 2.7 2 4.2A5 5 0 0 1 12 21a5 5 0 0 1-5-5.2C7 12 9 9 9 7c1 1 1.2 2 1.2 2S11 5 12 3Z"/></svg><span id="streak-num-m">0</span></div>
         <button class="icon-btn" id="theme-toggle-m" aria-label="Переключить тему"></button>
+        <button class="icon-btn bug-topbar-btn" id="bug-report-btn-m" data-open-bug-modal aria-label="Зафиксировать ошибку или замечание (Alt+B)" title="Зафиксировать ошибку или замечание (Alt+B)">🐞</button>
       </div>
     </header>
 
@@ -9147,10 +9241,11 @@ function viewPythonSkill(sid){
           <div class="echelon-clean-fill" style="width: ${echPct}%;"></div>
         </div>
       </div>
-      <div style="display:flex;gap:10px;align-items:center;margin-left:14px;flex:none;">
-        <div class="sprint-xp-pill" style="display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:999px;background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.35);color:#fbbf24;font-size:0.75rem;font-weight:700;white-space:nowrap;letter-spacing:0.01em;" title="Заработано за сутки: ${dayXpVal} XP">⚡ +${dayXpVal || 55} XP за сутки</div>
-        <a href="#/docs" class="topbar-help-btn" style="padding:6px 14px;border-radius:10px;" title="Справочник синтаксиса и методов Python"><span class="topbar-help-text">📖 Справка</span></a>
-        <button type="button" class="topbar-help-btn" data-toggle-audio data-audio-toggle style="padding:6px 14px;border-radius:10px;cursor:pointer;" title="Слушать аудио / Аудио-компаньон"><span class="topbar-audio-text">🎧 Озвучить</span></button>
+      <div class="echelon-topbar-actions" style="display:flex;gap:8px;align-items:center;margin-left:14px;flex:none;">
+        <div class="sprint-xp-pill" style="display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:999px;background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.35);color:#fbbf24;font-size:0.75rem;font-weight:700;white-space:nowrap;letter-spacing:0.01em;" title="Заработано за сутки: ${dayXpVal} XP">⚡ +${dayXpVal || 55} XP<span class="sprint-xp-subtext"> за сутки</span></div>
+        <a href="#/docs" class="topbar-help-btn" style="padding:6px 12px;border-radius:10px;" title="Справочник синтаксиса и методов Python"><span class="topbar-help-text">📖 Справка</span></a>
+        <button type="button" class="topbar-help-btn" data-toggle-audio data-audio-toggle style="padding:6px 12px;border-radius:10px;cursor:pointer;" title="Слушать аудио / Аудио-компаньон"><span class="topbar-audio-text">🎧 Озвучить</span></button>
+        <button type="button" class="topbar-help-btn bug-topbar-btn" data-open-bug-modal style="padding:6px 8px;border-radius:10px;cursor:pointer;" title="Зафиксировать ошибку или замечание (Alt+B)" aria-label="Сообщить о баге">🐞</button>
       </div>
     </div>
     <div id="theory-audio-bar" class="theory-audio-bar" style="display:${state.audioBarOpen ? 'flex' : 'none'};">
@@ -13439,7 +13534,47 @@ window.closeSettingsModal = closeSettingsModal;
     const rightContainer = topbar.querySelector('div[style*="display:flex"]');
     if(rightContainer){
       rightContainer.insertBefore(topSettingsBtn, rightContainer.firstChild);
+      if(!document.getElementById('bug-report-btn-m')){
+        const topBugBtn = document.createElement('button');
+        topBugBtn.id = 'bug-report-btn-m';
+        topBugBtn.className = 'icon-btn bug-topbar-btn';
+        topBugBtn.setAttribute('data-open-bug-modal', '');
+        topBugBtn.setAttribute('title', 'Зафиксировать ошибку или замечание (Alt+B)');
+        topBugBtn.setAttribute('aria-label', 'Зафиксировать ошибку или замечание (Alt+B)');
+        topBugBtn.innerHTML = '🐞';
+        rightContainer.appendChild(topBugBtn);
+      }
     }
+  }
+  // Mobile Floating Ladybug Quick Button (FAB)
+  if(!document.getElementById('bug-fab-btn-floating')){
+    const fab = document.createElement('button');
+    fab.id = 'bug-fab-btn-floating';
+    fab.className = 'bug-fab-btn';
+    fab.setAttribute('data-open-bug-modal', '');
+    fab.setAttribute('aria-label', 'Сообщить о баге (Alt+B)');
+    fab.setAttribute('title', 'Сообщить о баге (Alt+B)');
+    fab.innerHTML = '🐞';
+    document.body.appendChild(fab);
+  }
+  // Global Hotkey (быстрая клавиша Alt+B, Ctrl+Shift+B, или B вне полей ввода)
+  if(!window.__bugHotkeyBound){
+    window.__bugHotkeyBound = true;
+    document.addEventListener('keydown', function(e){
+      const isB = (e.key === 'b' || e.key === 'B' || e.key === 'и' || e.key === 'И' || e.code === 'KeyB');
+      const isAltB = (e.altKey && isB);
+      const isCtrlShiftB = (e.ctrlKey && e.shiftKey && isB);
+      const isPlainB = isB && !e.altKey && !e.ctrlKey && !e.metaKey;
+      const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+      const isTyping = tag === 'input' || tag === 'textarea' || tag === 'select' || (e.target && e.target.isContentEditable) || (e.target && e.target.closest && e.target.closest('.CodeMirror'));
+
+      if(isAltB || isCtrlShiftB || (isPlainB && !isTyping)){
+        if(!document.getElementById('bug-report-modal')){
+          e.preventDefault();
+          if(typeof openBugReportModal === 'function') openBugReportModal();
+        }
+      }
+    });
   }
 })();
 
