@@ -246,11 +246,23 @@ for _tn, _tf in _t_list:
 
     return 'import ast as _ast\n' + '\n'.join(checks)
 
+def _is_literal_or_setup_expr(node):
+    if isinstance(node, (ast.Constant, ast.List, ast.Dict, ast.Set, ast.Tuple)):
+        return True
+    if isinstance(node, ast.Call):
+        func_name = ast.unparse(node.func)
+        if any(setup_kw in func_name for setup_kw in [
+            'Redis', 'datetime', 'date', 'frozenset', 'defaultdict', 'deque',
+            'Counter', 'compile', 'range', 'StringIO', 'BytesIO'
+        ]):
+            return True
+    return False
+
 def build_starter_for_task(t):
     tid = t['id']
     c = clean_ref_code(tid, t['code'])
     tree = ast.parse(c)
-    lines = [f"# Задача #{tid}: {t['title']}"]
+    lines = []
 
     last_def_idx = -1
     for idx_n, n in enumerate(tree.body):
@@ -259,15 +271,14 @@ def build_starter_for_task(t):
 
     if last_def_idx >= 0:
         for idx_n, n in enumerate(tree.body[:last_def_idx + 1]):
-            if isinstance(n, (ast.Import, ast.ImportFrom, ast.Assign, ast.AnnAssign)):
-                seg = ast.get_source_segment(c, n)
-                if seg:
-                    lines.append(seg)
+            if isinstance(n, (ast.Import, ast.ImportFrom)):
+                lines.append(ast.unparse(n))
+            elif isinstance(n, (ast.Assign, ast.AnnAssign)):
+                lines.append(ast.unparse(n))
             elif isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 n_copy = copy.deepcopy(n)
                 n_copy.body = [ast.Pass()]
-                unparsed = ast.unparse(n_copy).replace('\n    pass', '\n    # TODO: реализуйте функцию\n    pass')
-                lines.append(unparsed + '\n')
+                lines.append(ast.unparse(n_copy))
             elif isinstance(n, ast.ClassDef):
                 n_copy = copy.deepcopy(n)
                 methods = [m for m in n_copy.body if isinstance(m, (ast.FunctionDef, ast.AsyncFunctionDef))]
@@ -275,46 +286,73 @@ def build_starter_for_task(t):
                     new_body = []
                     for item in n_copy.body:
                         if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                            item.body = [ast.Pass()]
+                            item_copy = copy.deepcopy(item)
+                            item_copy.body = [ast.Pass()]
+                            new_body.append(item_copy)
+                        elif isinstance(item, (ast.Assign, ast.AnnAssign, ast.ClassDef)):
                             new_body.append(item)
                     n_copy.body = new_body or [ast.Pass()]
                 else:
                     n_copy.body = [ast.Pass()]
-                unparsed = ast.unparse(n_copy)
-                lines.append(unparsed + '\n')
+                lines.append(ast.unparse(n_copy))
     else:
+        import_lines = []
         for n in tree.body:
             if isinstance(n, (ast.Import, ast.ImportFrom)):
-                seg = ast.get_source_segment(c, n)
-                if seg:
-                    lines.append(seg)
-        seen_vars = []
+                import_lines.append(ast.unparse(n))
+        if import_lines:
+            lines.extend(import_lines)
+            lines.append('')
+
+        all_assigns = []
         for n in tree.body:
             if isinstance(n, ast.Assign):
+                targets = []
                 for tg in n.targets:
-                    if isinstance(tg, ast.Name) and not tg.id.startswith('_') and tg.id not in seen_vars:
-                        seen_vars.append(tg.id)
+                    if isinstance(tg, ast.Name) and not tg.id.startswith('_'):
+                        targets.append(tg.id)
                     elif isinstance(tg, ast.Tuple):
                         for el in tg.elts:
-                            if isinstance(el, ast.Name) and not el.id.startswith('_') and el.id not in seen_vars:
-                                seen_vars.append(el.id)
+                            if isinstance(el, ast.Name) and not el.id.startswith('_'):
+                                targets.append(el.id)
+                if targets:
+                    all_assigns.append((targets, n.value, n))
             elif isinstance(n, ast.AnnAssign) and isinstance(n.target, ast.Name) and not n.target.id.startswith('_'):
-                if n.target.id not in seen_vars:
-                    seen_vars.append(n.target.id)
-        if seen_vars:
-            lines.append('# Заполните значения целевых переменных:')
-            for v in seen_vars:
-                lines.append(f'{v} = None  # TODO')
-        else:
-            lines.append('# Напишите ваше решение ниже:')
+                all_assigns.append(([n.target.id], n.value, n))
 
-    return '\n'.join(lines)
+        multiline_str_vars = {
+            'sql', 'dockerfile', 'github_actions_yaml', 'volumes_config',
+            'nginx_config', 'html', 'json_str', 'schema', 'config_yaml'
+        }
+
+        if len(all_assigns) == 1 and all_assigns[0][0][0] in multiline_str_vars:
+            tg = all_assigns[0][0][0]
+            lines.append(f'{tg} = """\n\n"""')
+        elif len(all_assigns) == 1:
+            tgs, _, _ = all_assigns[0]
+            for tg in tgs:
+                lines.append(f'{tg} = None')
+        else:
+            for i, (tgs, val_node, orig_node) in enumerate(all_assigns):
+                is_last = (i == len(all_assigns) - 1)
+                if not is_last and _is_literal_or_setup_expr(val_node):
+                    lines.append(ast.unparse(orig_node))
+                else:
+                    for tg in tgs:
+                        if tg in multiline_str_vars:
+                            lines.append(f'{tg} = """\n\n"""')
+                        else:
+                            lines.append(f'{tg} = None')
+
+    res = '\n'.join(lines).strip()
+    res = re.sub(r'#\s*TODO.*', '', res)
+    res = '\n'.join(l.rstrip() for l in res.split('\n'))
+    return res
 
 _TASK_OVERRIDES = {
     20: {
         'title': 'Разворот списка срезом [::-1]',
         'desc': '<p><strong>Задание:</strong> Создайте исходный список чисел <code>original</code> и получите его инвертированную копию <code>reversed_list</code> с помощью шага среза <code>[::-1]</code>.</p>',
-        'starter_header': '# Задача #20: Разворот списка срезом',
     }
 }
 
@@ -337,9 +375,6 @@ for _t in TASKS_381:
     _t['code'] = _code
     _t['solution'] = _code
     _t['initialCode'] = build_starter_for_task(_t)
-    if _t['id'] in _TASK_OVERRIDES and 'starter_header' in _TASK_OVERRIDES[_t['id']]:
-        _hdr = _TASK_OVERRIDES[_t['id']]['starter_header']
-        _t['initialCode'] = re.sub(r'^# Задача #\d+:.*', _hdr, _t['initialCode'])
     _doc_m = re.search(r'"""(.*?)"""', _code, re.S)
     if _t['id'] in _TASK_OVERRIDES and 'desc' in _TASK_OVERRIDES[_t['id']]:
         _t['desc'] = _TASK_OVERRIDES[_t['id']]['desc']

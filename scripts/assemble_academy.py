@@ -2947,9 +2947,27 @@ function setIdeTaskSolved(taskId, codeStr){
 function getIdeDraft(taskId, fallback){
   try{
     const dr = safeParseJsonObj(localStorage.getItem(IDE_DRAFTS_KEY)) || {};
-    if(dr[taskId] !== undefined) return dr[taskId];
-    const wn = readWindowNameBackup();
-    if(wn && wn.ideDrafts && wn.ideDrafts[taskId] !== undefined) return wn.ideDrafts[taskId];
+    let draft = (dr[taskId] !== undefined) ? dr[taskId] : undefined;
+    if(draft === undefined){
+      const wn = readWindowNameBackup();
+      if(wn && wn.ideDrafts && wn.ideDrafts[taskId] !== undefined) draft = wn.ideDrafts[taskId];
+    }
+    if(typeof draft === 'string'){
+      const isLegacyStub = draft.includes('# TODO') || draft.includes('# Заполните значения целевых переменных') || draft.includes('# Задача #');
+      const nonCommentLines = draft.split('\n').filter(l => l.trim() && !l.trim().startsWith('#'));
+      const isOnlyStubValues = nonCommentLines.length === 0 || nonCommentLines.every(l => l.includes('= None') || l.trim() === 'pass' || l.startsWith('import ') || l.startsWith('from '));
+      if(isLegacyStub && isOnlyStubValues){
+        return fallback;
+      }
+      let cleaned = draft
+        .replace(/^#\s*Задача\s*#\d+:.*$/gm, '')
+        .replace(/^#\s*Заполните значения.*$/gm, '')
+        .replace(/^#\s*Напишите ваше решение.*$/gm, '')
+        .replace(/^#\s*TODO:.*$/gm, '')
+        .replace(/\s*#\s*TODO\b/g, '');
+      cleaned = cleaned.replace(/^\n+/, '');
+      return cleaned;
+    }
     return fallback;
   }catch(e){ return fallback; }
 }
