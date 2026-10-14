@@ -580,24 +580,188 @@ print(f"JSON sizes: PY_MASTERY={len(py_mastery_json)//1024}KB, WEB_MASTERY={len(
 
 EXTRA_CSS = r"""
 
-  /* ================= CANONICAL SPRINT FOCUS & SINGLE LESSON CARD ================= */
-  body.is-sprint-focus .sidebar { display: none !important; }
+  /* ================= CANONICAL SPRINT FOCUS & BENCHMARK SCREENS (САЙДБАР ВСЕГДА ВИДЕН НА ДЕСКТОПЕ) ================= */
   body.is-sprint-focus .topbar { display: none !important; }
   body.is-sprint-focus .tabbar { display: none !important; }
-  body.is-sprint-focus #app { min-height: 100vh; display: block !important; }
-  body.is-sprint-focus main {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 14px 20px 48px !important;
-    margin: 0 auto !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    justify-content: center !important;
+
+  @media (max-width: 899px) {
+    body.is-sprint-focus .sidebar { display: none !important; }
+    body.is-sprint-focus #app { min-height: 100vh; display: block !important; }
+    body.is-sprint-focus main {
+      width: 100% !important;
+      max-width: 100% !important;
+      padding: 10px 12px 36px !important;
+      margin: 0 auto !important;
+      box-sizing: border-box !important;
+      display: flex !important;
+      justify-content: center !important;
+    }
   }
+
+  @media (min-width: 900px) {
+    body.is-sprint-focus #app {
+      display: flex !important;
+      flex-direction: row !important;
+      min-height: 100vh;
+    }
+    body.is-sprint-focus .sidebar {
+      display: flex !important;
+      flex: 0 0 280px !important;
+      max-width: 280px !important;
+    }
+    body.is-sprint-focus.zen-mode .sidebar {
+      display: none !important;
+    }
+    body.is-sprint-focus main {
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
+      max-width: calc(100% - 280px) !important;
+      padding: 14px 24px 48px !important;
+      margin: 0 !important;
+      box-sizing: border-box !important;
+      display: flex !important;
+      justify-content: center !important;
+    }
+  }
+
   body.is-sprint-focus .container {
     max-width: 940px !important;
     width: 100% !important;
     margin: 0 auto !important;
+  }
+
+  /* ================= CANONICAL PRACTICE BENCHMARK (SPLIT VIEW) ================= */
+  .practice-coddy-split {
+    display: grid !important;
+    grid-template-columns: 1.05fr 1fr;
+    gap: 18px;
+    align-items: stretch;
+  }
+  @media (max-width: 860px) {
+    .practice-coddy-split {
+      grid-template-columns: 1fr !important;
+    }
+  }
+  .practice-spec-pane {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: rgba(15, 23, 42, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 16px 18px;
+  }
+  .practice-right-pane {
+    background: rgba(15, 23, 42, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 16px 18px;
+  }
+  .practice-kbd-dock {
+    display: flex;
+    gap: 14px;
+    font-size: 0.74rem;
+    color: var(--ink-muted);
+    margin-top: 8px;
+  }
+  .practice-kbd-dock kbd {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 0.70rem;
+    color: var(--ink);
+  }
+  .btn-check-solution {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 14px;
+    padding: 12px 18px;
+    font-weight: 700;
+    font-size: 0.92rem;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+  }
+  .btn-check-solution:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 22px rgba(16, 185, 129, 0.45);
+    filter: brightness(1.06);
+  }
+  .btn-check-solution:active {
+    transform: translateY(0);
+  }
+  .btn-check-solution .xp-tag {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+  }
+
+  /* ================= CANONICAL FLASHCARD BENCHMARK (VIDEO RECORDING) ================= */
+  .fc-card {
+    background: var(--surface) !important;
+    border: 1px solid rgba(16, 185, 129, 0.4) !important;
+    border-radius: 22px !important;
+    padding: 26px 24px !important;
+    min-height: 220px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), 0 0 20px rgba(16, 185, 129, 0.08) !important;
+    transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease !important;
+  }
+  .fc-card:hover {
+    border-color: rgba(16, 185, 129, 0.6) !important;
+    box-shadow: 0 10px 36px rgba(0, 0, 0, 0.3), 0 0 26px rgba(16, 185, 129, 0.14) !important;
+  }
+  .fc-card .topic-badge {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--ink-muted);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    padding: 3px 10px;
+    border-radius: 8px;
+  }
+  .fc-card.fc-card--Answer .topic-badge {
+    background: rgba(16, 185, 129, 0.15) !important;
+    color: #10b981 !important;
+    border-color: rgba(16, 185, 129, 0.4) !important;
+  }
+  .card-help-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: var(--ink-muted);
+    text-decoration: none;
+    padding: 3px 10px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.15s ease;
+  }
+  .card-help-badge:hover {
+    color: var(--ink);
+    background: rgba(255, 255, 255, 0.1);
+  }
+  .fc-rate-row {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 10px !important;
+  }
+  @media (max-width: 600px) {
+    .fc-rate-row {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
   }
 
   .coddy-lesson-card {
@@ -6558,7 +6722,7 @@ function todayXp(){
 }
 
 // Helper: Build Code Editor with synchronized Line-Numbers Gutter and Sticky Python Accessory Bar
-function buildCodeEditorWithGutterHTML(editorId, codeStr, minHeightPx){
+function buildCodeEditorWithGutterHTML(editorId, codeStr, minHeightPx, customTokens){
   const raw = String(codeStr || '');
   const lineCount = Math.max(1, raw.split('\n').length);
   const nums = [];
@@ -6566,10 +6730,24 @@ function buildCodeEditorWithGutterHTML(editorId, codeStr, minHeightPx){
   const mh = typeof minHeightPx === 'number'
     ? minHeightPx
     : (parseInt(String(minHeightPx || '').replace(/\D+/g, ''), 10) || 200);
-  const tokens = [
-    { label: 'Tab ⇥', val: '    ' },
+
+  const baseTokens = [
+    { label: 'Tab ➔', val: '    ' },
     { label: ':', val: ':' },
-    { label: '_', val: '_' },
+    { label: '_', val: '_' }
+  ];
+
+  const extra = [];
+  if(Array.isArray(customTokens)){
+    customTokens.forEach(t => {
+      const s = String(t || '').trim();
+      if(s && !baseTokens.some(b => b.val === s)){
+        extra.push({ label: s, val: s });
+      }
+    });
+  }
+
+  const standardTokens = [
     { label: '( )', val: '()' },
     { label: '[ ]', val: '[]' },
     { label: '{ }', val: '{}' },
@@ -6577,10 +6755,11 @@ function buildCodeEditorWithGutterHTML(editorId, codeStr, minHeightPx){
     { label: 'return', val: 'return ' },
     { label: 'self.', val: 'self.' },
     { label: 'in', val: 'in ' },
-    { label: '==', val: ' == ' },
-    { label: '->', val: ' -> ' }
+    { label: '==', val: ' == ' }
   ];
-  const barBtns = tokens.map(t =>
+
+  const allTokens = [...baseTokens, ...extra, ...standardTokens];
+  const barBtns = allTokens.map(t =>
     `<button type="button" class="py-key-btn py-acc-btn" data-insert-token="${escapeHtmlStr(t.val)}" data-target-editor="${editorId}">${escapeHtmlStr(t.label)}</button>`
   ).join('');
   return `
@@ -7855,15 +8034,12 @@ function splitStepHtmlIntoChunks(htmlStr){
     const tail = s.slice(lastEnd).trim();
     if(tail) rawBlocks.push(tail);
   }
-  const isCodeOrList = (str) => /<(?:pre|ul|ol|table|blockquote)\b|snippet-wrap|code-snippet/i.test(str);
-
   const merged = [];
   let pending = '';
   for(let i = 0; i < rawBlocks.length; i++){
     const b = rawBlocks[i];
     const isHeading = /^<h[1-6]\b/i.test(b);
-    const nextIsCode = (i + 1 < rawBlocks.length) && isCodeOrList(rawBlocks[i+1]);
-    const isLeadInColon = /^<p\b/i.test(b) && (/:\s*(?:<\/(?:strong|b|em|i|code)>\s*)*<\/p>\s*$/i.test(b) || nextIsCode) && (i + 1 < rawBlocks.length);
+    const isLeadInColon = /^<p\b/i.test(b) && /:\s*(?:<\/(?:strong|b|em|i|code)>\s*)*<\/p>\s*$/i.test(b) && b.length < 300 && (i + 1 < rawBlocks.length);
     if(isHeading || isLeadInColon){
       pending = pending ? (pending + '\n' + b) : b;
     } else if(pending){
@@ -7877,14 +8053,24 @@ function splitStepHtmlIntoChunks(htmlStr){
     if(merged.length > 0) merged[merged.length - 1] += '\n' + pending;
     else merged.push(pending);
   }
+  const finalChunks = [];
+  for(let i = 0; i < merged.length; i++){
+    const c = merged[i];
+    const plainLen = c.replace(/<[^>]+>/g, '').trim().length;
+    if(finalChunks.length > 0 && plainLen < 75 && !/^<h[1-6]\b/i.test(c)){
+      finalChunks[finalChunks.length - 1] += '\n' + c;
+    } else {
+      finalChunks.push(c);
+    }
+  }
   if(merged.length === 1){
     const only = merged[0];
-    const pm = only.match(/^([\s\S]*?<p[^>]*>)([\s\S]*?)(<\/p>\s*)$/i);
-    if(pm && !/<(pre|table|ul|ol)\b/i.test(only)){
+    const pm = only.match(/^([\s\S]*?<p[^>]*>)([\s\S]*?)(<\/p>[\s\S]*?)$/i);
+    if(pm && !/<(pre|table|ul|ol)/i.test(only)){
       const prefix = pm[1];
       const inner = pm[2];
       const suffix = pm[3];
-      const sentRe = /([.!?])\s+(?=[А-ЯЁA-Z«"“]|<(?:strong|code|b|em|i)\b)/g;
+      const sentRe = /([.!?])\s+(?=[А-ЯЁA-Z«"“]|<(?:strong|code|b|em|i))/g;
       let sm;
       let splitPos = -1;
       while((sm = sentRe.exec(inner)) !== null){
@@ -7900,7 +8086,7 @@ function splitStepHtmlIntoChunks(htmlStr){
       }
     }
   }
-  return merged.length > 0 ? merged : [s];
+  return finalChunks.length > 0 ? finalChunks : [s];
 }
 window.splitStepHtmlIntoChunks = splitStepHtmlIntoChunks;
 
@@ -8100,8 +8286,8 @@ function viewPythonSkill(sid){
 
   const curEchTier = effTier || 1;
   const echProg = (typeof getEchelonProgress === 'function') ? getEchelonProgress(curEchTier) : { pct: 35 };
-  const echPct = (echProg && typeof echProg.pct === 'number' && echProg.pct > 0) ? echProg.pct : 35;
-  const dayXpVal = (typeof todayXp === 'function') ? (todayXp() || 55) : 55;
+  const echPct = echProg.pct || 0;
+  const dayXpVal = (typeof todayXp === 'function') ? todayXp() : 0;
 
   const focusTopbarHTML = `
     <div class="echelon-topbar-clean sprint-focus-topbar sprint-topbar" style="padding: 12px 20px;">
@@ -8120,6 +8306,7 @@ function viewPythonSkill(sid){
       <div style="display:flex;gap:10px;align-items:center;margin-left:14px;flex:none;">
         <div class="sprint-xp-pill" style="display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:999px;background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.35);color:#fbbf24;font-size:0.75rem;font-weight:700;white-space:nowrap;letter-spacing:0.01em;" title="Заработано за сутки: ${dayXpVal} XP">⚡ +${dayXpVal || 55} XP за сутки</div>
         <a href="#/docs" class="topbar-help-btn" style="padding:6px 14px;border-radius:10px;" title="Справочник синтаксиса и методов Python"><span class="topbar-help-text">📖 Справка</span></a>
+        <button type="button" class="topbar-help-btn" data-toggle-audio data-audio-toggle style="padding:6px 14px;border-radius:10px;cursor:pointer;" title="Слушать аудио / Аудио-компаньон"><span class="topbar-audio-text">🎧 Озвучить</span></button>
       </div>
     </div>
     <div id="theory-audio-bar" class="theory-audio-bar" style="display:${state.audioBarOpen ? 'flex' : 'none'};">
@@ -8140,7 +8327,7 @@ function viewPythonSkill(sid){
     const n = ALL_NOTES_COMBINED[kId] || { title: kId };
     const isDone = state.readNotes.includes(kId);
     const isActive = (pySkillViewState.tab === 'theory' && kId === activeK);
-    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="📖 Конспект: ${escapeHtmlStr(n.title)}" data-py-select-k="${kId}" data-py-skill-id="${sk.id}"></span>`;
+    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" data-py-select-k="${kId}" data-py-skill-id="${sk.id}"></span>`;
   }).join('');
 
   // 2. Флеш-карточки текущего навыка
@@ -8149,7 +8336,7 @@ function viewPythonSkill(sid){
     const d = ALL_DECKS_COMBINED[fid] || {};
     const isDone = state.reviewedDecks.includes(fid);
     const isActive = (pySkillViewState.tab === 'cards' && (activeF === fid || (!activeF && idx === 0)));
-    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="🗂️ Карточки: ${escapeHtmlStr(d.title || fid)}" data-py-select-f="${fid}"></span>`;
+    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" data-py-select-f="${fid}"></span>`;
   }).join('');
 
   // 3. Задачи практики кода текущего навыка
@@ -8159,21 +8346,21 @@ function viewPythonSkill(sid){
     const t = IDE_TASKS_BY_ID[tid] || {};
     const isDone = (solvedMap[tid] === 'solved');
     const isActive = (pySkillViewState.tab === 'code' && (activeTid === tid || (!activeTid && idx === 0)));
-    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="⚡ Задача #${tid}: ${escapeHtmlStr(t.title || '')}" data-py-select-task="${tid}"></span>`;
+    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" data-py-select-task="${tid}"></span>`;
   }).join('');
 
   // 4. Рубежный зачёт Юнита
   const examActive = (pySkillViewState.tab === 'exam');
-  const examDot = `<span class="dot-jewel milestone ${examActive ? 'active' : ''}" title="👑 Рубежный зачёт Юнита ${sk.unitId}" data-py-select-exam="${sk.unitId}"></span>`;
+  const examDot = `<span class="dot-jewel milestone ${examActive ? 'active' : ''}" data-py-select-exam="${sk.unitId}"></span>`;
 
   const dotsNecklaceHTML = `
-    <div class="dots-necklace" id="radar-dots-necklace" title="Конспекты → Карточки → Практика → Зачёт">
+    <div class="dots-necklace" id="radar-dots-necklace">
       ${noteDots}
-      <span class="dots-stage-divider" title="Переход к карточкам"></span>
+      <span class="dots-stage-divider"></span>
       ${cardDots}
-      <span class="dots-stage-divider" title="Переход к практике"></span>
+      <span class="dots-stage-divider"></span>
       ${taskDots}
-      <span class="dots-stage-divider" title="Рубежный зачёт"></span>
+      <span class="dots-stage-divider"></span>
       ${examDot}
     </div>`;
 
@@ -8194,9 +8381,9 @@ function viewPythonSkill(sid){
 
   // Деликатный двухстрочный заголовок: название юнита приглушено и не кричит (Refined Eyebrow), активная тема — выразительный элегантный фокус
   const eyebrowDotsHTML = `
-    <div class="topic-eyebrow-track" style="max-width:780px;margin:10px auto 14px;">
-      <div style="display:flex;flex-direction:column;gap:10px;width:100%;">
-        <div style="display:flex;flex-direction:column;align-items:flex-start;padding-left:2px;gap:2px;">
+    <div class="topic-eyebrow-track" style="max-width:100%;margin:16px 0 22px;padding:0 2px;">
+      <div style="display:flex;flex-direction:column;gap:12px;width:100%;">
+        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;">
           <div style="font-family:var(--font-b);font-size:0.80rem;font-weight:500;color:var(--ink-muted);letter-spacing:0.01em;line-height:1.2;">${escapeHtmlStr(cleanUnitTitle)}</div>
           ${activeItemTitle ? `<div style="font-family:var(--font-b);font-size:1.06rem;font-weight:600;color:var(--ink);line-height:1.35;letter-spacing:-0.01em;">${escapeHtmlStr(activeItemTitle)}</div>` : ''}
         </div>
@@ -8216,26 +8403,26 @@ function viewPythonSkill(sid){
 
     const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
     const canGoBack = (curChunkIdx > 0 || stepIdx > 0);
-    const backBtnHTML = canGoBack ? 
-      `<button type="button" class="btn btn-ghost" data-chunk-prev="py" style="padding:11px 16px;border-radius:14px;font-size:.88rem;">← Назад</button>` : 
-      `<a href="#${tr.routePrefix || '/python'}" class="btn btn-ghost" style="padding:11px 16px;border-radius:14px;font-size:.88rem;text-decoration:none;display:inline-flex;align-items:center;">← Назад</a>`;
+    const backBtnHTML = `<button type="button" class="btn btn-ghost" data-chunk-prev="py" style="padding:11px 16px;border-radius:14px;font-size:.88rem;white-space:nowrap;${canGoBack ? 'display:inline-flex;' : 'display:none;'}" ${canGoBack ? '' : 'disabled aria-hidden="true"'}>← Назад</button>`;
 
     let primaryActionHTML = '';
     if(hasMoreChunks){
       primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-chunk-more="py">Понятно, дальше (+10 XP) ➔</button>`;
     } else if(stepIdx + 1 < steps.length){
-      primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-next-step="${stepIdx+1}">Понятно, дальше (+10 XP) ➔</button>`;
+      const activeK = pySkillViewState.kId || 'unknown';
+      const stepKey = `${activeK}:${stepIdx+1}`;
+      const stepAlreadyDone = isRead || (state.completedNoteSteps && state.completedNoteSteps[stepKey]);
+      primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-next-step="${stepIdx+1}">Понятно, дальше${stepAlreadyDone ? '' : ' (+10 XP)'} ➔</button>`;
     } else {
       primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-finish-note="${activeK}">${isRead ? '✓ Конспект усвоен' : '✓ Завершить конспект (+10 MP)'}</button>`;
     }
 
     bodyHTML = `
-      <div class="card coddy-lesson-card" style="margin-top:0;">
-        ${feedHTML}
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--glass-border);flex-wrap:wrap;">
-          <div>${backBtnHTML}</div>
-          <div style="display:flex;gap:10px;align-items:center;">
-            <button type="button" class="btn btn-ghost" data-audio-toggle style="padding:11px 14px;border-radius:14px;font-size:.88rem;" title="Слушать аудио">🎧 Озвучить</button>
+      <div class="card coddy-lesson-card" style="margin-top:0;display:flex;flex-direction:column;justify-content:space-between;min-height:280px;">
+        <div style="flex:1;">${feedHTML}</div>
+        <div class="sprint-actions-bar" style="display:flex;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--glass-border);flex-wrap:nowrap;flex:none;">
+          ${backBtnHTML}
+          <div style="display:flex;gap:10px;align-items:center;flex:1;justify-content:center;">
             ${primaryActionHTML}
           </div>
         </div>
@@ -8243,29 +8430,37 @@ function viewPythonSkill(sid){
   } else if(pySkillViewState.tab === 'cards'){
     const deckObj = ALL_DECKS_COMBINED[activeF] || {id: activeF, title: activeF, cards: []};
     const cards = deckObj.cards || [];
-    const cardIdx = Math.min(pySkillViewState.cardIdx, Math.max(0, cards.length - 1));
-    const curCard = cards[cardIdx] || {q: 'Карточек пока нет', a: ''};
-    const isFlipped = pySkillViewState.cardFlipped;
+    const cIdx = Math.min(pySkillViewState.cardIdx, Math.max(0, cards.length - 1));
+    const curCard = cards[cIdx] || {q: 'Карточки загружаются', a: ''};
 
     bodyHTML = `
       <div class="card" style="margin-top:0;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <span style="font-size:0.80rem;color:var(--ink-muted);font-weight:600;">Карточка ${cards.length ? cardIdx + 1 : 0} из ${cards.length}</span>
-          
+          <span style="font-size:0.80rem;color:var(--ink-muted);font-weight:600;">Карточка ${cards.length ? cIdx + 1 : 0} из ${cards.length}</span>
+          <span style="font-size:0.75rem;padding:2px 8px;border-radius:999px;background:rgba(20,90,70,0.1);color:var(--moss);font-weight:600;">Интервальное повторение</span>
         </div>
-        <div class="py-flashcard ${isFlipped ? 'flipped' : ''}" data-py-flip-card style="min-height:180px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:26px 20px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);transition:all .25s ease;">
-          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-muted);margin-bottom:8px;">${isFlipped ? 'Ответ' : 'Вопрос (нажмите или пробел)'}</div>
-          <div style="font-size:1.08rem;font-weight:600;line-height:1.45;color:var(--ink);">${isFlipped ? curCard.a : curCard.q}</div>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;">
-          <button class="btn btn-ghost" data-py-prev-card ${cardIdx === 0 ? 'disabled' : ''}>← Назад</button>
-          <div style="display:flex;gap:8px;">
-            <button class="btn btn-ghost" data-py-rate-card="hard" title="Повторить скоро">Сложно</button>
-            <button class="btn btn-ghost" data-py-rate-card="good" title="В пределах нормы">Нормально</button>
-            <button class="btn btn-emerald" data-py-rate-card="easy" title="Отлично знаю">Легко (+5 MP)</button>
+        <div class="fc-card ${pySkillViewState.cardFlipped?'fc-card--Answer':''}" data-py-flip-card>
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div class="topic-badge">${pySkillViewState.cardFlipped ? 'Ответ' : 'Вопрос'}</div>
+              <a href="#/docs" class="card-help-badge" onclick="event.stopPropagation();" title="Открыть справку по теме в боковой панели">💡 Шпаргалка</a>
+            </div>
+            <div class="fc-q">${formatRichInlineText(curCard.q)}</div>
+            ${pySkillViewState.cardFlipped ? `<div class="fc-a">${formatRichInlineText(curCard.a)}</div>` : ''}
           </div>
-          <button class="btn btn-ghost" data-py-next-card ${cardIdx + 1 >= cards.length ? 'disabled' : ''}>Дальше →</button>
         </div>
+        ${pySkillViewState.cardFlipped ? `
+          <div class="fc-rate-row" style="margin-top:14px;">
+            <button class="btn btn-ghost" data-py-rate-card="1">Снова</button>
+            <button class="btn btn-burgundy" data-py-rate-card="2">Трудно (+2 XP)</button>
+            <button class="btn btn-clay" data-py-rate-card="3">Хорошо (+5 XP)</button>
+            <button class="btn btn-primary" data-py-rate-card="4">Легко (+10 XP)</button>
+          </div>` : `
+          <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-ghost" data-py-prev-card ${cIdx===0?'disabled':''}>← Назад</button>
+            <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-flip-card>Показать ответ (Пробел)</button>
+            <button class="btn btn-ghost" data-py-rate-card="3" ${cIdx + 1 >= cards.length ? 'disabled' : ''}>Дальше →</button>
+          </div>`}
       </div>`;
   } else if(pySkillViewState.tab === 'code'){
     const tObj = IDE_TASKS_BY_ID[activeTid] || {id: activeTid, title: 'Задача #' + activeTid, desc: '', initialCode: ''};
@@ -8274,10 +8469,19 @@ function viewPythonSkill(sid){
       `<div class="socratic-hint" style="margin:8px 0;padding:10px 14px;border-radius:12px;background:rgba(217,119,6,0.08);border-left:3px solid var(--amber);font-size:0.86rem;line-height:1.45;"><strong>💡 Наводка ${i+1}:</strong> ${h}</div>`
     ).join('');
 
+    const spec = buildTaskSpecDetails(tObj);
+    const taskIdx = tIds.indexOf(activeTid);
+    const isLastTask = (taskIdx >= tIds.length - 1);
+    const nextBtnLabel = isLastTask ? 'Рубежный зачёт ➔' : 'Следующая задача ➔';
+
     let runFeedback = '';
     if(pySkillViewState.runStatus === 'pass') runFeedback = `
-      <div class="result-feedback result-feedback--pass" style="margin-top:12px;padding:12px;border-radius:12px;background:rgba(16,185,129,0.12);border:1px solid #10b981;color:#10b981;">
-        <div style="font-weight:700;">✓ Все тесты пройдены! (+15 MP)</div>
+      <div class="result-feedback result-feedback--pass" style="margin-top:12px;padding:12px 16px;border-radius:14px;background:rgba(16,185,129,0.12);border:1px solid #10b981;color:#10b981;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div>
+          <div style="font-weight:700;">✓ Все тесты пройдены! (+15 MP)</div>
+          <div style="font-size:0.78rem;opacity:0.85;margin-top:2px;">Задача #${tObj.id} успешно решена и закреплена.</div>
+        </div>
+        <button type="button" class="btn-glass-emerald" style="padding:8px 16px;border-radius:10px;font-size:0.84rem;white-space:nowrap;" data-py-next-task-btn="${tObj.id}">${nextBtnLabel}</button>
       </div>`;
     else if(pySkillViewState.runStatus === 'fail') runFeedback = `
       <div class="result-feedback result-feedback--fail" style="margin-top:12px;padding:12px;border-radius:12px;background:rgba(239,68,68,0.12);border:1px solid #ef4444;color:#ef4444;">
@@ -8285,29 +8489,63 @@ function viewPythonSkill(sid){
         <pre style="margin-top:6px;font-size:0.80rem;white-space:pre-wrap;">${escapeHtmlStr(pySkillViewState.runOutput)}</pre>
       </div>`;
 
+    let cleanDesc = String(tObj.desc || '');
+    cleanDesc = cleanDesc.replace(/^<p>\s*<strong>\s*Задание\s*[:.-]?\s*<\/strong>\s*/i, '<p>');
+    cleanDesc = cleanDesc.replace(/^<p>\s*Задание\s*[:.-]?\s*/i, '<p>');
+    cleanDesc = cleanDesc.replace(/^<strong>\s*Задание\s*[:.-]?\s*<\/strong>\s*/i, '');
+    cleanDesc = cleanDesc.replace(/^Задание\s*[:.-]?\s*/i, '').trim();
+    cleanDesc = cleanDesc.replace(/^<p>/i, '').replace(/<\/p>$/i, '').trim();
+
     bodyHTML = `
       <div class="card" style="margin-top:0;">
-        <div class="practice-layout">
-          <div class="practice-left-pane">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-              <span class="topic-badge" style="margin:0;display:inline-flex;align-items:center;gap:6px;">Задача #${tObj.id} · <span class="badge" style="background:rgba(217,119,6,0.18);color:var(--amber);padding:1px 7px;border-radius:10px;font-weight:700;">${tObj.tier}</span> · ${tObj.topic}</span>
-              <div style="display:flex;gap:8px;align-items:center;">
-                <a href="#/docs" class="link-quiet" style="font-size:.78rem;">📚 Справка по методам Python</a>
-                ${solvedMap[tObj.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
+        <div class="practice-layout practice-coddy-split">
+          <div class="practice-left-pane practice-spec-pane">
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;">
+                <div style="display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;font-weight:700;">
+                  <span style="color:var(--ink-muted);">Задача #${tObj.id}</span>
+                  <span class="badge" style="background:rgba(217,119,6,0.18);color:var(--amber);padding:2px 8px;border-radius:8px;font-weight:700;white-space:nowrap;">${tObj.tier}</span>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <span style="font-size:0.78rem;color:var(--ink-muted);font-weight:600;">${taskIdx >= 0 ? taskIdx + 1 : 1} из ${tIds.length}</span>
+                  ${solvedMap[tObj.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
+                </div>
+              </div>
+              <div class="lesson-theory" style="font-size:0.89rem;color:var(--ink-soft);line-height:1.55;margin-bottom:12px;">
+                <strong>Задание:</strong> ${cleanDesc}
+              </div>
+              ${spec.ioCard}
+            </div>
+            <div style="margin-top:auto;padding-top:12px;border-top:1px solid var(--glass-border);">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <span style="font-size:0.75rem;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:0.04em;">💡 Наставник Сократ</span>
+                <span style="font-size:0.72rem;color:var(--ink-muted);">Уровень скаффолдинга: <strong>${pySkillViewState.hintLevel} / ${socraticHints.length}</strong></span>
+              </div>
+              <button type="button" class="btn btn-ghost" data-py-task-hint style="width:100%;justify-content:center;font-size:0.82rem;padding:9px 12px;border-radius:12px;border:1px dashed rgba(217,119,6,0.35);background:rgba(217,119,6,0.04);" ${pySkillViewState.hintLevel>=socraticHints.length?'disabled':''}>
+                ${pySkillViewState.hintLevel>=socraticHints.length ? '✓ Все наводки раскрыты' : 'Получить наводку без готового кода ➔'}
+              </button>
+              ${shownHints}
+            </div>
+          </div>
+          <div class="practice-right-pane" style="display:flex;flex-direction:column;justify-content:space-between;">
+            <div>
+              ${buildCodeEditorWithGutterHTML('py-skill-editor', pySkillViewState.codeDraft, 220, spec.quickTokens)}
+              <div class="practice-kbd-dock">
+                <span><kbd>Ctrl</kbd>+<kbd>Enter</kbd> Запустить тесты</span>
+                <span><kbd>Tab</kbd> Отступ</span>
               </div>
             </div>
-            <h2 style="margin-bottom:10px;">${tObj.title}</h2>
-            <div class="lesson-theory" style="margin-bottom:12px;">${tObj.desc}</div>
-            ${shownHints}
-          </div>
-          <div class="practice-right-pane">
-            ${buildCodeEditorWithGutterHTML('py-skill-editor', pySkillViewState.codeDraft, 220)}
-            <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-              <button class="btn-glass-emerald" data-py-run-task="${tObj.id}">${ICONS.play} Проверить решение (Ctrl+Enter)</button>
-              <button class="btn btn-ghost" data-py-task-hint ${pySkillViewState.hintLevel>=socraticHints.length?'disabled':''}>💡 Сократовская наводка (${pySkillViewState.hintLevel}/${socraticHints.length})</button>
-              <button class="btn btn-ghost" data-py-reset-task="${tObj.id}">Сбросить код</button>
+            <div style="margin-top:10px;">
+              <div style="display:flex;gap:10px;align-items:center;">
+                <button type="button" class="btn btn-ghost" data-py-reset-task="${tObj.id}" style="padding:12px 14px;border-radius:14px;flex:none;opacity:0.8;" title="Сбросить код к исходному шаблону">↺</button>
+                <button type="button" class="btn-check-solution" data-py-run-task="${tObj.id}">
+                  <span>${ICONS.play} Проверить решение</span>
+                  <span class="xp-tag">+15 XP</span>
+                  <span style="font-size:0.75rem;opacity:0.85;font-weight:500;">(Ctrl+Enter)</span>
+                </button>
+              </div>
+              ${runFeedback}
             </div>
-            ${runFeedback}
           </div>
         </div>
       </div>`;
@@ -8316,9 +8554,9 @@ function viewPythonSkill(sid){
   return `
     <div class="container" style="max-width:880px;">
       ${focusTopbarHTML}
-      ${celebrationBanner}
       ${eyebrowDotsHTML}
       ${bodyHTML}
+      ${celebrationBanner}
     </div>`;
 }
 
@@ -13490,6 +13728,39 @@ document.addEventListener('click', async function(e){
     return;
   }
 
+  const pnextTask = e.target.closest('[data-py-next-task-btn]');
+  if(pnextTask){
+    const tid = parseInt(pnextTask.getAttribute('data-py-next-task-btn'), 10);
+    const sk = PY_SKILLS_BY_ID[pySkillViewState.sid];
+    const tIds = (sk && sk.taskIds && sk.taskIds.length) ? sk.taskIds : [20, 19, 39, 255, 258];
+    const curIdx = tIds.indexOf(tid);
+    if(curIdx >= 0 && curIdx + 1 < tIds.length){
+      const nextTid = tIds[curIdx + 1];
+      const nextObj = IDE_TASKS_BY_ID[nextTid];
+      pySkillViewState.taskId = nextTid;
+      pySkillViewState.codeDraft = nextObj ? getIdeDraft(nextTid, nextObj.initialCode) : '';
+      pySkillViewState.hintLevel = 0;
+      pySkillViewState.runStatus = null;
+      pySkillViewState.runOutput = '';
+      saveReadingPosition();
+      render();
+    } else {
+      const tr = sk ? getTrackForSkill(sk.id) : (MASTERY_TRACKS.python || { key: 'python' });
+      const unitId = (sk && sk.unitId) || '1.1';
+      location.hash = `#/${tr.key}/unittest/${unitId}`;
+    }
+    return;
+  }
+
+  const psexam = e.target.closest('[data-py-select-exam]');
+  if(psexam){
+    const unitId = psexam.getAttribute('data-py-select-exam') || '1.1';
+    const sk = PY_SKILLS_BY_ID[pySkillViewState.sid];
+    const tr = sk ? getTrackForSkill(sk.id) : (MASTERY_TRACKS.python || { key: 'python' });
+    location.hash = `#/${tr.key}/unittest/${unitId}`;
+    return;
+  }
+
   // Module Boss Challenge actions
   if(e.target.closest('[data-boss-hint]')){
     const ed = document.getElementById('boss-code-editor');
@@ -14880,6 +15151,16 @@ if _IS_UNPACKED_ARCHIVE:
         with open(unpacked_html, 'w', encoding='utf-8', newline='\n') as f:
             f.write(html_out)
 
+# Canonical Benchmark: sync Эталоны.html with assembled academy.html
+etalon_path = os.path.join(_UNPACKED_ROOT, 'Эталоны.html')
+with open(etalon_path, 'w', encoding='utf-8', newline='\n') as f:
+    f.write(html_out)
+if os.path.isdir(_CLOUD_DIR):
+    cloud_etalon = os.path.join(_CLOUD_DIR, 'Эталоны.html')
+    if os.path.abspath(cloud_etalon) != os.path.abspath(etalon_path):
+        with open(cloud_etalon, 'w', encoding='utf-8', newline='\n') as f:
+            f.write(html_out)
+
 _inline_scripts = re.findall(r'<script>([\s\S]*?)</script>', html_out)
 if _inline_scripts:
     with open(os.path.join(_HERE, 'extracted_academy.js'), 'w', encoding='utf-8', newline='\n') as f:
@@ -14963,18 +15244,6 @@ if os.path.isdir(_CLOUD_DIR) and os.path.isdir(BASE_REMNOTE) and os.path.isfile(
                 with open(pf_full, 'rb') as src_f, open(dst_pf, 'wb') as dst_f:
                     dst_f.write(src_f.read())
 
-    scratch_mockups_dir = os.path.join(_HERE, 'design_mockups')
-    if os.path.isdir(scratch_mockups_dir):
-        cloud_mockups_dir = os.path.join(_CLOUD_DIR, 'design_mockups')
-        os.makedirs(cloud_mockups_dir, exist_ok=True)
-        for mf in os.listdir(scratch_mockups_dir):
-            mf_full = os.path.join(scratch_mockups_dir, mf)
-            if os.path.isfile(mf_full):
-                dst_mf = os.path.join(cloud_mockups_dir, mf)
-                if os.path.abspath(mf_full) != os.path.abspath(dst_mf):
-                    with open(mf_full, 'rb') as src_f, open(dst_mf, 'wb') as dst_f:
-                        dst_f.write(src_f.read())
-
     tmp_zip_path = ARCHIVE_ZIP_PATH + '.tmp'
     with zipfile.ZipFile(tmp_zip_path, 'w', compression=zipfile.ZIP_DEFLATED) as zf:
         handover_src = SCRATCH_HANDOVER_PATH if os.path.isfile(SCRATCH_HANDOVER_PATH) else CLOUD_HANDOVER_PATH
@@ -14987,6 +15256,7 @@ if os.path.isdir(_CLOUD_DIR) and os.path.isdir(BASE_REMNOTE) and os.path.isfile(
         zf.write(html_src, 'academy.html')
         zf.write(IDE_HTML_PATH, 'Практика кода — тренажёр с IDE.html')
         extra_root_files = [
+            'Эталоны.html',
             'manifest.json',
             'icon.svg',
             'sw.js',
@@ -15000,7 +15270,7 @@ if os.path.isdir(_CLOUD_DIR) and os.path.isdir(BASE_REMNOTE) and os.path.isfile(
             'RemNote_Python_Mastery_FIXED.zip'
         ]
         for erf in extra_root_files:
-            erf_full = os.path.join(_CLOUD_DIR, erf)
+            erf_full = os.path.join(_CLOUD_DIR, erf) if os.path.isfile(os.path.join(_CLOUD_DIR, erf)) else os.path.join(_UNPACKED_ROOT, erf)
             if os.path.isfile(erf_full):
                 zf.write(erf_full, erf)
         for root, dirs, files in os.walk(BASE_REMNOTE):

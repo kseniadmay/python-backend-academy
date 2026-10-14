@@ -2,7 +2,7 @@
 **Проект**: Интерактивная платформа и база знаний «Junior+ Python Backend Developer» (`academy.html` + `Практика кода — тренажёр с IDE.html` + `RemNote_Python_Mastery_FIXED`)  
 **Единая облачная папка проекта**: `C:\Users\fury6\OneDrive\Python_Backend_Academy` (ярлык на Рабочем столе: `C:\Users\fury6\OneDrive\Desktop\Python Backend Academy (Cloud).lnk`)  
 **Эталонный архив проекта**: `C:\Users\fury6\OneDrive\Python_Backend_Academy\Python_Backend_Academy_Project.zip`  
-**Последнее обновление**: 12.10.2026 (Аудит, чистка правил, интеграция Zen-практики, 100% PASS verify_all)  
+**Последнее обновление**: 14.10.2026 (Каноническое внедрение HTML-эталонов: чистая типографика теории без рамок, непрерывная цепь 13 точек, SRS карточки со шпаргалкой, Split-View практики с Сократом и I/O Flow, модалка рубежного теста, 100% PASS всех тестов)  
 
 > [!IMPORTANT]
 > **Инструкция для ИИ-ассистента в начале новой сессии**:
@@ -347,11 +347,10 @@
 ## 5. КАТАЛОГ ЭТАЛОНОВ И КАНОНИЧЕСКИЙ КАРКАС ИНТЕРФЕЙСА
 
 ### 🏛️ Утверждённый статус эталонов (Canonical Benchmarks)
-По результатам согласования реальное живое состояние интерфейса платформы (зафиксированное в `test_authentic_improvements.html` и `test_authentic_improvements.png`) утверждено в качестве **КАНОНИЧЕСКОГО ЭТАЛОНА (BENCHMARK)** для всех последующих сессий и доработок.
+Единственным утверждённым **КАНОНИЧЕСКИМ ЭТАЛОНОМ (BENCHMARK)** архитектуры, вёрстки, стилей и логики экранов платформы для всех последующих сессий и доработок является:
+- `C:\Users\fury6\OneDrive\Python_Backend_Academy\Эталоны.html` — полный автономный канонический HTML-эталон платформы со всеми скриптами, стилями, экранами и интерактивной механикой.
 
-Файлы эталонов размещены и зафиксированы:
-- `design_mockups/canonical_pro_screen_benchmark.html` — полный автономный HTML-эталон живого состояния со всеми скриптами, стилями и разметкой (зеркало в `C:\Users\fury6\.gemini\antigravity\scratch\design_mockups\canonical_pro_screen_benchmark.html`).
-- `design_mockups/canonical_pro_screen_benchmark.png` — утверждённый визуальный референс рендеринга высокого разрешения (зеркало в `C:\Users\fury6\.gemini\antigravity\scratch\design_mockups\canonical_pro_screen_benchmark.png`).
+Все остальные разрозненные макеты, старые мокапы и альтернативные правила создания экранов упразднены и удалены. Любые экраны обязаны строго соответствовать `Эталоны.html`.
 
 ---
 
