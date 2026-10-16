@@ -8969,14 +8969,14 @@ function buildPriorityRoadmapWidgetHTML(opts){
       </div>`;
   }).join('');
 
-  const gapsBanner = openGaps.length > 0 ? `
-    <div style="margin-top:12px;padding:10px 14px;border-radius:12px;background:rgba(185,28,28,0.08);border:1px solid rgba(185,28,28,0.28);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-      <div>
-        <span class="echelon-badge echelon-badge--gap">🎯 Приоритет №1 по диагностике</span>
-        <span style="font-size:.86rem;margin-left:6px;">Начни отсюда — это спросят на первом скрининге! Осталось закрыть пробелов: <b>${openGaps.length}</b> (${openGaps.slice(0,4).map(sid => `<a href="#${getTrackForSkill(sid).routePrefix}/skill/${sid}" style="font-weight:700;">${sid}</a>`).join(', ')})</span>
+  const gapsBanner = `
+    <div style="margin-top:12px;padding:10px 14px;border-radius:12px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.22);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span class="badge" style="background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.35);color:var(--moss);padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;">🎯 Следующий рубеж</span>
+        <span style="font-size:.84rem;color:var(--ink);">Следующий рубеж: завершите Unit 1.1 для перехода к скринингу${openGaps.length > 0 ? ` · Фокус: <b>${openGaps.slice(0,3).join(', ')}</b>` : ''}</span>
       </div>
-      <a href="#/topic/diag" class="link-quiet" style="font-size:.8rem;">Перепройти диагностику →</a>
-    </div>` : '';
+      <a href="#/path" class="link-quiet" style="font-size:.8rem;font-weight:600;">К тропе обучения ➔</a>
+    </div>`;
 
   return `
     <div class="priority-roadmap-card">
@@ -13381,6 +13381,7 @@ function getSpacedRepetitionStats(){
     weakCardsCount: weakCardsCount,
     reviewedDecksCount: reviewed.length,
     dueTodayCardsCount: dueTodayCardsCount,
+    dueTodayDecksCount: dueTodayDecks.size,
     masteredCardsCount: masteredCardsCount,
     dueDecks: dueDecks
   };
@@ -13536,7 +13537,7 @@ viewDashboard = function(){
     { label: 'Готовность к скринингу', val: e1Pct + '%', sub: `${e1CurMp} / ${e1MaxMp} MP`, icon: '🎯' },
     { label: 'Навыков освоено', val: Object.keys(state.masteryLevels || {}).filter(k => (state.masteryLevels[k]||0)>=80).length + ' / ' + skillsAll, sub: `${Math.round(totalAllMp / 12600 * 100)}% базы`, icon: '⚡' },
     { label: 'Задач IDE решено', val: totalSolvedIde + ' / 401', sub: `${Math.round(totalSolvedIde / 401 * 100)}% практики`, icon: '💻' },
-    { label: 'Повторено колод', val: srs.reviewedDecksCount + ' / 286', sub: `${srs.dueTodayDecksCount} ждут повторения`, icon: '🔁' }
+    { label: 'Повторено колод', val: srs.reviewedDecksCount + ' / 286', sub: `${srs.dueTodayDecksCount || (srs.dueTodayDecks ? srs.dueTodayDecks.size : 0)} ждут повторения`, icon: '🔁' }
   ].map(t => `
     <div class="dash-result-tile">
       <div class="tile-top"><span>${t.label}</span><span class="icon">${t.icon}</span></div>
@@ -13545,8 +13546,10 @@ viewDashboard = function(){
     </div>
   `).join('');
 
-  // 126-Skill Compact Matrix Across All 7 Tracks
-  const resultsMatrixHTML = Object.values(MASTERY_TRACKS).map(tr => {
+  // 126-Skill Compact Matrix Across All 7 Tracks (Coddy: active tracks first, 0% to 'Ожидает открытия' and folded)
+  const activeTrackRows = [];
+  const dormantTrackRows = [];
+  Object.values(MASTERY_TRACKS).forEach(tr => {
     const trCurMp = tr.skills.reduce((sum, s) => sum + getSkillMP(s.id), 0);
     const trMaxMp = Math.max(1, tr.skills.length * 100);
     const trPct = Math.round(trCurMp / trMaxMp * 100);
@@ -13558,14 +13561,36 @@ viewDashboard = function(){
       const focusCls = isFocus ? ' m-sq--focus' : '';
       return `<a href="#${s.routePrefix}/skill/${s.id}" class="m-sq ${isM ? 'mastered' : (isA ? 'active' : '')}${focusCls}" title="${s.id}: ${s.title} (${mp} MP)${isFocus ? ' · ТЕКУЩИЙ ФОКУС' : ''}"></a>`;
     }).join('');
-    return `
+    const statusText = trPct > 0 ? `${trPct}%` : 'Ожидает открытия';
+    const rowHTML = `
       <div class="dash-skill-row">
         <a href="#${tr.routePrefix}" class="tr-label" title="Открыть матрицу ${tr.title}">${tr.title}</a>
         <div class="tr-squares">${sqs}</div>
-        <div class="tr-pct">${trPct}%</div>
+        <div class="tr-pct" style="${trPct === 0 ? 'font-size:.72rem;color:var(--ink-muted);font-weight:600;' : ''}">${statusText}</div>
       </div>
     `;
-  }).join('');
+    if(trPct > 0){
+      activeTrackRows.push(rowHTML);
+    } else {
+      dormantTrackRows.push(rowHTML);
+    }
+  });
+
+  const dormantHTML = dormantTrackRows.length > 0 ? `
+    <details class="dash-accordion cocoon-details" style="margin-top:8px;border:none;background:transparent;padding:0;">
+      <summary style="cursor:pointer;font-size:.78rem;color:var(--ink-muted);padding:4px 0;font-weight:600;">Остальные направления (${dormantTrackRows.length}) ▾</summary>
+      <div style="margin-top:6px;">${dormantTrackRows.join('')}</div>
+    </details>
+  ` : '';
+
+  const resultsMatrixHTML = (activeTrackRows.length > 0
+    ? activeTrackRows.join('')
+    : (dormantTrackRows.length > 0 ? dormantTrackRows.slice(0, 1).join('') : ''))
+    + (activeTrackRows.length > 0 ? dormantHTML : (dormantTrackRows.length > 1 ? `
+    <details class="dash-accordion cocoon-details" style="margin-top:8px;border:none;background:transparent;padding:0;">
+      <summary style="cursor:pointer;font-size:.78rem;color:var(--ink-muted);padding:4px 0;font-weight:600;">Остальные направления (${dormantTrackRows.length - 1}) ▾</summary>
+      <div style="margin-top:6px;">${dormantTrackRows.slice(1).join('')}</div>
+    </details>` : ''));
 
   // Mini-list of echelon 1 topics with current focus badge
   const miniListHTML = e1.skills.map(s => {
@@ -13647,13 +13672,13 @@ viewDashboard = function(){
       </div>
 
       <!-- Mini-list of Echelon 1 Topics -->
-      <div class="panel" style="padding:14px 16px;margin-bottom:10px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <h3 style="font-size:0.95rem;margin:0;">🐍 Темы Эшелона 1 (Junior Screening)</h3>
-          <a href="#/python" class="link-quiet" style="font-size:.76rem;">Все 28 тем ➔</a>
-        </div>
-        ${miniListHTML}
-      </div>
+      <details class="dash-accordion cocoon-details" style="margin-bottom:10px;">
+        <summary style="cursor:pointer;font-weight:700;font-size:0.92rem;display:flex;justify-content:space-between;align-items:center;">
+          <span>🐍 Темы Эшелона 1 (${e1.skills.filter(s => getSkillMP(s.id) >= 100).length}/${e1.skills.length} пройдено) ▾</span>
+          <span class="link-quiet" style="font-size:.76rem;">Развернуть темы</span>
+        </summary>
+        <div style="margin-top:10px;">${miniListHTML}</div>
+      </details>
 
       <!-- Collapsible Full 126-Skill Matrix & Tracks Accordion -->
       <details class="dash-accordion cocoon-details" style="margin-bottom:10px;">
@@ -13678,12 +13703,7 @@ viewDashboard = function(){
       <!-- Collapsible Drawer for All Modules, Echelons, Pomodoro & Global Stats -->
       <details class="cocoon-details">
         <summary>Все модули, эшелоны и статистика ▾</summary>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px;">
-          <a href="#/practice" class="btn btn-ghost" style="padding:6px 12px;font-size:.78rem;">💻 Тренажёр 401 задачи</a>
-          <a href="#/cards" class="btn btn-ghost" style="padding:6px 12px;font-size:.78rem;">🃏 286 3D-колод Ф-xxx</a>
-          <a href="#/mock" class="btn btn-ghost" style="padding:6px 12px;font-size:.78rem;">🎙️ Симулятор собеседования</a>
-          <a href="#/docs" class="btn btn-ghost" style="padding:6px 12px;font-size:.78rem;">📚 Справочник Backend</a>
-        </div>
+        <div style="margin-top:12px;"></div>
         ${buildPriorityRoadmapWidgetHTML({ compact: true })}
         <div class="panel" style="margin-bottom:0;">
           <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -13701,6 +13721,15 @@ viewDashboard = function(){
           <p class="meta" style="margin:0;">Завершённый спринт приносит +25 XP. Звук: <button class="link-quiet" data-toggle-sound>${state.soundEnabled ? '🔊 Вкл' : '🔇 Выкл'}</button></p>
         </div>
       </details>
+
+      <!-- Мотивационная подсказка текущего спринта в нейтральном деликатном тоне -->
+      <div style="margin-top:12px;padding:11px 15px;border-radius:14px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.22);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="badge" style="background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.35);color:var(--moss);padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;">🎯 Текущий спринт</span>
+          <span style="font-size:.84rem;color:var(--ink-muted);">Следующий рубеж: завершите Unit 1.1 для перехода к скринингу</span>
+        </div>
+        <a href="#/python" class="link-quiet" style="font-size:.78rem;font-weight:600;">Перейти к юниту ➔</a>
+      </div>
     </div>`;
 };
 

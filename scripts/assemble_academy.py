@@ -7816,14 +7816,14 @@ function buildPriorityRoadmapWidgetHTML(opts){
       </div>`;
   }).join('');
 
-  const gapsBanner = openGaps.length > 0 ? `
-    <div style="margin-top:12px;padding:10px 14px;border-radius:12px;background:rgba(185,28,28,0.08);border:1px solid rgba(185,28,28,0.28);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-      <div>
-        <span class="echelon-badge echelon-badge--gap">🎯 Приоритет №1 по диагностике</span>
-        <span style="font-size:.86rem;margin-left:6px;">Начни отсюда — это спросят на первом скрининге! Осталось закрыть пробелов: <b>${openGaps.length}</b> (${openGaps.slice(0,4).map(sid => `<a href="#${getTrackForSkill(sid).routePrefix}/skill/${sid}" style="font-weight:700;">${sid}</a>`).join(', ')})</span>
+  const gapsBanner = `
+    <div style="margin-top:12px;padding:10px 14px;border-radius:12px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.22);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span class="badge" style="background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.35);color:var(--moss);padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;">🎯 Следующий рубеж</span>
+        <span style="font-size:.84rem;color:var(--ink);">Следующий рубеж: завершите Unit 1.1 для перехода к скринингу${openGaps.length > 0 ? ` · Фокус: <b>${openGaps.slice(0,3).join(', ')}</b>` : ''}</span>
       </div>
-      <a href="#/topic/diag" class="link-quiet" style="font-size:.8rem;">Перепройти диагностику →</a>
-    </div>` : '';
+      <a href="#/path" class="link-quiet" style="font-size:.8rem;font-weight:600;">К тропе обучения ➔</a>
+    </div>`;
 
   return `
     <div class="priority-roadmap-card">
