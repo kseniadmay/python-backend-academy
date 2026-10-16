@@ -1,6 +1,6 @@
 /**
  * test_bugs_regression.js
- * Автоматические регрессионные тесты для предотвращения повторения багов 1..40.
+ * Автоматические регрессионные тесты для предотвращения повторения багов 1..50.
  */
 
 'use strict';
@@ -14,7 +14,7 @@ const academyPath = path.join(rootDir, 'academy.html');
 const etalonyPath = path.join(rootDir, 'Эталоны', 'Эталоны.html');
 
 console.log('================================================================');
-console.log('   REGRESSION TEST SUITE: BUGS 1..40 VERIFICATION               ');
+console.log('   REGRESSION TEST SUITE: BUGS 1..50 VERIFICATION               ');
 console.log('================================================================\n');
 
 assert(fs.existsSync(academyPath), `academy.html missing`);
@@ -247,6 +247,74 @@ assert(!f026Content.includes('как statement') && f026Content.includes('сос
 assert(!academyHtml.includes('как statement'), 'Bug 40: academy.html must not contain statement jargon in F-026');
 console.log('✓ Bug 40: Clarification of statement vs expression in F-026 card 2 verified');
 
+// 41. Bug 41: Ф-027 card 2: инлайн форматирование кода list(map(...)) и list(filter(...))
+const f027Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.2 · Функции', '📇 Карточки', 'Ф-027. Функции map() и filter().md');
+assert(fs.existsSync(f027Path), 'Ф-027.md missing');
+const f027Content = fs.readFileSync(f027Path, 'utf-8');
+assert(f027Content.includes('`list(map(...))`') && f027Content.includes('`list(filter(...))`'), 'Bug 41: F-027 card 2 markdown must wrap list(map) and list(filter) in code backticks');
+assert(academyHtml.includes('<code>list(map(...))</code> или <code>list(filter(...))</code>'), 'Bug 41: academy.html must wrap list(map) and list(filter) in <code> tags in F-027 deck');
+console.log('✓ Bug 41: F-027 card 2 inline code formatting verified');
+
+// 42. Bug 42: Unit Test 1.2 explain: почему 4-й вариант O(log n) не подходит
+assert(academyHtml.includes('Вариант 4 с O(log n) невозможен: логарифмическая сложность присуща структурам на основе сбалансированных деревьев'), 'Bug 42: Unit test 1.2 question 1 explain must clearly detail why option 4 O(log n) is impossible for list');
+console.log('✓ Bug 42: Unit test 1.2 explanation of option 4 rejection verified');
+
+// 43. Bug 43: Unit Test 1.2: расширение пула вопросов до 8 исчерпывающих заданий
+const mUnitTests12 = academyHtml.match(/"1\.2":\s*\{\s*"unitId":\s*"1\.2".*?"questions":\s*(\[.*?\])\s*\}/s);
+assert(mUnitTests12, 'academy.html must contain parsed UNIT_TESTS 1.2');
+const parsedQuestions12 = JSON.parse(mUnitTests12[1]);
+assert.strictEqual(parsedQuestions12.length, 8, `Unit test 1.2 must contain 8 exhaustive questions, got ${parsedQuestions12.length}`);
+console.log('✓ Bug 43: Unit test 1.2 questions pool expanded to 8 exhaustive questions verified');
+
+// 44. Bug 44: Готовность к скринингу на экране #/path в верхнем баннере
+assert(academyHtml.includes('class="path-screening-badge"'), 'Bug 44: viewPathSerpentine must render .path-screening-badge in top banner');
+assert(academyHtml.includes('⚡ Готовность к тех-скринингу: ${e1PctTop}%'), 'Bug 44: top chapter banner must show dynamic readiness % badge');
+assert(academyHtml.includes('.path-screening-badge {'), 'Bug 44: CSS must define styling for .path-screening-badge');
+console.log('✓ Bug 44: Screening readiness indicator on top path banner verified');
+
+// 45. Bug 45: К-022 step 1: разбиение слишком большого шага на 2 микро-шага
+const k022Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.3 · Итераторы и генераторы', '📚 Конспекты', 'К-022. Итераторы и генераторы – в чём разница.md');
+assert(fs.existsSync(k022Path), 'К-022.md missing');
+const k022Content = fs.readFileSync(k022Path, 'utf-8');
+assert(k022Content.includes('## Iterable vs Iterator: ключевые различия'), 'Bug 45: K-022.md must define Iterable vs Iterator as standalone micro-step');
+assert(k022Content.includes('## Получение итератора через iter() и обход next()'), 'Bug 45: K-022.md must separate iter() and next() walkthrough into distinct micro-step');
+console.log('✓ Bug 45: K-022 step 1 split into 2 concise micro-steps verified');
+
+// 46. Bug 46: Фиксация поля вывода кода (не исчезает после запуска)
+assert(academyHtml.includes('window.__snippetOutputs'), 'Bug 46: academy.html must cache snippet outputs in window.__snippetOutputs');
+assert(academyHtml.includes('function restoreSnippetOutputs()'), 'Bug 46: academy.html must define restoreSnippetOutputs to preserve outputs across rerenders');
+assert(academyHtml.includes('e.stopPropagation()') && academyHtml.includes('runInlineSnippet(runInl)'), 'Bug 46: snippet click must stop event propagation');
+console.log('✓ Bug 46: Snippet output persistence and zero-vanish guarantee verified');
+
+// 47. Bug 47: К-022 step 4: разбиение большого шага памяти
+assert(k022Content.includes('## Память и ленивые вычисления: List vs Generator'), 'Bug 47: K-022.md must contain dedicated memory trade-off micro-step');
+assert(k022Content.includes('## Однократность обхода и компромиссы генераторов'), 'Bug 47: K-022.md must contain dedicated single-pass generator micro-step');
+console.log('✓ Bug 47: K-022 step 4 split into memory and traversal micro-steps verified');
+
+// 48. Bug 48: К-022 общее число микро-шагов = 7 (Coddy & Mastery Learning)
+const mK022 = academyHtml.match(/"К-022":\s*\{[^}]*"steps":\s*(\[.*?\])\s*\}/s);
+assert(mK022, 'academy.html must contain parsed К-022 object in NOTES_DATA');
+const parsedK022 = JSON.parse(mK022[1]);
+assert.strictEqual(parsedK022.length, 7, `K-022 must have exactly 7 micro-steps, got ${parsedK022.length}`);
+console.log('✓ Bug 48: K-022 partitioned into 7 digestible micro-steps verified');
+
+// 49. Bug 49: К-218 step 2: читабельная верстка бесконечных итераторов count, cycle, repeat
+const k218Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.3 · Итераторы и генераторы', '📚 Конспекты', 'К-218. Модуль itertools_ бесконечные итераторы, цепочки и комбинаторика.md');
+assert(fs.existsSync(k218Path), 'К-218.md missing');
+const k218Content = fs.readFileSync(k218Path, 'utf-8');
+assert(k218Content.includes('**1. `count(start=0, step=1)`'), 'Bug 49: K-218 step 2 must separate count into distinct section with code');
+assert(k218Content.includes('**2. `cycle(iterable)`'), 'Bug 49: K-218 step 2 must separate cycle into distinct section with code');
+assert(k218Content.includes('**3. `repeat(elem, times=None)`'), 'Bug 49: K-218 step 2 must separate repeat into distinct section with code');
+assert(academyHtml.includes('Round-Robin') && academyHtml.includes('count(start=100, step=5)'), 'Bug 49: academy.html must render structured infinite iterators');
+console.log('✓ Bug 49: K-218 step 2 readable layout for count, cycle and repeat verified');
+
+// 50. Bug 50: К-218 step 3: читабельный текст для chain, islice, takewhile, dropwhile
+assert(k218Content.includes('**1. `chain(*iterables)` и `chain.from_iterable()`'), 'Bug 50: K-218 step 3 must isolate chain with O(1) memory note');
+assert(k218Content.includes('**2. `islice(iterable, start, stop[, step])`'), 'Bug 50: K-218 step 3 must isolate islice with TypeError explanation');
+assert(k218Content.includes('**3. `takewhile` vs `dropwhile`'), 'Bug 50: K-218 step 3 must isolate takewhile and dropwhile with predicate difference');
+assert(academyHtml.includes('Склеивают последовательности без создания промежуточных копий') && academyHtml.includes('<code>takewhile</code> vs <code>dropwhile</code>'), 'Bug 50: academy.html must render structured stream operations');
+console.log('✓ Bug 50: K-218 step 3 readable formatting for chain, islice, takewhile, dropwhile verified');
+
 console.log('\n================================================================');
-console.log('  ALL 40 REGRESSION TESTS PASSED! (0 FAILURES, ZERO RECURRENCE) ');
+console.log('  ALL 50 REGRESSION TESTS PASSED! (0 FAILURES, ZERO RECURRENCE) ');
 console.log('================================================================\n');
