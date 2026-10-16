@@ -121,10 +121,10 @@ assert(academyHtml.includes('data-py-select-k="${nextKid}"'), 'Continue reading 
 assert(academyHtml.includes('cleanTitle = rawTitle.replace'), 'Celebration title must strip raw technical note IDs like К-001');
 console.log('✓ Bugs 17 & 18: Sprint finish celebration modal with continue reading button & clean titles verified');
 
-// 19. Bug 19: Убрать технические мусорные обозначения на #/ и соблюдать Home = Journey
+// 19. Bug 19: Убрать технические мусорные обозначения и восстановить дашборд на #/
 assert(!academyHtml.includes('Это каркас: карта навыков уже живая'), 'Old technical placeholder text must be stripped from dashboard');
-assert(academyHtml.includes("if(route === '/'){\n    root.innerHTML = (state.pathViewMode === 'pro') ? viewProPath() : viewPathSerpentine();") || academyHtml.includes("if(route === '/'){\r\n    root.innerHTML = (state.pathViewMode === 'pro') ? viewProPath() : viewPathSerpentine();"), 'Root route #/ must directly render the main journey path (Home = Journey)');
-console.log('✓ Bug 19: Root route cleaned from technical placeholders, Home = Journey enforced');
+assert(academyHtml.includes("if(route === '/' || route === '/dashboard'){\n    root.innerHTML = viewDashboard();") || academyHtml.includes("if(route === '/' || route === '/dashboard'){\r\n    root.innerHTML = viewDashboard();"), 'Root route #/ must render viewDashboard() to ensure Dashboard is functional');
+console.log('✓ Bug 19: Dashboard operational on #/ and technical placeholders stripped');
 
 // 20. Bug 20: К-004 step 2: 'в сравнении с list', а не 'со'
 const k004Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.1 · Базовый синтаксис', '📚 Конспекты', 'К-004. frozenset_ неизменяемое множество.md');
