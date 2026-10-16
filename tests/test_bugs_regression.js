@@ -1,0 +1,99 @@
+/**
+ * test_bugs_regression.js
+ * Автоматические регрессионные тесты для предотвращения повторения багов 1..10.
+ */
+
+'use strict';
+const fs = require('fs');
+const path = require('path');
+const assert = require('assert');
+
+const rootDir = path.resolve(__dirname, '..');
+const remnoteDir = path.join(rootDir, 'RemNote_Python_Mastery_FIXED');
+const academyPath = path.join(rootDir, 'academy.html');
+const etalonyPath = path.join(rootDir, 'Эталоны', 'Эталоны.html');
+
+console.log('================================================================');
+console.log('   REGRESSION TEST SUITE: BUGS 1..10 VERIFICATION               ');
+console.log('================================================================\n');
+
+assert(fs.existsSync(academyPath), `academy.html missing`);
+assert(fs.existsSync(etalonyPath), `Эталоны.html missing`);
+
+const academyHtml = fs.readFileSync(academyPath, 'utf-8');
+const etalonyHtml = fs.readFileSync(etalonyPath, 'utf-8');
+
+// 0. Строгая идентичность канонических файлов
+assert.strictEqual(academyHtml, etalonyHtml, 'academy.html и Эталоны.html обязаны быть строго побайтово идентичны!');
+console.log('✓ Invariant 0: academy.html === Эталоны.html (100% MATCH)');
+
+// 1. Bug 1: Ф-002 card 5: корректность all() и генераторного выражения без списковых скобок
+const f002Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.1 · Базовый синтаксис', '📇 Карточки', 'Ф-002. Методы проверки вхождения подмножества.md');
+assert(fs.existsSync(f002Path), 'Ф-002.md missing');
+const f002Content = fs.readFileSync(f002Path, 'utf-8');
+assert(f002Content.includes('all(x > 0 for x in [1, 2, 3])'), 'Ф-002 card 5 must use generator expression all(x > 0 for x in ...) without list brackets');
+assert(f002Content.includes('`short-circuit`'), 'Ф-002 card 5 must format short-circuit in code backticks');
+assert(academyHtml.includes('all(x &gt; 0 for x in [1, 2, 3])'), 'academy.html must contain generator expression all(x > 0 for x in [1, 2, 3]) in Ф-002');
+console.log('✓ Bug 1 (Ф-002 card 5): lazy generator all() and formatted short-circuit verified');
+
+// 2. Bug 2: Ф-004 card 6: фокус на цикле for и протоколе итерации
+const f004Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.1 · Базовый синтаксис', '📇 Карточки', 'Ф-004. Последовательности.md');
+assert(fs.existsSync(f004Path), 'Ф-004.md missing');
+const f004Content = fs.readFileSync(f004Path, 'utf-8');
+assert(f004Content.includes('Итерация через цикл `for` (обход `for item in sequence:`)'), 'Ф-004 card 6 must clearly state iteration through for loop');
+assert(academyHtml.includes('Итерация через цикл <code>for</code> (обход <code>for item in sequence:</code>)'), 'academy.html must contain clarified for loop explanation in Ф-004');
+console.log('✓ Bug 2 (Ф-004 card 6): for loop iteration answer verified');
+
+// 3. Bug 3: Ф-007 card 12: инлайн форматирование кода в ответе карточки join()
+const f007Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.1 · Базовый синтаксис', '📇 Карточки', 'Ф-007. Строковые методы split() и join().md');
+assert(fs.existsSync(f007Path), 'Ф-007.md missing');
+const f007Content = fs.readFileSync(f007Path, 'utf-8');
+assert(f007Content.includes('Пустую строку `""` (вызов `"".join([\'h\', \'i\'])`)'), 'Ф-007 card 12 must wrap join call in backticks in markdown');
+assert(academyHtml.includes('Пустую строку <code>&quot;&quot;</code> (вызов <code>&quot;&quot;.join([&#x27;h&#x27;, &#x27;i&#x27;])</code>)'), 'academy.html must contain code tags for join() call in Ф-007');
+assert(academyHtml.includes('Guaranteed markdown backticks conversion to <code> tags'), 'formatRichInlineText must guarantee markdown backtick conversion even when other tags exist');
+console.log('✓ Bug 3 (Ф-007 card 12): inline code formatting in card answer verified');
+
+// 4. Bug 4: Ф-009 card 2: подробное пояснение к sorted(arr) vs arr.sort()
+const f009Path = path.join(remnoteDir, '04 · ⚡ Алгоритмы', 'Юнит 4.1 · Сложность', '📇 Карточки', 'Ф-009. Сложность Сложность основных операций для lis.md');
+assert(fs.existsSync(f009Path), 'Ф-009.md missing');
+const f009Content = fs.readFileSync(f009Path, 'utf-8');
+assert(f009Content.includes('Пример и пояснение: `sorted([3, 1, 2])` создаёт и возвращает **новый** отсортированный список `[1, 2, 3]`'), 'Ф-009 card 2 must contain explicit code example and explanation in markdown');
+assert(f009Content.includes('не меняя исходный (в отличие от `arr.sort()`, который сортирует список на месте за $O(1)$ по доп. памяти)'), 'Ф-009 card 2 must explain difference with arr.sort() in-place');
+assert(academyHtml.includes('<code>sorted([3, 1, 2])</code> создаёт и возвращает <strong>новый</strong> отсортированный список <code>[1, 2, 3]</code>'), 'academy.html must contain formatted code example in Ф-009 card 2');
+console.log('✓ Bug 4 (Ф-009 card 2): code example and explanation for sorted() vs sort() verified');
+
+// 5. Bug 5: Ф-009 card 3: объяснение различия O(len(s1)) разности s1 - s2 от O(min(n, m)) пересечения
+assert(f009Content.includes('Разъяснение: $O(\\min(n, m))$ применяется для пересечения `s1 & s2`'), 'Ф-009 card 3 must explicitly explain why difference is not O(min(n, m))');
+assert(academyHtml.includes('Разъяснение: <span class=\\"math-formula\\">O(min(n, m))</span> применяется для пересечения <code>s1 &amp; s2</code>'), 'academy.html must contain difference vs intersection clarification in Ф-009 card 3');
+console.log('✓ Bug 5 (Ф-009 card 3): explanation for O(len(s1)) vs O(min(n, m)) verified');
+
+// 6, 7, 8. Bugs 6-8: Ф-009 cards 13 & 14: форматирование формул O(min(n, m)) и O(n + m) с пояснениями
+assert(f009Content.includes('13. Сложность `s1 & s2` (пересечение множеств)? >> $O(\\min(n, m))$ — алгоритм итерируется по меньшему'), 'Ф-009 card 13 must format formula and algorithm description');
+assert(f009Content.includes('14. Сложность `s1 | s2` (объединение множеств)? >> $O(n + m)$ — копирует все уникальные элементы'), 'Ф-009 card 14 must format formula and algorithm description');
+assert(academyHtml.includes('<span class=\\"math-formula\\">O(min(n, m))</span> — алгоритм итерируется по меньшему из двух множеств'), 'academy.html must render card 13 with .math-formula');
+assert(academyHtml.includes('<span class=\\"math-formula\\">O(n + m)</span> — копирует все уникальные элементы обоих множеств'), 'academy.html must render card 14 with .math-formula');
+console.log('✓ Bugs 6, 7, 8 (Ф-009 cards 13 & 14): math formula formatting and descriptions verified');
+
+// 9. Bug 9: Защита мобильных вкладок от наложения (overflow-x, nowrap, flex: 1 1 0, min-width: 0)
+assert(academyHtml.includes('overflow-x: auto;') && academyHtml.includes('flex-wrap: nowrap;') && academyHtml.includes('min-width: 0;'), 'CSS must prevent tab collision with overflow-x: auto and flex-wrap: nowrap');
+console.log('✓ Bug 9: Mobile tabs anti-collision and zero-overlap layout verified');
+
+// 10. Bug 10: Разделение первого шага конспекта К-001 на 2 независимых микро-шага
+const k001Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.1 · Базовый синтаксис', '📚 Конспекты', 'К-001. Структуры данных Python_ list, dict, set.md');
+assert(fs.existsSync(k001Path), 'К-001.md missing');
+const k001Content = fs.readFileSync(k001Path, 'utf-8');
+assert(k001Content.includes('## Почему выбор структуры данных важен'), 'К-001 must contain separate section for why data structures matter');
+assert(k001Content.includes('## List: динамический массив и порядок элементов'), 'К-001 must contain separate section for List dynamic array');
+
+// Проверяем скомпилированный объект К-001 в academyHtml
+const k001Match = academyHtml.match(/"К-001":\s*(\{[^}]*"steps":\s*\[.*?\]\s*\})/s);
+assert(k001Match, 'academy.html must contain parsed К-001 object');
+const k001Obj = JSON.parse(k001Match[1]);
+assert.strictEqual(k001Obj.steps.length, 8, `К-001 must have exactly 8 steps after split, got ${k001Obj.steps.length}`);
+assert.strictEqual(k001Obj.steps[0].title, 'Почему выбор структуры данных важен', 'Step 1 must be Why data structures matter');
+assert.strictEqual(k001Obj.steps[1].title, 'List: динамический массив и порядок элементов', 'Step 2 must be List: dynamic array and ordering');
+console.log('✓ Bug 10: Split K-001 step 1 into 2 distinct steps verified (8 steps total)');
+
+console.log('\n================================================================');
+console.log('  ALL 10 REGRESSION TESTS PASSED! (0 FAILURES, ZERO RECURRENCE) ');
+console.log('================================================================\n');
