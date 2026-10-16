@@ -1,9 +1,8 @@
-const CACHE_NAME = 'academy-pwa-v48';
+const CACHE_NAME = 'academy-pwa-v49';
 const ASSETS_TO_CACHE = [
   './',
   'index.html',
   'academy.html',
-  'Практика кода — тренажёр с IDE.html',
   'manifest.json',
   'icon.svg'
 ];

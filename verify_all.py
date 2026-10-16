@@ -35,6 +35,7 @@ except Exception:
 
 _ROOT = os.path.dirname(os.path.abspath(__file__))
 _SCRIPTS = os.path.join(_ROOT, 'scripts')
+_TESTS = os.path.join(_ROOT, 'tests')
 
 STAGES = [
     {
@@ -45,8 +46,8 @@ STAGES = [
     },
     {
         'num': '2/6',
-        'title': 'E2E DOM and Invariant tests',
-        'cmd': ['node', os.path.join(_SCRIPTS, 'test_e2e_dom.js')],
+        'title': 'Regression Bug Suite (80/80) & Canonical Benchmarks',
+        'cmd': ['node', os.path.join(_TESTS, 'test_bugs_regression.js')],
         'quick': True
     },
     {

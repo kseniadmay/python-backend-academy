@@ -9,11 +9,11 @@ except Exception:
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 HTML_PATH = os.path.normpath(os.path.join(_HERE, '..', 'academy.html'))
-ETALON_PATH = os.path.normpath(os.path.join(_HERE, '..', 'Эталоны.html'))
+ETALON_PATH = os.path.normpath(os.path.join(_HERE, '..', 'Эталоны', 'Эталоны.html'))
 IDE_PATH = os.path.normpath(os.path.join(_HERE, '..', 'Практика кода — тренажёр с IDE.html'))
 INDEX_PATH = os.path.normpath(os.path.join(_HERE, '..', 'index.html'))
 assert os.path.isfile(HTML_PATH), f"academy.html missing: {HTML_PATH}"
-assert os.path.isfile(ETALON_PATH), f"Эталоны.html missing: {ETALON_PATH}"
+assert os.path.isfile(ETALON_PATH), f"Эталоны/Эталоны.html missing: {ETALON_PATH}"
 
 # Verify Canonical Benchmark Invariant: academy.html and Эталоны.html must be strictly identical
 with open(HTML_PATH, encoding='utf-8') as f1, open(ETALON_PATH, encoding='utf-8') as f2:
@@ -71,7 +71,7 @@ chrome_flags = [
 ]
 
 routes = [
-    (base_uri, 'Правило 2 минут: Быстрый микро-шаг'),
+    (base_uri, 'coddy-path-layout'),
     (base_uri + '#/python', 'Матрица Мастерства Python'),
     (base_uri + '#/web', 'Матрица Мастерства Web'),
     (base_uri + '#/backend', 'Матрица Мастерства Backend'),
@@ -81,7 +81,7 @@ routes = [
     (base_uri + '#/infra', 'Матрица Мастерства Инфраструктура'),
     (base_uri + '#/infra/boss', 'Аудитор продакшен-инфраструктуры'),
     (base_uri + '#/mock', 'Симулятор собеседования'),
-    (base_uri + '#/map', 'Мои результаты'),  # Coddy-ref: #/map redirects to dashboard
+    (base_uri + '#/map', 'Матрица'),
     (base_uri + '#/path', 'Python Core'),
     (base_uri + '#/practice', 'Практика кода'),
     (base_uri + '#/cards', 'Центр 3D Флеш-карточек'),

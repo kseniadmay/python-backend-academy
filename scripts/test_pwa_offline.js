@@ -219,9 +219,6 @@ const ACTIVE_CACHE_NAME = activeCacheMatch[1];
   const offAcademy = await testFetchOffline('https://pwa-offline-test.local/academy.html');
   assert(offAcademy.url.includes('academy.html'), 'Оффлайн-запрос academy.html вернул кэш');
 
-  const offIdeTrainer = await testFetchOffline('https://pwa-offline-test.local/' + encodeURI('Практика кода — тренажёр с IDE.html'));
-  assert(offIdeTrainer.url.includes('Практика кода') || decodeURI(offIdeTrainer.url).includes('Практика кода'), 'Оффлайн-запрос тренажёра с IDE вернул кэш');
-
   const offManifest = await testFetchOffline('https://pwa-offline-test.local/manifest.json');
   assert(offManifest.url.includes('manifest.json'), 'Оффлайн-запрос manifest.json вернул кэш');
 
