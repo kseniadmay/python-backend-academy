@@ -537,8 +537,7 @@
   [data-theme="light"] .cd-checkpoint-sub{color:rgba(51, 65, 85, 0.85);}
   .btn-ghost-quiet{background:transparent !important;color:var(--ink-muted) !important;border:1px solid rgba(148, 163, 184, 0.25) !important;box-shadow:none !important;border-radius:8px;font-size:0.74rem;font-weight:600;padding:4px 9px;display:inline-flex;align-items:center;gap:4px;transition:all 0.2s ease;text-decoration:none;cursor:pointer;}
   .btn-ghost-quiet:hover{background:rgba(148, 163, 184, 0.12) !important;color:var(--ink) !important;border-color:rgba(148, 163, 184, 0.45) !important;}
-  body.is-dashboard-route .sidebar-foot .btn-quick-start{background:transparent !important;border:1px solid rgba(148, 163, 184, 0.22) !important;color:var(--ink-muted) !important;box-shadow:none !important;opacity:0.68;}
-  body.is-dashboard-route .sidebar-foot .btn-quick-start:hover{opacity:1;background:rgba(148, 163, 184, 0.12) !important;}
+  body.is-dashboard-route .sidebar-foot .btn-quick-start{display:none !important;}
 
   .cocoon-focus-card{
     background:linear-gradient(155deg, rgba(16,185,129,0.13), rgba(190,18,60,0.06)), var(--surface);
@@ -3960,14 +3959,14 @@
     font-weight: 700;
   }
   .echelon-bordeaux-title {
-    color: #be123c;
+    color: #be123c !important;
     font-weight: 800;
     letter-spacing: -0.01em;
-    text-shadow: 0 0 5px rgba(190, 18, 60, 0.5);
+    text-shadow: 0 0 12px rgba(190, 18, 60, 0.35) !important;
   }
   :root[data-theme="light"] .echelon-bordeaux-title {
-    color: #881337;
-    text-shadow: none;
+    color: #881337 !important;
+    text-shadow: 0 0 12px rgba(136, 19, 55, 0.25) !important;
   }
   .echelon-readiness-emerald {
     color: #34d399;
@@ -4216,6 +4215,8 @@
     position: relative;
     max-width: 820px;
     padding: 0 8px;
+    background: radial-gradient(ellipse at 15% 10%, rgba(190, 18, 60, 0.12), transparent 60%), radial-gradient(ellipse at 85% 85%, rgba(16, 185, 129, 0.08), transparent 60%);
+    border-radius: 28px;
   }
   .dashboard-container::before {
     content: '';
@@ -4309,9 +4310,9 @@
     width: 100%;
     padding: 14px 22px !important;
     border-radius: 14px !important;
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(5, 150, 105, 0.28)) !important;
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
     border: 1.5px solid rgba(52, 211, 153, 0.6) !important;
-    box-shadow: 0 0 24px rgba(16, 185, 129, 0.35), 0 6px 18px rgba(0, 0, 0, 0.28) !important;
+    box-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.45) !important;
     font-weight: 800 !important;
     font-size: 0.96rem !important;
     color: #ffffff !important;
@@ -4337,8 +4338,8 @@
     50%, 100% { left: 160%; }
   }
   .btn-dominant-cta:hover {
-    box-shadow: 0 10px 28px rgba(16, 185, 129, 0.45), 0 0 34px rgba(16, 185, 129, 0.65) !important;
-    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 24px 0 rgba(16, 185, 129, 0.6), 0 4px 20px -2px rgba(16, 185, 129, 0.45) !important;
+    transform: translateY(-2px) scale(1.008) !important;
   }
   .btn-dominant-cta:active {
     transform: translateY(0.5px) scale(0.99) !important;
@@ -4404,6 +4405,35 @@
     border: 1.5px dashed rgba(245, 158, 11, 0.5) !important;
     background: rgba(245, 158, 11, 0.05) !important;
     color: var(--amber) !important;
+  }
+  .heat-cell.today-start-badge {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(16, 185, 129, 0.14) 100%) !important;
+    border: 1px solid rgba(245, 158, 11, 0.45) !important;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.18), inset 0 0 6px rgba(16, 185, 129, 0.12) !important;
+    color: #fbbf24 !important;
+    font-weight: 700;
+  }
+  .heat-cell.today-start-badge b {
+    font-size: 0.62rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .today-glow-flame {
+    display: inline-block;
+    filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.6));
+    animation: flameSmolder 2.4s infinite ease-in-out;
+  }
+  @keyframes flameSmolder {
+    0%, 100% { opacity: 0.75; transform: scale(0.95); }
+    50% { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 7px rgba(245, 158, 11, 0.9)); }
+  }
+  .heat-cell.rest-day {
+    opacity: 0.35;
+    background: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.04);
   }
   .heat-cell.today-active {
     border: 1.5px solid rgba(16, 185, 129, 0.5) !important;
@@ -13382,12 +13412,12 @@ function buildSevenDayHeatmapHTML(){
         hint += ' (сегодня: цель выполнена! 🔥)';
       } else if(hasXp){
         cls = 'heat-cell active today-active';
-        valText = String(xp);
+        valText = '🔥 ' + xp;
         hint += ' (сегодня)';
       } else {
-        cls = 'heat-cell today-idle';
-        valText = '0';
-        hint += ' (сегодня: цель 50 XP)';
+        cls = 'heat-cell today-start-badge';
+        valText = '<span class="today-glow-flame">🔥</span> Сегодня';
+        hint += ' (день старта · цель 50 XP)';
       }
     } else {
       if(reachedGoal){
@@ -13403,7 +13433,7 @@ function buildSevenDayHeatmapHTML(){
         hint += ' (день в цепочке стрика)';
       } else {
         cls = 'heat-cell rest-day';
-        valText = '·';
+        valText = '';
       }
     }
     html += `<div class="${cls}" role="button" tabindex="0" data-heat-day="${k}" data-heat-xp="${xp}" data-heat-today="${isToday ? '1' : '0'}" title="${hint}" aria-label="${hint}"><span>${days[d.getDay()]}</span><b>${valText}</b></div>`;
@@ -13674,10 +13704,12 @@ viewDashboard = function(){
   const srs = getSpacedRepetitionStats();
   const allDecksList = Object.values(ALL_DECKS_COMBINED || {});
   let dueTodayCardsCount = 0;
+  let hasReviewedAnyCard = false;
   allDecksList.forEach(d => {
     (d.cards || []).forEach((c, cIdx) => {
       const ck = d.id + ':' + cIdx;
       const r = state.cardRatings[ck] || 0;
+      if(r > 0) hasReviewedAnyCard = true;
       if(r > 0 && r < 4) dueTodayCardsCount++;
     });
   });
@@ -13712,7 +13744,7 @@ viewDashboard = function(){
           <a href="#/python/skill/${s.id}" class="link-quiet" style="text-decoration:none;">${s.id} · ${s.title}</a>
         </span>
         <div style="display:flex;align-items:center;gap:6px;">
-          ${isFocusThis ? `<span class="badge" style="background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.35);color:var(--moss);padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;">✨ Текущий фокус</span>` : (mp === 100 ? `<span class="state-tag state-tag--mastered" style="font-size:.70rem;margin:0;">✓ 100 MP</span>` : `<span class="meta" style="font-size:.72rem;">${mp} MP</span>`)}
+          ${isFocusThis ? `<span class="badge" style="background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.35);color:var(--moss);padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;">✨ Текущий фокус</span>` : (mp === 100 ? `<span class="state-tag state-tag--mastered" style="font-size:.70rem;margin:0;">✓ 100 MP</span>` : (mp === 0 ? `<span class="meta" style="font-size:.72rem;opacity:0.6;">Готова к изучению</span>` : `<span class="meta" style="font-size:.72rem;">${mp} MP</span>`))}
         </div>
       </div>
     `;
@@ -13734,7 +13766,7 @@ viewDashboard = function(){
 
   const streakDays = state.streak || 0;
   const streakPlural = (streakDays % 10 === 1 && streakDays % 100 !== 11) ? 'день' : ((streakDays % 10 >= 2 && streakDays % 10 <= 4 && (streakDays % 100 < 10 || streakDays % 100 >= 20)) ? 'дня' : 'дней');
-  const streakText = `🔥 ${streakDays} ${streakPlural} подряд · ⚡ ${state.xp || 0} XP`;
+  const streakText = `🔥 ${streakDays} ${streakPlural} подряд`;
 
   // Инвариант 5: Согласование SRS
   const srsDeckLabel = (focusDeckObj && focusDeckObj.unitId) ? `Колода ${focusDeckObj.unitId}` : `Колода ${activeUnitId}`;
@@ -13752,7 +13784,11 @@ viewDashboard = function(){
   let accordionStatusText = '';
   if(curUnitDone === 0){
     const focusThemeId = focusSk ? focusSk.id : '1.1.1';
-    accordionStatusText = `Юнит ${activeUnitId} · Тема ${focusThemeId} в процессе ${isTheoryDone ? '(Теория ✓)' : `(${curUnitMpPct}% MP)`}`;
+    if(curUnitMp === 0){
+      accordionStatusText = `Юнит ${activeUnitId} · Тема ${focusThemeId} · Готова к изучению`;
+    } else {
+      accordionStatusText = `Юнит ${activeUnitId} · Тема ${focusThemeId} в процессе ${isTheoryDone ? '(Теория ✓)' : `(${curUnitMpPct}% MP)`}`;
+    }
   } else {
     accordionStatusText = `Юнит ${activeUnitId} · Пройдено ${curUnitDone} из ${curUnitTotal} тем (${curUnitMpPct}% MP)`;
   }
@@ -13763,7 +13799,7 @@ viewDashboard = function(){
       <div class="echelon-topbar-clean" style="padding:16px 20px;border-radius:20px;margin-bottom:18px;display:flex;flex-direction:column;gap:14px;background:rgba(18, 22, 31, 0.65);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255, 255, 255, 0.08);box-shadow:var(--shadow-1);">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
           <div>
-            <h1 class="rank-title-glow">${readinessRank} ${rankIcon}</h1>
+            <h1 class="rank-title-glow echelon-bordeaux-title">${readinessRank} ${rankIcon}</h1>
             <div class="meta" style="font-size:.84rem;margin-top:4px;color:var(--ink-muted);">
               ${streakText}
             </div>
@@ -13775,13 +13811,20 @@ viewDashboard = function(){
           </div>
         </div>
 
-        <div class="echelon-clean-wrap" style="width:100%;">
+        <div class="echelon-clean-wrap" style="width:100%;" title="Готовность к 1-му тех-скринингу">
           <div class="echelon-clean-meta" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <span class="echelon-readiness-emerald" style="font-weight:700;font-size:.84rem;">🎯 Готовность к 1-му тех-скринингу: ${e1Pct}%</span>
-            <span class="meta" style="font-size:.78rem;font-weight:700;color:var(--ink);">${e1CurMp} / ${e1MaxMp} MP</span>
+            ${e1CurMp === 0
+              ? `<span class="echelon-readiness-emerald" style="font-weight:700;font-size:.84rem;">🌱 Старт подготовки к Junior · Шаг 1</span>
+                 <span class="meta" style="font-size:.78rem;font-weight:700;color:var(--ink);">Цель первого рубежа: 50 MP</span>`
+              : `<span class="echelon-readiness-emerald" style="font-weight:700;font-size:.84rem;">🎯 Готовность к 1-му тех-скринингу: ${e1Pct}%</span>
+                 <span class="meta" style="font-size:.78rem;font-weight:700;color:var(--ink);">${e1CurMp} / ${e1MaxMp} MP</span>`
+            }
           </div>
           <div class="echelon-clean-track" style="height:8px;border-radius:999px;background:rgba(255,255,255,0.08);overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,0.4);">
-            <div class="echelon-clean-fill" style="width:${Math.max(4, e1Pct)}%;height:100%;border-radius:999px;background:linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%);box-shadow:0 0 12px rgba(16,185,129,0.5);transition:width .35s ease;"></div>
+            ${e1CurMp === 0
+              ? `<div class="echelon-clean-fill empty-goal-pulse" style="width:4%;height:100%;border-radius:999px;background:linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%);box-shadow:0 0 12px rgba(16,185,129,0.5);"></div>`
+              : `<div class="echelon-clean-fill" style="width:${Math.max(4, e1Pct)}%;height:100%;border-radius:999px;background:linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%);box-shadow:0 0 12px rgba(16,185,129,0.5);transition:width .35s ease;"></div>`
+            }
           </div>
           <div style="font-size:.76rem;color:var(--ink-muted);margin-top:6px;">
             Эшелон 1 · Открывает доступ к первому тех-собеседованию
@@ -13839,14 +13882,20 @@ viewDashboard = function(){
             <div class="meta" style="font-size:.78rem;color:var(--ink-muted);">
               ${dueTodayCardsCount > 0
                 ? srsSubtitle
-                : `<span class="badge" style="background:rgba(16,185,129,0.16);border:1px solid rgba(16,185,129,0.35);color:#34d399;padding:3px 9px;border-radius:8px;font-size:.76rem;font-weight:700;display:inline-block;">✓ Все карточки на сегодня повторены!</span>`
+                : (!hasReviewedAnyCard
+                    ? `<div>
+                        <span class="badge" style="background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.35);color:#fbbf24;padding:3px 9px;border-radius:8px;font-size:.76rem;font-weight:700;display:inline-block;">📦 Колода формируется</span>
+                        <div style="font-size:.78rem;color:var(--ink-muted);margin-top:5px;line-height:1.4;">Изучите тему 1.1.1 — ключевые понятия автоматически появятся здесь для закрепления</div>
+                      </div>`
+                    : `<span class="badge" style="background:rgba(16,185,129,0.16);border:1px solid rgba(16,185,129,0.35);color:#34d399;padding:3px 9px;border-radius:8px;font-size:.76rem;font-weight:700;display:inline-block;">✓ Все карточки на сегодня повторены!</span>`
+                  )
               }
             </div>
           </div>
           <div style="display:flex;justify-content:flex-end;">
             ${dueTodayCardsCount > 0
               ? `<a href="#/cards" ${targetDeckId ? `data-srs-open-deck="${targetDeckId}"` : ''} class="btn-srs-action" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:11px;font-weight:700;font-size:.82rem;background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.30);color:#34d399;text-decoration:none;transition:all .15s ease;">Повторить (2 мин) ➔</a>`
-              : `<a href="#/cards" class="btn-srs-action" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:11px;font-weight:700;font-size:.82rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);text-decoration:none;transition:all .15s ease;">Открыть колоды ➔</a>`
+              : `<a href="#/cards" class="btn-ghost-quiet" style="text-decoration:none;">Открыть колоды ➔</a>`
             }
           </div>
         </div>
@@ -13901,8 +13950,9 @@ renderNav = function(){
     const totalAllMp = totalPythonMP() + totalWebMP() + totalBackendMP() + totalAlgoMP() + totalDbMP() + totalArchMP() + totalInfraMP();
     const overallPct = Math.round(totalAllMp / 12600 * 100);
     const renderLink = function(it){
-      const pctBadge = (modPctMap[it.route] !== undefined)
-        ? `<span class="navlink__pct">${modPctMap[it.route]}%</span>`
+      const pVal = modPctMap[it.route];
+      const pctBadge = (pVal !== undefined && pVal > 0)
+        ? `<span class="navlink__pct">${pVal}%</span>`
         : '';
       return `<a href="#${it.route}" class="navlink" data-route="${it.route}">${ICONS[it.icon] || ICONS.dot}<span>${it.label}</span>${pctBadge}</a>`;
     };
@@ -13910,11 +13960,14 @@ renderNav = function(){
     const modLinks = NAV_ITEMS.filter(it => it.group === 'module').map(renderLink).join('');
     const trainerLinks = NAV_ITEMS.filter(it => it.group === 'trainer').map(renderLink).join('');
     const toolLinks = NAV_ITEMS.filter(it => it.group === 'tool').map(renderLink).join('');
+    const modulesPctBadge = overallPct === 0
+      ? `<span class="navlink__pct" style="color:var(--moss);font-size:0.72rem;font-weight:700;">● новый</span>`
+      : `<span class="navlink__pct">${overallPct}%</span>`;
     desk.innerHTML = `
       <div class="nav-group-label">Обучение</div>
       ${learnLinks}
       <details class="nav-modules-accordion">
-        <summary class="nav-modules-summary"><span>📚 Модули 01–07</span><span class="navlink__pct">${overallPct}%</span></summary>
+        <summary class="nav-modules-summary"><span>📚 Модули 01–07</span>${modulesPctBadge}</summary>
         <div class="nav-modules-list">${modLinks}</div>
       </details>
       <div class="nav-group-label">Тренажёры</div>
