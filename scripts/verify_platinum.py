@@ -5,17 +5,33 @@ import hashlib
 
 def run_platinum_audit():
     _here = os.path.dirname(os.path.abspath(__file__))
-    project_zip = os.path.normpath(os.path.join(_here, '..', 'RemNote_Python_Mastery_FIXED.zip'))
+    candidates_zip = [
+        os.path.normpath(os.path.join(_here, '..', 'RemNote_Python_Mastery_FIXED.zip')),
+        r'C:\Users\fury6\OneDrive\Документы\Обучение Python\RemNote_Python_Mastery_FIXED.zip',
+    ]
+    project_zip = next((p for p in candidates_zip if os.path.exists(p)), None)
+    project_dir = os.path.normpath(os.path.join(_here, '..', 'RemNote_Python_Mastery_FIXED'))
     
-    assert os.path.exists(project_zip), f"Project zip missing: {project_zip}"
+    if project_zip:
+        with open(project_zip, 'rb') as f1:
+            h1 = hashlib.sha256(f1.read()).hexdigest()
+        print(f"[OK] Archive found ({project_zip})")
+        print(f"[OK] SHA256: {h1}")
+        z = zipfile.ZipFile(project_zip)
+        names = z.namelist()
+        read_content = lambda p: z.read(p).decode('utf-8')
+    elif os.path.isdir(project_dir):
+        names = []
+        for root, _, files in os.walk(project_dir):
+            for f in files:
+                rel = os.path.relpath(os.path.join(root, f), project_dir).replace('\\', '/')
+                names.append(rel)
+        print(f"[OK] Source directory loaded: {project_dir}")
+        read_content = lambda p: open(os.path.join(project_dir, p.replace('/', os.sep)), 'r', encoding='utf-8').read()
+    else:
+        raise AssertionError(f"Neither zip ({project_zip}) nor dir ({project_dir}) found!")
     
-    with open(project_zip, 'rb') as f1:
-        h1 = hashlib.sha256(f1.read()).hexdigest()
-    print(f"[OK] SHA256: {h1}")
-    
-    z = zipfile.ZipFile(project_zip)
-    names = z.namelist()
-    print(f"[OK] Total files in archive: {len(names)} (expected 525)")
+    print(f"[OK] Total files: {len(names)} (expected 525)")
     assert len(names) == 525, f"Expected 525 files, got {len(names)}"
     
     notes = [n for n in names if '📚 Конспекты' in n and n.endswith('.md')]
@@ -34,7 +50,7 @@ def run_platinum_audit():
     total_flashcards = 0
     
     for nf in notes:
-        content = z.read(nf).decode('utf-8')
+        content = read_content(nf)
         lines = content.splitlines()
         
         # а) Проверка первой строки: флешкарта без буллета
@@ -100,7 +116,7 @@ def run_platinum_audit():
     total_qa = 0
     
     for cf in cards:
-        content = z.read(cf).decode('utf-8')
+        content = read_content(cf)
         lines = [l.strip() for l in content.splitlines() if l.strip()]
         
         expected_idx = 1
@@ -129,7 +145,7 @@ def run_platinum_audit():
     print(f"[OK] Cards audit passed: {total_qa} total flashcards strictly sequenced 1..N")
     
     # 4. Проверка Карты Мастерства
-    map_content = z.read('00 · 🗺️ Карта Мастерства.md').decode('utf-8')
+    map_content = read_content('00 · 🗺️ Карта Мастерства.md')
     assert len(map_content) > 50000, f"Map content too short: {len(map_content)}"
     
     # Проверка ссылок на конспекты и карточки

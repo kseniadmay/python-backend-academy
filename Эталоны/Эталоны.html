@@ -12220,6 +12220,8 @@ function viewPathSerpentine(options){
   const totalCompletedUnits = allUnits.filter(isUnitCompleted).length;
   const streakText = (typeof pluralizeRu === 'function') ? pluralizeRu(state.streak || 0, 'день', 'дня', 'дней') : 'дн.';
   const activeChapterNum = (getPathChaptersMeta(allUnits).find(c => c.units.some(u => u.id === curActiveUnit.id)) || { num: 1 }).num;
+  const e1Top = (typeof getEchelonProgress === 'function') ? getEchelonProgress(1) : null;
+  const e1PctTop = e1Top ? e1Top.pct : 0;
 
   return `
     <div class="coddy-path-layout">
