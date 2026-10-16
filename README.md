@@ -2,7 +2,7 @@
 
 [![Live Platform](https://img.shields.io/badge/platform-Web%20%7C%20PWA%20%7C%20Mobile-blue)](https://python-backend-academy.onrender.com)
 [![Status](https://img.shields.io/badge/status-production--ready-brightgreen)]()
-[![CI Pipeline](https://img.shields.io/badge/CI-100%25%20passed-brightgreen)]()
+[![CI Pipeline](https://github.com/kseniadmay/python-backend-academy/actions/workflows/ci.yml/badge.svg)](https://github.com/kseniadmay/python-backend-academy/actions)
 [![Python](https://img.shields.io/badge/python-3.13%20(Brython)-yellow)]()
 [![Stack](https://img.shields.io/badge/stack-Vanilla%20JS%20%7C%20Node.js%20%7C%20PostgreSQL-informational)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -284,10 +284,15 @@ Python_Backend_Academy/             # Корень репозитория
 ├── manifest.json                   # Манифест Progressive Web App
 ├── icon.svg                        # Векторная иконка платформы
 │
+├── requirements.txt                # Спецификация зависимостей Python (0 внешних pip-пакетов)
 ├── package.json                    # Зависимости Node.js и команды тестирования
 ├── render.yaml                     # Конфигурация облачного деплоя на Render
 ├── .env.example                    # Шаблон переменных окружения для сервера синхронизации
 ├── .gitignore                      # Исключения временных файлов, логов и дампов
+├── LICENSE                         # Юридическая лицензия MIT
+│
+├── .github/                        # Конфигурация автоматизации GitHub
+│   └── workflows/ci.yml            # Сквозной CI конвейер тестирования и верификации
 │
 ├── verify_all.py                   # 6-этапный мастер-конвейер полной верификации платформы
 ├── verify_all.cmd                  # Быстрый запуск конвейера верификации для Windows
