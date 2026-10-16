@@ -1,6 +1,6 @@
 /**
  * test_bugs_regression.js
- * Автоматические регрессионные тесты для предотвращения повторения багов 1..50.
+ * Автоматические регрессионные тесты для предотвращения повторения багов 1..60.
  */
 
 'use strict';
@@ -14,7 +14,7 @@ const academyPath = path.join(rootDir, 'academy.html');
 const etalonyPath = path.join(rootDir, 'Эталоны', 'Эталоны.html');
 
 console.log('================================================================');
-console.log('   REGRESSION TEST SUITE: BUGS 1..50 VERIFICATION               ');
+console.log('   REGRESSION TEST SUITE: BUGS 1..60 VERIFICATION               ');
 console.log('================================================================\n');
 
 assert(fs.existsSync(academyPath), `academy.html missing`);
@@ -315,6 +315,61 @@ assert(k218Content.includes('**3. `takewhile` vs `dropwhile`'), 'Bug 50: K-218 s
 assert(academyHtml.includes('Склеивают последовательности без создания промежуточных копий') && academyHtml.includes('<code>takewhile</code> vs <code>dropwhile</code>'), 'Bug 50: academy.html must render structured stream operations');
 console.log('✓ Bug 50: K-218 step 3 readable formatting for chain, islice, takewhile, dropwhile verified');
 
+// 51. Bug 51: К-218 step 4: убраны восклицательные знаки
+assert(!k218Content.includes('uniq в Linux!') && !k218Content.includes('по тому же ключу!'), 'Bug 51: K-218 step 4 must remove exclamation marks');
+assert(!academyHtml.includes('uniq в Linux!') && !academyHtml.includes('по тому же ключу!'), 'Bug 51: academy.html must not contain exclamation marks in K-218 step 4');
+console.log('✓ Bug 51: K-218 step 4 exclamation marks removed verified');
+
+// 52. Bug 52: К-218 step 4: явный вывод результата вместо строки-заглушки
+assert(k218Content.includes("print(f\"{status}: {[x['id'] for x in items]}\")"), 'Bug 52: K-218 step 4 must print groupby output');
+assert(academyHtml.includes('Выводим результат группировки') && academyHtml.includes('for status, items in grouped.items()'), 'Bug 52: academy.html must execute and print groupby results');
+console.log('✓ Bug 52: K-218 step 4 explicit groupby output verified');
+
+// 53. Bug 53: К-218 step 5: структурированный читабельный вид комбинаторики
+assert(k218Content.includes('**1. `product(*iterables)`') && k218Content.includes('**2. `permutations(iterable, r=None)`'), 'Bug 53: K-218 step 5 must format product and permutations into distinct sections');
+assert(k218Content.includes('**3. `combinations(iterable, r)`') && k218Content.includes('**4. `combinations_with_replacement(iterable, r)`'), 'Bug 53: K-218 step 5 must format combinations into distinct sections');
+assert(academyHtml.includes('декартово произведение (вложенные циклы)') && academyHtml.includes('перестановки (порядок важен)'), 'Bug 53: academy.html must render structured combinatorics sections');
+console.log('✓ Bug 53: K-218 step 5 combinatorics readability verified');
+
+// 54. Bug 54: К-218 step 6: ментальные модели accumulate и tee для новичка
+assert(k218Content.includes('история баланса в банковской выписке') && k218Content.includes('сантехнический тройник на трубе с водой'), 'Bug 54: K-218 step 6 must explain accumulate and tee via beginner-friendly real-world analogies');
+assert(academyHtml.includes('история баланса в банковской выписке') && academyHtml.includes('сантехнический тройник на трубе с водой'), 'Bug 54: academy.html must render beginner mental models for accumulate & tee');
+console.log('✓ Bug 54: K-218 step 6 beginner mental models verified');
+
+// 55. Bug 55: Убрана надпись " (Пробел)" с кнопок переворота карточек
+assert(!academyHtml.includes('Показать ответ (Пробел)'), 'Bug 55: Flip card buttons must not contain desktop-specific "(Пробел)" suffix');
+assert(academyHtml.includes('Показать ответ'), 'Bug 55: Flip card buttons must use clean CTA "Показать ответ"');
+console.log('✓ Bug 55: Removal of "(Пробел)" desktop suffix from flip card buttons verified');
+
+// 56. Bug 56: Ф-037 card 11: форматированный блок кода в ответе
+const f037Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.3 · Итераторы и генераторы', '📇 Карточки', 'Ф-037. Разница между генератором и итератором.md');
+assert(fs.existsSync(f037Path), 'Ф-037.md missing');
+const f037Content = fs.readFileSync(f037Path, 'utf-8').replace(/\r\n/g, '\n');
+assert(!f037Content.includes('def gen():; yield 1; yield 2; yield 3;'), 'Bug 56: F-037 card 11 must not contain unreadable semicolon spaghetti code');
+assert(f037Content.includes('```python\ndef gen():\n    yield 1'), 'Bug 56: F-037 card 11 markdown must format code as proper python block');
+assert(academyHtml.includes('def gen():') && academyHtml.includes('print(next(g))  # 1'), 'Bug 56: academy.html must render readable multiline code block in F-037 card 11');
+console.log('✓ Bug 56: F-037 card 11 multiline code block formatting verified');
+
+// 57. Bug 57: Убрана шпаргалка с лицевой стороны флеш-карточек
+assert(!academyHtml.includes('<a href="#/docs" class="card-help-badge"'), 'Bug 57: Cheat sheet badge must be removed from card front face');
+assert(academyHtml.includes('.card-help-badge { display: none !important; }'), 'Bug 57: CSS must strictly hide .card-help-badge');
+console.log('✓ Bug 57: Cheat sheet distraction badge removed from flashcard front verified');
+
+// 58 & 59. Bugs 58 & 59: Релевантные вопросы рубежного теста 1.3 и полнота конспектов
+const mUnitTests13 = academyHtml.match(/"1\.3":\s*\{\s*"unitId":\s*"1\.3".*?"questions":\s*(\[.*?\])\s*\}/s);
+assert(mUnitTests13, 'academy.html must contain parsed UNIT_TESTS 1.3');
+const parsedQuestions13 = JSON.parse(mUnitTests13[1]);
+assert.strictEqual(parsedQuestions13.length, 8, `Unit test 1.3 must contain 8 relevant questions on iterators & generators, got ${parsedQuestions13.length}`);
+assert(academyHtml.includes('Unit Test 1.3: Итераторы, генераторы и контекстные менеджеры'), 'Bug 59: Unit test 1.3 title must match unit topics');
+assert(academyHtml.includes('__iter__() и __next__()') && academyHtml.includes('yield from sub_iterable'), 'Bug 58: Unit test 1.3 must test core iterator & yield concepts covered in Unit 1.3 notes');
+console.log('✓ Bugs 58 & 59: Unit test 1.3 relevance to Unit 1.3 curriculum and note coverage verified');
+
+// 60. Bug 60: Обозначение текущего эшелона на тропе #/path
+assert(academyHtml.includes('class="path-echelon-pill'), 'Bug 60: viewPathSerpentine top banner must render .path-echelon-pill');
+assert(academyHtml.includes('pms-item pms-echelon'), 'Bug 60: mobile stats strip must display current echelon');
+assert(academyHtml.includes('.path-echelon-pill {') && academyHtml.includes('.echelon-pill--t1 {'), 'Bug 60: CSS must define styling for echelon pills');
+console.log('✓ Bug 60: Echelon visibility on #/path top banner and stats strip verified');
+
 console.log('\n================================================================');
-console.log('  ALL 50 REGRESSION TESTS PASSED! (0 FAILURES, ZERO RECURRENCE) ');
+console.log('  ALL 60 REGRESSION TESTS PASSED! (0 FAILURES, ZERO RECURRENCE) ');
 console.log('================================================================\n');
