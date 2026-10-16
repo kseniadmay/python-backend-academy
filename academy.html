@@ -13383,6 +13383,21 @@ viewDashboard = function(){
   const e1Remaining = e1.skills.filter(s => getSkillMP(s.id) < 100).length;
   const e1DoneUnits = Math.min(14, Math.max(1, 14 - Math.floor((e1Remaining / Math.max(1, e1.skills.length)) * 14)));
 
+  // Graduation Loop: при 100% готовности эшелона цель динамически переключается на следующий
+  const curTargetTier = e1.pct < 100 ? 1 : (e2.pct < 100 ? 2 : (e3.pct < 100 ? 3 : 4));
+  const curTargetEp = getEchelonProgress(curTargetTier);
+  const curTargetMeta = (typeof getEchelonMeta === 'function' ? getEchelonMeta(curTargetTier) : (INTERVIEW_ECHELONS && INTERVIEW_ECHELONS[curTargetTier])) || { label: 'Эшелон ' + curTargetTier, shortLabel: 'Эшелон ' + curTargetTier, desc: '' };
+  const curTargetRemaining = curTargetEp.skills.filter(s => getSkillMP(s.id) < 100).length;
+  const curTargetTotalUnits = Math.max(1, curTargetEp.unitsCount || 14);
+  const curTargetDoneUnits = Math.min(curTargetTotalUnits, Math.max(0, curTargetTotalUnits - Math.floor((curTargetRemaining / Math.max(1, curTargetEp.skills.length)) * curTargetTotalUnits)));
+  const targetStageTitle = curTargetTier === 1
+    ? `🎯 Готовность к 1-му тех-скринингу: ${e1.pct}%`
+    : (curTargetTier === 2
+      ? `🎯 Готовность к тех-интервью по стеку: ${e2.pct}%`
+      : (curTargetTier === 3
+        ? `⚡ Готовность к лайвкодингу и проду: ${e3.pct}%`
+        : `👑 Готовность к финалу и офферу: ${e4.pct}%`));
+
   // Determine the next priority skill for the 2-minute Cocoon Focus Card and map anchor
   const openGaps = (state.diagnosticGaps || []).filter(sid => PY_SKILLS_BY_ID[sid] && getSkillMP(sid) < 100);
   const activeTierNum = e1.pct < 100 ? 1 : (e2.pct < 100 ? 2 : (e3.pct < 100 ? 3 : 4));
@@ -13535,14 +13550,14 @@ viewDashboard = function(){
         <button class="cocoon-pill cocoon-pill--interactive" data-open-handover>🔄 Контекст<span class="sr-only"> для нового чата</span></button>
       </div>
 
-      <!-- Trajectory & Progress to 1st Screening -->
+      <!-- Trajectory & Progress to Next Interview Milestone (Graduation Loop) -->
       <div class="cd-box">
         <div class="cd-top">
-          <span class="cd-title">🎯 Готовность к 1-му тех-скринингу: ${e1.pct}%</span>
-          <span class="cd-count">⚡ Пройдено ${e1DoneUnits} из 14 юнитов Эшелона 1</span>
+          <span class="cd-title">${targetStageTitle}</span>
+          <span class="cd-count">⚡ Пройдено ${curTargetDoneUnits} из ${curTargetTotalUnits} юнитов (${curTargetMeta.shortLabel})</span>
         </div>
-        <div class="cd-bar cd-bar-track"><div class="cd-fill cd-bar-fill" style="width:${Math.max(6, e1.pct)}%;"></div></div>
-        <div class="cd-checkpoint-sub">Шаг ${e1DoneUnits} из 14 юнитов Эшелона 1 · Каждый решённый микро-шаг приближает к первому офферу</div>
+        <div class="cd-bar cd-bar-track"><div class="cd-fill cd-bar-fill" style="width:${Math.max(6, curTargetEp.pct)}%;"></div></div>
+        <div class="cd-checkpoint-sub">Шаг ${curTargetDoneUnits} из ${curTargetTotalUnits} юнитов (${curTargetMeta.shortLabel}) · Каждый решённый микро-шаг приближает к первому офферу</div>
       </div>
 
       <!-- Active 2-Minute Sprint Focus Card -->
@@ -14046,6 +14061,8 @@ function buildHandoverMarkdown(){
 10. **Полная Карта Навыков (\`#/map\` — 18 узлов, 64 интерактивных урока)** и анти-прокрастинационный контур («Правило 2 минут», Помодоро 15/25 мин, Дзен-режим, стрики, 50 XP/день).
 
 ## 3. Текущий прогресс ученика
+- **Текущий ранг**: ${(typeof curRankBadge !== 'undefined' ? curRankBadge : (getEchelonProgress(1).pct >= 60 ? '⚡ Скрининг почти готов' : '🌱 Старт подготовки'))}
+- **Фокус на дашборде**: ${(typeof focusSk !== 'undefined' && focusSk ? focusSk.id + ' (' + focusSk.title + ') · конспект ' + focusKId : 'Основы Python')} · **Этап собеседования**: ${(typeof dashStage !== 'undefined' ? dashStage : 1)}
 - **Выбранная ветка стека**: ${state.stackBranch || 'fastapi'} · **Пробелов скрининга в очереди**: ${(state.diagnosticGaps||[]).length}
 - **Эшелон 1 (Скрининг)**: ${getEchelonProgress(1).curMp} / ${getEchelonProgress(1).maxMp} MP (${getEchelonProgress(1).pct}%)
 - **Эшелон 2 (Тех-ядро)**: ${getEchelonProgress(2).curMp} / ${getEchelonProgress(2).maxMp} MP (${getEchelonProgress(2).pct}%)
@@ -14595,6 +14612,7 @@ document.addEventListener('click', async function(e){
   const dsBtn = e.target.closest('[data-dash-stage]');
   if(dsBtn){
     dashStage = parseInt(dsBtn.getAttribute('data-dash-stage'), 10) || 1;
+    try{ playSound('tick'); }catch(e){}
     render();
     return;
   }
