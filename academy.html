@@ -1775,6 +1775,7 @@
   .heat-cell{flex:1;height:28px;border-radius:7px;background:var(--surface-2);border:1px solid var(--line-soft);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.66rem;color:var(--ink-muted);}
   .heat-cell.active{background:var(--moss-soft);border-color:var(--moss);color:var(--moss-deep);font-weight:700;}
   .heat-cell.high{background:var(--emerald);border-color:var(--emerald);color:#fff;font-weight:700;}
+  .heat-cell.today{border:1.5px dashed var(--amber);background:rgba(245,158,11,0.08);color:var(--amber);font-weight:700;}
 
   /* Sub-tabs */
   .subtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;border-bottom:1px solid var(--line);padding-bottom:10px;}
@@ -8570,15 +8571,20 @@ function getFirstUnmasteredSkillInEchelon(tierNum, preferredTrackKey){
 }
 
 // Fast 2-Minute Anti-Procrastination Launcher (prioritizes Diagnostic Gaps -> Echelon 1 -> Echelon 2 -> Echelon 3 -> Echelon 4)
-function startTwoMinuteMicroStep(preferredTrackKey){
+function startTwoMinuteMicroStep(preferredTrackKey, prefKid){
   ensureExtendedState();
-  function goToSkillSprint(sk){
+  function goToSkillSprint(sk, kid){
     const targetHash = '#' + sk.routePrefix + '/skill/' + sk.id;
     ensurePySkillState(sk.id);
     pySkillViewState.tab = 'theory';
+    if(kid) pySkillViewState.kId = kid;
     pySkillViewState.sprintCelebration = null;
     if(location.hash === targetHash) render();
     else location.hash = targetHash;
+  }
+  if(preferredTrackKey && PY_SKILLS_BY_ID[preferredTrackKey]){
+    goToSkillSprint(PY_SKILLS_BY_ID[preferredTrackKey], prefKid);
+    return;
   }
   if(preferredTrackKey && MASTERY_TRACKS[preferredTrackKey]){
     const prefSkills = (MASTERY_TRACKS[preferredTrackKey].skills || []).slice().sort((a, b) => {
@@ -13147,8 +13153,12 @@ function buildSevenDayHeatmapHTML(){
     d.setDate(d.getDate() - i);
     const k = dateIsoKey(d);
     const xp = (state.dailyXpByDate && state.dailyXpByDate[k]) || 0;
-    const cls = xp >= state.dailyGoal ? 'heat-cell high' : (xp > 0 ? 'heat-cell active' : 'heat-cell');
-    html += `<div class="${cls}" title="${k}: ${xp} XP"><span>${days[d.getDay()]}</span><b>${xp > 0 ? xp : '—'}</b></div>`;
+    const isToday = (i === 0);
+    const isHigh = xp >= (state.dailyGoal || 50);
+    const isActive = xp > 0;
+    const cls = isHigh ? 'heat-cell high' : (isActive ? 'heat-cell active' : (isToday ? 'heat-cell today' : 'heat-cell'));
+    const valText = isHigh ? `✓ ${xp}` : (isActive ? `${xp}` : (isToday ? '🔥 0' : '—'));
+    html += `<div class="${cls}" title="${k}: ${xp} XP ${isToday ? '(сегодня)' : ''}"><span>${days[d.getDay()]}</span><b>${valText}</b></div>`;
   }
   return `<div class="heat-row">${html}</div>`;
 }
@@ -13490,12 +13500,12 @@ viewDashboard = function(){
   const miniListHTML = visibleStageSkills.map(s => {
     const smp = getSkillMP(s.id);
     const isNow = (s.id === (focusSk && focusSk.id)) || (smp < 100 && s.id === (stageSkills[firstUnmIdx] && stageSkills[firstUnmIdx].id));
-    let badgeHtml = `<span class="st-next">⏳ Далее</span>`;
-    if(smp >= 100) badgeHtml = `<span class="st-done">✓ 100 MP</span>`;
-    else if(isNow || smp >= 50) badgeHtml = `<span class="st-now">${smp > 0 ? '🔥 ' + smp + ' MP' : '🔥 Сейчас'}</span>`;
+    let badgeHtml = `<span class="st-next">⏳ В очереди</span>`;
+    if(smp >= 100) badgeHtml = `<span class="st-done">✓ 100 MP 👑</span>`;
+    else if(isNow || smp >= 50) badgeHtml = `<span class="st-now">${smp > 0 ? '🔥 ' + smp + ' MP' : '🔥 Сейчас'} ➔</span>`;
     const sm = s.title.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
     return `<a href="#${s.routePrefix}/skill/${s.id}" class="mini-item ${isNow ? 'now' : ''}" data-py-open-skill="${s.id}">
-      <span>${s.id} · ${sm ? `${sm[1]} <span class="t-detail">(${sm[2]})</span>` : s.title}</span>
+      <span><b>${s.id}</b> · ${sm ? `${sm[1]} <span class="t-detail">(${sm[2]})</span>` : s.title}</span>
       ${badgeHtml}
     </a>`;
   }).join('');
@@ -13542,7 +13552,7 @@ viewDashboard = function(){
         <div class="cocoon-focus-desc">Конспект <b>${focusKId}: ${focusNoteObj.title}</b> · ${focusStepsCount} ${(focusStepsCount % 10 === 1 && focusStepsCount % 100 !== 11) ? 'микро-шаг' : (focusStepsCount % 10 >= 2 && focusStepsCount % 10 <= 4 && (focusStepsCount % 100 < 10 || focusStepsCount % 100 >= 20) ? 'микро-шага' : 'микро-шагов')} · живой код · разбор Junior vs Senior</div>
         <div style="font-size:.77rem;color:var(--moss);font-weight:700;margin:2px 0 6px;">⚡ Этот 2-минутный спринт приблизит готовность к скринингу до ${Math.min(100, e1.pct + 2)}%!</div>
         <div style="display:flex;flex-direction:column;gap:7px;">
-          <button class="btn-glass-emerald btn-sprint-cta" data-quick-microstep="">▶ Начать спринт (2 мин) ➔</button>
+          <button class="btn-glass-emerald btn-sprint-cta" data-quick-microstep="${focusSk ? focusSk.id : ''}" data-quick-kid="${focusKId}">▶ Начать спринт (2 мин) ➔</button>
         </div>
       </div>
 
@@ -14957,7 +14967,9 @@ document.addEventListener('click', async function(e){
   const qmBtn = e.target.closest('[data-quick-microstep]');
   if(qmBtn){
     pySkillViewState.sprintCelebration = null;
-    startTwoMinuteMicroStep(qmBtn.getAttribute('data-quick-microstep') || '');
+    const sid = qmBtn.getAttribute('data-quick-microstep') || '';
+    const kid = qmBtn.getAttribute('data-quick-kid') || '';
+    startTwoMinuteMicroStep(sid, kid);
     return;
   }
   if(e.target.closest('[data-open-handover]')){ openHandoverModal(); return; }
