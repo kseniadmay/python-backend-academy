@@ -15361,18 +15361,17 @@ if os.path.isdir(_CLOUD_DIR) and os.path.isdir(BASE_REMNOTE) and os.path.isfile(
         zf.write(html_src, 'academy.html')
         zf.write(IDE_HTML_PATH, 'Практика кода — тренажёр с IDE.html')
         extra_root_files = [
-            'Эталоны.html',
             'manifest.json',
             'icon.svg',
             'sw.js',
             'index.html',
             'README.md',
-            'FEEDBACK_BACKLOG.md',
-            'UI_VISUALIZATION_IMPROVEMENTS_CATALOG.md',
+            os.path.join('docs', 'README.md'),
+            os.path.join('docs', 'FEEDBACK_BACKLOG.md'),
+            os.path.join('docs', 'UI_VISUALIZATION_IMPROVEMENTS_CATALOG.md'),
             'Запустить_с_Телефона.bat',
             'verify_all.cmd',
-            'verify_all.py',
-            'RemNote_Python_Mastery_FIXED.zip'
+            'verify_all.py'
         ]
         for erf in extra_root_files:
             erf_full = os.path.join(_CLOUD_DIR, erf) if os.path.isfile(os.path.join(_CLOUD_DIR, erf)) else os.path.join(_UNPACKED_ROOT, erf)
