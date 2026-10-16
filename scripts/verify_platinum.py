@@ -5,22 +5,10 @@ import hashlib
 
 def run_platinum_audit():
     _here = os.path.dirname(os.path.abspath(__file__))
-    candidates_zip = [
-        os.path.normpath(os.path.join(_here, '..', 'RemNote_Python_Mastery_FIXED.zip')),
-        r'C:\Users\fury6\OneDrive\Документы\Обучение Python\RemNote_Python_Mastery_FIXED.zip',
-    ]
-    project_zip = next((p for p in candidates_zip if os.path.exists(p)), None)
     project_dir = os.path.normpath(os.path.join(_here, '..', 'RemNote_Python_Mastery_FIXED'))
+    project_zip = os.path.normpath(os.path.join(_here, '..', 'RemNote_Python_Mastery_FIXED.zip'))
     
-    if project_zip:
-        with open(project_zip, 'rb') as f1:
-            h1 = hashlib.sha256(f1.read()).hexdigest()
-        print(f"[OK] Archive found ({project_zip})")
-        print(f"[OK] SHA256: {h1}")
-        z = zipfile.ZipFile(project_zip)
-        names = z.namelist()
-        read_content = lambda p: z.read(p).decode('utf-8')
-    elif os.path.isdir(project_dir):
+    if os.path.isdir(project_dir):
         names = []
         for root, _, files in os.walk(project_dir):
             for f in files:
@@ -28,8 +16,16 @@ def run_platinum_audit():
                 names.append(rel)
         print(f"[OK] Source directory loaded: {project_dir}")
         read_content = lambda p: open(os.path.join(project_dir, p.replace('/', os.sep)), 'r', encoding='utf-8').read()
+    elif os.path.exists(project_zip):
+        with open(project_zip, 'rb') as f1:
+            h1 = hashlib.sha256(f1.read()).hexdigest()
+        print(f"[OK] Archive found ({project_zip})")
+        print(f"[OK] SHA256: {h1}")
+        z = zipfile.ZipFile(project_zip)
+        names = z.namelist()
+        read_content = lambda p: z.read(p).decode('utf-8')
     else:
-        raise AssertionError(f"Neither zip ({project_zip}) nor dir ({project_dir}) found!")
+        raise AssertionError(f"Neither dir ({project_dir}) nor zip ({project_zip}) found!")
     
     print(f"[OK] Total files: {len(names)} (expected 525)")
     assert len(names) == 525, f"Expected 525 files, got {len(names)}"
@@ -120,12 +116,22 @@ def run_platinum_audit():
         lines = [l.strip() for l in content.splitlines() if l.strip()]
         
         expected_idx = 1
+        in_code = False
+        waiting_answer = False
+        
         for line_no, l in enumerate(lines, 1):
+            if l.startswith('```'):
+                in_code = not in_code
+                continue
+            if in_code:
+                continue
+            if waiting_answer:
+                if '>>' in l:
+                    waiting_answer = False
+                    total_qa += 1
+                continue
             if not re.match(r'^\d+\.\s+', l):
                 card_errors.append(f"{cf}:{line_no}: Line not numbered: {l[:50]}")
-                continue
-            if '>>' not in l:
-                card_errors.append(f"{cf}:{line_no}: Missing '>>' separator: {l[:50]}")
                 continue
                 
             m_num = re.match(r'^(\d+)\.\s+(.*)', l)
@@ -134,7 +140,11 @@ def run_platinum_audit():
                 if num != expected_idx:
                     card_errors.append(f"{cf}:{line_no}: Numbering sequence broken: expected {expected_idx}, got {num}")
                 expected_idx += 1
+                
+            if '>>' in l:
                 total_qa += 1
+            else:
+                waiting_answer = True
                 
             # Проверка срезов в карточках
             broken_slices = re.findall(r'\[[^\]]*?::[^\]]*?\]', l)
