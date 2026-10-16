@@ -820,6 +820,13 @@ def parse_k_note(cid):
             steps.append({'title': stitle, 'html': shtml})
     if not steps:
         steps.append({'title': clean_title, 'html': f'<p>{md_inline(clean_title)}</p>'})
+    if cid == 'К-222':
+        if len(steps) > 3 and steps[3].get('html'):
+            steps[3]['html'] = steps[3]['html'].replace('<strong><code>.is_symlink()</code></strong>', '<code>.is_symlink()</code>')
+            steps[3]['html'] = steps[3]['html'].replace('размер в байтах (<code>st_size</code>)', 'размер <code>st_size</code>')
+        if len(steps) > 4 and steps[4].get('html'):
+            steps[4]['html'] = steps[4]['html'].replace('<code>iterdir()</code>', '<b><code>iterdir()</code></b>')
+            steps[4]['html'] = steps[4]['html'].replace('<code>rglob(pattern)</code>', '<b><code>rglob(pattern)</code></b>')
     return {'id': cid, 'title': clean_title, 'steps': steps}
 
 
@@ -828,18 +835,35 @@ def parse_f_deck(fid, module=None):
     info = f_files_map[key]
     cards = []
     with open(info['path'], encoding='utf-8') as f:
-        for line in f:
-            line = line.strip()
-            if '>>' in line:
-                m_sep = re.match(r'^((?:[^`]|`[^`]*`)+?)>>(.*)$', line)
-                if m_sep:
-                    q, a = m_sep.group(1), m_sep.group(2)
-                else:
-                    q, a = line.split('>>', 1)
-                q = re.sub(r'^\d+\.\s*', '', q).strip()
-                a = a.strip()
-                if q and a:
-                    cards.append({'q': md_inline(q), 'a': md_inline(a)})
+        content = f.read()
+
+    cur_q = None
+    cur_a_lines = []
+
+    def flush():
+        nonlocal cur_q, cur_a_lines
+        if cur_q is not None:
+            a_text = '\n'.join(cur_a_lines).strip()
+            if a_text:
+                cards.append({'q': md_inline(cur_q), 'a': md_inline(a_text)})
+            cur_q = None
+            cur_a_lines = []
+
+    for raw_line in content.splitlines():
+        m_card = re.match(r'^(?:\d+\.\s*)?((?:[^`]|`[^`]*`)+?)>>(.*)$', raw_line)
+        if m_card:
+            flush()
+            cur_q = re.sub(r'^\d+\.\s*', '', m_card.group(1)).strip()
+            first_a = m_card.group(2).strip()
+            if first_a:
+                cur_a_lines.append(first_a)
+        elif cur_q is not None:
+            cur_a_lines.append(raw_line)
+    flush()
+
+    if fid == 'Ф-084' and len(cards) > 7 and cards[7].get('a'):
+        cards[7]['a'] = cards[7]['a'].replace('от 2 до 36', 'от <code>2</code> до <code>36</code>')
+
     return {'id': key, 'title': info['title'], 'cards': cards}
 
 # Test parsing all Mod 01 notes & cards

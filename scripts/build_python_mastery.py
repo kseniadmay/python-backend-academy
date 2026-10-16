@@ -44,6 +44,10 @@ EXTRA_F_BY_SKILL = {
     '1.9.3': ['Ф-194', 'Ф-215', 'Ф-216', 'Ф-250', 'Ф-256'],
 }
 
+EXPLICIT_DECKS_BY_SKILL = {
+    '1.9.1': ['Ф-082', 'Ф-081', 'Ф-083', 'Ф-255', 'Ф-251'],
+}
+
 # Explicit mapping of Python, Web, Backend, Algorithms, Databases, Architecture, and Infrastructure skills to their best matching IDE task IDs from TASKS_381
 SKILL_TASK_IDS = {
     # 01 · 🐍 Python (28 skills)
@@ -340,8 +344,11 @@ def parse_module_section(section_md: str, mod_prefix: str):
             stitle = _clean_skill_title(skill_blocks[s_idx + 1])
             sbody = skill_blocks[s_idx + 2]
             k_ids = re.findall(r'/(К-\d+)', sbody) + EXTRA_K_BY_SKILL.get(sid, [])
-            _extra_f = set(EXTRA_F_BY_SKILL.get(sid, []))
-            raw_f_ids = [f for f in re.findall(r'/(Ф-\d+)', sbody) if f not in _extra_f]
+            if sid in EXPLICIT_DECKS_BY_SKILL:
+                raw_f_ids = list(EXPLICIT_DECKS_BY_SKILL[sid])
+            else:
+                _extra_f = set(EXTRA_F_BY_SKILL.get(sid, []))
+                raw_f_ids = [f for f in re.findall(r'/(Ф-\d+)', sbody) if f not in _extra_f]
             f_ids = [f"{fid}@{mod_tag}" if f"{fid}@{mod_tag}" in f_files_map else fid for fid in raw_f_ids]
             k_ids = list(dict.fromkeys(k_ids))
             f_ids = list(dict.fromkeys(f_ids))
@@ -372,6 +379,8 @@ def parse_module_section(section_md: str, mod_prefix: str):
             'desc': f'Навыков: {len(skills)} · Конспектов: {sum(len(s["kIds"]) for s in skills)} · Колод карточек: {sum(len(s["fIds"]) for s in skills)}',
             'skills': skills
         })
+    if mod_prefix == '1':
+        linked_f.update(['Ф-078', 'Ф-079', 'Ф-080', 'Ф-084', 'Ф-085', 'Ф-257'])
     notes_data = {kid: parse_k_note(kid) for kid in sorted(linked_k)}
     decks_data = {fid: parse_f_deck(fid) for fid in sorted(linked_f)}
     return units, notes_data, decks_data

@@ -1,4 +1,4 @@
-import os, re, json, zipfile
+import os, re, json, zipfile, io
 from extract_remnote_data import BASE_REMNOTE, IDE_HTML_PATH, TASKS_381, k_files_map, f_files_map, parse_k_note
 from build_python_mastery import (
     PY_UNITS, PY_NOTES_DATA, PY_DECKS_DATA,
@@ -316,6 +316,11 @@ BACKEND_UNIT_TESTS = {
     },
 }
 
+CANONICAL_UT_PATH = os.path.join(_HERE, 'canonical_unit_tests.json')
+if os.path.isfile(CANONICAL_UT_PATH):
+    with open(CANONICAL_UT_PATH, encoding='utf-8') as f:
+        UNIT_TESTS.update(json.load(f))
+
 ALGO_UNIT_TESTS = {
     '4.1': {
         'unitId': '4.1',
@@ -603,7 +608,7 @@ UPDATED_LESSON_ORDER = {
 
 # 3. Prepare compact JSON payloads for injection
 def safe_js_json(obj):
-    return json.dumps(obj, ensure_ascii=False).replace('</', '<\\/')
+    return json.dumps(obj, ensure_ascii=False).replace('</script', '<\\/script').replace('</SCRIPT', '<\\/SCRIPT')
 
 py_mastery_json = safe_js_json({
     'units': PY_UNITS,
@@ -662,7 +667,12 @@ brython_prelude_json = safe_js_json(full_env_code)
 
 print(f"JSON sizes: PY_MASTERY={len(py_mastery_json)//1024}KB, WEB_MASTERY={len(web_mastery_json)//1024}KB, BACKEND_MASTERY={len(backend_mastery_json)//1024}KB, ALGO_MASTERY={len(algo_mastery_json)//1024}KB, DB_MASTERY={len(db_mastery_json)//1024}KB, ARCH_MASTERY={len(arch_mastery_json)//1024}KB, INFRA_MASTERY={len(infra_mastery_json)//1024}KB, IDE_TASKS={len(ide_tasks_json)//1024}KB, NEW_LESSONS={len(new_lessons_json)//1024}KB, PRELUDE={len(brython_prelude_json)//1024}KB")
 
-EXTRA_CSS = r"""
+CANONICAL_CSS_PATH = os.path.join(_HERE, 'canonical_extra_css.css')
+if os.path.isfile(CANONICAL_CSS_PATH):
+    with open(CANONICAL_CSS_PATH, encoding='utf-8') as f:
+        EXTRA_CSS = f.read()
+else:
+    EXTRA_CSS = r"""
 
   /* ================= CANONICAL SPRINT FOCUS & BENCHMARK SCREENS (САЙДБАР ВСЕГДА ВИДЕН НА ДЕСКТОПЕ) ================= */
   body.is-sprint-focus .topbar { display: none !important; }
@@ -1119,9 +1129,8 @@ EXTRA_CSS = r"""
     font-family:var(--font-m);font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s;
   }
   .topbar-pomo-pill:hover{border-color:var(--moss);transform:translateY(-1px);}
-  .topbar-pomo-pill.is-running{background:var(--emerald-soft);border-color:var(--emerald);color:var(--moss-deep);}
-  .bug-fab-btn{display:none !important;}
-  .bug-topbar-btn, #bug-report-btn-m, #bug-report-btn-d{
+  .bug-topbar-btn, #bug-report-btn-m { display: none !important; }
+  .bug-fab-btn, #bug-report-btn-d{
     font-size:1.05rem;line-height:1;width:34px;height:34px;padding:0;
     display:inline-flex;align-items:center;justify-content:center;
     border-radius:10px;border:1.5px solid rgba(107,29,47,0.38) !important;
@@ -1242,9 +1251,9 @@ EXTRA_CSS = r"""
   .cd-checkpoint-sub{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;font-size:.73rem;color:var(--ink-soft);font-weight:600;}
 
   .cocoon-focus-card{
-    background:linear-gradient(155deg, rgba(16,185,129,0.13), rgba(190,18,60,0.06)), var(--surface);
-    border:1.5px solid rgba(52,211,153,0.38);border-radius:24px;padding:18px 20px;margin-bottom:11px;
-    box-shadow:var(--shadow-1);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+    background:linear-gradient(155deg, rgba(16,185,129,0.12), rgba(190,18,60,0.05)), var(--surface);
+    border:1px solid rgba(16,185,129,0.25);border-radius:24px;padding:18px 20px;margin-bottom:11px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.25), 0 0 24px rgba(16,185,129,0.08);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
     max-width:100%;box-sizing:border-box;
   }
   @media (max-width:560px){
@@ -1270,7 +1279,21 @@ EXTRA_CSS = r"""
   }
   .cocoon-focus-title{
     font-family:var(--font-d);font-size:clamp(1.06rem,1rem + 0.8vw,1.48rem);font-weight:800;
-    line-height:1.22;color:var(--ink);margin-bottom:5px;overflow-wrap:anywhere;
+    line-height:1.22;color:var(--ink);margin-bottom:8px;overflow-wrap:anywhere;
+  }
+  .btn-dominant-cta{
+    background:linear-gradient(135deg, rgba(16,185,129,0.28), rgba(5,150,105,0.22)) !important;
+    border:1.5px solid rgba(52,211,153,0.55) !important;
+    box-shadow:0 0 20px rgba(16,185,129,0.32), 0 4px 14px rgba(0,0,0,0.25) !important;
+    font-weight:800;font-size:.95rem;animation:cta-glow 2.5s infinite ease-in-out;
+  }
+  .btn-dominant-cta:hover{
+    box-shadow:0 0 28px rgba(16,185,129,0.5), 0 6px 18px rgba(0,0,0,0.35) !important;
+    transform:translateY(-1.5px);
+  }
+  @keyframes cta-glow{
+    0%, 100%{box-shadow:0 0 16px rgba(16,185,129,0.28), 0 4px 12px rgba(0,0,0,0.25);}
+    50%{box-shadow:0 0 26px rgba(16,185,129,0.48), 0 4px 16px rgba(16,185,129,0.2);}
   }
   .cocoon-focus-desc{
     font-size:.86rem;line-height:1.44;color:var(--ink-soft);margin-bottom:11px;overflow-wrap:anywhere;
@@ -1338,22 +1361,36 @@ EXTRA_CSS = r"""
   .dash-track-chip__bar{height:4px;border-radius:99px;background:var(--surface-2);overflow:hidden;}
   .dash-track-chip__fill{height:100%;border-radius:99px;background:linear-gradient(90deg, var(--emerald), var(--amber));}
 
-  /* Section 2.5: Dashboard «Мои результаты» — настоящий дашборд: цифры, проценты навыков, матрица */
-  /* V31 (Coddy-ref): вторая итерация компактности — матрица в 2 колонки на desktop, плотные плитки */
+  /* Section 2.5: Dashboard «Мои результаты» — компактная карточка спринта + аккордеон матрицы */
   .dash-results-panel{
     background:var(--surface);border:1px solid var(--glass-border);border-radius:24px;padding:14px 16px;
-    margin-bottom:11px;box-shadow:var(--shadow-1);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+    margin-bottom:11px;box-shadow:var(--shadow-1);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   }
+  .dash-sprint-panel{
+    background:var(--surface);border:1px solid var(--glass-border);border-radius:22px;padding:14px 16px;
+    margin-bottom:11px;box-shadow:var(--shadow-1);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  }
+  .dash-accordion{
+    background:var(--surface);border:1px solid var(--glass-border);border-radius:20px;padding:12px 16px;
+    margin-bottom:11px;box-shadow:var(--shadow-1);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  }
+  .dash-accordion summary{
+    cursor:pointer;font-weight:800;font-size:.86rem;color:var(--ink-soft);list-style:none;
+    display:flex;justify-content:space-between;align-items:center;padding:2px 0;transition:color .15s;
+  }
+  .dash-accordion summary::-webkit-details-marker{display:none;}
+  .dash-accordion summary:hover{color:var(--ink);}
+  .dash-accordion[open] summary{margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--line-soft);color:var(--ink);}
   .dash-results-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
   .dash-results-head > span:first-child{font-weight:800;font-size:.94rem;color:var(--ink);}
   .dash-results-head .meta{font-weight:600;font-size:.74rem;}
   .dash-result-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:12px;}
   @media (max-width:680px){
     .dash-result-tiles{grid-template-columns:repeat(2,1fr);}
-    .dash-results-panel{padding:13px 13px;border-radius:18px;}
+    .dash-results-panel, .dash-sprint-panel{padding:13px 13px;border-radius:18px;}
   }
   .dash-result-tile{
-    background:var(--surface-2);border:1px solid var(--line-soft);border-radius:14px;padding:8px 11px;
+    background:rgba(255,255,255,0.025);border:1px solid rgba(148,163,184,0.14);border-radius:14px;padding:8px 11px;
     display:flex;flex-direction:column;gap:2px;min-width:0;
   }
   .dash-result-tile__num{
@@ -1368,7 +1405,7 @@ EXTRA_CSS = r"""
   }
   .dash-skill-row{
     display:flex;flex-direction:column;gap:4px;padding:8px 10px;border-radius:14px;
-    background:var(--surface-2);border:1px solid var(--line-soft);text-decoration:none;color:var(--ink);
+    background:rgba(255,255,255,0.02);border:1px solid rgba(148,163,184,0.12);text-decoration:none;color:var(--ink);
     transition:border-color .15s,transform .12s;
   }
   .dash-skill-row:hover{border-color:var(--moss);transform:translateY(-1px);}
@@ -1477,7 +1514,7 @@ EXTRA_CSS = r"""
     position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
   }
   .subtabs--compact{
-    display:flex;gap:2px;overflow-x:auto;flex-wrap:nowrap !important;margin-bottom:8px !important;padding:3px !important;border:1px solid var(--line) !important;border-radius:999px !important;background:var(--surface-2) !important;
+    display:flex;gap:2px;overflow-x: auto;flex-wrap: nowrap !important;margin-bottom:8px !important;padding:3px !important;border:1px solid var(--line) !important;border-radius:999px !important;background:var(--surface-2) !important;
     scrollbar-width:none;-webkit-overflow-scrolling:touch;
   }
   .subtabs--compact::-webkit-scrollbar{display:none;}
@@ -1568,8 +1605,9 @@ EXTRA_CSS = r"""
   }
   .feed-chunk + .feed-chunk{
     border-top:1px dashed var(--line-soft);
-    padding-top:12px;margin-top:4px;
+    padding-top:8px;margin-top:0;
   }
+  .feed-chunk p{margin:0 0 8px;line-height:1.55;}
   .feed-chunk h4,.feed-chunk h3{margin:0 0 8px;font-size:1.05rem;line-height:1.32;color:var(--ink);}
   .feed-chunk p:last-child{margin-bottom:0;}
   .feed-chunk-prev{
@@ -1620,6 +1658,7 @@ EXTRA_CSS = r"""
     box-shadow:0 0 0 2px rgba(16,185,129,0.22);
     font-weight:600;
   }
+  .quiz-opt--pending{border-color:var(--emerald) !important;background:rgba(16,185,129,0.14) !important;box-shadow:0 0 12px rgba(52,211,153,0.3) !important;}
   .quiz-opt--unsure{
     border-style:dashed !important;
     color:var(--ink-soft) !important;
@@ -1646,7 +1685,7 @@ EXTRA_CSS = r"""
   .tok-builtin{color:#38bdf8;font-weight:600;}
   .f-deck-chip-bar{
     display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;
-    scrollbar-width:none;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch;flex-wrap: nowrap;
   }
   .f-deck-chip-bar::-webkit-scrollbar{display:none;}
   .f-deck-chip-bar .btn{flex-shrink:0;white-space:nowrap;}
@@ -2490,9 +2529,10 @@ EXTRA_CSS = r"""
   /* Activity Heatmap & Daily Ring & Pomodoro */
   .anti-proc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:20px;}
   .heat-row{display:flex;gap:6px;align-items:center;margin-top:8px;}
-  .heat-cell{flex:1;height:28px;border-radius:7px;background:var(--surface-2);border:1px solid var(--line-soft);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.66rem;color:var(--ink-muted);}
+  .heat-cell{flex:1;height:28px;border-radius:7px;background:var(--surface-2);border:1px solid rgba(148,163,184,0.14);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.66rem;color:var(--ink-muted);transition:all .15s;}
   .heat-cell.active{background:var(--moss-soft);border-color:var(--moss);color:var(--moss-deep);font-weight:700;}
   .heat-cell.high{background:var(--emerald);border-color:var(--emerald);color:#fff;font-weight:700;}
+  .heat-cell.frozen{background:rgba(56,189,248,0.12);border-color:rgba(56,189,248,0.35);color:#7dd3fc;font-weight:700;}
 
   /* Sub-tabs */
   .subtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;border-bottom:1px solid var(--line);padding-bottom:10px;}
@@ -6817,6 +6857,13 @@ function awardXp(amount, anchorEl){
   saveState(state);
   playSound('xp');
   spawnXpParticle(amount, anchorEl);
+  try {
+    const dayVal = (typeof todayXp === 'function') ? todayXp() : (state.dailyXpByDate[k] || 0);
+    document.querySelectorAll('.sprint-xp-pill').forEach(function(el){
+      el.innerHTML = `⚡ +${dayVal} XP<span class="sprint-xp-subtext"> за сутки</span>`;
+      el.title = `Заработано за сутки: ${dayVal} XP`;
+    });
+  } catch(e){}
 }
 function todayXp(){
   ensureExtendedState();
@@ -8021,10 +8068,15 @@ function formatRichInlineText(rawStr){
   // If string has no HTML tags yet, escape basic HTML entities first
   if(!/<(code|strong|b|em|i|span|pre|br|p|div|ul|ol|li)\b/i.test(s)){
     s = escapeHtmlStr(s);
-    // Wrap inline code patterns in <code>...</code>
-    s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
     s = s.replace(/\b(d\[key\]|d\.get\(key\)|\.get\(\)|\.append\(\)|x in seen|x in collection|range\(\d+\)|Dog\(\)\.speak\(\)|raise ValueError\([^)]*\)|DELETE FROM users;|PRIMARY KEY|FOREIGN KEY|GROUP BY|ORDER BY|HAVING|WHERE|JOIN|UNION|COMMIT|ROLLBACK|git commit|git push|git clone|git init|Content-Type|application\/json|@property|@staticmethod|@cached_property|@lru_cache|KeyError|IndexError|TypeError|SyntaxError|UnboundLocalError|RecursionError|__defaults__|sys\.getrecursionlimit\(\))\b/g, '<code>$1</code>');
   }
+  // Guaranteed markdown backticks conversion to <code> tags across all cards and notes
+  // Поддержка fenced code blocks в карточках
+  s = s.replace(/```(?:python)?\s*([\s\S]*?)```/g, function(_, codeInner){
+    const highlighted = (typeof highlightPythonTokens === 'function') ? highlightPythonTokens(escapeHtmlStr(codeInner.trim())) : escapeHtmlStr(codeInner.trim());
+    return `<pre class="quiz-question-code fc-code-block" style="margin:10px 0;text-align:left;"><code>${highlighted}</code></pre>`;
+  });
+  s = s.replace(/`([^`\n]+)`/g, '<code>$1</code>');
   // Format Big-O notation and mathematical styling
   s = s.replace(/\$([^\$\n]+)\$/g, '<span class="math-formula">$1</span>');
   s = s.replace(/\bO\((?:n\^2|n²)\)/g, '<span class="math-formula">O(n²)</span>');
@@ -8047,12 +8099,15 @@ function formatQuizQuestionPromptHTML(rawText){
   const nlIdx = s.indexOf('\n');
   if(nlIdx !== -1){
     const lead = s.slice(0, nlIdx).trim();
-    const codePart = s.slice(nlIdx + 1);
-    return `<div>${formatRichInlineText(lead)}</div><pre class="quiz-question-code"><code>${escapeHtmlStr(codePart)}</code></pre>`;
+    const codePart = s.slice(nlIdx + 1).trim();
+    const highlighted = (typeof highlightPythonTokens === 'function') ? highlightPythonTokens(escapeHtmlStr(codePart)) : escapeHtmlStr(codePart);
+    return `<div>${formatRichInlineText(lead)}</div><pre class="quiz-question-code"><code>${highlighted}</code></pre>`;
   }
   const colonCodeMatch = s.match(/^(Что выведет:)\s*(.+)$/i);
   if(colonCodeMatch){
-    return `<div>${escapeHtmlStr(colonCodeMatch[1])}</div><pre class="quiz-question-code"><code>${escapeHtmlStr(colonCodeMatch[2])}</code></pre>`;
+    const codePart = colonCodeMatch[2].trim();
+    const highlighted = (typeof highlightPythonTokens === 'function') ? highlightPythonTokens(escapeHtmlStr(codePart)) : escapeHtmlStr(codePart);
+    return `<div>${escapeHtmlStr(colonCodeMatch[1])}</div><pre class="quiz-question-code"><code>${highlighted}</code></pre>`;
   }
   return formatRichInlineText(s);
 }
@@ -8077,7 +8132,12 @@ function highlightPythonTokens(codeInner){
 
 // Helper to decorate <pre><code> blocks with inline "▶ Запустить в Python" button (skips already-decorated RemNote K-note blocks)
 function decorateCodeBlocksWithRunBtn(htmlStr){
-  const s = String(htmlStr || '');
+  let s = String(htmlStr || '');
+  s = s.replace(/<pre><code>([\s\S]*?)<\/code><\/pre>/g, function(full, codeInner){
+    const looksLikePython = !(/^(SELECT|INSERT|UPDATE|DELETE|CREATE|FROM|docker|git|GET|POST|PATCH|PUT|paths:)/i.test(codeInner.trim()));
+    const highlighted = (looksLikePython && typeof highlightPythonTokens === 'function') ? highlightPythonTokens(codeInner) : codeInner;
+    return `<pre><code>${highlighted}</code></pre>`;
+  });
   if(s.indexOf('snippet-wrap') !== -1 || s.indexOf('code-snippet-wrap') !== -1) return s;
   return s.replace(/<pre><code>([\s\S]*?)<\/code><\/pre>/g, function(full, codeInner){
     const looksLikePython = !(/^(SELECT|INSERT|UPDATE|DELETE|CREATE|FROM|docker|git|GET|POST|PATCH|PUT|paths:)/i.test(codeInner.trim()));
@@ -8203,28 +8263,40 @@ function pluralRuTopics(n){
 
 function buildSprintFinishCelebrationHTML(cel){
   if(!cel) return '';
-  const remaining = (cel.remainingTopics !== undefined) ? cel.remainingTopics : 7;
-  const prevP = (cel.prevPct !== undefined) ? cel.prevPct : 0;
-  const newP = (cel.newPct !== undefined) ? cel.newPct : 2;
+  const isAlreadyRead = Boolean(cel.wasAlreadyRead || (state.readNotes && state.readNotes.includes(cel.kid)));
+  const xpBadge = isAlreadyRead ? '' : ' · +15 XP';
+  const noteObj = (typeof ALL_NOTES_COMBINED !== 'undefined' && ALL_NOTES_COMBINED[cel.kid]) || {};
+  const rawTitle = (noteObj && noteObj.title) || cel.kid || 'Тема';
+  const cleanTitle = rawTitle.replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+
+  let nextKid = null;
+  try {
+    const sk = (typeof PY_SKILLS_BY_ID !== 'undefined' && pySkillViewState && pySkillViewState.sid) ? PY_SKILLS_BY_ID[pySkillViewState.sid] : null;
+    if(sk && sk.kIds){
+      const idx = sk.kIds.indexOf(cel.kid);
+      if(idx >= 0 && idx + 1 < sk.kIds.length){
+        nextKid = sk.kIds[idx + 1];
+      }
+    }
+  } catch(e){}
+
+  const nextBtnHTML = nextKid ? `
+    <button type="button" class="btn-glass-emerald btn-lg" style="width:100%;max-width:380px;justify-content:center;margin-bottom:8px;" data-py-select-k="${nextKid}" data-dismiss-celebration>📖 Продолжить чтение конспектов ➔</button>
+    <button type="button" class="btn btn-ghost" style="width:100%;max-width:380px;justify-content:center;" data-py-tab="cards" data-dismiss-celebration>🃏 Перейти к карточкам</button>
+  ` : `
+    <button type="button" class="btn-glass-emerald btn-lg" style="width:100%;max-width:380px;justify-content:center;" data-py-tab="cards" data-dismiss-celebration>🃏 Закрепить на карточках ➔</button>
+  `;
+
   return `
-    <div class="sprint-finish-card" style="max-width:560px;margin:12px auto;text-align:center;">
-      <div class="sprint-finish-orb" style="font-size:2rem;margin-bottom:6px;">🎯</div>
-      <div class="cocoon-focus-eyebrow" style="margin-bottom:6px;">Теория закреплена · +15 XP за конспект</div>
-      <h2 style="font-size:1.35rem;margin-bottom:8px;">Конспект ${escapeHtmlStr(cel.kid || 'темы')} изучен!</h2>
-      <p class="meta" style="max-width:480px;margin:0 auto 12px;font-size:.88rem;">Материал пройден! Закрепи тему на карточках или переходи к коду в IDE:</p>
-
-      <div class="countdown-shift-card" style="margin:12px 0;padding:12px 16px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-weight:700;font-size:.88rem;">
-          <span>🎯 Прогресс юнита: ${prevP}% ➔ ${newP}%</span>
-          <span style="color:var(--moss);">⏳ До скрининга: ${remaining} ${pluralRuTopics(remaining)}</span>
+    <div class="celebration-modal-overlay" style="position:fixed;inset:0;background:rgba(10,14,20,0.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;">
+      <div class="sprint-finish-card" style="max-width:500px;width:100%;margin:0 auto;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.65);border:1.5px solid rgba(52,211,153,0.5);">
+        <div class="sprint-finish-orb" style="font-size:2.2rem;margin-bottom:6px;">✨</div>
+        <div class="cocoon-focus-eyebrow" style="margin-bottom:6px;">Конспект закреплён${xpBadge}</div>
+        <h2 style="font-size:1.35rem;margin-bottom:8px;">«${escapeHtmlStr(cleanTitle)}» ${isAlreadyRead ? 'повторён' : 'усвоен'}!</h2>
+        <p class="meta" style="max-width:440px;margin:0 auto 14px;font-size:.9rem;">Отличный темп! Закрепи изученное или переходи к следующей теме:</p>
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:14px;">
+          ${nextBtnHTML}
         </div>
-        <div class="cd-bar cd-bar-track"><div class="cd-fill cd-bar-fill" style="width:${Math.max(8, newP)}%;"></div></div>
-      </div>
-
-      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px;">
-        <button class="btn-glass-emerald" data-py-tab="cards" data-dismiss-celebration>🃏 Закрепить на карточках ➔</button>
-        <button class="btn-glass-ruby" data-py-tab="code" data-dismiss-celebration>💻 Решить задачу в IDE ➔</button>
-        <button class="btn btn-ghost" data-quick-microstep="" data-dismiss-celebration>Следующая тема</button>
       </div>
     </div>`;
 }
@@ -8249,7 +8321,9 @@ function getStepDefaultScratchpadCode(activeK, sid, curStep, stepIdx){
       return `# Быстрый эксперимент с множеством (Шаг 4)\na = {1, 2, 3}\nb = {3, 4, 5}\nprint("Пересечение:", a & b, "Объединение:", a | b)`;
     }
   }
-  return `# Проверь идею из конспекта ${activeK} (Шаг ${stepIdx+1})\nitems = [10, 20, 30]\nprint("Длина:", len(items), "Первый элемент:", items[0])`;
+  const cleanNoteTitle = (ALL_NOTES_COMBINED[activeK] && ALL_NOTES_COMBINED[activeK].title) ? ALL_NOTES_COMBINED[activeK].title.replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim() : '';
+  const topicLabel = cleanNoteTitle ? `«${cleanNoteTitle}»` : 'теории';
+  return `# Проверь идею из конспекта ${topicLabel} (Шаг ${stepIdx+1})\nitems = [10, 20, 30]\nprint("Длина:", len(items), "Первый элемент:", items[0])`;
 }
 
 function buildTaskSpecDetails(tObj){
@@ -8406,7 +8480,7 @@ function viewPythonSkill(sid){
         </div>
       </div>
       <div style="display:flex;gap:10px;align-items:center;margin-left:14px;flex:none;">
-        <div class="sprint-xp-pill" style="display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:999px;background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.35);color:#fbbf24;font-size:0.75rem;font-weight:700;white-space:nowrap;letter-spacing:0.01em;" title="Заработано за сутки: ${dayXpVal} XP">⚡ +${dayXpVal || 55} XP за сутки</div>
+        <div class="sprint-xp-pill" style="display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:999px;background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.35);color:#fbbf24;font-size:0.75rem;font-weight:700;white-space:nowrap;letter-spacing:0.01em;" title="Заработано за сутки: ${dayXpVal} XP">⚡ +${dayXpVal} XP<span class="sprint-xp-subtext"> за сутки</span></div>
         <a href="#/docs" class="topbar-help-btn" style="padding:6px 14px;border-radius:10px;" title="Справочник синтаксиса и методов Python"><span class="topbar-help-text">📖 Справка</span></a>
         <button type="button" class="topbar-help-btn" data-toggle-audio data-audio-toggle style="padding:6px 14px;border-radius:10px;cursor:pointer;" title="Слушать аудио / Аудио-компаньон"><span class="topbar-audio-text">🎧 Озвучить</span></button>
       </div>
@@ -8429,7 +8503,8 @@ function viewPythonSkill(sid){
     const n = ALL_NOTES_COMBINED[kId] || { title: kId };
     const isDone = state.readNotes.includes(kId);
     const isActive = (pySkillViewState.tab === 'theory' && kId === activeK);
-    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" data-py-select-k="${kId}" data-py-skill-id="${sk.id}"></span>`;
+    const cleanNoteTitle = (n.title || kId).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="${escapeHtmlStr(cleanNoteTitle)}" data-py-select-k="${kId}" data-py-skill-id="${sk.id}"></span>`;
   }).join('');
 
   // 2. Флеш-карточки текущего навыка
@@ -8438,7 +8513,8 @@ function viewPythonSkill(sid){
     const d = ALL_DECKS_COMBINED[fid] || {};
     const isDone = state.reviewedDecks.includes(fid);
     const isActive = (pySkillViewState.tab === 'cards' && (activeF === fid || (!activeF && idx === 0)));
-    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" data-py-select-f="${fid}"></span>`;
+    const cleanDeckTitle = (d.title || fid).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
+    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="${escapeHtmlStr(cleanDeckTitle)}" data-py-select-f="${fid}"></span>`;
   }).join('');
 
   // 3. Задачи практики кода текущего навыка
@@ -8834,15 +8910,18 @@ function viewPythonUnitTest(unitId, trackKey){
   }
 
   const q = questions[unitTestState.idx];
-  const sel = unitTestState.answers[unitTestState.idx];
+  const answeredSel = unitTestState.answers[unitTestState.idx];
+  const pendingSel = (typeof unitTestState.pending === 'number') ? unitTestState.pending : answeredSel;
   const rev = unitTestState.revealed;
   const optsHTML = q.options.map((opt, i) => {
     let cls = 'quiz-opt';
     if(rev){
       if(i === q.correct) cls += ' quiz-opt--correct';
-      else if(i === sel) cls += ' quiz-opt--wrong';
+      else if(i === answeredSel) cls += ' quiz-opt--wrong';
+    } else if(i === pendingSel){
+      cls += ' quiz-opt--pending';
     }
-    return `<button class="${cls}" data-ut-ans="${i}" ${rev?'disabled':''}>${i+1}. ${formatRichInlineText(opt)}</button>`;
+    return `<button type="button" class="${cls}" data-ut-ans="${i}" ${rev?'disabled':''}>${i+1}. ${formatRichInlineText(opt)}</button>`;
   }).join('');
 
   return `
@@ -8859,10 +8938,10 @@ function viewPythonUnitTest(unitId, trackKey){
         <h2 style="margin-bottom:16px;">${formatQuizQuestionPromptHTML(q.q)}</h2>
         <div style="display:flex;flex-direction:column;gap:9px;">${optsHTML}</div>
         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;">
-          ${unitTestState.idx > 0 ? `<button class="btn btn-ghost" data-ut-prev>← Предыдущий вопрос</button>` : `<span></span>`}
-          ${rev ? `<button class="btn btn-primary" data-ut-next>${unitTestState.idx+1>=questions.length?'Завершить тест':'Следующий вопрос'} ${ICONS.arrowRight}</button>` : ''}
+          ${unitTestState.idx > 0 ? `<button type="button" class="btn btn-ghost" data-ut-prev>← Предыдущий вопрос</button>` : `<span></span>`}
+          ${rev ? `<button type="button" class="btn btn-primary" data-ut-next>${unitTestState.idx+1>=questions.length?'Завершить тест':'Следующий вопрос'} ${ICONS.arrowRight}</button>` : (typeof pendingSel === 'number' ? `<button type="button" class="btn btn-primary" data-ut-confirm>Ответить</button>` : `<span></span>`)}
         </div>
-        ${rev && state.utShowExplanations ? `<div class="notice" style="margin-top:14px;">${sel===q.correct?'✓ Верно! ':'✗ Обрати внимание: '}${formatRichInlineText(q.explain)}</div>` : ''}
+        ${rev && state.utShowExplanations ? `<div class="notice" style="margin-top:14px;">${answeredSel===q.correct?'✓ Верно! ':'✗ Обрати внимание: '}${formatRichInlineText(q.explain)}</div>` : ''}
       </div>
     </div>` + (!showStartModal ? '' : (() => {
       const qn = questions.length;
@@ -10659,7 +10738,7 @@ function renderPathMobileStatsHTML(totalCompletedUnits, streakText){
     <div class="path-mobile-stats" role="status" aria-label="Статистика обучения">
       <span class="pms-item" title="Пройдено юнитов">📘 <b>${totalCompletedUnits}/45</b></span>
       <span class="pms-item" title="Стрик активности">🔥 <b>${state.streak || 0}</b> ${streakText}</span>
-      <span class="pms-item" title="Накопленный опыт">💎 <b>${state.xp || 0} XP</b></span>
+      <span class="pms-item" title="Накопленный опыт">⚡ <b>${state.xp || 0} XP</b></span>
     </div>`;
 }
 
@@ -10700,7 +10779,7 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)
           <span class="coddy-rail-stat-val">${state.streak || 0} ${streakText}</span>
         </div>
         <div class="coddy-rail-stat" title="Накопленный опыт">
-          <span class="coddy-rail-stat-icon">💎</span>
+          <span class="coddy-rail-stat-icon">⚡</span>
           <span class="coddy-rail-stat-val">${state.xp || 0} XP</span>
         </div>
       </div>
@@ -11946,14 +12025,30 @@ verifyCommandStage = function(stage){
 // Build 7-day heatmap data
 function buildSevenDayHeatmapHTML(){
   const days = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+  const hasActiveStreak = (state.streak || 0) > 0;
   let html = '';
   for(let i=6; i>=0; i--){
     const d = new Date();
     d.setDate(d.getDate() - i);
     const k = dateIsoKey(d);
     const xp = (state.dailyXpByDate && state.dailyXpByDate[k]) || 0;
-    const cls = xp >= state.dailyGoal ? 'heat-cell high' : (xp > 0 ? 'heat-cell active' : 'heat-cell');
-    html += `<div class="${cls}" title="${k}: ${xp} XP"><span>${days[d.getDay()]}</span><b>${xp > 0 ? xp : '—'}</b></div>`;
+    let cls = 'heat-cell';
+    let cellContent = '—';
+    let cellTitle = `${k}: 0 XP`;
+    if(xp >= state.dailyGoal){
+      cls = 'heat-cell high';
+      cellContent = xp;
+      cellTitle = `${k}: ${xp} XP (цель выполнена)`;
+    } else if(xp > 0){
+      cls = 'heat-cell active';
+      cellContent = xp;
+      cellTitle = `${k}: ${xp} XP`;
+    } else if(hasActiveStreak){
+      cls = 'heat-cell frozen';
+      cellContent = '🧊';
+      cellTitle = `${k}: Заморозка стрика (активность сохранена)`;
+    }
+    html += `<div class="${cls}" title="${cellTitle}"><span>${days[d.getDay()]}</span><b>${cellContent}</b></div>`;
   }
   return `<div class="heat-row">${html}</div>`;
 }
@@ -12061,8 +12156,9 @@ viewDashboard = function(){
   const e2 = getEchelonProgress(2);
   const e3 = getEchelonProgress(3);
   const e4 = getEchelonProgress(4);
-  const e1Remaining = e1.skills.filter(s => getSkillMP(s.id) < 100).length;
-  const e1DoneUnits = Math.min(14, Math.max(1, 14 - Math.floor((e1Remaining / Math.max(1, e1.skills.length)) * 14)));
+  const e1CurMp = e1.curMp || 0;
+  const e1MaxMp = e1.maxMp || 4100;
+  const e1Pct = e1.pct || 0;
 
   // --- Real dashboard: results across all 7 tracks (tiles + full skill matrix) ---
   const TRACK_DASH_META = {
@@ -12097,7 +12193,7 @@ viewDashboard = function(){
   const activeDaysCount = Math.max(historyActiveDays, state.streak || 0);
 
   const resultsTilesHTML = [
-    { num: `${state.xp}`, label: '💎 XP всего' },
+    { num: `${state.xp || 0}`, label: '⚡ XP всего' },
     { num: `${totalSolvedIde}<em> / 401</em>`, label: '💻 задач в IDE' },
     { num: `${masteredAll}<em> / ${skillsAll}</em>`, label: '🧠 навыков 👑' },
     { num: `${passedUnitsCount}<em> / ${totalUnitsAll}</em>`, label: '🏆 юнитов сдано' }
@@ -12115,15 +12211,17 @@ viewDashboard = function(){
       <div class="dash-skill-row__sqs">${m.sqs}</div>
     </a>`).join('');
 
-  // Determine the next priority skill for the 4-minute Cocoon Focus Card
+  // Determine the next priority skill for the 2-minute Cocoon Focus Card
   const openGaps = (state.diagnosticGaps || []).filter(sid => PY_SKILLS_BY_ID[sid] && getSkillMP(sid) < 100);
   const activeTierNum = e1.pct < 100 ? 1 : (e2.pct < 100 ? 2 : (e3.pct < 100 ? 3 : 4));
   const focusSk = openGaps.length > 0
     ? PY_SKILLS_BY_ID[openGaps[0]]
     : (getFirstUnmasteredSkillInEchelon(activeTierNum) || ALL_PY_SKILLS[0]);
-  const focusKId = (focusSk && focusSk.kIds && focusSk.kIds.find(k => !state.readNotes.includes(k))) || (focusSk && focusSk.kIds && focusSk.kIds[0]) || 'К-001';
-  const focusNoteObj = ALL_NOTES_COMBINED[focusKId] || { title: focusSk ? focusSk.title : 'Основы Python', steps: [] };
-  const focusStepsCount = (focusNoteObj.steps && focusNoteObj.steps.length) || 3;
+  const focusTitleFormatted = (() => {
+    if(!focusSk) return 'Основы Python';
+    const ft = (focusSk.title || '').match(/^(.*?)\s*\(([^()]*)\)\s*$/);
+    return ft ? `${focusSk.id} · ${ft[1]} <span class="t-detail">(${ft[2]})</span>` : `${focusSk.id} · ${focusSk.title}`;
+  })();
 
   // Build 1-line checklist for the selected interview stage (1..4)
   const stageEp = getEchelonProgress(dashStage);
@@ -12134,10 +12232,11 @@ viewDashboard = function(){
   const visibleStageSkills = stageSkills.slice(startSlice, startSlice + 3);
   const miniListHTML = visibleStageSkills.map(s => {
     const smp = getSkillMP(s.id);
-    const isNow = (s.id === (focusSk && focusSk.id)) || (smp < 100 && s.id === (stageSkills[firstUnmIdx] && stageSkills[firstUnmIdx].id));
+    const isNow = (s.id === (focusSk && focusSk.id));
     let badgeHtml = `<span class="st-next">⏳ Далее</span>`;
     if(smp >= 100) badgeHtml = `<span class="st-done">✓ 100 MP</span>`;
-    else if(isNow || smp >= 50) badgeHtml = `<span class="st-now">${smp > 0 ? '🔥 ' + smp + ' MP' : '🔥 Сейчас'}</span>`;
+    else if(isNow) badgeHtml = `<span class="st-now">✨ Текущий фокус</span>`;
+    else if(smp > 0) badgeHtml = `<span class="st-now">${smp} MP</span>`;
     const sm = s.title.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
     return `<a href="#${s.routePrefix}/skill/${s.id}" class="mini-item ${isNow ? 'now' : ''}" data-py-open-skill="${s.id}">
       <span>${s.id} · ${sm ? `${sm[1]} <span class="t-detail">(${sm[2]})</span>` : s.title}</span>
@@ -12145,82 +12244,67 @@ viewDashboard = function(){
     </a>`;
   }).join('');
 
+  // Spaced Repetition (SRS)
   const srs = getSpacedRepetitionStats();
+  const dueTodayCardsCount = srs.weakCardsCount || 0;
+  const isSrsAllDone = dueTodayCardsCount === 0;
+  const srsTotalDecks = Math.max(1, Object.keys(ALL_DECKS_COMBINED).length);
+  const srsRingCircum = 94.2;
+  const srsPct = isSrsAllDone ? 100 : Math.min(100, Math.max(8, Math.round((srs.reviewedDecksCount / srsTotalDecks) * 100)));
+  const srsRingOffset = isSrsAllDone ? '0' : (srsRingCircum * (1 - srsPct / 100)).toFixed(1);
   const srsDeckButtons = srs.dueDecks.map(did => {
     const dObj = ALL_DECKS_COMBINED[did];
     if(!dObj) return '';
     return `<a href="#/cards" class="btn btn-ghost" style="padding:5px 10px;font-size:.76rem;" data-srs-open-deck="${did}">🃏 ${did} (${(dObj.cards||[]).length})</a>`;
   }).join('');
-  const srsTotalDecks = Math.max(1, Object.keys(ALL_DECKS_COMBINED).length);
-  const srsRingCircum = 94.2;
-  const srsPct = Math.min(100, Math.max(8, Math.round((srs.reviewedDecksCount / srsTotalDecks) * 100)));
-  const srsRingOffset = (srsRingCircum * (1 - srsPct / 100)).toFixed(1);
 
   return `
     <div class="container">
       <!-- Top Cocoon Pills -->
       <div class="dash-top-pills">
-        <span class="cocoon-pill">🔥 ${state.streak || 1} дн.<span class="sr-only"> подряд</span> · 🧊 ${state.streakFreezes}</span>
-        <span class="cocoon-pill">🎯 ${tXp}/${state.dailyGoal || 50} XP<span class="sr-only"> сегодня</span></span>
+        <span class="cocoon-pill">🔥 ${state.streak || 1} дн. подряд · 🧊 ${state.streakFreezes || 0}</span>
+        <span class="cocoon-pill">⚡ ${tXp} / ${state.dailyGoal || 50} XP</span>
         <button class="cocoon-pill cocoon-pill--interactive" data-open-handover>🔄 Контекст<span class="sr-only"> для нового чата</span></button>
       </div>
 
       <!-- Trajectory & Reverse Countdown to 1st Screening -->
       <div class="cd-box">
         <div class="cd-top">
-          <span class="cd-title">🎯 До 1-го скрининга: ${e1.pct}%</span>
-          <span class="cd-count">⏳ Осталось ${e1Remaining} ${pluralRuTopics(e1Remaining)}</span>
+          <span class="cd-title">🎯 ${e1CurMp} / ${e1MaxMp} MP до 1-го тех-скрининга (${e1Pct}%)</span>
+          <span class="cd-count">⚡ Готовность ${e1Pct}%</span>
         </div>
-        <div class="cd-bar cd-bar-track"><div class="cd-fill cd-bar-fill" style="width:${Math.max(6, e1.pct)}%;"></div></div>
-        <div class="cd-checkpoint-sub">Шаг ${e1DoneUnits} из 14 юнитов Эшелона 1 · Открывает готовность к тех-скринингу</div>
+        <div class="cd-bar cd-bar-track"><div class="cd-fill cd-bar-fill" style="width:${Math.max(6, e1Pct)}%;"></div></div>
+        <div class="cd-checkpoint-sub">Эшелон 1 · Открывает готовность к первому тех-скринингу Junior Python</div>
       </div>
 
-      <!-- Active 4-Minute Sprint Focus Card -->
+      <!-- Active 2-Minute Sprint Focus Card (Single Dominant CTA) -->
       <div class="cocoon-focus-card">
-        <div class="cocoon-focus-eyebrow"><span class="pulse-ring-dot"></span>✨ Фокус сейчас · 4 минуты<span class="sr-only"> · Правило 2 минут: Быстрый микро-шаг</span></div>
-        <div class="cocoon-focus-title">${(() => { const ft = focusSk.title.match(/^(.*?)\s*\(([^()]*)\)\s*$/); return ft ? `${focusSk.id} · ${ft[1]} <span class="t-detail">(${ft[2]})</span>` : `${focusSk.id} · ${focusSk.title}`; })()}</div>
-        <div class="cocoon-focus-desc"><b>${focusNoteObj.title}</b> · ${focusStepsCount} ${(focusStepsCount % 10 === 1 && focusStepsCount % 100 !== 11) ? 'микро-шаг' : (focusStepsCount % 10 >= 2 && focusStepsCount % 10 <= 4 && (focusStepsCount % 100 < 10 || focusStepsCount % 100 >= 20) ? 'микро-шага' : 'микро-шагов')} · живой код · разбор Junior vs Senior</div>
-        <div style="display:flex;flex-direction:column;gap:7px;">
-          <button class="btn-glass-emerald btn-sprint-cta" data-quick-microstep="">▶ Начать спринт (4 мин) ➔</button>
-          <div class="focus-links">
-            <a href="#/mock">🎙️ Собеседование</a>
-            <a href="#/docs">📚 Справочник</a>
-          </div>
-        </div>
+        <div class="cocoon-focus-eyebrow"><span class="pulse-ring-dot"></span>✨ Фокус сейчас · 2 мин</div>
+        <div class="cocoon-focus-title">${focusTitleFormatted}</div>
+        <button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta" data-quick-microstep="">▶ Начать микро-шаг (2 мин) · +15 XP ⚡ ➔</button>
       </div>
 
-      <!-- Real Dashboard: Results Tiles + Full 126-Skill Matrix + Activity -->
-      <div class="dash-results-panel">
-        <div class="dash-results-head">
-          <span>📊 Мои результаты</span>
-          <span class="meta">${skillsAll} навыков · ${totalUnitsAll} юнитов · 💎 ${activeDaysCount} ${(activeDaysCount % 10 === 1 && activeDaysCount % 100 !== 11) ? 'день' : ((activeDaysCount % 10 >= 2 && activeDaysCount % 10 <= 4 && (activeDaysCount % 100 < 10 || activeDaysCount % 100 >= 20)) ? 'дня' : 'дней')} активности</span>
+      <!-- Current Sprint & 7-Day Rhythm Card -->
+      <div class="dash-results-panel dash-sprint-panel">
+        <div class="dash-goal-line">
+          <span class="meta" style="font-weight:700;font-size:.88rem;color:var(--ink);">🎯 Дневная цель: ${tXp} / ${state.dailyGoal || 50} XP</span>
+          <span class="meta" style="font-weight:800;color:var(--moss);">${goalPct}%</span>
         </div>
-        <div class="dash-result-tiles">
-          ${resultsTilesHTML}
-        </div>
-        <div class="dash-skill-matrix">
-          ${resultsMatrixHTML}
-        </div>
-        <div class="dash-results-foot">
-          <div class="dash-goal-line">
-            <span class="meta" style="font-weight:600;">🎯 Дневная цель: ${tXp} / ${state.dailyGoal || 50} XP</span>
-            <span class="meta" style="font-weight:800;color:var(--moss);">${goalPct}%</span>
-          </div>
-          <div class="mp-progress-track" style="margin:5px 0 9px;"><div class="mp-progress-fill" style="width:${goalPct}%;"></div></div>
-          ${buildSevenDayHeatmapHTML()}
-        </div>
+        <div class="mp-progress-track" style="margin:8px 0 12px;"><div class="mp-progress-fill" style="width:${goalPct}%;"></div></div>
+        ${buildSevenDayHeatmapHTML()}
       </div>
 
       <!-- Spaced Repetition (SRS) Quick Review Strip -->
       <div class="panel srs-strip-card" style="padding:11px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <svg class="srs-ring-svg" width="38" height="38" viewBox="0 0 38 38" aria-hidden="true">
+        <div style="display:flex;align-items:center;gap:11px;">
+          <svg class="srs-ring-svg" width="38" height="38" viewBox="0 0 38 38" aria-hidden="true" style="transform:none;overflow:visible;">
             <circle cx="19" cy="19" r="15" fill="none" stroke="rgba(148,163,184,0.2)" stroke-width="3.5"></circle>
             <circle cx="19" cy="19" r="15" fill="none" stroke="var(--moss)" stroke-width="3.5" stroke-dasharray="${srsRingCircum}" stroke-dashoffset="${srsRingOffset}" transform="rotate(-90 19 19)"></circle>
+            ${isSrsAllDone ? `<text x="19" y="24" text-anchor="middle" font-size="14" font-weight="900" fill="var(--moss)">✓</text>` : ''}
           </svg>
           <div>
             <div style="font-weight:700;font-size:.86rem;">🔁 Интервальное повторение (SRS)</div>
-            <div class="meta" style="font-size:.76rem;">Повторено колод: <b>${srs.reviewedDecksCount}</b> · Сложных карточек на закрепление: <b>${srs.weakCardsCount}</b></div>
+            <div class="meta" style="font-size:.76rem;">${isSrsAllDone ? '<span style="color:var(--moss);font-weight:700;">Все карточки на сегодня повторены ✓</span> · Повторено колод: <b>' + srs.reviewedDecksCount + '</b>' : 'Повторено колод: <b>' + srs.reviewedDecksCount + '</b> · Карточек на закрепление: <b>' + dueTodayCardsCount + '</b>'}</div>
           </div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">${srsDeckButtons}</div>
@@ -12236,6 +12320,26 @@ viewDashboard = function(){
       <div class="mini-list">
         ${miniListHTML}
       </div>
+
+      <!-- Collapsible Full 126-Skill Matrix & Tracks Accordion -->
+      <details class="dash-accordion cocoon-details" style="margin-bottom:10px;">
+        <summary>📊 Матрица компетенций и треки (развернуть) ▾</summary>
+        <div class="dash-results-panel-inner" style="padding-top:12px;">
+          <div class="dash-results-head" style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+            <span style="font-weight:800;font-size:.92rem;color:var(--ink);">📊 Мои результаты</span>
+            <span class="meta">${skillsAll} навыков · ${totalUnitsAll} юнитов · 🔥 ${activeDaysCount} ${(activeDaysCount % 10 === 1 && activeDaysCount % 100 !== 11) ? 'день' : ((activeDaysCount % 10 >= 2 && activeDaysCount % 10 <= 4 && (activeDaysCount % 100 < 10 || activeDaysCount % 100 >= 20)) ? 'дня' : 'дней')} активности</span>
+          </div>
+          <div class="dash-result-tiles">
+            ${resultsTilesHTML}
+          </div>
+          <div class="dash-skill-matrix">
+            ${resultsMatrixHTML}
+          </div>
+          <div style="margin-top:12px;text-align:center;">
+            <a href="#/map" class="link-quiet" style="font-size:.82rem;font-weight:700;">🗺️ Открыть полную карту компетенций ➔</a>
+          </div>
+        </div>
+      </details>
 
       <!-- Collapsible Drawer for All Modules, Echelons, Pomodoro & Global Stats -->
       <details class="cocoon-details">
@@ -12850,7 +12954,7 @@ render = function(){
     document.body.classList.toggle('is-sprint-focus', isSprintFocus);
     document.body.classList.toggle('is-interactive-route', isInteractiveRoute);
   }catch(e){}
-  if(route === '/'){
+  if(route === '/' || route === '/dashboard'){
     root.innerHTML = viewDashboard();
   } else if(route === '/python'){
     root.innerHTML = viewPythonMastery('python');
@@ -14234,10 +14338,15 @@ document.addEventListener('click', async function(e){
     return;
   }
 
-  // Unit Test actions
+  // Unit Test actions (двухфазный выбор: подумать -> подтвердить)
   const utAns = e.target.closest('[data-ut-ans]');
-  if(utAns && unitTestState){
-    unitTestState.answers[unitTestState.idx] = parseInt(utAns.getAttribute('data-ut-ans'), 10);
+  if(utAns && unitTestState && !unitTestState.revealed){
+    unitTestState.pending = parseInt(utAns.getAttribute('data-ut-ans'), 10);
+    render();
+    return;
+  }
+  if(e.target.closest('[data-ut-confirm]') && unitTestState && typeof unitTestState.pending === 'number'){
+    unitTestState.answers[unitTestState.idx] = unitTestState.pending;
     unitTestState.revealed = true;
     saveUnitTestDraftState();
     render();
@@ -15075,7 +15184,25 @@ html_out = html_out.replace(orig_reset_handler, upgraded_reset_handler, 1)
 html_out = html_out.replace("window.addEventListener('hashchange', render);", "window.addEventListener('hashchange', function(){ render(); });")
 
 # 5. Inject UPGRADE_JS + UPGRADE_VIEWS_JS + UPGRADE_DASHBOARD_AND_ROUTER_JS right before /* ================= INIT ================= */
-full_upgrade_js = (
+CANONICAL_TEMPLATE_JS_PATH = os.path.join(_HERE, 'canonical_template_js.js')
+if os.path.isfile(CANONICAL_TEMPLATE_JS_PATH):
+    with open(CANONICAL_TEMPLATE_JS_PATH, encoding='utf-8') as f:
+        _tmpl = f.read()
+    full_upgrade_js = (
+        _tmpl
+        .replace('__PY_MASTERY_JSON__', py_mastery_json)
+        .replace('__WEB_MASTERY_JSON__', web_mastery_json)
+        .replace('__BACKEND_MASTERY_JSON__', backend_mastery_json)
+        .replace('__ALGO_MASTERY_JSON__', algo_mastery_json)
+        .replace('__DB_MASTERY_JSON__', db_mastery_json)
+        .replace('__ARCH_MASTERY_JSON__', arch_mastery_json)
+        .replace('__INFRA_MASTERY_JSON__', infra_mastery_json)
+        .replace('__IDE_TASKS_JSON__', ide_tasks_json)
+        .replace('__NEW_LESSONS_JSON__', new_lessons_json)
+        .replace('__BRYTHON_PRELUDE_JSON__', brython_prelude_json)
+    )
+else:
+    full_upgrade_js = (
     UPGRADE_JS
     .replace('__PY_MASTERY_JSON__', py_mastery_json)
     .replace('__WEB_MASTERY_JSON__', web_mastery_json)
@@ -15096,9 +15223,10 @@ assert init_marker in html_out, "Could not find INIT marker"
 html_out = html_out.replace(init_marker, full_upgrade_js, 1)
 
 # Cross-device progress sync is kept in this canonical build step so rebuilds retain it.
-sync_init_marker = 'hydrateAndMergeAllProgressSources();\nbumpStreak();\nrestoreFromIndexedDBIfNeeded();\nsaveState(state);'
-assert sync_init_marker in html_out, "Could not find progress hydration marker"
-sync_client_js = r'''
+if 'const PROGRESS_SYNC_ENDPOINT' not in html_out:
+    sync_init_marker = 'hydrateAndMergeAllProgressSources();\nbumpStreak();\nrestoreFromIndexedDBIfNeeded();\nsaveState(state);'
+    assert sync_init_marker in html_out, "Could not find progress hydration marker"
+    sync_client_js = r'''
 const PROGRESS_SYNC_ENDPOINT = window.ACADEMY_SYNC_ENDPOINT || '/api/sync';
 const PROGRESS_SYNC_TOKEN_KEY = 'academy_sync_access_code';
 const PROGRESS_SYNC_DEVICE_KEY = 'academy_sync_device_id';
@@ -15238,7 +15366,7 @@ window.addEventListener('pagehide', function(){
 progressSyncTimer = setInterval(runProgressSync, PROGRESS_SYNC_INTERVAL_MS);
 setTimeout(runProgressSync, 1200);
 '''
-html_out = html_out.replace(sync_init_marker, sync_init_marker + '\n' + sync_client_js, 1)
+    html_out = html_out.replace(sync_init_marker, sync_init_marker + '\n' + sync_client_js, 1)
 
 with open(OUT_HTML_PATH, 'w', encoding='utf-8', newline='\n') as f:
     f.write(html_out)
@@ -15309,6 +15437,9 @@ if os.path.exists(SCRATCH_CONTEXT_PATH):
 # Automatically rebuild Python_Backend_Academy_Project.zip and sync scripts/mockups into OneDrive Cloud folder
 ARCHIVE_ZIP_PATH = os.path.join(_CLOUD_DIR, 'Python_Backend_Academy_Project.zip')
 PIPELINE_FILES = [
+    'canonical_unit_tests.json',
+    'canonical_extra_css.css',
+    'canonical_template_js.js',
     'academy.orig.html',
     'extract_remnote_data.py',
     'build_task_tests.py',
@@ -15361,6 +15492,7 @@ if os.path.isdir(_CLOUD_DIR) and os.path.isdir(BASE_REMNOTE) and os.path.isfile(
         zf.write(html_src, 'academy.html')
         zf.write(IDE_HTML_PATH, 'Практика кода — тренажёр с IDE.html')
         extra_root_files = [
+            'Эталоны.html',
             'manifest.json',
             'icon.svg',
             'sw.js',
@@ -15377,6 +15509,16 @@ if os.path.isdir(_CLOUD_DIR) and os.path.isdir(BASE_REMNOTE) and os.path.isfile(
             erf_full = os.path.join(_CLOUD_DIR, erf) if os.path.isfile(os.path.join(_CLOUD_DIR, erf)) else os.path.join(_UNPACKED_ROOT, erf)
             if os.path.isfile(erf_full):
                 zf.write(erf_full, erf)
+        rem_buf = io.BytesIO()
+        with zipfile.ZipFile(rem_buf, 'w', compression=zipfile.ZIP_DEFLATED) as rzf:
+            for root, dirs, files in os.walk(BASE_REMNOTE):
+                dirs.sort()
+                for fn in sorted(files):
+                    if fn.endswith('.md'):
+                        full_p = os.path.join(root, fn)
+                        rel_p = os.path.relpath(full_p, BASE_REMNOTE).replace(os.sep, '/')
+                        rzf.write(full_p, rel_p)
+        zf.writestr('RemNote_Python_Mastery_FIXED.zip', rem_buf.getvalue())
         for root, dirs, files in os.walk(BASE_REMNOTE):
             dirs.sort()
             for fn in sorted(files):

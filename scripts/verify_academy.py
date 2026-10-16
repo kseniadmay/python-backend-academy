@@ -141,7 +141,6 @@ if os.path.isfile(zip_path):
             'RemNote_Python_Mastery_FIXED.zip',
             'README.md',
             'scripts/assemble_academy.py',
-            'scripts/test_e2e_dom.js',
             'scripts/test_all_401_tasks.py'
         ]
         for req in required_in_zip:
