@@ -1,6 +1,6 @@
 /**
  * test_bugs_regression.js
- * Автоматические регрессионные тесты для предотвращения повторения багов 1..30.
+ * Автоматические регрессионные тесты для предотвращения повторения багов 1..40.
  */
 
 'use strict';
@@ -14,7 +14,7 @@ const academyPath = path.join(rootDir, 'academy.html');
 const etalonyPath = path.join(rootDir, 'Эталоны', 'Эталоны.html');
 
 console.log('================================================================');
-console.log('   REGRESSION TEST SUITE: BUGS 1..30 VERIFICATION               ');
+console.log('   REGRESSION TEST SUITE: BUGS 1..40 VERIFICATION               ');
 console.log('================================================================\n');
 
 assert(fs.existsSync(academyPath), `academy.html missing`);
@@ -178,6 +178,75 @@ console.log('✓ Bugs 28 & 30: Syntax-highlighted code blocks in unit test quest
 assert(academyHtml.includes('quiz-opt--pending') && academyHtml.includes('data-ut-confirm') && academyHtml.includes('Ответить'), 'Bug 29: unit test must have two-phase selection with pending state and explicit Ответить button');
 console.log('✓ Bug 29: Unit test two-phase selection (think before answer) verified');
 
+// 31. Bug 31: Отступы строк и комментарии сложности операций в К-004
+assert(academyHtml.includes('# O(len(a) + len(b)) — объединение') && academyHtml.includes('# O(min(len(a), len(b))) — пересечение'), 'Bug 31: K-004 must have spaced operations with Big-O comments');
+console.log('✓ Bug 31: K-004 step 3 operations spacing and Big-O comments verified');
+
+// 32. Bug 32: Разделение шага 4 в К-004 на 2 микро-шага по педагогике Coddy (5 шагов вместо 4)
+const k004ContentBatch4 = fs.readFileSync(k004Path, 'utf-8');
+assert(k004ContentBatch4.includes('## Сценарии применения frozenset') && k004ContentBatch4.includes('## Когда предпочесть обычный set'), 'Bug 32: K-004.md must split step 4 into 2 distinct micro-steps');
+const mK004Obj = academyHtml.match(/"К-004":\s*(\{[^}]*"steps":\s*\[.*?\]\s*\})/s);
+assert(mK004Obj, 'academy.html must contain parsed К-004');
+const parsedK004 = JSON.parse(mK004Obj[1]);
+assert.strictEqual(parsedK004.steps.length, 5, `К-004 must have exactly 5 micro-steps after pedagogical split, got ${parsedK004.steps.length}`);
+console.log('✓ Bug 32: K-004 split into 5 micro-steps (Home = Journey / Coddy pedagogy) verified');
+
+// 33. Bug 33: Наличие теоретических знаний в конспектах Юнита 1.1 для рубежного теста
+const k001ContentBatch4 = fs.readFileSync(k001Path, 'utf-8');
+assert(k001ContentBatch4.includes('Мутабельность списка: `+=` vs `+`') && k001ContentBatch4.includes('__iadd__'), 'Bug 33: K-001 must explain in-place += vs new list +');
+assert(k001ContentBatch4.includes('IEEE 754') && k001ContentBatch4.includes('0.1 + 0.2 == 0.3'), 'Bug 33: K-001 must explain float precision and IEEE 754');
+assert(k001ContentBatch4.includes('short-circuit') && k001ContentBatch4.includes('[] or "default" and 42'), 'Bug 33: K-001 must explain and/or operator precedence');
+const k003Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.1 · Базовый синтаксис', '📚 Конспекты', 'К-003. Срезы в Python – slice и синтаксис.md');
+assert(fs.existsSync(k003Path), 'К-003.md missing');
+const k003Content = fs.readFileSync(k003Path, 'utf-8');
+assert(k003Content.includes('casefold()') && k003Content.includes('caseless matching'), 'Bug 33: K-003 must explain casefold() vs lower() Unicode matching');
+console.log('✓ Bug 33: All unit test knowledge covered in Unit 1.1 theory notes verified');
+
+// 34. Bug 34: Исчерпывающее тестирование: расширение пула вопросов рубежного теста 1.1 до 8 вопросов
+const mUnitTests = academyHtml.match(/"1\.1":\s*\{\s*"unitId":\s*"1\.1".*?"questions":\s*(\[.*?\])\s*\}/s);
+assert(mUnitTests, 'academy.html must contain parsed UNIT_TESTS 1.1');
+const parsedQuestions11 = JSON.parse(mUnitTests[1]);
+assert.strictEqual(parsedQuestions11.length, 8, `Unit test 1.1 must have 8 exhaustive questions, got ${parsedQuestions11.length}`);
+console.log('✓ Bug 34: Unit test 1.1 questions pool expanded to 8 exhaustive questions verified');
+
+// 35. Bug 35: Отделение синтаксиса от текста в К-014 step 2
+const k014Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.2 · Функции', '📚 Конспекты', 'К-014. Лямбда-функции в Python.md');
+assert(fs.existsSync(k014Path), 'К-014.md missing');
+const k014Content = fs.readFileSync(k014Path, 'utf-8').replace(/\r\n/g, '\n');
+assert(k014Content.includes('Синтаксический шаблон:\n```python\nlambda аргументы: выражение\n```'), 'Bug 35: K-014.md must isolate lambda syntax template in a code block');
+assert(academyHtml.includes('lambda аргументы: выражение') && academyHtml.includes('quiz-question-code'), 'Bug 35: academy.html must render isolated lambda template block');
+console.log('✓ Bug 35: K-014 step 2 syntax isolated from text verified');
+
+// 36. Bug 36: Убран восклицательный знак в К-015
+const k015Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.2 · Функции', '📚 Конспекты', 'К-015. map() и filter()_ функциональный стиль.md');
+assert(fs.existsSync(k015Path), 'К-015.md missing');
+const k015Content = fs.readFileSync(k015Path, 'utf-8');
+assert(!k015Content.includes('(не список!)') && k015Content.includes('(а не готовый список)'), 'Bug 36: K-015.md must not contain exclamation mark');
+assert(!academyHtml.includes('(не список!)') && academyHtml.includes('(а не готовый список)'), 'Bug 36: academy.html must not contain exclamation mark');
+console.log('✓ Bug 36: Exclamation mark removed from K-015 verified');
+
+// 37 & 39. Bugs 37 & 39: Функции в условиях карточек Ф-025 оформлены блоками кода с подсветкой
+const f025Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.2 · Функции', '📇 Карточки', 'Ф-025. Замыкание.md');
+assert(fs.existsSync(f025Path), 'Ф-025.md missing');
+const f025Content = fs.readFileSync(f025Path, 'utf-8').replace(/\r\n/g, '\n');
+assert(f025Content.includes('Какая переменная захватывается замыканием в функции `multiplier`?\n```python\ndef make_multiplier(n):'), 'Bug 37: F-025 card 1 must format function as code block');
+assert(f025Content.includes('Что выведет следующий код с замыканием?\n```python\ndef make_multiplier(n):'), 'Bug 39: F-025 card 2 must format function as code block');
+assert(academyHtml.includes('fc-code-block'), 'Bug 37 & 39: formatRichInlineText must render .fc-code-block for cards');
+console.log('✓ Bugs 37 & 39: F-025 cards 1 & 2 multiline code blocks and formatting verified');
+
+// 38. Bug 38: Убраны технические обозначения дней повтора с кнопок SRS в карточках
+assert(!academyHtml.includes('<span class="srs-btn-sub">(${srsPrev.again.days}д)</span>'), 'Bug 38: SRS day counters must be removed from skill cards');
+assert(!academyHtml.includes('<span class="srs-btn-sub">(${srsPrev.easy.days}д)</span>'), 'Bug 38: SRS day counters must be removed from hub cards');
+console.log('✓ Bug 38: Removal of SRS day count suffixes from buttons verified');
+
+// 40. Bug 40: Разъяснение выражения (expression) vs составных инструкций вместо англицизма "как statement" в Ф-026
+const f026Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.2 · Функции', '📇 Карточки', 'Ф-026. Лямбда-функция.md');
+assert(fs.existsSync(f026Path), 'Ф-026.md missing');
+const f026Content = fs.readFileSync(f026Path, 'utf-8');
+assert(!f026Content.includes('как statement') && f026Content.includes('составные инструкции') && f026Content.includes('тернарное выражение'), 'Bug 40: F-026 card 2 must replace statement jargon with clear Russian pedagogy');
+assert(!academyHtml.includes('как statement'), 'Bug 40: academy.html must not contain statement jargon in F-026');
+console.log('✓ Bug 40: Clarification of statement vs expression in F-026 card 2 verified');
+
 console.log('\n================================================================');
-console.log('  ALL 30 REGRESSION TESTS PASSED! (0 FAILURES, ZERO RECURRENCE) ');
+console.log('  ALL 40 REGRESSION TESTS PASSED! (0 FAILURES, ZERO RECURRENCE) ');
 console.log('================================================================\n');
