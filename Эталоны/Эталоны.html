@@ -13162,7 +13162,7 @@ function buildSevenDayHeatmapHTML(){
     const isActive = xp > 0;
     const cls = isHigh ? 'heat-cell high' : (isActive ? 'heat-cell active' : (isToday ? 'heat-cell today' : 'heat-cell'));
     const valText = isHigh ? `✓ ${xp}` : (isActive ? `${xp}` : (isToday ? '🔥 0' : '—'));
-    html += `<div class="${cls}" title="${k}: ${xp} XP ${isToday ? '(сегодня)' : ''}"><span>${days[d.getDay()]}</span><b>${valText}</b></div>`;
+    html += `<div class="${cls}" data-heat-day="${k}" data-heat-xp="${xp}" data-heat-today="${isToday ? '1' : '0'}" title="${k}: ${xp} XP ${isToday ? '(сегодня)' : ''}"><span>${days[d.getDay()]}</span><b>${valText}</b></div>`;
   }
   return `<div class="heat-row">${html}</div>`;
 }
@@ -13565,7 +13565,7 @@ viewDashboard = function(){
       </div>
 
       <!-- Active 2-Minute Sprint Focus Card -->
-      <div class="cocoon-focus-card">
+      <div class="cocoon-focus-card" data-quick-microstep="${focusSk ? focusSk.id : ''}" data-quick-kid="${focusKId}" style="cursor:pointer;" title="Начать фокусный микро-шаг">
         <div class="cocoon-focus-eyebrow"><span class="pulse-ring-dot"></span>✨ Фокус сейчас · 2 минуты (Правило 2 минут)<span class="sr-only"> · Быстрый микро-шаг</span></div>
         <div class="cocoon-focus-title">${(() => { const ft = focusSk.title.match(/^(.*?)\s*\(([^()]*)\)\s*$/); return ft ? `${focusSk.id} · ${ft[1]} <span class="t-detail">(${ft[2]})</span>` : `${focusSk.id} · ${focusSk.title}`; })()}</div>
         <div class="cocoon-focus-desc">Конспект <b>${focusKId}: ${focusNoteObj.title}</b> · ${focusStepsCount} ${(focusStepsCount % 10 === 1 && focusStepsCount % 100 !== 11) ? 'микро-шаг' : (focusStepsCount % 10 >= 2 && focusStepsCount % 10 <= 4 && (focusStepsCount % 100 < 10 || focusStepsCount % 100 >= 20) ? 'микро-шага' : 'микро-шагов')} · живой код · разбор Junior vs Senior</div>
@@ -15094,8 +15094,24 @@ document.addEventListener('click', async function(e){
   if(e.target.closest('[data-pomo-toggle]')){ togglePomodoro(); return; }
   const ps = e.target.closest('[data-pomo-set]');
   if(ps){ togglePomodoro(parseInt(ps.getAttribute('data-pomo-set'), 10)); return; }
-  if(e.target.closest('[data-toggle-zen]')){ document.body.classList.toggle('zen-mode'); render(); return; }
-  if(e.target.closest('[data-toggle-sound]')){ state.soundEnabled = !state.soundEnabled; saveState(state); render(); return; }
+  if(e.target.closest('[data-toggle-zen]')){
+    document.body.classList.toggle('zen-mode');
+    try{ playSound('tick'); }catch(e){}
+    render();
+    return;
+  }
+  if(e.target.closest('[data-toggle-sound]')){
+    state.soundEnabled = !state.soundEnabled;
+    saveState(state);
+    if(state.soundEnabled){
+      try{ playSound('complete'); }catch(e){}
+      if(typeof showTactileToast === 'function') showTactileToast('🔊 Звуковые эффекты включены');
+    } else {
+      if(typeof showTactileToast === 'function') showTactileToast('🔇 Звуковые эффекты выключены');
+    }
+    render();
+    return;
+  }
 
   // Lesson micro-steps
   const lj = e.target.closest('[data-lstep-jump]');
@@ -15125,6 +15141,34 @@ document.addEventListener('click', async function(e){
   // Mastery Matrix & Skill actions (Python, Web, Backend, Algorithms, Databases, Architecture, Infrastructure)
   const drt = e.target.closest('.dash-result-tile');
   if(drt){ try{ playSound('tick'); }catch(e){} }
+
+  const hc = e.target.closest('[data-heat-day]');
+  if(hc){
+    const hDay = hc.getAttribute('data-heat-day');
+    const hXp = parseInt(hc.getAttribute('data-heat-xp'), 10) || 0;
+    const isToday = hc.getAttribute('data-heat-today') === '1';
+    try{ playSound('tick'); }catch(e){}
+    if(typeof showTactileToast === 'function'){
+      if(isToday){
+        if(hXp >= (state.dailyGoal || 50)){
+          showTactileToast(`🎉 Сегодня: ${hXp} XP! Дневная цель выполнена на 100%!`);
+        } else if(hXp > 0){
+          showTactileToast(`⚡ Сегодня: ${hXp} из ${state.dailyGoal || 50} XP. Ещё один спринт до цели!`);
+        } else {
+          showTactileToast(`🔥 Сегодня пока 0 XP. Нажми «Начать спринт», чтобы зажечь огонёк!`);
+        }
+      } else {
+        if(hXp >= (state.dailyGoal || 50)){
+          showTactileToast(`✓ ${hDay}: ${hXp} XP · Цель дня закрыта!`);
+        } else if(hXp > 0){
+          showTactileToast(`⚡ ${hDay}: ${hXp} XP активности.`);
+        } else {
+          showTactileToast(`❄️ ${hDay}: день отдыха.`);
+        }
+      }
+    }
+    return;
+  }
 
   const pos = e.target.closest('[data-py-open-skill]');
   if(pos){
