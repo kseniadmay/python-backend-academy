@@ -4212,15 +4212,68 @@
 
 
   /* ---------- Dashboard Flow State & Aesthetic Supremacy ---------- */
+  .dashboard-container {
+    position: relative;
+    max-width: 820px;
+    padding: 0 8px;
+  }
+  .dashboard-container::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    left: -15%;
+    width: 480px;
+    height: 480px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .dashboard-container::after {
+    content: '';
+    position: absolute;
+    top: 140px;
+    right: -15%;
+    width: 480px;
+    height: 480px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(136, 19, 55, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .rank-title-glow {
+    font-size: 1.42rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: var(--ink);
+    text-shadow: 0 0 16px rgba(16, 185, 129, 0.32), 0 0 28px rgba(190, 18, 60, 0.22);
+  }
+  .day-xp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(245, 158, 11, 0.14);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    color: #fbbf24;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+  }
   .cocoon-focus-card {
-    background: radial-gradient(circle at 18% 18%, rgba(16, 185, 129, 0.16), transparent 55%), rgba(18, 22, 31, 0.72) !important;
-    border: 1px solid rgba(16, 185, 129, 0.28) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.36), 0 0 24px rgba(16, 185, 129, 0.12) !important;
-    border-radius: 20px !important;
-    padding: 20px 22px !important;
-    margin-bottom: 12px !important;
+    background: rgba(18, 22, 31, 0.65) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.4), 0 0 24px rgba(16, 185, 129, 0.08) !important;
+    border-radius: 22px !important;
+    padding: 22px 24px !important;
+    margin-bottom: 16px !important;
+    position: relative;
+    z-index: 1;
   }
   .cocoon-focus-eyebrow {
     font-size: 0.72rem;
@@ -4229,16 +4282,22 @@
     text-transform: uppercase;
     color: var(--moss);
     display: inline-flex;
+    width: fit-content;
+    max-width: 100%;
     align-items: center;
     gap: 6px;
     margin-bottom: 8px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.28);
   }
   .cocoon-focus-title {
-    font-size: 1.15rem;
-    font-weight: 800;
-    line-height: 1.28;
+    font-size: 1.24rem;
+    font-weight: 700;
+    line-height: 1.3;
     color: var(--ink);
-    margin-bottom: 14px;
+    margin-bottom: 6px;
     letter-spacing: -0.01em;
   }
   .btn-dominant-cta {
@@ -4259,7 +4318,7 @@
     letter-spacing: 0.01em;
     animation: cta-glow 2.4s infinite ease-in-out !important;
     cursor: pointer;
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease !important;
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease !important;
   }
   .btn-dominant-cta::after {
     content: '';
@@ -4278,8 +4337,8 @@
     50%, 100% { left: 160%; }
   }
   .btn-dominant-cta:hover {
-    box-shadow: 0 0 34px rgba(16, 185, 129, 0.65), 0 8px 22px rgba(0, 0, 0, 0.38) !important;
-    transform: translateY(-2px) scale(1.008) !important;
+    box-shadow: 0 10px 28px rgba(16, 185, 129, 0.45), 0 0 34px rgba(16, 185, 129, 0.65) !important;
+    transform: translateY(-2px) !important;
   }
   .btn-dominant-cta:active {
     transform: translateY(0.5px) scale(0.99) !important;
@@ -4294,11 +4353,20 @@
       border-color: rgba(110, 231, 183, 0.85);
     }
   }
+  @keyframes emptyGoalPulse {
+    0%, 100% { opacity: 0.65; box-shadow: 0 0 6px rgba(16, 185, 129, 0.35); }
+    50% { opacity: 1; box-shadow: 0 0 16px rgba(16, 185, 129, 0.75); }
+  }
+  .empty-goal-pulse {
+    animation: emptyGoalPulse 2.2s infinite ease-in-out;
+  }
   .dash-pulse-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
     margin-bottom: 14px;
+    position: relative;
+    z-index: 1;
   }
   @media (max-width: 680px) {
     .dash-pulse-grid {
@@ -4306,13 +4374,21 @@
     }
   }
   .dash-pulse-card {
-    background: var(--surface) !important;
-    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.08)) !important;
+    background: rgba(18, 22, 31, 0.65) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
     border-radius: 18px !important;
     padding: 14px 16px !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
     box-shadow: var(--shadow-1) !important;
+  }
+  .dash-accordion {
+    background: rgba(18, 22, 31, 0.65) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    position: relative;
+    z-index: 1;
   }
   .btn-srs-action:hover {
     background: rgba(16, 185, 129, 0.18) !important;
@@ -13542,10 +13618,32 @@ function viewDocsHub(){
     </div>`;
 }
 
+function renderQuizModal(unitId, trackKey){
+  unitId = unitId || '1.1';
+  trackKey = trackKey || 'python';
+  const tr = (typeof MASTERY_TRACKS !== 'undefined' && MASTERY_TRACKS[trackKey]) ? MASTERY_TRACKS[trackKey] : { routePrefix: '/python' };
+  const targetHash = '#' + (tr.routePrefix ? tr.routePrefix.replace(/^#/, '') : 'python') + '/unittest/' + unitId;
+  if(typeof unitTestState !== 'undefined' && unitTestState){
+    unitTestState.unitId = unitId;
+    unitTestState.trackKey = trackKey;
+    unitTestState.started = false;
+    unitTestState.idx = 0;
+    unitTestState.selected = null;
+  }
+  if(location.hash === targetHash){
+    render();
+  } else {
+    location.hash = targetHash;
+  }
+}
+window.renderQuizModal = renderQuizModal;
+
 // Рефакторинг экрана Дашборда в соответствии с инвариантами Coddy & Duolingo и дизайн-системой «Вечерний Обсидиан»
 viewDashboard = function(){
   const tXp = todayXp();
-  const goalPct = Math.min(100, Math.round(tXp / (state.dailyGoal || 50) * 100));
+  const dailyGoal = state.dailyGoal || 50;
+  const goalPct = Math.min(100, Math.round(tXp / dailyGoal * 100));
+  const isZeroXp = tXp === 0;
 
   const e1 = getEchelonProgress(1);
   const e2 = getEchelonProgress(2);
@@ -13564,7 +13662,7 @@ viewDashboard = function(){
   const focusKId = (focusSk && focusSk.kIds && focusSk.kIds.find(k => !state.readNotes.includes(k))) || (focusSk && focusSk.kIds && focusSk.kIds[0]) || 'К-001';
   const focusSid = focusSk ? focusSk.id : '1.1.1';
 
-  // Звание и статус готовности к интервью
+  // Звание и статус готовности к интервью с мягким градиентным свечением
   let readinessRank = 'Стажёр (Junior 0)';
   let rankIcon = '🌱';
   if(e1Pct >= 100){ readinessRank = 'Готов к тех-скринингу (Junior 1)'; rankIcon = '🛡️'; }
@@ -13591,10 +13689,8 @@ viewDashboard = function(){
       return r > 0 && r < 4;
     });
   });
-  const dueDecksCount = srs.dueTodayDecksCount || (srs.dueTodayDecks ? srs.dueTodayDecks.size : dueDecks.length) || (isSrsAllDone ? 0 : 1);
   const focusDeckObj = (focusSk && focusSk.deckIds && ALL_DECKS_COMBINED[focusSk.deckIds[0]]) || null;
   const targetDeckId = (dueDecks.length > 0 && dueDecks[0].id) || (focusDeckObj && focusDeckObj.id) || (allDecksList[0] && allDecksList[0].id) || '';
-  const displayCardCount = dueTodayCardsCount > 0 ? dueTodayCardsCount : (focusDeckObj && focusDeckObj.cards ? focusDeckObj.cards.length : 6);
 
   // Локальный прогресс активного юнита и эшелона
   const activeUnitId = (focusSk && focusSk.unitId) || '1.1';
@@ -13602,6 +13698,9 @@ viewDashboard = function(){
   const curUnitSkills = (activeUnit && activeUnit.skills) || [];
   const curUnitDone = curUnitSkills.filter(s => getSkillMP(s.id) >= 100).length;
   const curUnitTotal = curUnitSkills.length || 9;
+  const curUnitMp = curUnitSkills.reduce((sum, s) => sum + getSkillMP(s.id), 0);
+  const curUnitMaxMp = Math.max(1, curUnitTotal * 100);
+  const curUnitMpPct = Math.round(curUnitMp / curUnitMaxMp * 100);
 
   // Список тем текущего эшелона
   const miniListHTML = e1.skills.map(s => {
@@ -13623,39 +13722,66 @@ viewDashboard = function(){
   const focusTitleFormatted = focusFt ? `${focusSk.id} · ${focusFt[1]} <span class="t-detail">(${focusFt[2]})</span>` : (focusSk ? `${focusSk.id} · ${focusSk.title}` : 'Основы Python');
 
   const unreadCount = (focusSk && focusSk.kIds) ? focusSk.kIds.filter(k => !state.readNotes.includes(k)).length : 0;
-  const focusContextText = unreadCount > 0
-    ? `Осталось ${unreadCount} ${unreadCount === 1 ? 'микро-шаг' : (unreadCount < 5 ? 'микро-шага' : 'микро-шагов')} до рубежного теста темы`
-    : 'Теория пройдена · Готов к рубежному тесту темы';
+  const isTheoryDone = unreadCount === 0;
+
+  // Инвариант 2: Синхронизация логики карточки фокуса (State Machine)
+  const focusContextText = isTheoryDone
+    ? '✓ Теория пройдена · Шаг 13: Рубежный тест темы'
+    : `Осталось ${unreadCount} ${unreadCount === 1 ? 'микро-шаг' : (unreadCount < 5 ? 'микро-шага' : 'микро-шагов')} до рубежного теста темы`;
+
+  const focusTr = focusSk ? getTrackForSkill(focusSk.id) : null;
+  const focusTrackKey = (focusTr && focusTr.key) || 'python';
 
   const streakDays = state.streak || 0;
   const streakPlural = (streakDays % 10 === 1 && streakDays % 100 !== 11) ? 'день' : ((streakDays % 10 >= 2 && streakDays % 10 <= 4 && (streakDays % 100 < 10 || streakDays % 100 >= 20)) ? 'дня' : 'дней');
   const streakText = `🔥 ${streakDays} ${streakPlural} подряд · ⚡ ${state.xp || 0} XP`;
 
-  const srsDeckGrammar = dueDecksCount === 1 ? '1 ждёт повторения' : `${dueDecksCount} ждут повторения`;
+  // Инвариант 5: Согласование SRS
+  const srsDeckLabel = (focusDeckObj && focusDeckObj.unitId) ? `Колода ${focusDeckObj.unitId}` : `Колода ${activeUnitId}`;
+  let srsCardWord = 'карточек ждут';
+  if(dueTodayCardsCount % 10 === 1 && dueTodayCardsCount % 100 !== 11){
+    srsCardWord = 'карточка ждёт';
+  } else if([2, 3, 4].includes(dueTodayCardsCount % 10) && ![12, 13, 14].includes(dueTodayCardsCount % 100)){
+    srsCardWord = 'карточки ждут';
+  }
+  const srsSubtitle = dueTodayCardsCount > 0
+    ? `${dueTodayCardsCount} ${srsCardWord} повторения (${srsDeckLabel})`
+    : 'Все карточки на сегодня повторены!';
+
+  // Инвариант 4: Активный статус в аккордеоне тем
+  let accordionStatusText = '';
+  if(curUnitDone === 0){
+    const focusThemeId = focusSk ? focusSk.id : '1.1.1';
+    accordionStatusText = `Юнит ${activeUnitId} · Тема ${focusThemeId} в процессе ${isTheoryDone ? '(Теория ✓)' : `(${curUnitMpPct}% MP)`}`;
+  } else {
+    accordionStatusText = `Юнит ${activeUnitId} · Пройдено ${curUnitDone} из ${curUnitTotal} тем (${curUnitMpPct}% MP)`;
+  }
 
   return `
-    <div class="container" style="max-width:820px;padding:0 8px;">
+    <div class="container dashboard-container">
       <!-- Зона 1: Шапка Эшелона (.echelon-topbar-clean) -->
-      <div class="echelon-topbar-clean" style="padding:14px 20px;border-radius:20px;margin-bottom:18px;display:flex;flex-direction:column;gap:12px;background:var(--surface);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid var(--glass-border);box-shadow:var(--shadow-1);">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <div class="echelon-topbar-clean" style="padding:16px 20px;border-radius:20px;margin-bottom:18px;display:flex;flex-direction:column;gap:14px;background:rgba(18, 22, 31, 0.65);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255, 255, 255, 0.08);box-shadow:var(--shadow-1);">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
           <div>
-            <h1 style="font-size:1.42rem;font-weight:800;letter-spacing:-0.02em;margin:0;color:var(--ink);">${readinessRank} ${rankIcon}</h1>
-            <div class="meta" style="font-size:.84rem;margin-top:3px;color:var(--ink-muted);">
+            <h1 class="rank-title-glow">${readinessRank} ${rankIcon}</h1>
+            <div class="meta" style="font-size:.84rem;margin-top:4px;color:var(--ink-muted);">
               ${streakText}
             </div>
           </div>
-          <div style="display:flex;gap:8px;align-items:center;">
-            <button type="button" class="btn btn-ghost-quiet" data-open-settings-modal style="padding:7px 11px;font-size:.82rem;border-radius:10px;border:1px solid rgba(255,255,255,0.08);" title="Настройки платформы">⚙️</button>
+          <div class="echelon-topbar-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <span class="day-xp-badge" title="Заработано за сутки: ${tXp} XP">⚡ +${todayXp()} XP за сутки</span>
+            <a href="#/docs" class="topbar-help-btn btn btn-ghost-quiet" style="padding:6px 12px;border-radius:10px;text-decoration:none;font-size:.82rem;font-weight:600;display:inline-flex;align-items:center;gap:4px;border:1px solid rgba(255,255,255,0.08);" title="Справочник платформы"><span class="topbar-help-text">📖 Справка</span></a>
+            <button type="button" class="btn btn-ghost-quiet" data-open-settings-modal style="padding:7px 11px;font-size:.82rem;border-radius:10px;border:1px solid rgba(255,255,255,0.08);cursor:pointer;" title="Настройки платформы">⚙️</button>
           </div>
         </div>
 
         <div class="echelon-clean-wrap" style="width:100%;">
           <div class="echelon-clean-meta" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
             <span class="echelon-readiness-emerald" style="font-weight:700;font-size:.84rem;">🎯 Готовность к 1-му тех-скринингу: ${e1Pct}%</span>
-            <span class="meta" style="font-size:.76rem;color:var(--ink-muted);">${e1CurMp} / ${e1MaxMp} MP</span>
+            <span class="meta" style="font-size:.78rem;font-weight:700;color:var(--ink);">${e1CurMp} / ${e1MaxMp} MP</span>
           </div>
-          <div class="echelon-clean-track" style="height:6px;border-radius:999px;background:rgba(255,255,255,0.08);overflow:hidden;">
-            <div class="echelon-clean-fill" style="width:${Math.max(4, e1Pct)}%;height:100%;border-radius:999px;background:linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%);box-shadow:0 0 10px rgba(16,185,129,0.45);transition:width .35s ease;"></div>
+          <div class="echelon-clean-track" style="height:8px;border-radius:999px;background:rgba(255,255,255,0.08);overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,0.4);">
+            <div class="echelon-clean-fill" style="width:${Math.max(4, e1Pct)}%;height:100%;border-radius:999px;background:linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%);box-shadow:0 0 12px rgba(16,185,129,0.5);transition:width .35s ease;"></div>
           </div>
           <div style="font-size:.76rem;color:var(--ink-muted);margin-top:6px;">
             Эшелон 1 · Открывает доступ к первому тех-собеседованию
@@ -13664,19 +13790,24 @@ viewDashboard = function(){
       </div>
 
       <!-- Зона 2: Главная карточка Фокуса (Single Dominant Hero Card) -->
-      <div class="cocoon-focus-card" style="padding:22px 24px;border-radius:22px;margin-bottom:16px;background:linear-gradient(155deg, rgba(16,185,129,0.08), rgba(136,19,55,0.03), rgba(245,158,11,0.03));border:1px solid rgba(16,185,129,0.22);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 12px 32px -8px rgba(0,0,0,0.4);">
-        <div class="cocoon-focus-eyebrow" style="display:flex;align-items:center;gap:7px;font-size:.74rem;font-weight:800;letter-spacing:0.06em;color:#34d399;text-transform:uppercase;margin-bottom:8px;">
+      <div class="cocoon-focus-card">
+        <div class="cocoon-focus-eyebrow" style="display:inline-flex;width:fit-content;max-width:100%;align-items:center;gap:7px;font-size:.74rem;font-weight:800;letter-spacing:0.06em;color:#34d399;text-transform:uppercase;margin-bottom:8px;padding:4px 12px;border-radius:999px;">
           <span class="pulse-ring-dot"></span> ФОКУС СЕЙЧАС · 2 МИН
         </div>
-        <div class="cocoon-focus-title" style="font-size:1.24rem;font-weight:700;line-height:1.3;margin-bottom:6px;color:var(--ink);">
+        <div class="cocoon-focus-title">
           ${focusTitleFormatted}
         </div>
         <div class="meta" style="font-size:.82rem;color:var(--ink-muted);margin-bottom:16px;">
           ${focusContextText}
         </div>
-        <button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta" data-quick-microstep="${focusSk ? focusSk.id : ''}" data-quick-kid="${focusKId}">
-          ► Продолжить микро-шаг (2 мин) · +15 XP ⚡ ➔
-        </button>
+        ${isTheoryDone
+          ? `<button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta" data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}">
+              🧪 Начать рубежный тест (+50 XP) ➔
+            </button>`
+          : `<button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta" data-quick-microstep="${focusSk ? focusSk.id : ''}" data-quick-kid="${focusKId}">
+              ► Продолжить микро-шаг (2 мин) · +15 XP ⚡ ➔
+            </button>`
+        }
       </div>
 
       <!-- Зона 3: Компактный суточный пульс (Rhythm & SRS Grid — 2 колонки) -->
@@ -13684,11 +13815,17 @@ viewDashboard = function(){
         <!-- Левая колонка: Дневная цель + ритм недели -->
         <div class="dash-pulse-card">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-            <span style="font-weight:700;font-size:.88rem;color:var(--ink);">🎯 Дневная цель: ${tXp} / ${state.dailyGoal || 50} XP</span>
-            <span style="font-weight:800;font-size:.82rem;color:var(--moss);">${goalPct}%</span>
+            <span style="font-weight:700;font-size:.88rem;color:var(--ink);">🎯 Дневная цель: ${tXp} / ${dailyGoal} XP</span>
+            ${isZeroXp
+              ? `<span style="font-weight:800;font-size:.82rem;color:var(--moss);display:inline-flex;align-items:center;gap:4px;">⚡ Старт дня</span>`
+              : `<span style="font-weight:800;font-size:.82rem;color:var(--moss);">${goalPct}%</span>`
+            }
           </div>
-          <div class="mp-progress-track" style="margin:0 0 12px;height:5px;border-radius:999px;background:rgba(255,255,255,0.06);overflow:hidden;">
-            <div class="mp-progress-fill" style="width:${goalPct}%;height:100%;background:linear-gradient(90deg,var(--emerald),#34d399);border-radius:999px;transition:width .3s ease;"></div>
+          <div class="mp-progress-track" style="margin:0 0 12px;height:6px;border-radius:999px;background:rgba(255,255,255,0.06);overflow:hidden;">
+            ${isZeroXp
+              ? `<div class="mp-progress-fill empty-goal-pulse" style="width:5%;height:100%;background:linear-gradient(90deg,var(--emerald),#34d399);border-radius:999px;"></div>`
+              : `<div class="mp-progress-fill" style="width:${goalPct}%;height:100%;background:linear-gradient(90deg,var(--emerald),#34d399);border-radius:999px;transition:width .3s ease;"></div>`
+            }
           </div>
           ${buildSevenDayHeatmapHTML()}
         </div>
@@ -13697,23 +13834,29 @@ viewDashboard = function(){
         <div class="dash-pulse-card" style="display:flex;flex-direction:column;justify-content:space-between;gap:12px;">
           <div>
             <div style="font-weight:700;font-size:.88rem;color:var(--ink);display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-              <span>🔁 Карточки на сегодня (${displayCardCount})</span>
+              <span>🔁 Интервальное повторение</span>
             </div>
             <div class="meta" style="font-size:.78rem;color:var(--ink-muted);">
-              ${isSrsAllDone && dueTodayCardsCount === 0 ? 'Все запланированные карточки закрыты ✓' : srsDeckGrammar}
+              ${dueTodayCardsCount > 0
+                ? srsSubtitle
+                : `<span class="badge" style="background:rgba(16,185,129,0.16);border:1px solid rgba(16,185,129,0.35);color:#34d399;padding:3px 9px;border-radius:8px;font-size:.76rem;font-weight:700;display:inline-block;">✓ Все карточки на сегодня повторены!</span>`
+              }
             </div>
           </div>
           <div style="display:flex;justify-content:flex-end;">
-            <a href="#/cards" ${targetDeckId ? `data-srs-open-deck="${targetDeckId}"` : ''} class="btn-srs-action" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:11px;font-weight:700;font-size:.82rem;background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.30);color:#34d399;text-decoration:none;transition:all .15s ease;">Повторить (2 мин) ➔</a>
+            ${dueTodayCardsCount > 0
+              ? `<a href="#/cards" ${targetDeckId ? `data-srs-open-deck="${targetDeckId}"` : ''} class="btn-srs-action" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:11px;font-weight:700;font-size:.82rem;background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.30);color:#34d399;text-decoration:none;transition:all .15s ease;">Повторить (2 мин) ➔</a>`
+              : `<a href="#/cards" class="btn-srs-action" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:11px;font-weight:700;font-size:.82rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);text-decoration:none;transition:all .15s ease;">Открыть колоды ➔</a>`
+            }
           </div>
         </div>
       </div>
 
       <!-- Зона 4: Вторичная (под аккуратным аккордеоном) -->
-      <details class="dash-accordion cocoon-details" style="margin-top:14px;margin-bottom:14px;border-radius:16px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);padding:12px 16px;">
+      <details class="dash-accordion cocoon-details" style="margin-top:14px;margin-bottom:14px;border-radius:16px;padding:12px 16px;">
         <summary style="cursor:pointer;font-weight:700;font-size:0.90rem;display:flex;justify-content:space-between;align-items:center;outline:none;user-select:none;">
           <span>Темы Эшелона 1 (Развернуть ▾)</span>
-          <span class="meta" style="font-size:.76rem;font-weight:500;">Пройдено ${curUnitDone} из ${curUnitTotal} тем Юнита ${activeUnitId}</span>
+          <span class="meta" style="font-size:.76rem;font-weight:500;">${accordionStatusText}</span>
         </summary>
         <div style="margin-top:12px;border-top:1px solid rgba(255,255,255,0.05);padding-top:8px;">
           ${miniListHTML}
@@ -15039,6 +15182,15 @@ document.addEventListener('click', async function(e){
   if(bpf){
     backendPartFilter = bpf.getAttribute('data-backend-part-filter') || 'all';
     render();
+    return;
+  }
+
+    const qzBtn = e.target.closest('[data-open-quiz-modal]');
+  if(qzBtn){
+    const uid = qzBtn.getAttribute('data-open-quiz-modal') || '1.1';
+    const trKey = qzBtn.getAttribute('data-track') || 'python';
+    try{ playSound('tick'); }catch(err){}
+    renderQuizModal(uid, trKey);
     return;
   }
 
