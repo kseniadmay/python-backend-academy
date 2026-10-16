@@ -1,6 +1,6 @@
 /**
  * test_bugs_regression.js
- * Автоматические регрессионные тесты для предотвращения повторения багов 1..70.
+ * Автоматические регрессионные тесты для предотвращения повторения багов 1..80.
  */
 
 'use strict';
@@ -14,7 +14,7 @@ const academyPath = path.join(rootDir, 'academy.html');
 const etalonyPath = path.join(rootDir, 'Эталоны', 'Эталоны.html');
 
 console.log('================================================================');
-console.log('   REGRESSION TEST SUITE: BUGS 1..70 VERIFICATION               ');
+console.log('   REGRESSION TEST SUITE: BUGS 1..80 VERIFICATION               ');
 console.log('================================================================\n');
 
 assert(fs.existsSync(academyPath), `academy.html missing`);
@@ -438,6 +438,81 @@ assert(academyHtml.includes('.dot-jewel {') && academyHtml.includes('flex-shrink
 assert(academyHtml.includes('.dots-stage-divider {') && academyHtml.includes('flex-shrink: 0;'), 'Bug 70: .dots-stage-divider must have flex-shrink: 0');
 console.log('✓ Bug 70: Responsive dots-necklace horizontal adaptation verified');
 
+// 71. Bug 71: Навык 1.9.1: мобильная адаптивность и ожерелье точек
+const skill191Decks = pyMasteryData.units.find(u => u.id === '1.9').skills.find(s => s.id === '1.9.1').decks;
+assert.strictEqual(skill191Decks.length, 5, `Bug 71: Skill 1.9.1 must have exactly 5 relevant decks matching notes, got ${skill191Decks.length}`);
+assert(academyHtml.includes('@media (max-width: 600px)') && academyHtml.includes('justify-content: flex-start;'), 'Bug 71: CSS must include mobile layout rule for dots-necklace');
+console.log('✓ Bug 71: Skill 1.9.1 mobile dots layout adaptation verified');
+
+// 72. Bug 72: К-222: разделение монолитной теории на микро-шаги (6 шагов)
+const k222Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.9 · Инструменты', '📚 Конспекты', 'К-222. Современная работа с путями и файлами_ модуль pathlib.md');
+assert(fs.existsSync(k222Path), 'К-222.md missing');
+const k222Content = fs.readFileSync(k222Path, 'utf-8');
+assert(k222Content.includes('## Иммутабельная модификация путей: with_suffix() и with_name()'), 'Bug 72: K-222.md must separate immutable path modification into distinct step');
+const k222Obj = pyMasteryData.notes['К-222'];
+assert.strictEqual(k222Obj.steps.length, 6, `Bug 72: K-222 must have 6 digestible micro-steps in academy.html, got ${k222Obj.steps.length}`);
+console.log('✓ Bug 72: K-222 step 2 breakdown into distinct micro-steps verified');
+
+// 73. Bug 73: К-222: структурированный список методов проверки статуса и метаданных
+assert(k222Content.includes('### Проверка статуса и метаданные пути') && k222Content.includes('**`.is_symlink()`**'), 'Bug 73: K-222.md must format stat & type methods as list');
+assert(k222Obj.steps[3].html.includes('<li><code>.is_symlink()</code>') && k222Obj.steps[3].html.includes('размер <code>st_size</code>'), 'Bug 73: K-222 step 4 must render structured list of path checks');
+console.log('✓ Bug 73: K-222 structured path inspection list verified');
+
+// 74. Bug 74: К-222: читабельная структура ленивых генераторов iterdir, glob, rglob
+assert(k222Content.includes('1. **`iterdir()`**') && k222Content.includes('3. **`rglob(pattern)`**'), 'Bug 74: K-222.md must format generators as clear steps');
+assert(k222Obj.steps[4].html.includes('<b><code>iterdir()</code></b>') && k222Obj.steps[4].html.includes('<b><code>rglob(pattern)</code></b>'), 'Bug 74: K-222 step 5 must render structured generator bullet points');
+console.log('✓ Bug 74: K-222 structured file search generators verified');
+
+// 75. Bug 75: К-220 step 2: структурированные блоки кода logging с комментариями
+const k220Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.9 · Инструменты', '📚 Конспекты', 'К-220. Логирование в Python_ модуль logging вместо print.md');
+assert(fs.existsSync(k220Path), 'К-220.md missing');
+const k220Content = fs.readFileSync(k220Path, 'utf-8');
+assert(k220Content.includes('# 1. Логгер: модульная точка входа') && k220Content.includes('# 4. Хендлер 2: ротация файла'), 'Bug 75: K-220.md must structure logging code snippet');
+const k220Obj = pyMasteryData.notes['К-220'];
+assert(k220Obj.steps[1].html.includes('# 1. Логгер: модульная точка входа') && k220Obj.steps[1].html.includes('# 5. Регистрация хендлеров'), 'Bug 75: K-220 step 2 must break code wall into 5 commented sections');
+console.log('✓ Bug 75: K-220 step 2 code readability and sectioning verified');
+
+// 76. Bug 76: Навык 1.9.1: 100% соответствие карточек конспектам
+assert(!skill191Decks.includes('Ф-078') && !skill191Decks.includes('Ф-079') && !skill191Decks.includes('Ф-080'), 'Bug 76: Skill 1.9.1 must not include unrelated Unit 1.1 syntax decks');
+assert(skill191Decks.includes('Ф-082') && skill191Decks.includes('Ф-081') && skill191Decks.includes('Ф-083') && skill191Decks.includes('Ф-255') && skill191Decks.includes('Ф-251'), 'Bug 76: Skill 1.9.1 decks must exactly match its notes');
+console.log('✓ Bug 76: Skill 1.9.1 decks and notes thematic alignment verified');
+
+// 77. Bug 77: Ф-080 card 8: красивый многострочный блок кода
+const f080Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.1 · Базовый синтаксис', '📇 Карточки', 'Ф-080. Оператор pass.md');
+assert(fs.existsSync(f080Path), 'Ф-080.md missing');
+const f080Content = fs.readFileSync(f080Path, 'utf-8');
+assert(f080Content.includes('def todo():') && f080Content.includes('pass'), 'Bug 77: F-080 card 8 must format todo function');
+const f080Obj = pyMasteryData.decks['Ф-080'];
+assert(f080Obj.cards[7].a.includes('def todo():') && f080Obj.cards[7].a.includes('pass'), 'Bug 77: F-080 card 8 must render multiline code block for todo function');
+console.log('✓ Bug 77: F-080 card 8 multiline code block formatting verified');
+
+// 78. Bug 78: Ф-081 card 1: инлайн форматирование параметров
+const f081Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.1 · Базовый синтаксис', '📇 Карточки', 'Ф-081. Работа с JSON.md');
+assert(fs.existsSync(f081Path), 'Ф-081.md missing');
+const f081Content = fs.readFileSync(f081Path, 'utf-8');
+assert(f081Content.includes('`sort_keys=True`') && f081Content.includes('`json.dumps()`'), 'Bug 78: F-081 card 1 markdown must format params in code backticks');
+const f081Obj = pyMasteryData.decks['Ф-081'];
+assert(f081Obj.cards[0].q.includes('<code>sort_keys=True</code>') && f081Obj.cards[0].q.includes('<code>json.dumps()</code>'), 'Bug 78: F-081 card 1 must contain inline code tags');
+console.log('✓ Bug 78: F-081 card 1 inline code formatting verified');
+
+// 79. Bug 79: Ф-084 card 8: полный ответ с диапазоном оснований систем счисления
+const f084Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.1 · Базовый синтаксис', '📇 Карточки', 'Ф-084. Системы счисления.md');
+assert(fs.existsSync(f084Path), 'Ф-084.md missing');
+const f084Content = fs.readFileSync(f084Path, 'utf-8');
+assert(f084Content.includes('от 2 до 36') && f084Content.includes('префиксам 0b, 0o, 0x'), 'Bug 79: F-084 card 8 markdown must contain full range from 2 to 36');
+const f084Obj = pyMasteryData.decks['Ф-084'];
+assert(f084Obj.cards[7].a.includes('от <code>2</code> до <code>36</code>'), 'Bug 79: F-084 card 8 in academy.html must include base range 2 to 36');
+console.log('✓ Bug 79: F-084 card 8 base range completeness verified');
+
+// 80. Bug 80: Ф-085 card 2: чистое форматирование и кавычки
+const f085Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.1 · Базовый синтаксис', '📇 Карточки', 'Ф-085. Устройство языка.md');
+assert(fs.existsSync(f085Path), 'Ф-085.md missing');
+const f085Content = fs.readFileSync(f085Path, 'utf-8');
+assert(f085Content.includes('«динамическая»') && f085Content.includes('«строгая»'), 'Bug 80: F-085 card 2 markdown must use clean typography quotes');
+const f085Obj = pyMasteryData.decks['Ф-085'];
+assert(f085Obj.cards[1].q.includes('«динамическая»') && f085Obj.cards[1].a.includes('Динамическая строгая'), 'Bug 80: F-085 card 2 in academy.html must have clean typography and formatting');
+console.log('✓ Bug 80: F-085 card 2 typography and clean formatting verified');
+
 console.log('\n================================================================');
-console.log('  ALL 70 REGRESSION TESTS PASSED! (0 FAILURES, ZERO RECURRENCE) ');
+console.log('  ALL 80 REGRESSION TESTS PASSED! (0 FAILURES, ZERO RECURRENCE) ');
 console.log('================================================================\n');
