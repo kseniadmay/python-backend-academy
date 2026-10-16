@@ -71,7 +71,7 @@ chrome_flags = [
 ]
 
 routes = [
-    (base_uri, 'Мои результаты'),
+    (base_uri, 'Готовность к 1-му тех-скринингу'),
     (base_uri + '#/python', 'Матрица Мастерства Python'),
     (base_uri + '#/web', 'Матрица Мастерства Web'),
     (base_uri + '#/backend', 'Матрица Мастерства Backend'),
