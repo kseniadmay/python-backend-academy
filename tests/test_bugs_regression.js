@@ -513,6 +513,9 @@ const f085Obj = pyMasteryData.decks['Ф-085'];
 assert(f085Obj.cards[1].q.includes('«динамическая»') && f085Obj.cards[1].a.includes('Динамическая строгая'), 'Bug 80: F-085 card 2 in academy.html must have clean typography and formatting');
 console.log('✓ Bug 80: F-085 card 2 typography and clean formatting verified');
 
-console.log('\n================================================================');
-console.log('  ALL 80 REGRESSION TESTS PASSED! (0 FAILURES, ZERO RECURRENCE) ');
+// 81. Проверка спецификации канонических эталонов и инвариантов
+require('./test_pravki_spec.js');
+
+console.log('================================================================');
+console.log('  ALL 80 REGRESSION TESTS & CANONICAL BENCHMARKS PASSED (100%)  ');
 console.log('================================================================\n');

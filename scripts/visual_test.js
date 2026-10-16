@@ -8,8 +8,7 @@
  *        маршруты academy.html (дашборд, #/path в game и pro, #/map в двух подрежимах,
  *        все 7 треков, страница юнита, #/practice, #/cards, #/mock, #/docs, #/sandbox)
  *        × viewport'ы (desktop 1440x900, mobile 390x844 @2x)
- *        × состояния (новичок + сеедированный прогресс «середина курса»);
- *      плюс экраны автономного «Практика кода — тренажёр с IDE.html».
+ *        × состояния (новичок + сеедированный прогресс «середина курса»).
  *   3. Для каждого кадра собирает зонды: JS-ошибки страницы (FAIL), горизонтальный
  *      overflow (FAIL), пустой рендер (FAIL), console.error и упавшие запросы (WARN).
  *   4. Сравнивает кадры с эталонами scripts/visual_baselines/ попиксельно
@@ -104,6 +103,17 @@ function serve() {
         res.end(JSON.stringify({ ok: true, revision: 0 }));
         return;
       }
+      if (u === '/favicon.ico') {
+        const iconPath = path.join(ROOT, 'icon.svg');
+        if (fs.existsSync(iconPath)) {
+          res.writeHead(200, { 'Content-Type': 'image/svg+xml' });
+          res.end(fs.readFileSync(iconPath));
+          return;
+        }
+        res.writeHead(204);
+        res.end();
+        return;
+      }
       let fp = u === '/' ? path.join(ROOT, 'academy.html') : path.join(ROOT, u);
       if (u.endsWith('/')) fp = path.join(ROOT, u, 'index.html');
       fs.readFile(fp, (err, data) => {
@@ -153,8 +163,7 @@ add('unittest_start_modal', { hash: '#/python/unittest/1.5' });
 add('dashboard_seed', { hash: '#/', seed: true });
 add('path_game_seed', { hash: '#/path', seed: true });
 add('path_pro_seed', { hash: '#/path', action: 'pro', seed: true });
-// автономный IDE-тренажёр (по одному кадру на viewport)
-add('ide', { ide: true, viewports: ['desktop', 'mobile'] });
+
 
 // ---------------------------------------------------------------- пиксельный diff
 function diffShots(pm, pngjs, currentPath, baselinePath, diffPath) {
@@ -208,14 +217,10 @@ function diffShots(pm, pngjs, currentPath, baselinePath, diffPath) {
   }
   const pageUrl = shot => {
     if (!FILE_MODE) {
-      return shot.ide
-        ? `http://127.0.0.1:${PORT}/${encodeURIComponent('Практика кода — тренажёр с IDE.html')}`
-        : `http://127.0.0.1:${PORT}/academy.html${shot.hash}`;
+      return `http://127.0.0.1:${PORT}/academy.html${shot.hash || ''}`;
     }
-    const file = shot.ide
-      ? path.join(ROOT, 'Практика кода — тренажёр с IDE.html')
-      : path.join(ROOT, 'academy.html');
-    return pathToFileURL(file).href + (shot.ide ? '' : (shot.hash || ''));
+    const file = path.join(ROOT, 'academy.html');
+    return pathToFileURL(file).href + (shot.hash || '');
   };
 
   const browser = await chromium.launch({ executablePath: findBrowser(), headless: true });
@@ -263,6 +268,17 @@ function diffShots(pm, pngjs, currentPath, baselinePath, diffPath) {
           continue;
         }
         await page.evaluate(() => (document.fonts ? document.fonts.ready : null)).catch(() => {});
+        await page.addStyleTag({
+          content: `
+            *, *::before, *::after {
+              animation-duration: 0s !important;
+              animation-delay: -0.0001s !important;
+              transition-duration: 0s !important;
+              transition-delay: 0s !important;
+              caret-color: transparent !important;
+            }
+          `
+        }).catch(() => {});
 
         if (shot.action === 'pro') {
           // Переключатель режимов перенесён в «⚙️ Настройки платформы» — открываем модалку и кликаем карточку pro.
@@ -294,7 +310,7 @@ function diffShots(pm, pngjs, currentPath, baselinePath, diffPath) {
         if (pageErrors.length) issues.push('JS-ошибки: ' + pageErrors.slice(0, 2).join(' | '));
 
         const file = path.join(OUT_DIR, `${label}.png`);
-        await page.screenshot({ path: file }).catch(e => issues.push('скриншот не удался: ' + e.message));
+        await page.screenshot({ path: file, animations: 'disabled' }).catch(e => issues.push('скриншот не удался: ' + e.message));
 
         let diffPct = null; const warns = [];
         const baseline = path.join(BASELINE_DIR, `${label}.png`);
