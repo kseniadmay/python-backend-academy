@@ -37,19 +37,20 @@
 | Скрипт | Этап конвейера |
 |---|---|
 | `verify_platinum.py` | **[1/6]** Аудит 525 файлов Markdown базы RemNote (конспекты, колоды карточек, ссылки) |
-| `test_e2e_dom.js` | **[2/6]** Сквозные инварианты DOM, роутинг, 3D Serpentine Path, расчет XP и стейт |
+| `tests/test_bugs_regression.js` | **[2/6]** Сквозные инварианты DOM, 80/80 регрессионных тестов и канонические эталоны |
 | `test_pwa_offline.js` | **[3/6]** Проверка Service Worker (`sw.js`), кэширования и PWA Manifest |
 | `verify_academy.py` | **[4/6]** Синтаксический аудит JS, запуск экранов в Headless Chrome без ошибок консоли |
 | `test_all_401_tasks.py` | **[5/6]** Автопрогон всех 401 задач IDE и 459 сниппетов Python 3.13 в среде Brython |
 | `visual_test.js` | **[6/6]** Снятие скриншотов всех маршрутов (десктоп/мобайл) и сравнение с `visual_baselines/` |
-| `audit_pipeline.py` | Комплексный аудит всех этапов сборки |
+| `test_coddy_interface.js` | Комплексный стресс-тест философии Coddy (3D-тропа, свайпы, Single CTA) |
+| `audit_pipeline.py` | Комплексный автоматический аудит и параллельный запуск всех тестов |
 | `visual_baselines/` | Директория канонических скриншотов эталонов для pixel-diff |
 
 ---
 
 ## 4. Сервер синхронизации прогресса
 
-- `server.js` — Легковесный Node.js сервер REST API для межплатформенной синхронизации прогресса (Desktop ↔ Mobile) с поддержкой локального JSON-хранилища (`data/progress_sync.json`) и облачной PostgreSQL.
+- `server.js` — Легковесный Node.js сервер REST API для межплатформенной синхронизации прогресса (Desktop ↔ Mobile) с поддержкой локального JSON-хранилища (`data/progress_sync.json`) и облачной PostgreSQL (Neon).
 
 ---
 
@@ -57,9 +58,3 @@
 
 - `install_hooks.py` — Установка pre-commit хука валидации синтаксиса в `.git/hooks`.
 - `quick_precommit_check.py` — Быстрый pre-commit аудит синтаксиса JS, Python, HTML и JSON.
-
----
-
-## 6. Вспомогательные отладочные скрипты
-
-- `diagnostic/` — архив из 378 вспомогательных разовых скриптов исследования LevelDB, дампов AST и точечных проверок карточек.
