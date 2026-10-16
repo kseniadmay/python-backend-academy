@@ -94,6 +94,46 @@ assert.strictEqual(k001Obj.steps[0].title, 'Почему выбор структ
 assert.strictEqual(k001Obj.steps[1].title, 'List: динамический массив и порядок элементов', 'Step 2 must be List: dynamic array and ordering');
 console.log('✓ Bug 10: Split K-001 step 1 into 2 distinct steps verified (8 steps total)');
 
+// 11, 13. Bugs 11 & 13: Убрать верхнюю кнопку багов, оставить нижнюю плавающую
+assert(!academyHtml.includes('id="bug-report-btn-m"'), 'Top bug button must be removed from header');
+assert(!academyHtml.includes('class="topbar-help-btn bug-topbar-btn"'), 'Top bug button must be removed from theory topbar');
+assert(academyHtml.includes('.bug-topbar-btn, #bug-report-btn-m { display: none !important; }'), 'CSS must strictly hide top bug buttons');
+assert(academyHtml.includes('.bug-fab-btn'), 'Bottom floating ladybug button (FAB) must remain preserved');
+console.log('✓ Bugs 11 & 13: Top duplicate bug button removed, bottom FAB preserved');
+
+// 12. Bug 12: Длинная строка items.insert заменена на скроллящийся многострочный блок
+assert(!academyHtml.includes('<p><code>items = [1, 2, 3, 4, 5]; items.insert(0, 0)'), 'Inline unscrollable items.insert snippet must be replaced');
+assert(academyHtml.includes('items = [1, 2, 3, 4, 5]\\nitems.insert(0, 0)') || academyHtml.includes('items = [1, 2, 3, 4, 5]\\\\nitems.insert(0, 0)'), 'Items snippet must be multiline');
+console.log('✓ Bug 12: items.insert responsive multiline block formatting verified');
+
+// 14. Bug 14: В блоке кода словаря сделаны отступы строк для читаемости
+assert(academyHtml.includes('# O(1) — мгновенный доступ по ключу') && academyHtml.includes('value = d[&#x27;key&#x27;]') && academyHtml.includes('# O(1) — добавление новой пары'), 'Dict code block in K-001 must have spaced lines and comments');
+console.log('✓ Bug 14: Dict code block spacing and line-by-line comments verified');
+
+// 15, 16. Bugs 15 & 16: Построчный разбор работы наивного и быстрого алгоритмов поиска дубликатов
+assert(academyHtml.includes('# Строка 1: фиксируем опорный элемент от первого до конца') || academyHtml.includes('Шаг 1: перебираем опорный элемент'), 'Duplicate search code must contain line-by-line comment scaffolding');
+assert(academyHtml.includes('Построчный разбор работы алгоритма:'), 'Theory step must introduce line-by-line algorithm walkthrough');
+console.log('✓ Bugs 15 & 16: Line-by-line scaffolding for duplicate search algorithms verified');
+
+// 17, 18. Bugs 17 & 18: Модалка финиша конспекта, «Продолжить чтение конспектов» и чистое название без К-001
+assert(academyHtml.includes('📖 Продолжить чтение конспектов ➔'), 'Finish celebration modal must offer explicit button to continue reading next note');
+assert(academyHtml.includes('data-py-select-k="${nextKid}"'), 'Continue reading button must target next note ID');
+assert(academyHtml.includes('cleanTitle = rawTitle.replace'), 'Celebration title must strip raw technical note IDs like К-001');
+console.log('✓ Bugs 17 & 18: Sprint finish celebration modal with continue reading button & clean titles verified');
+
+// 19. Bug 19: Убрать технические мусорные обозначения на #/ и соблюдать Home = Journey
+assert(!academyHtml.includes('Это каркас: карта навыков уже живая'), 'Old technical placeholder text must be stripped from dashboard');
+assert(academyHtml.includes("if(route === '/'){\n    root.innerHTML = (state.pathViewMode === 'pro') ? viewProPath() : viewPathSerpentine();") || academyHtml.includes("if(route === '/'){\r\n    root.innerHTML = (state.pathViewMode === 'pro') ? viewProPath() : viewPathSerpentine();"), 'Root route #/ must directly render the main journey path (Home = Journey)');
+console.log('✓ Bug 19: Root route cleaned from technical placeholders, Home = Journey enforced');
+
+// 20. Bug 20: К-004 step 2: 'в сравнении с list', а не 'со'
+const k004Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.1 · Базовый синтаксис', '📚 Конспекты', 'К-004. frozenset_ неизменяемое множество.md');
+assert(fs.existsSync(k004Path), 'К-004.md missing');
+const k004Content = fs.readFileSync(k004Path, 'utf-8');
+assert(k004Content.includes('Как и `tuple` в сравнении с `list`'), 'К-004.md must say "в сравнении с list"');
+assert(academyHtml.includes('в сравнении с <code>list') || academyHtml.includes('в сравнении с `list`'), 'academy.html must contain proper grammar "в сравнении с list" in К-004');
+console.log('✓ Bug 20: K-004 "в сравнении с list" grammar verified');
+
 console.log('\n================================================================');
-console.log('  ALL 10 REGRESSION TESTS PASSED! (0 FAILURES, ZERO RECURRENCE) ');
+console.log('  ALL 20 REGRESSION TESTS PASSED! (0 FAILURES, ZERO RECURRENCE) ');
 console.log('================================================================\n');
