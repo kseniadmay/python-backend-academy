@@ -709,9 +709,9 @@
   .dash-skill-row__name{font-weight:700;font-size:.78rem;overflow:hidden;text-overflow:ellipsis;}
   .dash-skill-row__mp{font-size:.66rem;font-weight:600;color:var(--ink-muted);overflow:hidden;text-overflow:ellipsis;}
   .dash-skill-row__pct{margin-left:auto;font-size:.73rem;font-weight:800;color:var(--ink-soft);flex:none;}
-  .dash-skill-row__sqs{display:flex;flex-wrap:wrap;gap:3px;align-items:center;}
+  .dash-skill-row__sqs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;min-height:22px;}
   .dash-skill-row .m-sq{
-    width:14px;height:14px;border-radius:4px;font-size:.5rem;
+    width:14px;height:14px;border-radius:4px;font-size:.5rem;touch-action:manipulation;
     transition:transform .12s,box-shadow .12s;cursor:pointer;
   }
   .dash-skill-row .m-sq:hover{
@@ -13162,7 +13162,7 @@ function buildSevenDayHeatmapHTML(){
     const isActive = xp > 0;
     const cls = isHigh ? 'heat-cell high' : (isActive ? 'heat-cell active' : (isToday ? 'heat-cell today' : 'heat-cell'));
     const valText = isHigh ? `✓ ${xp}` : (isActive ? `${xp}` : (isToday ? '🔥 0' : '—'));
-    html += `<div class="${cls}" data-heat-day="${k}" data-heat-xp="${xp}" data-heat-today="${isToday ? '1' : '0'}" title="${k}: ${xp} XP ${isToday ? '(сегодня)' : ''}"><span>${days[d.getDay()]}</span><b>${valText}</b></div>`;
+    html += `<div class="${cls}" role="button" tabindex="0" data-heat-day="${k}" data-heat-xp="${xp}" data-heat-today="${isToday ? '1' : '0'}" title="${k}: ${xp} XP ${isToday ? '(сегодня)' : ''}" aria-label="${k}: ${xp} XP ${isToday ? '(сегодня)' : ''}"><span>${days[d.getDay()]}</span><b>${valText}</b></div>`;
   }
   return `<div class="heat-row">${html}</div>`;
 }
@@ -13447,7 +13447,7 @@ viewDashboard = function(){
       const isFocus = (s.id === focusSid);
       const focusCls = isFocus ? ' m-sq--focus' : '';
       const focusTip = isFocus ? ' [🔥 Твой фокус сейчас]' : '';
-      return `<button class="m-sq m-sq--${smp}${focusCls}" data-py-open-skill="${s.id}" title="${s.id} ${s.title} — ${mpLabel(smp)}${focusTip}"></button>`;
+      return `<button class="m-sq m-sq--${smp}${focusCls}" data-py-open-skill="${s.id}" title="${s.id} ${s.title} — ${mpLabel(smp)}${focusTip}" aria-label="${s.id} ${s.title}: ${mpLabel(smp)}${focusTip}"></button>`;
     }).join('');
     return { key: tk, route: t.routePrefix, icon: meta.icon, name: meta.name, pct: tpct, mp, mx, sqs };
   });
