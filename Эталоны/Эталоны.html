@@ -738,8 +738,23 @@
   .stage-pill.active .stage-pill__pct{
     background:rgba(16,185,129,0.25);color:var(--moss-deep, #059669);
   }
+  .m-sq--focus{
+    outline:2px solid var(--amber) !important;
+    outline-offset:1px;
+    box-shadow:0 0 8px rgba(245,158,11,0.6);
+    animation:pulse-focus-sq 2s infinite ease-in-out;
+  }
+  @keyframes pulse-focus-sq{
+    0%, 100%{transform:scale(1);box-shadow:0 0 4px rgba(245,158,11,0.4);}
+    50%{transform:scale(1.18);box-shadow:0 0 10px rgba(245,158,11,0.85);}
+  }
   .stage-info-bar{
     padding:9px 12px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line-soft);margin-bottom:8px;
+    animation:fadeInStage .18s ease-out;
+  }
+  @keyframes fadeInStage{
+    from{opacity:0.4;transform:translateY(2px);}
+    to{opacity:1;transform:translateY(0);}
   }
   .stage-info-bar__head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;}
   .stage-info-bar__title{font-size:.8rem;font-weight:800;color:var(--ink);}
@@ -13339,6 +13354,17 @@ viewDashboard = function(){
   const e1Remaining = e1.skills.filter(s => getSkillMP(s.id) < 100).length;
   const e1DoneUnits = Math.min(14, Math.max(1, 14 - Math.floor((e1Remaining / Math.max(1, e1.skills.length)) * 14)));
 
+  // Determine the next priority skill for the 2-minute Cocoon Focus Card and map anchor
+  const openGaps = (state.diagnosticGaps || []).filter(sid => PY_SKILLS_BY_ID[sid] && getSkillMP(sid) < 100);
+  const activeTierNum = e1.pct < 100 ? 1 : (e2.pct < 100 ? 2 : (e3.pct < 100 ? 3 : 4));
+  const focusSk = openGaps.length > 0
+    ? PY_SKILLS_BY_ID[openGaps[0]]
+    : (getFirstUnmasteredSkillInEchelon(activeTierNum) || ALL_PY_SKILLS[0]);
+  const focusKId = (focusSk && focusSk.kIds && focusSk.kIds.find(k => !state.readNotes.includes(k))) || (focusSk && focusSk.kIds && focusSk.kIds[0]) || 'К-001';
+  const focusNoteObj = ALL_NOTES_COMBINED[focusKId] || { title: focusSk ? focusSk.title : 'Основы Python', steps: [] };
+  const focusStepsCount = (focusNoteObj.steps && focusNoteObj.steps.length) || 3;
+  const focusSid = focusSk ? focusSk.id : null;
+
   // Вычисляем текущий ранг подготовки
   const curRankBadge = e4.pct >= 100
     ? '👑 Pre-Offer Ready'
@@ -13370,7 +13396,10 @@ viewDashboard = function(){
       const smp = getSkillMP(s.id);
       if(smp >= 100) masteredAll++;
       skillsAll++;
-      return `<button class="m-sq m-sq--${smp}" data-py-open-skill="${s.id}" title="${s.id} ${s.title} — ${mpLabel(smp)}"></button>`;
+      const isFocus = (s.id === focusSid);
+      const focusCls = isFocus ? ' m-sq--focus' : '';
+      const focusTip = isFocus ? ' [🔥 Твой фокус сейчас]' : '';
+      return `<button class="m-sq m-sq--${smp}${focusCls}" data-py-open-skill="${s.id}" title="${s.id} ${s.title} — ${mpLabel(smp)}${focusTip}"></button>`;
     }).join('');
     return { key: tk, route: t.routePrefix, icon: meta.icon, name: meta.name, pct: tpct, mp, mx, sqs };
   });
@@ -13430,16 +13459,6 @@ viewDashboard = function(){
       <div class="dash-track-chip__bar"><div class="dash-track-chip__fill" style="width:${Math.max(3, m.pct)}%;"></div></div>
       <div class="dash-skill-row__sqs">${m.sqs}</div>
     </div>`).join('');
-
-  // Determine the next priority skill for the 2-minute Cocoon Focus Card
-  const openGaps = (state.diagnosticGaps || []).filter(sid => PY_SKILLS_BY_ID[sid] && getSkillMP(sid) < 100);
-  const activeTierNum = e1.pct < 100 ? 1 : (e2.pct < 100 ? 2 : (e3.pct < 100 ? 3 : 4));
-  const focusSk = openGaps.length > 0
-    ? PY_SKILLS_BY_ID[openGaps[0]]
-    : (getFirstUnmasteredSkillInEchelon(activeTierNum) || ALL_PY_SKILLS[0]);
-  const focusKId = (focusSk && focusSk.kIds && focusSk.kIds.find(k => !state.readNotes.includes(k))) || (focusSk && focusSk.kIds && focusSk.kIds[0]) || 'К-001';
-  const focusNoteObj = ALL_NOTES_COMBINED[focusKId] || { title: focusSk ? focusSk.title : 'Основы Python', steps: [] };
-  const focusStepsCount = (focusNoteObj.steps && focusNoteObj.steps.length) || 3;
 
   // Build 1-line checklist for the selected interview stage (1..4)
   const stageEp = getEchelonProgress(dashStage);
@@ -13502,6 +13521,7 @@ viewDashboard = function(){
         <div class="cocoon-focus-eyebrow"><span class="pulse-ring-dot"></span>✨ Фокус сейчас · 2 минуты (Правило 2 минут)<span class="sr-only"> · Быстрый микро-шаг</span></div>
         <div class="cocoon-focus-title">${(() => { const ft = focusSk.title.match(/^(.*?)\s*\(([^()]*)\)\s*$/); return ft ? `${focusSk.id} · ${ft[1]} <span class="t-detail">(${ft[2]})</span>` : `${focusSk.id} · ${focusSk.title}`; })()}</div>
         <div class="cocoon-focus-desc">Конспект <b>${focusKId}: ${focusNoteObj.title}</b> · ${focusStepsCount} ${(focusStepsCount % 10 === 1 && focusStepsCount % 100 !== 11) ? 'микро-шаг' : (focusStepsCount % 10 >= 2 && focusStepsCount % 10 <= 4 && (focusStepsCount % 100 < 10 || focusStepsCount % 100 >= 20) ? 'микро-шага' : 'микро-шагов')} · живой код · разбор Junior vs Senior</div>
+        <div style="font-size:.77rem;color:var(--moss);font-weight:700;margin:2px 0 6px;">⚡ Этот 2-минутный спринт приблизит готовность к скринингу до ${Math.min(100, e1.pct + 2)}%!</div>
         <div style="display:flex;flex-direction:column;gap:7px;">
           <button class="btn-glass-emerald btn-sprint-cta" data-quick-microstep="">▶ Начать спринт (2 мин) ➔</button>
         </div>
