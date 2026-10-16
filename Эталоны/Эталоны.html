@@ -3959,10 +3959,10 @@
     font-weight: 700;
   }
   .echelon-bordeaux-title {
-    color: #be123c !important;
+    color: #fb7185 !important;
     font-weight: 800;
     letter-spacing: -0.01em;
-    text-shadow: 0 0 12px rgba(190, 18, 60, 0.35) !important;
+    text-shadow: 0 0 20px rgba(244, 63, 94, 0.35) !important;
   }
   :root[data-theme="light"] .echelon-bordeaux-title {
     color: #881337 !important;
@@ -8075,6 +8075,11 @@ setTimeout(runProgressSync, 1200);
 
 // Russian pluralization helper (1 день / 2 дня / 5 дней)
 function pluralizeRu(n, one, two, five){
+  if(Array.isArray(one)){
+    five = one[2];
+    two = one[1];
+    one = one[0];
+  }
   const abs = Math.abs(Number(n) || 0) % 100;
   const n1 = abs % 10;
   if(abs > 10 && abs < 20) return five;
@@ -13881,7 +13886,7 @@ viewDashboard = function(){
         const cleanTok = tok.trim();
         return cleanTok ? `<span class="focus-code-chip">${escapeHtmlStr(cleanTok)}</span>` : '';
       }).filter(Boolean).join(' ');
-      focusTitleFormatted = `${focusSk.id} · ${escapeHtmlStr(ftMatch[1])} <span class="focus-chips-wrap">(${conceptChips})</span>`;
+      focusTitleFormatted = `${focusSk.id} · ${escapeHtmlStr(ftMatch[1])} <span class="focus-chips-wrap" style="margin-left:6px;">${conceptChips}</span>`;
     } else {
       focusTitleFormatted = `${focusSk.id} · ${escapeHtmlStr(focusSk.title)}`;
     }
@@ -13892,21 +13897,41 @@ viewDashboard = function(){
   const unreadCount = (focusSk && focusSk.kIds) ? focusSk.kIds.filter(k => !state.readNotes.includes(k)).length : 0;
   const isTheoryDone = unreadCount === 0;
 
-  // Инвариант 2: Синхронизация логики карточки фокуса (State Machine)
-  const focusContextText = isTheoryDone
-    ? '✓ Теория пройдена · Шаг 13: Рубежный тест темы'
-    : `Осталось ${unreadCount} ${unreadCount === 1 ? 'микро-шаг' : (unreadCount < 5 ? 'микро-шага' : 'микро-шагов')} до рубежного теста темы`;
-
   // Ювелирные бусины микро-шагов (Atomic Dots Mini-Track) для карточки фокуса
   const focusKIds = (focusSk && focusSk.kIds) ? focusSk.kIds : ['К-001', 'К-002', 'К-003'];
   const focusFIds = (focusSk && focusSk.fIds) ? focusSk.fIds : ['Ф-001', 'Ф-002'];
   const focusTIds = (focusSk && focusSk.taskIds && focusSk.taskIds.length) ? focusSk.taskIds : [20, 19, 39];
   const isUnitExamPassed = Boolean(state.unitTests && state.unitTests[activeUnitId]);
 
-  let firstUnreadK = focusKIds.find(k => !state.readNotes.includes(k));
-  let firstUnreviewedF = !firstUnreadK ? focusFIds.find(f => !state.reviewedDecks.includes(f)) : null;
-  let firstUnsolvedT = (!firstUnreadK && !firstUnreviewedF) ? focusTIds.find(t => !(state.taskCodeHistory && state.taskCodeHistory[t])) : null;
-  let isAllPreExamDone = !firstUnreadK && !firstUnreviewedF && !firstUnsolvedT;
+  const firstUnreadK = focusKIds.find(k => !state.readNotes.includes(k));
+  const firstUnreviewedF = !firstUnreadK ? focusFIds.find(f => !state.reviewedDecks.includes(f)) : null;
+  const firstUnsolvedT = (!firstUnreadK && !firstUnreviewedF) ? focusTIds.find(t => !(state.taskCodeHistory && state.taskCodeHistory[t])) : null;
+  const isAllPreExamDone = !firstUnreadK && !firstUnreviewedF && !firstUnsolvedT;
+
+  const curKIdx = firstUnreadK ? focusKIds.indexOf(firstUnreadK) : focusKIds.length;
+  const curFIdx = firstUnreviewedF ? focusFIds.indexOf(firstUnreviewedF) : focusFIds.length;
+  const curTIdx = firstUnsolvedT ? focusTIds.indexOf(firstUnsolvedT) : focusTIds.length;
+  const totalSteps = focusKIds.length + focusFIds.length + focusTIds.length + 1;
+
+  const focusTr = focusSk ? getTrackForSkill(focusSk.id) : null;
+  const focusTrackKey = (focusTr && focusTr.key) || 'python';
+
+  // Инвариант 2: Честный сквозной пайплайн прогресса (Mastery Flow)
+  let focusContextText = '';
+  let focusCtaHTML = '';
+  if(firstUnreadK){
+    focusContextText = `Теория темы · Шаг ${curKIdx + 1} из ${focusKIds.length} (всего ${totalSteps} этапов)`;
+    focusCtaHTML = `<button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta" data-quick-microstep="${focusSid}" data-quick-kid="${firstUnreadK}">Продолжить микро-шаг (2 мин) · +15 XP ⚡ ➔</button>`;
+  } else if(firstUnreviewedF){
+    focusContextText = `Теория изучена ✓ · Закрепление карточками (колода ${curFIdx + 1} из ${focusFIds.length})`;
+    focusCtaHTML = `<a href="#/cards" data-srs-open-deck="${firstUnreviewedF}" class="btn-glass-emerald btn-sprint-cta btn-dominant-cta">Повторить карточки темы (2 мин) · +10 XP ➔</a>`;
+  } else if(firstUnsolvedT){
+    focusContextText = `Карточки усвоены ✓ · Практика кода в IDE (задача ${curTIdx + 1} из ${focusTIds.length})`;
+    focusCtaHTML = `<a href="#/practice?task=${firstUnsolvedT}" class="btn-glass-emerald btn-sprint-cta btn-dominant-cta">Решить задачу в IDE · +15 XP ➔</a>`;
+  } else {
+    focusContextText = `Все этапы темы пройдены ✓ · Допуск к зачёту открыт`;
+    focusCtaHTML = `<button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta" data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}">🧪 Начать рубежный тест (+50 XP) ➔</button>`;
+  }
 
   const miniTrackDots = [];
   focusKIds.forEach((kId, idx) => {
@@ -13915,7 +13940,7 @@ viewDashboard = function(){
     const cls = isActive ? 'active' : (isDone ? 'done' : '');
     const n = (typeof ALL_NOTES_COMBINED !== 'undefined' && ALL_NOTES_COMBINED[kId]) || { title: kId };
     const title = (n.title || kId).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-    miniTrackDots.push(`<span class="dot-jewel ${cls}" title="Шаг ${idx + 1}: ${escapeHtmlStr(title)}" data-quick-kid="${kId}"></span>`);
+    miniTrackDots.push(`<span class="dot-jewel ${cls}" title="Шаг ${idx + 1}: ${escapeHtmlStr(title)}" data-quick-microstep="${focusSid}" data-quick-kid="${kId}" style="cursor:pointer;"></span>`);
   });
   miniTrackDots.push('<span class="dots-stage-divider" style="width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,0.15);flex-shrink:0;"></span>');
 
@@ -13925,29 +13950,26 @@ viewDashboard = function(){
     const cls = isActive ? 'active' : (isDone ? 'done' : '');
     const d = (typeof ALL_DECKS_COMBINED !== 'undefined' && ALL_DECKS_COMBINED[fId]) || {};
     const title = (d.title || fId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
-    miniTrackDots.push(`<span class="dot-jewel ${cls}" title="Карточки: ${escapeHtmlStr(title)}" data-srs-open-deck="${fId}"></span>`);
+    miniTrackDots.push(`<span class="dot-jewel ${cls}" title="Карточки: ${escapeHtmlStr(title)}" data-srs-open-deck="${fId}" style="cursor:pointer;"></span>`);
   });
   miniTrackDots.push('<span class="dots-stage-divider" style="width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,0.15);flex-shrink:0;"></span>');
 
-  focusTIds.slice(0, 3).forEach((tId, idx) => {
+  focusTIds.forEach((tId, idx) => {
     const isDone = Boolean(state.taskCodeHistory && state.taskCodeHistory[tId]);
     const isActive = (firstUnsolvedT === tId);
     const cls = isActive ? 'active' : (isDone ? 'done' : '');
-    miniTrackDots.push(`<span class="dot-jewel ${cls}" title="Практика #${tId}"></span>`);
+    miniTrackDots.push(`<span class="dot-jewel ${cls}" title="Практика #${tId}" data-open-practice-task="${tId}" style="cursor:pointer;"></span>`);
   });
   miniTrackDots.push('<span class="dots-stage-divider" style="width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,0.15);flex-shrink:0;"></span>');
 
   const examCls = isUnitExamPassed ? 'done' : (isAllPreExamDone ? 'active' : '');
-  miniTrackDots.push(`<span class="dot-jewel milestone ${examCls}" title="Рубежный зачёт Юнита ${activeUnitId}"></span>`);
+  miniTrackDots.push(`<span class="dot-jewel milestone ${examCls}" title="Рубежный зачёт Юнита ${activeUnitId}" data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}" style="cursor:pointer;"></span>`);
 
   const focusMiniTrackHTML = `
     <div class="focus-mini-track dots-necklace" style="display:flex;align-items:center;gap:6px;margin:8px 0 14px;overflow-x:auto;padding-bottom:2px;">
       ${miniTrackDots.join('')}
     </div>
   `;
-
-  const focusTr = focusSk ? getTrackForSkill(focusSk.id) : null;
-  const focusTrackKey = (focusTr && focusTr.key) || 'python';
 
   const streakDays = state.streak || 0;
   const streakPlural = (streakDays % 10 === 1 && streakDays % 100 !== 11) ? 'день' : ((streakDays % 10 >= 2 && streakDays % 10 <= 4 && (streakDays % 100 < 10 || streakDays % 100 >= 20)) ? 'дня' : 'дней');
@@ -14040,14 +14062,7 @@ viewDashboard = function(){
           ${focusContextText}
         </div>
         ${focusMiniTrackHTML}
-        ${isTheoryDone
-          ? `<button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta" data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}">
-              🧪 Начать рубежный тест (+50 XP) ➔
-            </button>`
-          : `<button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta" data-quick-microstep="${focusSk ? focusSk.id : ''}" data-quick-kid="${focusKId}">
-              Продолжить микро-шаг (2 мин) · +15 XP ⚡ ➔
-            </button>`
-        }
+        ${focusCtaHTML}
       </div>
 
       <!-- Зона 3: Компактный суточный пульс (Rhythm & SRS Grid — 2 колонки) -->
@@ -14084,8 +14099,8 @@ viewDashboard = function(){
                 ? srsSubtitle
                 : (!hasReviewedAnyCard
                     ? `<div>
-                        <span class="badge" style="background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.35);color:#fbbf24;padding:3px 9px;border-radius:8px;font-size:.76rem;font-weight:700;display:inline-block;">🔒 Колода формируется</span>
-                        <div style="font-size:.78rem;color:var(--ink-muted);margin-top:5px;line-height:1.4;">Изучите тему 1.1.1 — ключевые понятия автоматически появятся здесь для закрепления</div>
+                        <span class="badge" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.28);color:#34d399;padding:3px 9px;border-radius:8px;font-size:.76rem;font-weight:700;">🌱 Первое повторение</span>
+                        <div style="font-size:.78rem;color:var(--ink-muted);margin-top:5px;line-height:1.4;">Карточки темы ${focusSid} будут готовы к закреплению после прохождения первого микро-шага</div>
                       </div>`
                     : `<span class="badge" style="background:rgba(16,185,129,0.16);border:1px solid rgba(16,185,129,0.35);color:#34d399;padding:3px 9px;border-radius:8px;font-size:.76rem;font-weight:700;display:inline-block;">✓ Все карточки на сегодня повторены!</span>`
                   )
@@ -14114,14 +14129,10 @@ viewDashboard = function(){
           ${currentUnitThemesHTML}
           ${subsequentUnitsHTML}
           <div style="text-align:center;margin-top:12px;">
-            <a href="#/map" class="link-quiet" style="display:inline-flex;align-items:center;gap:6px;font-size:.82rem;font-weight:700;color:var(--moss);text-decoration:none;">🗺️ Открыть полную карту компетенций эшелона (${e1.skills.length} тем) ➔</a>
+            <a href="#/map" class="link-quiet" style="display:inline-flex;align-items:center;gap:6px;font-size:.82rem;font-weight:700;color:var(--moss);text-decoration:none;">🗺️ Открыть полную карту компетенций эшелона (${e1.skills.length} ${pluralize(e1.skills.length, ['тема', 'темы', 'тем'])}) ➔</a>
           </div>
         </div>
       </details>
-
-      <div style="text-align:center;margin-top:12px;">
-        <a href="#/map" class="link-quiet" style="display:inline-flex;align-items:center;gap:6px;font-size:.84rem;font-weight:600;color:var(--ink-muted);text-decoration:none;" title="Мои результаты · Полная матрица компетенций">🗺️ Перейти к полной карте компетенций ➔ <span class="sr-only">Мои результаты</span></a>
-      </div>
     </div>`;
 };
 
@@ -14638,7 +14649,7 @@ render = function(){
   const root = document.getElementById('view-root');
   let navRoute = route;
   const isSprintFocus = route.indexOf('/skill/') !== -1 || route.indexOf('/lesson/') === 0;
-  const isInteractiveRoute = ['/cards', '/practice', '/mock', '/interview-sim', '/sandbox'].includes(route) || route.indexOf('/boss') !== -1;
+  const isInteractiveRoute = ['/cards', '/practice', '/mock', '/interview-sim', '/sandbox'].some(p => route === p || route.indexOf(p + '?') === 0) || route.indexOf('/boss') !== -1;
   const isDashboardRoute = (route === '/' || route === '/dashboard' || !route);
   try{
     document.body.classList.toggle('is-sprint-focus', isSprintFocus);
@@ -14752,7 +14763,14 @@ render = function(){
   } else if(route === '/cards'){
     root.innerHTML = viewCardsHub();
     navRoute = '/cards';
-  } else if(route === '/practice'){
+  } else if(route === '/practice' || route.indexOf('/practice?') === 0){
+    const match = route.match(/[?&]task=(\d+)/);
+    if(match){
+      const tid = parseInt(match[1], 10);
+      if(IDE_TASKS_BY_ID[tid]){
+        selectPracticeTask(tid);
+      }
+    }
     root.innerHTML = viewPracticeHub();
     navRoute = '/practice';
   } else if(route === '/docs' || route === '/reference'){
@@ -15448,7 +15466,19 @@ document.addEventListener('click', async function(e){
     return;
   }
 
-    const qzBtn = e.target.closest('[data-open-quiz-modal]');
+    const optBtn = e.target.closest('[data-open-practice-task]');
+  if(optBtn){
+    const tid = parseInt(optBtn.getAttribute('data-open-practice-task'), 10);
+    if(tid && IDE_TASKS_BY_ID[tid]){
+      selectPracticeTask(tid);
+    }
+    try{ playSound('tick'); }catch(err){}
+    location.hash = '#/practice?task=' + tid;
+    render();
+    return;
+  }
+
+  const qzBtn = e.target.closest('[data-open-quiz-modal]');
   if(qzBtn){
     const uid = qzBtn.getAttribute('data-open-quiz-modal') || '1.1';
     const trKey = qzBtn.getAttribute('data-track') || 'python';
