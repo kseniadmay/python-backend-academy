@@ -674,25 +674,37 @@
   }
   .dash-result-tile{
     background:var(--surface-2);border:1px solid var(--line-soft);border-radius:14px;padding:8px 11px;
-    display:flex;flex-direction:column;gap:2px;min-width:0;
+    display:flex;flex-direction:column;gap:2px;min-width:0;text-decoration:none;color:inherit;
+    transition:border-color .15s,transform .12s,background .15s;cursor:pointer;
   }
+  .dash-result-tile:hover{border-color:var(--moss);transform:translateY(-1px);background:var(--surface-3, var(--surface-2));}
+  .dash-tile-top{display:flex;align-items:baseline;justify-content:space-between;gap:4px;min-width:0;}
   .dash-result-tile__num{
-    font-family:var(--font-d);font-size:1.28rem;font-weight:800;color:var(--ink);line-height:1.15;
+    font-family:var(--font-d);font-size:1.24rem;font-weight:800;color:var(--ink);line-height:1.15;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
   .dash-result-tile__num em{font-style:normal;font-size:.74rem;font-weight:700;color:var(--ink-muted);}
+  .dash-tile-badge{
+    font-size:.65rem;font-weight:800;color:var(--moss-deep, #059669);background:rgba(16,185,129,0.14);
+    border:1px solid rgba(16,185,129,0.28);border-radius:8px;padding:1px 5px;white-space:nowrap;flex:none;
+  }
   .dash-result-tile__label{font-size:.7rem;font-weight:600;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dash-tile-sub{font-size:.66rem;font-weight:700;color:var(--moss);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .dash-skill-matrix{display:grid;grid-template-columns:1fr;gap:7px;}
   @media (min-width:900px){
     .dash-skill-matrix{grid-template-columns:1fr 1fr;gap:8px;}
   }
   .dash-skill-row{
-    display:flex;flex-direction:column;gap:4px;padding:8px 10px;border-radius:14px;
-    background:var(--surface-2);border:1px solid var(--line-soft);text-decoration:none;color:var(--ink);
-    transition:border-color .15s,transform .12s;
+    display:flex;flex-direction:column;gap:5px;padding:9px 11px;border-radius:14px;
+    background:var(--surface-2);border:1px solid var(--line-soft);
+    transition:border-color .15s,box-shadow .15s;
   }
-  .dash-skill-row:hover{border-color:var(--moss);transform:translateY(-1px);}
-  .dash-skill-row__top{display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;}
+  .dash-skill-row:hover{border-color:rgba(52,211,153,0.4);box-shadow:var(--shadow-1);}
+  .dash-skill-row__top{
+    display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;
+    text-decoration:none;color:var(--ink);cursor:pointer;transition:color .12s;
+  }
+  .dash-skill-row__top:hover .dash-skill-row__name{color:var(--moss);}
   .dash-skill-row__icon{flex:none;font-size:.86rem;}
   .dash-skill-row__name{font-weight:700;font-size:.78rem;overflow:hidden;text-overflow:ellipsis;}
   .dash-skill-row__mp{font-size:.66rem;font-weight:600;color:var(--ink-muted);overflow:hidden;text-overflow:ellipsis;}
@@ -707,19 +719,32 @@
     display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;
   }
   .stage-pill{
-    padding:8px 6px;border-radius:12px;text-align:center;font-size:.77rem;font-weight:700;
+    padding:8px 6px;border-radius:12px;text-align:center;font-size:.76rem;font-weight:700;
     background:var(--surface);border:1px solid var(--glass-border);color:var(--ink-soft);cursor:pointer;
-    transition:all .15s;backdrop-filter:blur(14px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    transition:all .15s;backdrop-filter:blur(14px);white-space:nowrap;display:flex;justify-content:center;align-items:center;gap:4px;
   }
   @media (max-width:560px){
-    .stage-pill{padding:7px 4px;font-size:.73rem;border-radius:11px;}
+    .stage-pill{padding:7px 3px;font-size:.7rem;border-radius:11px;}
   }
   .stage-pill:hover{border-color:var(--moss);color:var(--ink);}
   .stage-pill.active{
     background:rgba(16,185,129,0.16);color:var(--ink);border:1.5px solid rgba(52,211,153,0.45);
     font-weight:800;
   }
-  .mini-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+  .stage-pill__pct{
+    font-size:.66rem;font-weight:800;padding:1px 5px;border-radius:6px;
+    background:rgba(148,163,184,0.16);color:var(--ink-muted);
+  }
+  .stage-pill.active .stage-pill__pct{
+    background:rgba(16,185,129,0.25);color:var(--moss-deep, #059669);
+  }
+  .stage-info-bar{
+    padding:9px 12px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line-soft);margin-bottom:8px;
+  }
+  .stage-info-bar__head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;}
+  .stage-info-bar__title{font-size:.8rem;font-weight:800;color:var(--ink);}
+  .stage-info-bar__pct{font-size:.74rem;font-weight:800;color:var(--moss);}
+    .mini-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
   .mini-item{
     padding:9px 12px;border-radius:13px;background:var(--surface);border:1px solid var(--glass-border);
     display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.83rem;font-weight:600;
@@ -13314,6 +13339,15 @@ viewDashboard = function(){
   const e1Remaining = e1.skills.filter(s => getSkillMP(s.id) < 100).length;
   const e1DoneUnits = Math.min(14, Math.max(1, 14 - Math.floor((e1Remaining / Math.max(1, e1.skills.length)) * 14)));
 
+  // Вычисляем текущий ранг подготовки
+  const curRankBadge = e4.pct >= 100
+    ? '👑 Pre-Offer Ready'
+    : (e3.pct >= 100
+      ? '🏛️ Highload & Прод'
+      : (e2.pct >= 100
+        ? '🚀 Стек & Backend'
+        : (e1.pct >= 60 ? '⚡ Скрининг почти готов' : '🌱 Старт подготовки')));
+
   // --- Real dashboard: results across all 7 tracks (tiles + full skill matrix) ---
   const TRACK_DASH_META = {
     python: { icon: '🐍', name: 'Python' },
@@ -13347,25 +13381,57 @@ viewDashboard = function(){
   const activeDaysCount = Math.max(historyActiveDays, state.streak || 0);
 
   const resultsTilesHTML = [
-    { num: `${state.xp}`, label: '💎 XP всего' },
-    { num: `${totalSolvedIde}<em> / 401</em>`, label: '💻 задач в IDE' },
-    { num: `${masteredAll}<em> / ${skillsAll}</em>`, label: '🧠 навыков 👑' },
-    { num: `${passedUnitsCount}<em> / ${totalUnitsAll}</em>`, label: '🏆 юнитов сдано' }
-  ].map(t => `<div class="dash-result-tile"><span class="dash-result-tile__num">${t.num}</span><span class="dash-result-tile__label">${t.label}</span></div>`).join('');
+    {
+      num: `${state.xp}`,
+      badge: tXp > 0 ? `<span class="dash-tile-badge">+${tXp} сегодня</span>` : '',
+      label: '💎 XP всего',
+      sub: `цель: ${state.dailyGoal || 50} XP`,
+      href: '#/'
+    },
+    {
+      num: `${totalSolvedIde}<em> / 401</em>`,
+      badge: totalSolvedIde > 0 ? `<span class="dash-tile-badge">${Math.round(totalSolvedIde / 401 * 100)}%</span>` : '',
+      label: '💻 задач в IDE',
+      sub: 'в тренажёр ➔',
+      href: '#/practice'
+    },
+    {
+      num: `${masteredAll}<em> / ${skillsAll}</em>`,
+      badge: masteredAll > 0 ? `<span class="dash-tile-badge">👑 ${masteredAll}</span>` : '',
+      label: '🧠 навыков 👑',
+      sub: '3D-тропа ➔',
+      href: '#/path'
+    },
+    {
+      num: `${passedUnitsCount}<em> / ${totalUnitsAll}</em>`,
+      badge: passedUnitsCount > 0 ? `<span class="dash-tile-badge">${Math.round(passedUnitsCount / Math.max(1, totalUnitsAll) * 100)}%</span>` : '',
+      label: '🏆 юнитов сдано',
+      sub: 'модули 01–07 ➔',
+      href: '#/python'
+    }
+  ].map(t => `
+    <a href="${t.href}" class="dash-result-tile" title="${t.label}: ${t.sub}">
+      <div class="dash-tile-top">
+        <span class="dash-result-tile__num">${t.num}</span>
+        ${t.badge}
+      </div>
+      <span class="dash-result-tile__label">${t.label}</span>
+      <span class="dash-tile-sub">${t.sub}</span>
+    </a>`).join('');
 
   const resultsMatrixHTML = trackMatrixRows.map(m => `
-    <a href="#${m.route}" class="dash-skill-row" title="${m.name}: ${m.mp} / ${m.mx} MP (${m.pct}%)" aria-label="${m.name}: ${m.pct}%">
-      <div class="dash-skill-row__top">
+    <div class="dash-skill-row">
+      <a href="#${m.route}" class="dash-skill-row__top" title="Перейти к треку ${m.name}">
         <span class="dash-skill-row__icon">${m.icon}</span>
         <span class="dash-skill-row__name">${m.name}</span>
         <span class="dash-skill-row__mp">${m.mp} / ${m.mx} MP</span>
         <span class="dash-skill-row__pct">${m.pct}%</span>
-      </div>
+      </a>
       <div class="dash-track-chip__bar"><div class="dash-track-chip__fill" style="width:${Math.max(3, m.pct)}%;"></div></div>
       <div class="dash-skill-row__sqs">${m.sqs}</div>
-    </a>`).join('');
+    </div>`).join('');
 
-  // Determine the next priority skill for the 4-minute Cocoon Focus Card
+  // Determine the next priority skill for the 2-minute Cocoon Focus Card
   const openGaps = (state.diagnosticGaps || []).filter(sid => PY_SKILLS_BY_ID[sid] && getSkillMP(sid) < 100);
   const activeTierNum = e1.pct < 100 ? 1 : (e2.pct < 100 ? 2 : (e3.pct < 100 ? 3 : 4));
   const focusSk = openGaps.length > 0
@@ -13377,6 +13443,7 @@ viewDashboard = function(){
 
   // Build 1-line checklist for the selected interview stage (1..4)
   const stageEp = getEchelonProgress(dashStage);
+  const stageEpMeta = (typeof getEchelonMeta === 'function' ? getEchelonMeta(dashStage) : (INTERVIEW_ECHELONS && INTERVIEW_ECHELONS[dashStage])) || { label: 'Эшелон ' + dashStage, desc: '', icon: '🎯' };
   const stageSkills = stageEp.skills || [];
   let firstUnmIdx = stageSkills.findIndex(s => getSkillMP(s.id) < 100);
   if(firstUnmIdx < 0) firstUnmIdx = 0;
@@ -13401,6 +13468,9 @@ viewDashboard = function(){
     if(!dObj) return '';
     return `<a href="#/cards" class="btn btn-ghost" style="padding:5px 10px;font-size:.76rem;" data-srs-open-deck="${did}">🃏 ${did} (${(dObj.cards||[]).length})</a>`;
   }).join('');
+  const srsCtaButton = (srs.dueTodayCardsCount > 0)
+    ? `<a href="#/cards" class="btn btn-primary" style="padding:5px 12px;font-size:.76rem;">🔥 Повторить (${srs.dueTodayCardsCount}) ➔</a>`
+    : `<a href="#/cards" class="btn btn-ghost" style="padding:5px 10px;font-size:.76rem;">🃏 Все 286 колод ➔</a>`;
   const srsTotalDecks = Math.max(1, Object.keys(ALL_DECKS_COMBINED).length);
   const srsRingCircum = 94.2;
   const srsPct = Math.min(100, Math.max(8, Math.round((srs.reviewedDecksCount / srsTotalDecks) * 100)));
@@ -13410,32 +13480,30 @@ viewDashboard = function(){
     <div class="container">
       <!-- Top Cocoon Pills -->
       <div class="dash-top-pills">
+        <span class="cocoon-pill" title="Текущий статус подготовки">${curRankBadge}</span>
         <span class="cocoon-pill">🔥 ${state.streak || 1} дн.<span class="sr-only"> подряд</span> · 🧊 ${state.streakFreezes}</span>
         <span class="cocoon-pill">🎯 ${tXp}/${state.dailyGoal || 50} XP<span class="sr-only"> сегодня</span></span>
+        <a href="#/path" class="cocoon-pill cocoon-pill--interactive" title="Перейти к интерактивной 3D-тропе обучения">🗺️ 3D-Тропа пути ➔</a>
         <button class="cocoon-pill cocoon-pill--interactive" data-open-handover>🔄 Контекст<span class="sr-only"> для нового чата</span></button>
       </div>
 
-      <!-- Trajectory & Reverse Countdown to 1st Screening -->
+      <!-- Trajectory & Progress to 1st Screening -->
       <div class="cd-box">
         <div class="cd-top">
-          <span class="cd-title">🎯 До 1-го скрининга: ${e1.pct}%</span>
-          <span class="cd-count">⏳ Осталось ${e1Remaining} ${pluralRuTopics(e1Remaining)}</span>
+          <span class="cd-title">🎯 Готовность к 1-му тех-скринингу: ${e1.pct}%</span>
+          <span class="cd-count">⚡ Пройдено ${e1DoneUnits} из 14 юнитов Эшелона 1</span>
         </div>
         <div class="cd-bar cd-bar-track"><div class="cd-fill cd-bar-fill" style="width:${Math.max(6, e1.pct)}%;"></div></div>
-        <div class="cd-checkpoint-sub">Шаг ${e1DoneUnits} из 14 юнитов Эшелона 1 · Открывает готовность к тех-скринингу</div>
+        <div class="cd-checkpoint-sub">Шаг ${e1DoneUnits} из 14 юнитов Эшелона 1 · Каждый решённый микро-шаг приближает к первому офферу</div>
       </div>
 
-      <!-- Active 4-Minute Sprint Focus Card -->
+      <!-- Active 2-Minute Sprint Focus Card -->
       <div class="cocoon-focus-card">
-        <div class="cocoon-focus-eyebrow"><span class="pulse-ring-dot"></span>✨ Фокус сейчас · 4 минуты<span class="sr-only"> · Правило 2 минут: Быстрый микро-шаг</span></div>
+        <div class="cocoon-focus-eyebrow"><span class="pulse-ring-dot"></span>✨ Фокус сейчас · 2 минуты (Правило 2 минут)<span class="sr-only"> · Быстрый микро-шаг</span></div>
         <div class="cocoon-focus-title">${(() => { const ft = focusSk.title.match(/^(.*?)\s*\(([^()]*)\)\s*$/); return ft ? `${focusSk.id} · ${ft[1]} <span class="t-detail">(${ft[2]})</span>` : `${focusSk.id} · ${focusSk.title}`; })()}</div>
         <div class="cocoon-focus-desc">Конспект <b>${focusKId}: ${focusNoteObj.title}</b> · ${focusStepsCount} ${(focusStepsCount % 10 === 1 && focusStepsCount % 100 !== 11) ? 'микро-шаг' : (focusStepsCount % 10 >= 2 && focusStepsCount % 10 <= 4 && (focusStepsCount % 100 < 10 || focusStepsCount % 100 >= 20) ? 'микро-шага' : 'микро-шагов')} · живой код · разбор Junior vs Senior</div>
         <div style="display:flex;flex-direction:column;gap:7px;">
-          <button class="btn-glass-emerald btn-sprint-cta" data-quick-microstep="">▶ Начать спринт (4 мин) ➔</button>
-          <div class="focus-links">
-            <a href="#/mock">🎙️ Собеседование</a>
-            <a href="#/docs">📚 Справочник</a>
-          </div>
+          <button class="btn-glass-emerald btn-sprint-cta" data-quick-microstep="">▶ Начать спринт (2 мин) ➔</button>
         </div>
       </div>
 
@@ -13473,20 +13541,32 @@ viewDashboard = function(){
             <div class="meta" style="font-size:.76rem;">Повторено колод: <b>${srs.reviewedDecksCount}</b> · ${srs.dueTodayCardsCount > 0 ? `<span style="color:#fb7185;font-weight:700;">🔥 К повторению сегодня: ${srs.dueTodayCardsCount}</span>` : '<span style="color:var(--moss);">✓ На сегодня повторено</span>'} · Сложных карточек: <b>${srs.weakCardsCount}</b> · Закреплено: <b>${srs.masteredCardsCount || 0}</b></div>
           </div>
         </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">${srsDeckButtons}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+          ${srsCtaButton}
+          ${srsDeckButtons}
+        </div>
       </div>
 
       <!-- 4 Interview Stages Switcher & 1-Line Topic Checklist -->
       <div class="stage-pills">
-        <button class="stage-pill ${dashStage===1?'active':''}" data-dash-stage="1">1. Скрининг<span class="sr-only"> (${e1.pct}%)</span></button>
-        <button class="stage-pill ${dashStage===2?'active':''}" data-dash-stage="2">2. Стек<span class="sr-only"> (${e2.pct}%)</span></button>
-        <button class="stage-pill ${dashStage===3?'active':''}" data-dash-stage="3">3. Прод<span class="sr-only"> (${e3.pct}%)</span></button>
-        <button class="stage-pill ${dashStage===4?'active':''}" data-dash-stage="4">4. Оффер<span class="sr-only"> (${e4.pct}%)</span></button>
+        <button class="stage-pill ${dashStage===1?'active':''}" data-dash-stage="1">1. Скрининг <span class="stage-pill__pct">${e1.pct}%</span></button>
+        <button class="stage-pill ${dashStage===2?'active':''}" data-dash-stage="2">2. Стек <span class="stage-pill__pct">${e2.pct}%</span></button>
+        <button class="stage-pill ${dashStage===3?'active':''}" data-dash-stage="3">3. Прод <span class="stage-pill__pct">${e3.pct}%</span></button>
+        <button class="stage-pill ${dashStage===4?'active':''}" data-dash-stage="4">4. Оффер <span class="stage-pill__pct">${e4.pct}%</span></button>
       </div>
+
+      <div class="stage-info-bar">
+        <div class="stage-info-bar__head">
+          <span class="stage-info-bar__title">${stageEpMeta.icon || '🎯'} ${stageEpMeta.label || ('Эшелон ' + dashStage)}</span>
+          <span class="stage-info-bar__pct">${stageEp.pct}% готовности · ${stageEp.curMp || 0} / ${stageEp.maxMp || 1} MP</span>
+        </div>
+        <div class="mp-progress-track" style="height:6px;margin:5px 0 6px;"><div class="mp-progress-fill" style="width:${Math.max(4, stageEp.pct)}%;"></div></div>
+        <div class="meta" style="font-size:.74rem;line-height:1.35;">${stageEpMeta.desc || ''}</div>
+      </div>
+
       <div class="mini-list">
         ${miniListHTML}
       </div>
-
       <!-- Collapsible Drawer for All Modules, Echelons, Pomodoro & Global Stats -->
       <details class="cocoon-details">
         <summary>Все модули, эшелоны и статистика ▾</summary>
