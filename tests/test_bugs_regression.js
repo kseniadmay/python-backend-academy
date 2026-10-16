@@ -1,6 +1,6 @@
 /**
  * test_bugs_regression.js
- * Автоматические регрессионные тесты для предотвращения повторения багов 1..10.
+ * Автоматические регрессионные тесты для предотвращения повторения багов 1..30.
  */
 
 'use strict';
@@ -14,7 +14,7 @@ const academyPath = path.join(rootDir, 'academy.html');
 const etalonyPath = path.join(rootDir, 'Эталоны', 'Эталоны.html');
 
 console.log('================================================================');
-console.log('   REGRESSION TEST SUITE: BUGS 1..10 VERIFICATION               ');
+console.log('   REGRESSION TEST SUITE: BUGS 1..30 VERIFICATION               ');
 console.log('================================================================\n');
 
 assert(fs.existsSync(academyPath), `academy.html missing`);
@@ -134,6 +134,50 @@ assert(k004Content.includes('Как и `tuple` в сравнении с `list`')
 assert(academyHtml.includes('в сравнении с <code>list') || academyHtml.includes('в сравнении с `list`'), 'academy.html must contain proper grammar "в сравнении с list" in К-004');
 console.log('✓ Bug 20: K-004 "в сравнении с list" grammar verified');
 
+// 21. Bug 21: Реактивное обновление счетчика +XP за сутки и удаление захардкоженного fallback || 55
+assert(!academyHtml.includes('⚡ +${dayXpVal || 55} XP'), 'Bug 21: fallback || 55 must be removed');
+assert(academyHtml.includes("document.querySelectorAll('.sprint-xp-pill').forEach"), 'Bug 21: awardXp must reactively update sprint-xp-pill in DOM');
+console.log('✓ Bug 21: Reactive daily XP sprint pill update and removal of hardcoded fallback 55 verified');
+
+// 22. Bug 22: Отступы строк и пояснения к сложности операций в К-004
+assert(academyHtml.includes('# O(len(a) + len(b)) — объединение') && academyHtml.includes('# O(min(len(a), len(b))) — пересечение'), 'Bug 22: operations in K-004 must have line breaks and comments');
+const k004ContentUpdated = fs.readFileSync(k004Path, 'utf-8');
+assert(k004ContentUpdated.includes('# O(len(a) + len(b)) — объединение'), 'Bug 22: K-004.md must have spaced operation lines with comments');
+console.log('✓ Bug 22: K-004 step 3 operations code block spacing and comments verified');
+
+// 23. Bug 23: Компактные отступы между блоками теории (.feed-chunk + .feed-chunk)
+assert(academyHtml.includes('padding-top:8px;margin-top:0;') && academyHtml.includes('.feed-chunk p{margin:0 0 8px;'), 'Bug 23: feed-chunk spacing must be compact (8px instead of 14px)');
+console.log('✓ Bug 23: Theory feed-chunk compact spacing verified');
+
+// 24. Bug 24: Подсветка синтаксиса в блоках кода конспектов (highlightPythonTokens до snippet-wrap check)
+assert(academyHtml.includes('s = s.replace(/<pre><code>([\\s\\S]*?)<\\/code><\\/pre>/g') && academyHtml.includes('highlightPythonTokens(codeInner)'), 'Bug 24: decorateCodeBlocksWithRunBtn must highlight python tokens before snippet-wrap check');
+console.log('✓ Bug 24: Syntax highlighting in theory code snippets verified');
+
+// 25. Bug 25: Мобильная читаемость кода в К-005 step 6 (длинные комментарии вынесены на строки над кодом)
+const k005Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.1 · Базовый синтаксис', '📚 Конспекты', 'К-005. args kwargs и распаковка в Python.md');
+assert(fs.existsSync(k005Path), 'К-005.md missing');
+const k005Content = fs.readFileSync(k005Path, 'utf-8');
+assert(k005Content.includes('# При слиянии словарей overrides перезатирает совпадающие ключи:') && k005Content.includes('# Аналогично для объединения списков через *:'), 'Bug 25: long comments in K-005 step 6 must be placed on separate lines for mobile display');
+assert(academyHtml.includes('# При слиянии словарей overrides перезатирает совпадающие ключи:') && academyHtml.includes('config = {**defaults, **overrides}'), 'Bug 25: academy.html must have comments on separate lines in K-005');
+console.log('✓ Bug 25: K-005 step 6 mobile code block readability verified');
+
+// 26. Bug 26: Очистка тултипов dot-jewel конспектов от технических префиксов К-\d+
+assert(academyHtml.includes("cleanNoteTitle = (n.title || kId).replace(/^К-\\d+\\s*[:·•\\-]\\s*/i, '').trim();") && academyHtml.includes("title=\"${escapeHtmlStr(cleanNoteTitle)}\""), 'Bug 26: dot-jewel title must strip technical prefix К-\\d+');
+console.log('✓ Bug 26: Strip technical prefix К-\\d+ from note dots and titles verified');
+
+// 27. Bug 27: Ясное и дидактичное условие задачи #258 про хэшируемость кортежа vs изменяемый список
+assert(academyHtml.includes('"id": 258') && academyHtml.includes("TypeError: unhashable type: 'list'") && academyHtml.includes('point_tuple: \\"запись в кэше\\"'), 'Bug 27: task 258 must clearly explain tuple hashability vs mutable list with explicit steps');
+console.log('✓ Bug 27: Task 258 tuple hashability and dictionary key invariants verified');
+
+// 28, 30. Bugs 28 & 30: Красивые блоки кода с подсветкой в вопросах рубежного теста
+assert(academyHtml.includes('formatQuizQuestionPromptHTML(rawText)') && academyHtml.includes('highlightPythonTokens(escapeHtmlStr(codePart))') && academyHtml.includes('quiz-question-code'), 'Bug 28 & 30: quiz question code block must be syntax-highlighted in formatQuizQuestionPromptHTML');
+assert(academyHtml.includes('Что выведет следующий код?\\n\\na = [1, 2]\\nb = a\\nb += [3]\\nprint(len(a))'), 'Bug 30: question 1 in unit test 1.1 must be formatted as readable multiline code block');
+console.log('✓ Bugs 28 & 30: Syntax-highlighted code blocks in unit test questions verified');
+
+// 29. Bug 29: Двухфазный выбор ответов в рубежном тесте (pending selection -> осознанное нажатие кнопки «Ответить»)
+assert(academyHtml.includes('quiz-opt--pending') && academyHtml.includes('data-ut-confirm') && academyHtml.includes('Ответить'), 'Bug 29: unit test must have two-phase selection with pending state and explicit Ответить button');
+console.log('✓ Bug 29: Unit test two-phase selection (think before answer) verified');
+
 console.log('\n================================================================');
-console.log('  ALL 20 REGRESSION TESTS PASSED! (0 FAILURES, ZERO RECURRENCE) ');
+console.log('  ALL 30 REGRESSION TESTS PASSED! (0 FAILURES, ZERO RECURRENCE) ');
 console.log('================================================================\n');
