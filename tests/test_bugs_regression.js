@@ -1,6 +1,6 @@
 /**
  * test_bugs_regression.js
- * Автоматические регрессионные тесты для предотвращения повторения багов 1..60.
+ * Автоматические регрессионные тесты для предотвращения повторения багов 1..70.
  */
 
 'use strict';
@@ -14,7 +14,7 @@ const academyPath = path.join(rootDir, 'academy.html');
 const etalonyPath = path.join(rootDir, 'Эталоны', 'Эталоны.html');
 
 console.log('================================================================');
-console.log('   REGRESSION TEST SUITE: BUGS 1..60 VERIFICATION               ');
+console.log('   REGRESSION TEST SUITE: BUGS 1..70 VERIFICATION               ');
 console.log('================================================================\n');
 
 assert(fs.existsSync(academyPath), `academy.html missing`);
@@ -370,6 +370,74 @@ assert(academyHtml.includes('pms-item pms-echelon'), 'Bug 60: mobile stats strip
 assert(academyHtml.includes('.path-echelon-pill {') && academyHtml.includes('.echelon-pill--t1 {'), 'Bug 60: CSS must define styling for echelon pills');
 console.log('✓ Bug 60: Echelon visibility on #/path top banner and stats strip verified');
 
+// 61. Bug 61: К-026: опечатка 'полиморфизm' устранена
+const k026Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.4 · ООП базовое', '📚 Конспекты', 'К-026. Наследование, isinstance() и.md');
+assert(fs.existsSync(k026Path), 'К-026.md missing');
+const k026Content = fs.readFileSync(k026Path, 'utf-8');
+assert(!k026Content.includes('полиморфизm'), 'Bug 61: K-026.md must not contain Latin typo "полиморфизm"');
+assert(k026Content.includes('полиморфизм'), 'Bug 61: K-026.md must contain correct Russian word "полиморфизм"');
+assert(!academyHtml.includes('полиморфизm'), 'Bug 61: academy.html must not contain Latin typo "полиморфизm"');
+console.log('✓ Bug 61: K-026 "полиморфизm" typo fix verified');
+
+// 62. Bug 62: К-026: разделение теории на микро-шаги (6 шагов)
+assert(k026Content.includes('## Наследование vs композиция: когда что выбирать') && k026Content.includes('## Когда использовать isinstance() и issubclass()'), 'Bug 62: K-026.md must split step 5 into micro-steps');
+const mPY = academyHtml.match(/const PY_MASTERY = ({[\s\S]*?});\s*(?:const|let|var|function)/);
+assert(mPY, 'academy.html must contain PY_MASTERY object');
+const pyMasteryData = JSON.parse(mPY[1]);
+const k026Obj = pyMasteryData.notes['К-026'];
+assert(k026Obj && k026Obj.steps, 'academy.html must contain К-026 with steps');
+assert.strictEqual(k026Obj.steps.length, 6, `Bug 62: K-026 must have 6 micro-steps in academy.html, got ${k026Obj.steps.length}`);
+console.log('✓ Bug 62: K-026 pedagogy micro-steps breakdown verified');
+
+// 63 & 64. Bugs 63 & 64: К-027 steps 2 & 3: корректное инлайн форматирование __new__ и __init__
+const k027Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.4 · ООП базовое', '📚 Конспекты', 'К-027. __new__ и __init___ два этапа создания.md');
+assert(fs.existsSync(k027Path), 'К-027.md missing');
+const k027Content = fs.readFileSync(k027Path, 'utf-8');
+assert(!k027Content.includes('`_`**`_new__`**') && !k027Content.includes('`_`**`_init__`**'), 'Bugs 63 & 64: K-027.md must not have broken markdown underscores');
+assert(!academyHtml.includes('<code>_</code><strong><code>_new__</code></strong>'), 'Bug 63: academy.html must not have broken inline formatting for __new__');
+assert(!academyHtml.includes('<code>_</code><strong><code>_init__</code></strong>'), 'Bug 64: academy.html must not have broken inline formatting for __init__');
+console.log('✓ Bugs 63 & 64: K-027 __new__ and __init__ inline formatting verified');
+
+// 65. Bug 65: Ф-041 card 1: согласованность вопроса и ответа карточки
+const f041Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.4 · ООП базовое', '📇 Карточки', 'Ф-041. ООП isinstance() и issubclass().md');
+assert(fs.existsSync(f041Path), 'Ф-041.md missing');
+const f041Content = fs.readFileSync(f041Path, 'utf-8');
+assert(f041Content.includes('Работает ли `isinstance()` с абстрактными базовыми классами'), 'Bug 65: F-041 card 1 question must match the "Да; ..." answer');
+assert(academyHtml.includes('Работает ли <code>isinstance()</code> с абстрактными базовыми классами'), 'Bug 65: academy.html must contain fixed question in F-041 card 1');
+console.log('✓ Bug 65: F-041 card 1 Q&A logical consistency verified');
+
+// 66. Bug 66: Ф-043 card 2: полноценная реализация Singleton в ответе карточки
+const f043Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.4 · ООП базовое', '📇 Карточки', 'Ф-043. ООП Магические методы __init__ и __new__.md');
+assert(fs.existsSync(f043Path), 'Ф-043.md missing');
+const f043Content = fs.readFileSync(f043Path, 'utf-8');
+assert(f043Content.includes('cls._instance = super().__new__(cls)') && f043Content.includes('return cls._instance'), 'Bug 66: F-043 card 2 must include full Singleton logic with return cls._instance');
+assert(academyHtml.includes('class Singleton:') && academyHtml.includes('return cls._instance'), 'Bug 66: academy.html must render structured Singleton code in F-043 card 2');
+console.log('✓ Bug 66: F-043 card 2 Singleton implementation verified');
+
+// 67 & 68. Bugs 67 & 68: Ф-044 card 2: читабельный блок кода вместо стены кода с точками с запятой
+const f044Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.4 · ООП базовое', '📇 Карточки', 'Ф-044. ООП Наследование.md');
+assert(fs.existsSync(f044Path), 'Ф-044.md missing');
+const f044Content = fs.readFileSync(f044Path, 'utf-8');
+assert(!f044Content.includes('class Animal:; def __init__'), 'Bugs 67 & 68: F-044 card 2 must not contain single-line semicolon code wall');
+assert(!academyHtml.includes('class Animal:; def __init__'), 'Bugs 67 & 68: academy.html must not contain unreadable semicolon code wall in F-044');
+assert(academyHtml.includes('class Animal:') && academyHtml.includes('class Dog(Animal):'), 'Bugs 67 & 68: academy.html must format Dog/Animal classes with proper newlines');
+console.log('✓ Bugs 67 & 68: F-044 card 2 code readability and formatting verified');
+
+// 69. Bug 69: Рубежный тест 1.4: 8 исчерпывающих вопросов по ООП
+const mUnitTests14 = academyHtml.match(/"1\.4":\s*\{\s*"unitId":\s*"1\.4".*?"questions":\s*(\[.*?\])\s*\}/s);
+assert(mUnitTests14, 'academy.html must contain parsed UNIT_TESTS 1.4');
+const parsedQuestions14 = JSON.parse(mUnitTests14[1]);
+assert.strictEqual(parsedQuestions14.length, 8, `Bug 69: Unit test 1.4 must contain 8 comprehensive questions on OOP, got ${parsedQuestions14.length}`);
+assert(academyHtml.includes('Unit Test 1.4: Базовое объектно-ориентированное программирование (ООП)'), 'Bug 69: Unit test 1.4 title must match OOP curriculum');
+assert(academyHtml.includes('Name Mangling') && academyHtml.includes('декоратор @property'), 'Bug 69: Unit test 1.4 questions must cover core OOP concepts');
+console.log('✓ Bug 69: Unit test 1.4 expanded to 8 comprehensive OOP questions verified');
+
+// 70. Bug 70: Адаптивность ожерелья точек на мобильных экранах (отсутствие выпадения)
+assert(academyHtml.includes('.dots-necklace {') && academyHtml.includes('overflow-x: auto;') && academyHtml.includes('scrollbar-width: none;'), 'Bug 70: .dots-necklace must support responsive overflow scroll without scrollbars');
+assert(academyHtml.includes('.dot-jewel {') && academyHtml.includes('flex-shrink: 0;'), 'Bug 70: .dot-jewel must have flex-shrink: 0 to prevent oval deformation');
+assert(academyHtml.includes('.dots-stage-divider {') && academyHtml.includes('flex-shrink: 0;'), 'Bug 70: .dots-stage-divider must have flex-shrink: 0');
+console.log('✓ Bug 70: Responsive dots-necklace horizontal adaptation verified');
+
 console.log('\n================================================================');
-console.log('  ALL 60 REGRESSION TESTS PASSED! (0 FAILURES, ZERO RECURRENCE) ');
+console.log('  ALL 70 REGRESSION TESTS PASSED! (0 FAILURES, ZERO RECURRENCE) ');
 console.log('================================================================\n');
