@@ -718,6 +718,10 @@
     transform:scale(1.3);z-index:3;box-shadow:0 2px 6px rgba(0,0,0,0.3);
   }
   .btn-sprint-cta{position:relative;overflow:hidden;}
+  .badge-sprint-xp{display:inline-block;padding:1px 6px;border-radius:6px;background:rgba(255,255,255,0.22);font-size:.78rem;font-weight:800;letter-spacing:.02em;}
+  .heat-cell{transition:transform .12s,box-shadow .12s;cursor:default;}
+  .heat-cell.active, .heat-cell.high, .heat-cell.today{cursor:pointer;}
+  .heat-cell.active:hover, .heat-cell.high:hover, .heat-cell.today:hover{transform:translateY(-2px);box-shadow:0 3px 8px rgba(0,0,0,0.2);}
   .btn-sprint-cta::after{
     content:'';
     position:absolute;top:-50%;left:-60%;width:35%;height:200%;
@@ -13567,7 +13571,7 @@ viewDashboard = function(){
         <div class="cocoon-focus-desc">Конспект <b>${focusKId}: ${focusNoteObj.title}</b> · ${focusStepsCount} ${(focusStepsCount % 10 === 1 && focusStepsCount % 100 !== 11) ? 'микро-шаг' : (focusStepsCount % 10 >= 2 && focusStepsCount % 10 <= 4 && (focusStepsCount % 100 < 10 || focusStepsCount % 100 >= 20) ? 'микро-шага' : 'микро-шагов')} · живой код · разбор Junior vs Senior</div>
         <div style="font-size:.77rem;color:var(--moss);font-weight:700;margin:2px 0 6px;">⚡ Этот 2-минутный спринт приблизит готовность к скринингу до ${Math.min(100, e1.pct + 2)}%!</div>
         <div style="display:flex;flex-direction:column;gap:7px;">
-          <button class="btn-glass-emerald btn-sprint-cta" data-quick-microstep="${focusSk ? focusSk.id : ''}" data-quick-kid="${focusKId}">▶ Начать спринт (2 мин) ➔</button>
+          <button class="btn-glass-emerald btn-sprint-cta" data-quick-microstep="${focusSk ? focusSk.id : ''}" data-quick-kid="${focusKId}">▶ Начать спринт (2 мин) · <span class="badge-sprint-xp">+15 XP ⚡</span> ➔</button>
         </div>
       </div>
 
@@ -13607,7 +13611,7 @@ viewDashboard = function(){
           </svg>
           <div>
             <div style="font-weight:700;font-size:.86rem;">🔁 Интервальное повторение (SRS)</div>
-            <div class="meta" style="font-size:.76rem;">Повторено колод: <b>${srs.reviewedDecksCount}</b> · ${srs.dueTodayCardsCount > 0 ? `<span style="color:#fb7185;font-weight:700;">🔥 К повторению сегодня: ${srs.dueTodayCardsCount}</span>` : '<span style="color:var(--moss);">✓ На сегодня повторено</span>'} · Сложных карточек: <b>${srs.weakCardsCount}</b> · Закреплено: <b>${srs.masteredCardsCount || 0}</b></div>
+            <div class="meta" style="font-size:.76rem;">Повторено колод: <b>${srs.reviewedDecksCount}</b> · ${srs.dueTodayCardsCount > 0 ? `<span style="color:#fb7185;font-weight:700;">🔥 К повторению сегодня: ${srs.dueTodayCardsCount}</span>` : '<span style="color:var(--moss);font-weight:700;">🌟 Все повторения на сегодня закрыты!</span>'} · Сложных карточек: <b>${srs.weakCardsCount}</b> · Закреплено: <b>${srs.masteredCardsCount || 0}</b></div>
           </div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
@@ -13617,11 +13621,11 @@ viewDashboard = function(){
       </div>
 
       <!-- 4 Interview Stages Switcher & 1-Line Topic Checklist -->
-      <div class="stage-pills">
-        <button class="stage-pill ${dashStage===1?'active':''}" data-dash-stage="1">1. Скрининг <span class="stage-pill__pct">${e1.pct}%</span></button>
-        <button class="stage-pill ${dashStage===2?'active':''}" data-dash-stage="2">2. Стек <span class="stage-pill__pct">${e2.pct}%</span></button>
-        <button class="stage-pill ${dashStage===3?'active':''}" data-dash-stage="3">3. Прод <span class="stage-pill__pct">${e3.pct}%</span></button>
-        <button class="stage-pill ${dashStage===4?'active':''}" data-dash-stage="4">4. Оффер <span class="stage-pill__pct">${e4.pct}%</span></button>
+      <div class="stage-pills" role="tablist" aria-label="Этапы технического собеседования">
+        <button class="stage-pill ${dashStage===1?'active':''}" data-dash-stage="1" role="tab" aria-selected="${dashStage===1}">1. Скрининг <span class="stage-pill__pct">${e1.pct}%</span></button>
+        <button class="stage-pill ${dashStage===2?'active':''}" data-dash-stage="2" role="tab" aria-selected="${dashStage===2}">2. Стек <span class="stage-pill__pct">${e2.pct}%</span></button>
+        <button class="stage-pill ${dashStage===3?'active':''}" data-dash-stage="3" role="tab" aria-selected="${dashStage===3}">3. Прод <span class="stage-pill__pct">${e3.pct}%</span></button>
+        <button class="stage-pill ${dashStage===4?'active':''}" data-dash-stage="4" role="tab" aria-selected="${dashStage===4}">4. Оффер <span class="stage-pill__pct">${e4.pct}%</span></button>
       </div>
 
       <div class="stage-info-bar">
@@ -15116,10 +15120,14 @@ document.addEventListener('click', async function(e){
   }
 
   // Mastery Matrix & Skill actions (Python, Web, Backend, Algorithms, Databases, Architecture, Infrastructure)
+  const drt = e.target.closest('.dash-result-tile');
+  if(drt){ try{ playSound('tick'); }catch(e){} }
+
   const pos = e.target.closest('[data-py-open-skill]');
   if(pos){
     const sid = pos.getAttribute('data-py-open-skill');
     const tr = getTrackForSkill(sid);
+    try{ playSound('tick'); }catch(e){}
     location.hash = '#' + tr.routePrefix + '/skill/' + sid;
     return;
   }
