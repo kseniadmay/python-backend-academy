@@ -533,7 +533,12 @@
   .cd-count{font-weight:800;font-size:.8rem;color:var(--moss);background:var(--emerald-soft);padding:3px 10px;border-radius:999px;border:1px solid rgba(16,185,129,0.28);white-space:nowrap;flex:none;}
   .cd-bar,.cd-bar-track{height:8px;border-radius:999px;background:var(--surface-2);overflow:hidden;border:1px solid var(--line-soft);}
   .cd-fill,.cd-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg, #be123c, #10b981);box-shadow:0 0 12px rgba(16,185,129,0.45);transition:width .4s ease;}
-  .cd-checkpoint-sub{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;font-size:.73rem;color:var(--ink-soft);font-weight:600;}
+  .cd-checkpoint-sub{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;font-size:.73rem;color:rgba(226, 232, 240, 0.72);font-weight:600;}
+  [data-theme="light"] .cd-checkpoint-sub{color:rgba(51, 65, 85, 0.85);}
+  .btn-ghost-quiet{background:transparent !important;color:var(--ink-muted) !important;border:1px solid rgba(148, 163, 184, 0.25) !important;box-shadow:none !important;border-radius:8px;font-size:0.74rem;font-weight:600;padding:4px 9px;display:inline-flex;align-items:center;gap:4px;transition:all 0.2s ease;text-decoration:none;cursor:pointer;}
+  .btn-ghost-quiet:hover{background:rgba(148, 163, 184, 0.12) !important;color:var(--ink) !important;border-color:rgba(148, 163, 184, 0.45) !important;}
+  body.is-dashboard-route .sidebar-foot .btn-quick-start{background:transparent !important;border:1px solid rgba(148, 163, 184, 0.22) !important;color:var(--ink-muted) !important;box-shadow:none !important;opacity:0.68;}
+  body.is-dashboard-route .sidebar-foot .btn-quick-start:hover{opacity:1;background:rgba(148, 163, 184, 0.12) !important;}
 
   .cocoon-focus-card{
     background:linear-gradient(155deg, rgba(16,185,129,0.13), rgba(190,18,60,0.06)), var(--surface);
@@ -12673,7 +12678,7 @@ viewMap = function(){
 
   return `
     <div class="container">
-      <h1 style="margin-bottom:6px;">Карта навыков и Эшелоны собеседования</h1>
+      <h1 style="margin-bottom:6px;">Карта навыков: Матрица компетенций и Эшелоны собеседования</h1>
       <p class="meta" style="margin-bottom:14px;">Единая архитектура: 4 сквозных эшелона приоритета (от 100% обязательного тех-скрининга до архитектурного резерва) синхронизированы с 18 узлами дерева навыков и 45 юнитами в 7 модулях.</p>
       ${modeSwitcherHTML}
       ${buildPriorityRoadmapWidgetHTML({ compact: false })}
@@ -13489,16 +13494,17 @@ viewDashboard = function(){
     : (getFirstUnmasteredSkillInEchelon(activeTierNum) || ALL_PY_SKILLS[0]);
   const focusKId = (focusSk && focusSk.kIds && focusSk.kIds.find(k => !state.readNotes.includes(k))) || (focusSk && focusSk.kIds && focusSk.kIds[0]) || 'К-001';
   const focusNoteObj = ALL_NOTES_COMBINED[focusKId] || { title: focusSk ? focusSk.title : 'Основы Python', steps: [] };
-  const focusStepsCount = (focusNoteObj.steps && focusNoteObj.steps.length) || 3;
-  const focusSid = focusSk ? focusSk.id : null;
+  const focusStepCount = (focusNoteObj.steps && focusNoteObj.steps.length) || 13;
+  const focusSid = focusSk ? focusSk.id : '1.1.1';
 
-  // Вычисляем текущий ранг подготовки
+  // Overall MP & Global Rank calculation
   const totalAllMp = totalPythonMP() + totalWebMP() + totalBackendMP() + totalAlgoMP() + totalDbMP() + totalArchMP() + totalInfraMP();
-  let readinessRank = 'Junior Trainee';
+  let readinessRank = 'Стажёр (Junior 0)';
   let rankIcon = '🌱';
-  if(totalAllMp >= 9000){ readinessRank = 'Junior+ Backend Developer'; rankIcon = '👑'; }
-  else if(totalAllMp >= 6000){ readinessRank = 'Junior Backend Developer'; rankIcon = '⚡'; }
-  else if(totalAllMp >= 3000){ readinessRank = 'Junior Coder'; rankIcon = '🚀'; }
+  if(e1Pct >= 100){ readinessRank = 'Готов к тех-скринингу (Junior 1)'; rankIcon = '🛡️'; }
+  if(e2.pct >= 100){ readinessRank = 'Стек-разработчик (Junior 2)'; rankIcon = '⚔️'; }
+  if(e3.pct >= 100){ readinessRank = 'Прод-разработчик (Junior+)'; rankIcon = '⚡'; }
+  if(e4.pct >= 100){ readinessRank = 'Готов к офферу (Middle)'; rankIcon = '👑'; }
 
   // Spaced Repetition (SRS) Stats & Quick Review Deck Strip
   const srs = getSpacedRepetitionStats();
@@ -13524,8 +13530,12 @@ viewDashboard = function(){
   }).slice(0, 3);
 
   const srsDeckButtons = dueDecks.map(d =>
-    `<a href="#/cards" class="btn btn-ghost" style="padding:4px 9px;font-size:.74rem;border-radius:8px;" title="Повторить колоду ${d.id}">🃏 ${d.id}</a>`
-  ).join('') || `<a href="#/cards" class="btn btn-ghost" style="padding:4px 9px;font-size:.74rem;border-radius:8px;">Все колоды ➔</a>`;
+    `<a href="#/cards" class="btn btn-ghost-quiet" style="padding:4px 9px;font-size:.74rem;border-radius:8px;" title="Повторить колоду ${d.id}">🃏 ${d.id}</a>`
+  ).join('') || `<a href="#/cards" class="btn btn-ghost-quiet" style="padding:4px 9px;font-size:.74rem;border-radius:8px;">Все колоды ➔</a>`;
+
+  const srsBadgeHTML = dueTodayCardsCount > 0
+    ? `<span class="badge" style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.32);color:var(--moss);padding:2px 7px;border-radius:6px;font-size:.72rem;font-weight:700;margin-left:6px;">${dueTodayCardsCount} ${(dueTodayCardsCount % 10 === 1 && dueTodayCardsCount % 100 !== 11) ? 'карточка' : ((dueTodayCardsCount % 10 >= 2 && dueTodayCardsCount % 10 <= 4 && (dueTodayCardsCount % 100 < 10 || dueTodayCardsCount % 100 >= 20)) ? 'карточки' : 'карточек')}</span>`
+    : '';
 
   // Total metrics across all tracks
   const skillsAll = 126;
@@ -13546,53 +13556,18 @@ viewDashboard = function(){
     </div>
   `).join('');
 
-  // 126-Skill Compact Matrix Across All 7 Tracks (Coddy: active tracks first, 0% to 'Ожидает открытия' and folded)
-  const activeTrackRows = [];
-  const dormantTrackRows = [];
-  Object.values(MASTERY_TRACKS).forEach(tr => {
-    const trCurMp = tr.skills.reduce((sum, s) => sum + getSkillMP(s.id), 0);
-    const trMaxMp = Math.max(1, tr.skills.length * 100);
-    const trPct = Math.round(trCurMp / trMaxMp * 100);
-    const sqs = tr.skills.map(s => {
-      const mp = getSkillMP(s.id);
-      const isM = mp >= 100;
-      const isA = mp > 0 && mp < 100;
-      const isFocus = (s.id === focusSid);
-      const focusCls = isFocus ? ' m-sq--focus' : '';
-      return `<a href="#${s.routePrefix}/skill/${s.id}" class="m-sq ${isM ? 'mastered' : (isA ? 'active' : '')}${focusCls}" title="${s.id}: ${s.title} (${mp} MP)${isFocus ? ' · ТЕКУЩИЙ ФОКУС' : ''}"></a>`;
-    }).join('');
-    const statusText = trPct > 0 ? `${trPct}%` : 'Ожидает открытия';
-    const rowHTML = `
-      <div class="dash-skill-row">
-        <a href="#${tr.routePrefix}" class="tr-label" title="Открыть матрицу ${tr.title}">${tr.title}</a>
-        <div class="tr-squares">${sqs}</div>
-        <div class="tr-pct" style="${trPct === 0 ? 'font-size:.72rem;color:var(--ink-muted);font-weight:600;' : ''}">${statusText}</div>
-      </div>
-    `;
-    if(trPct > 0){
-      activeTrackRows.push(rowHTML);
-    } else {
-      dormantTrackRows.push(rowHTML);
-    }
-  });
-
-  const dormantHTML = dormantTrackRows.length > 0 ? `
-    <details class="dash-accordion cocoon-details" style="margin-top:8px;border:none;background:transparent;padding:0;">
-      <summary style="cursor:pointer;font-size:.78rem;color:var(--ink-muted);padding:4px 0;font-weight:600;">Остальные направления (${dormantTrackRows.length}) ▾</summary>
-      <div style="margin-top:6px;">${dormantTrackRows.join('')}</div>
-    </details>
-  ` : '';
-
-  const resultsMatrixHTML = (activeTrackRows.length > 0
-    ? activeTrackRows.join('')
-    : (dormantTrackRows.length > 0 ? dormantTrackRows.slice(0, 1).join('') : ''))
-    + (activeTrackRows.length > 0 ? dormantHTML : (dormantTrackRows.length > 1 ? `
-    <details class="dash-accordion cocoon-details" style="margin-top:8px;border:none;background:transparent;padding:0;">
-      <summary style="cursor:pointer;font-size:.78rem;color:var(--ink-muted);padding:4px 0;font-weight:600;">Остальные направления (${dormantTrackRows.length - 1}) ▾</summary>
-      <div style="margin-top:6px;">${dormantTrackRows.slice(1).join('')}</div>
-    </details>` : ''));
-
   // Mini-list of echelon 1 topics with current focus badge
+  const masteredCount = e1.skills.filter(s => getSkillMP(s.id) >= 100).length;
+  const totalCount = e1.skills.length;
+  let echelonTopicsTitle = '';
+  if (masteredCount > 0) {
+    echelonTopicsTitle = `🐍 Темы Эшелона 1 · Освоено ${masteredCount} из ${totalCount} (${e1Pct}%)`;
+  } else if (e1CurMp > 0) {
+    echelonTopicsTitle = `🐍 Темы Эшелона 1 · В процессе освоения (${e1Pct}% пройдено)`;
+  } else {
+    echelonTopicsTitle = `🐍 Темы Эшелона 1 · Старт освоения`;
+  }
+
   const miniListHTML = e1.skills.map(s => {
     const mp = getSkillMP(s.id);
     const isFocusThis = s.id === focusSid;
@@ -13635,14 +13610,14 @@ viewDashboard = function(){
           <span class="meta">${e1CurMp} / ${e1MaxMp} MP (${e1Pct}%)</span>
         </div>
         <div class="cd-bar cd-bar-track"><div class="cd-fill cd-bar-fill" style="width:${Math.max(6, e1Pct)}%;"></div></div>
-        <div class="cd-checkpoint-sub">Эшелон 1 · Открывает готовность к первому тех-скринингу Junior Python</div>
+        <div class="cd-checkpoint-sub" style="color:rgba(226, 232, 240, 0.72);">Эшелон 1 · Открывает готовность к первому тех-скринингу Junior Python</div>
       </div>
 
       <!-- Active 2-Minute Sprint Focus Card (Single Dominant CTA) -->
       <div class="cocoon-focus-card">
-        <div class="cocoon-focus-eyebrow"><span class="pulse-ring-dot"></span>✨ Фокус сейчас · 2 мин</div>
+        <div class="cocoon-focus-eyebrow"><span class="pulse-ring-dot"></span> ФОКУС СЕЙЧАС · 2 МИН</div>
         <div class="cocoon-focus-title">${focusTitleFormatted}</div>
-        <button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta" data-quick-microstep="">▶ Начать микро-шаг (2 мин) · +15 XP ⚡ ➔</button>
+        <button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta" data-quick-microstep="">► Начать микро-шаг (2 мин) · +15 XP ⚡ ➔</button>
       </div>
 
       <!-- Current Sprint & 7-Day Rhythm Card -->
@@ -13658,69 +13633,66 @@ viewDashboard = function(){
       <!-- Spaced Repetition (SRS) Quick Review Strip -->
       <div class="panel srs-strip-card" style="padding:11px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
         <div style="display:flex;align-items:center;gap:11px;">
-          <svg class="srs-ring-svg" width="38" height="38" viewBox="0 0 38 38" aria-hidden="true" style="transform:none;overflow:visible;">
+          <svg class="srs-ring-svg" width="38" height="38" viewBox="0 0 38 38" aria-hidden="true" style="transform:none;overflow:visible;filter:drop-shadow(0 0 4px rgba(16,185,129,0.3));">
             <circle cx="19" cy="19" r="15" fill="none" stroke="rgba(148,163,184,0.2)" stroke-width="3.5"></circle>
             <circle cx="19" cy="19" r="15" fill="none" stroke="var(--moss)" stroke-width="3.5" stroke-dasharray="${srsRingCircum}" stroke-dashoffset="${srsRingOffset}" transform="rotate(-90 19 19)"></circle>
-            ${isSrsAllDone ? `<text x="19" y="24" text-anchor="middle" font-size="14" font-weight="900" fill="var(--moss)">✓</text>` : ''}
+            ${isSrsAllDone ? `<text x="19" y="24" text-anchor="middle" font-size="14" font-weight="900" fill="var(--moss)">✓</text>` : (dueTodayCardsCount > 0 ? `<text x="19" y="23" text-anchor="middle" font-size="11" font-weight="800" fill="var(--moss)">${dueTodayCardsCount}</text>` : '')}
           </svg>
           <div>
-            <div style="font-weight:700;font-size:.86rem;">🔁 Интервальное повторение (SRS)</div>
+            <div style="font-weight:700;font-size:.86rem;display:flex;align-items:center;gap:4px;">
+              <span>🔁 Интервальное повторение (SRS)</span>
+              ${srsBadgeHTML}
+            </div>
             <div class="meta" style="font-size:.76rem;">${isSrsAllDone ? '<span style="color:var(--moss);font-weight:700;">Все карточки на сегодня повторены ✓</span> · Повторено колод: <b>' + srs.reviewedDecksCount + '</b>' : 'Повторено колод: <b>' + srs.reviewedDecksCount + '</b> · Карточек на закрепление: <b>' + dueTodayCardsCount + '</b>'}</div>
           </div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">${srsDeckButtons}</div>
       </div>
 
-      <!-- Mini-list of Echelon 1 Topics -->
+      <!-- Аккордеон тем текущего эшелона (единственный аккордеон) -->
       <details class="dash-accordion cocoon-details" style="margin-bottom:10px;">
         <summary style="cursor:pointer;font-weight:700;font-size:0.92rem;display:flex;justify-content:space-between;align-items:center;">
-          <span>🐍 Темы Эшелона 1 (${e1.skills.filter(s => getSkillMP(s.id) >= 100).length}/${e1.skills.length} пройдено) ▾</span>
+          <span>${echelonTopicsTitle} ▾</span>
           <span class="link-quiet" style="font-size:.76rem;">Развернуть темы</span>
         </summary>
         <div style="margin-top:10px;">${miniListHTML}</div>
       </details>
 
-      <!-- Collapsible Full 126-Skill Matrix & Tracks Accordion -->
-      <details class="dash-accordion cocoon-details" style="margin-bottom:10px;">
-        <summary>📊 Матрица компетенций и треки (развернуть) ▾</summary>
-        <div class="dash-results-panel-inner" style="padding-top:12px;">
-          <div class="dash-results-head" style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
-            <span style="font-weight:800;font-size:.92rem;color:var(--ink);">📊 Мои результаты</span>
-            <span class="meta">${skillsAll} навыков · ${totalUnitsAll} юнитов · 🔥 ${activeDaysCount} ${(activeDaysCount % 10 === 1 && activeDaysCount % 100 !== 11) ? 'день' : ((activeDaysCount % 10 >= 2 && activeDaysCount % 10 <= 4 && (activeDaysCount % 100 < 10 || activeDaysCount % 100 >= 20)) ? 'дня' : 'дней')} активности</span>
+      <!-- Чистая сводная карточка матрицы компетенций с прямым переходом в #/map -->
+      <div class="panel dash-matrix-summary-card" style="padding:14px 16px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+          <div>
+            <div style="font-weight:700;font-size:.92rem;color:var(--ink);">📊 Мои результаты · Матрица компетенций</div>
+            <div class="meta" style="font-size:.78rem;margin-top:2px;">126 навыков · 47 юнитов · 7 треков платформы</div>
           </div>
-          <div class="dash-result-tiles">
-            ${resultsTilesHTML}
-          </div>
-          <div class="dash-skill-matrix">
-            ${resultsMatrixHTML}
-          </div>
-          <div style="margin-top:12px;text-align:center;">
-            <a href="#/map" class="link-quiet" style="font-size:.82rem;font-weight:700;">🗺️ Открыть полную карту компетенций ➔</a>
-          </div>
+          <a href="#/map" class="btn btn-ghost-quiet" style="font-size:.8rem;padding:6px 12px;font-weight:700;">🗺️ Открыть полную карту ➔</a>
         </div>
-      </details>
+        <div class="dash-result-tiles" style="margin-bottom:0;">
+          ${resultsTilesHTML}
+        </div>
+      </div>
 
-      <!-- Collapsible Drawer for All Modules, Echelons, Pomodoro & Global Stats -->
-      <details class="cocoon-details">
-        <summary>Все модули, эшелоны и статистика ▾</summary>
-        <div style="margin-top:12px;"></div>
-        ${buildPriorityRoadmapWidgetHTML({ compact: true })}
-        <div class="panel" style="margin-bottom:0;">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <h3>⏱ Фокус-спринт (Помодоро)</h3>
-            <button class="link-quiet" data-toggle-zen>${document.body.classList.contains('zen-mode') ? 'Выйти из Дзен' : '🧘 Дзен-режим'}</button>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin:12px 0;">
-            <span id="pomo-time-display" style="font-family:var(--font-d);font-size:2rem;font-weight:700;color:var(--moss-deep);">${formatPomo(pomoState.secondsLeft)}</span>
-            <div style="display:flex;gap:6px;">
-              <button class="btn ${pomoState.running?'btn-clay':'btn-primary'}" style="padding:8px 14px;font-size:.84rem;" data-pomo-toggle>${pomoState.running ? 'Пауза' : 'Старт'}</button>
-              <button class="btn btn-ghost" style="padding:8px 10px;font-size:.8rem;" data-pomo-set="15">15м</button>
-              <button class="btn btn-ghost" style="padding:8px 10px;font-size:.8rem;" data-pomo-set="25">25м</button>
+      <!-- Фокус-спринт (Помодоро) -->
+      <div class="panel" style="margin-bottom:10px;padding:12px 16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:1.15rem;">⏱</span>
+            <div>
+              <div style="font-weight:700;font-size:.86rem;">Фокус-спринт (Помодоро)</div>
+              <div class="meta" style="font-size:.74rem;">+25 XP за завершённый спринт · Звук: <button class="link-quiet" data-toggle-sound style="font-size:.74rem;">${state.soundEnabled ? '🔊 Вкл' : '🔇 Выкл'}</button></div>
             </div>
           </div>
-          <p class="meta" style="margin:0;">Завершённый спринт приносит +25 XP. Звук: <button class="link-quiet" data-toggle-sound>${state.soundEnabled ? '🔊 Вкл' : '🔇 Выкл'}</button></p>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span id="pomo-time-display" style="font-family:var(--font-d);font-size:1.45rem;font-weight:700;color:var(--moss-deep);">${formatPomo(pomoState.secondsLeft)}</span>
+            <div style="display:flex;gap:6px;">
+              <button class="btn ${pomoState.running ? 'btn-clay' : 'btn-ghost-quiet'}" style="padding:6px 12px;font-size:.82rem;" data-pomo-toggle>${pomoState.running ? 'Пауза' : 'Старт'}</button>
+              <button class="btn btn-ghost-quiet" style="padding:6px 8px;font-size:.76rem;" data-pomo-set="15">15м</button>
+              <button class="btn btn-ghost-quiet" style="padding:6px 8px;font-size:.76rem;" data-pomo-set="25">25м</button>
+            </div>
+            <button class="link-quiet" data-toggle-zen style="font-size:.78rem;margin-left:4px;">${document.body.classList.contains('zen-mode') ? 'Выйти из Дзен' : '🧘 Дзен'}</button>
+          </div>
         </div>
-      </details>
+      </div>
 
       <!-- Мотивационная подсказка текущего спринта в нейтральном деликатном тоне -->
       <div style="margin-top:12px;padding:11px 15px;border-radius:14px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.22);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
@@ -13728,12 +13700,11 @@ viewDashboard = function(){
           <span class="badge" style="background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.35);color:var(--moss);padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;">🎯 Текущий спринт</span>
           <span style="font-size:.84rem;color:var(--ink-muted);">Следующий рубеж: завершите Unit 1.1 для перехода к скринингу</span>
         </div>
-        <a href="#/python" class="link-quiet" style="font-size:.78rem;font-weight:600;">Перейти к юниту ➔</a>
+        <a href="#/python" class="link-quiet" style="font-size:.78rem;font-weight:600;color:var(--ink-muted);text-decoration:none;border:none;background:none;padding:0;box-shadow:none;">Перейти к юниту ➔</a>
       </div>
     </div>`;
 };
 
-// Update Navigation items cleanly (1-line labels without redundant parenthetical numbers or duplicate emojis)
 NAV_ITEMS.splice(0, NAV_ITEMS.length,
   {route:'/path', icon:'map', label:'3D-Тропа', shortLabel:'Тропа', mobileTab:true, group:'learn'},
   {route:'/practice', icon:'code', label:'Практика IDE', shortLabel:'IDE', mobileTab:true, group:'trainer'},
@@ -14241,9 +14212,11 @@ render = function(){
   let navRoute = route;
   const isSprintFocus = route.indexOf('/skill/') !== -1 || route.indexOf('/lesson/') === 0;
   const isInteractiveRoute = ['/cards', '/practice', '/mock', '/interview-sim', '/sandbox'].includes(route) || route.indexOf('/boss') !== -1;
+  const isDashboardRoute = (route === '/' || route === '/dashboard' || !route);
   try{
     document.body.classList.toggle('is-sprint-focus', isSprintFocus);
     document.body.classList.toggle('is-interactive-route', isInteractiveRoute);
+    document.body.classList.toggle('is-dashboard-route', isDashboardRoute);
   }catch(e){}
   if(route === '/' || route === '/dashboard'){
     root.innerHTML = viewDashboard();
@@ -14374,9 +14347,8 @@ render = function(){
       }catch(err){}
     }, 60);
   } else if(route === '/map'){
-    // Coddy-ref: один экран «Путь» — карта дублер дашборда; старые ссылки на #/map ведут на результаты
-    root.innerHTML = viewDashboard();
-    navRoute = '/';
+    root.innerHTML = viewMap();
+    navRoute = '/path';
   } else if(route === '/sandbox'){
     root.innerHTML = viewSandbox();
   } else if(route === '/diagnostic' || route === '/lesson/quiz'){
