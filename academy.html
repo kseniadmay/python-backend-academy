@@ -370,13 +370,37 @@
     #bug-report-btn,
     #bug-fab-btn-floating,
     .bug-fab-btn{
-      display:flex !important;
-      bottom:78px !important;
-      right:16px !important;
+      display:inline-flex !important;
+      position:static !important;
+      width:34px !important;
+      height:34px !important;
+      border-radius:10px !important;
+      font-size:1.05rem !important;
+      background:rgba(255,255,255,0.04) !important;
+      border:1px solid rgba(255,255,255,0.12) !important;
+      box-shadow:none !important;
+      margin:0 !important;
+      padding:0 !important;
+      flex-shrink:0 !important;
+      transition:background 0.2s ease, border-color 0.2s ease !important;
+    }
+    .topbar .bug-fab-btn:hover {
+      background:rgba(244,63,94,0.16) !important;
+      border-color:rgba(244,63,94,0.40) !important;
     }
     .dashboard-container {
-      padding-bottom: 96px !important;
+      padding-bottom: 120px !important;
     }
+  }
+  body:has(.dash-accordion[open]) .bug-fab-btn,
+  .dash-accordion[open] ~ .bug-fab-btn {
+    opacity: 0.25 !important;
+    transform: scale(0.85) !important;
+  }
+  body:has(.dash-accordion[open]) .bug-fab-btn:hover,
+  .dash-accordion[open] ~ .bug-fab-btn:hover {
+    opacity: 1 !important;
+    transform: scale(1) !important;
   }
   body.has-jump-btn .bug-fab-btn,
   .path-serpentine-wrap ~ .bug-fab-btn{
@@ -4844,10 +4868,9 @@
     white-space: nowrap !important;
   }
   .dash-accordion-theme-row a {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    display: inline-block;
+    overflow: visible;
+    white-space: normal;
   }
   .cocoon-focus-cta {
     display: flex !important;
@@ -4867,9 +4890,9 @@
   }
   .cocoon-focus-cta-label {
     text-align: left;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
     min-width: 0;
     flex: 1 1 auto;
     font-weight: 800;
@@ -4883,40 +4906,70 @@
   }
   @media (max-width: 640px) {
     .dashboard-container .echelon-topbar-subrow {
-      flex-wrap: nowrap !important;
-      gap: 6px !important;
+      flex-wrap: wrap !important;
+      gap: 8px !important;
+    }
+    .dashboard-container .echelon-subrow-xp {
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
     }
     .dashboard-container .echelon-topbar-actions {
       width: auto !important;
       margin-left: auto !important;
       flex-shrink: 0 !important;
       display: inline-flex !important;
-      gap: 5px !important;
+      align-items: center !important;
+      gap: 6px !important;
     }
     .dashboard-container .echelon-topbar-actions .topbar-help-btn {
-      padding: 5px 8px !important;
-      font-size: 0.74rem !important;
+      padding: 6px 10px !important;
+      font-size: 0.76rem !important;
       gap: 4px !important;
+      min-height: 36px !important;
+      min-width: 36px !important;
+      box-sizing: border-box !important;
+      justify-content: center !important;
     }
-    .dashboard-container .echelon-topbar-actions .topbar-help-text,
-    .dashboard-container .echelon-topbar-actions .topbar-audio-text {
-      font-size: 0.74rem !important;
+  }
+  @media (max-width: 400px) {
+    .dashboard-container .echelon-topbar-subrow {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 8px !important;
+    }
+    .dashboard-container .echelon-topbar-actions {
+      width: 100% !important;
+      margin-left: 0 !important;
+      display: flex !important;
+      gap: 6px !important;
+    }
+    .dashboard-container .echelon-topbar-actions .topbar-help-btn {
+      flex: 1 1 0 !important;
+      min-height: 36px !important;
+      justify-content: center !important;
     }
   }
   @media (max-width: 480px) {
     .cocoon-focus-cta {
       padding: 0 14px !important;
+      min-height: 48px !important;
     }
     .cocoon-focus-cta-label {
-      font-size: 0.88rem !important;
+      font-size: 0.95rem !important;
+      white-space: nowrap !important;
+      overflow: visible !important;
     }
     .cocoon-focus-cta-right {
-      gap: 6px;
-      margin-left: 6px;
+      gap: 6px !important;
+      margin-left: 6px !important;
     }
     .cocoon-focus-cta .btn-reward-badge {
-      font-size: 0.70rem !important;
-      padding: 2px 6px !important;
+      font-size: 0.74rem !important;
+      padding: 3px 7px !important;
+      white-space: nowrap !important;
+    }
+    .cocoon-focus-cta .btn-cta-arrow {
+      font-size: 0.92rem !important;
     }
   }
   .dash-accordion-summary {
@@ -4958,20 +5011,44 @@
   .sidebar-foot .streak-pill {
     display: none !important;
   }
+  .heat-row {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    gap: 4px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin-top: 8px !important;
+  }
   .heat-cell {
-    border-radius: 10px !important;
+    border-radius: 9px !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 4px !important;
-    padding: 6px 4px !important;
-    height: 52px !important;
+    gap: 2px !important;
+    padding: 4px 1px !important;
+    height: 48px !important;
     min-width: 0 !important;
-    flex: 1 !important;
+    width: 100% !important;
     box-sizing: border-box !important;
     position: relative;
     transition: all 0.2s ease;
+  }
+  .heat-cell span:first-child {
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+  }
+  .heat-cell b {
+    font-size: 0.68rem !important;
+    font-weight: 800 !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
+  }
+  .heat-dot {
+    width: 10px !important;
+    height: 3px !important;
+    margin: 1px auto 0 !important;
   }
   .heat-cell.today-start-badge,
   .heat-cell.today-active,
@@ -14408,19 +14485,29 @@ viewDashboard = function(){
     return escapeHtmlStr(cleanT);
   };
 
-  // 1. Темы текущего активного модуля с моноширинными чипсами в названиях и деликатной нумерацией
+  // 1. Темы текущего активного модуля: статусные индикаторы вместо жестких номеров
   const currentUnitThemesHTML = curUnitSkills.map((s, idx) => {
     const mp = getSkillMP(s.id);
     const isFocusThis = s.id === focusSid;
+    const isDoneTheme = mp >= 100;
+    const isLockedTheme = mp === 0 && !isFocusThis;
     const formattedTitle = formatSkillTitleWithChips(s.title, 2);
-    const stepNumberBadge = isFocusThis
-      ? `<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.4);font-size:.70rem;font-weight:700;color:var(--moss);flex-shrink:0;">${idx + 1}</span>`
-      : `<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);font-size:.70rem;font-weight:700;color:var(--ink-muted);flex-shrink:0;">${idx + 1}</span>`;
+    const stepStatusIndicator = isFocusThis
+      ? `<span class="dash-theme-status-icon" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(16,185,129,0.22);border:1px solid rgba(16,185,129,0.45);font-size:.74rem;color:var(--moss);box-shadow:0 0 10px rgba(16,185,129,0.35);flex-shrink:0;" title="Тема в фокусе">✨</span>`
+      : (isDoneTheme
+          ? `<span class="dash-theme-status-icon" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);font-size:.72rem;font-weight:700;color:#34d399;flex-shrink:0;" title="Тема освоена">✓</span>`
+          : (isLockedTheme
+              ? `<span class="dash-theme-status-icon" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);font-size:.72rem;opacity:0.4;flex-shrink:0;" title="Откроется после выполнения предыдущих тем">🔒</span>`
+              : `<span class="dash-theme-status-icon" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.25);font-size:.70rem;color:var(--moss);flex-shrink:0;">●</span>`
+            )
+        );
     return `
       <div class="dash-accordion-theme-row" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:.82rem;">
-        <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto;">
-          ${stepNumberBadge}
-          <a href="#/python/skill/${s.id}" class="link-quiet" style="text-decoration:none;color:inherit;font-weight:600;min-width:0;line-height:1.35;">${formattedTitle}</a>
+        <div class="dash-theme-title-col" style="display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto;">
+          ${stepStatusIndicator}
+          <div class="dash-theme-text-wrap" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;min-width:0;flex:1 1 auto;">
+            <a href="#/python/skill/${s.id}" class="link-quiet dash-theme-link" style="text-decoration:none;color:inherit;font-weight:600;min-width:0;line-height:1.35;">${formattedTitle}</a>
+          </div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:auto;">
           ${isFocusThis
@@ -14450,7 +14537,7 @@ viewDashboard = function(){
   const curSkillIndex = curUnitSkills.findIndex(s => s.id === focusSid);
   const curSkillNum = curSkillIndex >= 0 ? curSkillIndex + 1 : 1;
   const curSkillTotal = curUnitSkills.length || 3;
-  const focusEyebrowText = `ЮНИТ ${activeUnitId} · ТЕМА ${curSkillNum} ИЗ ${curSkillTotal}`;
+  const focusEyebrowText = `${cleanUnitTitle} · В фокусе`;
 
   // Ювелирная цепочка микро-шагов (Continuous Atomic Dots Necklace) для карточки фокуса
   const allKIds = (focusSk && focusSk.kIds) ? focusSk.kIds : ['К-001', 'К-002', 'К-003'];
@@ -14526,12 +14613,18 @@ viewDashboard = function(){
     const savedReading = (state.readingPositions && state.readingPositions[focusSid]) || {};
     const hasAnyRead = (state.readNotes && state.readNotes.length > 0 && state.readNotes.some(k => focusKIds.includes(k)));
     const isStarted = Boolean(hasAnyRead || curKIdx > 0 || (savedReading.stepIdx && savedReading.stepIdx > 0) || (savedReading.chunkIdx && savedReading.chunkIdx > 0));
-    const ctaLabel = isStarted ? 'Продолжить микро-шаг (2 мин)' : 'Начать микро-шаг (2 мин)';
-    focusContextText = `<span class="badge" style="background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);color:#34d399;padding:2px 8px;border-radius:6px;font-size:0.74rem;font-weight:700;display:inline-flex;align-items:center;margin-right:6px;">${bookIconSvg} Теория</span> Шаг ${curKIdx + 1} из ${focusKIds.length} · Быстрый разбор концепций (2 мин)`;
+    const ctaLabel = isStarted ? 'Продолжить (2 мин)' : 'Начать (2 мин)';
+    let stepPhaseName = 'Интуиция и основы';
+    if(curKIdx === 1){
+      stepPhaseName = 'Ключевые нюансы';
+    } else if(curKIdx >= 2){
+      stepPhaseName = 'Закрепление';
+    }
+    focusContextText = `<span class="badge" style="background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);color:#34d399;padding:2px 8px;border-radius:6px;font-size:0.74rem;font-weight:700;display:inline-flex;align-items:center;margin-right:6px;">${bookIconSvg} Теория</span> ${stepPhaseName} · Быстрый разбор (2 мин)`;
     focusCtaHTML = `<div class="focus-cta-wrap"><button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta cocoon-focus-cta" data-quick-microstep="${focusSid}" data-quick-kid="${firstUnreadK}"><span class="cocoon-focus-cta-label">${ctaLabel}</span><span class="cocoon-focus-cta-right"><span class="btn-reward-badge">+15 XP ⚡</span><span class="btn-cta-arrow">➔</span></span></button></div>`;
   } else if(firstUnreviewedF){
     focusContextText = `<span class="badge" style="background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);color:#34d399;padding:2px 8px;border-radius:6px;font-size:0.74rem;font-weight:700;display:inline-flex;align-items:center;margin-right:6px;">📇 Карточки</span> Закрепление темы карточками · Быстрый повтор (2 мин)`;
-    focusCtaHTML = `<div class="focus-cta-wrap"><a href="#/cards" data-srs-open-deck="${firstUnreviewedF}" class="btn-glass-emerald btn-sprint-cta btn-dominant-cta cocoon-focus-cta"><span class="cocoon-focus-cta-label">Повторить карточки темы (2 мин)</span><span class="cocoon-focus-cta-right"><span class="btn-reward-badge">+10 XP ⚡</span><span class="btn-cta-arrow">➔</span></span></a></div>`;
+    focusCtaHTML = `<div class="focus-cta-wrap"><a href="#/cards" data-srs-open-deck="${firstUnreviewedF}" class="btn-glass-emerald btn-sprint-cta btn-dominant-cta cocoon-focus-cta"><span class="cocoon-focus-cta-label">Повторить карточки (2 мин)</span><span class="cocoon-focus-cta-right"><span class="btn-reward-badge">+10 XP ⚡</span><span class="btn-cta-arrow">➔</span></span></a></div>`;
   } else if(firstUnsolvedT){
     focusContextText = `<span class="badge" style="background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);color:#34d399;padding:2px 8px;border-radius:6px;font-size:0.74rem;font-weight:700;display:inline-flex;align-items:center;margin-right:6px;">💻 Практика</span> Практика в редакторе IDE · Решение задачи`;
     focusCtaHTML = `<div class="focus-cta-wrap"><a href="#/practice?task=${firstUnsolvedT}" class="btn-glass-emerald btn-sprint-cta btn-dominant-cta cocoon-focus-cta"><span class="cocoon-focus-cta-label">Решить задачу в IDE</span><span class="cocoon-focus-cta-right"><span class="btn-reward-badge">+15 XP ⚡</span><span class="btn-cta-arrow">➔</span></span></a></div>`;
@@ -14639,14 +14732,16 @@ viewDashboard = function(){
   const remainingGoalSteps = Math.ceil(remainingGoalXp / 15);
   const stepsWord = (remainingGoalSteps === 1) ? 'шаг' : (remainingGoalSteps >= 2 && remainingGoalSteps <= 4 ? 'шага' : 'шагов');
   const goalMicroHintText = remainingGoalSteps > 0
-    ? `⚡ 1 микро-шаг = +15 XP · До цели: <b>${remainingGoalSteps}&nbsp;${stepsWord}</b>`
+    ? (tXp === 0
+        ? `Сделайте первый 2-минутный шаг дня ⚡`
+        : `⚡ 1 микро-шаг = +15 XP · До цели: <b>${remainingGoalSteps}&nbsp;${stepsWord}</b>`)
     : `⚡ Дневная цель выполнена! Отличный темп 🎯`;
 
   // Активный статус в аккордеоне тем без технического префикса «Юнит X.X»
   const curUnitDoneCount = curUnitSkills.filter(s => getSkillMP(s.id) >= 100).length;
   const accordionStatusText = curUnitDoneCount > 0
     ? `${curUnitDoneCount} из ${curUnitTotal} тем закрыто (${curUnitMpPct}% MP)`
-    : `Тема 1 из ${curUnitTotal} · В фокусе`;
+    : `Текущий спринт · В фокусе`;
 
   return `
     <div class="container dashboard-container">
@@ -14661,7 +14756,7 @@ viewDashboard = function(){
         <div class="echelon-topbar-subrow" style="display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;flex-wrap:wrap;">
           <div class="echelon-subrow-xp" style="display:flex;align-items:center;min-width:0;">
             ${todayXp() === 0
-              ? `<span class="day-xp-badge empty-day-badge" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.22);color:#34d399;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="Суточная цель: 50 XP">⚡ Ждёт первого шага · Цель: 50 XP</span>`
+              ? `<span class="day-xp-badge empty-day-badge" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.22);color:#34d399;white-space:nowrap;display:inline-flex;align-items:center;" title="Суточная цель: 50 XP">⚡ Ждёт первого шага · Цель: 50 XP</span>`
               : `<span class="day-xp-badge" style="white-space:nowrap;" title="Заработано за сутки: ${tXp} XP">⚡ +${todayXp()} XP за сутки</span>`
             }
           </div>
@@ -14684,12 +14779,12 @@ viewDashboard = function(){
                   <span class="echelon-label-full">🎯 Старт пути к тех-скринингу</span>
                   <span class="echelon-label-mobile">🎯 Старт пути к тех-скринингу</span>
                 </span>
-                <span class="meta echelon-mp-counter" style="font-size:.78rem;font-weight:700;color:var(--ink);flex-shrink:0;white-space:nowrap;">Юнит 1.1: 0 / 5 тем</span>`
+                <span class="meta echelon-mp-counter" style="font-size:.78rem;font-weight:700;color:var(--ink);flex-shrink:0;white-space:nowrap;">Старт модуля · ${cleanUnitTitle}</span>`
               : `<span class="echelon-readiness-emerald" style="font-weight:700;font-size:.84rem;flex:1 1 auto;min-width:0;">
                   <span class="echelon-label-full">🎯 Готовность к тех-скринингу: ${e1Pct}%</span>
                   <span class="echelon-label-mobile">🎯 Тех-скрининг: ${e1Pct}%</span>
                 </span>
-                <span class="meta echelon-mp-counter" style="font-size:.78rem;font-weight:700;color:var(--ink);flex-shrink:0;white-space:nowrap;">Навыки: ${e1CurMp} / ${e1MaxMp} MP</span>`
+                <span class="meta echelon-mp-counter" style="font-size:.78rem;font-weight:700;color:var(--ink);flex-shrink:0;white-space:nowrap;">Освоено тем: ${curUnitDone} из ${curUnitTotal}</span>`
             }
           </div>
           <div class="echelon-clean-track" style="height:8px;border-radius:999px;background:rgba(255,255,255,0.08);overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,0.4);">
@@ -14725,8 +14820,8 @@ viewDashboard = function(){
         <div class="dash-pulse-card">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
             ${tXp === 0
-              ? `<span style="font-weight:700;font-size:.88rem;color:var(--ink);">🎯 Цель дня: ${dailyGoal} XP · 4 микро-шага</span>
-                 <span class="badge" style="font-weight:800;font-size:.74rem;color:var(--moss);background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25);padding:2px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;">0%</span>`
+              ? `<span style="font-weight:700;font-size:.88rem;color:var(--ink);">🎯 Цель дня: ${dailyGoal} XP</span>
+                 <span class="badge" style="font-weight:800;font-size:.74rem;color:var(--moss);background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25);padding:2px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;">Старт дня</span>`
               : `<span style="font-weight:700;font-size:.88rem;color:var(--ink);">🎯 Дневная цель: ${tXp} / ${dailyGoal} XP (${goalPct}%)</span>
                  <span style="font-weight:800;font-size:.82rem;color:var(--moss);">${goalPct}%</span>`
             }
@@ -14770,15 +14865,15 @@ viewDashboard = function(){
             ${dueTodayCardsCount > 0
               ? `<div style="display:flex;justify-content:flex-end;"><a href="#/cards" ${targetDeckId ? `data-srs-open-deck="${targetDeckId}"` : ''} class="btn-ghost-quiet btn-srs-quiet" style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;font-weight:600;font-size:.80rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:var(--ink-muted);text-decoration:none;transition:all .2s ease;">Повторить (2 мин) ➔</a></div>`
               : (!hasReviewedAnyCard
-                  ? `<div class="srs-locked-preview" title="Откроется автоматически после завершения теории" style="display:flex;align-items:center;justify-content:space-between;padding:6px 12px;border-radius:10px;margin-top:auto;">
-                      <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+                  ? `<div class="srs-locked-preview" title="Откроется автоматически после завершения теории" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 12px;border-radius:10px;margin-top:auto;">
+                      <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 auto;">
                         <span style="font-size:1rem;flex-shrink:0;">📇</span>
-                        <div style="font-size:0.75rem;color:var(--ink-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                          <span style="font-weight:600;color:var(--ink);">Карточки темы · 15 шт</span>
-                          <span style="opacity:0.75;"> (откроются после теории)</span>
+                        <div style="font-size:0.75rem;color:var(--ink-muted);line-height:1.35;">
+                          <span style="font-weight:600;color:var(--ink);">Флеш-колода темы</span>
+                          <span style="opacity:0.75;"> (откроется после разбора теории)</span>
                         </div>
                       </div>
-                      <span class="badge" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--ink-muted);font-size:0.68rem;padding:2px 7px;border-radius:6px;font-weight:600;flex-shrink:0;">🔒 +10 XP</span>
+                      <span class="badge" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--ink-muted);font-size:0.68rem;padding:2px 7px;border-radius:6px;font-weight:600;flex-shrink:0;white-space:nowrap;">🔒 +10 XP</span>
                     </div>`
                   : `<div style="display:flex;justify-content:flex-end;"><a href="#/cards" class="btn-srs-pill link-quiet text-muted">Обзор колод ➔</a></div>`
                 )
@@ -14856,7 +14951,7 @@ renderNav = function(){
       <div class="nav-group-label">Обучение</div>
       ${learnLinks}
       <details class="nav-modules-accordion">
-        <summary class="nav-modules-summary"><span>📚 Модули 01–07</span>${modulesPctBadge}</summary>
+        <summary class="nav-modules-summary"><span>📚 Карта модулей</span>${modulesPctBadge}</summary>
         <div class="nav-modules-list">${modLinks}</div>
       </details>
       <div class="nav-group-label">Тренажёры</div>
@@ -15150,7 +15245,7 @@ window.closeSettingsModal = closeSettingsModal;
 // Removed duplicate top bug button per user request 13
     }
   }
-  // Mobile Floating Ladybug Quick Button (FAB)
+  // Mobile Floating Ladybug Quick Button (FAB / Topbar on mobile)
   if(!document.getElementById('bug-fab-btn-floating') && !document.getElementById('bug-report-btn')){
     const fab = document.createElement('button');
     fab.id = 'bug-report-btn';
@@ -15160,6 +15255,26 @@ window.closeSettingsModal = closeSettingsModal;
     fab.setAttribute('title', 'Сообщить о баге (Alt+B)');
     fab.innerHTML = '🐞';
     document.body.appendChild(fab);
+  }
+  const syncFabPlacement = function(){
+    const fab = document.getElementById('bug-report-btn') || document.getElementById('bug-fab-btn-floating');
+    const tb = document.querySelector('.topbar');
+    const tbRight = tb && tb.querySelector('div[style*="display:flex"]');
+    if(!fab) return;
+    if(window.innerWidth <= 880 && tbRight){
+      if(fab.parentElement !== tbRight){
+        tbRight.insertBefore(fab, tbRight.firstChild);
+      }
+    } else {
+      if(fab.parentElement !== document.body){
+        document.body.appendChild(fab);
+      }
+    }
+  };
+  syncFabPlacement();
+  if(!window.__fabResizeBound){
+    window.__fabResizeBound = true;
+    window.addEventListener('resize', syncFabPlacement);
   }
   // Global Hotkey (быстрая клавиша Alt+B, Ctrl+Shift+B, или B вне полей ввода)
   if(!window.__bugHotkeyBound){
