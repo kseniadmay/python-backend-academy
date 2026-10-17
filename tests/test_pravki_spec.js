@@ -80,7 +80,7 @@ assert(academyHtml.includes('@media (max-width:880px)') || academyHtml.includes(
 console.log('✓ 5. Desktop Sidebar Invariant: левое меню платформы сохраняется на всех экранах');
 
 // 6. Академия: Инварианты Дашборда (Single Focus, Coddy/Duolingo Topbar, Friendly SRS Empty State, Clean Accordion)
-assert(academyHtml.includes('⚡ Ждёт первого шага · Цель: 50 XP'), 'Dashboard topbar must show friendly zero-balance badge');
+assert(academyHtml.includes('⚡ Ждёт первого шага · Цель: 50 XP') || academyHtml.includes('⚡ Ждёт первого шага · Цель:&nbsp;50&nbsp;XP'), 'Dashboard topbar must show friendly zero-balance badge');
 assert(!academyHtml.includes('⚡ 0 / ${dailyGoal} XP за сутки'), 'Dashboard topbar must not show demotivating 0/50 XP text');
 assert(academyHtml.includes('· +10 XP') || academyHtml.includes('🔒 +10 XP после теории') || academyHtml.includes('+10 XP при открытии'), 'SRS locked card must show friendly +10 XP badge');
 assert(academyHtml.includes('🌱 Откроется после 3 шагов теории') || academyHtml.includes('🌱 Активация через 3 шага теории'), 'SRS status badge must show friendly activation badge');

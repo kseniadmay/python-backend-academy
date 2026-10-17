@@ -4446,6 +4446,7 @@
     text-decoration: none;
     user-select: none;
     -webkit-user-select: none;
+    touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
     transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.14s ease, filter 0.14s ease !important;
   }
@@ -5462,6 +5463,17 @@
   @media (max-width: 480px) {
     .srs-act-text-desk { display: none !important; }
     .srs-act-text-mob { display: inline !important; }
+    .dashboard-container .dot-jewel {
+      position: relative;
+    }
+    .dashboard-container .dot-jewel::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      bottom: -8px;
+      left: -6px;
+      right: -6px;
+    }
     .cocoon-focus-cta {
       padding: 0 14px !important;
       min-height: 48px !important;
@@ -16099,18 +16111,18 @@ viewDashboard = function(){
     }
     const currentStepNum = curKIdx + 1;
     focusContextText = `<span class="badge" style="background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);color:#34d399;padding:2px 8px;border-radius:6px;font-size:0.74rem;font-weight:700;display:inline-flex;align-items:center;margin-right:6px;">📖 Теория</span> Шаг ${currentStepNum} из 13 (${stepPhaseName})`;
-    focusCtaHTML = `<div class="focus-cta-wrap"><button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta cocoon-focus-cta" data-quick-microstep="${focusSid}" data-quick-kid="${firstUnreadK}"><span class="cocoon-focus-cta-label">${ctaLabel}</span><span class="cocoon-focus-cta-right"><span class="btn-reward-badge">+15 XP ⚡</span><span class="btn-cta-arrow">➔</span></span></button></div>`;
+    focusCtaHTML = `<div class="focus-cta-wrap"><button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta cocoon-focus-cta" data-quick-microstep="${focusSid}" data-quick-kid="${firstUnreadK}"><span class="cocoon-focus-cta-label">${ctaLabel}</span><span class="cocoon-focus-cta-right"><span class="btn-reward-badge">+15&nbsp;XP ⚡</span><span class="btn-cta-arrow">➔</span></span></button></div>`;
   } else if(firstUnreviewedF){
     const cardStepNum = focusKIds.length + curFIdx + 1;
     focusContextText = `<span class="badge" style="background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);color:#34d399;padding:2px 8px;border-radius:6px;font-size:0.74rem;font-weight:700;display:inline-flex;align-items:center;margin-right:6px;">📇 Карточки</span> Шаг ${cardStepNum} из 13 · Закрепление темы карточками`;
-    focusCtaHTML = `<div class="focus-cta-wrap"><a href="#/cards" data-srs-open-deck="${firstUnreviewedF}" class="btn-glass-emerald btn-sprint-cta btn-dominant-cta cocoon-focus-cta"><span class="cocoon-focus-cta-label">Повторить карточки (2 мин)</span><span class="cocoon-focus-cta-right"><span class="btn-reward-badge">+10 XP ⚡</span><span class="btn-cta-arrow">➔</span></span></a></div>`;
+    focusCtaHTML = `<div class="focus-cta-wrap"><a href="#/cards" data-srs-open-deck="${firstUnreviewedF}" class="btn-glass-emerald btn-sprint-cta btn-dominant-cta cocoon-focus-cta"><span class="cocoon-focus-cta-label">Повторить карточки (2 мин)</span><span class="cocoon-focus-cta-right"><span class="btn-reward-badge">+10&nbsp;XP ⚡</span><span class="btn-cta-arrow">➔</span></span></a></div>`;
   } else if(firstUnsolvedT){
     const practiceStepNum = focusKIds.length + cardList.length + curTIdx + 1;
     focusContextText = `<span class="badge" style="background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);color:#34d399;padding:2px 8px;border-radius:6px;font-size:0.74rem;font-weight:700;display:inline-flex;align-items:center;margin-right:6px;">💻 Практика</span> Шаг ${practiceStepNum} из 13 · Практика в редакторе IDE`;
-    focusCtaHTML = `<div class="focus-cta-wrap"><a href="#/practice?task=${firstUnsolvedT}" class="btn-glass-emerald btn-sprint-cta btn-dominant-cta cocoon-focus-cta"><span class="cocoon-focus-cta-label">Решить задачу в IDE</span><span class="cocoon-focus-cta-right"><span class="btn-reward-badge">+15 XP ⚡</span><span class="btn-cta-arrow">➔</span></span></a></div>`;
+    focusCtaHTML = `<div class="focus-cta-wrap"><a href="#/practice?task=${firstUnsolvedT}" class="btn-glass-emerald btn-sprint-cta btn-dominant-cta cocoon-focus-cta"><span class="cocoon-focus-cta-label">Решить задачу в IDE</span><span class="cocoon-focus-cta-right"><span class="btn-reward-badge">+15&nbsp;XP ⚡</span><span class="btn-cta-arrow">➔</span></span></a></div>`;
   } else {
     focusContextText = `<span class="badge" style="background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);color:#34d399;padding:2px 8px;border-radius:6px;font-size:0.74rem;font-weight:700;display:inline-flex;align-items:center;margin-right:6px;">🧪 Зачёт</span> Шаг 13 из 13 · Рубежный тест открыт`;
-    focusCtaHTML = `<div class="focus-cta-wrap"><button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta cocoon-focus-cta" data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}"><span class="cocoon-focus-cta-label">Начать рубежный тест</span><span class="cocoon-focus-cta-right"><span class="btn-reward-badge">+50 XP ⚡</span><span class="btn-cta-arrow">➔</span></span></button></div>`;
+    focusCtaHTML = `<div class="focus-cta-wrap"><button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta cocoon-focus-cta" data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}"><span class="cocoon-focus-cta-label">Начать рубежный тест</span><span class="cocoon-focus-cta-right"><span class="btn-reward-badge">+50&nbsp;XP ⚡</span><span class="btn-cta-arrow">➔</span></span></button></div>`;
   }
 
   // 1. Точки Кластера «Теория»
@@ -16288,8 +16300,8 @@ viewDashboard = function(){
         <div class="echelon-topbar-subrow" style="display:flex;align-items:center;width:100%;">
           <div class="echelon-subrow-xp" style="display:flex;align-items:center;min-width:0;">
             ${todayXp() === 0
-              ? `<span class="day-xp-badge empty-day-badge" style="background:rgba(245, 158, 11, 0.10);border:1px solid rgba(245, 158, 11, 0.28);color:#fbbf24;white-space:nowrap;display:inline-flex;align-items:center;" title="Суточная цель: 50 XP">⚡ Ждёт первого шага · Цель: 50 XP</span>`
-              : `<span class="day-xp-badge" style="white-space:nowrap;" title="Заработано за сутки: ${tXp} XP">⚡ +${todayXp()} XP за сутки</span>`
+              ? `<span class="day-xp-badge empty-day-badge" style="background:rgba(245, 158, 11, 0.10);border:1px solid rgba(245, 158, 11, 0.28);color:#fbbf24;white-space:nowrap;display:inline-flex;align-items:center;" title="Суточная цель: 50 XP">⚡ Ждёт первого шага · Цель:&nbsp;50&nbsp;XP</span>`
+              : `<span class="day-xp-badge" style="white-space:nowrap;" title="Заработано за сутки: ${tXp} XP">⚡ +${todayXp()}&nbsp;XP за сутки</span>`
             }
           </div>
         </div>
@@ -16389,7 +16401,8 @@ viewDashboard = function(){
                           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 4px 0;font-size:.74rem;">
                             <span style="color:var(--ink-muted);font-size:.74rem;display:inline-flex;align-items:center;gap:5px;" title="🌱 Откроется после 3 шагов теории · +10 XP">
                               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;flex-shrink:0;filter:drop-shadow(0 0 4px rgba(16,185,129,0.5));"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
-                              <span>Откроется после 3 шагов теории (+10 XP)</span>
+                              <span class="srs-act-text-desk">Откроется после 3 шагов теории (+10&nbsp;XP)</span>
+<span class="srs-act-text-mob">После 3 шагов теории (+10&nbsp;XP)</span>
                             </span>
                             <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.03);padding:2px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);">
                               <span style="font-size:0.70rem;color:var(--ink-muted);">${theoryDoneCount}/3</span>
