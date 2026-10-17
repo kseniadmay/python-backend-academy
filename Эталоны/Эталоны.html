@@ -330,10 +330,12 @@
   .topbar-pomo-pill:hover{border-color:var(--moss);transform:translateY(-1px);}
   .topbar-pomo-pill.is-running{background:var(--emerald-soft);border-color:var(--emerald);color:var(--moss-deep);}
       /* ---------- Section 1.1 & 9.1: Global Topbar Pomodoro Pill & Bug Button (Mobile Tactile FAB & Hotkey) ---------- */
+  #bug-report-btn,
+  #bug-fab-btn-floating,
   .bug-fab-btn{
     position:fixed;
-    bottom:calc(74px + env(safe-area-inset-bottom, 12px));
-    right:16px;
+    bottom:74px;
+    right:14px;
     z-index:90;
     width:42px;
     height:42px;
@@ -365,7 +367,13 @@
     transform:translateY(1px) scale(0.95);
   }
   @media (max-width: 880px){
-    .bug-fab-btn{display:flex !important;}
+    #bug-report-btn,
+    #bug-fab-btn-floating,
+    .bug-fab-btn{
+      display:flex !important;
+      bottom:74px !important;
+      right:14px !important;
+    }
   }
   body.has-jump-btn .bug-fab-btn,
   .path-serpentine-wrap ~ .bug-fab-btn{
@@ -1797,9 +1805,19 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
     font-size: 0.76rem;
     font-weight: 400;
-    white-space: nowrap;
+    width: 100%;
+  }
+  .echelon-clean-meta .echelon-label-full { display: inline; }
+  .echelon-clean-meta .echelon-label-mobile { display: none; }
+  .echelon-clean-meta .echelon-mp-counter { flex-shrink: 0; white-space: nowrap; }
+
+  @media (max-width: 420px) {
+    .echelon-clean-meta .echelon-label-full { display: none !important; }
+    .echelon-clean-meta .echelon-label-mobile { display: inline !important; }
   }
   .echelon-clean-track {
     height: 6px;
@@ -4547,6 +4565,67 @@
     margin: 12px 0 16px;
     padding: 6px 4px;
     box-sizing: border-box;
+  }
+  @media (max-width: 480px) {
+    .tracker-clusters-wrap {
+      gap: 4px !important;
+      padding: 4px 0 !important;
+      justify-content: space-between !important;
+    }
+    .tracker-cluster {
+      gap: 4px !important;
+    }
+    .tracker-cluster-label {
+      font-size: 0.72rem !important;
+    }
+    .tracker-cluster-label .cluster-label-text {
+      display: none !important;
+    }
+    .tracker-cluster-dots {
+      gap: 4px !important;
+    }
+    .dots-phase-divider {
+      height: 16px !important;
+      margin: 0 2px !important;
+    }
+    .focus-mini-track .dot-jewel,
+    .tracker-cluster-dots .dot-jewel {
+      width: 8px !important;
+      height: 8px !important;
+    }
+    .focus-mini-track .dot-jewel.active,
+    .tracker-cluster-dots .dot-jewel.active {
+      width: 10px !important;
+      height: 10px !important;
+    }
+    .focus-mini-track .dot-jewel.milestone,
+    .tracker-cluster-dots .dot-jewel.milestone {
+      width: 8px !important;
+      height: 8px !important;
+    }
+    .focus-mini-track .dot-jewel.milestone.active,
+    .tracker-cluster-dots .dot-jewel.milestone.active {
+      width: 10px !important;
+      height: 10px !important;
+    }
+  }
+  @media (max-width: 400px) {
+    .topbar-help-text,
+    .topbar-audio-text {
+      display: none !important;
+    }
+  }
+  .btn-srs-quiet {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    color: var(--ink-muted) !important;
+    transition: all 0.2s ease !important;
+  }
+  .btn-srs-quiet:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    color: var(--ink) !important;
+    transform: translateY(-1px);
   }
   .tracker-cluster {
     display: flex;
@@ -14180,12 +14259,7 @@ viewDashboard = function(){
   const focusKId = (focusSk && focusSk.kIds && focusSk.kIds.find(k => !state.readNotes.includes(k))) || (focusSk && focusSk.kIds && focusSk.kIds[0]) || 'К-001';
   const focusSid = focusSk ? focusSk.id : '1.1.1';
 
-  // Чистое название темы без скобок параметров
-  const cleanTitle = (focusSk && focusSk.title)
-    ? focusSk.title.replace(/\s*\([^)]*\)\s*$/, '').trim()
-    : 'Базовые коллекции и срезы';
-
-  // Звание и статус готовности к интервью с благородным градиентом бордо и золотистым отливом
+  // Звание и статус готовности к интервью
   let readinessRank = 'Стажёр (Junior 0)';
   let rankIcon = '🌱';
   if(e1Pct >= 100){ readinessRank = 'Готов к тех-скринингу (Junior 1)'; rankIcon = '🛡️'; }
@@ -14229,11 +14303,17 @@ viewDashboard = function(){
 
   // Название активного юнита без технического префикса «Юнит X.X ·»
   const rawUnitTitle = (activeUnit && activeUnit.title) || 'Базовый синтаксис';
-  const cleanUnitTitle = rawUnitTitle.replace(/^Юнит\s+[\d.]+\s*[:·•\-]\s*/i, '').trim();
+  const cleanUnitTitle = rawUnitTitle.replace(/^Юнит\s+[\d.]+\s*[:·•\-]\s*/i, '').replace(/^[·•\-]\s*/, '').trim();
+
+  // Чистое название фокусной темы без технических префиксов и скобок параметров
+  const cleanTitle = (focusSk && focusSk.title)
+    ? String(focusSk.title).replace(/^[\d.]+\s*[:·•\-]\s*/i, '').replace(/^[·•\-]\s*/, '').replace(/\s*\([^)]*\)\s*$/, '').trim()
+    : 'Базовые коллекции и срезы';
 
   // Вспомогательная функция для оборачивания синтаксических терминов в моноширинные чипсы (макс. 3-4 ключевых тега)
   const formatSkillTitleWithChips = (title) => {
-    const ftMatch = String(title || '').match(/^(.*?)\s*\(([^()]*)\)\s*$/);
+    const cleanT = String(title || '').replace(/^[\d.]+\s*[:·•\-]\s*/i, '').replace(/^[·•\-]\s*/, '').trim();
+    const ftMatch = cleanT.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
     if(ftMatch){
       const rawTokens = ftMatch[2].split(',').map(tok => tok.trim()).filter(Boolean);
       const conceptTokens = rawTokens.slice(0, 4);
@@ -14242,7 +14322,7 @@ viewDashboard = function(){
       }).join(' ');
       return `${escapeHtmlStr(ftMatch[1])} <span class="focus-chips-wrap" style="margin-left:4px;">${conceptChips}</span>`;
     }
-    return escapeHtmlStr(title);
+    return escapeHtmlStr(cleanT);
   };
 
   // 1. Темы текущего активного модуля с моноширинными чипсами в названиях и деликатной нумерацией
@@ -14251,21 +14331,22 @@ viewDashboard = function(){
     const isFocusThis = s.id === focusSid;
     const formattedTitle = formatSkillTitleWithChips(s.title);
     const stepNumberBadge = isFocusThis
-      ? `<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.4);font-size:.70rem;font-weight:700;color:var(--moss);flex-shrink:0;">${idx + 1}</span>`
-      : `<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);font-size:.70rem;font-weight:700;color:var(--ink-muted);flex-shrink:0;">${idx + 1}</span>`;
+      ? `<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.4);font-size:.70rem;font-weight:700;color:var(--moss);flex-shrink:0;">${idx + 1}</span>`
+      : `<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);font-size:.70rem;font-weight:700;color:var(--ink-muted);flex-shrink:0;">${idx + 1}</span>`;
     return `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:.82rem;">
-        <span style="font-weight:600;display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <a href="#/python/skill/${s.id}" class="link-quiet" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;">${stepNumberBadge} ${formattedTitle}</a>
-        </span>
-        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+      <div class="dash-accordion-theme-row" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:.82rem;">
+        <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto;">
+          ${stepNumberBadge}
+          <a href="#/python/skill/${s.id}" class="link-quiet" style="text-decoration:none;color:inherit;font-weight:600;min-width:0;line-height:1.35;">${formattedTitle}</a>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:auto;">
           ${isFocusThis
-            ? `<span class="badge" style="background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.35);color:var(--moss);padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;">✨ В фокусе</span>`
+            ? `<span class="badge" style="background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.35);color:var(--moss);padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;white-space:nowrap;">✨ В фокусе</span>`
             : (mp === 100
-                ? `<span class="state-tag state-tag--mastered" style="font-size:.70rem;margin:0;">✓ 100 MP</span>`
+                ? `<span class="state-tag state-tag--mastered" style="font-size:.70rem;margin:0;white-space:nowrap;">✓ 100 MP</span>`
                 : (mp === 0
                     ? `<span class="meta" style="font-size:.78rem;opacity:0.4;display:inline-flex;align-items:center;" title="Откроется после выполнения предыдущих тем"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>`
-                    : `<span class="meta" style="font-size:.72rem;">${mp} MP</span>`
+                    : `<span class="meta" style="font-size:.72rem;white-space:nowrap;">${mp} MP</span>`
                   )
               )
           }
@@ -14282,31 +14363,80 @@ viewDashboard = function(){
     focusTitleFormatted = 'Базовые коллекции и срезы';
   }
 
-  const unreadCount = (focusSk && focusSk.kIds) ? focusSk.kIds.filter(k => !state.readNotes.includes(k)).length : 0;
-  const isTheoryDone = unreadCount === 0;
+  // Индекс активной темы в текущем модуле для надзаголовка
+  const curSkillIndex = curUnitSkills.findIndex(s => s.id === focusSid);
+  const curSkillNum = curSkillIndex >= 0 ? curSkillIndex + 1 : 1;
+  const curSkillTotal = curUnitSkills.length || 3;
+  const focusEyebrowText = `ЮНИТ ${activeUnitId} · ТЕМА ${curSkillNum} ИЗ ${curSkillTotal}`;
 
   // Ювелирная цепочка микро-шагов (Continuous Atomic Dots Necklace) для карточки фокуса
-  const focusKIds = (focusSk && focusSk.kIds) ? focusSk.kIds : ['К-001', 'К-002', 'К-003'];
-  const focusFIds = (focusSk && focusSk.fIds) ? focusSk.fIds : ['Ф-001', 'Ф-002', 'Ф-003'];
-  const focusTIds = (focusSk && focusSk.taskIds && focusSk.taskIds.length) ? focusSk.taskIds : [20, 19, 39];
+  const allKIds = (focusSk && focusSk.kIds) ? focusSk.kIds : ['К-001', 'К-002', 'К-003'];
+  const focusKIds = allKIds.length > 5 ? allKIds.slice(0, 5) : allKIds;
+
+  // Формирование списка карточек темы (3-4 ключевых сессии)
+  let cardList = [];
+  if(focusSid === '1.1.1' || activeUnitId === '1.1'){
+    const defaultF = (focusSk && focusSk.fIds) ? focusSk.fIds : ['Ф-001', 'Ф-002', 'Ф-003'];
+    cardList = [
+      { id: defaultF[0] || 'Ф-001', title: 'Карточки: list & tuple' },
+      { id: defaultF[1] || 'Ф-002', title: 'Карточки: срезы и память' },
+      { id: defaultF[2] || 'Ф-003', title: 'Карточки: comprehensions' }
+    ];
+  } else {
+    const rawFIds = (focusSk && focusSk.fIds && focusSk.fIds.length)
+      ? focusSk.fIds
+      : ((focusSk && focusSk.deckIds && focusSk.deckIds.length) ? focusSk.deckIds : ['Ф-001', 'Ф-002', 'Ф-003']);
+    const curFList = rawFIds.length > 4 ? rawFIds.slice(0, 4) : rawFIds;
+    cardList = curFList.map(fId => {
+      const d = (typeof ALL_DECKS_COMBINED !== 'undefined' && ALL_DECKS_COMBINED[fId]) || {};
+      const t = (d.title || fId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
+      return { id: fId, title: `Карточки: ${t}` };
+    });
+  }
+  const focusFIds = cardList.map(c => c.id);
+
+  // Формирование списка задач практики (до 4 ключевых задач для непрерывной нити 13 бусин)
+  const allTIds = (focusSk && focusSk.taskIds && focusSk.taskIds.length) ? focusSk.taskIds : [20, 19, 39];
+  const firstUnsolvedTIdx = allTIds.findIndex(t => !(state.taskCodeHistory && state.taskCodeHistory[t]));
+  const startT = firstUnsolvedTIdx === -1 ? Math.max(0, allTIds.length - 4) : Math.min(Math.max(0, firstUnsolvedTIdx), Math.max(0, allTIds.length - 4));
+  const focusTIds = allTIds.length > 5 ? allTIds.slice(startT, startT + 4) : allTIds;
+
   const isUnitExamPassed = Boolean(state.unitTests && state.unitTests[activeUnitId]);
 
+  // Определение активных элементов по фазам
   const firstUnreadK = focusKIds.find(k => !state.readNotes.includes(k));
-  const firstUnreviewedF = !firstUnreadK ? focusFIds.find(f => !state.reviewedDecks.includes(f)) : null;
+  const firstUnreviewedF = !firstUnreadK ? (cardList.find(c => !state.reviewedDecks.includes(c.id))?.id || null) : null;
   const firstUnsolvedT = (!firstUnreadK && !firstUnreviewedF) ? focusTIds.find(t => !(state.taskCodeHistory && state.taskCodeHistory[t])) : null;
   const isAllPreExamDone = !firstUnreadK && !firstUnreviewedF && !firstUnsolvedT;
 
   const curKIdx = firstUnreadK ? focusKIds.indexOf(firstUnreadK) : focusKIds.length;
-  const curFIdx = firstUnreviewedF ? focusFIds.indexOf(firstUnreviewedF) : focusFIds.length;
+  const curFIdx = firstUnreviewedF ? cardList.findIndex(c => c.id === firstUnreviewedF) : cardList.length;
   const curTIdx = firstUnsolvedT ? focusTIds.indexOf(firstUnsolvedT) : focusTIds.length;
+
+  // Определение единого глобального индекса активного шага:
+  // [0 .. focusKIds.length - 1] -> теория
+  // [focusKIds.length .. focusKIds.length + cardList.length - 1] -> карточки
+  // [focusKIds.length + cardList.length .. + focusTIds.length - 1] -> практика
+  // [последний индекс] -> зачёт
+  let activeGlobalStepIdx = -1;
+  if(firstUnreadK){
+    activeGlobalStepIdx = curKIdx;
+  } else if(firstUnreviewedF){
+    activeGlobalStepIdx = focusKIds.length + curFIdx;
+  } else if(firstUnsolvedT){
+    activeGlobalStepIdx = focusKIds.length + cardList.length + curTIdx;
+  } else if(!isUnitExamPassed){
+    activeGlobalStepIdx = focusKIds.length + cardList.length + focusTIds.length;
+  } else {
+    activeGlobalStepIdx = 9999; // Все выполнено
+  }
 
   const focusTr = focusSk ? getTrackForSkill(focusSk.id) : null;
   const focusTrackKey = (focusTr && focusTr.key) || 'python';
 
-  // Чистый SVG-символ книги для устранения сломанного глифа перед конспектом
+  // Чистый SVG-символ книги
   const bookIconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>`;
 
-  // Честный сквозной пайплайн фокуса без технических кодов и с чистыми формулировками
   let focusContextText = '';
   let focusCtaHTML = '';
   if(firstUnreadK){
@@ -14323,45 +14453,29 @@ viewDashboard = function(){
     focusCtaHTML = `<div class="focus-cta-wrap"><button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta" data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}"><span>Начать рубежный тест</span><span class="btn-reward-badge">+50 XP ⚡</span><span class="btn-cta-arrow">➔</span></button></div>`;
   }
 
-  // 1. Точки Кластера «Теория» (чистый тултип без технического префикса «Конспект N:»)
+  // 1. Точки Кластера «Теория»
   const theoryDots = [];
   focusKIds.forEach((kId, idx) => {
-    const isDone = state.readNotes.includes(kId);
-    const isActive = Boolean(firstUnreadK && firstUnreadK === kId);
+    const globalIdx = idx;
+    const isDone = isUnitExamPassed || (globalIdx < activeGlobalStepIdx);
+    const isActive = (globalIdx === activeGlobalStepIdx);
     const cls = isDone ? 'done' : (isActive ? 'active' : '');
     const n = (typeof ALL_NOTES_COMBINED !== 'undefined' && ALL_NOTES_COMBINED[kId]) || { title: kId };
     const title = (n.title || kId).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
     theoryDots.push(`<span class="dot-jewel ${cls}" title="Теория: ${escapeHtmlStr(title)}" data-quick-microstep="${focusSid}" data-quick-kid="${kId}"></span>`);
   });
 
-  // 2. Точки Кластера «Карточки» (лаконичная подпись «📇 Карточки» без чисел в скобках)
-  // Точки карточек могут становиться .active ТОЛЬКО когда вся теория пройдена (!firstUnreadK) и есть неповторенная колода (firstUnreviewedF)
+  // 2. Точки Кластера «Карточки»
   const cardDots = [];
-  if(focusSid === '1.1.1' || activeUnitId === '1.1'){
-    const cardSessions = [
-      { id: focusFIds[0] || 'Ф-001', title: 'Карточки: list & tuple' },
-      { id: focusFIds[1] || 'Ф-002', title: 'Карточки: срезы и память' },
-      { id: focusFIds[2] || 'Ф-003', title: 'Карточки: comprehensions' }
-    ];
-    cardSessions.forEach((s, idx) => {
-      const isDone = state.reviewedDecks.includes(s.id);
-      const isActive = Boolean(!firstUnreadK && firstUnreviewedF === s.id);
-      const cls = isDone ? 'done' : (isActive ? 'active' : '');
-      cardDots.push(`<span class="dot-jewel ${cls}" title="${escapeHtmlStr(s.title)}" data-srs-open-deck="${s.id}"></span>`);
-    });
-  } else {
-    focusFIds.forEach((fId, idx) => {
-      const isDone = state.reviewedDecks.includes(fId);
-      const isActive = Boolean(!firstUnreadK && firstUnreviewedF === fId);
-      const cls = isDone ? 'done' : (isActive ? 'active' : '');
-      const d = (typeof ALL_DECKS_COMBINED !== 'undefined' && ALL_DECKS_COMBINED[fId]) || {};
-      const title = (d.title || fId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
-      cardDots.push(`<span class="dot-jewel ${cls}" title="Карточки: ${escapeHtmlStr(title)}" data-srs-open-deck="${fId}"></span>`);
-    });
-  }
+  cardList.forEach((s, idx) => {
+    const isActive = Boolean(!firstUnreadK && firstUnreviewedF === s.id);
+    const globalIdx = focusKIds.length + idx;
+    const isDone = isUnitExamPassed || (globalIdx < activeGlobalStepIdx);
+    const cls = isDone ? 'done' : (isActive ? 'active' : '');
+    cardDots.push(`<span class="dot-jewel ${cls}" title="${escapeHtmlStr(s.title)}" data-srs-open-deck="${s.id}"></span>`);
+  });
 
-  // 3. Точки Кластера «Практика» (чистый тултип «Практика: ${escapeHtmlStr(shortT)}» без знака # и ID)
-  // Точки практики становятся .active ТОЛЬКО после закрытия теории и карточек
+  // 3. Точки Кластера «Практика»
   const taskShortTitles = {
     20: 'Срезы списков',
     19: 'Диагональный срез матрицы',
@@ -14371,23 +14485,27 @@ viewDashboard = function(){
   };
   const practiceDots = [];
   focusTIds.forEach((tId, idx) => {
-    const isDone = Boolean(state.taskCodeHistory && state.taskCodeHistory[tId]);
-    const isActive = Boolean(!firstUnreadK && !firstUnreviewedF && firstUnsolvedT === tId);
+    const globalIdx = focusKIds.length + cardList.length + idx;
+    const isDone = isUnitExamPassed || (globalIdx < activeGlobalStepIdx);
+    const isActive = (globalIdx === activeGlobalStepIdx);
     const cls = isDone ? 'done' : (isActive ? 'active' : '');
     const shortT = taskShortTitles[tId] || 'Практическое задание';
     practiceDots.push(`<span class="dot-jewel ${cls}" title="Практика: ${escapeHtmlStr(shortT)}" data-open-practice-task="${tId}"></span>`);
   });
 
-  // 4. Точка Кластера «Зачёт» (чистый тултип «Итоговый зачёт темы»)
-  const examCls = isUnitExamPassed ? 'done' : (isAllPreExamDone ? 'active' : '');
+  // 4. Точка Кластера «Зачёт»
+  const examGlobalIdx = focusKIds.length + cardList.length + focusTIds.length;
+  const isExamDone = isUnitExamPassed || (examGlobalIdx < activeGlobalStepIdx);
+  const isExamActive = (examGlobalIdx === activeGlobalStepIdx);
+  const examCls = isExamDone ? 'done' : (isExamActive ? 'active' : '');
   const examDot = `<span class="dot-jewel milestone ${examCls}" title="Итоговый зачёт темы" data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}"></span>`;
 
-  // Кластерная структура трекера с четкими чистыми подписями над точками (без чисел в скобках)
+  // Кластерная структура трекера со сверхкомпактными иконками и полноэкранной адаптацией
   const focusMiniTrackHTML = `
     <div class="dots-necklace-container" style="margin: 12px 0 16px;">
       <div class="tracker-clusters-wrap">
         <div class="tracker-cluster">
-          <span class="tracker-cluster-label">📖 Теория</span>
+          <span class="tracker-cluster-label"><span class="cluster-icon">📖</span><span class="cluster-label-text">Теория</span></span>
           <div class="tracker-cluster-dots">
             ${theoryDots.join('')}
           </div>
@@ -14396,7 +14514,7 @@ viewDashboard = function(){
         <span class="dots-phase-divider"></span>
 
         <div class="tracker-cluster">
-          <span class="tracker-cluster-label">📇 Карточки</span>
+          <span class="tracker-cluster-label"><span class="cluster-icon">📇</span><span class="cluster-label-text">Карточки</span></span>
           <div class="tracker-cluster-dots">
             ${cardDots.join('')}
           </div>
@@ -14405,7 +14523,7 @@ viewDashboard = function(){
         <span class="dots-phase-divider"></span>
 
         <div class="tracker-cluster">
-          <span class="tracker-cluster-label">💻 Практика</span>
+          <span class="tracker-cluster-label"><span class="cluster-icon">💻</span><span class="cluster-label-text">Практика</span></span>
           <div class="tracker-cluster-dots">
             ${practiceDots.join('')}
           </div>
@@ -14414,7 +14532,7 @@ viewDashboard = function(){
         <span class="dots-phase-divider"></span>
 
         <div class="tracker-cluster">
-          <span class="tracker-cluster-label">🧪 Зачёт</span>
+          <span class="tracker-cluster-label"><span class="cluster-icon">🧪</span><span class="cluster-label-text">Зачёт</span></span>
           <div class="tracker-cluster-dots">
             ${examDot}
           </div>
@@ -14423,19 +14541,10 @@ viewDashboard = function(){
     </div>
   `;
 
-  const streakDays = state.streak || 0;
-  const streakPlural = (streakDays % 10 === 1 && streakDays % 100 !== 11) ? 'день' : ((streakDays % 10 >= 2 && streakDays % 10 <= 4 && (streakDays % 100 < 10 || streakDays % 100 >= 20)) ? 'дня' : 'дней');
-  const streakText = `🔥 ${streakDays} ${streakPlural} подряд`;
-
-  // Инвариант 5: Согласование SRS без технических кодов колод
-  let srsCardWord = 'карточек ждут';
-  if(dueTodayCardsCount % 10 === 1 && dueTodayCardsCount % 100 !== 11){
-    srsCardWord = 'карточка ждёт';
-  } else if([2, 3, 4].includes(dueTodayCardsCount % 10) && ![12, 13, 14].includes(dueTodayCardsCount % 100)){
-    srsCardWord = 'карточки ждут';
-  }
+  // Порционный микро-шаг SRS: не пугать десятками/сотнями карточек, предлагать порцию в 5 карточек
+  const srsExpressCount = Math.min(5, dueTodayCardsCount);
   const srsSubtitle = dueTodayCardsCount > 0
-    ? `${dueTodayCardsCount} ${srsCardWord} повторения (Колода темы)`
+    ? `Экспресс-повтор: ${srsExpressCount} карточек (2 мин) · ${escapeHtmlStr(cleanTitle)}`
     : 'Все карточки на сегодня повторены!';
 
   // Контекстная подсказка до дневной нормы
@@ -14455,33 +14564,39 @@ viewDashboard = function(){
   return `
     <div class="container dashboard-container">
       <!-- Зона 1: Шапка Эшелона (.echelon-topbar-clean) -->
-      <div class="echelon-topbar-clean" style="padding:16px 20px;border-radius:20px;margin-bottom:18px;display:flex;flex-direction:column;gap:14px;background:rgba(18, 22, 31, 0.65);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255, 255, 255, 0.08);box-shadow:var(--shadow-1);">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
-          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-            <h1 class="rank-title-glow echelon-bordeaux-title" style="margin:0;font-size:1.32rem;">${readinessRank} ${rankIcon}</h1>
-            <span class="badge" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);color:#fbbf24;padding:3px 10px;border-radius:999px;font-size:0.75rem;font-weight:700;">${streakText}</span>
-          </div>
-          <div class="echelon-topbar-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <div class="echelon-topbar-clean" style="padding:16px 20px;border-radius:20px;margin-bottom:18px;display:flex;flex-direction:column;gap:12px;background:rgba(18, 22, 31, 0.65);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255, 255, 255, 0.08);box-shadow:var(--shadow-1);">
+        <!-- Ряд 1: Звание и статус готовности без дублирующего стрика -->
+        <div style="display:flex;align-items:center;min-width:0;">
+          <h1 class="rank-title-glow echelon-bordeaux-title" style="margin:0;font-size:1.32rem;">${readinessRank} ${rankIcon}</h1>
+        </div>
+
+        <!-- Ряд 2: Единая аккуратная линия: XP слева, Справка и Озвучить справа -->
+        <div class="echelon-topbar-subrow" style="display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;flex-wrap:wrap;">
+          <div class="echelon-subrow-xp" style="display:flex;align-items:center;min-width:0;">
             ${todayXp() === 0
-              ? `<span class="day-xp-badge empty-day-badge" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.22);color:#34d399;" title="Суточная цель: 50 XP">⚡ Ждёт первого шага · Цель: 50 XP</span>`
-              : `<span class="day-xp-badge" title="Заработано за сутки: ${tXp} XP">⚡ +${todayXp()} XP за сутки</span>`
+              ? `<span class="day-xp-badge empty-day-badge" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.22);color:#34d399;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="Суточная цель: 50 XP">⚡ Ждёт первого шага · Цель: 50 XP</span>`
+              : `<span class="day-xp-badge" style="white-space:nowrap;" title="Заработано за сутки: ${tXp} XP">⚡ +${todayXp()} XP за сутки</span>`
             }
-            <a href="#/docs" class="topbar-help-btn btn btn-ghost-quiet" style="padding:6px 12px;border-radius:10px;text-decoration:none;font-size:.82rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--ink-muted);" title="Справочник платформы">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          </div>
+          <div class="echelon-topbar-actions" style="display:flex;gap:6px;align-items:center;flex-shrink:0;margin-left:auto;">
+            <a href="#/docs" class="topbar-help-btn btn btn-ghost-quiet" style="padding:6px 10px;border-radius:10px;text-decoration:none;font-size:.82rem;font-weight:600;display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--ink-muted);" title="Справочник платформы" aria-label="Справка">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;flex-shrink:0;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
               <span class="topbar-help-text">Справка</span>
             </a>
-            <button type="button" class="topbar-help-btn btn btn-ghost-quiet" data-toggle-audio data-audio-toggle style="padding:6px 12px;border-radius:10px;cursor:pointer;text-decoration:none;font-size:.82rem;font-weight:600;display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--ink-muted);" title="Слушать аудио / Аудио-компаньон"><span class="topbar-audio-text">🎧 Озвучить</span></button>
+            <button type="button" class="topbar-help-btn btn btn-ghost-quiet" data-toggle-audio data-audio-toggle style="padding:6px 10px;border-radius:10px;cursor:pointer;text-decoration:none;font-size:.82rem;font-weight:600;display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--ink-muted);" title="Слушать аудио / Аудио-компаньон" aria-label="Озвучить">
+              <span class="topbar-audio-icon" style="flex-shrink:0;">🎧</span><span class="topbar-audio-text">Озвучить</span>
+            </button>
           </div>
         </div>
 
+        <!-- Прогресс эшелона -->
         <div class="echelon-clean-wrap" style="width:100%;" title="Готовность к 1-му тех-скринингу">
-          <div class="echelon-clean-meta" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            ${e1CurMp === 0
-              ? `<span class="echelon-readiness-emerald" style="font-weight:700;font-size:.84rem;">🌱 Старт подготовки · Эшелон 1 (Junior)</span>
-                 <span class="meta" style="font-size:.78rem;font-weight:700;color:var(--emerald);">Первая цель: +15 XP</span>`
-              : `<span class="echelon-readiness-emerald" style="font-weight:700;font-size:.84rem;">🎯 Готовность к тех-скринингу: ${e1Pct}%</span>
-                 <span class="meta" style="font-size:.78rem;font-weight:700;color:var(--ink);">Навыки: ${e1CurMp} / ${e1MaxMp} MP</span>`
-            }
+          <div class="echelon-clean-meta" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+            <span class="echelon-readiness-emerald" style="font-weight:700;font-size:.84rem;flex:1 1 auto;min-width:0;">
+              <span class="echelon-label-full">🎯 Готовность к тех-скринингу: ${e1Pct}%</span>
+              <span class="echelon-label-mobile">🎯 Тех-скрининг: ${e1Pct}%</span>
+            </span>
+            <span class="meta echelon-mp-counter" style="font-size:.78rem;font-weight:700;color:var(--ink);flex-shrink:0;white-space:nowrap;">Навыки: ${e1CurMp} / ${e1MaxMp} MP</span>
           </div>
           <div class="echelon-clean-track" style="height:8px;border-radius:999px;background:rgba(255,255,255,0.08);overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,0.4);">
             ${e1CurMp === 0
@@ -14498,7 +14613,7 @@ viewDashboard = function(){
       <!-- Зона 2: Главная карточка Фокуса (Single Dominant Hero Card) -->
       <div class="cocoon-focus-card">
         <div class="cocoon-focus-eyebrow" style="display:inline-flex;width:fit-content;max-width:100%;align-items:center;gap:7px;font-size:.74rem;font-weight:800;letter-spacing:0.06em;color:#34d399;text-transform:uppercase;margin-bottom:8px;padding:4px 12px;border-radius:999px;">
-          <span class="pulse-ring-dot"></span> ФОКУС СЕЙЧАС · 2 МИН
+          <span class="pulse-ring-dot"></span> ${focusEyebrowText}
         </div>
         <div class="cocoon-focus-title">
           ${focusTitleFormatted}
@@ -14559,7 +14674,7 @@ viewDashboard = function(){
           </div>
           <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px;">
             ${dueTodayCardsCount > 0
-              ? `<div style="display:flex;justify-content:flex-end;"><a href="#/cards" ${targetDeckId ? `data-srs-open-deck="${targetDeckId}"` : ''} class="btn-srs-action" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:11px;font-weight:700;font-size:.82rem;background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.30);color:#34d399;text-decoration:none;transition:all .15s ease;">Повторить (2 мин) ➔</a></div>`
+              ? `<div style="display:flex;justify-content:flex-end;"><a href="#/cards" ${targetDeckId ? `data-srs-open-deck="${targetDeckId}"` : ''} class="btn-ghost-quiet btn-srs-quiet" style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;font-weight:600;font-size:.80rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:var(--ink-muted);text-decoration:none;transition:all .2s ease;">Повторить (2 мин) ➔</a></div>`
               : (!hasReviewedAnyCard
                   ? `<div class="srs-locked-preview" title="Откроется автоматически после завершения теории" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:12px;margin-top:auto;">
                       <div style="display:flex;align-items:center;gap:10px;">
@@ -14591,8 +14706,7 @@ viewDashboard = function(){
           ${currentUnitThemesHTML}
           <div style="text-align:center;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05);">
             <a href="#/map" class="btn-competence-pill" style="display:inline-flex;align-items:center;gap:8px;padding:9px 20px;border-radius:999px;font-size:.82rem;font-weight:700;color:#34d399;background:rgba(16, 185, 129, 0.08);border:1px solid rgba(16, 185, 129, 0.25);text-decoration:none;transition:all .2s ease;">
-              <span>🗺️ Смотреть все модули и полную карту компетенций эшелона</span>
-              <span class="pill-arrow" style="display:inline-block;transition:transform .2s ease;">➔</span>
+              <span>🗺️ Смотреть все модули и полную карту компетенций эшелона ➔</span>
             </a>
           </div>
         </div>
@@ -14943,9 +15057,9 @@ window.closeSettingsModal = closeSettingsModal;
     }
   }
   // Mobile Floating Ladybug Quick Button (FAB)
-  if(!document.getElementById('bug-fab-btn-floating')){
+  if(!document.getElementById('bug-fab-btn-floating') && !document.getElementById('bug-report-btn')){
     const fab = document.createElement('button');
-    fab.id = 'bug-fab-btn-floating';
+    fab.id = 'bug-report-btn';
     fab.className = 'bug-fab-btn';
     fab.setAttribute('data-open-bug-modal', '');
     fab.setAttribute('aria-label', 'Сообщить о баге (Alt+B)');
