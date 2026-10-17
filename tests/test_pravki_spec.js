@@ -79,6 +79,16 @@ assert(academyHtml.includes('.sidebar{width:236px') || academyHtml.includes('.si
 assert(academyHtml.includes('@media (max-width:880px)') || academyHtml.includes('@media (max-width: 880px)'), 'CSS must preserve sidebar on desktop (breakpoint <=880px for mobile hide)');
 console.log('✓ 5. Desktop Sidebar Invariant: левое меню платформы сохраняется на всех экранах');
 
+// 6. Академия: Инварианты Дашборда (Single Focus, Coddy/Duolingo Topbar, SRS Locked Affordance, Clean Accordion)
+assert(academyHtml.includes('⚡ Ждёт первого шага · Цель: 50 XP'), 'Dashboard topbar must show friendly zero-balance badge');
+assert(!academyHtml.includes('⚡ 0 / ${dailyGoal} XP за сутки'), 'Dashboard topbar must not show demotivating 0/50 XP text');
+assert(academyHtml.includes('🔒 +10 XP'), 'SRS locked card must show muted locked +10 XP badge');
+assert(academyHtml.includes('📇</span> Первое повторение'), 'SRS status badge must use 📇 card file icon');
+assert(!academyHtml.includes('Откроется по порядку'), 'Accordion module topics must eliminate text fence "Откроется по порядку"');
+assert(academyHtml.includes('title="Откроется после выполнения предыдущих тем"'), 'Locked unit topic must show clean lock SVG with tooltip');
+assert(academyHtml.includes('const isActive = Boolean(!firstUnreadK && firstUnreviewedF === s.id);'), '13-dots tracker must enforce single global focus');
+console.log('✓ 6. Dashboard Invariants: Single Focus, Friendly 0 XP Topbar, Muted SRS Locked Badge & Clean Accordion confirmed');
+
 console.log('\n================================================================');
 console.log('  ALL CANONICAL BENCHMARK SPECIFICATIONS PASSED! (100% PERFECT) ');
 console.log('================================================================\n');

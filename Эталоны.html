@@ -14180,6 +14180,11 @@ viewDashboard = function(){
   const focusKId = (focusSk && focusSk.kIds && focusSk.kIds.find(k => !state.readNotes.includes(k))) || (focusSk && focusSk.kIds && focusSk.kIds[0]) || 'К-001';
   const focusSid = focusSk ? focusSk.id : '1.1.1';
 
+  // Чистое название темы без скобок параметров
+  const cleanTitle = (focusSk && focusSk.title)
+    ? focusSk.title.replace(/\s*\([^)]*\)\s*$/, '').trim()
+    : 'Базовые коллекции и срезы';
+
   // Звание и статус готовности к интервью с благородным градиентом бордо и золотистым отливом
   let readinessRank = 'Стажёр (Junior 0)';
   let rankIcon = '🌱';
@@ -14222,28 +14227,36 @@ viewDashboard = function(){
   const curUnitMaxMp = Math.max(1, curUnitTotal * 100);
   const curUnitMpPct = Math.round(curUnitMp / curUnitMaxMp * 100);
 
-  // Вспомогательная функция для оборачивания синтаксических терминов в моноширинные чипсы
+  // Название активного юнита без технического префикса «Юнит X.X ·»
+  const rawUnitTitle = (activeUnit && activeUnit.title) || 'Базовый синтаксис';
+  const cleanUnitTitle = rawUnitTitle.replace(/^Юнит\s+[\d.]+\s*[:·•\-]\s*/i, '').trim();
+
+  // Вспомогательная функция для оборачивания синтаксических терминов в моноширинные чипсы (макс. 3-4 ключевых тега)
   const formatSkillTitleWithChips = (title) => {
     const ftMatch = String(title || '').match(/^(.*?)\s*\(([^()]*)\)\s*$/);
     if(ftMatch){
-      const conceptChips = ftMatch[2].split(',').map(tok => {
-        const cleanTok = tok.trim();
-        return cleanTok ? `<span class="focus-code-chip">${escapeHtmlStr(cleanTok)}</span>` : '';
-      }).filter(Boolean).join(' ');
+      const rawTokens = ftMatch[2].split(',').map(tok => tok.trim()).filter(Boolean);
+      const conceptTokens = rawTokens.slice(0, 4);
+      const conceptChips = conceptTokens.map(cleanTok => {
+        return `<span class="focus-code-chip">${escapeHtmlStr(cleanTok)}</span>`;
+      }).join(' ');
       return `${escapeHtmlStr(ftMatch[1])} <span class="focus-chips-wrap" style="margin-left:4px;">${conceptChips}</span>`;
     }
     return escapeHtmlStr(title);
   };
 
-  // 1. Темы текущего активного юнита с моноширинными чипсами в названиях
-  const currentUnitThemesHTML = curUnitSkills.map(s => {
+  // 1. Темы текущего активного модуля с моноширинными чипсами в названиях и деликатной нумерацией
+  const currentUnitThemesHTML = curUnitSkills.map((s, idx) => {
     const mp = getSkillMP(s.id);
     const isFocusThis = s.id === focusSid;
     const formattedTitle = formatSkillTitleWithChips(s.title);
+    const stepNumberBadge = isFocusThis
+      ? `<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.4);font-size:.70rem;font-weight:700;color:var(--moss);flex-shrink:0;">${idx + 1}</span>`
+      : `<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);font-size:.70rem;font-weight:700;color:var(--ink-muted);flex-shrink:0;">${idx + 1}</span>`;
     return `
       <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:.82rem;">
-        <span style="font-weight:600;display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;">
-          <a href="#/python/skill/${s.id}" class="link-quiet" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap;"><b>${s.id}</b> · ${formattedTitle}</a>
+        <span style="font-weight:600;display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <a href="#/python/skill/${s.id}" class="link-quiet" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;">${stepNumberBadge} ${formattedTitle}</a>
         </span>
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
           ${isFocusThis
@@ -14251,7 +14264,7 @@ viewDashboard = function(){
             : (mp === 100
                 ? `<span class="state-tag state-tag--mastered" style="font-size:.70rem;margin:0;">✓ 100 MP</span>`
                 : (mp === 0
-                    ? `<span class="meta" style="font-size:.72rem;opacity:0.5;display:inline-flex;align-items:center;gap:4px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Откроется по порядку</span>`
+                    ? `<span class="meta" style="font-size:.78rem;opacity:0.4;display:inline-flex;align-items:center;" title="Откроется после выполнения предыдущих тем"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>`
                     : `<span class="meta" style="font-size:.72rem;">${mp} MP</span>`
                   )
               )
@@ -14261,12 +14274,12 @@ viewDashboard = function(){
     `;
   }).join('');
 
-  // Заголовок карточки фокуса с чипсами
+  // Заголовок карточки фокуса: чистое название без технического префикса `${focusSk.id} ·`
   let focusTitleFormatted = '';
   if(focusSk){
-    focusTitleFormatted = `${focusSk.id} · ${formatSkillTitleWithChips(focusSk.title)}`;
+    focusTitleFormatted = formatSkillTitleWithChips(focusSk.title);
   } else {
-    focusTitleFormatted = '1.1.1 · Базовые коллекции и срезы';
+    focusTitleFormatted = 'Базовые коллекции и срезы';
   }
 
   const unreadCount = (focusSk && focusSk.kIds) ? focusSk.kIds.filter(k => !state.readNotes.includes(k)).length : 0;
@@ -14293,40 +14306,38 @@ viewDashboard = function(){
   // Чистый SVG-символ книги для устранения сломанного глифа перед конспектом
   const bookIconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>`;
 
-  // Честный сквозной пайплайн фокуса без демотивирующих глобальных счётчиков
+  // Честный сквозной пайплайн фокуса без технических кодов и с чистыми формулировками
   let focusContextText = '';
   let focusCtaHTML = '';
   if(firstUnreadK){
-    focusContextText = `<span class="badge" style="background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);color:#34d399;padding:2px 8px;border-radius:6px;font-size:0.74rem;font-weight:700;display:inline-flex;align-items:center;margin-right:6px;">${bookIconSvg} Теория</span> Микро-конспект ${curKIdx + 1} из ${focusKIds.length} · Быстрый разбор концепций (2 мин)`;
+    focusContextText = `<span class="badge" style="background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);color:#34d399;padding:2px 8px;border-radius:6px;font-size:0.74rem;font-weight:700;display:inline-flex;align-items:center;margin-right:6px;">${bookIconSvg} Теория</span> Шаг ${curKIdx + 1} из ${focusKIds.length} · Быстрый разбор концепций (2 мин)`;
     focusCtaHTML = `<div class="focus-cta-wrap"><button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta" data-quick-microstep="${focusSid}" data-quick-kid="${firstUnreadK}"><span>Продолжить микро-шаг (2 мин)</span><span class="btn-reward-badge">+15 XP ⚡</span><span class="btn-cta-arrow">➔</span></button></div>`;
   } else if(firstUnreviewedF){
-    focusContextText = `<span class="badge" style="background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);color:#34d399;padding:2px 8px;border-radius:6px;font-size:0.74rem;font-weight:700;display:inline-flex;align-items:center;margin-right:6px;">📇 Карточки</span> Закрепление карточками (${curFIdx + 1} из ${focusFIds.length}) · Быстрый повтор (2 мин)`;
+    focusContextText = `<span class="badge" style="background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);color:#34d399;padding:2px 8px;border-radius:6px;font-size:0.74rem;font-weight:700;display:inline-flex;align-items:center;margin-right:6px;">📇 Карточки</span> Закрепление темы карточками · Быстрый повтор (2 мин)`;
     focusCtaHTML = `<div class="focus-cta-wrap"><a href="#/cards" data-srs-open-deck="${firstUnreviewedF}" class="btn-glass-emerald btn-sprint-cta btn-dominant-cta"><span>Повторить карточки темы (2 мин)</span><span class="btn-reward-badge">+10 XP ⚡</span><span class="btn-cta-arrow">➔</span></a></div>`;
   } else if(firstUnsolvedT){
-    focusContextText = `<span class="badge" style="background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);color:#34d399;padding:2px 8px;border-radius:6px;font-size:0.74rem;font-weight:700;display:inline-flex;align-items:center;margin-right:6px;">💻 Практика</span> Практика кода в IDE (задача ${curTIdx + 1} из ${focusTIds.length}) · Закрепление навыка`;
+    focusContextText = `<span class="badge" style="background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);color:#34d399;padding:2px 8px;border-radius:6px;font-size:0.74rem;font-weight:700;display:inline-flex;align-items:center;margin-right:6px;">💻 Практика</span> Практика в редакторе IDE · Решение задачи`;
     focusCtaHTML = `<div class="focus-cta-wrap"><a href="#/practice?task=${firstUnsolvedT}" class="btn-glass-emerald btn-sprint-cta btn-dominant-cta"><span>Решить задачу в IDE</span><span class="btn-reward-badge">+15 XP ⚡</span><span class="btn-cta-arrow">➔</span></a></div>`;
   } else {
     focusContextText = `<span class="badge" style="background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);color:#34d399;padding:2px 8px;border-radius:6px;font-size:0.74rem;font-weight:700;display:inline-flex;align-items:center;margin-right:6px;">🧪 Зачёт</span> Все этапы темы пройдены ✓ · Рубежный тест открыт`;
     focusCtaHTML = `<div class="focus-cta-wrap"><button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta" data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}"><span>Начать рубежный тест</span><span class="btn-reward-badge">+50 XP ⚡</span><span class="btn-cta-arrow">➔</span></button></div>`;
   }
 
-  // 1. Точки Кластера «Теория»
+  // 1. Точки Кластера «Теория» (чистый тултип без технического префикса «Конспект N:»)
   const theoryDots = [];
   focusKIds.forEach((kId, idx) => {
     const isDone = state.readNotes.includes(kId);
-    const isActive = (firstUnreadK === kId);
-    const cls = isActive ? 'active' : (isDone ? 'done' : '');
+    const isActive = Boolean(firstUnreadK && firstUnreadK === kId);
+    const cls = isDone ? 'done' : (isActive ? 'active' : '');
     const n = (typeof ALL_NOTES_COMBINED !== 'undefined' && ALL_NOTES_COMBINED[kId]) || { title: kId };
     const title = (n.title || kId).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-    theoryDots.push(`<span class="dot-jewel ${cls}" title="Конспект ${idx + 1}: ${escapeHtmlStr(title)}" data-quick-microstep="${focusSid}" data-quick-kid="${kId}"></span>`);
+    theoryDots.push(`<span class="dot-jewel ${cls}" title="Теория: ${escapeHtmlStr(title)}" data-quick-microstep="${focusSid}" data-quick-kid="${kId}"></span>`);
   });
 
-  // 2. Точки Кластера «Карточки» (синхронизировано с колодой Юнита 1.1 из 15 карточек)
+  // 2. Точки Кластера «Карточки» (лаконичная подпись «📇 Карточки» без чисел в скобках)
+  // Точки карточек могут становиться .active ТОЛЬКО когда вся теория пройдена (!firstUnreadK) и есть неповторенная колода (firstUnreviewedF)
   const cardDots = [];
-  let cardsClusterTitle = '📇 Карточки';
   if(focusSid === '1.1.1' || activeUnitId === '1.1'){
-    // Компактный кластер из 3 ключевых сессий темы (всего 15 карточек по 5 в сессии)
-    cardsClusterTitle = '📇 Карточки (15)';
     const cardSessions = [
       { id: focusFIds[0] || 'Ф-001', title: 'Карточки: list & tuple' },
       { id: focusFIds[1] || 'Ф-002', title: 'Карточки: срезы и память' },
@@ -14334,23 +14345,23 @@ viewDashboard = function(){
     ];
     cardSessions.forEach((s, idx) => {
       const isDone = state.reviewedDecks.includes(s.id);
-      const isActive = (firstUnreviewedF === s.id) || (!firstUnreviewedF && idx === 0 && !isDone);
+      const isActive = Boolean(!firstUnreadK && firstUnreviewedF === s.id);
       const cls = isDone ? 'done' : (isActive ? 'active' : '');
       cardDots.push(`<span class="dot-jewel ${cls}" title="${escapeHtmlStr(s.title)}" data-srs-open-deck="${s.id}"></span>`);
     });
   } else {
-    cardsClusterTitle = `📇 Карточки (${focusFIds.length})`;
     focusFIds.forEach((fId, idx) => {
       const isDone = state.reviewedDecks.includes(fId);
-      const isActive = (firstUnreviewedF === fId);
-      const cls = isActive ? 'active' : (isDone ? 'done' : '');
+      const isActive = Boolean(!firstUnreadK && firstUnreviewedF === fId);
+      const cls = isDone ? 'done' : (isActive ? 'active' : '');
       const d = (typeof ALL_DECKS_COMBINED !== 'undefined' && ALL_DECKS_COMBINED[fId]) || {};
       const title = (d.title || fId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
       cardDots.push(`<span class="dot-jewel ${cls}" title="Карточки: ${escapeHtmlStr(title)}" data-srs-open-deck="${fId}"></span>`);
     });
   }
 
-  // 3. Точки Кластера «Практика»
+  // 3. Точки Кластера «Практика» (чистый тултип «Практика: ${escapeHtmlStr(shortT)}» без знака # и ID)
+  // Точки практики становятся .active ТОЛЬКО после закрытия теории и карточек
   const taskShortTitles = {
     20: 'Срезы списков',
     19: 'Диагональный срез матрицы',
@@ -14361,22 +14372,22 @@ viewDashboard = function(){
   const practiceDots = [];
   focusTIds.forEach((tId, idx) => {
     const isDone = Boolean(state.taskCodeHistory && state.taskCodeHistory[tId]);
-    const isActive = (firstUnsolvedT === tId);
-    const cls = isActive ? 'active' : (isDone ? 'done' : '');
-    const shortT = taskShortTitles[tId] || `Задача #${tId}`;
-    practiceDots.push(`<span class="dot-jewel ${cls}" title="Задача #${tId}: ${escapeHtmlStr(shortT)}" data-open-practice-task="${tId}"></span>`);
+    const isActive = Boolean(!firstUnreadK && !firstUnreviewedF && firstUnsolvedT === tId);
+    const cls = isDone ? 'done' : (isActive ? 'active' : '');
+    const shortT = taskShortTitles[tId] || 'Практическое задание';
+    practiceDots.push(`<span class="dot-jewel ${cls}" title="Практика: ${escapeHtmlStr(shortT)}" data-open-practice-task="${tId}"></span>`);
   });
 
-  // 4. Точка Кластера «Зачёт»
+  // 4. Точка Кластера «Зачёт» (чистый тултип «Итоговый зачёт темы»)
   const examCls = isUnitExamPassed ? 'done' : (isAllPreExamDone ? 'active' : '');
-  const examDot = `<span class="dot-jewel milestone ${examCls}" title="Рубежный зачёт: Юнит ${activeUnitId}" data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}"></span>`;
+  const examDot = `<span class="dot-jewel milestone ${examCls}" title="Итоговый зачёт темы" data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}"></span>`;
 
-  // Кластерная структура трекера с четким позиционированием подписей над точками
+  // Кластерная структура трекера с четкими чистыми подписями над точками (без чисел в скобках)
   const focusMiniTrackHTML = `
     <div class="dots-necklace-container" style="margin: 12px 0 16px;">
       <div class="tracker-clusters-wrap">
         <div class="tracker-cluster">
-          <span class="tracker-cluster-label">📖 Теория (${focusKIds.length})</span>
+          <span class="tracker-cluster-label">📖 Теория</span>
           <div class="tracker-cluster-dots">
             ${theoryDots.join('')}
           </div>
@@ -14385,7 +14396,7 @@ viewDashboard = function(){
         <span class="dots-phase-divider"></span>
 
         <div class="tracker-cluster">
-          <span class="tracker-cluster-label">${cardsClusterTitle}</span>
+          <span class="tracker-cluster-label">📇 Карточки</span>
           <div class="tracker-cluster-dots">
             ${cardDots.join('')}
           </div>
@@ -14394,7 +14405,7 @@ viewDashboard = function(){
         <span class="dots-phase-divider"></span>
 
         <div class="tracker-cluster">
-          <span class="tracker-cluster-label">💻 Практика (${focusTIds.length})</span>
+          <span class="tracker-cluster-label">💻 Практика</span>
           <div class="tracker-cluster-dots">
             ${practiceDots.join('')}
           </div>
@@ -14416,8 +14427,7 @@ viewDashboard = function(){
   const streakPlural = (streakDays % 10 === 1 && streakDays % 100 !== 11) ? 'день' : ((streakDays % 10 >= 2 && streakDays % 10 <= 4 && (streakDays % 100 < 10 || streakDays % 100 >= 20)) ? 'дня' : 'дней');
   const streakText = `🔥 ${streakDays} ${streakPlural} подряд`;
 
-  // Инвариант 5: Согласование SRS
-  const srsDeckLabel = (focusDeckObj && focusDeckObj.unitId) ? `Колода ${focusDeckObj.unitId}` : `Колода ${activeUnitId}`;
+  // Инвариант 5: Согласование SRS без технических кодов колод
   let srsCardWord = 'карточек ждут';
   if(dueTodayCardsCount % 10 === 1 && dueTodayCardsCount % 100 !== 11){
     srsCardWord = 'карточка ждёт';
@@ -14425,7 +14435,7 @@ viewDashboard = function(){
     srsCardWord = 'карточки ждут';
   }
   const srsSubtitle = dueTodayCardsCount > 0
-    ? `${dueTodayCardsCount} ${srsCardWord} повторения (${srsDeckLabel})`
+    ? `${dueTodayCardsCount} ${srsCardWord} повторения (Колода темы)`
     : 'Все карточки на сегодня повторены!';
 
   // Контекстная подсказка до дневной нормы
@@ -14436,11 +14446,11 @@ viewDashboard = function(){
     ? `⚡ 1 микро-шаг = +15 XP · До цели: <b>${remainingGoalSteps}&nbsp;${stepsWord}</b>`
     : `⚡ Дневная цель выполнена! Отличный темп 🎯`;
 
-  // Активный статус в аккордеоне тем
+  // Активный статус в аккордеоне тем без технического префикса «Юнит X.X»
   const curUnitDoneCount = curUnitSkills.filter(s => getSkillMP(s.id) >= 100).length;
   const accordionStatusText = curUnitDoneCount > 0
     ? `${curUnitDoneCount} из ${curUnitTotal} тем закрыто (${curUnitMpPct}% MP)`
-    : `Юнит ${activeUnitId} · Тема 1 из ${curUnitTotal} в фокусе`;
+    : `Тема 1 из ${curUnitTotal} · В фокусе`;
 
   return `
     <div class="container dashboard-container">
@@ -14453,7 +14463,7 @@ viewDashboard = function(){
           </div>
           <div class="echelon-topbar-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
             ${todayXp() === 0
-              ? `<span class="day-xp-badge empty-day-badge" title="Суточный баланс: 0 / ${dailyGoal} XP">⚡ 0 / ${dailyGoal} XP за сутки</span>`
+              ? `<span class="day-xp-badge empty-day-badge" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.22);color:#34d399;" title="Суточная цель: 50 XP">⚡ Ждёт первого шага · Цель: 50 XP</span>`
               : `<span class="day-xp-badge" title="Заработано за сутки: ${tXp} XP">⚡ +${todayXp()} XP за сутки</span>`
             }
             <a href="#/docs" class="topbar-help-btn btn btn-ghost-quiet" style="padding:6px 12px;border-radius:10px;text-decoration:none;font-size:.82rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--ink-muted);" title="Справочник платформы">
@@ -14480,7 +14490,7 @@ viewDashboard = function(){
             }
           </div>
           <div style="font-size:.76rem;color:var(--ink-muted);margin-top:6px;">
-            Эшелон 1 · Открывает доступ к первому тех-собеседованию
+            Открывает доступ к первому техническому собеседованию
           </div>
         </div>
       </div>
@@ -14536,10 +14546,10 @@ viewDashboard = function(){
                 : (!hasReviewedAnyCard
                     ? `<div>
                         <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.28);color:#34d399;padding:4px 10px;border-radius:8px;font-size:.76rem;font-weight:700;">
-                          <span>🗂</span> Первое повторение
+                          <span>📇</span> Первое повторение
                         </div>
                         <div style="font-size:.78rem;color:var(--ink-muted);margin-top:6px;line-height:1.45;">
-                          Первое повторение откроется после конспекта ${focusSid}. Карточки Лейтнера помогут закрепить базу в долговременной памяти.
+                          Первое повторение откроется после завершения теории по теме «${escapeHtmlStr(cleanTitle)}». Карточки с умным интервалом помогут закрепить базу в долговременной памяти.
                         </div>
                       </div>`
                     : `<span class="badge" style="background:rgba(16,185,129,0.16);border:1px solid rgba(16,185,129,0.35);color:#34d399;padding:4px 10px;border-radius:8px;font-size:.76rem;font-weight:700;display:inline-block;">✓ Все карточки на сегодня повторены!</span>`
@@ -14555,11 +14565,11 @@ viewDashboard = function(){
                       <div style="display:flex;align-items:center;gap:10px;">
                         <span style="font-size:1.15rem;opacity:0.8;">🔒</span>
                         <div>
-                          <div style="font-size:0.78rem;font-weight:700;color:var(--ink);">Колода ${activeUnitId} · 15 карточек</div>
+                          <div style="font-size:0.78rem;font-weight:700;color:var(--ink);">Колода темы · 15 карточек</div>
                           <div style="font-size:0.70rem;color:var(--ink-muted);">list, tuple, slice, memory model</div>
                         </div>
                       </div>
-                      <span class="badge" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25);color:#34d399;font-size:0.68rem;padding:3px 8px;border-radius:6px;font-weight:700;">+10 XP</span>
+                      <span class="badge" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--ink-muted);font-size:0.68rem;padding:3px 8px;border-radius:6px;font-weight:600;">🔒 +10 XP</span>
                     </div>`
                   : `<div style="display:flex;justify-content:flex-end;"><a href="#/cards" class="btn-srs-pill link-quiet text-muted">Обзор колод ➔</a></div>`
                 )
@@ -14573,7 +14583,7 @@ viewDashboard = function(){
         <summary class="dash-accordion-summary">
           <div class="dash-accordion-title-wrap">
             <svg class="chevron-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--moss);transition:transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);display:inline-block;flex-shrink:0;"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            <span class="dash-accordion-title">Темы активного юнита ${activeUnitId}</span>
+            <span class="dash-accordion-title">Темы текущего модуля: ${escapeHtmlStr(cleanUnitTitle)}</span>
           </div>
           <span class="meta dash-accordion-status" style="font-size:.76rem;font-weight:500;">${accordionStatusText}</span>
         </summary>
@@ -14581,7 +14591,7 @@ viewDashboard = function(){
           ${currentUnitThemesHTML}
           <div style="text-align:center;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05);">
             <a href="#/map" class="btn-competence-pill" style="display:inline-flex;align-items:center;gap:8px;padding:9px 20px;border-radius:999px;font-size:.82rem;font-weight:700;color:#34d399;background:rgba(16, 185, 129, 0.08);border:1px solid rgba(16, 185, 129, 0.25);text-decoration:none;transition:all .2s ease;">
-              <span>🗺️ Смотреть все юниты и полную карту компетенций эшелона</span>
+              <span>🗺️ Смотреть все модули и полную карту компетенций эшелона</span>
               <span class="pill-arrow" style="display:inline-block;transition:transform .2s ease;">➔</span>
             </a>
           </div>
