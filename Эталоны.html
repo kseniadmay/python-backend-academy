@@ -370,30 +370,13 @@
     #bug-report-btn,
     #bug-fab-btn-floating,
     .bug-fab-btn{
-      display:inline-flex !important;
-      position:static !important;
-      width:34px !important;
-      height:34px !important;
-      border-radius:10px !important;
-      font-size:1.0rem !important;
-      background:rgba(255,255,255,0.06) !important;
-      border:1px solid rgba(255,255,255,0.12) !important;
-      color:var(--ink-soft) !important;
-      box-shadow:none !important;
-      margin:0 !important;
-      padding:0 !important;
-      align-items:center !important;
-      justify-content:center !important;
-      flex-shrink:0 !important;
-      transition:background 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+      display:none !important;
     }
-    .topbar .bug-fab-btn:hover {
-      background:rgba(255,255,255,0.12) !important;
-      border-color:rgba(255,255,255,0.22) !important;
-      color:var(--ink) !important;
+    .topbar .bug-fab-btn {
+      display:none !important;
     }
     .dashboard-container {
-      padding-bottom: 120px !important;
+      padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important;
     }
   }
   body:has(.dash-accordion[open]) .bug-fab-btn,
@@ -4351,7 +4334,7 @@
     width: 1.5px;
     height: 16px;
     background: rgba(255, 255, 255, 0.12);
-    margin: 0 5px !important;
+    margin: 0 4px !important;
     opacity: 0.35 !important;
     flex-shrink: 0;
   }
@@ -4605,43 +4588,92 @@
   .dots-necklace-container {
     width: 100%;
     box-sizing: border-box;
+    display: flex;
+    justify-content: center;
   }
   .tracker-clusters-wrap {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    width: 100%;
-    margin: 12px 0 16px;
-    padding: 6px 4px;
+    justify-content: center; /* Центрируем, убираем разлёт по краям */
+    gap: 18px;                /* Плотный, благородный ритм между фазами */
+    width: auto;
+    max-width: 520px;         /* Ограничиваем максимальный размах на десктопе */
+    margin: 12px auto 16px;   /* Центрируем блок внутри карточки фокуса */
+    padding: 8px 16px;
     box-sizing: border-box;
+  }
+  .tracker-cluster-dots .dot-jewel {
+    position: relative !important;
+    width: 8px !important;
+    height: 8px !important;
+    flex-shrink: 0;
+  }
+  .tracker-cluster-dots .dot-jewel.active {
+    width: 9px !important;
+    height: 9px !important;
+  }
+  .tracker-cluster-dots .dot-jewel::before {
+    content: '' !important;
+    position: absolute !important;
+    inset: -10px !important;
+    border-radius: 50% !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    z-index: 2;
+  }
+  .tracker-cluster-dots .dot-jewel::after,
+  .tracker-cluster-dots .dot-jewel.active::after {
+    display: none !important;
+    content: none !important;
+  }
+  .tracker-cluster-dots .dot-jewel.active::before {
+    border: none !important;
+    box-shadow: none !important;
+    animation: none !important;
+    background: transparent !important;
   }
   @media (max-width: 480px) {
     .tracker-clusters-wrap {
-      gap: 4px !important;
+      gap: 8px !important;
       padding: 4px 0 !important;
-      justify-content: space-between !important;
+      justify-content: center !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 12px 0 16px !important;
     }
     .tracker-cluster {
-      gap: 4px !important;
-    }
-    .tracker-cluster-label {
-      font-size: 0.72rem !important;
-    }
-    .tracker-cluster-label .cluster-label-text {
-      display: none !important;
-    }
-    .tracker-cluster {
+      gap: 5px !important;
+      display: flex !important;
+      flex-direction: column !important;
       align-items: center !important;
       text-align: center !important;
+      background: transparent !important;
+      border-radius: 0 !important;
+      padding: 0 !important;
     }
     .tracker-cluster-label {
+      display: flex !important;
+      align-items: center !important;
+      gap: 3px !important;
+      font-size: 0.68rem !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.04em !important;
+      text-transform: uppercase !important;
+      color: var(--ink-muted) !important;
       justify-content: center !important;
+    }
+    .tracker-cluster-label .cluster-label-text {
+      display: inline !important;
     }
     .tracker-cluster-dots {
       gap: 6px !important;
       justify-content: center !important;
       align-items: center !important;
+      display: flex !important;
     }
     .tracker-cluster-dots .dot-jewel {
       position: relative !important;
@@ -4651,13 +4683,34 @@
     .tracker-cluster-dots .dot-jewel::before {
       content: '' !important;
       position: absolute !important;
-      inset: -8px !important;
+      inset: -10px !important;
       border-radius: 50% !important;
+      border: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      outline: none !important;
+      cursor: pointer !important;
+      pointer-events: auto !important;
+      z-index: 2;
+    }
+    .tracker-cluster-dots .dot-jewel::after,
+    .tracker-cluster-dots .dot-jewel.active::after {
+      display: none !important;
+      content: none !important;
+    }
+    .tracker-cluster-dots .dot-jewel.active::before {
+      border: none !important;
+      box-shadow: none !important;
+      animation: none !important;
+      background: transparent !important;
     }
     .dots-phase-divider {
+      display: inline-block !important;
+      width: 1.5px !important;
       height: 16px !important;
-      margin: 0 5px !important;
+      margin: 0 4px !important;
       opacity: 0.35 !important;
+      flex-shrink: 0 !important;
     }
     .focus-mini-track .dot-jewel,
     .tracker-cluster-dots .dot-jewel {
@@ -4666,8 +4719,8 @@
     }
     .focus-mini-track .dot-jewel.active,
     .tracker-cluster-dots .dot-jewel.active {
-      width: 10px !important;
-      height: 10px !important;
+      width: 9px !important;
+      height: 9px !important;
     }
     .focus-mini-track .dot-jewel.milestone,
     .tracker-cluster-dots .dot-jewel.milestone {
@@ -4676,8 +4729,8 @@
     }
     .focus-mini-track .dot-jewel.milestone.active,
     .tracker-cluster-dots .dot-jewel.milestone.active {
-      width: 10px !important;
-      height: 10px !important;
+      width: 9px !important;
+      height: 9px !important;
     }
   }
   @media (max-width: 360px) {
@@ -4727,11 +4780,16 @@
     height: 22px;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(52, 211, 153, 0.4) 50%, rgba(255, 255, 255, 0.04) 100%);
     box-shadow: 0 0 6px rgba(52, 211, 153, 0.4);
-    margin: 0 5px !important;
+    margin: 0 4px !important;
     opacity: 0.35 !important;
     flex-shrink: 0;
     border-radius: 999px;
     align-self: center;
+  }
+  @media (min-width: 880px) {
+    .dots-phase-divider {
+      margin: 0 4px !important;
+    }
   }
   .goal-micro-hint {
     white-space: normal;
@@ -4797,17 +4855,48 @@
   .dashboard-container [data-toggle-audio] {
     display: none !important;
   }
+  .dashboard-container .echelon-topbar-clean {
+    align-items: stretch !important;
+    text-align: left !important;
+  }
+  .dashboard-container .echelon-topbar-row-top {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    text-align: left !important;
+  }
+  .dashboard-container .rank-title-glow {
+    text-align: left !important;
+  }
   @media (max-width: 680px) {
     .dashboard-container .echelon-topbar-clean {
       padding: 12px 14px !important;
       gap: 8px !important;
       margin-bottom: 12px !important;
+      align-items: stretch !important;
+      text-align: left !important;
+    }
+    .dashboard-container .echelon-topbar-row-top {
+      flex-wrap: wrap !important;
+      gap: 8px !important;
+      justify-content: space-between !important;
+      text-align: left !important;
     }
     .dashboard-container .rank-title-glow {
       font-size: 1.18rem !important;
+      text-align: left !important;
+    }
+    .dashboard-container .topbar-help-btn {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 4px !important;
+      padding: 4px 8px !important;
+      font-size: 0.72rem !important;
     }
     .dashboard-container .topbar-help-btn .topbar-help-text {
-      display: none !important;
+      display: inline !important;
+      font-size: 0.72rem !important;
     }
     .dashboard-container .topbar-help-btn[href="#/docs"] {
       padding: 6px 8px !important;
@@ -4879,10 +4968,14 @@
     50% { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 7px rgba(245, 158, 11, 0.9)); }
   }
   .heat-cell.rest-day {
-    opacity: 0.35;
+    opacity: 0.65 !important;
+    color: rgba(255, 255, 255, 0.65) !important;
     background: rgba(255, 255, 255, 0.02);
-    border-color: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.06);
     box-sizing: border-box !important;
+  }
+  .heat-cell.rest-day > span:first-child {
+    color: rgba(255, 255, 255, 0.65) !important;
   }
   .heat-cell.today-active {
     border: 1.5px solid rgba(16, 185, 129, 0.5) !important;
@@ -4897,6 +4990,31 @@
     box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
     box-sizing: border-box !important;
   }
+  .heat-cell.heat-cell--today-pending {
+    border: 1.5px dashed rgba(16, 185, 129, 0.45) !important;
+    background: rgba(16, 185, 129, 0.04) !important;
+    color: #34d399 !important;
+    box-sizing: border-box !important;
+    animation: emeraldPendingPulse 3s infinite ease-in-out;
+  }
+  .heat-cell.heat-cell--today-pending b {
+    font-size: 0.72rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: rgba(52, 211, 153, 0.75) !important;
+  }
+  .today-pending-spark {
+    display: inline-block;
+    opacity: 0.75;
+    font-size: 0.72rem;
+    line-height: 1;
+    filter: drop-shadow(0 0 3px rgba(16, 185, 129, 0.4));
+  }
+  @keyframes emeraldPendingPulse {
+    0%, 100% { border-color: rgba(16, 185, 129, 0.35); box-shadow: none; }
+    50% { border-color: rgba(16, 185, 129, 0.65); box-shadow: 0 0 8px rgba(16, 185, 129, 0.2); }
+  }
   .heat-cell .heat-dot {
     width: 4px !important;
     height: 4px !important;
@@ -4905,6 +5023,16 @@
     flex-shrink: 0 !important;
   }
   /* Dashboard Refactoring: Ephemeral Obsidian, Coddy & Duolingo Invariants */
+  .dash-step-locked-badge {
+    font-size: 0.72rem !important;
+    opacity: 0.6 !important;
+    padding: 2px 7px !important;
+    border-radius: 6px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    color: var(--ink-muted) !important;
+    white-space: nowrap !important;
+  }
   .focus-code-chip {
     font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
     font-size: 0.76rem;
@@ -5140,7 +5268,8 @@
   }
   .heat-cell.today-start-badge,
   .heat-cell.today-active,
-  .heat-cell.today-goal {
+  .heat-cell.today-goal,
+  .heat-cell.heat-cell--today-pending {
     justify-content: center !important;
     padding: 6px 4px !important;
     border-radius: 10px !important;
@@ -14222,10 +14351,17 @@ function buildSevenDayHeatmapHTML(){
         dotCls = 'done';
         hint += ' (сегодня)';
       } else {
-        cls = 'heat-cell today-start-badge';
-        valText = '<span class="today-glow-flame">🔥</span>';
-        dotCls = 'active';
-        hint += ' (сегодня · цель 50 XP)';
+        if(streak > 0){
+          cls = 'heat-cell heat-cell--today-pending';
+          valText = '<span class="today-pending-spark">✨</span>';
+          dotCls = 'active';
+          hint += ` (сегодня · серия ${streak} дн. · цель ${dailyGoal} XP)`;
+        } else {
+          cls = 'heat-cell today-start-badge';
+          valText = '<span class="today-glow-flame">🔥</span>';
+          dotCls = 'active';
+          hint += ` (сегодня · цель ${dailyGoal} XP)`;
+        }
       }
     } else if(isPast){
       if(reachedGoal){
@@ -14579,7 +14715,7 @@ viewDashboard = function(){
     const isFocusThis = s.id === focusSid;
     const isDoneTheme = mp >= 100;
     const isLockedTheme = mp === 0 && !isFocusThis;
-    const formattedTitle = formatSkillTitleWithChips(s.title, 2);
+    const formattedTitle = formatSkillTitleWithChips(s.title, 3);
     const stepStatusIndicator = isFocusThis
       ? `<span class="dash-theme-status-icon" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(16,185,129,0.22);border:1px solid rgba(16,185,129,0.45);font-size:.74rem;color:var(--moss);box-shadow:0 0 10px rgba(16,185,129,0.35);flex-shrink:0;" title="Тема в фокусе">✨</span>`
       : (isDoneTheme
@@ -14603,7 +14739,7 @@ viewDashboard = function(){
             : (mp === 100
                 ? `<span class="state-tag state-tag--mastered" style="font-size:.70rem;margin:0;white-space:nowrap;">✓ 100 MP</span>`
                 : (mp === 0
-                    ? `<span class="meta" style="font-size:.72rem;opacity:0.35;">Шаг ${idx+1}</span>`
+                    ? `<span class="meta dash-step-locked-badge" style="font-size:.72rem;opacity:0.6;padding:2px 7px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);color:var(--ink-muted);white-space:nowrap;">Шаг ${idx+1}</span>`
                     : `<span class="meta" style="font-size:.72rem;white-space:nowrap;">${mp} MP</span>`
                   )
               )
@@ -14839,7 +14975,7 @@ viewDashboard = function(){
       <!-- Зона 1: Шапка Эшелона (.echelon-topbar-clean) -->
       <div class="echelon-topbar-clean" style="padding:16px 20px;border-radius:20px;margin-bottom:18px;display:flex;flex-direction:column;gap:12px;background:rgba(18, 22, 31, 0.65);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255, 255, 255, 0.08);box-shadow:var(--shadow-1);">
         <!-- Ряд 1: Звание и статус готовности без дублирующего стрика -->
-        <div style="display:flex;align-items:center;min-width:0;">
+        <div class="echelon-topbar-row-top" style="display:flex;align-items:center;min-width:0;">
           <h1 class="rank-title-glow echelon-bordeaux-title" style="margin:0;font-size:1.32rem;">${readinessRank} ${rankIcon}</h1>
         </div>
 
@@ -14856,9 +14992,7 @@ viewDashboard = function(){
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;flex-shrink:0;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
               <span class="topbar-help-text">Справка</span>
             </a>
-            <button type="button" class="topbar-help-btn btn btn-ghost-quiet" data-toggle-audio data-audio-toggle style="display:none !important;padding:6px 10px;border-radius:10px;cursor:pointer;text-decoration:none;font-size:.82rem;font-weight:600;align-items:center;gap:4px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--ink-muted);" title="Слушать аудио / Аудио-компаньон" aria-label="Озвучить">
-              <span class="topbar-audio-icon" style="flex-shrink:0;">🎧</span><span class="topbar-audio-text">Озвучить</span>
-            </button>
+
           </div>
         </div>
 
@@ -14867,13 +15001,13 @@ viewDashboard = function(){
           <div class="echelon-clean-meta" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
             ${e1CurMp === 0
               ? `<span class="echelon-readiness-emerald" style="font-weight:700;font-size:.84rem;flex:1 1 auto;min-width:0;">
-                  <span class="echelon-label-full">🎯 Старт пути к тех-скринингу</span>
-                  <span class="echelon-label-mobile">🎯 Старт пути к тех-скринингу</span>
+                  <span class="echelon-label-full">🧭 Старт пути к тех-скринингу</span>
+                  <span class="echelon-label-mobile">🧭 Старт пути к тех-скринингу</span>
                 </span>
-                <span class="meta echelon-mp-counter" style="font-size:.78rem;font-weight:700;color:var(--ink);flex-shrink:0;white-space:nowrap;">Старт модуля · ${cleanUnitTitle}</span>`
+                <span class="meta echelon-mp-counter" style="font-size:.78rem;font-weight:700;color:var(--ink);flex-shrink:0;white-space:nowrap;">Модуль 1 · Введение</span>`
               : `<span class="echelon-readiness-emerald" style="font-weight:700;font-size:.84rem;flex:1 1 auto;min-width:0;">
-                  <span class="echelon-label-full">🎯 Готовность к тех-скринингу: ${e1Pct}%</span>
-                  <span class="echelon-label-mobile">🎯 Тех-скрининг: ${e1Pct}%</span>
+                  <span class="echelon-label-full">🧭 Готовность к тех-скринингу: ${e1Pct}%</span>
+                  <span class="echelon-label-mobile">🧭 Тех-скрининг: ${e1Pct}%</span>
                 </span>
                 <span class="meta echelon-mp-counter" style="font-size:.78rem;font-weight:700;color:var(--ink);flex-shrink:0;white-space:nowrap;">Освоено тем: ${curUnitDone} из ${curUnitTotal}</span>`
             }
@@ -14939,25 +15073,25 @@ viewDashboard = function(){
               ${dueTodayCardsCount > 0
                 ? srsSubtitle
                 : (!hasReviewedAnyCard
-                    ? `<div style="display:flex;flex-direction:column;gap:10px;">
-                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                          <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.28);color:#34d399;padding:4px 10px;border-radius:8px;font-size:.76rem;font-weight:700;">
-                            <span>📇</span> Первое повторение
+                    ? (() => {
+                        const theoryDoneCount = focusKIds.filter(k => state.readNotes.includes(k)).length;
+                        return `<div style="display:flex;flex-direction:column;gap:10px;">
+                          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                            <span class="badge" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:var(--ink-muted);padding:3px 8px;border-radius:6px;font-size:.74rem;font-weight:600;">🔒 Откроется после теории</span>
                           </div>
-                          <span class="badge" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);font-size:.72rem;padding:3px 8px;border-radius:6px;font-weight:600;">Шпаргалки и карточки темы</span>
-                        </div>
-                        <div style="font-size:.78rem;color:var(--ink-muted);line-height:1.45;">
-                          Первое повторение откроется после завершения теории по теме «${escapeHtmlStr(cleanTitle)}». Карточки с умным интервалом помогут закрепить базу в долговременной памяти.
-                        </div>
-                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:8px;font-size:.74rem;">
-                          <span style="color:var(--ink-muted);font-size:.72rem;">Откроется после 3 шагов теории</span>
-                          <span style="display:inline-flex;gap:4px;align-items:center;" title="Прогресс шагов теории">
-                            <span style="width:6px;height:6px;border-radius:50%;background:#10b981;box-shadow:0 0 6px rgba(16,185,129,0.6);"></span>
-                            <span style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.15);"></span>
-                            <span style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.15);"></span>
-                          </span>
-                        </div>
-                      </div>`
+                          <div style="font-size:.78rem;color:var(--ink-muted);line-height:1.45;">
+                            Умный алгоритм SRS активируется сразу после 3 микро-шагов теории.
+                          </div>
+                          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:8px;font-size:.74rem;">
+                            <span style="color:var(--ink-muted);font-size:.72rem;">Пройдено ${theoryDoneCount} из 3 шагов теории</span>
+                            <span style="display:inline-flex;gap:5px;align-items:center;" title="Прогресс шагов теории: ${theoryDoneCount} из 3">
+                              <span style="width:7px;height:7px;border-radius:50%;background:${theoryDoneCount >= 1 ? '#10b981' : 'rgba(255,255,255,0.15)'};${theoryDoneCount >= 1 ? 'box-shadow:0 0 6px rgba(16,185,129,0.6);' : ''}"></span>
+                              <span style="width:7px;height:7px;border-radius:50%;background:${theoryDoneCount >= 2 ? '#10b981' : 'rgba(255,255,255,0.15)'};${theoryDoneCount >= 2 ? 'box-shadow:0 0 6px rgba(16,185,129,0.6);' : ''}"></span>
+                              <span style="width:7px;height:7px;border-radius:50%;background:${theoryDoneCount >= 3 ? '#10b981' : 'rgba(255,255,255,0.15)'};${theoryDoneCount >= 3 ? 'box-shadow:0 0 6px rgba(16,185,129,0.6);' : ''}"></span>
+                            </span>
+                          </div>
+                        </div>`;
+                      })()
                     : `<span class="badge" style="background:rgba(16,185,129,0.16);border:1px solid rgba(16,185,129,0.35);color:#34d399;padding:4px 10px;border-radius:8px;font-size:.76rem;font-weight:700;display:inline-block;">✓ Все карточки на сегодня повторены!</span>`
                   )
               }
@@ -14967,12 +15101,11 @@ viewDashboard = function(){
             ${dueTodayCardsCount > 0
               ? `<div style="display:flex;justify-content:flex-end;"><a href="#/cards" ${targetDeckId ? `data-srs-open-deck="${targetDeckId}"` : ''} class="btn-ghost-quiet btn-srs-quiet" style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;font-weight:600;font-size:.80rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:var(--ink-muted);text-decoration:none;transition:all .2s ease;">Повторить (2 мин) ➔</a></div>`
               : (!hasReviewedAnyCard
-                  ? `<div class="srs-locked-preview" title="Откроется автоматически после завершения теории" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 12px;border-radius:10px;margin-top:2px;">
+                  ? `<div class="srs-locked-preview" title="Откроется автоматически после 3 шагов теории" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 12px;border-radius:10px;margin-top:2px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);">
                       <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 auto;">
                         <span style="font-size:1rem;flex-shrink:0;">📇</span>
                         <div style="font-size:0.75rem;color:var(--ink-muted);line-height:1.35;">
-                          <span style="font-weight:600;color:var(--ink);">Флеш-колода темы</span>
-                          <span style="opacity:0.75;"> (откроется после разбора теории)</span>
+                          <span style="font-weight:600;color:var(--ink);">Флеш-колода к теме</span>
                         </div>
                       </div>
                       <span class="badge" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--ink-muted);font-size:0.68rem;padding:2px 7px;border-radius:6px;font-weight:600;flex-shrink:0;white-space:nowrap;">🔒 +10 XP</span>
@@ -14990,7 +15123,7 @@ viewDashboard = function(){
           <div class="dash-accordion-title-wrap" style="min-width:0;flex:1 1 auto;overflow:hidden;display:inline-flex;align-items:center;gap:8px;">
             <svg class="chevron-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--moss);transition:transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);display:inline-block;flex-shrink:0;"><polyline points="6 9 12 15 18 9"></polyline></svg>
             <span class="dash-accordion-title" style="min-width:0;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;">
-              <span class="dash-accordion-title-desk">Темы текущего модуля:</span>
+              <span class="dash-accordion-title-desk">Все темы модуля:</span>
               <span class="dash-accordion-title-mob">Модуль:</span>
               ${escapeHtmlStr(cleanUnitTitle)}
             </span>
@@ -15002,8 +15135,8 @@ viewDashboard = function(){
         </summary>
         <div style="margin-top:12px;border-top:1px solid rgba(255,255,255,0.05);padding-top:8px;">
           ${currentUnitThemesHTML}
-          <div style="text-align:center;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05);">
-            <a href="#/map" class="link-quiet" style="font-size:.80rem;display:inline-flex;align-items:center;gap:6px;text-decoration:none;opacity:0.75;transition:opacity .2s ease, color .2s ease;">
+          <div style="text-align:center;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05);margin-bottom:calc(16px + env(safe-area-inset-bottom));">
+            <a href="#/map" class="link-quiet dash-map-link" style="font-size:.80rem;display:inline-flex;align-items:center;gap:6px;text-decoration:none;opacity:0.75;transition:opacity .2s ease, color .2s ease;margin-bottom:calc(16px + env(safe-area-inset-bottom));">
               <span>🗺️ Смотреть все модули и полную карту компетенций эшелона ➔</span>
             </a>
           </div>
@@ -18048,6 +18181,19 @@ document.addEventListener('keydown', function(e){
       return;
     }
   }
+  // Горячая клавиша Enter на дашборде для мгновенного запуска dominant CTA без мыши
+  if(e.key === 'Enter' && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey){
+    const activeModal = document.querySelector('.modal[style*="display: block"], #bug-report-modal, #settings-modal, #path-anchored-popover:not([style*="display: none"])');
+    if(!activeModal){
+      const dominantCta = document.querySelector('.dashboard-container .btn-dominant-cta, .dashboard-container .cocoon-focus-cta');
+      if(dominantCta){
+        e.preventDefault();
+        dominantCta.click();
+        return;
+      }
+    }
+  }
+
   if((e.key === 'Enter' || e.code === 'Space') && e.target && e.target.closest && (e.target.closest('.hex-3d-node') || e.target.closest('.hex-challenge-node') || e.target.closest('[data-gate-track]'))){
     e.preventDefault();
     const clickEv = (typeof MouseEvent !== 'undefined') ? new MouseEvent('click', { bubbles: true, cancelable: true }) : { type: 'click', bubbles: true };

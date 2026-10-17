@@ -83,7 +83,8 @@ console.log('✓ 5. Desktop Sidebar Invariant: левое меню платфо�
 assert(academyHtml.includes('⚡ Ждёт первого шага · Цель: 50 XP'), 'Dashboard topbar must show friendly zero-balance badge');
 assert(!academyHtml.includes('⚡ 0 / ${dailyGoal} XP за сутки'), 'Dashboard topbar must not show demotivating 0/50 XP text');
 assert(academyHtml.includes('🔒 +10 XP'), 'SRS locked card must show muted locked +10 XP badge');
-assert(academyHtml.includes('📇</span> Первое повторение'), 'SRS status badge must use 📇 card file icon');
+assert(academyHtml.includes('🔒 Откроется после теории'), 'SRS status badge must show 🔒 Откроется после теории');
+assert(academyHtml.includes('Флеш-колода к теме'), 'SRS deck preview must show Флеш-колода к теме');
 assert(!academyHtml.includes('Откроется по порядку'), 'Accordion module topics must eliminate text fence "Откроется по порядку"');
 assert(academyHtml.includes('title="Откроется после выполнения предыдущих тем"'), 'Locked unit topic must show clean lock SVG with tooltip');
 assert(academyHtml.includes('const isActive = Boolean(!firstUnreadK && firstUnreviewedF === s.id);'), '13-dots tracker must enforce single global focus');
