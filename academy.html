@@ -3966,7 +3966,7 @@
     color: #fb7185 !important;
     font-weight: 800;
     letter-spacing: -0.01em;
-    text-shadow: 0 0 20px rgba(244, 63, 94, 0.3) !important;
+    text-shadow: 0 0 18px rgba(244, 63, 94, 0.35) !important;
     filter: drop-shadow(0 0 10px rgba(244, 63, 94, 0.3));
   }
   :root[data-theme="light"] .echelon-bordeaux-title {
@@ -4269,6 +4269,20 @@
     white-space: nowrap;
     letter-spacing: 0.01em;
   }
+  .day-xp-badge.empty-day-badge {
+    background: rgba(16, 185, 129, 0.10);
+    border-color: rgba(16, 185, 129, 0.28);
+    color: #34d399;
+    opacity: 0.9;
+  }
+  .dots-phase-divider {
+    display: inline-block;
+    width: 1px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.12);
+    margin: 0 2px;
+    flex-shrink: 0;
+  }
   .cocoon-focus-card {
     background: rgba(18, 22, 31, 0.65) !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -4482,8 +4496,8 @@
     height: 10px !important;
     background: #ffffff !important;
     border: 1.5px solid #ffffff !important;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.35), 0 0 10px rgba(16, 185, 129, 0.6) !important;
-    animation: jewel-pearl-pulse 2s infinite ease-in-out !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3), 0 0 10px rgba(52, 211, 153, 0.6) !important;
+    animation: pulse-ring 2s infinite !important;
   }
   @keyframes jewel-pearl-pulse {
     0%, 100% {
@@ -13677,7 +13691,7 @@ function buildSevenDayHeatmapHTML(){
         hint += ' (активность учтена)';
       } else {
         cls = 'heat-cell rest-day';
-        valText = '—';
+        valText = '·';
         dotCls = 'rest';
         hint += ' (день отдыха)';
       }
@@ -14001,7 +14015,7 @@ viewDashboard = function(){
             : (mp === 100
                 ? `<span class="state-tag state-tag--mastered" style="font-size:.70rem;margin:0;">✓ 100 MP</span>`
                 : (mp === 0
-                    ? `<span class="meta" style="font-size:.72rem;opacity:0.65;">Готова</span>`
+                    ? `<span class="meta" style="font-size:.72rem;opacity:0.55;">Не начата</span>`
                     : `<span class="meta" style="font-size:.72rem;">${mp} MP</span>`
                   )
               )
@@ -14066,6 +14080,7 @@ viewDashboard = function(){
     focusCtaHTML = `<button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta" data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}">🧪 Начать рубежный тест (+50 XP) ➔</button>`;
   }
 
+  const phaseDivider = '<span class="dots-phase-divider" style="display:inline-block;width:1px;height:10px;background:rgba(255,255,255,0.12);margin:0 2px;"></span>';
   const miniTrackDots = [];
   focusKIds.forEach((kId, idx) => {
     const isDone = state.readNotes.includes(kId);
@@ -14076,6 +14091,10 @@ viewDashboard = function(){
     miniTrackDots.push(`<span class="dot-jewel ${cls}" title="Конспект ${idx + 1}: ${escapeHtmlStr(title)}" data-quick-microstep="${focusSid}" data-quick-kid="${kId}"></span>`);
   });
 
+  if(focusKIds.length && focusFIds.length){
+    miniTrackDots.push(phaseDivider);
+  }
+
   focusFIds.forEach((fId, idx) => {
     const isDone = state.reviewedDecks.includes(fId);
     const isActive = (firstUnreviewedF === fId);
@@ -14084,6 +14103,10 @@ viewDashboard = function(){
     const title = (d.title || fId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
     miniTrackDots.push(`<span class="dot-jewel ${cls}" title="Карточки: ${escapeHtmlStr(title)}" data-srs-open-deck="${fId}"></span>`);
   });
+
+  if(focusFIds.length && focusTIds.length){
+    miniTrackDots.push(phaseDivider);
+  }
 
   focusTIds.forEach((tId, idx) => {
     const isDone = Boolean(state.taskCodeHistory && state.taskCodeHistory[tId]);
@@ -14129,7 +14152,7 @@ viewDashboard = function(){
   const curUnitDoneCount = curUnitSkills.filter(s => getSkillMP(s.id) >= 100).length;
   const accordionStatusText = curUnitDoneCount > 0
     ? `${curUnitDoneCount} из ${curUnitTotal} тем закрыто (${curUnitMpPct}% MP)`
-    : `1 из ${curUnitTotal} тем в фокусе (${curUnitMpPct}% MP)`;
+    : `Юнит ${activeUnitId} · Тема 1 из ${curUnitTotal} в фокусе`;
 
   return `
     <div class="container dashboard-container">
@@ -14143,7 +14166,10 @@ viewDashboard = function(){
             </div>
           </div>
           <div class="echelon-topbar-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <span class="day-xp-badge" title="Заработано за сутки: ${tXp} XP">⚡ +${todayXp()} XP за сутки</span>
+            ${todayXp() === 0
+              ? `<span class="day-xp-badge empty-day-badge">⚡ Ждёт первого шага</span>`
+              : `<span class="day-xp-badge" title="Заработано за сутки: ${tXp} XP">⚡ +${todayXp()} XP за сутки</span>`
+            }
             <a href="#/docs" class="topbar-help-btn btn btn-ghost-quiet" style="padding:6px 12px;border-radius:10px;text-decoration:none;font-size:.82rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,0.08);" title="Справочник платформы">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
               <span class="topbar-help-text">Справка</span>
@@ -14156,7 +14182,7 @@ viewDashboard = function(){
           <div class="echelon-clean-meta" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
             ${e1CurMp === 0
               ? `<span class="echelon-readiness-emerald" style="font-weight:700;font-size:.84rem;">🌱 Старт подготовки · Эшелон 1 (Junior)</span>
-                 <span class="meta" style="font-size:.78rem;font-weight:700;color:var(--ink);">Навыки: 0 / ${e1MaxMp} MP</span>`
+                 <span class="meta" style="font-size:.78rem;font-weight:700;color:var(--emerald);">Первая цель: +15 XP</span>`
               : `<span class="echelon-readiness-emerald" style="font-weight:700;font-size:.84rem;">🎯 Готовность к тех-скринингу: ${e1Pct}%</span>
                  <span class="meta" style="font-size:.78rem;font-weight:700;color:var(--ink);">Навыки: ${e1CurMp} / ${e1MaxMp} MP</span>`
             }
@@ -14237,7 +14263,10 @@ viewDashboard = function(){
           <div style="display:flex;justify-content:flex-end;margin-top:auto;">
             ${dueTodayCardsCount > 0
               ? `<a href="#/cards" ${targetDeckId ? `data-srs-open-deck="${targetDeckId}"` : ''} class="btn-srs-action" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:11px;font-weight:700;font-size:.82rem;background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.30);color:#34d399;text-decoration:none;transition:all .15s ease;">Повторить (2 мин) ➔</a>`
-              : `<a href="#/cards" class="btn-srs-pill link-quiet text-muted">Обзор колод ➔</a>`
+              : (hasReviewedAnyCard
+                  ? `<a href="#/cards" class="btn-srs-pill link-quiet text-muted">Обзор колод ➔</a>`
+                  : ''
+                )
             }
           </div>
         </div>
