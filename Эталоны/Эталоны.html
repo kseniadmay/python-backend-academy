@@ -376,7 +376,10 @@
       display:none !important;
     }
     .dashboard-container {
-      padding-bottom: 0 !important;
+      padding-bottom: calc(112px + env(safe-area-inset-bottom, 20px)) !important;
+    }
+    main {
+      padding-bottom: calc(112px + env(safe-area-inset-bottom, 20px)) !important;
     }
   }
   body:has(.dash-accordion[open]) .bug-fab-btn,
@@ -1824,10 +1827,11 @@
     justify-content: space-between;
     align-items: center;
     gap: 8px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap !important;
     font-size: 0.76rem;
     font-weight: 400;
     width: 100%;
+    margin-bottom: 6px;
   }
   .echelon-clean-meta .echelon-label-full { display: inline; }
   .echelon-clean-meta .echelon-label-mobile { display: none; }
@@ -1835,9 +1839,13 @@
 
   @media (max-width: 480px) {
     .echelon-clean-meta {
-      flex-direction: column !important;
-      align-items: flex-start !important;
-      gap: 2px !important;
+      display: flex !important;
+      flex-direction: row !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      gap: 8px !important;
+      flex-wrap: nowrap !important;
+      margin-bottom: 6px !important;
     }
     .echelon-clean-meta .echelon-mp-counter {
       margin-left: 0 !important;
@@ -4301,13 +4309,23 @@
     pointer-events: none;
     z-index: 0;
   }
+  .dashboard-container .echelon-bordeaux-title,
   .rank-title-glow {
     font-size: 1.42rem;
     font-weight: 800;
     letter-spacing: -0.02em;
     margin: 0;
-    color: var(--ink);
-    text-shadow: 0 0 16px rgba(16, 185, 129, 0.32), 0 0 28px rgba(190, 18, 60, 0.22);
+    background: linear-gradient(135deg, #f43f5e 0%, #fb7185 50%, #fda4af 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(244, 63, 94, 0.25);
+  }
+  :root[data-theme="light"] .dashboard-container .echelon-bordeaux-title,
+  :root[data-theme="light"] .rank-title-glow {
+    background: linear-gradient(135deg, #be123c 0%, #e11d48 50%, #9f1239 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
   }
   .day-xp-badge {
     display: inline-flex;
@@ -14846,7 +14864,7 @@ viewDashboard = function(){
   const curSkillIndex = curUnitSkills.findIndex(s => s.id === focusSid);
   const curSkillNum = curSkillIndex >= 0 ? curSkillIndex + 1 : 1;
   const curSkillTotal = curUnitSkills.length || 3;
-  const focusEyebrowText = `${cleanUnitTitle} · В фокусе`;
+  const focusEyebrowText = `● СПРИНТ-ФОКУС · ${cleanUnitTitle.toUpperCase()}`;
 
   // Ювелирная цепочка микро-шагов: строго 13 бусин (3 теории + 3 карточек + 6 практики + 1 зачёт)
   const allKIds = (focusSk && focusSk.kIds && focusSk.kIds.length) ? [...focusSk.kIds] : ['К-001', 'К-002', 'К-003'];
@@ -15015,7 +15033,15 @@ viewDashboard = function(){
     <div class="dots-necklace-container" style="margin: 12px 0 16px;">
       <div class="tracker-clusters-wrap">
         <div class="tracker-cluster">
-          <span class="tracker-cluster-label"><span class="cluster-icon">📖</span><span class="cluster-label-text">Теория</span></span>
+          <span class="tracker-cluster-label">
+            <span class="cluster-icon" style="display:inline-flex;align-items:center;vertical-align:middle;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink-muted);">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+            </span>
+            <span class="cluster-label-text">Теория</span>
+          </span>
           <div class="tracker-cluster-dots">
             ${theoryDots.join('')}
           </div>
@@ -15071,10 +15097,10 @@ viewDashboard = function(){
   const curUnitDoneCount = curUnitSkills.filter(s => getSkillMP(s.id) >= 100).length;
   const accordionStatusText = curUnitDoneCount > 0
     ? `${curUnitDoneCount} из ${curUnitTotal} тем закрыто (${curUnitMpPct}% MP)`
-    : `Текущий спринт · В фокусе`;
+    : `${curUnitTotal} тем модуля · Старт с 1-й темы`;
   const accordionMobStatusText = curUnitDoneCount > 0
     ? `${curUnitDoneCount}/${curUnitTotal} закрыто`
-    : `В фокусе`;
+    : `${curUnitTotal} тем`;
 
   return `
     <div class="container dashboard-container">
@@ -15082,7 +15108,7 @@ viewDashboard = function(){
       <div class="echelon-topbar-clean" style="padding:16px 20px;border-radius:20px;margin-bottom:18px;display:flex;flex-direction:column;gap:12px;background:rgba(18, 22, 31, 0.65);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255, 255, 255, 0.08);box-shadow:var(--shadow-1);">
         <!-- Ряд 1: Звание слева, кнопка «Справка» справа -->
         <div class="echelon-topbar-row-top" style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px;">
-          <h1 class="rank-title-glow echelon-bordeaux-title" style="margin:0;font-size:1.32rem;">${readinessRank} ${rankIcon}</h1>
+          <h1 class="rank-title-glow echelon-bordeaux-title" style="margin:0;font-size:1.32rem;">${readinessRank} <span style="-webkit-text-fill-color:initial;text-shadow:none;">${rankIcon}</span></h1>
           <a href="#/docs" class="topbar-help-btn btn btn-ghost-quiet" style="padding:6px 10px;border-radius:10px;text-decoration:none;font-size:.82rem;font-weight:600;display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--ink-muted);flex-shrink:0;" title="Справочник платформы" aria-label="Справка">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;flex-shrink:0;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
             <span class="topbar-help-text">Справка</span>
@@ -15101,18 +15127,18 @@ viewDashboard = function(){
 
         <!-- Прогресс эшелона -->
         <div class="echelon-clean-wrap" style="width:100%;" title="Готовность к 1-му тех-скринингу">
-          <div class="echelon-clean-meta" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+          <div class="echelon-clean-meta" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:nowrap;margin-bottom:6px;">
             ${e1CurMp === 0
-              ? `<span class="echelon-readiness-emerald" style="font-weight:700;font-size:.84rem;flex:1 1 auto;min-width:0;">
+              ? `<span class="echelon-readiness-emerald" style="font-weight:700;font-size:.84rem;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                   <span class="echelon-label-full">🧭 Старт пути к тех-скринингу</span>
-                  <span class="echelon-label-mobile">🧭 Старт пути к тех-скринингу</span>
+                  <span class="echelon-label-mobile">🧭 Тех-скрининг</span>
                 </span>
-                <span class="meta echelon-mp-counter" style="font-size:.78rem;font-weight:700;color:var(--ink);flex-shrink:0;white-space:nowrap;">Модуль 1 · Введение</span>`
-              : `<span class="echelon-readiness-emerald" style="font-weight:700;font-size:.84rem;flex:1 1 auto;min-width:0;">
+                <span class="meta echelon-mp-counter" style="font-size:.74rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:2px 7px;border-radius:6px;white-space:nowrap;flex-shrink:0;">Модуль 1</span>`
+              : `<span class="echelon-readiness-emerald" style="font-weight:700;font-size:.84rem;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                   <span class="echelon-label-full">🧭 Готовность к тех-скринингу: ${e1Pct}%</span>
                   <span class="echelon-label-mobile">🧭 Тех-скрининг: ${e1Pct}%</span>
                 </span>
-                <span class="meta echelon-mp-counter" style="font-size:.78rem;font-weight:700;color:var(--ink);flex-shrink:0;white-space:nowrap;">Освоено тем: ${curUnitDone} из ${curUnitTotal}</span>`
+                <span class="meta echelon-mp-counter" style="font-size:.74rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:2px 7px;border-radius:6px;white-space:nowrap;flex-shrink:0;">Модуль 1 · ${curUnitDone}/${curUnitTotal}</span>`
             }
           </div>
           <div class="echelon-clean-track" style="height:8px;border-radius:999px;background:rgba(255,255,255,0.08);overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,0.4);">
@@ -15130,7 +15156,7 @@ viewDashboard = function(){
       <!-- Зона 2: Главная карточка Фокуса (Single Dominant Hero Card) -->
       <div class="cocoon-focus-card">
         <div class="cocoon-focus-eyebrow" style="display:inline-flex;width:fit-content;max-width:100%;align-items:center;gap:7px;font-size:.74rem;font-weight:800;letter-spacing:0.06em;color:#34d399;text-transform:uppercase;margin-bottom:8px;padding:4px 12px;border-radius:999px;">
-          <span class="pulse-ring-dot"></span> ${focusEyebrowText}
+          <span class="pulse-ring-dot"></span> ${focusEyebrowText.replace(/^●\s*/, '')}
         </div>
         <div class="cocoon-focus-title">
           ${focusTitleFormatted}
@@ -15238,8 +15264,8 @@ viewDashboard = function(){
         </summary>
         <div style="margin-top:12px;border-top:1px solid rgba(255,255,255,0.05);padding-top:8px;">
           ${currentUnitThemesHTML}
-          <div style="text-align:center;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05);margin-bottom:8px;">
-            <a href="#/map" class="link-quiet dash-map-link" style="font-size:.80rem;display:inline-flex;align-items:center;gap:6px;text-decoration:none;opacity:0.75;transition:opacity .2s ease, color .2s ease;">
+          <div style="text-align:center;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05);margin-bottom:12px;">
+            <a href="#/map" class="link-quiet dash-map-link" style="font-size:.80rem;display:flex;width:100%;justify-content:center;align-items:center;gap:6px;text-decoration:none;opacity:0.75;transition:opacity .2s ease, color .2s ease;margin-bottom:12px;padding:8px 12px;box-sizing:border-box;">
               <span>🗺️ Смотреть все модули и полную карту компетенций эшелона ➔</span>
             </a>
           </div>
