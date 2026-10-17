@@ -4638,33 +4638,37 @@
   }
   @media (max-width: 480px) {
     .tracker-clusters-wrap {
-      gap: 4px !important;
+      gap: 12px !important;
       padding: 4px 0 !important;
-      justify-content: space-between !important;
+      justify-content: center !important;
       width: 100% !important;
       max-width: 100% !important;
       margin: 12px 0 16px !important;
     }
     .tracker-cluster {
-      gap: 4px !important;
+      gap: 5px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      text-align: center !important;
+      background: rgba(255, 255, 255, 0.02) !important;
+      border-radius: 12px !important;
+      padding: 6px 8px !important;
     }
     .tracker-cluster-label {
       font-size: 0.72rem !important;
+      justify-content: center !important;
+      align-items: center !important;
+      display: flex !important;
     }
     .tracker-cluster-label .cluster-label-text {
       display: none !important;
-    }
-    .tracker-cluster {
-      align-items: center !important;
-      text-align: center !important;
-    }
-    .tracker-cluster-label {
-      justify-content: center !important;
     }
     .tracker-cluster-dots {
       gap: 6px !important;
       justify-content: center !important;
       align-items: center !important;
+      display: flex !important;
     }
     .tracker-cluster-dots .dot-jewel {
       position: relative !important;
@@ -4696,9 +4700,7 @@
       background: transparent !important;
     }
     .dots-phase-divider {
-      height: 16px !important;
-      margin: 0 4px !important;
-      opacity: 0.35 !important;
+      display: none !important;
     }
     .focus-mini-track .dot-jewel,
     .tracker-cluster-dots .dot-jewel {
@@ -4843,14 +4845,37 @@
   .dashboard-container [data-toggle-audio] {
     display: none !important;
   }
+  .dashboard-container .echelon-topbar-clean {
+    align-items: stretch !important;
+    text-align: left !important;
+  }
+  .dashboard-container .echelon-topbar-row-top {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    text-align: left !important;
+  }
+  .dashboard-container .rank-title-glow {
+    text-align: left !important;
+  }
   @media (max-width: 680px) {
     .dashboard-container .echelon-topbar-clean {
       padding: 12px 14px !important;
       gap: 8px !important;
       margin-bottom: 12px !important;
+      align-items: stretch !important;
+      text-align: left !important;
+    }
+    .dashboard-container .echelon-topbar-row-top {
+      flex-wrap: wrap !important;
+      gap: 8px !important;
+      justify-content: space-between !important;
+      text-align: left !important;
     }
     .dashboard-container .rank-title-glow {
       font-size: 1.18rem !important;
+      text-align: left !important;
     }
     .dashboard-container .topbar-help-btn .topbar-help-text {
       display: none !important;
@@ -4942,6 +4967,31 @@
     color: #ffffff !important;
     box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
     box-sizing: border-box !important;
+  }
+  .heat-cell.heat-cell--today-pending {
+    border: 1.5px dashed rgba(16, 185, 129, 0.45) !important;
+    background: rgba(16, 185, 129, 0.04) !important;
+    color: #34d399 !important;
+    box-sizing: border-box !important;
+    animation: emeraldPendingPulse 3s infinite ease-in-out;
+  }
+  .heat-cell.heat-cell--today-pending b {
+    font-size: 0.72rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: rgba(52, 211, 153, 0.75) !important;
+  }
+  .today-pending-spark {
+    display: inline-block;
+    opacity: 0.75;
+    font-size: 0.72rem;
+    line-height: 1;
+    filter: drop-shadow(0 0 3px rgba(16, 185, 129, 0.4));
+  }
+  @keyframes emeraldPendingPulse {
+    0%, 100% { border-color: rgba(16, 185, 129, 0.35); box-shadow: none; }
+    50% { border-color: rgba(16, 185, 129, 0.65); box-shadow: 0 0 8px rgba(16, 185, 129, 0.2); }
   }
   .heat-cell .heat-dot {
     width: 4px !important;
@@ -5186,7 +5236,8 @@
   }
   .heat-cell.today-start-badge,
   .heat-cell.today-active,
-  .heat-cell.today-goal {
+  .heat-cell.today-goal,
+  .heat-cell.heat-cell--today-pending {
     justify-content: center !important;
     padding: 6px 4px !important;
     border-radius: 10px !important;
@@ -14268,10 +14319,17 @@ function buildSevenDayHeatmapHTML(){
         dotCls = 'done';
         hint += ' (сегодня)';
       } else {
-        cls = 'heat-cell today-start-badge';
-        valText = '<span class="today-glow-flame">🔥</span>';
-        dotCls = 'active';
-        hint += ' (сегодня · цель 50 XP)';
+        if(streak > 0){
+          cls = 'heat-cell heat-cell--today-pending';
+          valText = '<span class="today-pending-spark">✨</span>';
+          dotCls = 'active';
+          hint += ` (сегодня · серия ${streak} дн. · цель ${dailyGoal} XP)`;
+        } else {
+          cls = 'heat-cell today-start-badge';
+          valText = '<span class="today-glow-flame">🔥</span>';
+          dotCls = 'active';
+          hint += ` (сегодня · цель ${dailyGoal} XP)`;
+        }
       }
     } else if(isPast){
       if(reachedGoal){
@@ -14885,7 +14943,7 @@ viewDashboard = function(){
       <!-- Зона 1: Шапка Эшелона (.echelon-topbar-clean) -->
       <div class="echelon-topbar-clean" style="padding:16px 20px;border-radius:20px;margin-bottom:18px;display:flex;flex-direction:column;gap:12px;background:rgba(18, 22, 31, 0.65);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255, 255, 255, 0.08);box-shadow:var(--shadow-1);">
         <!-- Ряд 1: Звание и статус готовности без дублирующего стрика -->
-        <div style="display:flex;align-items:center;min-width:0;">
+        <div class="echelon-topbar-row-top" style="display:flex;align-items:center;min-width:0;">
           <h1 class="rank-title-glow echelon-bordeaux-title" style="margin:0;font-size:1.32rem;">${readinessRank} ${rankIcon}</h1>
         </div>
 
@@ -14913,13 +14971,13 @@ viewDashboard = function(){
           <div class="echelon-clean-meta" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
             ${e1CurMp === 0
               ? `<span class="echelon-readiness-emerald" style="font-weight:700;font-size:.84rem;flex:1 1 auto;min-width:0;">
-                  <span class="echelon-label-full">🎯 Старт пути к тех-скринингу</span>
-                  <span class="echelon-label-mobile">🎯 Старт пути к тех-скринингу</span>
+                  <span class="echelon-label-full">🧭 Старт пути к тех-скринингу</span>
+                  <span class="echelon-label-mobile">🧭 Старт пути к тех-скринингу</span>
                 </span>
                 <span class="meta echelon-mp-counter" style="font-size:.78rem;font-weight:700;color:var(--ink);flex-shrink:0;white-space:nowrap;">Старт модуля · ${cleanUnitTitle}</span>`
               : `<span class="echelon-readiness-emerald" style="font-weight:700;font-size:.84rem;flex:1 1 auto;min-width:0;">
-                  <span class="echelon-label-full">🎯 Готовность к тех-скринингу: ${e1Pct}%</span>
-                  <span class="echelon-label-mobile">🎯 Тех-скрининг: ${e1Pct}%</span>
+                  <span class="echelon-label-full">🧭 Готовность к тех-скринингу: ${e1Pct}%</span>
+                  <span class="echelon-label-mobile">🧭 Тех-скрининг: ${e1Pct}%</span>
                 </span>
                 <span class="meta echelon-mp-counter" style="font-size:.78rem;font-weight:700;color:var(--ink);flex-shrink:0;white-space:nowrap;">Освоено тем: ${curUnitDone} из ${curUnitTotal}</span>`
             }
