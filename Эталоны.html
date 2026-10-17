@@ -376,9 +376,9 @@
       display:none !important;
     }
     .dashboard-container {
-      padding-bottom: calc(112px + env(safe-area-inset-bottom, 20px)) !important;
+      padding-bottom: calc(76px + env(safe-area-inset-bottom, 16px)) !important;
     }
-    main {
+    main:not(:has(.dashboard-container)) {
       padding-bottom: calc(112px + env(safe-area-inset-bottom, 20px)) !important;
     }
   }
@@ -5565,7 +5565,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(13, 17, 23, 0.94) !important;
+      background: rgba(13, 17, 23, 0.98) !important;
       backdrop-filter: blur(20px) !important;
       -webkit-backdrop-filter: blur(20px) !important;
       border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -5579,31 +5579,130 @@
       left: 0;
       right: 0;
       top: 100%;
-      height: env(safe-area-inset-bottom, 20px);
+      height: env(safe-area-inset-bottom, 24px);
       background: rgba(13, 17, 23, 0.98);
+      pointer-events: none;
+    }
+    body:has(.dashboard-container) #view-root,
+    body:has(.dashboard-container) main,
+    main:has(.dashboard-container) {
+      padding-bottom: 0 !important;
+      min-height: auto !important;
     }
     .dashboard-container {
-      padding-bottom: calc(84px + env(safe-area-inset-bottom, 16px)) !important;
+      padding-bottom: calc(76px + env(safe-area-inset-bottom, 16px)) !important;
       min-height: auto !important;
     }
   }
 
-  /* ========== ТЗ: Адаптация кластеров трекера 13 бусин и touch-targets ========== */
+  /* ========== ТЗ: Адаптация кластеров трекера 13 бусин и полноценные touch-targets 36x36 ========== */
   .dot-jewel {
     position: relative;
   }
   .dot-jewel::before {
-    content: '';
-    position: absolute;
-    inset: -6px;
-    border-radius: 50%;
+    content: '' !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    border-radius: 50% !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    z-index: 10 !important;
   }
 
   @media (max-width: 640px) {
-    .tracker-cluster-label .cluster-label-text { display: none !important; }
-    .tracker-cluster-label { margin-bottom: 2px !important; }
-    .tracker-clusters-wrap { gap: 8px !important; justify-content: center !important; }
-    .dots-phase-divider { width: 1px !important; height: 14px !important; margin: 0 2px !important; }
+    .tracker-clusters-wrap {
+      gap: 8px !important;
+      justify-content: center !important;
+      padding: 6px 2px !important;
+      max-width: 100% !important;
+    }
+    .tracker-cluster-label {
+      font-size: 0.62rem !important;
+      letter-spacing: 0.03em !important;
+      gap: 2px !important;
+      margin-bottom: 3px !important;
+    }
+    .tracker-cluster-label .cluster-label-text {
+      display: inline !important;
+    }
+    .tracker-cluster-dots {
+      gap: 4px !important;
+    }
+    .dots-phase-divider {
+      width: 1px !important;
+      height: 14px !important;
+      margin: 0 3px !important;
+      opacity: 0.25 !important;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .tracker-clusters-wrap {
+      gap: 6px !important;
+      padding: 4px 2px !important;
+    }
+    .tracker-cluster-label {
+      font-size: 0.60rem !important;
+      gap: 2px !important;
+    }
+    .tracker-cluster-dots {
+      gap: 4px !important;
+    }
+  }
+
+  /* ========== ТЗ: Стабилизация высоты карточек тем на мобильных устройствах (<=540px) ========== */
+  @media (max-width: 540px) {
+    .dash-accordion-theme-row {
+      padding: 7px 0 !important;
+      gap: 6px !important;
+    }
+    .dash-theme-title-col {
+      min-width: 0 !important;
+      overflow: hidden !important;
+    }
+    .dash-theme-text-wrap {
+      min-width: 0 !important;
+      flex-wrap: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+    }
+    .dash-accordion-theme-row .dash-theme-link {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 4px !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+    }
+    .dash-accordion .focus-chips-wrap {
+      display: inline-flex !important;
+      flex-wrap: nowrap !important;
+      overflow: hidden !important;
+      max-width: 100% !important;
+      gap: 3px !important;
+    }
+    .dash-accordion .focus-code-chip {
+      font-size: 0.68rem !important;
+      padding: 2px 6px !important;
+      white-space: nowrap !important;
+      max-width: 100% !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      flex-shrink: 1 !important;
+    }
   }
 
   /* ========== ТЗ: Шапка эшелона и искра 0 MP ========== */
@@ -5615,15 +5714,77 @@
     animation: sparkPulse 2s infinite ease-in-out;
   }
 
-  @media (max-width: 520px) {
-    .dashboard-container .topbar-help-btn .topbar-help-text {
-      display: none !important;
-    }
-    .dashboard-container .topbar-help-btn {
-      padding: 6px 8px !important;
+  /* ========== ТЗ: Гармоничная кнопка «Справка» и адаптация эшелона на мобильных устройствах ========== */
+  .dashboard-container,
+  .dashboard-container * {
+    box-sizing: border-box !important;
+  }
+
+  @media (max-width: 680px) {
+    .dashboard-container {
+      padding: 0 4px !important;
+      max-width: 100% !important;
+      overflow-x: hidden !important;
     }
     .dashboard-container .echelon-topbar-clean {
-      padding: 16px 14px !important;
+      padding: 12px 14px !important;
+      max-width: 100% !important;
+    }
+    .dashboard-container .echelon-label-full {
+      display: none !important;
+    }
+    .dashboard-container .echelon-label-mobile {
+      display: inline !important;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .dashboard-container .echelon-topbar-row-top {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      gap: 10px !important;
+      width: 100% !important;
+      min-width: 0 !important;
+    }
+    .dashboard-container .rank-title-glow,
+    .dashboard-container .echelon-bordeaux-title {
+      font-size: 1.05rem !important;
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+    .dashboard-container .topbar-help-btn,
+    .dashboard-container .topbar-help-btn[href="#/docs"] {
+      width: 34px !important;
+      height: 34px !important;
+      min-width: 34px !important;
+      min-height: 34px !important;
+      padding: 0 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border-radius: 10px !important;
+      background: rgba(255, 255, 255, 0.05) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+      flex-shrink: 0 !important;
+      margin-left: auto !important;
+    }
+    .dashboard-container .topbar-help-btn .topbar-help-text,
+    .dashboard-container .topbar-help-btn[href="#/docs"] .topbar-help-text {
+      display: none !important;
+    }
+    .dashboard-container .topbar-help-btn svg {
+      width: 15px !important;
+      height: 15px !important;
+      margin: 0 !important;
+      color: var(--ink-soft) !important;
+    }
+    .dashboard-container .echelon-topbar-clean {
+      padding: 12px 12px !important;
     }
   }
 
@@ -14971,7 +15132,7 @@ viewDashboard = function(){
     } else if(isDoneTheme){
       stepStatusIndicator = `<span class="dash-theme-status-icon" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);font-size:.72rem;font-weight:700;color:#34d399;flex-shrink:0;" title="Тема освоена">✓</span>`;
     } else if(isLockedTheme){
-      stepStatusIndicator = `<span class="dash-theme-status-icon" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);font-size:.70rem;font-weight:600;opacity:0.4;color:var(--ink-muted);flex-shrink:0;" title="Откроется последовательно после завершения предыдущего шага">${stepNumStr}</span>`;
+      stepStatusIndicator = `<span class="dash-theme-status-icon" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);font-size:.66rem;font-weight:600;opacity:0.5;color:var(--ink-muted);flex-shrink:0;" title="Откроется последовательно после завершения предыдущего шага">🔒</span>`;
       linkAttrs = `class="link-quiet dash-theme-link" style="text-decoration:none;color:inherit;font-weight:600;min-width:0;line-height:1.35;pointer-events: none; opacity: 0.55; cursor: default;" title="Откроется последовательно после завершения предыдущего шага"`;
     } else {
       stepStatusIndicator = `<span class="dash-theme-status-icon" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.25);font-size:.70rem;color:var(--moss);flex-shrink:0;">●</span>`;
@@ -14987,11 +15148,11 @@ viewDashboard = function(){
         </div>
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:auto;">
           ${isFocusThis
-            ? `<span class="badge" style="background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.35);color:var(--moss);padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;white-space:nowrap;">В фокусе</span>`
+            ? `<span class="badge" style="background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.45);color:var(--moss);padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;white-space:nowrap;box-shadow:0 0 10px rgba(16,185,129,0.25);">В фокусе</span>`
             : (mp === 100
                 ? `<span class="state-tag state-tag--mastered" style="font-size:.70rem;margin:0;white-space:nowrap;">✓ 100 MP</span>`
                 : (mp === 0
-                    ? `<span class="meta dash-step-locked-badge" style="font-size:.72rem;opacity:0.6;padding:2px 7px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);color:var(--ink-muted);white-space:nowrap;">Шаг ${idx+1}</span>`
+                    ? `<span class="meta dash-step-locked-badge" style="font-size:.72rem;opacity:0.7;padding:2px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);color:var(--ink-muted);white-space:nowrap;display:inline-flex;align-items:center;gap:4px;" title="Откроется последовательно после завершения предыдущего шага">🔒 Шаг ${idx+1} · Закрыто</span>`
                     : `<span class="meta" style="font-size:.72rem;white-space:nowrap;">${mp} MP</span>`
                   )
               )
@@ -15170,7 +15331,7 @@ viewDashboard = function(){
     const isActive = (globalIdx === activeGlobalStepIdx);
     const cls = isDone ? 'done' : (isActive ? 'active' : '');
     const shortT = taskShortTitles[tId] || 'Практическое задание';
-    const extraStyle = (idx === 2) ? 'style="margin-right:4px;"' : '';
+    const extraStyle = '';
     practiceDots.push(`<span class="dot-jewel ${cls}" ${extraStyle} title="Практика: ${escapeHtmlStr(shortT)}" data-open-practice-task="${tId}"></span>`);
   });
 
@@ -15187,8 +15348,8 @@ viewDashboard = function(){
       <div class="tracker-clusters-wrap">
         <div class="tracker-cluster">
           <span class="tracker-cluster-label">
-            <span class="cluster-icon" style="display:inline-flex;align-items:center;vertical-align:middle;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink-muted);">
+            <span class="cluster-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:2px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                 <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
               </svg>
@@ -15203,7 +15364,15 @@ viewDashboard = function(){
         <span class="dots-phase-divider"></span>
 
         <div class="tracker-cluster">
-          <span class="tracker-cluster-label"><span class="cluster-icon">📇</span><span class="cluster-label-text">Карточки</span></span>
+          <span class="tracker-cluster-label">
+            <span class="cluster-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:2px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="6" width="14" height="15" rx="2"></rect>
+                <path d="M7 2h12a2 2 0 0 1 2 2v13"></path>
+              </svg>
+            </span>
+            <span class="cluster-label-text">Карточки</span>
+          </span>
           <div class="tracker-cluster-dots">
             ${cardDots.join('')}
           </div>
@@ -15212,7 +15381,15 @@ viewDashboard = function(){
         <span class="dots-phase-divider"></span>
 
         <div class="tracker-cluster">
-          <span class="tracker-cluster-label"><span class="cluster-icon">💻</span><span class="cluster-label-text">Практика</span></span>
+          <span class="tracker-cluster-label">
+            <span class="cluster-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:2px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="4 17 10 11 4 5"></polyline>
+                <line x1="12" y1="19" x2="20" y2="19"></line>
+              </svg>
+            </span>
+            <span class="cluster-label-text">Практика</span>
+          </span>
           <div class="tracker-cluster-dots">
             ${practiceDots.join('')}
           </div>
@@ -15221,7 +15398,16 @@ viewDashboard = function(){
         <span class="dots-phase-divider"></span>
 
         <div class="tracker-cluster">
-          <span class="tracker-cluster-label"><span class="cluster-icon">🧪</span><span class="cluster-label-text">Зачёт</span></span>
+          <span class="tracker-cluster-label">
+            <span class="cluster-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:2px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 2v7.31L4.1 19.46A2 2 0 0 0 5.8 22h12.4a2 2 0 0 0 1.7-2.54L14 9.31V2"></path>
+                <path d="M8.5 2h7"></path>
+                <path d="M7 16h10"></path>
+              </svg>
+            </span>
+            <span class="cluster-label-text">Зачёт</span>
+          </span>
           <div class="tracker-cluster-dots">
             ${examDot}
           </div>
@@ -15363,11 +15549,11 @@ viewDashboard = function(){
                           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                             <span class="badge" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);color:#34d399;font-size:0.74rem;font-weight:700;padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;">🌱 Активация через 3 шага теории</span>
                           </div>
-                          <div class="srs-clean-preview" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);">
+                          <div class="srs-clean-preview" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);">
                             <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 auto;">
                               <span style="font-weight:600;color:var(--ink);font-size:0.78rem;">📇 Флеш-колода к теме: list, tuple & slice</span>
                             </div>
-                            <span class="badge" style="background:rgba(255,255,255,0.05);color:var(--ink-muted);font-size:0.68rem;padding:2px 7px;border-radius:6px;font-weight:600;flex-shrink:0;white-space:nowrap;">+10 XP при открытии</span>
+                            <span class="badge" style="background:rgba(245, 158, 11, 0.12);border:1px solid rgba(245, 158, 11, 0.3);color:#fbbf24;font-weight:700;font-size:0.72rem;padding:2px 8px;border-radius:6px;flex-shrink:0;white-space:nowrap;">+10 XP при открытии ⚡</span>
                           </div>
                           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 6px;font-size:.74rem;">
                             <span style="color:var(--ink-muted);font-size:.72rem;">Пройдено ${theoryDoneCount} из 3 шагов теории</span>
