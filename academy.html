@@ -5217,7 +5217,8 @@
     align-items: center !important;
     justify-content: center !important;
   }
-  .heat-cell.in-streak {
+  .heat-cell.in-streak,
+  .heat-cell.in-streak-saved {
     background: rgba(16, 185, 129, 0.16) !important;
     border-color: rgba(16, 185, 129, 0.38) !important;
     color: #34d399 !important;
@@ -6343,14 +6344,42 @@
     .topbar #theme-toggle-m {
       display: none !important;
     }
-    /* Пункт 6: Очистка дублирующей кнопки Справки в шапке эшелона */
-    .dashboard-container .echelon-topbar-actions .topbar-help-btn[href="#/docs"],
-    .dashboard-container .topbar-help-btn[href="#/docs"] {
+    .dashboard-container .topbar-help-btn,
+    .dashboard-container .topbar-help-btn[href="#/docs"],
+    .echelon-topbar-clean .topbar-help-btn {
+      width: 36px !important;
+      height: 36px !important;
+      min-width: 36px !important;
+      min-height: 36px !important;
+      padding: 0 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border-radius: 10px !important;
+      background: rgba(255, 255, 255, 0.05) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+      flex-shrink: 0 !important;
+      margin-left: auto !important;
+      box-sizing: border-box !important;
+    }
+    .dashboard-container .topbar-help-btn .topbar-help-text,
+    .dashboard-container .topbar-help-btn[href="#/docs"] .topbar-help-text,
+    .echelon-topbar-clean .topbar-help-btn .topbar-help-text {
       display: none !important;
+    }
+    .dashboard-container .topbar-help-btn svg,
+    .echelon-topbar-clean .topbar-help-btn svg {
+      width: 15px !important;
+      height: 15px !important;
+      margin: 0 !important;
+      color: var(--ink-soft) !important;
+      display: block !important;
+      vertical-align: middle !important;
     }
     /* Пункт 7: Устранение пустого зазора перед мобильным таббаром */
     .dashboard-container {
-      padding-bottom: calc(var(--tabbar-h, 64px) + 16px) !important;
+      padding-bottom: calc(var(--tabbar-h, 64px) + 24px + env(safe-area-inset-bottom, 16px)) !important;
     }
   }
 
@@ -6380,10 +6409,22 @@
     }
     .dashboard-container .tracker-cluster {
       display: inline-flex !important;
+      flex-direction: column !important;
       align-items: center !important;
+      gap: 3px !important;
     }
     .dashboard-container .tracker-cluster-label {
-      display: none !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin-bottom: 2px !important;
+    }
+    .dashboard-container .tracker-cluster-label .cluster-label-text {
+      display: none !important; /* скрываем только текст, сохраняя SVG-иконку */
+    }
+    .dashboard-container .tracker-cluster-label .cluster-icon svg {
+      width: 11px !important;
+      height: 11px !important;
     }
     .dashboard-container .tracker-cluster-dots {
       display: inline-flex !important;
@@ -6392,6 +6433,14 @@
     }
     .dashboard-container .tracker-cluster-dots .dot-jewel {
       margin: 0 1px !important;
+    }
+    .dashboard-container .dot-jewel {
+      position: relative;
+    }
+    .dashboard-container .dot-jewel::after {
+      content: '';
+      position: absolute;
+      top: -10px; bottom: -10px; left: -6px; right: -6px;
     }
     .dashboard-container .dots-phase-divider {
       display: inline-block !important;
@@ -15481,6 +15530,11 @@ function buildSevenDayHeatmapHTML(){
         valText = String(xp);
         dotCls = 'done';
         hint += ' (активность учтена)';
+      } else if(streak >= 2 && (currentDayOfWeekIdx - i <= streak)){
+        cls = 'heat-cell in-streak-saved';
+        valText = '🔥';
+        dotCls = 'done';
+        hint = `${dayNames[i]}: Учтено в серии (${state.streak} дн.)`;
       } else {
         cls = 'heat-cell rest-day';
         valText = '';
@@ -16256,18 +16310,23 @@ viewDashboard = function(){
                     ? `<div style="display:flex;flex-direction:column;gap:8px;width:100%;">
                           <div class="srs-clean-preview" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);">
                             <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 auto;">
-                              <span style="font-weight:600;color:var(--ink);font-size:0.78rem;">🎴 Флеш-колода к теме: list, tuple & slice</span>
+                              <span style="font-weight:600;color:var(--ink-muted);font-size:0.78rem;display:inline-flex;align-items:center;gap:6px;opacity:0.8;">
+                                🔒 🎴 Флеш-колода к теме: list, tuple & slice
+                              </span>
                             </div>
                           </div>
                           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 4px 0;font-size:.74rem;">
                             <span style="color:var(--ink-muted);font-size:.74rem;display:inline-flex;align-items:center;gap:5px;">
                               🌱 Откроется после 3 шагов теории · +10 XP
                             </span>
-                            <span style="flex-shrink: 0; display: inline-flex; gap: 5px; align-items: center;" title="Прогресс шагов теории: ${theoryDoneCount} из 3">
-                              <span style="width:7px;height:7px;border-radius:50%;background:${theoryDoneCount >= 1 ? '#10b981' : 'rgba(255,255,255,0.15)'};${theoryDoneCount >= 1 ? 'box-shadow:0 0 6px rgba(16,185,129,0.6);' : ''}"></span>
-                              <span style="width:7px;height:7px;border-radius:50%;background:${theoryDoneCount >= 2 ? '#10b981' : 'rgba(255,255,255,0.15)'};${theoryDoneCount >= 2 ? 'box-shadow:0 0 6px rgba(16,185,129,0.6);' : ''}"></span>
-                              <span style="width:7px;height:7px;border-radius:50%;background:${theoryDoneCount >= 3 ? '#10b981' : 'rgba(255,255,255,0.15)'};${theoryDoneCount >= 3 ? 'box-shadow:0 0 6px rgba(16,185,129,0.6);' : ''}"></span>
-                            </span>
+                            <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.03);padding:2px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);">
+                              <span style="font-size:0.70rem;color:var(--ink-muted);">Теория: ${theoryDoneCount}/3</span>
+                              <span style="display:inline-flex;gap:4px;align-items:center;">
+                                <span style="width:6px;height:6px;border-radius:50%;background:${theoryDoneCount >= 1 ? '#10b981' : 'rgba(255,255,255,0.18)'};"></span>
+                                <span style="width:6px;height:6px;border-radius:50%;background:${theoryDoneCount >= 2 ? '#10b981' : 'rgba(255,255,255,0.18)'};"></span>
+                                <span style="width:6px;height:6px;border-radius:50%;background:${theoryDoneCount >= 3 ? '#10b981' : 'rgba(255,255,255,0.18)'};"></span>
+                              </span>
+                            </div>
                           </div>
                         </div>`
                     : `<span class="badge" style="background:rgba(16,185,129,0.16);border:1px solid rgba(16,185,129,0.35);color:#34d399;padding:4px 10px;border-radius:8px;font-size:.76rem;font-weight:700;display:inline-block;">✓ Все карточки на сегодня повторены!</span>`
