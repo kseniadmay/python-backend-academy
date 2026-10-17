@@ -370,30 +370,13 @@
     #bug-report-btn,
     #bug-fab-btn-floating,
     .bug-fab-btn{
-      display:inline-flex !important;
-      position:static !important;
-      width:34px !important;
-      height:34px !important;
-      border-radius:10px !important;
-      font-size:1.0rem !important;
-      background:rgba(255,255,255,0.06) !important;
-      border:1px solid rgba(255,255,255,0.12) !important;
-      color:var(--ink-soft) !important;
-      box-shadow:none !important;
-      margin:0 !important;
-      padding:0 !important;
-      align-items:center !important;
-      justify-content:center !important;
-      flex-shrink:0 !important;
-      transition:background 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+      display:none !important;
     }
-    .topbar .bug-fab-btn:hover {
-      background:rgba(255,255,255,0.12) !important;
-      border-color:rgba(255,255,255,0.22) !important;
-      color:var(--ink) !important;
+    .topbar .bug-fab-btn {
+      display:none !important;
     }
     .dashboard-container {
-      padding-bottom: 120px !important;
+      padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important;
     }
   }
   body:has(.dash-accordion[open]) .bug-fab-btn,
@@ -4351,7 +4334,7 @@
     width: 1.5px;
     height: 16px;
     background: rgba(255, 255, 255, 0.12);
-    margin: 0 5px !important;
+    margin: 0 4px !important;
     opacity: 0.35 !important;
     flex-shrink: 0;
   }
@@ -4605,22 +4588,62 @@
   .dots-necklace-container {
     width: 100%;
     box-sizing: border-box;
+    display: flex;
+    justify-content: center;
   }
   .tracker-clusters-wrap {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    width: 100%;
-    margin: 12px 0 16px;
-    padding: 6px 4px;
+    justify-content: center; /* Центрируем, убираем разлёт по краям */
+    gap: 18px;                /* Плотный, благородный ритм между фазами */
+    width: auto;
+    max-width: 520px;         /* Ограничиваем максимальный размах на десктопе */
+    margin: 12px auto 16px;   /* Центрируем блок внутри карточки фокуса */
+    padding: 8px 16px;
     box-sizing: border-box;
+  }
+  .tracker-cluster-dots .dot-jewel {
+    position: relative !important;
+    width: 8px !important;
+    height: 8px !important;
+    flex-shrink: 0;
+  }
+  .tracker-cluster-dots .dot-jewel.active {
+    width: 9px !important;
+    height: 9px !important;
+  }
+  .tracker-cluster-dots .dot-jewel::before {
+    content: '' !important;
+    position: absolute !important;
+    inset: -10px !important;
+    border-radius: 50% !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    z-index: 2;
+  }
+  .tracker-cluster-dots .dot-jewel::after,
+  .tracker-cluster-dots .dot-jewel.active::after {
+    display: none !important;
+    content: none !important;
+  }
+  .tracker-cluster-dots .dot-jewel.active::before {
+    border: none !important;
+    box-shadow: none !important;
+    animation: none !important;
+    background: transparent !important;
   }
   @media (max-width: 480px) {
     .tracker-clusters-wrap {
       gap: 4px !important;
       padding: 4px 0 !important;
       justify-content: space-between !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 12px 0 16px !important;
     }
     .tracker-cluster {
       gap: 4px !important;
@@ -4651,12 +4674,30 @@
     .tracker-cluster-dots .dot-jewel::before {
       content: '' !important;
       position: absolute !important;
-      inset: -8px !important;
+      inset: -10px !important;
       border-radius: 50% !important;
+      border: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      outline: none !important;
+      cursor: pointer !important;
+      pointer-events: auto !important;
+      z-index: 2;
+    }
+    .tracker-cluster-dots .dot-jewel::after,
+    .tracker-cluster-dots .dot-jewel.active::after {
+      display: none !important;
+      content: none !important;
+    }
+    .tracker-cluster-dots .dot-jewel.active::before {
+      border: none !important;
+      box-shadow: none !important;
+      animation: none !important;
+      background: transparent !important;
     }
     .dots-phase-divider {
       height: 16px !important;
-      margin: 0 5px !important;
+      margin: 0 4px !important;
       opacity: 0.35 !important;
     }
     .focus-mini-track .dot-jewel,
@@ -4666,8 +4707,8 @@
     }
     .focus-mini-track .dot-jewel.active,
     .tracker-cluster-dots .dot-jewel.active {
-      width: 10px !important;
-      height: 10px !important;
+      width: 9px !important;
+      height: 9px !important;
     }
     .focus-mini-track .dot-jewel.milestone,
     .tracker-cluster-dots .dot-jewel.milestone {
@@ -4676,8 +4717,8 @@
     }
     .focus-mini-track .dot-jewel.milestone.active,
     .tracker-cluster-dots .dot-jewel.milestone.active {
-      width: 10px !important;
-      height: 10px !important;
+      width: 9px !important;
+      height: 9px !important;
     }
   }
   @media (max-width: 360px) {
@@ -4727,11 +4768,16 @@
     height: 22px;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(52, 211, 153, 0.4) 50%, rgba(255, 255, 255, 0.04) 100%);
     box-shadow: 0 0 6px rgba(52, 211, 153, 0.4);
-    margin: 0 5px !important;
+    margin: 0 4px !important;
     opacity: 0.35 !important;
     flex-shrink: 0;
     border-radius: 999px;
     align-self: center;
+  }
+  @media (min-width: 880px) {
+    .dots-phase-divider {
+      margin: 0 4px !important;
+    }
   }
   .goal-micro-hint {
     white-space: normal;
