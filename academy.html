@@ -4368,10 +4368,10 @@
     transform: scale(1.02);
   }
   .day-xp-badge.empty-day-badge {
-    background: rgba(16, 185, 129, 0.10);
-    border-color: rgba(16, 185, 129, 0.28);
-    color: #34d399;
-    opacity: 0.9;
+    background: rgba(245, 158, 11, 0.10) !important;
+    border: 1px solid rgba(245, 158, 11, 0.28) !important;
+    color: #fbbf24 !important;
+    opacity: 0.95;
   }
   .dots-phase-divider {
     display: inline-block;
@@ -6469,7 +6469,44 @@
       top: -10px; bottom: -10px; left: -6px; right: -6px;
     }
     .dashboard-container .dots-phase-divider {
-      display: none !important;
+      display: block !important;
+      width: 1px !important;
+      height: 10px !important;
+      background: rgba(255, 255, 255, 0.12) !important;
+      margin: 0 4px !important;
+      align-self: center !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .dashboard-container .dots-phase-divider {
+      display: block !important;
+      width: 1px !important;
+      height: 10px !important;
+      background: rgba(255, 255, 255, 0.12) !important;
+      margin: 0 4px !important;
+      align-self: center !important;
+    }
+    .dashboard-container .tracker-clusters-wrap {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 2px !important;
+      padding: 4px 6px !important;
+      background: rgba(255, 255, 255, 0.02) !important;
+      border: 1px solid rgba(255, 255, 255, 0.05) !important;
+      border-radius: 14px !important;
+    }
+    .dashboard-container .tracker-cluster {
+      display: inline-flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      gap: 4px !important;
+    }
+    .dashboard-container .tracker-cluster-label .cluster-icon svg {
+      width: 12px !important;
+      height: 12px !important;
+      opacity: 0.85 !important;
     }
   }
 
@@ -16213,7 +16250,7 @@ viewDashboard = function(){
     ? (tXp === 0
         ? `Сделайте первый 2-минутный шаг дня ⚡`
         : `⚡ 1 микро-шаг = +15 XP · До цели: <b>${remainingGoalSteps}&nbsp;${stepsWord}</b>`)
-    : `⚡ Дневная цель выполнена! Отличный темп 🎯`;
+    : `⚡ Дневная цель выполнена! Отличный темп`;
 
   // Активный статус в аккордеоне тем без технического префикса «Юнит X.X»
   const curUnitDoneCount = curUnitSkills.filter(s => getSkillMP(s.id) >= 100).length;
@@ -16229,20 +16266,29 @@ viewDashboard = function(){
     <div class="container dashboard-container">
       <!-- Зона 1: Шапка Эшелона (.echelon-topbar-clean) -->
       <div class="echelon-topbar-clean" style="padding:16px 20px;border-radius:20px;margin-bottom:18px;display:flex;flex-direction:column;gap:12px;background:rgba(18, 22, 31, 0.65);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255, 255, 255, 0.08);box-shadow:var(--shadow-1);">
-        <!-- Ряд 1: Звание слева, кнопка «Справка» справа -->
+        <!-- Ряд 1: Звание слева, аудио-компаньон и кнопка «Справка» справа -->
         <div class="echelon-topbar-row-top" style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px;">
-          <h1 class="rank-title-glow echelon-bordeaux-title" style="margin:0;font-size:1.32rem;">${readinessRank} <span style="-webkit-text-fill-color:initial;text-shadow:none;">${rankIcon}</span></h1>
-          <a href="#/docs" class="topbar-help-btn btn btn-ghost-quiet" style="padding:6px 10px;border-radius:10px;text-decoration:none;font-size:.82rem;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--ink-muted);flex-shrink:0;" title="Справочник платформы" aria-label="Справка">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;flex-shrink:0;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-            <span class="topbar-help-text">Справка</span>
-          </a>
+          <h1 class="rank-title-glow echelon-bordeaux-title" style="margin:0;font-size:1.32rem;">${readinessRank} <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-left:4px;"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg></h1>
+          <div class="echelon-topbar-actions" style="display:inline-flex;align-items:center;gap:8px;flex-shrink:0;">
+            <button class="topbar-audio-btn btn btn-ghost-quiet" id="dashAudioCompanionBtn" title="Голосовой наставник Сократ" aria-label="Озвучить спринт" style="padding:6px 10px;border-radius:10px;font-size:.82rem;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(12px);color:var(--ink-muted);cursor:pointer;transition:all .2s ease;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;flex-shrink:0;">
+                <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+              </svg>
+              <span class="topbar-audio-text">Озвучить</span>
+            </button>
+            <a href="#/docs" class="topbar-help-btn btn btn-ghost-quiet" style="padding:6px 10px;border-radius:10px;text-decoration:none;font-size:.82rem;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--ink-muted);flex-shrink:0;" title="Справочник платформы" aria-label="Справка">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;flex-shrink:0;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+              <span class="topbar-help-text">Справка</span>
+            </a>
+          </div>
         </div>
 
         <!-- Ряд 2: Чистая строка суточного прогресс-бейджа XP -->
         <div class="echelon-topbar-subrow" style="display:flex;align-items:center;width:100%;">
           <div class="echelon-subrow-xp" style="display:flex;align-items:center;min-width:0;">
             ${todayXp() === 0
-              ? `<span class="day-xp-badge empty-day-badge" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.22);color:#34d399;white-space:nowrap;display:inline-flex;align-items:center;" title="Суточная цель: 50 XP">⚡ Ждёт первого шага · Цель: 50 XP</span>`
+              ? `<span class="day-xp-badge empty-day-badge" style="background:rgba(245, 158, 11, 0.10);border:1px solid rgba(245, 158, 11, 0.28);color:#fbbf24;white-space:nowrap;display:inline-flex;align-items:center;" title="Суточная цель: 50 XP">⚡ Ждёт первого шага · Цель: 50 XP</span>`
               : `<span class="day-xp-badge" style="white-space:nowrap;" title="Заработано за сутки: ${tXp} XP">⚡ +${todayXp()} XP за сутки</span>`
             }
           </div>
@@ -16299,9 +16345,9 @@ viewDashboard = function(){
         <div class="dash-pulse-card">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
             ${tXp === 0
-              ? `<span style="font-weight:700;font-size:.88rem;color:var(--ink);">🎯 Цель дня: ${dailyGoal} XP</span>
+              ? `<span style="font-weight:700;font-size:.88rem;color:var(--ink);display:inline-flex;align-items:center;gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;flex-shrink:0;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg> Цель дня: ${dailyGoal} XP</span>
                  <span class="badge" data-quick-microstep="${focusSid}" data-quick-kid="${firstUnreadK}" style="font-weight:600;font-size:.72rem;color:var(--ink-muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:2px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;" title="Начать первый шаг дня">${streakDayText}</span>`
-              : `<span style="font-weight:700;font-size:.88rem;color:var(--ink);">🎯 Дневная цель: ${tXp} / ${dailyGoal} XP (${goalPct}%)</span>
+              : `<span style="font-weight:700;font-size:.88rem;color:var(--ink);display:inline-flex;align-items:center;gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;flex-shrink:0;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg> Дневная цель: ${tXp} / ${dailyGoal} XP (${goalPct}%)</span>
                  <span style="font-weight:800;font-size:.82rem;color:var(--moss);">${goalPct}%</span>`
             }
           </div>
@@ -16321,7 +16367,8 @@ viewDashboard = function(){
         <div class="dash-pulse-card" style="display:flex;flex-direction:column;justify-content:space-between;gap:12px;">
           <div>
             <div style="font-weight:700;font-size:.88rem;color:var(--ink);display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-              <span>🔁 Интервальное повторение</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--moss)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:2px;flex-shrink:0;"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+              <span>Интервальное повторение</span>
             </div>
             <div class="meta" style="font-size:.78rem;color:var(--ink-muted);">
               ${dueTodayCardsCount > 0
@@ -16329,22 +16376,27 @@ viewDashboard = function(){
                 : (!hasReviewedAnyCard
                     ? `<div style="display:flex;flex-direction:column;gap:8px;width:100%;">
                           <div class="srs-clean-preview" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);">
-                            <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 auto;">
-                              <span style="font-weight:600;color:var(--ink-muted);font-size:0.78rem;display:inline-flex;align-items:center;gap:6px;opacity:0.8;">
-                                🔒 🎴 Флеш-колода к теме: list, tuple & slice
+                            <div style="display:flex;align-items:center;gap:7px;min-width:0;flex:1 1 auto;">
+                              <span style="display:inline-flex;align-items:center;gap:4px;color:var(--ink-muted);opacity:0.85;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;flex-shrink:0;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;flex-shrink:0;"><rect x="3" y="6" width="14" height="15" rx="2"></rect><path d="M7 2h12a2 2 0 0 1 2 2v13"></path></svg>
+                              </span>
+                              <span style="font-weight:600;color:var(--ink);font-size:0.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                Флеш-колода к теме: list, tuple & slice
                               </span>
                             </div>
                           </div>
                           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 4px 0;font-size:.74rem;">
-                            <span style="color:var(--ink-muted);font-size:.74rem;display:inline-flex;align-items:center;gap:5px;">
-                              🌱 Откроется после 3 шагов теории · +10 XP
+                            <span style="color:var(--ink-muted);font-size:.74rem;display:inline-flex;align-items:center;gap:5px;" title="🌱 Откроется после 3 шагов теории · +10 XP">
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;flex-shrink:0;filter:drop-shadow(0 0 4px rgba(16,185,129,0.5));"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
+                              <span>Откроется после 3 шагов теории (+10 XP)</span>
                             </span>
                             <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.03);padding:2px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);">
-                              <span style="font-size:0.70rem;color:var(--ink-muted);">Теория: ${theoryDoneCount}/3</span>
+                              <span style="font-size:0.70rem;color:var(--ink-muted);">${theoryDoneCount}/3</span>
                               <span style="display:inline-flex;gap:4px;align-items:center;">
-                                <span style="width:6px;height:6px;border-radius:50%;background:${theoryDoneCount >= 1 ? '#10b981' : 'rgba(255,255,255,0.18)'};"></span>
-                                <span style="width:6px;height:6px;border-radius:50%;background:${theoryDoneCount >= 2 ? '#10b981' : 'rgba(255,255,255,0.18)'};"></span>
-                                <span style="width:6px;height:6px;border-radius:50%;background:${theoryDoneCount >= 3 ? '#10b981' : 'rgba(255,255,255,0.18)'};"></span>
+                                <span style="width:6px;height:6px;border-radius:50%;background:${theoryDoneCount >= 1 ? '#10b981' : 'rgba(255,255,255,0.18)'};${theoryDoneCount >= 1 ? 'box-shadow:0 0 6px rgba(16,185,129,0.7);' : ''}"></span>
+                                <span style="width:6px;height:6px;border-radius:50%;background:${theoryDoneCount >= 2 ? '#10b981' : 'rgba(255,255,255,0.18)'};${theoryDoneCount >= 2 ? 'box-shadow:0 0 6px rgba(16,185,129,0.7);' : ''}"></span>
+                                <span style="width:6px;height:6px;border-radius:50%;background:${theoryDoneCount >= 3 ? '#10b981' : 'rgba(255,255,255,0.18)'};${theoryDoneCount >= 3 ? 'box-shadow:0 0 6px rgba(16,185,129,0.7);' : ''}"></span>
                               </span>
                             </div>
                           </div>
@@ -16367,7 +16419,7 @@ viewDashboard = function(){
       </div>
 
       <!-- Зона 4: Вторичная (под аккуратным свернутым аккордеоном) -->
-      <details class="dash-accordion cocoon-details" style="margin-top:14px;margin-bottom:16px;border-radius:16px;padding:12px 16px;">
+      <details class="dash-accordion cocoon-details" ${state.dashAccordionOpen ? 'open' : ''} style="margin-top:14px;margin-bottom:16px;border-radius:16px;padding:12px 16px;">
         <summary class="dash-accordion-summary">
           <div class="dash-accordion-title-wrap" style="min-width:0;flex:1 1 auto;overflow:hidden;display:inline-flex;align-items:center;gap:8px;">
             <svg class="chevron-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--moss);transition:transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);display:inline-block;flex-shrink:0;"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -16385,7 +16437,7 @@ viewDashboard = function(){
           ${currentUnitThemesHTML}
           <div style="text-align:center;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05);margin-bottom:16px;">
             <a href="#/map" class="link-quiet dash-map-link" style="font-size:.80rem;display:flex;width:100%;justify-content:center;align-items:center;gap:6px;text-decoration:none;opacity:0.75;transition:opacity .2s ease, color .2s ease;margin-bottom:0;padding:8px 12px;box-sizing:border-box;">
-              <span>🗺️ Смотреть все модули и полную карту компетенций эшелона ➔</span>
+              <span style="display:inline-flex;align-items:center;gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;flex-shrink:0;"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></svg>Смотреть все модули и полную карту компетенций эшелона ➔</span>
             </a>
           </div>
         </div>
@@ -16695,6 +16747,14 @@ function openStreakModal(){
 window.openStreakModal = openStreakModal;
 
 window.openSettingsModal = openSettingsModal;
+
+  // Сохранение состояния раскрытия аккордеона тем только по явному клику пользователя
+  document.addEventListener('toggle', function(e){
+    if(e.target && e.target.classList && e.target.classList.contains('dash-accordion')){
+      state.dashAccordionOpen = Boolean(e.target.open);
+      try { saveState(state); } catch(err){}
+    }
+  }, true);
 
   document.addEventListener('click', function(e){
     const pill = e.target.closest('.streak-pill, .sidebar-streak-badge');
@@ -19230,6 +19290,19 @@ const psk = e.target.closest('[data-py-select-k]');
     if(targetNode){
       targetNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
       try{ targetNode.focus(); }catch(err){}
+    }
+    return;
+  }
+
+  // Dashboard Audio Companion button
+  if(e.target.closest('#dashAudioCompanionBtn, .topbar-audio-btn')){
+    if(window.theoryAudioPlayer){
+      const focusCardTitle = document.querySelector('.cocoon-focus-title');
+      const focusText = 'Голосовой наставник Сократ. Текущий спринт-фокус: ' + (focusCardTitle ? focusCardTitle.innerText.trim() : 'коллекции Python');
+      window.theoryAudioPlayer.togglePlay(focusText);
+      showToast('Голосовой наставник Сократ: аудио-сопровождение спринта', 'info');
+    } else {
+      showToast('Голосовой наставник Сократ готов к озвучке спринта', 'info');
     }
     return;
   }
