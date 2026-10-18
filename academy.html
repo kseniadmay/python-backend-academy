@@ -350,7 +350,8 @@
     justify-content:center;
     font-size:1.20rem;
     cursor:pointer;
-    transition:transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+    opacity:0.95;
+    transition:transform .16s ease, border-color .16s ease, box-shadow .16s ease, opacity .2s ease;
     -webkit-tap-highlight-color:transparent;
   }
   :root[data-theme="light"] .bug-fab-btn{
@@ -384,13 +385,13 @@
   }
   body:has(.dash-accordion[open]) .bug-fab-btn,
   .dash-accordion[open] ~ .bug-fab-btn {
-    opacity: 0.25 !important;
-    transform: scale(0.85) !important;
+    opacity: 0.35 !important;
+    transform: none !important;
   }
   body:has(.dash-accordion[open]) .bug-fab-btn:hover,
   .dash-accordion[open] ~ .bug-fab-btn:hover {
-    opacity: 1 !important;
-    transform: scale(1) !important;
+    opacity: 0.95 !important;
+    transform: none !important;
   }
   body.has-jump-btn .bug-fab-btn,
   .path-serpentine-wrap ~ .bug-fab-btn{
@@ -5039,6 +5040,7 @@
     }
   }
   .dash-pulse-card {
+    min-height: 146px;
     background: rgba(18, 22, 31, 0.65);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 18px !important;
@@ -5052,10 +5054,13 @@
     border-color: rgba(255, 255, 255, 0.13) !important;
   }
   .dash-accordion {
-    background: rgba(18, 22, 31, 0.65);
+    background: rgba(18, 22, 31, 0.88) !important;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(24px) !important;
-    -webkit-backdrop-filter: blur(24px) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    contain: paint;
+    transform: translateZ(0);
+    will-change: auto;
     position: relative;
     z-index: 1;
     transition: border-color 0.24s ease, box-shadow 0.24s ease;
@@ -5066,11 +5071,16 @@
   /* Чистые CSS-переменные для светлой темы (theme-light) */
   html.theme-light .cocoon-focus-card,
   html.theme-light .dash-pulse-card,
-  html.theme-light .dash-accordion,
   :root[data-theme="light"] .cocoon-focus-card,
-  :root[data-theme="light"] .dash-pulse-card,
-  :root[data-theme="light"] .dash-accordion {
+  :root[data-theme="light"] .dash-pulse-card {
     background: rgba(255, 255, 255, 0.85) !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
+    color: #0f172a !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+  }
+  html.theme-light .dash-accordion,
+  :root[data-theme="light"] .dash-accordion {
+    background: rgba(255, 255, 255, 0.94) !important;
     border-color: rgba(0, 0, 0, 0.08) !important;
     color: #0f172a !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
@@ -5507,10 +5517,12 @@
       font-size: 0.92rem !important;
     }
   }
+  .dash-accordion summary,
   .dash-accordion-summary {
     cursor: pointer;
     font-weight: 700;
-    font-size: 0.90rem;
+    font-size: 0.88rem;
+    color: var(--ink);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -5521,22 +5533,35 @@
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
     padding: 10px 14px;
-    border-radius: 12px;
+    border-radius: 14px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.06));
     list-style: none;
     transition: background 0.2s ease, border-color 0.2s ease, transform 0.12s ease;
   }
+  .dash-accordion summary::-webkit-details-marker,
+  .dash-accordion-summary::-webkit-details-marker {
+    display: none;
+  }
+  .dash-accordion summary:hover,
   .dash-accordion-summary:hover {
     background: rgba(255, 255, 255, 0.06);
     border-color: rgba(255, 255, 255, 0.12);
   }
+  .dash-accordion summary:active,
   .dash-accordion-summary:active {
     transform: scale(0.996);
   }
+  .dash-accordion summary:focus-visible,
   .dash-accordion-summary:focus-visible {
     outline: 2px solid rgba(16, 185, 129, 0.5) !important;
     outline-offset: 2px !important;
+  }
+  .dash-accordion[open] summary,
+  .dash-accordion[open] .dash-accordion-summary {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
   .dash-accordion-title-desk, .dash-accordion-status-desk { display: inline; }
   .dash-accordion-title-mob, .dash-accordion-status-mob { display: none; }
@@ -5559,10 +5584,11 @@
     border-color: rgba(16, 185, 129, 0.25) !important;
   }
   .srs-clean-preview:active {
-    transform: scale(0.985);
+    transform: scale(0.99);
   }
   .dash-accordion .focus-chips-wrap { display: inline-flex; align-items: center; gap: 4px; margin-left: 4px; }
   @media (max-width: 540px) {
+    .dash-accordion,
     .dash-accordion.cocoon-details {
       padding: 8px 10px !important;
     }
@@ -5606,17 +5632,9 @@
   }
   .dash-accordion > div,
   .dash-accordion-content {
-    animation: accordionFadeSlide 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  }
-  @keyframes accordionFadeSlide {
-    0% {
-      opacity: 0;
-      transform: translateY(-6px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.2s ease;
   }
   /* Мягкий фоновый импульс с изумрудно-градиентным дыханием при 0 MP */
   @keyframes startTrackBreathe {
@@ -5777,40 +5795,7 @@
     transform: translateX(3px);
   }
 
-  .dash-accordion summary {
-    cursor: pointer;
-    font-weight: 700;
-    font-size: 0.88rem;
-    color: var(--ink);
-    min-height: 44px;
-    box-sizing: border-box;
-    outline: none;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    padding: 10px 14px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.06));
-    list-style: none;
-    transition: background 0.2s ease, border-color 0.2s ease, transform 0.12s ease;
-  }
-  .dash-accordion summary:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.12);
-  }
-  .dash-accordion summary:active {
-    transform: scale(0.996);
-  }
-  .dash-accordion summary:focus-visible {
-    outline: 2px solid rgba(16, 185, 129, 0.5) !important;
-    outline-offset: 2px !important;
-  }
-  .dash-accordion[open] summary {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
-  }
+  /* .dash-accordion summary объединен выше с .dash-accordion-summary */
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
@@ -5846,6 +5831,14 @@
       height: env(safe-area-inset-bottom, 24px);
       background: rgba(13, 17, 23, 0.98);
       pointer-events: none;
+    }
+    html.theme-light .tabbar,
+    :root[data-theme="light"] .tabbar {
+      background: rgba(250, 248, 245, 0.98) !important;
+    }
+    html.theme-light .tabbar::after,
+    :root[data-theme="light"] .tabbar::after {
+      background: rgba(250, 248, 245, 0.98) !important;
     }
     body:has(.dashboard-container) #view-root,
     body:has(.dashboard-container) main,
@@ -6565,8 +6558,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.13.0/brython_stdlib.js"></script>
 </head>
 <body>
-<div class="ambient-orb ambient-orb--burgundy" aria-hidden="true"></div>
-<div class="ambient-orb ambient-orb--emerald" aria-hidden="true"></div>
+<div id="ambient-orb-burgundy" class="ambient-orb ambient-orb--burgundy" aria-hidden="true"></div>
+<div id="ambient-orb-emerald" class="ambient-orb ambient-orb--emerald" aria-hidden="true"></div>
 <div id="app">
 
   <aside class="sidebar">
@@ -15985,7 +15978,7 @@ viewDashboard = function(){
     let linkAttrs = `href="#/python/skill/${s.id}" class="link-quiet dash-theme-link" style="text-decoration:none;color:inherit;font-weight:600;min-width:0;line-height:1.35;"`;
 
     if(isFocusThis){
-      stepStatusIndicator = `<span class="dash-theme-status-icon dash-theme-focus-node" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(16,185,129,0.22);border:1px solid rgba(16,185,129,0.45);font-size:.70rem;font-weight:700;color:#34d399;box-shadow:0 0 10px rgba(16,185,129,0.35);flex-shrink:0;" title="Тема в фокусе">${stepNumStr}</span>`;
+      stepStatusIndicator = `<span class="dash-theme-status-icon dash-theme-focus-node" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(16,185,129,0.22);border:1px solid rgba(16,185,129,0.45);font-size:.70rem;font-weight:700;color:#34d399;box-shadow:0 0 8px rgba(16,185,129,0.3);flex-shrink:0;" title="Тема в фокусе">${stepNumStr}</span>`;
     } else if(isDoneTheme){
       stepStatusIndicator = `<span class="dash-theme-status-icon" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);font-size:.72rem;font-weight:700;color:#34d399;flex-shrink:0;" title="Тема освоена">✓</span>`;
     } else if(isLockedTheme){
@@ -16465,7 +16458,7 @@ viewDashboard = function(){
       </div>
 
       <!-- Зона 4: Вторичная (под аккуратным свернутым аккордеоном) -->
-      <details class="dash-accordion cocoon-details" ${state.dashAccordionOpen ? 'open' : ''} style="margin-top:14px;margin-bottom:16px;border-radius:16px;padding:12px 16px;">
+      <details class="dash-accordion" ${state.dashAccordionOpen ? 'open' : ''} style="margin-top:14px;margin-bottom:16px;border-radius:16px;padding:12px 16px;">
         <summary class="dash-accordion-summary">
           <div class="dash-accordion-title-wrap" style="min-width:0;flex:1 1 auto;overflow:hidden;display:inline-flex;align-items:center;gap:8px;">
             <svg class="chevron-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--moss);transition:transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);display:inline-block;flex-shrink:0;"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -16479,7 +16472,7 @@ viewDashboard = function(){
             <span class="dash-accordion-status-mob">${accordionMobStatusText}</span>
           </span>
         </summary>
-        <div style="margin-top:12px;border-top:1px solid rgba(255,255,255,0.05);padding-top:8px;">
+        <div class="dash-accordion-content" style="margin-top:10px;padding-top:4px;">
           ${currentUnitThemesHTML}
           <div style="text-align:center;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05);margin-bottom:16px;">
             <a href="#/map" class="link-quiet dash-map-link" style="font-size:.80rem;display:flex;width:100%;justify-content:center;align-items:center;gap:6px;text-decoration:none;opacity:0.75;transition:opacity .2s ease, color .2s ease;margin-bottom:0;padding:8px 12px;box-sizing:border-box;">
@@ -16832,7 +16825,7 @@ window.closeSettingsModal = closeSettingsModal;
       link.href = 'https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap';
       document.head.appendChild(link);
     }
-    if(document.body && !document.getElementById('ambient-orb-burgundy')){
+    if(document.body && !document.getElementById('ambient-orb-burgundy') && !document.getElementById('ambient-orb-emerald') && !document.querySelector('.ambient-orb')){
       const orb1 = document.createElement('div');
       orb1.id = 'ambient-orb-burgundy';
       orb1.className = 'ambient-orb ambient-orb--burgundy';
