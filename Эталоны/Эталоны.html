@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
+    --tabbar-h:68px;
     --paper:#F1F2EC; --surface:#FBFBF7; --surface-2:#F4F5EE;
     --ink:#1C201A; --ink-soft:#565A4E; --ink-muted:#8B8D80;
     --line:#DCDBCD; --line-soft:#E7E6DA;
@@ -5807,38 +5808,44 @@
   }
 
 
-  /* ========== ТЗ: Герметичный мобильный таббар и оверскролл ========== */
+  /* ========== ТЗ: Плавающий остров мобильного таббара (Floating Glass Pill / Island Nav) ========== */
   @media (max-width: 880px) {
-    .tabbar {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(13, 17, 23, 0.98) !important;
-      backdrop-filter: blur(20px) !important;
-      -webkit-backdrop-filter: blur(20px) !important;
-      border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-      padding: 8px 6px calc(8px + env(safe-area-inset-bottom, 12px)) !important;
-      z-index: 100 !important;
+    :root {
+      --tabbar-h: 68px;
     }
-    /* Блокиратор утечки под safe-area */
+    .tabbar {
+      display: flex !important;
+      position: fixed !important;
+      left: 16px !important;
+      right: 16px !important;
+      bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+      inset: auto 16px calc(12px + env(safe-area-inset-bottom, 0px)) 16px !important;
+      width: calc(100% - 32px) !important;
+      max-width: 480px !important;
+      margin: 0 auto !important;
+      height: var(--tabbar-h, 68px) !important;
+      padding: 6px 8px !important;
+      border-radius: 28px !important;
+      background: rgba(18, 22, 32, 0.88) !important;
+      backdrop-filter: blur(24px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.55), 0 4px 14px -2px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+      z-index: 100000 !important;
+      justify-content: space-around !important;
+      align-items: center !important;
+      gap: 4px !important;
+      box-sizing: border-box !important;
+      overflow: visible !important;
+    }
     .tabbar::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 100%;
-      height: env(safe-area-inset-bottom, 24px);
-      background: rgba(13, 17, 23, 0.98);
-      pointer-events: none;
+      display: none !important;
     }
     html.theme-light .tabbar,
     :root[data-theme="light"] .tabbar {
-      background: rgba(250, 248, 245, 0.98) !important;
-    }
-    html.theme-light .tabbar::after,
-    :root[data-theme="light"] .tabbar::after {
-      background: rgba(250, 248, 245, 0.98) !important;
+      background: rgba(255, 255, 255, 0.90) !important;
+      border: 1px solid rgba(0, 0, 0, 0.08) !important;
+      box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.12), 0 4px 14px -2px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
     }
     body:has(.dashboard-container) #view-root,
     body:has(.dashboard-container) main,
@@ -5846,10 +5853,111 @@
       padding-bottom: 0 !important;
       min-height: auto !important;
     }
-    .dashboard-container {
-      padding-bottom: calc(var(--tabbar-h, 64px) + 16px) !important;
+    /* Защита контента от перекрытия плавающим таббаром */
+    #view-root,
+    main,
+    .dashboard-container,
+    .view-container,
+    .layout-main,
+    .fc-stage {
+      padding-bottom: calc(var(--tabbar-h, 68px) + 24px + env(safe-area-inset-bottom, 0px)) !important;
       min-height: auto !important;
     }
+    body.is-sprint-focus .tabbar {
+      display: none !important;
+    }
+    body.is-sprint-focus main,
+    body.is-sprint-focus #view-root {
+      padding-bottom: 24px !important;
+    }
+  }
+
+  /* ========== ТЗ: Гарантированный клик и эргономика мобильного таббара (.tabbar) ========== */
+  .tabbar__item {
+    flex: 1 1 0;
+    min-height: 48px;
+    min-width: 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 4px 6px;
+    border-radius: 18px;
+    cursor: pointer;
+    position: relative;
+    color: var(--ink-muted, #94a3b8);
+    font-size: 0.70rem;
+    font-weight: 500;
+    text-decoration: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    transition: color 0.18s ease, background 0.18s ease, transform 0.12s ease;
+  }
+  .tabbar__item svg {
+    width: 22px;
+    height: 22px;
+    pointer-events: none !important;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), stroke 0.18s ease;
+  }
+  .tabbar__item span {
+    font-size: 0.68rem;
+    line-height: 1;
+    pointer-events: none !important;
+  }
+  .tabbar__item:active {
+    transform: scale(0.92);
+  }
+  .tabbar__item.active {
+    color: #38bdf8 !important;
+    background: rgba(56, 189, 248, 0.12);
+    font-weight: 600;
+  }
+  .tabbar__item.active svg {
+    transform: translateY(-1px) scale(1.08);
+    stroke: #38bdf8 !important;
+  }
+  .tabbar__item.active::after {
+    content: '';
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #38bdf8;
+    box-shadow: 0 0 6px #38bdf8;
+  }
+  html.theme-light .tabbar__item.active,
+  :root[data-theme="light"] .tabbar__item.active {
+    color: #0284c7 !important;
+    background: rgba(14, 165, 233, 0.10);
+  }
+  html.theme-light .tabbar__item.active svg,
+  :root[data-theme="light"] .tabbar__item.active svg {
+    stroke: #0284c7 !important;
+  }
+  html.theme-light .tabbar__item.active::after,
+  :root[data-theme="light"] .tabbar__item.active::after {
+    background: #0284c7;
+    box-shadow: 0 0 6px #0284c7;
+  }
+
+  /* ========== ТЗ: Интерактивность всех кластеров фокус-карты ========== */
+  .tracker-cluster-label,
+  .tracker-cluster {
+    cursor: pointer;
+  }
+  .tracker-cluster-label:hover {
+    opacity: 1;
+  }
+
+  /* ========== ТЗ: Вынос тостов поверх таббара (.academy-tactile-toast) ========== */
+  #academy-tactile-toast {
+    bottom: calc(var(--tabbar-h, 68px) + 24px + env(safe-area-inset-bottom, 16px)) !important;
+    z-index: 100001 !important;
   }
 
   /* ========== ТЗ: Адаптация кластеров трекера 13 бусин и полноценные touch-targets 36x36 ========== */
@@ -8942,6 +9050,21 @@ function render(){
 
 /* ================= EVENTS ================= */
 document.addEventListener('click', function(e){
+  const tabItem = e.target.closest('.tabbar__item');
+  if (tabItem) {
+    const route = tabItem.getAttribute('data-route') || tabItem.getAttribute('href')?.replace(/^#/, '');
+    if (route) {
+      e.preventDefault();
+      try { playSound('tick'); } catch(err) {}
+      if (location.hash !== '#' + route) {
+        location.hash = '#' + route;
+      } else {
+        render();
+      }
+      return;
+    }
+  }
+
   const card = e.target.closest('[data-open]');
   if(card){ location.hash = '#/topic/' + card.getAttribute('data-open'); return; }
   const m = e.target.closest('[data-master]');
@@ -10244,7 +10367,7 @@ function showToast(msg, type = 'info'){
     if(!toast){
       toast = document.createElement('div');
       toast.id = 'academy-tactile-toast';
-      toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(20,24,33,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.14);color:#e2e8f0;padding:8px 16px;border-radius:12px;font-size:0.80rem;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,0.5);z-index:99999;opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s cubic-bezier(0.16, 1, 0.3, 1);display:flex;align-items:center;gap:8px;';
+      toast.style.cssText = 'position:fixed;bottom:calc(var(--tabbar-h, 64px) + 20px + env(safe-area-inset-bottom, 16px));left:50%;transform:translateX(-50%) translateY(20px);background:rgba(20,24,33,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.14);color:#e2e8f0;padding:8px 16px;border-radius:12px;font-size:0.80rem;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,0.5);z-index:100001;opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s cubic-bezier(0.16, 1, 0.3, 1);display:flex;align-items:center;gap:8px;';
       document.body.appendChild(toast);
     }
     const icon = type === 'info' ? 'ℹ️' : (type === 'warn' ? '⚠️' : '⚡');
@@ -16204,8 +16327,8 @@ viewDashboard = function(){
   const focusMiniTrackHTML = `
     <div class="dots-necklace-container" style="margin: 12px 0 16px;">
       <div class="tracker-clusters-wrap">
-        <div class="tracker-cluster">
-          <span class="tracker-cluster-label">
+        <div class="tracker-cluster" data-quick-microstep="${focusSid}" data-quick-kid="${firstUnreadK || focusKIds[0]}" style="cursor:pointer;">
+          <span class="tracker-cluster-label" data-quick-microstep="${focusSid}" data-quick-kid="${firstUnreadK || focusKIds[0]}" style="cursor:pointer;" title="Теория">
             <span class="cluster-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:2px;">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
@@ -16221,8 +16344,8 @@ viewDashboard = function(){
 
         <span class="dots-phase-divider"></span>
 
-        <div class="tracker-cluster">
-          <span class="tracker-cluster-label">
+        <div class="tracker-cluster" data-srs-open-deck="${firstUnreviewedF || focusFIds[0]}" style="cursor:pointer;">
+          <span class="tracker-cluster-label" data-srs-open-deck="${firstUnreviewedF || focusFIds[0]}" style="cursor:pointer;" title="Карточки">
             <span class="cluster-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:2px;">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="6" width="14" height="15" rx="2"></rect>
@@ -16238,8 +16361,8 @@ viewDashboard = function(){
 
         <span class="dots-phase-divider"></span>
 
-        <div class="tracker-cluster">
-          <span class="tracker-cluster-label">
+        <div class="tracker-cluster" data-open-practice-task="${firstUnsolvedT || focusTIds[0]}" style="cursor:pointer;">
+          <span class="tracker-cluster-label" data-open-practice-task="${firstUnsolvedT || focusTIds[0]}" style="cursor:pointer;" title="Практика">
             <span class="cluster-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:2px;">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="4 17 10 11 4 5"></polyline>
@@ -16255,8 +16378,8 @@ viewDashboard = function(){
 
         <span class="dots-phase-divider"></span>
 
-        <div class="tracker-cluster">
-          <span class="tracker-cluster-label">
+        <div class="tracker-cluster" data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}" style="cursor:pointer;">
+          <span class="tracker-cluster-label" data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}" style="cursor:pointer;" title="Зачёт">
             <span class="cluster-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:2px;">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M10 2v7.31L4.1 19.46A2 2 0 0 0 5.8 22h12.4a2 2 0 0 0 1.7-2.54L14 9.31V2"></path>
