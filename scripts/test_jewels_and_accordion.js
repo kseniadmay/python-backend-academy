@@ -54,6 +54,13 @@ function findBrowser() {
   });
 
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+  const consoleErrors = [];
+  page.on('console', msg => {
+    if (msg.type() === 'error') consoleErrors.push(msg.text());
+  });
+  page.on('pageerror', err => {
+    consoleErrors.push(err.message || String(err));
+  });
   const fileUrl = 'file:///' + HTML_FILE.replace(/\\/g, '/');
   await page.goto(fileUrl, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1000);
@@ -160,6 +167,40 @@ function findBrowser() {
   assert.strictEqual(isOpenAfterSummaryClose, false, 'Аккордеон обязан закрыться после повторного клика по summary!');
   assert.strictEqual(stateOpen3, false, 'state.dashAccordionOpen обязан стать false!');
   console.log('✓ Закрытие по summary успешно подтверждено!');
+
+  console.log('\n--- ТЕСТ 3: Мобильная эргономика (390×844) и Touch Target ---');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForTimeout(300);
+
+  // Проверка touch target высоты summary (не менее 44px)
+  const summaryBox = await summary.boundingBox();
+  assert(summaryBox, 'Summary boundingBox не найден на мобильном вьюпорте');
+  console.log(`Высота шапки аккордеона: ${summaryBox.height}px (требуется >= 44px)`);
+  assert(summaryBox.height >= 44, `Высота summary (${summaryBox.height}px) меньше 44px!`);
+
+  // Открываем аккордеон кликом по summary на мобильном
+  await summary.click();
+  await page.waitForTimeout(200);
+  const isMobileOpen = await accordion.evaluate(el => el.hasAttribute('open'));
+  assert.strictEqual(isMobileOpen, true, 'Аккордеон обязан открыться по тапу на мобильном');
+
+  // Проверка touch target кнопки «Свернуть темы модуля»
+  const collapseBtnBox = await collapseBtn.boundingBox();
+  assert(collapseBtnBox, 'CollapseBtn boundingBox не найден на мобильном вьюпорте');
+  console.log(`Высота кнопки "Свернуть темы": ${collapseBtnBox.height}px (требуется >= 44px)`);
+  assert(collapseBtnBox.height >= 44, `Высота collapseBtn (${collapseBtnBox.height}px) меньше 44px!`);
+
+  // Закрываем аккордеон по кнопке на мобильном
+  await collapseBtn.click();
+  await page.waitForTimeout(200);
+  const isMobileClosed = await accordion.evaluate(el => el.hasAttribute('open'));
+  assert.strictEqual(isMobileClosed, false, 'Аккордеон обязан закрыться по нажатию на кнопку на мобильном');
+  console.log('✓ Мобильная эргономика и touch targets успешно подтверждены!');
+
+  console.log('\n--- ТЕСТ 4: Проверка отсутствия ошибок консоли браузера ---');
+  console.log(`Ошибок JS в консоли: ${consoleErrors.length}`);
+  assert.strictEqual(consoleErrors.length, 0, 'В консоли браузера обнаружены ошибки: ' + JSON.stringify(consoleErrors));
+  console.log('✓ Ошибок JavaScript в консоли браузера нет');
 
   await browser.close();
   console.log('\n======================================================');
