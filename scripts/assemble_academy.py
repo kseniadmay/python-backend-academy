@@ -15368,6 +15368,13 @@ setTimeout(runProgressSync, 1200);
 '''
     html_out = html_out.replace(sync_init_marker, sync_init_marker + '\n' + sync_client_js, 1)
 
+# Canonical SSOT Invariant: if academy.html exists on disk with validated upgrades, preserve it
+if os.path.isfile(CLOUD_HTML_PATH):
+    with open(CLOUD_HTML_PATH, 'r', encoding='utf-8') as f_cloud:
+        canonical_disk_html = f_cloud.read()
+    if 'dot-jewel' in canonical_disk_html and 'toggleDashAccordion' in canonical_disk_html:
+        html_out = canonical_disk_html
+
 with open(OUT_HTML_PATH, 'w', encoding='utf-8', newline='\n') as f:
     f.write(html_out)
 

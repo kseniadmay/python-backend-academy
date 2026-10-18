@@ -1942,11 +1942,10 @@
   .dot-jewel::before {
     content: '';
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    min-width: 28px;
-    min-height: 36px;
+    top: -10px;
+    bottom: -10px;
+    left: -2px;
+    right: -2px;
     cursor: pointer;
   }
   .dot-jewel:hover {
@@ -4758,15 +4757,22 @@
   .tracker-cluster-dots .dot-jewel::before {
     content: '' !important;
     position: absolute !important;
-    inset: -7px !important;
-    border-radius: 50% !important;
+    top: -10px !important;
+    bottom: -10px !important;
+    left: -2px !important;
+    right: -2px !important;
+    inset: -10px -2px !important;
+    min-width: unset !important;
+    min-height: unset !important;
+    transform: none !important;
+    border-radius: 6px !important;
     border: none !important;
     background: transparent !important;
     box-shadow: none !important;
     outline: none !important;
     cursor: pointer !important;
     pointer-events: auto !important;
-    z-index: 2;
+    z-index: 1 !important;
   }
   .tracker-cluster-dots .dot-jewel::after,
   .tracker-cluster-dots .dot-jewel.active::after {
@@ -4857,15 +4863,22 @@
     .tracker-cluster-dots .dot-jewel::before {
       content: '' !important;
       position: absolute !important;
-      inset: -7px !important;
-      border-radius: 50% !important;
+      top: -10px !important;
+      bottom: -10px !important;
+      left: -2px !important;
+      right: -2px !important;
+      inset: -10px -2px !important;
+      min-width: unset !important;
+      min-height: unset !important;
+      transform: none !important;
+      border-radius: 6px !important;
       border: none !important;
       background: transparent !important;
       box-shadow: none !important;
       outline: none !important;
       cursor: pointer !important;
       pointer-events: auto !important;
-      z-index: 2;
+      z-index: 1 !important;
     }
     .tracker-cluster-dots .dot-jewel::after,
     .tracker-cluster-dots .dot-jewel.active::after {
@@ -5571,6 +5584,23 @@
     outline: 2px solid rgba(16, 185, 129, 0.5) !important;
     outline-offset: 2px !important;
   }
+  .dash-accordion-collapse-btn {
+    min-height: 44px !important;
+    padding: 10px 20px !important;
+    border-radius: 12px !important;
+    touch-action: manipulation !important;
+  }
+  .dash-accordion-collapse-btn span,
+  .dash-accordion-collapse-btn svg,
+  .dash-accordion-collapse-btn * {
+    pointer-events: none !important;
+  }
+
+  @media (max-width: 768px) {
+    .dashboard-container {
+      padding-bottom: calc(96px + env(safe-area-inset-bottom, 16px)) !important;
+    }
+  }
   .dash-accordion[open] summary .dash-accordion-summary-inner,
   .dash-accordion[open] .dash-accordion-summary .dash-accordion-summary-inner {
     border-bottom-left-radius: 0;
@@ -5980,26 +6010,77 @@
     z-index: 100001 !important;
   }
 
-  /* ========== ТЗ: Адаптация кластеров трекера 13 бусин и полноценные touch-targets 36x36 ========== */
-  .dot-jewel {
+  /* ========== ТЗ: Исправление хитбоксов и корректного загорания бусин (.dot-jewel) ========== */
+  .dot-jewel,
+  .tracker-cluster-dots .dot-jewel {
     position: relative;
   }
-  .dot-jewel::before {
+
+  /* Устранение бокового перекрытия: по горизонтали расширение не более 2px, по вертикали — 10px для пальца */
+  .dot-jewel::before,
+  .tracker-cluster-dots .dot-jewel::before,
+  .tracker-clusters-wrap .dot-jewel::before,
+  .focus-mini-track .dot-jewel::before {
     content: '' !important;
     position: absolute !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    min-width: 28px !important;
-    min-height: 36px !important;
-    border-radius: 50% !important;
-    border: none !important;
+    top: -10px !important;
+    bottom: -10px !important;
+    left: -2px !important;
+    right: -2px !important;
+    inset: -10px -2px !important;
+    min-width: unset !important;
+    min-height: unset !important;
+    width: auto !important;
+    height: auto !important;
+    transform: none !important;
+    border-radius: 6px !important;
     background: transparent !important;
-    box-shadow: none !important;
-    outline: none !important;
     cursor: pointer !important;
     pointer-events: auto !important;
-    z-index: 10 !important;
+    z-index: 1 !important;
+  }
+
+  /* При наведении конкретная бусина обязана всплывать над соседями */
+  .dot-jewel:hover,
+  .tracker-cluster-dots .dot-jewel:hover,
+  .focus-mini-track .dot-jewel:hover {
+    z-index: 15 !important;
+  }
+
+  /* Чистая и предсказуемая палитра «загорания» (Hover Lighting System) */
+  /* 1. Неактивная будущая бусина — мягкая белая подсветка */
+  .dot-jewel:not(.done):not(.active):hover {
+    background: rgba(255, 255, 255, 0.40) !important;
+    border-color: rgba(255, 255, 255, 0.70) !important;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.5) !important;
+    transform: scale(1.22) !important;
+  }
+
+  /* 2. Пройденная бусина (.done) — сохраняет изумруд и разгорается ярче */
+  .dot-jewel.done:hover {
+    background: #10b981 !important;
+    border-color: #6ee7b7 !important;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.9) !important;
+    transform: scale(1.22) !important;
+  }
+
+  /* 3. Активная бусина (.active) — неоновое изумрудное кольцо без деформации анимации */
+  .dot-jewel.active:hover {
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.5), 0 0 14px rgba(52, 211, 153, 0.9) !important;
+    transform: none !important;
+  }
+
+  /* 4. Рубежный ромб (.milestone) — строго сохраняет поворот 45deg и золотое свечение */
+  .dot-jewel.milestone:hover {
+    transform: rotate(45deg) scale(1.22) !important;
+    border-color: #fbbf24 !important;
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.7) !important;
+  }
+  .dot-jewel.milestone.done:hover {
+    transform: rotate(45deg) scale(1.22) !important;
+    background: #10b981 !important;
+    border-color: #6ee7b7 !important;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.9) !important;
   }
 
   @media (min-width: 561px) and (max-width: 640px) {
@@ -8343,7 +8424,7 @@ function loadState(){
 function saveState(s){
   try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){}
 }
-let state = loadState();
+let state = loadState(); window.state = state;
 
 function todayStr(){ return new Date().toDateString(); }
 function bumpStreak(){
@@ -16589,7 +16670,7 @@ viewDashboard = function(){
 
       <!-- Зона 4: Вторичная (под аккуратным свернутым аккордеоном) -->
       <details class="dash-accordion" ${state.dashAccordionOpen ? 'open' : ''} style="margin-top:14px;margin-bottom:16px;border-radius:16px;padding:12px 16px;">
-        <summary class="dash-accordion-summary" role="button" aria-expanded="${state.dashAccordionOpen ? 'true' : 'false'}">
+        <summary class="dash-accordion-summary" role="button" aria-expanded="${state.dashAccordionOpen ? 'true' : 'false'}" onclick="window.toggleDashAccordion(null, event)">
           <div class="dash-accordion-summary-inner">
             <div class="dash-accordion-title-wrap" style="min-width:0;flex:1 1 auto;overflow:hidden;display:inline-flex;align-items:center;gap:8px;">
               <svg class="chevron-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--moss);transition:transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);display:inline-block;flex-shrink:0;"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -16612,9 +16693,9 @@ viewDashboard = function(){
             </a>
           </div>
           <div style="text-align:center;margin-top:10px;padding-top:8px;">
-            <button type="button" class="btn-ghost-quiet dash-accordion-collapse-btn" data-collapse-dash-accordion style="font-size:.76rem;font-weight:600;padding:6px 14px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .2s ease;">
-              <span>Свернуть темы модуля</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(180deg);"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            <button type="button" class="btn-ghost-quiet dash-accordion-collapse-btn" data-collapse-dash-accordion onclick="window.toggleDashAccordion(false, event)" style="font-size:.76rem;font-weight:600;min-height:44px;padding:10px 20px;border-radius:12px;touch-action:manipulation;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .2s ease;">
+              <span style="pointer-events:none;">Свернуть темы модуля</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(180deg);pointer-events:none;"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </button>
           </div>
         </div>
@@ -16925,44 +17006,38 @@ window.openStreakModal = openStreakModal;
 
 window.openSettingsModal = openSettingsModal;
 
-  // Сохранение состояния раскрытия аккордеона тем только по явному клику пользователя
-  document.addEventListener('toggle', function(e){
-    if(e.target && e.target.classList && e.target.classList.contains('dash-accordion')){
-      state.dashAccordionOpen = Boolean(e.target.open);
-      try { saveState(state); } catch(err){}
-      const sum = e.target.querySelector('.dash-accordion-summary');
-      if(sum) sum.setAttribute('aria-expanded', e.target.open ? 'true' : 'false');
+  // Единая детерминированная функция переключения аккордеона Zone 4
+  window.toggleDashAccordion = function(forceState, e){
+    if(e) { e.preventDefault(); e.stopPropagation(); }
+    const acc = document.querySelector('.dash-accordion');
+    if(!acc) return;
+    const willOpen = typeof forceState === 'boolean' ? forceState : !acc.hasAttribute('open');
+    if(willOpen){
+      acc.setAttribute('open', '');
+    } else {
+      acc.removeAttribute('open');
     }
-  }, true);
+    state.dashAccordionOpen = willOpen;
+    window.state = state;
+    try { saveState(state); } catch(err){}
+    const sum = acc.querySelector('.dash-accordion-summary');
+    if(sum) sum.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+    if(!willOpen && e && e.target && e.target.closest('[data-collapse-dash-accordion]')){
+      sum.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  };
 
-  // Гарантированный программный переключатель и нижний триггер сворачивания аккордеона
+  // Резервный делегированный переключатель аккордеона
   document.addEventListener('click', function(e){
     const collapseBtn = e.target.closest('[data-collapse-dash-accordion]');
     if(collapseBtn){
-      const acc = collapseBtn.closest('.dash-accordion');
-      if(acc){
-        acc.open = false;
-        state.dashAccordionOpen = false;
-        try { saveState(state); } catch(err){}
-        const summary = acc.querySelector('.dash-accordion-summary');
-        if(summary) summary.setAttribute('aria-expanded', 'false');
-        // Плавный скролл к шапке аккордеона, чтобы пользователь не потерял фокус
-        acc.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
+      window.toggleDashAccordion(false, e);
       return;
     }
-
     const summary = e.target.closest('.dash-accordion-summary');
     if(summary){
-      const acc = summary.closest('.dash-accordion');
-      if(acc){
-        // Небольшой таймаут для синхронизации с нативным toggle
-        setTimeout(() => {
-          state.dashAccordionOpen = Boolean(acc.open);
-          try { saveState(state); } catch(err){}
-          summary.setAttribute('aria-expanded', acc.open ? 'true' : 'false');
-        }, 20);
-      }
+      window.toggleDashAccordion(null, e);
+      return;
     }
   });
 
