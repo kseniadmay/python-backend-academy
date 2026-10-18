@@ -5520,46 +5520,54 @@
   }
   .dash-accordion summary,
   .dash-accordion-summary {
-    cursor: pointer;
-    font-weight: 700;
-    font-size: 0.88rem;
-    color: var(--ink);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    min-height: 44px;
-    box-sizing: border-box;
-    outline: none;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    padding: 10px 14px;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.06));
+    display: block;
     list-style: none;
-    transition: background 0.2s ease, border-color 0.2s ease, transform 0.12s ease;
+    cursor: pointer;
+    outline: none;
+    padding: 0;
+    border: none;
+    background: transparent;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
   }
   .dash-accordion summary::-webkit-details-marker,
   .dash-accordion-summary::-webkit-details-marker {
     display: none;
   }
-  .dash-accordion summary:hover,
-  .dash-accordion-summary:hover {
+  .dash-accordion-summary-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 44px;
+    box-sizing: border-box;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--zen-hairline-subtle, rgba(255, 255, 255, 0.06));
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 0.88rem;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.12s ease;
+  }
+  .dash-accordion-summary-inner * {
+    pointer-events: none !important;
+  }
+  .dash-accordion summary:hover .dash-accordion-summary-inner,
+  .dash-accordion-summary:hover .dash-accordion-summary-inner {
     background: rgba(255, 255, 255, 0.06);
     border-color: rgba(255, 255, 255, 0.12);
   }
-  .dash-accordion summary:active,
-  .dash-accordion-summary:active {
+  .dash-accordion summary:active .dash-accordion-summary-inner,
+  .dash-accordion-summary:active .dash-accordion-summary-inner {
     transform: scale(0.996);
   }
-  .dash-accordion summary:focus-visible,
-  .dash-accordion-summary:focus-visible {
+  .dash-accordion summary:focus-visible .dash-accordion-summary-inner,
+  .dash-accordion-summary:focus-visible .dash-accordion-summary-inner {
     outline: 2px solid rgba(16, 185, 129, 0.5) !important;
     outline-offset: 2px !important;
   }
-  .dash-accordion[open] summary,
-  .dash-accordion[open] .dash-accordion-summary {
+  .dash-accordion[open] summary .dash-accordion-summary-inner,
+  .dash-accordion[open] .dash-accordion-summary .dash-accordion-summary-inner {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
@@ -5594,6 +5602,9 @@
       padding: 8px 10px !important;
     }
     .dash-accordion-summary {
+      display: block !important;
+    }
+    .dash-accordion-summary-inner {
       flex-wrap: nowrap !important;
       gap: 6px !important;
     }
@@ -5856,11 +5867,14 @@
     /* Защита контента от перекрытия плавающим таббаром */
     #view-root,
     main,
-    .dashboard-container,
     .view-container,
     .layout-main,
     .fc-stage {
       padding-bottom: calc(var(--tabbar-h, 68px) + 24px + env(safe-area-inset-bottom, 0px)) !important;
+      min-height: auto !important;
+    }
+    .dashboard-container {
+      padding-bottom: calc(var(--tabbar-h, 68px) + 28px + env(safe-area-inset-bottom, 16px)) !important;
       min-height: auto !important;
     }
     body.is-sprint-focus .tabbar {
@@ -5910,13 +5924,13 @@
     transform: scale(0.92);
   }
   .tabbar__item.active {
-    color: #38bdf8 !important;
-    background: rgba(56, 189, 248, 0.12);
+    color: #34d399 !important;
+    background: rgba(16, 185, 129, 0.12);
     font-weight: 600;
   }
   .tabbar__item.active svg {
     transform: translateY(-1px) scale(1.08);
-    stroke: #38bdf8 !important;
+    stroke: #34d399 !important;
   }
   .tabbar__item.active::after {
     content: '';
@@ -5927,22 +5941,22 @@
     width: 4px;
     height: 4px;
     border-radius: 50%;
-    background: #38bdf8;
-    box-shadow: 0 0 6px #38bdf8;
+    background: #10b981;
+    box-shadow: 0 0 6px #10b981;
   }
   html.theme-light .tabbar__item.active,
   :root[data-theme="light"] .tabbar__item.active {
-    color: #0284c7 !important;
-    background: rgba(14, 165, 233, 0.10);
+    color: #059669 !important;
+    background: rgba(16, 185, 129, 0.10);
   }
   html.theme-light .tabbar__item.active svg,
   :root[data-theme="light"] .tabbar__item.active svg {
-    stroke: #0284c7 !important;
+    stroke: #059669 !important;
   }
   html.theme-light .tabbar__item.active::after,
   :root[data-theme="light"] .tabbar__item.active::after {
-    background: #0284c7;
-    box-shadow: 0 0 6px #0284c7;
+    background: #059669;
+    box-shadow: 0 0 6px #059669;
   }
 
   /* ========== ТЗ: Интерактивность всех кластеров фокус-карты ========== */
@@ -6194,7 +6208,7 @@
       padding-top: 0 !important;
       padding-left: 4px !important;
       padding-right: 4px !important;
-      padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important;
+      padding-bottom: calc(var(--tabbar-h, 68px) + 28px + env(safe-area-inset-bottom, 16px)) !important;
       max-width: 100% !important;
       overflow-x: hidden !important;
     }
@@ -6540,7 +6554,7 @@
     }
     /* Пункт 7: Устранение пустого зазора перед мобильным таббаром */
     .dashboard-container {
-      padding-bottom: calc(var(--tabbar-h, 64px) + 24px + env(safe-area-inset-bottom, 16px)) !important;
+      padding-bottom: calc(var(--tabbar-h, 68px) + 28px + env(safe-area-inset-bottom, 16px)) !important;
     }
   }
 
@@ -16582,18 +16596,20 @@ viewDashboard = function(){
 
       <!-- Зона 4: Вторичная (под аккуратным свернутым аккордеоном) -->
       <details class="dash-accordion" ${state.dashAccordionOpen ? 'open' : ''} style="margin-top:14px;margin-bottom:16px;border-radius:16px;padding:12px 16px;">
-        <summary class="dash-accordion-summary">
-          <div class="dash-accordion-title-wrap" style="min-width:0;flex:1 1 auto;overflow:hidden;display:inline-flex;align-items:center;gap:8px;">
-            <svg class="chevron-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--moss);transition:transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);display:inline-block;flex-shrink:0;"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            <span class="dash-accordion-title" style="min-width:0;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;">
-              <span class="dash-accordion-title-desk">Все темы модуля:</span>
-              ${escapeHtmlStr(cleanUnitTitle)}
+        <summary class="dash-accordion-summary" role="button" aria-expanded="${state.dashAccordionOpen ? 'true' : 'false'}">
+          <div class="dash-accordion-summary-inner">
+            <div class="dash-accordion-title-wrap" style="min-width:0;flex:1 1 auto;overflow:hidden;display:inline-flex;align-items:center;gap:8px;">
+              <svg class="chevron-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--moss);transition:transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);display:inline-block;flex-shrink:0;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              <span class="dash-accordion-title" style="min-width:0;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;">
+                <span class="dash-accordion-title-desk">Все темы модуля:</span>
+                ${escapeHtmlStr(cleanUnitTitle)}
+              </span>
+            </div>
+            <span class="meta dash-accordion-status" style="font-size:.76rem;font-weight:500;flex-shrink:0;white-space:nowrap;">
+              <span class="dash-accordion-status-desk">${accordionStatusText}</span>
+              <span class="dash-accordion-status-mob">${accordionMobStatusText}</span>
             </span>
           </div>
-          <span class="meta dash-accordion-status" style="font-size:.76rem;font-weight:500;flex-shrink:0;white-space:nowrap;">
-            <span class="dash-accordion-status-desk">${accordionStatusText}</span>
-            <span class="dash-accordion-status-mob">${accordionMobStatusText}</span>
-          </span>
         </summary>
         <div class="dash-accordion-content" style="margin-top:10px;padding-top:4px;">
           ${currentUnitThemesHTML}
@@ -16601,6 +16617,12 @@ viewDashboard = function(){
             <a href="#/map" class="link-quiet dash-map-link" style="font-size:.80rem;display:flex;width:100%;justify-content:center;align-items:center;gap:6px;text-decoration:none;opacity:0.75;transition:opacity .2s ease, color .2s ease;margin-bottom:0;padding:8px 12px;box-sizing:border-box;">
               <span style="display:inline-flex;align-items:center;gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;flex-shrink:0;"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></svg>Смотреть все модули и полную карту компетенций эшелона ➔</span>
             </a>
+          </div>
+          <div style="text-align:center;margin-top:10px;padding-top:8px;">
+            <button type="button" class="btn-ghost-quiet dash-accordion-collapse-btn" data-collapse-dash-accordion style="font-size:.76rem;font-weight:600;padding:6px 14px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .2s ease;">
+              <span>Свернуть темы модуля</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(180deg);"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
           </div>
         </div>
       </details>
@@ -16915,8 +16937,41 @@ window.openSettingsModal = openSettingsModal;
     if(e.target && e.target.classList && e.target.classList.contains('dash-accordion')){
       state.dashAccordionOpen = Boolean(e.target.open);
       try { saveState(state); } catch(err){}
+      const sum = e.target.querySelector('.dash-accordion-summary');
+      if(sum) sum.setAttribute('aria-expanded', e.target.open ? 'true' : 'false');
     }
   }, true);
+
+  // Гарантированный программный переключатель и нижний триггер сворачивания аккордеона
+  document.addEventListener('click', function(e){
+    const collapseBtn = e.target.closest('[data-collapse-dash-accordion]');
+    if(collapseBtn){
+      const acc = collapseBtn.closest('.dash-accordion');
+      if(acc){
+        acc.open = false;
+        state.dashAccordionOpen = false;
+        try { saveState(state); } catch(err){}
+        const summary = acc.querySelector('.dash-accordion-summary');
+        if(summary) summary.setAttribute('aria-expanded', 'false');
+        // Плавный скролл к шапке аккордеона, чтобы пользователь не потерял фокус
+        acc.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      return;
+    }
+
+    const summary = e.target.closest('.dash-accordion-summary');
+    if(summary){
+      const acc = summary.closest('.dash-accordion');
+      if(acc){
+        // Небольшой таймаут для синхронизации с нативным toggle
+        setTimeout(() => {
+          state.dashAccordionOpen = Boolean(acc.open);
+          try { saveState(state); } catch(err){}
+          summary.setAttribute('aria-expanded', acc.open ? 'true' : 'false');
+        }, 20);
+      }
+    }
+  });
 
   document.addEventListener('click', function(e){
     const pill = e.target.closest('.streak-pill, .sidebar-streak-badge');
