@@ -338,7 +338,13 @@ _mod_aiopika.connect_robust = _connect_robust
 _sys.modules["aio_pika"] = _mod_aiopika
 '''
 
-with open(r'C:\Users\fury6\Downloads\Практика кода — тренажёр с IDE.html', encoding='utf-8') as f:
+import os
+_ide_candidates = [
+    os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "Практика кода — тренажёр с IDE.html")),
+    "Практика кода — тренажёр с IDE.html"
+]
+_found_ide = next((p for p in _ide_candidates if os.path.isfile(p)), None)
+with open(_found_ide, encoding="utf-8") as f:
     lines = f.read().splitlines()
 start = next(i for i, l in enumerate(lines) if 'const wrapper = [' in l)
 end = next(i for i, l in enumerate(lines[start:], start) if '].join(' in l)
@@ -1773,12 +1779,12 @@ assert r2 == {"issues": [], "probes_healthy": True, "ready": True}, r2
 '''
             ),
         }
-        import os, re as _re_boss
-        _asm_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assemble_academy.py')
-        with open(_asm_path, encoding='utf-8') as _af:
+        import os, io as _real_io, re as _re_boss
+        _asm_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'canonical_template_js.js')
+        with _real_io.open(_asm_path, encoding='utf-8') as _af:
             _asm_src = _af.read()
-        _boss_block_m = _re_boss.search(r'const MODULE_BOSS_TASKS = \{([\s\S]*?)\n\};\nwindow\.MODULE_BOSS_TASKS', _asm_src)
-        assert _boss_block_m, "Could not locate MODULE_BOSS_TASKS in assemble_academy.py"
+        _boss_block_m = _re_boss.search(r'const MODULE_BOSS_TASKS = \{([\s\S]*?)\n\};\n(?:window\.)?MODULE_BOSS_TASKS', _asm_src)
+        assert _boss_block_m, f"Could not locate MODULE_BOSS_TASKS in {_asm_path}"
         _boss_block = _boss_block_m.group(1)
         _live_boss_data = {}
         for _tk in boss_solutions:
@@ -1833,7 +1839,7 @@ assert r2 == {"issues": [], "probes_healthy": True, "ready": True}, r2
         import json as _json_disk
         _ide_path = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'Практика кода — тренажёр с IDE.html'))
         if os.path.isfile(_ide_path):
-            with open(_ide_path, 'r', encoding='utf-8') as _f:
+            with _real_io.open(_ide_path, 'r', encoding='utf-8') as _f:
                 _ide_content = _f.read()
             assert '__ACADEMY_SYNC_V1__:' in _ide_content, "Missing __ACADEMY_SYNC_V1__: in standalone IDE"
             assert "window.addEventListener('storage'" in _ide_content, "Missing storage listener in standalone IDE"

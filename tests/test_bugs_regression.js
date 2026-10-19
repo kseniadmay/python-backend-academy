@@ -513,9 +513,21 @@ const f085Obj = pyMasteryData.decks['Ф-085'];
 assert(f085Obj.cards[1].q.includes('«динамическая»') && f085Obj.cards[1].a.includes('Динамическая строгая'), 'Bug 80: F-085 card 2 in academy.html must have clean typography and formatting');
 console.log('✓ Bug 80: F-085 card 2 typography and clean formatting verified');
 
-// 81. Проверка спецификации канонических эталонов и инвариантов
+// 81. Bug 81: К-055: квантование теории регулярных выражений (14 микро-шагов по канону Кодди и Эшелона 1)
+const k055Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.9 · Инструменты', '📚 Конспекты', 'К-055. Регулярные выражения в Python_ модуль re.md');
+assert(fs.existsSync(k055Path), 'К-055.md missing');
+const k055Content = fs.readFileSync(k055Path, 'utf-8');
+assert(k055Content.includes('## re.match() vs re.fullmatch(): валидация префикса и полной строки'), 'Bug 81: K-055.md must separate fullmatch into distinct micro-step');
+assert(k055Content.includes('## Безопасность на скрининге: катастрофический бэктрекинг (ReDoS)'), 'Bug 81: K-055.md must include screening ReDoS micro-step');
+assert(!k055Content.includes('. – любой символ, кроме перевода строки. \\d – цифра, \\D – не цифра.'), 'Bug 81: K-055.md must eliminate monolithic text wall in character classes');
+const k055Obj = pyMasteryData.notes['К-055'];
+assert(k055Obj && k055Obj.steps, 'academy.html must contain К-055 with steps');
+assert.strictEqual(k055Obj.steps.length, 14, `Bug 81: K-055 must have 14 digestible micro-steps in academy.html, got ${k055Obj.steps.length}`);
+console.log('✓ Bug 81: K-055 text wall elimination & 14 Coddy pedagogy micro-steps verified');
+
+// Проверка спецификации канонических эталонов и инвариантов
 require('./test_pravki_spec.js');
 
 console.log('================================================================');
-console.log('  ALL 80 REGRESSION TESTS & CANONICAL BENCHMARKS PASSED (100%)  ');
+console.log('  ALL 81 REGRESSION TESTS & CANONICAL BENCHMARKS PASSED (100%)  ');
 console.log('================================================================\n');
