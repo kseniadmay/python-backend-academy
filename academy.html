@@ -6828,7 +6828,75 @@
 
 
   /* ========== Dashboard Mobile QA Refinements (Descriptor Specifications) ========== */
+  /* 1. Desktop Sidebar: Убираем паразитный серый фон у пункта «Карта модулей» */
+  .nav-modules-accordion {
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    box-shadow: none !important;
+    margin: 2px 0 4px !important;
+    border-radius: 10px !important;
+    transition: background 0.15s ease, border-color 0.15s ease !important;
+  }
+  .nav-modules-accordion:hover,
+  .nav-modules-accordion[open] {
+    background: rgba(255, 255, 255, 0.02) !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+  }
+  .nav-modules-accordion > summary {
+    padding: 6px 10px !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    color: var(--ink-muted) !important;
+    border-radius: 8px !important;
+  }
+  .nav-modules-accordion > summary:hover {
+    color: var(--ink) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+  }
+
+  /* 2. Календарь стрика: Состояние ожидания первого шага (hollow ring + dashed border) */
+  .heat-cell--today-pending {
+    border: 1.5px dashed rgba(245, 158, 11, 0.5) !important;
+    background: rgba(245, 158, 11, 0.05) !important;
+  }
+  .heat-dot.today-pending-dot {
+    width: 5px !important;
+    height: 5px !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+    border: 1.5px solid var(--amber) !important;
+    box-shadow: 0 0 6px rgba(245, 158, 11, 0.45) !important;
+    opacity: 0.9 !important;
+    margin: 0 auto !important;
+  }
+
+  /* 3. WCAG AA: Повышение контраста для вторичного текста и статусов */
+  .dashboard-container .meta,
+  .dashboard-container .echelon-mp-counter,
+  .dashboard-container .goal-micro-hint,
+  .dashboard-container .dash-accordion-status,
+  .dashboard-container .srs-act-text-desk,
+  .dashboard-container .srs-act-text-mob,
+  .dash-theme-title-text {
+    color: #94a3b8 !important;
+  }
+  .dashboard-container .echelon-clean-wrap span:last-child {
+    color: #94a3b8 !important;
+  }
+
+  /* 4. Адаптив хедера и мобильного топбара */
   @media (max-width: 640px) {
+    /* Разгрузка мобильного Topbar: убираем дубликат стрика 🔥, так как он есть в карточке дня */
+    .topbar .streak-pill {
+      display: none !important;
+    }
+    .topbar {
+      padding: 8px 12px !important;
+    }
+    .topbar > div:last-child {
+      gap: 6px !important;
+    }
+
     .dashboard-container .echelon-clean-meta {
       display: flex !important;
       flex-direction: column !important;
@@ -6851,11 +6919,12 @@
     }
     .dashboard-container .topbar-audio-btn,
     .dashboard-container .topbar-help-btn {
-      min-height: 44px !important;
-      min-width: 44px !important;
+      min-height: 40px !important;
+      min-width: 40px !important;
     }
   }
 
+  /* 5. Аккордеон тем на мобильных */
   @media (max-width: 540px) {
     .dash-accordion-theme-row {
       display: flex !important;
@@ -6929,19 +6998,21 @@
     }
   }
 
+  /* 6. Степпер микро-шагов: полное устранение overflow и клиппинга на экранах от 320px до 480px */
   @media (max-width: 480px) {
     .dashboard-container .dots-necklace-container {
       margin: 8px 0 12px !important;
       width: 100% !important;
+      max-width: 100% !important;
       box-sizing: border-box !important;
       overflow-x: auto !important;
       scrollbar-width: none !important;
       -webkit-overflow-scrolling: touch !important;
       display: flex !important;
-      justify-content: flex-start !important;
-      padding: 4px 6px !important;
-      mask-image: linear-gradient(to right, black calc(100% - 16px), transparent 100%) !important;
-      -webkit-mask-image: linear-gradient(to right, black calc(100% - 16px), transparent 100%) !important;
+      justify-content: center !important;
+      padding: 4px 2px !important;
+      mask-image: none !important;
+      -webkit-mask-image: none !important;
     }
     .dashboard-container .dots-necklace-container::-webkit-scrollbar {
       display: none !important;
@@ -6951,18 +7022,20 @@
       width: 1px !important;
       height: 12px !important;
       background: rgba(255, 255, 255, 0.12) !important;
-      margin: 0 4px !important;
+      margin: 0 3px !important;
       align-self: center !important;
+      flex-shrink: 0 !important;
     }
     .dashboard-container .tracker-clusters-wrap {
       margin: 0 auto !important;
-      padding: 6px 10px !important;
-      gap: 6px !important;
+      padding: 5px 8px !important;
+      gap: 4px !important;
       display: inline-flex !important;
       align-items: center !important;
       justify-content: center !important;
       width: auto !important;
-      min-width: max-content !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
       flex-wrap: nowrap !important;
       background: rgba(255, 255, 255, 0.02) !important;
       border: 1px solid rgba(255, 255, 255, 0.06) !important;
@@ -6970,32 +7043,62 @@
     }
     .dashboard-container .tracker-cluster {
       display: inline-flex !important;
-      flex-direction: column !important;
+      flex-direction: row !important;
       align-items: center !important;
       gap: 3px !important;
+      flex-shrink: 0 !important;
+    }
+    .dashboard-container .tracker-cluster-label {
+      padding: 2px 4px !important;
+      margin-right: 2px !important;
+      border-radius: 6px !important;
     }
     .dashboard-container .tracker-cluster-label .cluster-icon svg {
       width: 11px !important;
       height: 11px !important;
-      opacity: 0.85 !important;
-    }
-  }
-
-  @media (max-width: 420px) {
-    .dashboard-container .tracker-clusters-wrap {
-      gap: 4px !important;
-      padding: 5px 8px !important;
+      opacity: 0.9 !important;
     }
     .dashboard-container .tracker-cluster-label .cluster-label-text {
       display: none !important;
     }
-    .dashboard-container .tracker-cluster {
-      flex-direction: row !important;
+    .dashboard-container .tracker-cluster-dots {
+      display: inline-flex !important;
       align-items: center !important;
       gap: 3px !important;
     }
+    .dashboard-container .dot-jewel {
+      width: 7.5px !important;
+      height: 7.5px !important;
+      border-width: 1px !important;
+      flex-shrink: 0 !important;
+    }
+    .dashboard-container .dot-jewel.milestone {
+      width: 9.5px !important;
+      height: 9.5px !important;
+      border-radius: 2px !important;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .dashboard-container .tracker-clusters-wrap {
+      gap: 3px !important;
+      padding: 4px 5px !important;
+    }
+    .dashboard-container .tracker-cluster-dots {
+      gap: 2px !important;
+    }
     .dashboard-container .dots-phase-divider {
-      margin: 0 2px !important;
+      margin: 0 1.5px !important;
+    }
+  }
+
+  /* 7. Safe Area: Гарантированный отступ от нижней плашки навигации на мобильных */
+  @media (max-width: 880px) {
+    .dashboard-container {
+      padding-bottom: 40px !important;
+    }
+    main {
+      padding-bottom: 96px !important;
     }
   }
 </style>
@@ -16071,14 +16174,14 @@ function buildSevenDayHeatmapHTML(){
       } else {
         if(streak > 0){
           cls = 'heat-cell heat-cell--today-pending';
-          valText = '<span class="today-pending-spark">✨</span>';
-          dotCls = 'active';
-          hint += ` (сегодня · серия ${streak} дн. · цель ${dailyGoal} XP)`;
+          valText = '<span class="today-pending-spark" style="display:inline-flex;align-items:center;justify-content:center;color:var(--amber);font-size:0.75rem;">⚡</span>';
+          dotCls = 'today-pending-dot';
+          hint += ` (сегодня · сделайте шаг для продления серии до ${streak + 1} дн. · цель ${dailyGoal} XP)`;
         } else {
-          cls = 'heat-cell today-start-badge';
-          valText = '<span class="today-glow-flame">🔥</span>';
-          dotCls = 'active';
-          hint += ` (сегодня · цель ${dailyGoal} XP)`;
+          cls = 'heat-cell heat-cell--today-pending today-start-badge';
+          valText = '<span class="today-glow-flame" style="opacity:0.55;">🔥</span>';
+          dotCls = 'today-pending-dot';
+          hint += ` (сегодня · сделайте первый шаг · цель ${dailyGoal} XP)`;
         }
       }
     } else if(isPast){
@@ -16767,7 +16870,7 @@ viewDashboard = function(){
     : `1 в фокусе, ${lockedCount} закрыто`;
   const accordionMobStatusText = curUnitDoneCount > 0
     ? `${curUnitDoneCount}/${curUnitTotal} закрыто`
-    : `1 в фокусе`;
+    : `1 в фокусе · ${lockedCount} в очереди`;
 
   return `
     <div class="container dashboard-container">
@@ -16775,7 +16878,7 @@ viewDashboard = function(){
       <div class="echelon-topbar-clean" style="padding:16px 20px;border-radius:20px;margin-bottom:18px;display:flex;flex-direction:column;gap:12px;background:rgba(18, 22, 31, 0.65);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255, 255, 255, 0.08);box-shadow:var(--shadow-1);">
         <!-- Ряд 1: Звание слева, аудио-компаньон и кнопка «Справка» справа -->
         <div class="echelon-topbar-row-top" style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px;">
-          <h1 class="rank-title-glow echelon-bordeaux-title" style="margin:0;font-size:1.32rem;">${readinessRank} <svg width="16" height="16" viewBox="0 0 24 24" fill="rgba(244, 63, 94, 0.25)" stroke="#f43f5e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-left:4px;"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg></h1>
+          <h1 class="rank-title-glow echelon-bordeaux-title" style="margin:0;font-size:1.32rem;">${readinessRank} <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-left:4px;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg></h1>
           <div class="echelon-topbar-actions" style="display:inline-flex;align-items:center;gap:8px;flex-shrink:0;">
             <button class="topbar-audio-btn btn btn-ghost-quiet" id="dashAudioCompanionBtn" title="Голосовой аудио-брифинг дня от наставника Сократа" aria-label="Голосовой наставник Сократ" style="padding:6px 10px;border-radius:10px;font-size:.82rem;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(12px);color:var(--ink-muted);cursor:pointer;transition:all .2s ease;">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;flex-shrink:0;">
@@ -16784,9 +16887,9 @@ viewDashboard = function(){
               </svg>
               <span class="topbar-audio-text">Аудио-брифинг</span>
             </button>
-            <a href="#/docs" class="topbar-help-btn btn btn-ghost-quiet" style="padding:6px 10px;border-radius:10px;text-decoration:none;font-size:.82rem;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--ink-muted);flex-shrink:0;" title="Справочник платформы" aria-label="Справочник платформы">
+            <a href="#/docs" class="topbar-help-btn btn btn-ghost-quiet" style="padding:6px 10px;border-radius:10px;text-decoration:none;font-size:.82rem;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--ink-muted);flex-shrink:0;" title="Информация и критерии грейда" aria-label="Информация и критерии грейда">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;flex-shrink:0;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-              <span class="topbar-help-text">Справка</span>
+              <span class="topbar-help-text">О модуле</span>
             </a>
           </div>
         </div>
@@ -16963,7 +17066,7 @@ NAV_ITEMS.splice(0, NAV_ITEMS.length,
   {route:'/path', icon:'path', label:'3D-Тропа', shortLabel:'3D-Тропа', mobileTab:true, group:'learn'},
   {route:'/practice', icon:'code', label:'Практика IDE', shortLabel:'IDE', mobileTab:true, group:'trainer'},
   {route:'/cards', icon:'cards', label:'Карточки', shortLabel:'Карточки', mobileTab:true, group:'trainer'},
-  {route:'/mock', icon:'crown', label:'Собеседование', shortLabel:'Собес', mobileTab:true, group:'trainer'},
+  {route:'/mock', icon:'crown', label:'Собеседование', shortLabel:'Интервью', mobileTab:true, group:'trainer'},
   {route:'/python', icon:'python', label:'Python Core', shortLabel:'Python', group:'module'},
   {route:'/web', icon:'globe', label:'Web и HTTP', shortLabel:'Web', group:'module'},
   {route:'/backend', icon:'server', label:'Backend', shortLabel:'Backend', group:'module'},
