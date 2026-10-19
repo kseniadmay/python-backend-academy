@@ -3838,13 +3838,15 @@
   /* ================= CODDY-REFERENCE DESIGNER BATCH (2026-10-07, согласовано с Ксенией) ================= */
   /* V6/V7-компаньон: инлайн-код в теории — цветные чипы-«ключевые слова» как в Coddy,
      снимают тяжесть сплошных кодовых вставок (цвета платформы не меняем) */
-  .lesson-theory p > code:not(pre code),
-  .lesson-theory li > code:not(pre code){
+  .lesson-theory p code:not(pre code),
+  .lesson-theory li code:not(pre code),
+  .lesson-theory strong > code:not(pre code){
     background:var(--emerald-soft);border:1px solid var(--line);border-radius:7px;
     padding:1px 6px;font-size:.82em;white-space:nowrap;
   }
-  html:not([data-theme="dark"]) .lesson-theory p > code:not(pre code),
-  html:not([data-theme="dark"]) .lesson-theory li > code:not(pre code){
+  html:not([data-theme="dark"]) .lesson-theory p code:not(pre code),
+  html:not([data-theme="dark"]) .lesson-theory li code:not(pre code),
+  html:not([data-theme="dark"]) .lesson-theory strong > code:not(pre code){
     background:rgba(20,90,70,0.08);
   }
   /* V10: practice mobile — контент вкладки доходит до таб-бара, действие прижато вниз (как CTA у Coddy) */
@@ -4380,24 +4382,14 @@
     width: 8px;
     height: 8px;
     background: #ffffff;
-    box-shadow: 0 0 5px rgba(255, 255, 255, 0.8), 0 0 10px rgba(52, 211, 153, 0.5);
-    animation: radar-core-breathe-emerald 2.4s infinite ease-in-out;
+    border: 1.5px solid #10b981;
+    border-radius: 50%;
+    animation: pulse-ring 2s infinite !important;
   }
-  .dot-jewel.active::before {
+  .dot-jewel.active::before,
+  .dot-jewel.active::after {
     display: none !important;
     content: none !important;
-  }
-  .dot-jewel.active::after {
-    content: '' !important;
-    position: absolute !important;
-    inset: 0 !important;
-    border-radius: 50% !important;
-    border: 1.5px solid rgba(52, 211, 153, 0.85) !important;
-    box-sizing: border-box !important;
-    pointer-events: none !important;
-    transform-origin: center center !important;
-    display: block !important;
-    animation: radar-ripple-emerald 2.4s infinite cubic-bezier(0.15, 0.85, 0.35, 1) !important;
   }
   #radar-dots-necklace .dot-jewel.active,
   .dots-necklace .dot-jewel.active {
@@ -4405,28 +4397,16 @@
     height: 8px !important;
     background: #ffffff !important;
     border: 1.5px solid #10b981 !important;
-    box-shadow: 0 0 0 1.5px rgba(16, 185, 129, 0.45), 0 0 8px rgba(52, 211, 153, 0.7) !important;
     border-radius: 50% !important;
     flex-shrink: 0 !important;
     box-sizing: border-box !important;
     position: relative !important;
     z-index: 5 !important;
     transform: none !important;
-    animation: radar-core-breathe-emerald 2.4s infinite ease-in-out !important;
+    animation: pulse-ring 2s infinite !important;
   }
   #radar-dots-necklace .dot-jewel.active::after,
-  .dots-necklace .dot-jewel.active::after {
-    content: '' !important;
-    position: absolute !important;
-    inset: 0 !important;
-    border-radius: 50% !important;
-    border: 1.5px solid rgba(52, 211, 153, 0.85) !important;
-    box-sizing: border-box !important;
-    pointer-events: none !important;
-    transform-origin: center center !important;
-    display: block !important;
-    animation: radar-ripple-emerald 2.4s infinite cubic-bezier(0.15, 0.85, 0.35, 1) !important;
-  }
+  .dots-necklace .dot-jewel.active::after,
   #radar-dots-necklace .dot-jewel.active::before,
   .dots-necklace .dot-jewel.active::before {
     display: none !important;
@@ -4533,7 +4513,7 @@
   :root[data-theme="light"] .dots-necklace .dot-jewel.active {
     background: #ffffff !important;
     border: 1.5px solid #059669 !important;
-    box-shadow: 0 0 0 2.5px rgba(5, 150, 105, 0.25), 0 0 10px rgba(16, 185, 129, 0.5) !important;
+    animation: pulse-ring 2s infinite !important;
   }
 
   @keyframes radar-core-breathe-emerald {
@@ -12752,6 +12732,11 @@ function splitStepHtmlIntoChunks(htmlStr){
       finalChunks[finalChunks.length - 1] += '\n' + c;
       continue;
     }
+    const isCodeSnippet = /class=["'][^"']*(?:snippet-wrap|code-snippet-wrap)[^"']*["']/i.test(c) || /^<pre\b/i.test(c);
+    if(finalChunks.length > 0 && isCodeSnippet && finalChunks[finalChunks.length - 1].replace(/<[^>]+>/g, '').trim().length < 350 && merged.length <= 3){
+      finalChunks[finalChunks.length - 1] += '\n' + c;
+      continue;
+    }
     if(finalChunks.length > 0 && plainLen < 75 && !/^<h[1-6]\b/i.test(c)){
       finalChunks[finalChunks.length - 1] += '\n' + c;
     } else {
@@ -13078,7 +13063,7 @@ function viewPythonSkill(sid){
   const eyebrowDotsHTML = `
     <div class="topic-eyebrow-track" style="max-width:100%;margin:16px 0 22px;padding:0 2px;">
       <div style="display:flex;flex-direction:column;gap:12px;width:100%;">
-        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;">
+        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;max-width:760px;margin:0 auto;width:100%;">
           <div style="font-family:var(--font-b);font-size:0.80rem;font-weight:500;color:var(--ink-muted);letter-spacing:0.01em;line-height:1.2;">${escapeHtmlStr(cleanUnitTitle)}</div>
           ${activeItemTitle ? `<div style="font-family:var(--font-b);font-size:1.06rem;font-weight:600;color:var(--ink);line-height:1.35;letter-spacing:-0.01em;">${escapeHtmlStr(activeItemTitle)}</div>` : ''}
         </div>
