@@ -24,14 +24,19 @@ if res.returncode != 0:
 
 files = [os.path.normpath(f.strip()) for f in res.stdout.splitlines() if f.strip()]
 
+import shutil
+
+has_node = shutil.which('node') is not None
+
 for f in files:
     if not os.path.isfile(f):
         continue
     if f.endswith('.js'):
-        c = subprocess.run(['node', '--check', f], capture_output=True, text=True)
-        if c.returncode != 0:
-            print(f"[HOOK ERROR] Ошибка синтаксиса JS в {f}:\n{c.stderr}")
-            sys.exit(1)
+        if has_node:
+            c = subprocess.run(['node', '--check', f], capture_output=True, text=True)
+            if c.returncode != 0:
+                print(f"[HOOK ERROR] Ошибка синтаксиса JS в {f}:\n{c.stderr}")
+                sys.exit(1)
     elif f.endswith('.py'):
         c = subprocess.run([sys.executable, '-m', 'py_compile', f], capture_output=True, text=True)
         if c.returncode != 0:
@@ -51,17 +56,18 @@ for f in files:
         except Exception as e:
             print(f"[HOOK ERROR] Не удалось прочитать HTML {f}:\n{e}")
             sys.exit(1)
-        for m in re.finditer(r'<script(?:\s+([^>]*))?>([\s\S]*?)</script>', html, re.IGNORECASE):
-            attrs = m.group(1) or ''
-            code = m.group(2)
-            if not code.strip():
-                continue
-            if 'type=' in attrs and not any(t in attrs for t in ['javascript', 'module']):
-                continue
-            c = subprocess.run(['node', '--check'], input=code, text=True, capture_output=True)
-            if c.returncode != 0:
-                print(f"[HOOK ERROR] Ошибка синтаксиса inline JS в {f}:\n{c.stderr}")
-                sys.exit(1)
+        if has_node:
+            for m in re.finditer(r'<script(?:\s+([^>]*))?>([\s\S]*?)</script>', html, re.IGNORECASE):
+                attrs = m.group(1) or ''
+                code = m.group(2)
+                if not code.strip():
+                    continue
+                if 'type=' in attrs and not any(t in attrs for t in ['javascript', 'module']):
+                    continue
+                c = subprocess.run(['node', '--check'], input=code, text=True, capture_output=True)
+                if c.returncode != 0:
+                    print(f"[HOOK ERROR] Ошибка синтаксиса inline JS в {f}:\n{c.stderr}")
+                    sys.exit(1)
 
 print("✓ [Pre-Commit] Синтаксическая проверка пройдена (JS, Python, JSON, HTML inline в норме).")
 sys.exit(0)

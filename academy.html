@@ -5414,19 +5414,22 @@
     white-space: normal;
   }
   .dash-accordion-theme-row--locked {
-    opacity: 0.68 !important;
+    opacity: 0.88 !important;
     transition: opacity 0.2s ease;
   }
   .dash-accordion-theme-row--locked:hover {
-    opacity: 0.90 !important;
+    opacity: 1 !important;
+  }
+  .dash-accordion-theme-row--locked .dash-theme-title-text {
+    color: var(--ink-soft, #cbd5e1) !important;
   }
   .dash-accordion-theme-row--locked .chip-tag,
   .dash-accordion-theme-row--locked code {
-    background: rgba(255, 255, 255, 0.02) !important;
-    border-color: rgba(255, 255, 255, 0.08) !important;
-    color: var(--ink-muted) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #94a3b8 !important;
     box-shadow: none !important;
-    filter: grayscale(0.5);
+    filter: none !important;
   }
   .cocoon-focus-cta {
     display: flex !important;
@@ -5967,6 +5970,12 @@
     font-size: 0.68rem;
     line-height: 1;
     pointer-events: none !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    max-width: 100% !important;
+    text-align: center !important;
+    padding: 0 1px !important;
   }
   .tabbar__item:active {
     transform: scale(0.96) !important;
@@ -16690,7 +16699,7 @@ viewDashboard = function(){
             ${dueTodayCardsCount > 0
               ? `<div style="display:flex;justify-content:flex-end;"><a href="#/cards" ${targetDeckId ? `data-srs-open-deck="${targetDeckId}"` : ''} class="btn-ghost-quiet btn-srs-quiet" style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;font-weight:600;font-size:.80rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:var(--ink-muted);text-decoration:none;transition:all .2s ease;">Повторить (2 мин) ➔</a></div>`
               : (!hasReviewedAnyCard
-                  ? `<div style="margin-top:auto;padding-top:8px;border-top:1px solid rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:flex-start;min-height:24px;font-size:0.74rem;color:var(--ink-muted);"><a href="#/cards" class="link-quiet text-muted" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;font-size:0.74rem;transition:color .2s ease;">Все колоды эшелона ➔</a></div>`
+                  ? `<div style="margin-top:auto;padding-top:8px;border-top:1px solid rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:flex-start;min-height:24px;font-size:0.74rem;color:var(--ink-muted);"><a href="#/cards" class="link-quiet text-muted" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;font-size:0.74rem;transition:color .2s ease;">Все колоды модуля ➔</a></div>`
                   : `<div style="display:flex;justify-content:flex-end;"><a href="#/cards" class="btn-srs-pill link-quiet text-muted">Обзор колод ➔</a></div>`
                 )
             }
@@ -16719,7 +16728,7 @@ viewDashboard = function(){
           ${currentUnitThemesHTML}
           <div style="text-align:center;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05);margin-bottom:16px;">
             <a href="#/map" class="link-quiet dash-map-link" style="font-size:.80rem;display:flex;width:100%;justify-content:center;align-items:center;gap:6px;text-decoration:none;opacity:0.75;transition:opacity .2s ease, color .2s ease;margin-bottom:0;padding:8px 12px;box-sizing:border-box;">
-              <span style="display:inline-flex;align-items:center;gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;flex-shrink:0;"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></svg>Смотреть все модули и полную карту компетенций эшелона ➔</span>
+              <span style="display:inline-flex;align-items:center;gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;flex-shrink:0;"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></svg>Смотреть все модули и карту навыков ➔</span>
             </a>
           </div>
           <div style="text-align:center;margin-top:10px;padding-top:8px;">
@@ -16740,7 +16749,7 @@ NAV_ITEMS.splice(0, NAV_ITEMS.length,
   {route:'/path', icon:'path', label:'3D-Тропа', shortLabel:'3D-Тропа', mobileTab:true, group:'learn'},
   {route:'/practice', icon:'code', label:'Практика IDE', shortLabel:'IDE', mobileTab:true, group:'trainer'},
   {route:'/cards', icon:'cards', label:'Карточки', shortLabel:'Карточки', mobileTab:true, group:'trainer'},
-  {route:'/mock', icon:'crown', label:'Собеседование', shortLabel:'Собеседование', mobileTab:true, group:'trainer'},
+  {route:'/mock', icon:'crown', label:'Собеседование', shortLabel:'Собес', mobileTab:true, group:'trainer'},
   {route:'/python', icon:'python', label:'Python Core', shortLabel:'Python', group:'module'},
   {route:'/web', icon:'globe', label:'Web и HTTP', shortLabel:'Web', group:'module'},
   {route:'/backend', icon:'server', label:'Backend', shortLabel:'Backend', group:'module'},
@@ -17150,7 +17159,7 @@ window.closeSettingsModal = closeSettingsModal;
   pomoPill.setAttribute('data-pomo-toggle', '');
   pomoPill.setAttribute('title', 'Запустить Pomodoro-фокус (15 мин)');
   pomoPill.setAttribute('aria-label', 'Запустить Pomodoro-фокус (15 мин)');
-  pomoPill.innerHTML = '<span class="pomo-icon" aria-hidden="true">⏱</span> <span id="sidebar-pomo-time">' + formatPomo(pomoState.secondsLeft) + '</span>';
+  pomoPill.innerHTML = '<span class="pomo-icon" aria-hidden="true">⏱</span> <span id="sidebar-pomo-time">' + formatPomo(pomoState.secondsLeft) + '</span> <span class="pomo-tag" style="font-size:0.68rem;opacity:0.75;margin-left:2px;font-weight:500;">(Фокус)</span>';
   pomoPill.style.flex = '1 1 auto';
 
   const streakBadge = document.createElement('span');
