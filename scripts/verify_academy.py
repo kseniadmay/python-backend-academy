@@ -45,6 +45,16 @@ print(f"1. [PASS] node --check passed with 0 syntax errors across {c_acad + c_et
 
 # 2. Discover Chrome executable across standard installation paths and PATH
 def get_chrome_executable():
+    # Check macOS Playwright cache first
+    mac_pw = os.path.expanduser('~/Library/Caches/ms-playwright')
+    if os.path.isdir(mac_pw):
+        for root, dirs, files in os.walk(mac_pw):
+            for f in files:
+                if f == 'Chromium' and 'Chromium.app/Contents/MacOS' in root:
+                    pw_exe = os.path.join(root, f)
+                    if os.path.isfile(pw_exe):
+                        return pw_exe
+
     candidates = [
         r'C:\Program Files\Google\Chrome\Application\chrome.exe',
         r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe',
@@ -70,6 +80,7 @@ if chrome_exe:
     chrome_flags = [
         chrome_exe, '--headless', '--no-sandbox', '--disable-gpu',
         '--disable-background-networking', '--disable-sync', '--disable-default-apps',
+        '--no-first-run', '--no-default-browser-check',
         '--allow-file-access-from-files',
         '--enable-logging=stderr', '--dump-dom'
     ]
@@ -97,10 +108,12 @@ if chrome_exe:
             td_ctx = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
         except TypeError:
             td_ctx = tempfile.TemporaryDirectory()
+        extra_args = [f'--user-data-dir={td}'] if sys.platform != 'darwin' else []
         with td_ctx as td:
             c_res = subprocess.run(
-                chrome_flags + [f'--user-data-dir={td}', route],
-                capture_output=True, text=True, encoding='utf-8', errors='ignore'
+                chrome_flags + extra_args + [route],
+                capture_output=True, text=True, encoding='utf-8', errors='ignore',
+                timeout=30
             )
             assert c_res.returncode == 0, f"Chrome failed with code {c_res.returncode} on {route}"
             c_errors = [line for line in c_res.stderr.splitlines() if 'ERROR:CONSOLE' in line or 'Uncaught ' in line]
@@ -113,7 +126,7 @@ if chrome_exe:
 
     with ThreadPoolExecutor(max_workers=5) as executor:
         for msg in executor.map(verify_single_route, routes):
-            print(msg)
+            print(msg, flush=True)
 else:
     print("2. [SKIP] Headless Chrome binary not found on this OS, skipped browser DOM checks.")
 
@@ -124,10 +137,12 @@ if os.path.isfile(IDE_PATH) and chrome_exe:
         td_ide_ctx = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
     except TypeError:
         td_ide_ctx = tempfile.TemporaryDirectory()
+    extra_ide_args = [f'--user-data-dir={td_ide}'] if sys.platform != 'darwin' else []
     with td_ide_ctx as td_ide:
         ide_res = subprocess.run(
-            chrome_flags + [f'--user-data-dir={td_ide}', ide_uri],
-            capture_output=True, text=True, encoding='utf-8', errors='ignore'
+            chrome_flags + extra_ide_args + [ide_uri],
+            capture_output=True, text=True, encoding='utf-8', errors='ignore',
+            timeout=30
         )
         assert ide_res.returncode == 0, f"Chrome failed on standalone IDE with code {ide_res.returncode}"
         ide_c_errors = [line for line in ide_res.stderr.splitlines() if 'ERROR:CONSOLE' in line or 'Uncaught ' in line]

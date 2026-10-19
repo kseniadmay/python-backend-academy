@@ -47,8 +47,14 @@ const ONLY = ONLY_IDX >= 0 ? process.argv[ONLY_IDX + 1] : null;
 // ---------------------------------------------------------------- зависимости
 function resolveDep(name) {
   try { return require(name); } catch (e) { /* дальше по списку */ }
-  const p = path.join(DEPS_DIR, 'node_modules', name);
-  if (fs.existsSync(p)) return require(p);
+  const candidates = [
+    path.join(DEPS_DIR, 'node_modules', name),
+    path.join(os.homedir(), '.pba-visual-deps', 'node_modules', name),
+    path.join(os.homedir(), '.pba-visual-deps', 'pba-visual-deps', 'node_modules', name)
+  ];
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return require(p);
+  }
   return null;
 }
 
@@ -59,7 +65,7 @@ function ensureDeps() {
   if (pw && pm && pngjs) return { pw, pm, pngjs };
   console.log('[visual] Установка зависимостей в ' + DEPS_DIR + ' (один раз)...');
   fs.mkdirSync(DEPS_DIR, { recursive: true });
-  const r = spawnSync('npm', ['install', '--prefix', DEPS_DIR, 'playwright-core@1.63.0', 'pixelmatch@5.3.0', 'pngjs@7.0.0', '--no-audit', '--no-fund', '--loglevel', 'error'], { stdio: 'inherit', shell: process.platform === 'win32' });
+  const r = spawnSync('npm', ['install', '--prefix', DEPS_DIR, 'playwright-core@1.49.0', 'pixelmatch@5.3.0', 'pngjs@7.0.0', '--no-audit', '--no-fund', '--loglevel', 'error'], { stdio: 'inherit', shell: process.platform === 'win32' });
   if (r.status !== 0) throw new Error('npm install зависимостей не удался (код ' + r.status + ')');
   return {
     pw: resolveDep('playwright-core'),
@@ -74,9 +80,23 @@ function findBrowser() {
     'C:/Program Files/Google/Chrome/Application/chrome.exe',
     'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
     'C:/Program Files/Microsoft/Edge/Application/msedge.exe',
-    'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
+    'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
+    '/Applications/Chromium.app/Contents/MacOS/Chromium'
   ];
   for (const c of candidates) if (fs.existsSync(c)) return c;
+
+  // macOS ms-playwright cache
+  const macPwCache = path.join(os.homedir(), 'Library', 'Caches', 'ms-playwright');
+  if (fs.existsSync(macPwCache)) {
+    for (const d of fs.readdirSync(macPwCache)) {
+      const exe = path.join(macPwCache, d, 'chrome-mac', 'Chromium.app', 'Contents', 'MacOS', 'Chromium');
+      if (fs.existsSync(exe)) return exe;
+    }
+  }
+
+  // Windows ms-playwright cache
   const pwCache = path.join(process.env.LOCALAPPDATA || '', 'ms-playwright');
   if (fs.existsSync(pwCache)) {
     for (const d of fs.readdirSync(pwCache)) {
@@ -84,7 +104,17 @@ function findBrowser() {
       if (fs.existsSync(exe)) return exe;
     }
   }
-  throw new Error('Не найден Chrome/Edge для визуальных снимков');
+
+  // Linux ms-playwright cache
+  const linuxPwCache = path.join(os.homedir(), '.cache', 'ms-playwright');
+  if (fs.existsSync(linuxPwCache)) {
+    for (const d of fs.readdirSync(linuxPwCache)) {
+      const exe = path.join(linuxPwCache, d, 'chrome-linux', 'chrome');
+      if (fs.existsSync(exe)) return exe;
+    }
+  }
+
+  throw new Error('Не найден Chrome/Edge/Chromium для визуальных снимков');
 }
 
 // ---------------------------------------------------------------- сервер
@@ -195,12 +225,13 @@ function diffShots(pm, pngjs, currentPath, baselinePath, diffPath) {
 
   const shots = ONLY ? SHOTS.filter(s => s.name.includes(ONLY)) : SHOTS;
   if (!shots.length) { console.error('[visual] Ни один кадр не подходит под --only ' + ONLY); process.exit(1); }
+  console.log(`[visual] Запуск конвейера (кадров: ${shots.length}, UPDATE=${UPDATE})...`);
 
   // Песочницы (например, ZCode) могут блокировать клиентские TCP-соединения на 127.0.0.1:
   // сервер поднимается, но браузер не может открыть страницу и goto зависает.
   // Проба loopback, при недоступности — работа напрямую через file:// (localStorage на file-origin работает).
   let srv = null;
-  let FILE_MODE = process.env.PBA_FILE_URL === '1';
+  let FILE_MODE = process.env.PBA_FILE_URL === '1' || (process.env.PBA_FILE_URL !== '0' && process.platform === 'darwin');
   if (!FILE_MODE) {
     srv = await serve();
     const loopbackOk = await new Promise(res => {
@@ -223,7 +254,11 @@ function diffShots(pm, pngjs, currentPath, baselinePath, diffPath) {
     return pathToFileURL(file).href + (shot.hash || '');
   };
 
-  const browser = await chromium.launch({ executablePath: findBrowser(), headless: true });
+  const browser = await chromium.launch({
+    executablePath: findBrowser(),
+    headless: true,
+    args: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage']
+  });
   const results = [];
   let failures = 0;
 
@@ -259,11 +294,12 @@ function diffShots(pm, pngjs, currentPath, baselinePath, diffPath) {
         page.on('response', r => { if (r.status() >= 400) failedRequests.push(r.url().slice(-120) + ' :: HTTP ' + r.status()); });
 
         const label = `${shot.name}_${vpName}`;
+        console.log(`[visual] -> Кадр: ${label}`);
         try {
           await page.goto(pageUrl(shot), { waitUntil: 'load', timeout: 60000 });
         } catch (e) {
           results.push({ shot: label, status: 'FAIL', reason: 'навигация не удалась: ' + e.message });
-          failures++; console.log(`[FAIL] ${label} :: навигация не удалась`);
+          failures++; console.log(`[FAIL] ${label} :: навигация не удалась: ${e.message}\n${e.stack}`);
           await page.close().catch(() => {});
           continue;
         }
