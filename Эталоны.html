@@ -2202,10 +2202,35 @@
     stroke-linejoin: round;
     paint-order: stroke;
     pointer-events: none;
+    transition: fill 0.2s ease, font-size 0.2s ease;
   }
   html:not([data-theme="dark"]) .hex-node-underlabel {
     fill: #5a6678;
     stroke: rgba(250, 248, 245, 0.92);
+  }
+  .hex-node-underlabel--active {
+    fill: #f8fafc !important;
+    font-size: 11.5px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.02em;
+    stroke: rgba(10, 13, 18, 0.95) !important;
+    stroke-width: 3.5px !important;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.85));
+  }
+  html:not([data-theme="dark"]) .hex-node-underlabel--active {
+    fill: #0f172a !important;
+    stroke: rgba(255, 255, 255, 0.95) !important;
+  }
+  .hex-node-underlabel--completed {
+    fill: #e2e8f0 !important;
+    font-weight: 700 !important;
+  }
+  html:not([data-theme="dark"]) .hex-node-underlabel--completed {
+    fill: #1e293b !important;
+  }
+  .hex-node-underlabel--locked {
+    fill: #64748b !important;
+    opacity: 0.85;
   }
   .hex-active-tooltip {
     pointer-events: none;
@@ -2601,11 +2626,16 @@
   }
   .path-chapter-segments {
     display: flex;
-    gap: 4px;
+    gap: 3px;
     align-items: center;
+    flex: 1 1 auto;
+    max-width: 200px;
+    min-width: 0;
   }
   .path-seg-bar {
-    width: 22px;
+    flex: 1 1 0;
+    min-width: 6px;
+    max-width: 22px;
     height: 8px;
     border-radius: 999px;
     background: rgba(190, 18, 60, 0.30);
@@ -2629,6 +2659,14 @@
     color: #94a3b8;
     white-space: nowrap;
     margin-left: 4px;
+    flex-shrink: 0;
+  }
+  .path-chapter-count .pcc-short {
+    display: none;
+  }
+  @media (max-width: 480px) {
+    .path-chapter-count .pcc-full { display: none !important; }
+    .path-chapter-count .pcc-short { display: inline !important; }
   }
 
   /* Coddy-style ПРОДОЛЖИТЬ CTA in the game-mode chapter banner */
@@ -2757,6 +2795,19 @@
   .path-jump-btn--up svg {
     transform: rotate(180deg);
   }
+  .path-popover-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 100001;
+    animation: popoverBackdropFade 0.2s ease-out;
+  }
+  @keyframes popoverBackdropFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
   @media (max-width: 640px) {
     .path-popover {
       position: fixed !important;
@@ -2771,7 +2822,7 @@
       padding: 20px 20px calc(24px + env(safe-area-inset-bottom, 16px)) 20px !important;
       box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.6) !important;
       border-bottom: none !important;
-      z-index: 1050 !important;
+      z-index: 100002 !important;
       animation: popoverSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
     .path-popover-arrow {
@@ -11495,7 +11546,7 @@ window.formatPomo = formatPomo;
 
 /* ================= INTERVIEW-FIRST PRIORITY ARCHITECTURE (4 ECHELONS + PARALLEL STACK BRANCHES) ================= */
 const INTERVIEW_ECHELONS = {
-  1: { tier: 1, icon: '🚨', badgeClass: 'echelon-badge--t1', label: '🚨 Эшелон 1: Скрининг · Фундамент', shortLabel: '🚨 Эшелон 1: Скрининг', focus: 'Фундамент', targetLabel: 'к скринингу', desc: 'Первичный отсев на HR и тех-скрининге (Python Core, сложность O(n), два указателя, SQL JOIN, HTTP/REST, Git и pytest)', color: '#34d399', gradient: 'linear-gradient(90deg, #f43f5e, #34d399)' },
+  1: { tier: 1, icon: '🛡️', badgeClass: 'echelon-badge--t1', label: '🛡️ Эшелон 1: Скрининг · Фундамент', shortLabel: '🛡️ Эшелон 1: Скрининг', focus: 'Фундамент', targetLabel: 'к скринингу', desc: 'Первичный отсев на HR и тех-скрининге (Python Core, сложность O(n), два указателя, SQL JOIN, HTTP/REST, Git и pytest)', color: '#34d399', gradient: 'linear-gradient(90deg, #f43f5e, #34d399)' },
   2: { tier: 2, icon: '🎯', badgeClass: 'echelon-badge--t2', label: '🎯 Эшелон 2: Тех-интервью · Стек и базы данных', shortLabel: '🎯 Эшелон 2: Тех-интервью', focus: 'Стек и базы данных', targetLabel: 'к тех-интервью', desc: 'Основное техническое собеседование по выбранному стеку (ООП, Итераторы, Asyncio/GIL, FastAPI + SQLAlchemy или Django + DRF, ACID/Индексы, Docker)', color: '#fbbf24', gradient: 'linear-gradient(90deg, #f59e0b, #10b981)' },
   3: { tier: 3, icon: '⚡', badgeClass: 'echelon-badge--t3', label: '⚡ Эшелон 3: Лайвкодинг · Сервисы и продакшен', shortLabel: '⚡ Эшелон 3: Лайвкодинг', focus: 'Сервисы и продакшен', targetLabel: 'к лайвкодингу', desc: 'Инженерия уровня Strong Junior / Middle (Redis, Celery/Kafka, SOLID и Чистая архитектура, CI/CD, Linux/Nginx, Observability)', color: '#34d399', gradient: 'linear-gradient(90deg, #10b981, #06b6d4)' },
   4: { tier: 4, icon: '👑', badgeClass: 'echelon-badge--t4', label: '👑 Эшелон 4: Финал · Системный дизайн и оффер', shortLabel: '👑 Эшелон 4: Финал', focus: 'Системный дизайн и оффер', targetLabel: 'к офферу', desc: 'Конкурентное преимущество на оффер (Highload, System Design, паттерны проектирования, альтернативный фреймворк в резерве)', color: '#c084fc', gradient: 'linear-gradient(90deg, #a855f7, #ec4899)' }
@@ -14963,32 +15014,26 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)
   const e1 = (typeof getEchelonProgress === 'function') ? getEchelonProgress(1) : null;
   const e1Pct = e1 ? e1.pct : 0;
   const e1Remaining = e1 ? e1.skills.filter(s => getSkillMP(s.id) < 100).length : 0;
+  const curChap = chaptersMeta.find(c => c.num === activeChapterNum) || chaptersMeta[0];
+  const curChapCompleted = curChap ? curChap.units.filter(isUnitCompleted).length : 0;
+  const curChapTotal = curChap ? curChap.units.length : 9;
+
+  // Real dynamic mastery calculation for screening radar themes
+  const r1Mp = (typeof getSkillMP === 'function') ? Math.round(getSkillMP('1.1.1')) : 0;
+  const r2Mp = (typeof getSkillMP === 'function') ? Math.round(getSkillMP('1.1.2')) : 0;
+  const r3Mp = (typeof getSkillMP === 'function') ? Math.round(getSkillMP('5.1.2')) : 0;
+
   const dailyGoal = Math.max(1, Number(state.dailyGoal) || 50);
   const dailyXp = (typeof todayXp === 'function') ? todayXp() : 0;
   const dailyPct = Math.min(100, Math.round(dailyXp / dailyGoal * 100));
-  const chaptersListHTML = chaptersMeta.map(ch => {
-    const chCompleted = ch.units.filter(isUnitCompleted).length;
-    const chPct = Math.round(chCompleted / ch.units.length * 100);
-    const route = (typeof getTrackForUnit === 'function' && ch.units[0]) ? getTrackForUnit(ch.units[0].id).routePrefix : 'python';
-    const isCurrent = (ch.num === activeChapterNum);
-    return `
-      <a class="crc-row ${isCurrent ? 'crc-row--current' : 'crc-row--compact'}" href="#/${route}" ${isCurrent ? 'aria-current="location"' : ''} title="Глава ${ch.num}: ${escapeHtmlStr(ch.title)} — перейти к модулю">
-        <span class="crc-num">${ch.num}</span>
-        <span class="crc-body">
-          <span class="crc-title">${escapeHtmlStr(ch.title)}</span>
-          ${isCurrent ? `<span class="crc-bar"><span class="crc-bar-fill" style="width:${chPct}%;"></span></span>` : ''}
-        </span>
-        <span class="crc-pct">${chCompleted}/${ch.units.length}</span>
-      </a>`;
-  }).join('');
 
   return `
     <aside class="coddy-right-rail">
       <!-- Top Stats Row (Coddy style) -->
       <div class="coddy-rail-stats-row">
-        <div class="coddy-rail-stat" title="Пройдено юнитов">
+        <div class="coddy-rail-stat" title="Пройдено в главе ${activeChapterNum}">
           <span class="coddy-rail-stat-icon">📘</span>
-          <span class="coddy-rail-stat-val">${totalCompletedUnits}/45</span>
+          <span class="coddy-rail-stat-val">Гл. ${activeChapterNum}: ${curChapCompleted}/${curChapTotal}</span>
         </div>
         <div class="coddy-rail-stat" title="Стрик активности">
           <span class="coddy-rail-stat-icon">🔥</span>
@@ -15007,14 +15052,15 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)
           <a href="#/mock" class="coddy-rail-link">Симулятор →</a>
         </div>
         <div class="coddy-rail-meter">
-          <span class="coddy-rail-meter-value">${e1Pct}%</span>
-          <span class="meta">готовности к тех-скринингу</span>
+          ${e1Pct > 0
+            ? `<span class="coddy-rail-meter-value">${e1Pct}%</span><span class="meta">готовности к тех-скринингу</span>`
+            : `<span class="coddy-rail-meter-value" style="font-size:1.35rem;color:var(--amber,#fbbf24);">СТАРТ</span><span class="meta">базовый тех-скрининг</span>`}
         </div>
-        <div class="cd-bar cd-bar-track" role="progressbar" aria-label="Готовность к техническому скринингу" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${e1Pct}"><div class="cd-fill cd-bar-fill" style="width:${Math.max(6, e1Pct)}%;"></div></div>
-        <div class="meta" style="font-size:.75rem;margin-top:7px;">⏳ Осталось ${e1Remaining} ${pluralRuTopics(e1Remaining)} Эшелона 1</div>
+        <div class="cd-bar cd-bar-track" role="progressbar" aria-label="Готовность к техническому скринингу" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${e1Pct}"><div class="cd-fill cd-bar-fill" style="width:${Math.max(8, e1Pct)}%;"></div></div>
+        <div class="meta" style="font-size:.75rem;margin-top:7px;">${e1Pct > 0 ? `⏳ Освоено ${e1 ? e1.skills.filter(s => getSkillMP(s.id) >= 80).length : 0} из ${e1 ? e1.skills.length : 32} навыков Эшелона 1` : `🎯 Фундамент тех-скрининга · Глава ${activeChapterNum}`}</div>
       </div>
 
-      <!-- Widget: Radar Screening Themes (Replaces duplicate chapter tree) -->
+      <!-- Widget: Radar Screening Themes (Dynamic mastery from RemNote Knowledge Base) -->
       <div class="panel coddy-rail-card">
         <div class="coddy-rail-card-head">
           <div class="coddy-rail-badge">🎯 Радар скрининга</div>
@@ -15022,22 +15068,22 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)
         </div>
         <div style="display:flex;flex-direction:column;gap:7px;margin-top:8px;">
           <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;">
-            <span style="color:#f8fafc;">Сложность O(n) & срезы</span>
-            <span style="color:var(--emerald);font-weight:700;">85%</span>
+            <span style="color:${r1Mp > 0 ? '#f8fafc' : 'var(--ink-muted)'};">Сложность O(n) & срезы</span>
+            <span style="color:${r1Mp > 0 ? 'var(--emerald)' : 'var(--ink-muted)'};font-weight:${r1Mp > 0 ? '700' : '600'};">${r1Mp > 0 ? r1Mp + '%' : 'Не начато'}</span>
           </div>
-          <div class="cd-bar cd-bar-track" style="height:4px;"><div class="cd-fill cd-bar-fill" style="width:85%;"></div></div>
+          <div class="cd-bar cd-bar-track" style="height:4px;"><div class="cd-fill cd-bar-fill" style="width:${r1Mp}%;"></div></div>
           
           <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;margin-top:2px;">
-            <span style="color:var(--ink-muted);">Хеш-таблицы & dict/set</span>
-            <span style="color:var(--amber);font-weight:700;">40%</span>
+            <span style="color:${r2Mp > 0 ? '#f8fafc' : 'var(--ink-muted)'};">Хеш-таблицы & dict/set</span>
+            <span style="color:${r2Mp > 0 ? 'var(--amber)' : 'var(--ink-muted)'};font-weight:${r2Mp > 0 ? '700' : '600'};">${r2Mp > 0 ? r2Mp + '%' : 'Не начато'}</span>
           </div>
-          <div class="cd-bar cd-bar-track" style="height:4px;"><div class="cd-fill cd-bar-fill" style="width:40%;background:var(--amber);"></div></div>
+          <div class="cd-bar cd-bar-track" style="height:4px;"><div class="cd-fill cd-bar-fill" style="width:${r2Mp}%;background:var(--amber);"></div></div>
 
           <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;margin-top:2px;">
-            <span style="color:var(--ink-muted);">SQL JOIN & индексы</span>
-            <span style="color:var(--ink-muted);font-weight:600;">0%</span>
+            <span style="color:${r3Mp > 0 ? '#f8fafc' : 'var(--ink-muted)'};">SQL JOIN & индексы</span>
+            <span style="color:${r3Mp > 0 ? 'var(--emerald)' : 'var(--ink-muted)'};font-weight:${r3Mp > 0 ? '700' : '600'};">${r3Mp > 0 ? r3Mp + '%' : 'Не начато'}</span>
           </div>
-          <div class="cd-bar cd-bar-track" style="height:4px;"><div class="cd-fill cd-bar-fill" style="width:0%;"></div></div>
+          <div class="cd-bar cd-bar-track" style="height:4px;"><div class="cd-fill cd-bar-fill" style="width:${r3Mp}%;"></div></div>
         </div>
       </div>
 
@@ -15207,8 +15253,8 @@ function viewPathSerpentine(options){
     return `<div class="path-seg-bar ${isPassed ? 'done' : (isActive ? 'active' : '')}" title="Юнит ${u.id}: ${escapeHtmlStr(u.title)}"></div>`;
   }).join('');
   const chapterProgressLabel = completedInChapter === 0
-    ? `Начало · ${totalInChapter} ${pluralizeRu(totalInChapter, 'юнит', 'юнита', 'юнитов')}`
-    : `${completedInChapter} из ${totalInChapter} сдано`;
+    ? `<span class="pcc-full">Начало · ${totalInChapter} ${pluralizeRu(totalInChapter, 'юнит', 'юнита', 'юнитов')}</span><span class="pcc-short">0 / ${totalInChapter}</span>`
+    : `<span class="pcc-full">${completedInChapter} из ${totalInChapter} сдано</span><span class="pcc-short">${completedInChapter} / ${totalInChapter}</span>`;
 
   // Chapter markers: Chapter 1 has top ribbon, Chapters 2..7 have Coddy Section Gate Cards (Variant C, Hard Gate)
   const chapterBreakpoints = [
@@ -15544,7 +15590,8 @@ function viewPathSerpentine(options){
             ${branchesSVG}
           </svg>
 
-          <!-- Anchored Popover Modal -->
+          <!-- Anchored Popover Modal & Backdrop -->
+          <div id="path-popover-backdrop" class="path-popover-backdrop" style="display:none;" aria-hidden="true"></div>
           <div id="path-anchored-popover" class="path-popover" style="display:none;" role="dialog" tabindex="-1" aria-labelledby="popover-title" aria-describedby="popover-status">
             <div class="path-popover-arrow path-popover-arrow--down" id="popover-arrow"></div>
             <div class="path-popover-content">
@@ -18166,7 +18213,10 @@ render = function(){
               }
             }
           };
-          window.addEventListener('scroll', updateJumpBtn, { passive: true });
+          if(!window._pathJumpScrollBound){
+            window._pathJumpScrollBound = true;
+            window.addEventListener('scroll', updateJumpBtn, { passive: true });
+          }
           updateJumpBtn();
         }
       }catch(err){}
@@ -20170,7 +20220,9 @@ const psk = e.target.closest('[data-py-select-k]');
           pCta.className = isPassed ? 'btn-3d-emerald path-popover-cta' : (isLocked ? 'btn-3d-locked path-popover-cta' : 'btn-3d-orange path-popover-cta');
           pCta.textContent = isPassed ? 'ОБЗОР ➔' : (isLocked ? 'ЗАБЛОКИРОВАНО' : (unitStarted ? 'ПРОДОЛЖИТЬ ➔' : 'НАЧАТЬ ➔'));
           pCta.disabled = isLocked;
-          pCta.setAttribute('data-target-route', `#${track.routePrefix}/skill/${(u.skills && u.skills[0]) ? u.skills[0].id : ''}`);
+          const activeSkill = (u.skills || []).find(s => (getSkillMP(s.id) || 0) < 80) || (u.skills && u.skills[0]);
+          const targetSkillId = activeSkill ? activeSkill.id : '';
+          pCta.setAttribute('data-target-route', `#${track.routePrefix}/skill/${targetSkillId}`);
         }
 
         const parent = popover.offsetParent || popover.parentElement;
@@ -20202,6 +20254,10 @@ const psk = e.target.closest('[data-py-select-k]');
           }
         }
         popover.style.display = 'block';
+        const backdropEl = document.getElementById('path-popover-backdrop');
+        if(backdropEl && window.innerWidth <= 640){
+          backdropEl.style.display = 'block';
+        }
         if(openedByKeyboard && typeof popover.focus === 'function') popover.focus();
         // Clamp to the viewport; disable the scale-in animation while measuring its full size.
         try{
@@ -20224,9 +20280,20 @@ const psk = e.target.closest('[data-py-select-k]');
     }
   }
 
+  // Popover backdrop tap closes mobile sheet
+  if(e.target.closest('#path-popover-backdrop')){
+    const popover = document.getElementById('path-anchored-popover');
+    const backdrop = document.getElementById('path-popover-backdrop');
+    if(popover) popover.style.display = 'none';
+    if(backdrop) backdrop.style.display = 'none';
+    return;
+  }
+
   // Popover close and CTA button
   if(e.target.closest('#popover-close-btn')){
     const popover = document.getElementById('path-anchored-popover');
+    const backdrop = document.getElementById('path-popover-backdrop');
+    if(backdrop) backdrop.style.display = 'none';
     if(popover){
       popover.style.display = 'none';
       const returnId = popover.getAttribute('data-return-focus-unit');
@@ -20239,16 +20306,20 @@ const psk = e.target.closest('[data-py-select-k]');
   if(popCta){
     const tr = popCta.getAttribute('data-target-route');
     const popover = document.getElementById('path-anchored-popover');
+    const backdrop = document.getElementById('path-popover-backdrop');
+    if(backdrop) backdrop.style.display = 'none';
     if(popover) popover.style.display = 'none';
     if(tr && !popCta.disabled){
       location.hash = tr;
     }
     return;
   }
-  if(!e.target.closest('#path-anchored-popover') && !e.target.closest('.hex-3d-node')){
+  if(!e.target.closest('#path-anchored-popover') && !e.target.closest('.hex-3d-node') && !e.target.closest('#path-popover-backdrop')){
     const popover = document.getElementById('path-anchored-popover');
+    const backdrop = document.getElementById('path-popover-backdrop');
     if(popover && popover.style && popover.style.display !== 'none'){
       popover.style.display = 'none';
+      if(backdrop) backdrop.style.display = 'none';
     }
   }
 
@@ -20529,6 +20600,8 @@ document.addEventListener('keydown', function(e){
       return;
     }
     const popover = document.getElementById('path-anchored-popover');
+    const backdrop = document.getElementById('path-popover-backdrop');
+    if(backdrop) backdrop.style.display = 'none';
     if(popover && popover.style && popover.style.display !== 'none'){
       popover.style.display = 'none';
       const returnId = popover.getAttribute('data-return-focus-unit');
