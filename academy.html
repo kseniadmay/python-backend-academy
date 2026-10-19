@@ -2307,11 +2307,11 @@
     cursor: pointer;
   }
   .hex-active-tooltip--direct:hover .hex-active-tooltip__inner rect {
-    fill: #ea580c;
-    filter: drop-shadow(0 6px 14px rgba(234, 88, 12, 0.55));
+    fill: #d97706;
+    filter: drop-shadow(0 6px 14px rgba(217, 119, 6, 0.65));
   }
   .hex-active-tooltip--direct:active .hex-active-tooltip__inner rect {
-    fill: #c2410c;
+    fill: #b45309;
   }
   .hex-active-tooltip--direct:focus-visible {
     outline: none;
@@ -15340,7 +15340,7 @@ function renderPathMobileStatsHTML(totalCompletedUnits, streakText, curTier, act
       <span class="pms-item pms-echelon" title="Текущий эшелон подготовки">${(typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[tierNum] && INTERVIEW_ECHELONS[tierNum].icon) || '🛡️'} <b>Эшелон ${tierNum}</b></span>
       <span class="pms-item" title="Пройдено в главе ${chNum}">📘 <b>Гл. ${chNum}: ${chDone}/${chTot}</b></span>
       <span class="pms-item" title="Стрик активности">🔥 <b>${state.streak || 0}</b> ${streakText}</span>
-      <span class="pms-item" title="Накопленный опыт">💎 <b>${state.xp || 0} XP</b></span>
+      <span class="pms-item" title="Накопленный опыт">⚡ <b>${state.xp || 0} XP</b></span>
     </div>`;
 }
 
@@ -15375,7 +15375,7 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)
           <span class="coddy-rail-stat-val">${state.streak || 0} ${streakText}</span>
         </div>
         <div class="coddy-rail-stat" title="Накопленный опыт">
-          <span class="coddy-rail-stat-icon">💎</span>
+          <span class="coddy-rail-stat-icon">⚡</span>
           <span class="coddy-rail-stat-val">${state.xp || 0} XP</span>
         </div>
       </div>
@@ -15530,10 +15530,10 @@ function viewPathSerpentine(options){
   if(activeUnitIndex === -1) activeUnitIndex = allUnits.length - 1;
 
   // Track coordinates for each of the 45 nodes
-  // Account for chapter spacing: Chapter 1 starts at y=140 (with Chapter 1 ribbon at y=36)
+  // Chapter 1 starts at y=90 with clean breathing buffer below top chapter banner
   // Each chapter transition adds +150px of breathing room for Coddy-style Section Gate Cards!
   const chapterStartSet = new Set([9, 13, 21, 27, 33, 39]);
-  let curY = 140;
+  let curY = 90;
   const coords = allUnits.map((u, i) => {
     if(i > 0){
       curY += 115;
@@ -15595,7 +15595,7 @@ function viewPathSerpentine(options){
     return `<div class="path-seg-bar ${isPassed ? 'done' : (isActive ? 'active' : '')}" title="Юнит ${u.id}: ${escapeHtmlStr(u.title)}"></div>`;
   }).join('');
   const chapterProgressLabel = completedInChapter === 0
-    ? `<span class="pcc-full">Начало · ${totalInChapter} ${pluralizeRu(totalInChapter, 'юнит', 'юнита', 'юнитов')}</span><span class="pcc-short">Старт · ${totalInChapter}</span>`
+    ? `<span class="pcc-full">Начало · ${totalInChapter} ${pluralizeRu(totalInChapter, 'юнит', 'юнита', 'юнитов')}</span><span class="pcc-short">0 / ${totalInChapter}</span>`
     : `<span class="pcc-full">${completedInChapter} из ${totalInChapter} сдано</span><span class="pcc-short">${completedInChapter} / ${totalInChapter}</span>`;
 
   // Chapter markers: Chapter 1 has top ribbon, Chapters 2..7 have Coddy Section Gate Cards (Variant C, Hard Gate)
@@ -15616,15 +15616,8 @@ function viewPathSerpentine(options){
   chapterBreakpoints.forEach((cb, ci) => {
     if(coords[cb.startIdx]){
       if(cb.startIdx === 0){
-        // Chapter 1 retains clean top ribbon with warm amber accent and 30px breathing buffer
-        const cy = 36;
-        markersSVG += `
-          <g class="path-chapter-ribbon" transform="translate(210, ${cy})">
-            <line x1="-190" y1="0" x2="-130" y2="0" stroke="rgba(245, 158, 11, 0.40)" stroke-width="1.5" stroke-dasharray="4 4"/>
-            <line x1="130" y1="0" x2="190" y2="0" stroke="rgba(245, 158, 11, 0.40)" stroke-width="1.5" stroke-dasharray="4 4"/>
-            <rect x="-120" y="-14" width="240" height="28" rx="14" fill="rgba(22, 27, 36, 0.88)" stroke="rgba(245, 158, 11, 0.45)" stroke-width="1.2"/>
-            <text x="0" y="4" text-anchor="middle" font-size="11" font-weight="800" fill="#fbbf24" letter-spacing="0.04em">${escapeHtmlStr(cb.title)}</text>
-          </g>`;
+        // Chapter 1 is prominently headed by the top sticky chapter banner;
+        // no redundant ribbon needed in SVG, keeping header clean and airy
       } else {
         // Chapters 2..7 get Coddy-style Section Gate Cards (Variant C, Hard Gate)
         const prevCb = chapterBreakpoints[ci - 1];
