@@ -581,10 +581,10 @@ def _align_python_inline_comments(raw_code: str) -> str:
             parsed.append((s, None))
     code_lengths = [len(cp) for cp, cm in parsed if cm is not None]
     if len(code_lengths) >= 2:
-        max_len = min(max(code_lengths), 64)
+        max_len = min(max(code_lengths), 32)
         out_lines = []
         for cp, cm in parsed:
-            if cm is not None and len(cp) <= max_len:
+            if cm is not None and len(cp) <= max_len and (max_len + 2 + len(cm) <= 45):
                 pad = ' ' * (max_len - len(cp) + 2)
                 out_lines.append(f"{cp}{pad}{cm}")
             elif cm is not None:
