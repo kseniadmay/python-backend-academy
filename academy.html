@@ -2705,19 +2705,23 @@
     max-width: 22px;
     height: 8px;
     border-radius: 999px;
-    background: rgba(190, 18, 60, 0.30);
-    transition: background 0.2s ease, box-shadow 0.2s ease;
+    background: rgba(148, 163, 184, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   }
   /* Light theme tint only for empty segments: (0,2,1)-specificity override must not
      beat .done/.active fills, so state classes are excluded via :not() */
   html:not([data-theme="dark"]) .path-seg-bar:not(.done):not(.active) {
-    background: rgba(107, 29, 47, 0.16);
+    background: rgba(100, 116, 139, 0.14);
+    border-color: rgba(0, 0, 0, 0.06);
   }
   .path-seg-bar.done {
     background: linear-gradient(180deg, #fcd34d, #f59e0b);
+    border-color: transparent;
   }
   .path-seg-bar.active {
     background: linear-gradient(180deg, #fb923c, #ea580c);
+    border-color: transparent;
     box-shadow: 0 0 10px rgba(249, 115, 22, 0.55);
   }
   .path-chapter-count {
@@ -15301,7 +15305,7 @@ function renderPathMobileStatsHTML(totalCompletedUnits, streakText, curTier, act
   const chTot = (typeof chapterTotal === 'number') ? chapterTotal : 9;
   return `
     <div class="path-mobile-stats" role="status" aria-label="Статистика обучения">
-      <span class="pms-item pms-echelon" title="Текущий эшелон подготовки">🎯 <b>Эшелон ${tierNum}</b></span>
+      <span class="pms-item pms-echelon" title="Текущий эшелон подготовки">${(typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[tierNum] && INTERVIEW_ECHELONS[tierNum].icon) || '🛡️'} <b>Эшелон ${tierNum}</b></span>
       <span class="pms-item" title="Пройдено в главе ${chNum}">📘 <b>Гл. ${chNum}: ${chDone}/${chTot}</b></span>
       <span class="pms-item" title="Стрик активности">🔥 <b>${state.streak || 0}</b> ${streakText}</span>
       <span class="pms-item" title="Накопленный опыт">💎 <b>${state.xp || 0} XP</b></span>
@@ -15362,7 +15366,7 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)
       <!-- Widget: Radar Screening Themes (Dynamic mastery from RemNote Knowledge Base) -->
       <div class="panel coddy-rail-card">
         <div class="coddy-rail-card-head">
-          <div class="coddy-rail-badge">🎯 Радар скрининга</div>
+          <div class="coddy-rail-badge">📡 Радар скрининга</div>
           <span class="coddy-rail-link">14 тем</span>
         </div>
         <div style="display:flex;flex-direction:column;gap:7px;margin-top:8px;">
