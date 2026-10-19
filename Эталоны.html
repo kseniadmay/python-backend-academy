@@ -15840,7 +15840,7 @@ function viewPathSerpentine(options){
     branchesSVG += `
       <g class="hex-challenge-branch">
         <path d="M ${x},${y + 24} Q ${x},${(y + by) / 2} ${bx},${by - 20}" fill="none" stroke="${connectorStroke}" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3 4"/>
-        <g class="hex-challenge-node hex-challenge-node--${chStatus}" data-challenge-route="#${track.routePrefix}/unittest/${u.id}" data-challenge-status="${chStatus}" data-cx="${bx}" data-cy="${by}" role="button" tabindex="0" aria-label="Челлендж мастерства, проверка юнита ${u.id}. ${chDone ? 'Пройдено' : (chUnlocked ? 'Доступно' : 'Заблокировано до прохождения предыдущих юнитов')}. Нажмите Enter или пробел, чтобы открыть." aria-keyshortcuts="Enter Space" aria-disabled="${chStatus === 'locked' ? 'true' : 'false'}">
+        <g class="hex-challenge-node hex-challenge-node--${chStatus}" data-challenge-route="#${track.routePrefix}/unittest/${u.id}" data-challenge-status="${chStatus}" data-cx="${bx}" data-cy="${by}" role="button" tabindex="0" aria-label="Челлендж мастерства, проверка урока ${u.id}. ${chDone ? 'Пройдено' : (chUnlocked ? 'Доступно' : 'Заблокировано до прохождения предыдущих уроков')}. Нажмите Enter или пробел, чтобы открыть." aria-keyshortcuts="Enter Space" aria-disabled="${chStatus === 'locked' ? 'true' : 'false'}">
           ${chHalo}
           <circle cx="${bx}" cy="${by}" r="24" fill="transparent" pointer-events="all"/>
           ${challengeShape}
@@ -15995,7 +15995,7 @@ function viewProPath(options){
   const activeChapTotal = activeChap.units.length;
   const activeChapPct = Math.round(activeChapCompleted / activeChapTotal * 100);
   const activeChapSummary = activeChapCompleted === 0
-    ? `Начни главу · ${activeChapTotal} ${pluralizeRu(activeChapTotal, 'юнит', 'юнита', 'юнитов')}`
+    ? `Начни главу · ${activeChapTotal} ${pluralizeRu(activeChapTotal, 'урок', 'урока', 'уроков')}`
     : `Глава ${activeChap.num}: ${escapeHtmlStr(activeChap.title)} · ${activeChapCompleted}/${activeChapTotal} уроков · ${activeChapPct}%`;
 
   // Segments for active chapter
@@ -16153,7 +16153,7 @@ viewMap = function(){
     return `
       <div class="container" style="padding-bottom:10px;">
         <h1 style="margin-bottom:6px;">Карта навыков: Интерактивная 3D-Тропа обучения</h1>
-        <p class="meta" style="margin-bottom:14px;">Математическая извилистая S-трасса соединяет все 45 юнитов курса в единое непрерывное приключение.</p>
+        <p class="meta" style="margin-bottom:14px;">Математическая извилистая S-трасса соединяет все 45 уроков курса в единое непрерывное приключение.</p>
         ${modeSwitcherHTML}
       </div>
       ${(state.pathViewMode === 'pro') ? viewProPath() : viewPathSerpentine()}`;
@@ -16162,7 +16162,7 @@ viewMap = function(){
   return `
     <div class="container">
       <h1 style="margin-bottom:6px;">Карта навыков: Матрица компетенций и Эшелоны собеседования</h1>
-      <p class="meta" style="margin-bottom:14px;">Единая архитектура: 4 сквозных эшелона приоритета (от 100% обязательного тех-скрининга до архитектурного резерва) синхронизированы с 18 узлами дерева навыков и 45 юнитами в 7 модулях.</p>
+      <p class="meta" style="margin-bottom:14px;">Единая архитектура: 4 сквозных эшелона приоритета (от 100% обязательного тех-скрининга до архитектурного резерва) синхронизированы с 18 узлами дерева навыков и 45 уроками в 7 модулях.</p>
       ${modeSwitcherHTML}
       ${buildPriorityRoadmapWidgetHTML({ compact: false })}
       ${stagesHTML}
@@ -16192,11 +16192,11 @@ viewTopic = function(id){
             <span class="echelon-badge ${eMeta.badgeClass}">${eMeta.shortLabel}</span>
             <span class="meta">${uMp}/${uMax} MP</span>
           </div>
-          <div style="font-weight:700;font-size:.92rem;">Юнит ${u.id}: ${u.title}</div>
+          <div style="font-weight:700;font-size:.92rem;">Урок ${u.id} · ${cleanUnitTitle(u.id, u.title)}</div>
           <div class="meta" style="font-size:.78rem;">Навыков: ${u.skills.length} · Конспекты + Карточки + Практика IDE</div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          ${firstSkill ? `<button class="btn btn-primary" style="padding:6px 10px;font-size:.78rem;" data-py-open-skill="${firstSkill.id}">Открыть юнит ${u.id}</button>` : ''}
+          ${firstSkill ? `<button class="btn btn-primary" style="padding:6px 10px;font-size:.78rem;" data-py-open-skill="${firstSkill.id}">Открыть урок ${u.id}</button>` : ''}
           <a href="#${tr.routePrefix}/unittest/${u.id}" class="btn btn-ghost" style="padding:6px 10px;font-size:.78rem;">Unit Test ${u.id}</a>
         </div>
       </div>`;
@@ -16205,7 +16205,7 @@ viewTopic = function(id){
   const bridgeBlock = `
     <div class="panel" style="margin-top:18px;">
       <div class="topic-badge">Двусторонняя синхронизация с 7 модулями Мастерства</div>
-      <h3 style="margin-bottom:8px;">Связанные юниты (теория, флеш-карточки и задачи в IDE)</h3>
+      <h3 style="margin-bottom:8px;">Связанные уроки (теория, флеш-карточки и задачи в IDE)</h3>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
         ${unitCards}
       </div>
@@ -17094,7 +17094,7 @@ viewDashboard = function(){
 
   // Название активного юнита без технического префикса «Юнит X.X ·»
   const rawUnitTitle = (activeUnit && activeUnit.title) || 'Базовый синтаксис';
-  const cleanUnitTitle = rawUnitTitle.replace(/^Юнит\s+[\d.]+\s*[:·•\-]\s*/i, '').replace(/^[·•\-]\s*/, '').trim();
+  const cleanUnitTitle = rawUnitTitle.replace(/^(?:Юнит|Урок|Модуль)\s+[\d.]+\s*[:·•\-–—]?\s*/i, '').replace(/^[·•\-–—]\s*/, '').trim();
 
   // Чистое название фокусной темы без технических префиксов и скобок параметров
   const cleanTitle = (focusSk && focusSk.title)
