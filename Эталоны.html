@@ -1513,7 +1513,7 @@
   }
   .prac-chips-bar::-webkit-scrollbar{display:none;}
   .prac-chip-select-pill{
-    position:relative;display:inline-flex;align-items:center;border-radius:999px;
+    position:relative;display:inline-flex;align-items:center;min-height:36px;border-radius:999px;
     background:var(--surface);border:1px solid var(--glass-border);padding:6px 14px;
     cursor:pointer;transition:border-color .15s ease, background .15s ease, transform .12s ease;
     box-shadow:var(--shadow-1);flex-shrink:0;user-select:none;
@@ -1529,7 +1529,7 @@
     display:inline-flex;align-items:center;gap:4px;
   }
   .prac-chip-btn{
-    display:inline-flex;align-items:center;justify-content:center;border-radius:999px;
+    display:inline-flex;align-items:center;justify-content:center;min-height:36px;border-radius:999px;
     background:var(--surface);border:1px solid var(--glass-border);padding:6px 13px;
     font-size:.82rem;font-weight:700;color:var(--ink);cursor:pointer;
     transition:border-color .15s ease, background .15s ease, transform .12s ease;
@@ -1538,7 +1538,7 @@
   .prac-chip-btn:hover{border-color:var(--moss);transform:translateY(-1px);}
   .prac-chip-btn.is-active,.prac-chip-btn.active{background:var(--emerald-soft);border-color:var(--emerald);color:var(--ink);}
   .prac-chip{
-    padding:6px 11px;border-radius:999px;font-size:.76rem;font-weight:700;white-space:nowrap;
+    display:inline-flex;align-items:center;min-height:36px;padding:6px 11px;border-radius:999px;font-size:.76rem;font-weight:700;white-space:nowrap;
     background:var(--surface);border:1px solid var(--glass-border);color:var(--ink-soft);cursor:pointer;transition:all .14s;
   }
   .prac-chip:hover{border-color:var(--moss);color:var(--ink);}
@@ -1600,6 +1600,7 @@
   }
   .py-accessory-bar::-webkit-scrollbar{display:none;}
   .py-acc-btn, .py-key-btn{
+    min-height:34px;min-width:32px;display:inline-flex;align-items:center;justify-content:center;
     padding:5px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--line);
     color:var(--ink);font-family:var(--font-m);font-size:.76rem;font-weight:700;cursor:pointer;white-space:nowrap;
     transition:all .12s;flex-shrink:0;user-select:none;
@@ -2747,6 +2748,44 @@
   }
   .path-jump-btn:active {
     transform: translateY(1px);
+  }
+  .path-jump-btn.is-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: scale(0.75) !important;
+  }
+  .path-jump-btn--up svg {
+    transform: rotate(180deg);
+  }
+  @media (max-width: 640px) {
+    .path-popover {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      top: auto !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      transform: none !important;
+      border-radius: 24px 24px 0 0 !important;
+      padding: 20px 20px calc(24px + env(safe-area-inset-bottom, 16px)) 20px !important;
+      box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.6) !important;
+      border-bottom: none !important;
+      z-index: 1050 !important;
+      animation: popoverSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    .path-popover-arrow {
+      display: none !important;
+    }
+    .path-popover-close {
+      width: 36px !important;
+      height: 36px !important;
+      font-size: 1.1rem !important;
+    }
+  }
+  @keyframes popoverSlideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
   }
   @media (max-width: 768px) {
     .path-jump-btn {
@@ -7121,10 +7160,10 @@
   /* 7. Safe Area: Гарантированный отступ от нижней плашки навигации на мобильных */
   @media (max-width: 880px) {
     .dashboard-container {
-      padding-bottom: calc(56px + env(safe-area-inset-bottom, 16px)) !important;
+      padding-bottom: calc(84px + env(safe-area-inset-bottom, 24px)) !important;
     }
     main {
-      padding-bottom: calc(112px + env(safe-area-inset-bottom, 16px)) !important;
+      padding-bottom: calc(96px + env(safe-area-inset-bottom, 24px)) !important;
     }
   }
 
@@ -7185,6 +7224,33 @@
   .dash-theme-link--locked:hover {
     color: #cbd5e1 !important;
     opacity: 0.9 !important;
+  }
+
+  /* 11. Оптимизация закрытых тем модуля, кнопок и хедера на мобильных */
+  @media (max-width: 640px) {
+    .dash-accordion-theme-row--locked .focus-chips-wrap {
+      display: none !important;
+    }
+    .dash-accordion-theme-row--locked {
+      padding: 7px 0 !important;
+      min-height: 44px !important;
+    }
+  }
+  @media (max-width: 768px) {
+    .topbar [data-open-settings-modal] {
+      display: none !important;
+    }
+  }
+  .btn-dominant-cta:active,
+  .btn-sprint-cta:active {
+    transform: scale(0.98) !important;
+  }
+  .heat-dot.future {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px dashed rgba(255, 255, 255, 0.14) !important;
+    width: 6px !important;
+    height: 2px !important;
+    box-shadow: none !important;
   }
 </style>
 <link rel="manifest" href="manifest.json">
@@ -9882,7 +9948,8 @@ ICONS.bolt = '<svg class="icon" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9
 ICONS.database = '<svg class="icon" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>';
 ICONS.arch = '<svg class="icon" viewBox="0 0 24 24"><path d="M3 21h18M4 18h16M6 18v-7M10 18v-7M14 18v-7M18 18v-7M12 3 2 8h20L12 3z"/></svg>';
 ICONS.rocket = '<svg class="icon" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>';
-ICONS.crown = '<svg class="icon" viewBox="0 0 24 24"><path d="m3 7 4.5 4L12 5l4.5 6L21 7l-2 12H5L3 7z"/></svg>';
+ICONS.crown = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>';
+ICONS.mock = ICONS.crown;
 
 // Extend state fields for Mastery Learning, Anti-Procrastination & Bulletproof Persistence
 const ACADEMY_SCHEMA_VERSION = 3;
@@ -11381,7 +11448,7 @@ function syncPomoDisplays(){
     const el = document.getElementById(id);
     if(el) el.textContent = formatted;
   });
-  ['topbar-pomo-btn', 'sidebar-pomo-btn'].forEach(id => {
+  ['topbar-pomo-btn', 'sidebar-pomo-btn', 'topbar-pomo-pill-el'].forEach(id => {
     const btn = document.getElementById(id);
     if(btn) btn.classList.toggle('is-running', !!pomoState.running);
   });
@@ -14877,12 +14944,15 @@ function isUnitCompleted(u){
   return (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80));
 }
 
-function renderPathMobileStatsHTML(totalCompletedUnits, streakText, curTier){
+function renderPathMobileStatsHTML(totalCompletedUnits, streakText, curTier, activeChapterNum, chapterCompleted, chapterTotal){
   const tierNum = curTier || 1;
+  const chNum = activeChapterNum || 1;
+  const chDone = (typeof chapterCompleted === 'number') ? chapterCompleted : 0;
+  const chTot = (typeof chapterTotal === 'number') ? chapterTotal : 9;
   return `
     <div class="path-mobile-stats" role="status" aria-label="Статистика обучения">
       <span class="pms-item pms-echelon" title="Текущий эшелон подготовки">🎯 <b>Эшелон ${tierNum}</b></span>
-      <span class="pms-item" title="Пройдено юнитов">📘 <b>${totalCompletedUnits}/45</b></span>
+      <span class="pms-item" title="Пройдено в главе ${chNum}">📘 <b>Гл. ${chNum}: ${chDone}/${chTot}</b></span>
       <span class="pms-item" title="Стрик активности">🔥 <b>${state.streak || 0}</b> ${streakText}</span>
       <span class="pms-item" title="Накопленный опыт">💎 <b>${state.xp || 0} XP</b></span>
     </div>`;
@@ -14990,11 +15060,7 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)
         </div>
         <div class="coddy-rail-daily-summary"><span>Сегодня: <strong>${dailyXp}/${dailyGoal} XP</strong></span><span>${dailyXp >= dailyGoal ? 'Цель выполнена' : `Осталось ${dailyGoal - dailyXp} XP`}</span></div>
       </div>
-      <!-- Widget 2: SRS Cards Review (compact one-row card) -->
-      <div class="panel coddy-rail-card coddy-rail-card--row">
-        <div class="coddy-rail-badge">🃏 Повторение карточек</div>
-        <a href="#/cards" class="coddy-rail-link">Повторить →</a>
-      </div>
+
     </aside>`;
 }
 
@@ -15039,6 +15105,23 @@ const TRAIL_CHAPTER_ICONS = [
   ['cloud', 'layers', 'book', 'star'],
   ['wrench', 'cloud', 'shield', 'book']
 ];
+
+// Семантический маппинг иконок узлов тропы по темам юнитов
+function getSemanticTrailIcon(u, i, isChapterLast){
+  if(isChapterLast) return 'trophy';
+  if(!u) return 'star';
+  const uid = String(u.id);
+  const map = {
+    '1.1': 'terminal', '1.2': 'code', '1.3': 'zap', '1.4': 'layers', '1.5': 'layers', '1.6': 'shield', '1.7': 'wrench', '1.8': 'zap', '1.9': 'terminal',
+    '2.1': 'globe', '2.2': 'globe', '2.3': 'code', '2.4': 'shield',
+    '3.1': 'terminal', '3.2': 'layers', '3.3': 'code', '3.4': 'code', '3.5': 'shield', '3.6': 'layers', '3.7': 'zap', '3.8': 'cloud',
+    '4.1': 'zap', '4.2': 'branch', '4.3': 'layers', '4.4': 'database', '4.5': 'branch', '4.6': 'star',
+    '5.1': 'database', '5.2': 'database', '5.3': 'database', '5.4': 'shield', '5.5': 'layers', '5.6': 'zap',
+    '6.1': 'shield', '6.2': 'layers', '6.3': 'layers', '6.4': 'book', '6.5': 'layers', '6.6': 'cloud',
+    '7.1': 'branch', '7.2': 'cloud', '7.3': 'cloud', '7.4': 'wrench', '7.5': 'terminal', '7.6': 'wrench'
+  };
+  return map[uid] || 'star';
+}
 
 function viewPathSerpentine(options){
   options = options || {};
@@ -15121,8 +15204,8 @@ function viewPathSerpentine(options){
     return `<div class="path-seg-bar ${isPassed ? 'done' : (isActive ? 'active' : '')}" title="Юнит ${u.id}: ${escapeHtmlStr(u.title)}"></div>`;
   }).join('');
   const chapterProgressLabel = completedInChapter === 0
-    ? `Начни · ${totalInChapter}`
-    : `${completedInChapter} / ${totalInChapter}`;
+    ? `Начало · ${totalInChapter} ${pluralizeRu(totalInChapter, 'юнит', 'юнита', 'юнитов')}`
+    : `${completedInChapter} из ${totalInChapter} сдано`;
 
   // Chapter markers: Chapter 1 has top ribbon, Chapters 2..7 have Coddy Section Gate Cards (Variant C, Hard Gate)
   const chapterBreakpoints = [
@@ -15256,24 +15339,40 @@ function viewPathSerpentine(options){
     let centerIcon = '';
     let pulseHalo = '';
     let activeBubble = '';
+    let radialProgressRing = '';
     const cbIdx = chapterBreakpoints.reduce((acc, cb, ci) => (i >= cb.startIdx ? ci : acc), 0);
-    const iconSet = TRAIL_CHAPTER_ICONS[cbIdx] || TRAIL_CHAPTER_ICONS[0];
-    const iconName = chapterLastIdxSet.has(i) ? 'trophy' : iconSet[(i - chapterBreakpoints[cbIdx].startIdx) % iconSet.length];
+    const isChapterLast = chapterLastIdxSet.has(i);
+    const iconName = getSemanticTrailIcon(u, i, isChapterLast);
+
+    let unitProgPct = 0;
+    let unitSkillsMastered = 0;
+    const unitTotalSkills = (u.skills && u.skills.length > 0) ? u.skills.length : 1;
+    if(u.skills && u.skills.length > 0){
+      unitSkillsMastered = u.skills.filter(s => getSkillMP(s.id) >= 80).length;
+      unitProgPct = Math.round((unitSkillsMastered / unitTotalSkills) * 100);
+    }
+    if(isCompleted) unitProgPct = 100;
+
     if(isCompleted){
       centerIcon = `<text x="${x}" y="${y+(usePawNodes?10:7)}" text-anchor="middle" font-size="${usePawNodes?18:22}" font-weight="900" fill="#ffffff">✓</text>`;
     } else if(isActive){
       pulseHalo = `<circle class="hex-pulse-halo" cx="${x}" cy="${y}" r="40" fill="none" stroke="rgba(245, 158, 11, 0.6)"/>`;
       centerIcon = trailIconCenter(x, y + (usePawNodes ? 5 : 1), iconName, usePawNodes ? 20 : 26, '#ffffff');
       const unitStarted = (u.skills || []).some(s => (getSkillMP(s.id) || 0) > 0);
-      const bubbleTxt = unitStarted ? 'ПРОДОЛЖИТЬ' : 'НАЧАТЬ';
-      const bubbleW = unitStarted ? 104 : 72;
+      if(unitStarted && unitProgPct > 0 && unitProgPct < 100){
+        const circ = 238.7;
+        const dashOffset = (circ * (1 - unitProgPct / 100)).toFixed(1);
+        radialProgressRing = `<circle class="hex-progress-ring" cx="${x}" cy="${y}" r="38" fill="none" stroke="#fbbf24" stroke-width="3.5" stroke-dasharray="${circ}" stroke-dashoffset="${dashOffset}" stroke-linecap="round" transform="rotate(-90 ${x} ${y})" filter="drop-shadow(0 0 6px rgba(251,191,36,0.6))"/>`;
+      }
+      const bubbleTxt = unitStarted ? (unitProgPct > 0 ? `ПРОДОЛЖИТЬ · ${unitSkillsMastered}/${unitTotalSkills}` : 'ПРОДОЛЖИТЬ') : 'НАЧАТЬ';
+      const bubbleW = unitStarted ? (unitProgPct > 0 ? 128 : 104) : 72;
       const bubbleY = y - 44;
       activeBubble = `
         <g class="hex-active-tooltip" transform="translate(${x}, ${bubbleY})">
           <g class="hex-active-tooltip__inner">
             <rect x="${-bubbleW/2}" y="-16" width="${bubbleW}" height="22" rx="11" fill="#ff7a00" filter="drop-shadow(0 4px 10px rgba(255,122,0,0.45))"/>
             <polygon points="-5,6 5,6 0,11" fill="#ff7a00"/>
-            <text x="0" y="-1" text-anchor="middle" font-size="10.5" font-weight="900" fill="#ffffff" letter-spacing="0.08em">${bubbleTxt}</text>
+            <text x="0" y="-1" text-anchor="middle" font-size="10" font-weight="900" fill="#ffffff" letter-spacing="0.06em">${bubbleTxt}</text>
           </g>
         </g>`;
     } else {
@@ -15285,8 +15384,9 @@ function viewPathSerpentine(options){
       : trailIsometricButton(x, y, buttonGrad, isActive ? 'rgba(255,230,160,0.95)' : (isCompleted ? 'rgba(167,243,208,0.75)' : 'rgba(203,213,225,0.42)'), isActive ? 1.8 : 1.3);
 
     const buttonContent = usePawNodes ? centerIcon : `<g class="path-button-icon">${centerIcon}</g>`;
-    // Подпись темы под активным узлом и двумя следующими (видно «что дальше» без клика)
-    const showUnderLabel = (i >= activeUnitIndex && i <= activeUnitIndex + 2);
+    // Подпись темы: отображаем для всех юнитов текущей главы, пройденных и 3 ближайших вперед
+    const inCurrentChapter = (cbIdx === chapterBreakpoints.findIndex(cb => cb.chapterNum === activeChapterNum));
+    const showUnderLabel = inCurrentChapter || (i <= activeUnitIndex + 3) || isCompleted;
     const underTitleFull = cleanUnitTitle(u.id, u.title);
     const shortTitle = (underTitleFull.length > 24) ? underTitleFull.slice(0, 22) + '…' : underTitleFull;
     // у финишных юнитов главы снизу-сбоку висит ветка челленджа — уводим подпись в противоположную сторону
@@ -15300,10 +15400,11 @@ function viewPathSerpentine(options){
     nodesSVG += `
       <g class="hex-3d-node hex-node--${status}" data-unit-id="${u.id}" data-node-idx="${i}" data-cx="${x}" data-cy="${y}" role="button" tabindex="0" aria-label="${escapeHtmlStr(nodeAccessibleLabel)}" aria-keyshortcuts="Enter Space ArrowUp ArrowDown Home End" title="${escapeHtmlStr(nodeAccessibleLabel)}">
         ${pulseHalo}
+        ${radialProgressRing}
         <circle cx="${x}" cy="${y}" r="34" fill="transparent" pointer-events="all"/>
         ${nodeShape}
         ${buttonContent}
-        ${showUnderLabel ? `<text class="hex-node-underlabel" x="${underLabelX}" y="${y + 52}" text-anchor="${underLabelAnchor}">${escapeHtmlStr(shortTitle)}</text>` : ''}
+        ${showUnderLabel ? `<text class="hex-node-underlabel hex-node-underlabel--${status}" x="${underLabelX}" y="${y + 52}" text-anchor="${underLabelAnchor}">${status === 'locked' ? '🔒 ' : ''}${escapeHtmlStr(shortTitle)}</text>` : ''}
         ${activeBubble}
       </g>`;
   });
@@ -15365,7 +15466,7 @@ function viewPathSerpentine(options){
         <!-- Переключатель режимов game/pro перенесён в «⚙️ Настройки платформы» (по ТЗ — тех.информация не в топбаре) -->
 
         <!-- Mobile compact stats strip (visible when the right rail is hidden) -->
-        ${renderPathMobileStatsHTML(totalCompletedUnits, streakText, curActiveUnit.tier || 1)}
+        ${renderPathMobileStatsHTML(totalCompletedUnits, streakText, curActiveUnit.tier || 1, activeChapterNum, completedInChapter, totalInChapter)}
 
         <!-- Top Chapter Banner -->
         <div class="path-chapter-banner">
@@ -15375,7 +15476,7 @@ function viewPathSerpentine(options){
                 <span class="path-echelon-pill echelon-pill--t${curActiveUnit.tier || 1}">${curActiveUnit.tierLabel || `Эшелон ${curActiveUnit.tier || 1}`}</span>
                 <span class="path-crumb-sep">›</span>
                 <span>ГЛАВА ${activeChapterNum}</span>
-                <span class="path-screening-badge" title="Готовность к 1-му техническому скринингу">⚡ Готовность к тех-скринингу: ${e1PctTop}%</span>
+                <span class="path-screening-badge" title="Готовность к 1-му техническому скринингу">${e1PctTop > 0 ? `⚡ Готовность к тех-скринингу: ${e1PctTop}%` : '⚡ Старт тех-скрининга · База'}</span>
               </div>
               <div class="path-chapter-title">Юнит ${curActiveUnit.id} · ${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</div>
             </div>
@@ -16294,7 +16395,7 @@ function buildSevenDayHeatmapHTML(){
     } else {
       cls = 'heat-cell rest-day future-day';
       valText = '';
-      dotCls = 'idle';
+      dotCls = 'future';
       hint += ' (предстоит)';
     }
 
@@ -17150,7 +17251,7 @@ NAV_ITEMS.splice(0, NAV_ITEMS.length,
   {route:'/path', icon:'path', label:'3D-Тропа', shortLabel:'3D-Тропа', mobileTab:true, group:'learn'},
   {route:'/practice', icon:'code', label:'Практика IDE', shortLabel:'IDE', mobileTab:true, group:'trainer'},
   {route:'/cards', icon:'cards', label:'Карточки', shortLabel:'Карточки', mobileTab:true, group:'trainer'},
-  {route:'/mock', icon:'crown', label:'Собеседование', shortLabel:'Интервью', mobileTab:true, group:'trainer'},
+  {route:'/mock', icon:'mock', label:'Собеседование', shortLabel:'Интервью', mobileTab:true, group:'trainer'},
   {route:'/python', icon:'python', label:'Python Core', shortLabel:'Python', group:'module'},
   {route:'/web', icon:'globe', label:'Web и HTTP', shortLabel:'Web', group:'module'},
   {route:'/backend', icon:'server', label:'Backend', shortLabel:'Backend', group:'module'},
@@ -17297,41 +17398,41 @@ function openMobileDrawer(){
   modal.setAttribute('role', 'dialog');
   modal.setAttribute('aria-modal', 'true');
   modal.innerHTML = `
-    <div class="modal-card mobile-drawer-card" style="max-width:440px;padding:22px 20px;border-radius:20px;background:rgba(18,22,31,0.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.12);box-shadow:0 16px 40px rgba(0,0,0,0.65);">
+    <div class="modal-card mobile-drawer-card" style="max-width:440px;width:100%;padding:22px 20px;border-radius:20px;background:var(--surface);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid var(--line);box-shadow:0 16px 40px rgba(0,0,0,0.45);">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
         <h3 style="margin:0;font-size:1.18rem;font-weight:800;display:flex;align-items:center;gap:8px;color:var(--ink);">
           <span>🧭</span> Навигация Академии
         </h3>
-        <button class="btn btn-ghost" style="padding:6px 12px;" data-close-drawer aria-label="Закрыть">✕</button>
+        <button class="btn btn-ghost" style="padding:6px 12px;min-width:40px;min-height:40px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;border-radius:10px;" data-close-drawer aria-label="Закрыть">✕</button>
       </div>
 
       <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-muted);margin-bottom:8px;">Разделы платформы</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;">
-        <a href="#/" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);">🏠 Дашборд</a>
-        <a href="#/path" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);">🗺️ 3D-Тропа</a>
-        <a href="#/map" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);">📚 Карта модулей</a>
-        <a href="#/practice" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);">💻 Практика IDE</a>
-        <a href="#/cards" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);">🃏 Карточки</a>
-        <a href="#/mock" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);">👑 Собеседование</a>
-        <a href="#/docs" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);">📖 Справочник</a>
-        <a href="#/sandbox" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);">🧪 Песочница</a>
+        <a href="#/" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);">🏠 Дашборд</a>
+        <a href="#/path" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);">🗺️ 3D-Тропа</a>
+        <a href="#/map" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);">📚 Карта модулей</a>
+        <a href="#/practice" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);">💻 Практика IDE</a>
+        <a href="#/cards" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);">🃏 Карточки</a>
+        <a href="#/mock" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);">💼 Собеседование</a>
+        <a href="#/docs" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);">📖 Справочник</a>
+        <a href="#/sandbox" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);">🧪 Песочница</a>
       </div>
 
       <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-muted);margin-bottom:8px;">Быстрые действия</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
-        <button type="button" class="btn btn-ghost" id="drawer-theme-btn" style="flex:1;min-width:130px;font-size:0.80rem;padding:9px 10px;border-radius:10px;">
+        <button type="button" class="btn btn-ghost" id="drawer-theme-btn" style="flex:1;min-width:130px;font-size:0.80rem;padding:10px 10px;border-radius:10px;background:var(--surface-2);border:1px solid var(--line);">
           🌓 Тема
         </button>
-        <button type="button" class="btn btn-ghost" id="drawer-lang-btn" style="flex:1;min-width:130px;font-size:0.80rem;padding:9px 10px;border-radius:10px;">
+        <button type="button" class="btn btn-ghost" id="drawer-lang-btn" style="flex:1;min-width:130px;font-size:0.80rem;padding:10px 10px;border-radius:10px;background:var(--surface-2);border:1px solid var(--line);">
           🌐 Язык: ${state.lang === 'en' ? 'EN' : 'RU'}
         </button>
       </div>
 
-      <div style="display:flex;gap:8px;border-top:1px solid rgba(255,255,255,0.06);padding-top:14px;">
-        <button type="button" class="btn btn-ghost" onclick="closeMobileDrawer(); openSettingsModal();" style="flex:1;font-size:0.82rem;padding:9px 12px;border-radius:10px;">
+      <div style="display:flex;gap:8px;border-top:1px solid var(--line);padding-top:14px;">
+        <button type="button" class="btn btn-ghost" onclick="closeMobileDrawer(); openSettingsModal();" style="flex:1;font-size:0.82rem;padding:10px 12px;border-radius:10px;background:var(--surface-2);border:1px solid var(--line);">
           ⚙️ Все настройки
         </button>
-        <button type="button" class="btn btn-ghost" onclick="closeMobileDrawer(); openBugReportModal();" style="flex:1;font-size:0.82rem;padding:9px 12px;border-radius:10px;">
+        <button type="button" class="btn btn-ghost" onclick="closeMobileDrawer(); openBugReportModal();" style="flex:1;font-size:0.82rem;padding:10px 12px;border-radius:10px;background:var(--surface-2);border:1px solid var(--line);">
           🐞 Баг-репорт
         </button>
       </div>
@@ -17395,13 +17496,14 @@ function openSettingsModal(){
       <div class="settings-section">
         <div class="settings-section-title">🧭 Разделы платформы</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;margin-top:10px;">
+          <a href="#/" class="btn btn-ghost" onclick="closeSettingsModal();" style="text-decoration:none;justify-content:flex-start;font-size:0.82rem;padding:9px 12px;border-radius:12px;">🏠 Дашборд</a>
           <a href="#/path" class="btn btn-ghost" onclick="closeSettingsModal();" style="text-decoration:none;justify-content:flex-start;font-size:0.82rem;padding:9px 12px;border-radius:12px;">🗺️ 3D-Тропа</a>
           <a href="#/map" class="btn btn-ghost" onclick="closeSettingsModal();" style="text-decoration:none;justify-content:flex-start;font-size:0.82rem;padding:9px 12px;border-radius:12px;">📚 Карта модулей</a>
-          <a href="#/docs" class="btn btn-ghost" onclick="closeSettingsModal();" style="text-decoration:none;justify-content:flex-start;font-size:0.82rem;padding:9px 12px;border-radius:12px;">📖 Справочник</a>
-          <a href="#/sandbox" class="btn btn-ghost" onclick="closeSettingsModal();" style="text-decoration:none;justify-content:flex-start;font-size:0.82rem;padding:9px 12px;border-radius:12px;">🧪 Песочница</a>
           <a href="#/practice" class="btn btn-ghost" onclick="closeSettingsModal();" style="text-decoration:none;justify-content:flex-start;font-size:0.82rem;padding:9px 12px;border-radius:12px;">💻 Практика IDE</a>
           <a href="#/cards" class="btn btn-ghost" onclick="closeSettingsModal();" style="text-decoration:none;justify-content:flex-start;font-size:0.82rem;padding:9px 12px;border-radius:12px;">🃏 Карточки</a>
-          <a href="#/mock" class="btn btn-ghost" onclick="closeSettingsModal();" style="text-decoration:none;justify-content:flex-start;font-size:0.82rem;padding:9px 12px;border-radius:12px;">👑 Собеседование</a>
+          <a href="#/mock" class="btn btn-ghost" onclick="closeSettingsModal();" style="text-decoration:none;justify-content:flex-start;font-size:0.82rem;padding:9px 12px;border-radius:12px;">💼 Собеседование</a>
+          <a href="#/docs" class="btn btn-ghost" onclick="closeSettingsModal();" style="text-decoration:none;justify-content:flex-start;font-size:0.82rem;padding:9px 12px;border-radius:12px;">📖 Справочник</a>
+          <a href="#/sandbox" class="btn btn-ghost" onclick="closeSettingsModal();" style="text-decoration:none;justify-content:flex-start;font-size:0.82rem;padding:9px 12px;border-radius:12px;">🧪 Песочница</a>
         </div>
       </div>
 
@@ -18041,6 +18143,29 @@ render = function(){
           if(r.top < 90 || r.bottom > (window.innerHeight || 800) - 110){
             activeNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
+        }
+        // Умная плавающая кнопка прыжка к активному уроку
+        const jumpBtn = document.getElementById('path-jump-btn');
+        if(jumpBtn && activeNode){
+          const updateJumpBtn = function(){
+            const rect = activeNode.getBoundingClientRect();
+            const vh = window.innerHeight || 800;
+            const isVisible = (rect.top >= 60 && rect.bottom <= vh - 60);
+            if(isVisible){
+              jumpBtn.classList.add('is-hidden');
+            } else {
+              jumpBtn.classList.remove('is-hidden');
+              if(rect.top < 60){
+                jumpBtn.classList.add('path-jump-btn--up');
+                jumpBtn.title = 'Вернуться к текущему уроку (вверх)';
+              } else {
+                jumpBtn.classList.remove('path-jump-btn--up');
+                jumpBtn.title = 'Перейти к текущему уроку (вниз)';
+              }
+            }
+          };
+          window.addEventListener('scroll', updateJumpBtn, { passive: true });
+          updateJumpBtn();
         }
       }catch(err){}
     }, 60);
@@ -19921,6 +20046,7 @@ const psk = e.target.closest('[data-py-select-k]');
   // 4-Tab Mobile IDE tabs
   const pracMobTab = e.target.closest('[data-prac-mob-tab]');
   if(pracMobTab){
+    syncActiveEditorDrafts();
     const tab = pracMobTab.getAttribute('data-prac-mob-tab');
     if(typeof practiceHubState !== 'undefined'){
       practiceHubState.mobileTab = tab;
@@ -19992,6 +20118,9 @@ const psk = e.target.closest('[data-py-select-k]');
   // 3D Serpentine Path node click (Open anchored popover)
   const hexNode = e.target.closest('.hex-3d-node');
   if(hexNode){
+    if(typeof navigator !== 'undefined' && navigator.vibrate){
+      try{ navigator.vibrate(10); }catch(vErr){}
+    }
     const openedByKeyboard = e.detail === 0;
     const uid = hexNode.getAttribute('data-unit-id');
     const popover = document.getElementById('path-anchored-popover');
@@ -20028,8 +20157,9 @@ const psk = e.target.closest('[data-py-select-k]');
 
         if(pSkills){
           const skillItems = (u.skills || []).slice(0, 3);
+          const noteCount = (u.skills || []).reduce((acc, s) => acc + (s.kIds ? s.kIds.length : 1), 0);
           pSkills.innerHTML = skillItems.length
-            ? `<div class="path-popover-skills-label">В этом юните</div><div class="path-popover-skills-list">${skillItems.map(s => `<div class="path-popover-skill">${escapeHtmlStr(s.title)}</div>`).join('')}</div>`
+            ? `<div class="path-popover-meta-row" style="font-size:0.75rem;color:var(--ink-muted);margin-bottom:8px;display:flex;gap:12px;"><span>📚 <b>${noteCount}</b> тем-конспектов</span><span>🎯 <b>${(u.skills||[]).length}</b> навыков</span></div><div class="path-popover-skills-label">Ключевые навыки юнита:</div><div class="path-popover-skills-list">${skillItems.map(s => `<div class="path-popover-skill">${escapeHtmlStr(s.title)}</div>`).join('')}</div>`
             : '';
         }
 
@@ -20120,8 +20250,11 @@ const psk = e.target.closest('[data-py-select-k]');
     }
   }
 
-  // Jump to active unit button
+  // Jump to active unit button (with haptics and smooth scroll)
   if(e.target.closest('#path-jump-btn')){
+    if(typeof navigator !== 'undefined' && navigator.vibrate){
+      try{ navigator.vibrate(12); }catch(vErr){}
+    }
     const targetNode = document.querySelector('.hex-node--active') || document.querySelector('.hex-3d-node');
     if(targetNode){
       targetNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
