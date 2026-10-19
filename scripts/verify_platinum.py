@@ -12,6 +12,8 @@ def run_platinum_audit():
         names = []
         for root, _, files in os.walk(project_dir):
             for f in files:
+                if f == '.DS_Store' or f.startswith('._'):
+                    continue
                 rel = os.path.relpath(os.path.join(root, f), project_dir).replace('\\', '/')
                 names.append(rel)
         print(f"[OK] Source directory loaded: {project_dir}")
