@@ -15195,6 +15195,9 @@ function viewPathSerpentine(options){
   // Active unit metadata for top chapter banner
   const curActiveUnit = allUnits[activeUnitIndex] || allUnits[0];
   const activeTrack = getTrackForUnit(curActiveUnit.id);
+  const activeChapterNum = (typeof getPathChaptersMeta === 'function')
+    ? ((getPathChaptersMeta(allUnits).find(c => c.units.some(u => u.id === curActiveUnit.id)) || { num: 1 }).num)
+    : 1;
   const chapterUnits = allUnits.filter(u => getTrackForUnit(u.id).routePrefix === activeTrack.routePrefix);
   const totalInChapter = chapterUnits.length;
   const completedInChapter = chapterUnits.filter(u => (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80))).length;
@@ -15456,7 +15459,6 @@ function viewPathSerpentine(options){
 
   const totalCompletedUnits = allUnits.filter(isUnitCompleted).length;
   const streakText = (typeof pluralizeRu === 'function') ? pluralizeRu(state.streak || 0, 'день', 'дня', 'дней') : 'дн.';
-  const activeChapterNum = (getPathChaptersMeta(allUnits).find(c => c.units.some(u => u.id === curActiveUnit.id)) || { num: 1 }).num;
   const e1Top = (typeof getEchelonProgress === 'function') ? getEchelonProgress(1) : null;
   const e1PctTop = e1Top ? e1Top.pct : 0;
 
