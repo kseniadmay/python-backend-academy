@@ -2596,14 +2596,15 @@
     font-size: 0.88rem;
   }
 
-  /* Top Chapter Banner */
+  /* Top Chapter Banner (Three-tier card layout) */
   .path-chapter-banner {
     position: sticky;
     top: 56px;
     z-index: 100;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
     background: rgba(22, 27, 36, 0.90);
     border: 1px solid rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(20px);
@@ -2618,11 +2619,12 @@
     border: 1px solid rgba(0, 0, 0, 0.07);
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
   }
-  .path-chapter-banner-left {
+  .path-chapter-banner-top {
     display: flex;
-    flex-direction: column;
-    gap: 3px;
-    min-width: 0;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
   }
   .card-help-badge { display: none !important; }
   .path-echelon-pill {
@@ -2635,6 +2637,8 @@
     border-radius: 999px;
     letter-spacing: 0.02em;
     text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .echelon-pill--t1 {
     background: rgba(239, 68, 68, 0.15);
@@ -2660,8 +2664,7 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    margin-left: 10px;
-    padding: 2px 8px;
+    padding: 3px 10px;
     font-size: 0.68rem;
     font-weight: 700;
     border-radius: 999px;
@@ -2670,65 +2673,72 @@
     border: 1px solid rgba(16, 185, 129, 0.3);
     text-transform: none;
     letter-spacing: normal;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .path-chapter-breadcrumb {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
     gap: 6px;
+    min-width: 0;
   }
-  .path-chapter-breadcrumb-old {
-    font-size: 0.70rem;
+  .path-chapter-crumb-label {
+    font-size: 0.72rem;
     font-weight: 800;
     color: #f59e0b;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .path-crumb-sep {
+    font-size: 0.76rem;
+    color: rgba(148, 163, 184, 0.5);
   }
   .path-chapter-title {
-    font-size: 0.96rem;
+    font-size: 1.05rem;
     font-weight: 800;
     color: #f8fafc;
     letter-spacing: -0.01em;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 1.25;
+    margin: 2px 0 4px;
   }
   html:not([data-theme="dark"]) .path-chapter-title {
     color: #0f172a;
   }
-  .path-chapter-sub {
-    font-size: 0.78rem;
-    color: #94a3b8;
-  }
   .path-chapter-progress-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
   }
-  .path-chapter-target-icon {
-    font-size: 0.92rem;
-    line-height: 1;
+  html:not([data-theme="dark"]) .path-chapter-progress-row {
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
   }
   .path-chapter-segments {
     display: flex;
-    gap: 3px;
+    gap: 4px;
     align-items: center;
     flex: 1 1 auto;
-    max-width: 200px;
     min-width: 0;
+    max-width: 100%;
   }
   .path-seg-bar {
     flex: 1 1 0;
-    min-width: 6px;
-    max-width: 22px;
-    height: 8px;
+    min-width: 10px;
+    max-width: 32px;
+    height: 7px;
     border-radius: 999px;
     background: rgba(148, 163, 184, 0.16);
     border: 1px solid rgba(255, 255, 255, 0.05);
     transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   }
-  /* Light theme tint only for empty segments: (0,2,1)-specificity override must not
-     beat .done/.active fills, so state classes are excluded via :not() */
+  /* Light theme tint only for empty segments */
   html:not([data-theme="dark"]) .path-seg-bar:not(.done):not(.active) {
     background: rgba(100, 116, 139, 0.14);
     border-color: rgba(0, 0, 0, 0.06);
@@ -2757,59 +2767,34 @@
     .path-chapter-count .pcc-full { display: none !important; }
     .path-chapter-count .pcc-short { display: inline !important; }
   }
-
-  /* Coddy-style Chapter Banner: clean 1-row layout on desktop, compact 2-row layout on mobile */
-  .path-chapter-banner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    padding: 12px 18px;
-  }
-  .path-chapter-banner-main {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-width: 0;
-    flex: 1 1 auto;
-  }
-  .path-chapter-banner-right {
-    flex: 0 0 auto;
-    min-width: 0;
-  }
-  .path-chapter-banner .path-chapter-progress-row {
-    padding-top: 0;
-    border-top: none;
+  .path-echelon-pill .pep-short,
+  .path-screening-badge .psb-short {
+    display: none;
   }
   @media (max-width: 768px) {
     .path-chapter-banner {
-      flex-direction: column;
-      align-items: stretch;
-      row-gap: 8px;
       padding: 10px 14px;
       margin-bottom: 14px;
-    }
-    .path-chapter-banner-main {
-      flex: 1 1 100%;
-      flex-direction: column;
-      align-items: stretch;
       gap: 5px;
     }
-    .path-chapter-banner-right {
-      flex: 1 1 100%;
-    }
-    .path-chapter-banner .path-chapter-progress-row {
-      padding-top: 8px;
-      border-top: 1px solid rgba(255, 255, 255, 0.07);
-    }
-    html:not([data-theme="dark"]) .path-chapter-banner .path-chapter-progress-row {
-      border-top: 1px solid rgba(0, 0, 0, 0.06);
-    }
+    .path-chapter-banner .path-crumb-sep,
     .path-chapter-banner .path-chapter-crumb-label {
       display: none !important;
     }
+    .path-echelon-pill .pep-full,
+    .path-screening-badge .psb-full {
+      display: none !important;
+    }
+    .path-echelon-pill .pep-short,
+    .path-screening-badge .psb-short {
+      display: inline !important;
+    }
     .path-chapter-title {
       font-size: 1.02rem !important;
+    }
+    .path-screening-badge {
+      font-size: 0.65rem;
+      padding: 2px 7px;
     }
   }
 
@@ -15439,7 +15424,7 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)
       <div class="panel coddy-rail-card">
         <div class="coddy-rail-card-head">
           <div class="coddy-rail-badge">🏆 Цель дня</div>
-          <span class="meta" style="font-size:0.75rem;">${dailyXp}/${dailyGoal} XP</span>
+          <span class="meta" style="font-size:0.75rem;font-weight:700;color:${dailyPct >= 100 ? 'var(--emerald)' : 'var(--amber,#fbbf24)'};">${dailyPct}%</span>
         </div>
         <div class="progress-bar-wrap" style="height:6px;margin:8px 0 6px;">
           <div class="progress-bar-fill" style="width:${dailyPct}%;background:linear-gradient(90deg,#fbbf24,#f59e0b);"></div>
@@ -15840,6 +15825,10 @@ function viewPathSerpentine(options){
   const streakText = (typeof pluralizeRu === 'function') ? pluralizeRu(state.streak || 0, 'день', 'дня', 'дней') : 'дн.';
   const e1Top = (typeof getEchelonProgress === 'function') ? getEchelonProgress(1) : null;
   const e1PctTop = e1Top ? e1Top.pct : 0;
+  const echelonFull = (typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[curActiveUnit.tier] && INTERVIEW_ECHELONS[curActiveUnit.tier].shortLabel) || `Эшелон ${curActiveUnit.tier || 1}`;
+  const echelonShort = (typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[curActiveUnit.tier] && INTERVIEW_ECHELONS[curActiveUnit.tier].icon) ? `${INTERVIEW_ECHELONS[curActiveUnit.tier].icon} Эшелон ${curActiveUnit.tier || 1}` : `Эшелон ${curActiveUnit.tier || 1}`;
+  const screeningFull = e1PctTop > 0 ? `⚡ Готовность к тех-скринингу: ${e1PctTop}%` : '⚡ Старт тех-скрининга · База';
+  const screeningShort = e1PctTop > 0 ? `⚡ ${e1PctTop}% к скринингу` : '⚡ Старт · База';
 
   return `
     <div class="coddy-path-layout">
@@ -15849,26 +15838,22 @@ function viewPathSerpentine(options){
         <!-- Mobile compact stats strip (visible when the right rail is hidden) -->
         ${renderPathMobileStatsHTML(totalCompletedUnits, streakText, curActiveUnit.tier || 1, activeChapterNum, completedInChapter, totalInChapter)}
 
-        <!-- Top Chapter Banner -->
+        <!-- Top Chapter Banner (Three-tier layout) -->
         <div class="path-chapter-banner">
-          <div class="path-chapter-banner-main">
-            <div class="path-chapter-banner-left">
-              <div class="path-chapter-breadcrumb">
-                <span class="path-echelon-pill echelon-pill--t${curActiveUnit.tier || 1}">${(typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[curActiveUnit.tier] && INTERVIEW_ECHELONS[curActiveUnit.tier].shortLabel) || `Эшелон ${curActiveUnit.tier || 1}`}</span>
-                <span class="path-crumb-sep">›</span>
-                <span class="path-chapter-crumb-label">ГЛАВА ${activeChapterNum}</span>
-                <span class="path-screening-badge" title="Готовность к 1-му техническому скринингу">${e1PctTop > 0 ? `⚡ Готовность к тех-скринингу: ${e1PctTop}%` : '⚡ Старт тех-скрининга · База'}</span>
-              </div>
-              <div class="path-chapter-title">Юнит ${curActiveUnit.id} · ${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</div>
+          <div class="path-chapter-banner-top">
+            <div class="path-chapter-breadcrumb">
+              <span class="path-echelon-pill echelon-pill--t${curActiveUnit.tier || 1}"><span class="pep-full">${echelonFull}</span><span class="pep-short">${echelonShort}</span></span>
+              <span class="path-crumb-sep">›</span>
+              <span class="path-chapter-crumb-label">ГЛАВА ${activeChapterNum}</span>
             </div>
+            <span class="path-screening-badge" title="Готовность к 1-му техническому скринингу"><span class="psb-full">${screeningFull}</span><span class="psb-short">${screeningShort}</span></span>
           </div>
-          <div class="path-chapter-banner-right">
-            <div class="path-chapter-progress-row">
-              <div class="path-chapter-segments">
-                ${chapterSegmentsHTML}
-              </div>
-              <span class="path-chapter-count" title="${completedInChapter === 0 ? `Начни главу: в ней ${totalInChapter} ${pluralizeRu(totalInChapter, 'юнит', 'юнита', 'юнитов')}` : `Завершено юнитов: ${completedInChapter} из ${totalInChapter}`}" aria-label="${completedInChapter === 0 ? `Начни главу: ${totalInChapter} ${pluralizeRu(totalInChapter, 'юнит', 'юнита', 'юнитов')}` : `Завершено юнитов: ${completedInChapter} из ${totalInChapter}`}">${chapterProgressLabel}</span>
+          <div class="path-chapter-title">Юнит ${curActiveUnit.id} · ${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</div>
+          <div class="path-chapter-progress-row">
+            <div class="path-chapter-segments">
+              ${chapterSegmentsHTML}
             </div>
+            <span class="path-chapter-count" title="${completedInChapter === 0 ? `Начни главу: в ней ${totalInChapter} ${pluralizeRu(totalInChapter, 'юнит', 'юнита', 'юнитов')}` : `Завершено юнитов: ${completedInChapter} из ${totalInChapter}`}" aria-label="${completedInChapter === 0 ? `Начни главу: ${totalInChapter} ${pluralizeRu(totalInChapter, 'юнит', 'юнита', 'юнитов')}` : `Завершено юнитов: ${completedInChapter} из ${totalInChapter}`}">${chapterProgressLabel}</span>
           </div>
         </div>
 
