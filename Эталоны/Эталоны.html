@@ -15196,7 +15196,7 @@ function viewPathSerpentine(options){
     if(i > 0){
       curY += 115;
       if(chapterStartSet.has(i)){
-        curY += 150; // Dedicated gap for Coddy Section Gate Card (Variant C)
+        curY += 240; // Dedicated gap (+240px) for Mastery Challenge branch and Chapter Gate Card
       }
     }
     const x = Math.round(210 + 110 * Math.sin((i * Math.PI) / 2.2));
@@ -15300,7 +15300,8 @@ function viewPathSerpentine(options){
 
         const prevY = coords[cb.startIdx - 1].y;
         const nextY = coords[cb.startIdx].y;
-        const cy = Math.round((prevY + nextY) / 2);
+        // Position gate card with generous clearance (+180px) below the previous chapter's mastery challenge
+        const cy = prevY + 180;
 
         let hexFill = 'url(#pathButtonActive)';
         let hexStroke = 'rgba(251, 191, 36, 0.95)';
@@ -15328,7 +15329,7 @@ function viewPathSerpentine(options){
 
         let subText = '';
         if(isLocked){
-          subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10.5" font-weight="600" fill="#fda4af">🔒 ${cb.unitsCount} ${pluralizeRu(cb.unitsCount, 'юнит', 'юнита', 'юнитов')} · Откроется после «${escapeHtmlStr(prevCb.shortTitle)}»</text>`;
+          subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10.5" font-weight="600" fill="#fda4af">${cb.unitsCount} ${pluralizeRu(cb.unitsCount, 'юнит', 'юнита', 'юнитов')} · Откроется после «${escapeHtmlStr(prevCb.shortTitle)}»</text>`;
         } else if(isCurChapterDone){
           subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10.5" font-weight="600" fill="#6ee7b7">✓ Все ${cb.unitsCount} из ${cb.unitsCount} юнитов сданы · 100%</text>`;
         } else {
@@ -15339,14 +15340,14 @@ function viewPathSerpentine(options){
         let btnContent = '';
         if(isLocked){
           btnContent = `
-            <g class="path-gate-btn path-gate-btn--locked" data-gate-track="${cb.track}" data-gate-locked="1" data-gate-prev-title="${escapeHtmlStr(prevCb.shortTitle)}" role="button" tabindex="0" aria-label="Раздел ${cb.chapterNum} заблокирован. Завершите темы «${escapeHtmlStr(prevCb.shortTitle)}»." aria-disabled="true">
+            <g class="path-gate-btn path-gate-btn--locked" data-gate-track="${cb.track}" data-gate-locked="1" data-gate-prev-title="${escapeHtmlStr(prevCb.shortTitle)}" role="button" tabindex="0" aria-label="Глава ${cb.chapterNum} заблокирована. Завершите темы «${escapeHtmlStr(prevCb.shortTitle)}»." aria-disabled="true">
               <rect x="-110" y="18" width="220" height="28" rx="14" fill="rgba(65, 12, 26, 0.75)" stroke="rgba(190, 18, 60, 0.55)" stroke-width="1.2"/>
-              <text x="0" y="36" text-anchor="middle" font-size="10.5" font-weight="800" fill="#fda4af" letter-spacing="0.06em">🔒 РАЗДЕЛ ЗАКРЫТ</text>
+              <text x="0" y="36" text-anchor="middle" font-size="10.5" font-weight="800" fill="#fda4af" letter-spacing="0.06em">🔒 ГЛАВА ЗАКРЫТА</text>
             </g>`;
         } else {
-          const btnLabel = isCurChapterDone ? 'ОБЗОР РАЗДЕЛА ➔' : 'ПЕРЕЙТИ К РАЗДЕЛУ ➔';
+          const btnLabel = isCurChapterDone ? 'ОБЗОР ГЛАВЫ ➔' : 'ПЕРЕЙТИ К ГЛАВЕ ➔';
           btnContent = `
-            <g class="path-gate-btn path-gate-btn--unlocked" data-gate-track="${cb.track}" data-gate-locked="0" role="button" tabindex="0" aria-label="Перейти к разделу ${cb.chapterNum}: ${escapeHtmlStr(cb.shortTitle)}" aria-keyshortcuts="Enter Space">
+            <g class="path-gate-btn path-gate-btn--unlocked" data-gate-track="${cb.track}" data-gate-locked="0" role="button" tabindex="0" aria-label="Перейти к главе ${cb.chapterNum}: ${escapeHtmlStr(cb.shortTitle)}" aria-keyshortcuts="Enter Space">
               <rect class="path-gate-btn-rect" x="-110" y="18" width="220" height="28" rx="14" fill="url(#hexGradCompleted)" stroke="rgba(52, 211, 153, 0.60)" stroke-width="1.2" filter="drop-shadow(0 4px 12px rgba(16,185,129,0.40))"/>
               <text x="0" y="36" text-anchor="middle" font-size="10.5" font-weight="900" fill="#ffffff" letter-spacing="0.06em">${btnLabel}</text>
             </g>`;
@@ -15358,7 +15359,7 @@ function viewPathSerpentine(options){
             <line x1="160" y1="0" x2="195" y2="0" stroke="rgba(190, 18, 60, 0.40)" stroke-width="1.5" stroke-dasharray="4 4"/>
             <rect class="path-section-gate-bg" x="-155" y="-53" width="310" height="112" rx="18" fill="rgba(19, 24, 34, 0.94)" stroke="${isLocked ? 'rgba(190, 18, 60, 0.45)' : (isCurChapterDone ? 'rgba(16, 185, 129, 0.50)' : 'rgba(245, 158, 11, 0.60)')}" stroke-width="1.5" filter="drop-shadow(0 12px 28px rgba(0,0,0,0.65))"/>
             ${hexBadge}
-            <text class="path-gate-title" x="0" y="-14" text-anchor="middle" font-size="12" font-weight="900" fill="#f8fafc" letter-spacing="0.08em">РАЗДЕЛ ${cb.chapterNum}: ${escapeHtmlStr(cb.shortTitle.toUpperCase())}</text>
+            <text class="path-gate-title" x="0" y="-14" text-anchor="middle" font-size="12" font-weight="900" fill="#f8fafc" letter-spacing="0.08em">ГЛАВА ${cb.chapterNum}: ${escapeHtmlStr(cb.shortTitle.toUpperCase())}</text>
             ${subText}
             ${btnContent}
           </g>`;
@@ -15469,8 +15470,8 @@ function viewPathSerpentine(options){
     const chDone = (state.passedUnitTests || []).includes(u.id);
     const chUnlocked = endIdx <= activeUnitIndex;
     const chStatus = chDone ? 'done' : (chUnlocked ? 'open' : 'locked');
-    const bx = Math.max(64, Math.min(356, x + (x >= 210 ? 66 : -66)));
-    const by = y + 56;
+    const bx = Math.max(68, Math.min(352, x + (x >= 210 ? 70 : -70)));
+    const by = y + 36;
     const chGrad = chDone ? 'url(#hexGradCompleted)' : (chStatus === 'open' ? 'url(#hexGradChallenge)' : 'url(#hexGradLocked)');
     const chButtonGrad = chDone ? 'url(#pathButtonCompleted)' : (chStatus === 'open' ? 'url(#pathButtonChallenge)' : 'url(#pathButtonLocked)');
     const chStroke = chDone ? 'rgba(255,255,255,0.3)' : (chStatus === 'open' ? 'rgba(251,113,133,0.6)' : 'rgba(148,163,184,0.28)');
@@ -15492,13 +15493,13 @@ function viewPathSerpentine(options){
 
     branchesSVG += `
       <g class="hex-challenge-branch">
-        <path d="M ${x},${y + 30} Q ${x},${(y + by) / 2} ${bx},${by - 22}" fill="none" stroke="${connectorStroke}" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="1 8"/>
+        <path d="M ${x},${y + 24} Q ${x},${(y + by) / 2} ${bx},${by - 20}" fill="none" stroke="${connectorStroke}" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="1 8"/>
         <g class="hex-challenge-node hex-challenge-node--${chStatus}" data-challenge-route="#${track.routePrefix}/unittest/${u.id}" data-challenge-status="${chStatus}" data-cx="${bx}" data-cy="${by}" role="button" tabindex="0" aria-label="Челлендж мастерства, проверка юнита ${u.id}. ${chDone ? 'Пройдено' : (chUnlocked ? 'Доступно' : 'Заблокировано до прохождения предыдущих юнитов')}. Нажмите Enter или пробел, чтобы открыть." aria-keyshortcuts="Enter Space" aria-disabled="${chStatus === 'locked' ? 'true' : 'false'}">
           ${chHalo}
           <circle cx="${bx}" cy="${by}" r="24" fill="transparent" pointer-events="all"/>
           ${challengeShape}
           ${challengeContent}
-          <text class="hex-branch-label" x="${bx}" y="${by + 44}" text-anchor="middle">ЧЕЛЛЕНДЖ<tspan x="${bx}" dy="13">МАСТЕРСТВА</tspan></text>
+          <text class="hex-branch-label" x="${bx}" y="${by + 36}" text-anchor="middle">ЧЕЛЛЕНДЖ<tspan x="${bx}" dy="12">МАСТЕРСТВА</tspan></text>
         </g>
       </g>`;
   });
@@ -20143,10 +20144,10 @@ const psk = e.target.closest('[data-py-select-k]');
   if(gateBtn){
     const isLocked = gateBtn.getAttribute('data-gate-locked') === '1';
     const track = gateBtn.getAttribute('data-gate-track');
-    const prevTitle = gateBtn.getAttribute('data-gate-prev-title') || 'предыдущего раздела';
+    const prevTitle = gateBtn.getAttribute('data-gate-prev-title') || 'предыдущей главы';
     if(isLocked){
       if(typeof showTactileToast === 'function'){
-        showTactileToast(`🔒 Завершите все темы «${prevTitle}», чтобы открыть этот раздел!`);
+        showTactileToast(`🔒 Завершите все темы «${prevTitle}», чтобы открыть главу!`);
       }
       return;
     }
