@@ -6897,9 +6897,60 @@
   /* 7. Safe Area: Гарантированный отступ от нижней плашки навигации на мобильных */
   @media (max-width: 880px) {
     .dashboard-container {
-      padding-bottom: 40px !important;
+      padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px)) !important;
     }
     main {
-      padding-bottom: 96px !important;
+      padding-bottom: 104px !important;
     }
+  }
+
+  /* 8. Mobile Tabbar: Чистый рендеринг без обрезки лейблов */
+  .tabbar__item {
+    padding: 4px 2px !important;
+  }
+  .tabbar__item span {
+    font-size: 0.69rem !important;
+    letter-spacing: -0.015em !important;
+    max-width: 100% !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* 9. Предотвращение обрезки заголовка тем модуля на мобильных */
+  @media (max-width: 540px) {
+    .dash-accordion-title-wrap {
+      min-width: 0 !important;
+      flex: 1 1 auto !important;
+      overflow: hidden !important;
+      gap: 6px !important;
+    }
+    .dash-accordion-title {
+      min-width: 0 !important;
+      font-size: 0.81rem !important;
+      font-weight: 600 !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+    }
+    .dash-accordion-status {
+      font-size: 0.72rem !important;
+      flex-shrink: 0 !important;
+      white-space: nowrap !important;
+    }
+    .dash-accordion-title-desk { display: none !important; }
+    .dash-accordion-title-mob { display: inline !important; }
+    .dash-accordion-status-desk { display: none !important; }
+    .dash-accordion-status-mob { display: inline !important; }
+  }
+
+  /* 10. Кликабельность заблокированных тем (Affordance) */
+  .dash-theme-link--locked {
+    cursor: pointer !important;
+    transition: opacity 0.15s ease, color 0.15s ease !important;
+  }
+  .dash-theme-link--locked:hover {
+    color: #cbd5e1 !important;
+    opacity: 0.9 !important;
   }

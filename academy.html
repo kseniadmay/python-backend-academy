@@ -7095,11 +7095,62 @@
   /* 7. Safe Area: Гарантированный отступ от нижней плашки навигации на мобильных */
   @media (max-width: 880px) {
     .dashboard-container {
-      padding-bottom: 40px !important;
+      padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px)) !important;
     }
     main {
-      padding-bottom: 96px !important;
+      padding-bottom: 104px !important;
     }
+  }
+
+  /* 8. Mobile Tabbar: Чистый рендеринг без обрезки лейблов */
+  .tabbar__item {
+    padding: 4px 2px !important;
+  }
+  .tabbar__item span {
+    font-size: 0.69rem !important;
+    letter-spacing: -0.015em !important;
+    max-width: 100% !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* 9. Предотвращение обрезки заголовка тем модуля на мобильных */
+  @media (max-width: 540px) {
+    .dash-accordion-title-wrap {
+      min-width: 0 !important;
+      flex: 1 1 auto !important;
+      overflow: hidden !important;
+      gap: 6px !important;
+    }
+    .dash-accordion-title {
+      min-width: 0 !important;
+      font-size: 0.81rem !important;
+      font-weight: 600 !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+    }
+    .dash-accordion-status {
+      font-size: 0.72rem !important;
+      flex-shrink: 0 !important;
+      white-space: nowrap !important;
+    }
+    .dash-accordion-title-desk { display: none !important; }
+    .dash-accordion-title-mob { display: inline !important; }
+    .dash-accordion-status-desk { display: none !important; }
+    .dash-accordion-status-mob { display: inline !important; }
+  }
+
+  /* 10. Кликабельность заблокированных тем (Affordance) */
+  .dash-theme-link--locked {
+    cursor: pointer !important;
+    transition: opacity 0.15s ease, color 0.15s ease !important;
+  }
+  .dash-theme-link--locked:hover {
+    color: #cbd5e1 !important;
+    opacity: 0.9 !important;
   }
 </style>
 <link rel="manifest" href="manifest.json">
@@ -16898,7 +16949,7 @@ viewDashboard = function(){
         <div class="echelon-topbar-subrow" style="display:flex;align-items:center;width:100%;">
           <div class="echelon-subrow-xp" style="display:flex;align-items:center;min-width:0;">
             ${todayXp() === 0
-              ? `<span class="day-xp-badge empty-day-badge" style="background:rgba(245, 158, 11, 0.10);border:1px solid rgba(245, 158, 11, 0.28);color:#fbbf24;white-space:nowrap;display:inline-flex;align-items:center;" title="Суточная цель: 50 XP">⚡ Ждёт первого шага · Цель:&nbsp;50&nbsp;XP</span>`
+              ? `<span class="day-xp-badge empty-day-badge" style="background:rgba(245, 158, 11, 0.10);border:1px solid rgba(245, 158, 11, 0.28);color:#fbbf24;white-space:nowrap;display:inline-flex;align-items:center;" title="Сделайте первый 2-минутный шаг дня: +15 XP">⚡ Ждёт первого шага · Спринт: +15&nbsp;XP</span>`
               : `<span class="day-xp-badge" style="white-space:nowrap;" title="Заработано за сутки: ${tXp} XP">⚡ +${todayXp()}&nbsp;XP за сутки</span>`
             }
           </div>
@@ -16955,7 +17006,7 @@ viewDashboard = function(){
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
             ${tXp === 0
               ? `<span style="font-weight:700;font-size:.88rem;color:var(--ink);display:inline-flex;align-items:center;gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;flex-shrink:0;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg> Цель дня: ${dailyGoal} XP</span>
-                 <span class="badge" data-quick-microstep="${focusSid}" data-quick-kid="${firstUnreadK}" style="font-weight:600;font-size:.72rem;color:var(--ink-muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:2px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;" title="${currentStreakVal > 0 ? `Завершите 1 шаг сегодня, чтобы продлить серию до ${currentStreakVal + 1} дн.` : 'Начать первый шаг дня'}">${streakDayText}</span>`
+                 <span class="badge" data-quick-microstep="${focusSid}" data-quick-kid="${firstUnreadK}" style="font-weight:600;font-size:.72rem;color:#fbbf24;background:rgba(245,158,11,0.10);border:1px dashed rgba(245,158,11,0.45);padding:2px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;" title="${currentStreakVal > 0 ? `Завершите 1 шаг сегодня, чтобы продлить серию до ${currentStreakVal + 1} дн.` : 'Начать первый шаг дня'}">${currentStreakVal > 0 ? `🔥 Серия: ${currentStreakVal} дн. (ждёт шага)` : 'День 1 серии'}</span>`
               : `<span style="font-weight:700;font-size:.88rem;color:var(--ink);display:inline-flex;align-items:center;gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;flex-shrink:0;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg> Дневная цель: ${tXp} / ${dailyGoal} XP (${goalPct}%)</span>
                  <span style="font-weight:800;font-size:.82rem;color:var(--moss);">${goalPct}%</span>`
             }
@@ -17035,9 +17086,8 @@ viewDashboard = function(){
             <div class="dash-accordion-title-wrap" style="min-width:0;flex:1 1 auto;overflow:hidden;display:inline-flex;align-items:center;gap:8px;">
               <svg class="chevron-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--moss);transition:transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);display:inline-block;flex-shrink:0;"><polyline points="6 9 12 15 18 9"></polyline></svg>
               <span class="dash-accordion-title" style="min-width:0;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;">
-                <span class="dash-accordion-title-desk">Все темы модуля:</span>
-                <span class="dash-accordion-title-mob">Темы модуля:</span>
-                ${escapeHtmlStr(cleanUnitTitle)}
+                <span class="dash-accordion-title-desk">Все темы модуля: ${escapeHtmlStr(cleanUnitTitle)}</span>
+                <span class="dash-accordion-title-mob">Темы: ${escapeHtmlStr(cleanUnitTitle)}</span>
               </span>
             </div>
             <span class="meta dash-accordion-status" style="font-size:.76rem;font-weight:500;flex-shrink:0;white-space:nowrap;">
@@ -17066,7 +17116,7 @@ NAV_ITEMS.splice(0, NAV_ITEMS.length,
   {route:'/path', icon:'path', label:'3D-Тропа', shortLabel:'3D-Тропа', mobileTab:true, group:'learn'},
   {route:'/practice', icon:'code', label:'Практика IDE', shortLabel:'IDE', mobileTab:true, group:'trainer'},
   {route:'/cards', icon:'cards', label:'Карточки', shortLabel:'Карточки', mobileTab:true, group:'trainer'},
-  {route:'/mock', icon:'crown', label:'Собеседование', shortLabel:'Интервью', mobileTab:true, group:'trainer'},
+  {route:'/mock', icon:'crown', label:'Собеседование', shortLabel:'Собес', mobileTab:true, group:'trainer'},
   {route:'/python', icon:'python', label:'Python Core', shortLabel:'Python', group:'module'},
   {route:'/web', icon:'globe', label:'Web и HTTP', shortLabel:'Web', group:'module'},
   {route:'/backend', icon:'server', label:'Backend', shortLabel:'Backend', group:'module'},
