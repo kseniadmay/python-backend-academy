@@ -7043,23 +7043,31 @@
     }
     .dashboard-container .tracker-cluster {
       display: inline-flex !important;
-      flex-direction: row !important;
+      flex-direction: column !important;
       align-items: center !important;
-      gap: 3px !important;
+      gap: 2px !important;
       flex-shrink: 0 !important;
     }
     .dashboard-container .tracker-cluster-label {
-      padding: 2px 4px !important;
-      margin-right: 2px !important;
+      padding: 1px 3px !important;
+      margin: 0 !important;
       border-radius: 6px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 2px !important;
     }
     .dashboard-container .tracker-cluster-label .cluster-icon svg {
-      width: 11px !important;
-      height: 11px !important;
+      width: 10px !important;
+      height: 10px !important;
       opacity: 0.9 !important;
     }
     .dashboard-container .tracker-cluster-label .cluster-label-text {
-      display: none !important;
+      display: inline-block !important;
+      font-size: 0.58rem !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.02em !important;
+      color: var(--ink-muted) !important;
     }
     .dashboard-container .tracker-cluster-dots {
       display: inline-flex !important;
@@ -7069,13 +7077,32 @@
     .dashboard-container .dot-jewel {
       width: 7.5px !important;
       height: 7.5px !important;
-      border-width: 1px !important;
+      border-width: 1.2px !important;
+      background: rgba(255, 255, 255, 0.08) !important;
+      border-color: rgba(255, 255, 255, 0.22) !important;
       flex-shrink: 0 !important;
     }
+    .dashboard-container .dot-jewel.active {
+      width: 10.5px !important;
+      height: 10.5px !important;
+      background: #0d1016 !important;
+      border: 2px solid #34d399 !important;
+      box-shadow: 0 0 0 1.5px rgba(16, 185, 129, 0.35), 0 0 8px rgba(52, 211, 153, 0.7) !important;
+    }
+    .dashboard-container .dot-jewel.done {
+      background: #10b981 !important;
+      border-color: #34d399 !important;
+      box-shadow: 0 0 5px rgba(16, 185, 129, 0.6) !important;
+    }
     .dashboard-container .dot-jewel.milestone {
-      width: 9.5px !important;
-      height: 9.5px !important;
+      width: 9px !important;
+      height: 9px !important;
       border-radius: 2px !important;
+    }
+    .dashboard-container .dot-jewel.milestone.active {
+      background: #0d1016 !important;
+      border: 2px solid #fbbf24 !important;
+      box-shadow: 0 0 0 1.5px rgba(251, 191, 36, 0.35), 0 0 8px rgba(251, 191, 36, 0.7) !important;
     }
   }
 
@@ -7095,10 +7122,10 @@
   /* 7. Safe Area: Гарантированный отступ от нижней плашки навигации на мобильных */
   @media (max-width: 880px) {
     .dashboard-container {
-      padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px)) !important;
+      padding-bottom: calc(56px + env(safe-area-inset-bottom, 16px)) !important;
     }
     main {
-      padding-bottom: 104px !important;
+      padding-bottom: calc(112px + env(safe-area-inset-bottom, 16px)) !important;
     }
   }
 
@@ -7118,24 +7145,32 @@
 
   /* 9. Предотвращение обрезки заголовка тем модуля на мобильных */
   @media (max-width: 540px) {
+    .dash-accordion-summary-inner {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      flex-wrap: wrap !important;
+      gap: 6px 10px !important;
+    }
     .dash-accordion-title-wrap {
       min-width: 0 !important;
       flex: 1 1 auto !important;
-      overflow: hidden !important;
       gap: 6px !important;
     }
     .dash-accordion-title {
       min-width: 0 !important;
-      font-size: 0.81rem !important;
+      font-size: 0.82rem !important;
       font-weight: 600 !important;
-      overflow: hidden !important;
-      text-overflow: ellipsis !important;
-      white-space: nowrap !important;
+      overflow: visible !important;
+      text-overflow: clip !important;
+      white-space: normal !important;
+      line-height: 1.35 !important;
     }
     .dash-accordion-status {
       font-size: 0.72rem !important;
       flex-shrink: 0 !important;
       white-space: nowrap !important;
+      margin-left: auto !important;
     }
     .dash-accordion-title-desk { display: none !important; }
     .dash-accordion-title-mob { display: inline !important; }
@@ -16605,10 +16640,10 @@ viewDashboard = function(){
     } else if(isDoneTheme){
       stepStatusIndicator = `<span class="dash-theme-status-icon" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);font-size:.72rem;font-weight:700;color:#34d399;flex-shrink:0;" title="Тема освоена">✓</span>`;
     } else if(isLockedTheme){
-      stepStatusIndicator = `<span class="dash-theme-status-icon" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);font-family:var(--font-m);font-size:.68rem;font-weight:600;color:var(--ink-muted);opacity:0.45;flex-shrink:0;" title="Шаг ${idx+1}">${stepNumStr}</span>`;
-      linkAttrs = `class="link-quiet dash-theme-link dash-theme-link--locked" style="text-decoration:none;color:inherit;font-weight:600;min-width:0;line-height:1.35;cursor: pointer;" title="Откроется последовательно после завершения предыдущего шага" data-locked-clean-title="${escapeHtmlStr(cleanTitle)}" onclick="showToast('Сначала завершите текущий шаг: ' + ${JSON.stringify(cleanTitle).replace(/"/g, '&quot;')}, 'info'); return false;"`;
+      stepStatusIndicator = `<span class="dash-theme-status-icon" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);font-family:var(--font-m);font-size:.68rem;font-weight:600;color:var(--ink-muted);opacity:0.45;flex-shrink:0;" title="Тема ${idx+1}">${stepNumStr}</span>`;
+      linkAttrs = `class="link-quiet dash-theme-link dash-theme-link--locked" style="text-decoration:none;color:inherit;font-weight:600;min-width:0;line-height:1.35;cursor: pointer;" title="Откроется последовательно после завершения предыдущей темы" data-locked-clean-title="${escapeHtmlStr(cleanTitle)}" onclick="showToast('Сначала завершите текущую тему: ' + ${JSON.stringify(cleanTitle).replace(/"/g, '&quot;')}, 'info'); return false;"`;
     } else {
-      stepStatusIndicator = `<span class="dash-theme-status-icon" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);font-family:var(--font-m);font-size:.68rem;font-weight:600;color:var(--ink-muted);opacity:0.45;flex-shrink:0;" title="Шаг ${idx+1}">${stepNumStr}</span>`;
+      stepStatusIndicator = `<span class="dash-theme-status-icon" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);font-family:var(--font-m);font-size:.68rem;font-weight:600;color:var(--ink-muted);opacity:0.45;flex-shrink:0;" title="Тема ${idx+1}">${stepNumStr}</span>`;
     }
 
     const rowLockedAttr = isLockedTheme
@@ -16629,7 +16664,7 @@ viewDashboard = function(){
             : (mp === 100
                 ? `<span class="state-tag state-tag--mastered" style="font-size:.70rem;margin:0;white-space:nowrap;">✓ 100 MP</span>`
                 : (mp === 0
-                    ? `<span class="meta dash-step-locked-badge" style="font-size:.72rem;padding:2px 7px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#cbd5e1;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;" title="Откроется последовательно после завершения предыдущего шага"><span class="dash-step-locked-badge-desk">🔒 Шаг ${idx+1} · Закрыто</span><span class="dash-step-locked-badge-mob">🔒 Шаг ${idx+1} · Закрыто</span></span>`
+                    ? `<span class="meta dash-step-locked-badge" style="font-size:.72rem;padding:2px 7px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#cbd5e1;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;" title="Откроется последовательно после завершения предыдущей темы"><span class="dash-step-locked-badge-desk">🔒 Тема ${idx+1} · Закрыто</span><span class="dash-step-locked-badge-mob">🔒 Тема ${idx+1} · Закрыто</span></span>`
                     : `<span class="meta" style="font-size:.72rem;white-space:nowrap;">${mp} MP</span>`
                   )
               )
@@ -16921,7 +16956,7 @@ viewDashboard = function(){
     : `1 в фокусе, ${lockedCount} закрыто`;
   const accordionMobStatusText = curUnitDoneCount > 0
     ? `${curUnitDoneCount}/${curUnitTotal} закрыто`
-    : `1 в фокусе · ${lockedCount} в очереди`;
+    : `1 в фокусе · ${lockedCount} закрыто`;
 
   return `
     <div class="container dashboard-container">
@@ -16977,9 +17012,9 @@ viewDashboard = function(){
               : `<div class="echelon-clean-fill" style="width:${e1Pct}%;height:100%;border-radius:999px;background:linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%);box-shadow:0 0 12px rgba(16,185,129,0.5);transition:width .35s ease;"></div>`
             }
           </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;font-size:.76rem;color:var(--ink-muted);margin-top:6px;">
-            <span>Открывает доступ к первому техническому собеседованию</span>
-            <span style="font-weight:700;font-size:.74rem;color:${e1CurMp === 0 ? 'var(--ink-muted)' : '#34d399'};">${e1Pct}%</span>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:.76rem;color:#94a3b8;margin-top:6px;">
+            <span style="color:#94a3b8;">Открывает доступ к первому техническому собеседованию</span>
+            <span style="font-weight:700;font-size:.74rem;color:${e1CurMp === 0 ? '#94a3b8' : '#34d399'};">${e1Pct}%</span>
           </div>
         </div>
       </div>
@@ -17087,7 +17122,7 @@ viewDashboard = function(){
               <svg class="chevron-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--moss);transition:transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);display:inline-block;flex-shrink:0;"><polyline points="6 9 12 15 18 9"></polyline></svg>
               <span class="dash-accordion-title" style="min-width:0;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;">
                 <span class="dash-accordion-title-desk">Все темы модуля: ${escapeHtmlStr(cleanUnitTitle)}</span>
-                <span class="dash-accordion-title-mob">Темы: ${escapeHtmlStr(cleanUnitTitle)}</span>
+                <span class="dash-accordion-title-mob">Темы модуля: ${escapeHtmlStr(cleanUnitTitle)}</span>
               </span>
             </div>
             <span class="meta dash-accordion-status" style="font-size:.76rem;font-weight:500;flex-shrink:0;white-space:nowrap;">
@@ -17116,7 +17151,7 @@ NAV_ITEMS.splice(0, NAV_ITEMS.length,
   {route:'/path', icon:'path', label:'3D-Тропа', shortLabel:'3D-Тропа', mobileTab:true, group:'learn'},
   {route:'/practice', icon:'code', label:'Практика IDE', shortLabel:'IDE', mobileTab:true, group:'trainer'},
   {route:'/cards', icon:'cards', label:'Карточки', shortLabel:'Карточки', mobileTab:true, group:'trainer'},
-  {route:'/mock', icon:'crown', label:'Собеседование', shortLabel:'Собес', mobileTab:true, group:'trainer'},
+  {route:'/mock', icon:'crown', label:'Собеседование', shortLabel:'Интервью', mobileTab:true, group:'trainer'},
   {route:'/python', icon:'python', label:'Python Core', shortLabel:'Python', group:'module'},
   {route:'/web', icon:'globe', label:'Web и HTTP', shortLabel:'Web', group:'module'},
   {route:'/backend', icon:'server', label:'Backend', shortLabel:'Backend', group:'module'},
@@ -17615,7 +17650,7 @@ window.closeSettingsModal = closeSettingsModal;
   pomoPill.setAttribute('data-pomo-toggle', '');
   pomoPill.setAttribute('title', 'Запустить Pomodoro-фокус (15 мин)');
   pomoPill.setAttribute('aria-label', 'Запустить Pomodoro-фокус (15 мин)');
-  pomoPill.innerHTML = '<span class="pomo-icon" aria-hidden="true">⏱</span> <span id="sidebar-pomo-time">' + formatPomo(pomoState.secondsLeft) + '</span> <span class="pomo-tag" style="font-size:0.68rem;opacity:0.75;margin-left:2px;font-weight:500;">(Фокус)</span>';
+  pomoPill.innerHTML = '<span class="pomo-icon" aria-hidden="true">⏱</span> <span id="sidebar-pomo-time">' + formatPomo(pomoState.secondsLeft) + '</span> <span class="pomo-tag" style="font-size:0.68rem;opacity:0.85;margin-left:2px;font-weight:600;">(Фокус ▶)</span>';
   pomoPill.style.flex = '1 1 auto';
 
   const streakBadge = document.createElement('span');
@@ -18713,7 +18748,7 @@ document.addEventListener('click', async function(e){
     e.preventDefault();
     e.stopPropagation();
     const cTitle = lockedThemeEl.getAttribute('data-locked-clean-title') || '';
-    showToast('Сначала завершите текущий шаг: ' + cTitle, 'info');
+    showToast('Сначала завершите текущую тему: ' + cTitle, 'info');
     return;
   }
 
