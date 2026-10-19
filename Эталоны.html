@@ -12391,6 +12391,26 @@ function formatQuizQuestionPromptHTML(rawText){
 }
 window.formatQuizQuestionPromptHTML = formatQuizQuestionPromptHTML;
 
+// Форматирование структурированного 3-блочного ответа первичной карточки (Суть, Код, Скрининг)
+function formatInitialCardAnswerHTML(rawAnswer){
+  if(!rawAnswer) return '';
+  const text = String(rawAnswer).trim();
+  const formattedText = formatRichInlineText(text);
+
+  return `
+    <div style="display:flex;flex-direction:column;gap:12px;text-align:left;">
+      <div style="padding:14px 16px;border-radius:14px;background:rgba(16,185,129,0.08);border-left:3.5px solid #10b981;font-size:0.95rem;line-height:1.6;color:var(--ink);">
+        <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#34d399;margin-bottom:6px;">💡 Суть ответа</div>
+        <div>${formattedText}</div>
+      </div>
+      <div style="padding:12px 16px;border-radius:14px;background:rgba(59,130,246,0.08);border-left:3.5px solid #3b82f6;font-size:0.86rem;line-height:1.55;color:var(--ink-soft);">
+        <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#60a5fa;margin-bottom:4px;">💼 Фокус бэкендера & Скрининг</div>
+        Этот вопрос часто встречается на техническом собеседовании для проверки понимания внутреннего устройства коллекций и байткода CPython.
+      </div>
+    </div>
+  `;
+}
+
 // Lightweight client-side Python syntax highlighter (keywords, strings, comments, numbers, built-in calls)
 function highlightPythonTokens(codeInner){
   if(codeInner.indexOf('tok-') !== -1) return codeInner;
@@ -12869,41 +12889,88 @@ function viewPythonSkill(sid){
   } else if(pySkillViewState.tab === 'cards'){
     const deckObj = ALL_DECKS_COMBINED[activeF] || {id: activeF, title: activeF, cards: []};
     const cards = deckObj.cards || [];
-    const cIdx = Math.min(pySkillViewState.cardIdx, Math.max(0, cards.length - 1));
-    const curCard = cards[cIdx] || {q: 'Карточки загружаются', a: ''};
 
-    bodyHTML = `
-      <div class="card" style="margin-top:0;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <span style="font-size:0.80rem;color:var(--ink-muted);font-weight:600;">Карточка ${cards.length ? cIdx + 1 : 0} из ${cards.length}</span>
-          ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(activeF + ':' + cIdx) : '<span style="font-size:0.75rem;padding:2px 8px;border-radius:999px;background:rgba(20,90,70,0.1);color:var(--moss);font-weight:600;">Интервальное повторение</span>'}
-        </div>
-        <div class="fc-card ${pySkillViewState.cardFlipped?'fc-card--Answer':''}" data-py-flip-card>
-          <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-              <div class="topic-badge">${pySkillViewState.cardFlipped ? 'Ответ' : 'Вопрос'}</div>
-              
+    // Инициализация внутрисессионной очереди повторения (Intra-Session Loop)
+    if(pySkillViewState.sessionFid !== activeF || !Array.isArray(pySkillViewState.sessionQueue) || pySkillViewState.sessionQueueOriginalLen !== cards.length){
+      pySkillViewState.sessionFid = activeF;
+      pySkillViewState.sessionQueue = cards.map((_, i) => i);
+      pySkillViewState.sessionQueueOriginalLen = cards.length;
+      pySkillViewState.sessionPos = 0;
+      pySkillViewState.sessionRepeats = 0;
+      pySkillViewState.sessionLearned = 0;
+      pySkillViewState.sessionDone = false;
+      pySkillViewState.cardFlipped = false;
+    }
+
+    if(pySkillViewState.sessionDone || cards.length === 0){
+      // Handoff Screen: экран завершения первичного ознакомления и передачи в долгосрочный тренажёр
+      bodyHTML = `
+        <div class="card" style="margin-top:0;padding:36px 24px;text-align:center;border:1.5px solid rgba(16,185,129,0.35);border-radius:24px;background:radial-gradient(ellipse at top, rgba(16,185,129,0.12), transparent 70%), var(--surface);">
+          <div style="width:64px;height:64px;margin:0 auto 16px;border-radius:50%;background:rgba(16,185,129,0.18);color:#10b981;display:flex;align-items:center;justify-content:center;font-size:30px;border:1.5px solid rgba(16,185,129,0.45);box-shadow:0 0 20px rgba(16,185,129,0.25);">✓</div>
+          <div style="display:inline-block;padding:4px 12px;border-radius:999px;background:rgba(16,185,129,0.15);color:#34d399;font-size:0.75rem;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.06em;">Первичное усвоение завершено</div>
+          <h2 style="font-size:1.45rem;font-weight:800;color:var(--ink);margin:0 0 10px;">${cards.length} понятий успешно закреплены!</h2>
+          <p style="font-size:0.92rem;color:var(--ink-muted);max-width:520px;margin:0 auto 24px;line-height:1.6;">
+            Все карточки темы усвоены и перенесены в ваш постоянный тренажёр повторений в разделе <strong style="color:#10b981;">«Тренажёры → Карточки»</strong>. Первое интервальное повторение запланировано через 24 часа.
+          </p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:440px;margin:0 auto 28px;text-align:left;">
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px 16px;">
+              <div style="font-size:0.75rem;color:var(--ink-muted);">Усвоено в теме</div>
+              <div style="font-size:1.15rem;font-weight:700;color:#10b981;">${cards.length} из ${cards.length}</div>
             </div>
-            <div class="fc-q">${formatRichInlineText(curCard.q)}</div>
-            ${pySkillViewState.cardFlipped ? `<div class="fc-a">${formatRichInlineText(curCard.a)}</div>` : ''}
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px 16px;">
+              <div style="font-size:0.75rem;color:var(--ink-muted);">Повторено в сессии</div>
+              <div style="font-size:1.15rem;font-weight:700;color:var(--amber);">${pySkillViewState.sessionRepeats} раз</div>
+            </div>
           </div>
-        </div>
-        ${pySkillViewState.cardFlipped ? (() => {
-          const srsPrev = typeof computeRemNoteIntervals === 'function' ? computeRemNoteIntervals(activeF + ':' + cIdx) : {again:{days:1},hard:{days:2},good:{days:3},easy:{days:7}};
-          return `
-          <div class="fc-rate-row" style="margin-top:14px;">
-            <button class="btn btn-ghost" data-py-rate-card="1" title="Повторить снова">Снова</button>
-            <button class="btn btn-burgundy" data-py-rate-card="2" title="Повторить через 2 дня (+2 XP)">Трудно (+2 XP)</button>
-            <button class="btn btn-clay" data-py-rate-card="3" title="Повторить через 3 дня (+5 XP)">Хорошо (+5 XP)</button>
-            <button class="btn btn-primary" data-py-rate-card="4" title="Повторить через 7 дней (+10 XP)">Легко (+10 XP)</button>
-          </div>`;
-        })() : `
-          <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn btn-ghost" data-py-prev-card ${cIdx===0?'disabled':''}>← Назад</button>
-            <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-py-flip-card>Показать ответ</button>
-            <button class="btn btn-ghost" data-py-rate-card="3" ${cIdx + 1 >= cards.length ? 'disabled' : ''}>Дальше →</button>
-          </div>`}
-      </div>`;
+          <button type="button" class="btn-glass-emerald btn-sprint-cta" style="width:100%;max-width:440px;padding:16px 24px;font-size:1rem;font-weight:800;border-radius:16px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:8px;" data-py-finish-cards-btn>
+            <span>Перейти к практике в IDE (+15 XP)</span>
+            <span>➔</span>
+          </button>
+        </div>`;
+    } else {
+      const qPos = Math.min(pySkillViewState.sessionPos || 0, pySkillViewState.sessionQueue.length - 1);
+      const cIdx = pySkillViewState.sessionQueue[qPos] !== undefined ? pySkillViewState.sessionQueue[qPos] : 0;
+      const curCard = cards[cIdx] || {q: 'Карточки загружаются', a: ''};
+      const remainingInQueue = pySkillViewState.sessionQueue.length - qPos;
+      const answerHtml = formatInitialCardAnswerHTML(curCard.a);
+
+      bodyHTML = `
+        <div class="card" style="margin-top:0;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:0.80rem;color:var(--ink-muted);font-weight:600;">Карточка ${qPos + 1} из ${pySkillViewState.sessionQueue.length}</span>
+              <span style="font-size:0.72rem;padding:2px 8px;border-radius:999px;background:rgba(217,119,6,0.12);color:var(--amber);font-weight:700;">В очереди: ${remainingInQueue}</span>
+            </div>
+            <span style="font-size:0.75rem;padding:2px 10px;border-radius:999px;background:rgba(16,185,129,0.12);color:#10b981;font-weight:700;border:1px solid rgba(16,185,129,0.25);">🌱 Первичное закрепление</span>
+          </div>
+          <div class="fc-card ${pySkillViewState.cardFlipped?'fc-card--Answer':''}" data-py-flip-card>
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <div class="topic-badge" style="background:${pySkillViewState.cardFlipped ? 'rgba(16,185,129,0.2)' : 'rgba(59,130,246,0.15)'};color:${pySkillViewState.cardFlipped ? '#34d399' : '#60a5fa'};font-weight:700;">
+                  ${pySkillViewState.cardFlipped ? 'Ответ (Разбор)' : 'Вопрос'}
+                </div>
+              </div>
+              <div class="fc-q">${formatRichInlineText(curCard.q)}</div>
+              ${pySkillViewState.cardFlipped ? `<div class="fc-a-structured" style="margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);">${answerHtml}</div>` : ''}
+            </div>
+          </div>
+          ${pySkillViewState.cardFlipped ? `
+            <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <button type="button" class="btn btn-ghost" style="padding:14px 16px;border-radius:14px;border:1.5px solid rgba(245,158,11,0.35);background:rgba(245,158,11,0.08);color:#fbbf24;font-weight:700;font-size:0.90rem;display:flex;align-items:center;justify-content:center;gap:6px;" data-py-card-loop="repeat" title="Вернуть карточку в конец очереди текущей сессии">
+                <span>🔄 Еще не запомнил</span>
+              </button>
+              <button type="button" class="btn-glass-emerald btn-sprint-cta" style="padding:14px 16px;border-radius:14px;font-weight:800;font-size:0.92rem;display:flex;align-items:center;justify-content:center;gap:6px;" data-py-card-loop="pass" title="Отметить карточку как усвоенную">
+                <span>✓ Понятно, запомнил ➔</span>
+              </button>
+            </div>
+          ` : `
+            <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
+              <button type="button" class="btn btn-ghost" data-py-prev-card ${qPos === 0 ? 'disabled' : ''} style="padding:12px 18px;border-radius:14px;">← Назад</button>
+              <button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;padding:12px 20px;border-radius:14px;font-weight:800;" data-py-flip-card>Показать ответ (Пробел)</button>
+            </div>
+          `}
+        </div>`;
+    }
   } else if(pySkillViewState.tab === 'code'){
     const tObj = IDE_TASKS_BY_ID[activeTid] || {id: activeTid, title: 'Задача #' + activeTid, desc: '', initialCode: ''};
     const socraticHints = buildSocraticHintsForTask(tObj);
@@ -19297,7 +19364,13 @@ const psk = e.target.closest('[data-py-select-k]');
     return;
   }
   if(e.target.closest('[data-py-prev-card]')){
-    if(pySkillViewState.cardIdx > 0){
+    if(typeof pySkillViewState.sessionPos === 'number' && pySkillViewState.sessionPos > 0){
+      pySkillViewState.sessionPos--;
+      pySkillViewState.cardFlipped = false;
+      pySkillViewState.sprintCelebration = null;
+      saveReadingPosition();
+      render();
+    } else if(pySkillViewState.cardIdx > 0){
       pySkillViewState.cardIdx--;
       pySkillViewState.cardFlipped = false;
       pySkillViewState.sprintCelebration = null;
@@ -19324,6 +19397,79 @@ const psk = e.target.closest('[data-py-select-k]');
     render();
     return;
   }
+
+  // Внутрисессионная сортировка первичных карточек (Intra-Session Loop)
+  const cardLoopBtn = e.target.closest('[data-py-card-loop]');
+  if(cardLoopBtn){
+    pySkillViewState.sprintCelebration = null;
+    const action = cardLoopBtn.getAttribute('data-py-card-loop');
+    const fid = pySkillViewState.fId;
+    const curQueue = Array.isArray(pySkillViewState.sessionQueue) ? pySkillViewState.sessionQueue : [];
+    const qPos = pySkillViewState.sessionPos || 0;
+    const cIdx = curQueue[qPos] !== undefined ? curQueue[qPos] : (pySkillViewState.cardIdx || 0);
+
+    if(action === 'repeat'){
+      // Карточка возвращается в конец очереди текущей сессии
+      curQueue.push(cIdx);
+      pySkillViewState.sessionRepeats = (pySkillViewState.sessionRepeats || 0) + 1;
+      pySkillViewState.sessionPos = qPos + 1;
+      pySkillViewState.cardFlipped = false;
+    } else if(action === 'pass'){
+      // Карточка первично освоена и регистрируется в долгосрочной базе FSRS
+      pySkillViewState.sessionLearned = (pySkillViewState.sessionLearned || 0) + 1;
+      ensureExtendedState();
+      if(fid){
+        const ck = fid + ':' + cIdx;
+        const wasStudied = (state.cardRatings[ck] !== undefined && state.cardRatings[ck] > 0);
+        if(typeof applyRemNoteCardRating === 'function'){
+          applyRemNoteCardRating(ck, 3); // Режим "Хорошо" по умолчанию в FSRS
+        } else {
+          state.cardRatings[ck] = Math.max(Number(state.cardRatings[ck]) || 0, 3);
+        }
+        if(!wasStudied) awardXp(5);
+      }
+      pySkillViewState.sessionPos = qPos + 1;
+      pySkillViewState.cardFlipped = false;
+    }
+
+    if(pySkillViewState.sessionPos >= curQueue.length){
+      // Вся пачка карточек успешно закреплена!
+      pySkillViewState.sessionDone = true;
+      awardXp(15);
+      if(fid && !state.reviewedDecks.includes(fid)) state.reviewedDecks.push(fid);
+      if(pySkillViewState.sid) setSkillMP(pySkillViewState.sid, 50);
+    }
+
+    saveReadingPosition();
+    render();
+    return;
+  }
+
+  // Кнопка перехода с экрана завершения карточек в IDE-практику
+  const finishCardsBtn = e.target.closest('[data-py-finish-cards-btn]');
+  if(finishCardsBtn){
+    pySkillViewState.sprintCelebration = null;
+    const fid = pySkillViewState.fId;
+    const sk = PY_SKILLS_BY_ID[pySkillViewState.sid];
+    pySkillViewState.cardFlipped = false;
+    if(sk && Array.isArray(sk.fIds)){
+      const fIdx = sk.fIds.indexOf(fid);
+      if(fIdx >= 0 && fIdx + 1 < sk.fIds.length){
+        pySkillViewState.fId = sk.fIds[fIdx + 1];
+        pySkillViewState.sessionFid = null;
+        pySkillViewState.sessionDone = false;
+      } else {
+        pySkillViewState.tab = 'code';
+      }
+    } else {
+      pySkillViewState.tab = 'code';
+    }
+    saveReadingPosition();
+    render();
+    return;
+  }
+
+  // Совместимость с классическими кнопками рейтинга (если вызваны программно)
   const prc = e.target.closest('[data-py-rate-card]');
   if(prc){
     pySkillViewState.sprintCelebration = null;
