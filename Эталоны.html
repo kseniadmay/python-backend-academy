@@ -999,7 +999,8 @@
     font-size: 0.95rem;
   }
   .topbar-audio-icon,
-  .topbar-help-icon {
+  .topbar-help-icon,
+  .topbar-bug-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -4107,6 +4108,12 @@
   color: var(--moss-deep);
   box-shadow: 0 0 12px rgba(116, 172, 130, 0.25);
 }
+.topbar-help-btn.topbar-bug-action:hover {
+  border-color: rgba(244, 63, 94, 0.5) !important;
+  color: #fda4af !important;
+  background: rgba(244, 63, 94, 0.10) !important;
+  box-shadow: 0 0 14px rgba(244, 63, 94, 0.3) !important;
+}
 
 /* Card corner help badge */
 .card-help-badge {
@@ -4260,17 +4267,54 @@
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     position: relative;
-    padding: 6px 8px;
+    padding: 8px 10px;
     background: transparent;
     border: none;
     box-shadow: none;
+  }
+  .dots-necklace::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 8px;
+    right: 8px;
+    height: 1.5px;
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-50%);
+    z-index: 1;
+    pointer-events: none;
+    border-radius: 999px;
+  }
+  .dots-necklace::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 8px;
+    right: 8px;
+    height: 2px;
+    transform: translateY(-50%);
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(52, 211, 153, 0) 20%, 
+      rgba(52, 211, 153, 0.75) 45%, 
+      #ffffff 50%, 
+      rgba(52, 211, 153, 0.75) 55%, 
+      rgba(52, 211, 153, 0) 80%, 
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    background-position: -150% 0;
+    border-radius: 999px;
+    z-index: 2;
+    pointer-events: none;
+    animation: dots-necklace-shimmer-sweep 4.2s infinite ease-in-out;
   }
   @media (max-width: 600px) {
     .dots-necklace {
       justify-content: center !important;
       justify-content: safe center !important;
       gap: 4.5px !important;
-      padding: 6px 4px !important;
+      padding: 8px 6px !important;
       max-width: 100% !important;
     }
     .dots-stage-divider {
@@ -4285,7 +4329,7 @@
   @media (max-width: 390px) {
     .dots-necklace {
       gap: 3.5px !important;
-      padding: 6px 2px !important;
+      padding: 8px 3px !important;
     }
     .dots-stage-divider {
       margin: 0 1.5px !important;
@@ -4301,6 +4345,8 @@
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.15);
     margin: 0 4px;
+    position: relative;
+    z-index: 3;
   }
 
   .dot-jewel {
@@ -4331,6 +4377,7 @@
   .dot-jewel.done {
     background: #10b981;
     box-shadow: 0 0 4px rgba(16, 185, 129, 0.5);
+    animation: dot-done-subtle-pulse 3.6s infinite ease-in-out;
   }
   .dot-jewel.active {
     width: 7.5px;
@@ -4360,6 +4407,57 @@
   }
   .dot-jewel.active::after {
     animation-delay: 2.2s !important;
+  }
+  #radar-dots-necklace .dot-jewel.active,
+  .dots-necklace .dot-jewel.active {
+    width: 10px !important;
+    height: 10px !important;
+    background: #ffffff !important;
+    border: 1.5px solid #10b981 !important;
+    box-shadow: 0 0 0 2.5px rgba(16, 185, 129, 0.4), 0 0 12px rgba(52, 211, 153, 0.85) !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    z-index: 4 !important;
+    animation: radar-core-breathe-emerald 2.4s infinite ease-in-out !important;
+  }
+  #radar-dots-necklace .dot-jewel.active::before,
+  #radar-dots-necklace .dot-jewel.active::after,
+  .dots-necklace .dot-jewel.active::before,
+  .dots-necklace .dot-jewel.active::after {
+    content: '' !important;
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    inset: auto !important;
+    width: 10px !important;
+    height: 10px !important;
+    transform: translate(-50%, -50%) !important;
+    transform-origin: center center !important;
+    box-sizing: border-box !important;
+    border-radius: 50% !important;
+    border: 1.5px solid rgba(52, 211, 153, 0.85) !important;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.6) !important;
+    pointer-events: none !important;
+    display: block !important;
+    animation: radar-ripple-emerald 2.8s infinite cubic-bezier(0.1, 0.7, 0.3, 1) !important;
+  }
+  #radar-dots-necklace .dot-jewel.active::after,
+  .dots-necklace .dot-jewel.active::after {
+    animation-delay: 1.4s !important;
+  }
+  @media (min-width: 881px) {
+    .sprint-close-btn-responsive {
+      display: none !important;
+    }
+  }
+  @media (max-width: 880px) {
+    .sprint-close-btn-responsive {
+      display: inline-flex !important;
+    }
   }
   .dot-jewel.milestone {
     border-radius: 2px;
@@ -4408,8 +4506,79 @@
     border: 1.5px solid rgba(217, 119, 6, 0.5) !important;
     box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.2), 0 1px 3px rgba(15, 23, 42, 0.06) !important;
   }
+  :root[data-theme="light"] .dots-necklace::before {
+    background: rgba(15, 23, 42, 0.08);
+  }
+  :root[data-theme="light"] .dots-necklace::after {
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(16, 185, 129, 0) 20%, 
+      rgba(16, 185, 129, 0.6) 45%, 
+      #059669 50%, 
+      rgba(16, 185, 129, 0.6) 55%, 
+      rgba(16, 185, 129, 0) 80%, 
+      transparent 100%
+    );
+    background-size: 200% 100%;
+  }
+  :root[data-theme="light"] #radar-dots-necklace .dot-jewel.active,
+  :root[data-theme="light"] .dots-necklace .dot-jewel.active {
+    background: #ffffff !important;
+    border: 1.5px solid #059669 !important;
+    box-shadow: 0 0 0 2.5px rgba(5, 150, 105, 0.25), 0 0 10px rgba(16, 185, 129, 0.5) !important;
+  }
 
-
+  @keyframes radar-core-breathe-emerald {
+    0%, 100% {
+      box-shadow: 0 0 0 2.5px rgba(16, 185, 129, 0.4), 0 0 10px rgba(52, 211, 153, 0.75);
+      transform: scale(1);
+    }
+    50% {
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.65), 0 0 18px rgba(52, 211, 153, 0.95);
+      transform: scale(1.08);
+    }
+  }
+  @keyframes radar-ripple-emerald {
+    0% {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 0.85;
+      border-color: rgba(52, 211, 153, 0.9);
+    }
+    60% {
+      opacity: 0.35;
+      border-color: rgba(16, 185, 129, 0.5);
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(2.8);
+      opacity: 0;
+      border-color: rgba(16, 185, 129, 0);
+    }
+  }
+  @keyframes dots-necklace-shimmer-sweep {
+    0% {
+      background-position: 150% 0;
+      opacity: 0;
+    }
+    15% {
+      opacity: 0.9;
+    }
+    75% {
+      background-position: -50% 0;
+      opacity: 0.9;
+    }
+    85%, 100% {
+      background-position: -50% 0;
+      opacity: 0;
+    }
+  }
+  @keyframes dot-done-subtle-pulse {
+    0%, 100% {
+      box-shadow: 0 0 4px rgba(16, 185, 129, 0.5);
+    }
+    50% {
+      box-shadow: 0 0 8px rgba(52, 211, 153, 0.85);
+    }
+  }
 
   @keyframes radar-breathe-white {
     0%, 100% {
@@ -12822,13 +12991,12 @@ function viewPythonSkill(sid){
   const echProg = (typeof getEchelonProgress === 'function') ? getEchelonProgress(curEchTier) : { pct: 35 };
   const echPct = echProg.pct || 0;
   const dayXpVal = (typeof todayXp === 'function') ? todayXp() : 0;
-  const readinessStatusText = echPct > 0
-    ? `${echPct}% готовности ${echMeta.targetLabel || 'к скринингу'}`
-    : '⚡ Старт тех-скрининга · Фундамент';
+  const displayEchPct = echPct > 0 ? echPct : 35;
+  const readinessStatusText = `${displayEchPct}% готовности ${echMeta.targetLabel || 'к скринингу'}`;
 
   const focusTopbarHTML = `
     <div class="echelon-topbar-clean sprint-focus-topbar sprint-topbar" style="padding: 12px 20px;">
-      <a href="#${tr.routePrefix}" class="sprint-close-btn sr-only" title="${tr.backLabel}">${tr.backLabel}</a>
+      <a href="#${tr.routePrefix}" class="sprint-close-btn sprint-close-btn-responsive" title="${tr.backLabel}" aria-label="${tr.backLabel}">✕</a>
       <div class="echelon-clean-wrap">
         <div class="echelon-clean-meta" style="font-size: 0.78rem; justify-content: flex-start; gap: 8px; align-items: center;">
           <span class="echelon-bordeaux-title">Эшелон ${curEchTier}</span>
@@ -12837,14 +13005,14 @@ function viewPythonSkill(sid){
           <span class="sr-only">Шаг ${stepIdx+1}/${steps.length}</span>
         </div>
         <div class="echelon-clean-track" style="height: 6px; margin-top: 3px;">
-          <div class="echelon-clean-fill" style="width: ${echPct}%;"></div>
+          <div class="echelon-clean-fill" style="width: ${displayEchPct}%;"></div>
         </div>
       </div>
       <div class="echelon-topbar-actions" style="display:flex;gap:8px;align-items:center;margin-left:14px;flex:none;">
         <div class="sprint-xp-pill" style="display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:999px;background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.35);color:#fbbf24;font-size:0.75rem;font-weight:700;white-space:nowrap;letter-spacing:0.01em;" title="Заработано за сутки: ${dayXpVal} XP">⚡ +${dayXpVal} XP<span class="sprint-xp-subtext"> за сутки</span></div>
         <a href="#/docs" class="topbar-help-btn" style="padding:6px 12px;border-radius:10px;" title="Справочник синтаксиса и методов Python"><span class="topbar-help-icon">📖</span><span class="topbar-help-text">&nbsp;Справка</span></a>
         <button type="button" class="topbar-help-btn" data-toggle-audio data-audio-toggle style="padding:6px 12px;border-radius:10px;cursor:pointer;" title="Слушать аудио / Аудио-компаньон"><span class="topbar-audio-icon">🎧</span><span class="topbar-audio-text">&nbsp;Озвучить</span></button>
-        
+        <button type="button" class="topbar-help-btn topbar-bug-action" data-open-bug-modal style="padding:6px 12px;border-radius:10px;cursor:pointer;" title="Сообщить об ошибке или опечатке (🐞)" aria-label="Сообщить об ошибке"><span class="topbar-bug-icon">🐞</span><span class="topbar-bug-text">&nbsp;Баг</span></button>
       </div>
     </div>
     <div id="theory-audio-bar" class="theory-audio-bar" style="display:${state.audioBarOpen ? 'flex' : 'none'};">
@@ -12961,7 +13129,7 @@ function viewPythonSkill(sid){
     bodyHTML = `
       <div class="card coddy-lesson-card" style="margin-top:0;display:flex;flex-direction:column;justify-content:space-between;min-height:280px;">
         <div style="flex:1;">${feedHTML}</div>
-        <div class="sprint-actions-bar" style="display:flex;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--glass-border);flex-wrap:nowrap;flex:none;justify-content:center;">
+        <div class="sprint-actions-bar" style="display:flex;align-items:center;gap:10px;margin-top:24px;flex-wrap:nowrap;flex:none;justify-content:center;">
           ${backBtnHTML}
           <div style="display:flex;gap:10px;align-items:center;flex:1;justify-content:center;max-width:440px;">
             ${primaryActionHTML}
@@ -17455,8 +17623,8 @@ viewDashboard = function(){
     </div>`;
 };
 NAV_ITEMS.splice(0, NAV_ITEMS.length,
-  {route:'/', icon:'home', label:'Дашборд', shortLabel:'Дашборд', mobileTab:true, group:'learn'},
   {route:'/path', icon:'path', label:'3D-Тропа', shortLabel:'3D-Тропа', mobileTab:true, group:'learn'},
+  {route:'/', icon:'home', label:'Дашборд', shortLabel:'Дашборд', mobileTab:true, group:'learn'},
   {route:'/practice', icon:'code', label:'Практика IDE', shortLabel:'IDE', mobileTab:true, group:'trainer'},
   {route:'/cards', icon:'cards', label:'Карточки', shortLabel:'Карточки', mobileTab:true, group:'trainer'},
   {route:'/mock', icon:'mock', label:'Собеседование', shortLabel:'Интервью', mobileTab:true, group:'trainer'},
@@ -17497,13 +17665,13 @@ renderNav = function(){
     const trainerLinks = NAV_ITEMS.filter(it => it.group === 'trainer').map(renderLink).join('');
     const toolLinks = NAV_ITEMS.filter(it => it.group === 'tool').map(renderLink).join('');
     const modulesPctBadge = overallPct === 0
-      ? `<span class="navlink__pct" style="color:var(--moss);font-size:0.72rem;font-weight:700;">● новый</span>`
+      ? `<span class="navlink__pct" style="color:var(--ink-muted);font-size:0.75rem;font-weight:700;">14%</span>`
       : `<span class="navlink__pct">${overallPct}%</span>`;
     desk.innerHTML = `
       <div class="nav-group-label">Обучение</div>
       ${learnLinks}
       <details class="nav-modules-accordion">
-        <summary class="nav-modules-summary"><span>📚 Карта модулей</span>${modulesPctBadge}</summary>
+        <summary class="nav-modules-summary"><span>🗺️ Модули 01–07</span>${modulesPctBadge}</summary>
         <div class="nav-modules-list">${modLinks}</div>
       </details>
       <div class="nav-group-label">Тренажёры</div>
@@ -17982,13 +18150,13 @@ window.closeSettingsModal = closeSettingsModal;
     hoBtn.setAttribute('data-open-handover', '');
     hoBtn.textContent = '🔄 Контекст для нового чата';
     foot.appendChild(hoBtn);
-
-    const bugBtn = document.createElement('button');
-    bugBtn.className = 'link-quiet';
-    bugBtn.setAttribute('data-open-bug-modal', '');
-    bugBtn.textContent = '🐞 Журнал замечаний';
-    foot.appendChild(bugBtn);
   }
+
+  const bugBtn = document.createElement('button');
+  bugBtn.className = 'link-quiet';
+  bugBtn.setAttribute('data-open-bug-modal', '');
+  bugBtn.textContent = '🐞 Журнал замечаний';
+  foot.appendChild(bugBtn);
 
   const setBtn = document.createElement('button');
   setBtn.className = 'link-quiet';
