@@ -473,7 +473,8 @@
       font-size:0.72rem !important;
       flex-shrink:1 !important;
     }
-    .echelon-topbar-actions .sprint-xp-subtext{
+    .echelon-topbar-actions .sprint-xp-subtext,
+    .sprint-xp-full{
       display:none !important;
     }
     .echelon-topbar-actions .topbar-help-btn{
@@ -491,9 +492,37 @@
       display:none !important;
     }
     .sprint-focus-topbar{
+      display:flex !important;
       flex-wrap:wrap !important;
+      align-items:center !important;
+      justify-content:space-between !important;
       padding:8px 10px !important;
       gap:6px !important;
+    }
+    .sprint-focus-topbar .sprint-close-btn-responsive{
+      order:1 !important;
+      flex:0 0 auto !important;
+      margin:0 !important;
+    }
+    .sprint-focus-topbar .echelon-topbar-actions{
+      order:2 !important;
+      margin-left:auto !important;
+      flex:0 0 auto !important;
+    }
+    .sprint-focus-topbar .echelon-clean-wrap{
+      order:3 !important;
+      flex:1 1 100% !important;
+      min-width:100% !important;
+      width:100% !important;
+      margin-top:2px !important;
+    }
+    .sprint-focus-topbar .echelon-clean-meta{
+      display:flex !important;
+      justify-content:flex-start !important;
+      align-items:center !important;
+      gap:6px !important;
+      width:100% !important;
+      margin-bottom:3px !important;
     }
     .sprint-progress-wrap{
       min-width:120px !important;
@@ -4459,6 +4488,31 @@
   @media (max-width: 880px) {
     .sprint-close-btn-responsive {
       display: inline-flex !important;
+    }
+    .sprint-focus-topbar .sprint-close-btn-responsive {
+      order: 1 !important;
+      flex: 0 0 auto !important;
+      margin: 0 !important;
+    }
+    .sprint-focus-topbar .echelon-topbar-actions {
+      order: 2 !important;
+      margin-left: auto !important;
+      flex: 0 0 auto !important;
+    }
+    .sprint-focus-topbar .echelon-clean-wrap {
+      order: 3 !important;
+      flex: 1 1 100% !important;
+      min-width: 100% !important;
+      width: 100% !important;
+      margin-top: 2px !important;
+    }
+    .sprint-focus-topbar .echelon-clean-meta {
+      display: flex !important;
+      justify-content: flex-start !important;
+      align-items: center !important;
+      gap: 6px !important;
+      width: 100% !important;
+      margin-bottom: 3px !important;
     }
   }
   .dot-jewel.milestone {
@@ -12769,6 +12823,11 @@ function splitStepHtmlIntoChunks(htmlStr){
       finalChunks[0] += '\n' + c;
       continue;
     }
+    const isVisualContrastCard = /class=["'][^"']*(?:theory-contrast-card|visual-contrast|contrast-grid)[^"']*["']/i.test(c);
+    if(finalChunks.length > 0 && isVisualContrastCard && finalChunks[finalChunks.length - 1].replace(/<[^>]+>/g, '').trim().length < 450){
+      finalChunks[finalChunks.length - 1] += '\n' + c;
+      continue;
+    }
     if(finalChunks.length > 0 && plainLen < 75 && !/^<h[1-6]\b/i.test(c)){
       finalChunks[finalChunks.length - 1] += '\n' + c;
     } else {
@@ -12993,15 +13052,18 @@ function viewPythonSkill(sid){
   const dayXpVal = (typeof todayXp === 'function') ? todayXp() : 0;
   const displayEchPct = echPct > 0 ? echPct : 35;
   const readinessStatusText = `${displayEchPct}% готовности ${echMeta.targetLabel || 'к скринингу'}`;
+  const xpValBadge = dayXpVal > 0 ? `+${dayXpVal} XP` : `<span class="sprint-xp-full">Старт дня · </span>0 XP`;
 
   const focusTopbarHTML = `
     <div class="echelon-topbar-clean sprint-focus-topbar sprint-topbar" style="padding: 12px 20px;">
       <a href="#${tr.routePrefix}" class="sprint-close-btn sprint-close-btn-responsive" title="${tr.backLabel}" aria-label="${tr.backLabel}">✕</a>
       <div class="echelon-clean-wrap">
-        <div class="echelon-clean-meta" style="font-size: 0.78rem; justify-content: flex-start; gap: 8px; align-items: center;">
-          <span class="echelon-bordeaux-title">Эшелон ${curEchTier}</span>
-          <span style="color:var(--ink-muted);font-weight:400;opacity:0.6;">·</span>
-          <span class="echelon-readiness-emerald">${readinessStatusText}</span>
+        <div class="echelon-clean-meta" style="font-size: 0.78rem; justify-content: flex-start; gap: 6px; align-items: center;">
+          <span class="echelon-clean-title-group" style="display:inline-flex;align-items:center;gap:6px;">
+            <span class="echelon-bordeaux-title">Эшелон ${curEchTier}</span>
+            <span style="color:var(--ink-muted);font-weight:400;opacity:0.6;">·</span>
+            <span class="echelon-readiness-emerald">${readinessStatusText}</span>
+          </span>
           <span class="sr-only">Шаг ${stepIdx+1}/${steps.length}</span>
         </div>
         <div class="echelon-clean-track" style="height: 6px; margin-top: 3px;">
@@ -13009,7 +13071,7 @@ function viewPythonSkill(sid){
         </div>
       </div>
       <div class="echelon-topbar-actions" style="display:flex;gap:8px;align-items:center;margin-left:14px;flex:none;">
-        <div class="sprint-xp-pill" style="display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:999px;background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.35);color:#fbbf24;font-size:0.75rem;font-weight:700;white-space:nowrap;letter-spacing:0.01em;" title="Заработано за сутки: ${dayXpVal} XP">⚡ +${dayXpVal} XP<span class="sprint-xp-subtext"> за сутки</span></div>
+        <div class="sprint-xp-pill" style="display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:999px;background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.35);color:#fbbf24;font-size:0.75rem;font-weight:700;white-space:nowrap;letter-spacing:0.01em;" title="Заработано за сутки: ${dayXpVal} XP">⚡ ${xpValBadge}<span class="sprint-xp-subtext"> за сутки</span></div>
         <a href="#/docs" class="topbar-help-btn" style="padding:6px 12px;border-radius:10px;" title="Справочник синтаксиса и методов Python"><span class="topbar-help-icon">📖</span><span class="topbar-help-text">&nbsp;Справка</span></a>
         <button type="button" class="topbar-help-btn" data-toggle-audio data-audio-toggle style="padding:6px 12px;border-radius:10px;cursor:pointer;" title="Слушать аудио / Аудио-компаньон"><span class="topbar-audio-icon">🎧</span><span class="topbar-audio-text">&nbsp;Озвучить</span></button>
         <button type="button" class="topbar-help-btn topbar-bug-action" data-open-bug-modal style="padding:6px 12px;border-radius:10px;cursor:pointer;" title="Сообщить об ошибке или опечатке (🐞)" aria-label="Сообщить об ошибке"><span class="topbar-bug-icon">🐞</span><span class="topbar-bug-text">&nbsp;Баг</span></button>
@@ -13065,11 +13127,11 @@ function viewPythonSkill(sid){
   const dotsNecklaceHTML = `
     <div class="dots-necklace" id="radar-dots-necklace">
       ${noteDots}
-      <span class="dots-stage-divider"></span>
+      <span class="dots-stage-divider" title="Переход к карточкам (SRS)"></span>
       ${cardDots}
-      <span class="dots-stage-divider"></span>
+      <span class="dots-stage-divider" title="Переход к задачам в IDE"></span>
       ${taskDots}
-      <span class="dots-stage-divider"></span>
+      <span class="dots-stage-divider" title="Рубежный зачёт юнита"></span>
       ${examDot}
     </div>`;
 
