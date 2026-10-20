@@ -631,9 +631,37 @@ assert(!reverseRegex.test(desc255) && !(task255.solution && task255.solution.inc
 assert(reverseRegex.test(desc20) || (task20.solution && task20.solution.includes('[::-1]')), 'Task 20 must trigger reverse list anatomy widget');
 console.log('✓ Bug 86: Reverse list widget regex precision (Task 19 & 255 skipped, Task 20 matched) verified');
 
+// 87. Bug 87: Педагогика Кодди для Навыка 1.9.1 (38 активных проверок понимания по 5 конспектам и Mobile-First 390px)
+const mChecks87 = academyHtml.match(/const NOTE_STEP_CHECKS = ({[\s\S]*?});\s*window\.NOTE_STEP_CHECKS/);
+assert(mChecks87, 'academy.html must contain parseable NOTE_STEP_CHECKS');
+const noteStepChecks87 = eval('(' + mChecks87[1] + ')');
+
+const expectedSkills191 = {
+  'К-055': 14,
+  'К-056': 7,
+  'К-057': 6,
+  'К-222': 6,
+  'К-220': 5
+};
+
+let verified191StepsCount = 0;
+for(const [kid, stepCount] of Object.entries(expectedSkills191)){
+  for(let s = 0; s < stepCount; s++){
+    const key = `${kid}:${s}`;
+    assert(noteStepChecks87[key], `Bug 87: NOTE_STEP_CHECKS must contain entry for ${key}`);
+    assert(typeof noteStepChecks87[key].q === 'string' && noteStepChecks87[key].q.length > 10, `${key} must have valid question`);
+    assert(Array.isArray(noteStepChecks87[key].options) && noteStepChecks87[key].options.length === 3, `${key} must have exactly 3 options`);
+    assert(typeof noteStepChecks87[key].correct === 'number' && noteStepChecks87[key].correct >= 0 && noteStepChecks87[key].correct < 3, `${key} must have valid correct index`);
+    assert(typeof noteStepChecks87[key].explain === 'string' && noteStepChecks87[key].explain.length > 20, `${key} must have detailed pedagogical explanation`);
+    verified191StepsCount++;
+  }
+}
+assert.strictEqual(verified191StepsCount, 38, 'Must verify all 38 steps of Skill 1.9.1');
+console.log(`✓ Bug 87: Coddy active comprehension checks (${verified191StepsCount} steps across 5 notes of Skill 1.9.1) verified`);
+
 // Проверка спецификации канонических эталонов и инвариантов
 require('./test_pravki_spec.js');
 
 console.log('================================================================');
-console.log('  ALL 86 REGRESSION TESTS & CANONICAL BENCHMARKS PASSED (100%)  ');
+console.log('  ALL 87 REGRESSION TESTS & CANONICAL BENCHMARKS PASSED (100%)  ');
 console.log('================================================================\n');
