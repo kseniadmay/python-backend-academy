@@ -2195,9 +2195,9 @@
   /* Compact cards hub filter styling for mobile viewports (REV-005) */
   .cards-hub-controls{
     display:grid;
-    grid-template-columns:1fr 1fr 1.6fr;
-    gap:8px;
-    margin-bottom:12px;
+    grid-template-columns:minmax(210px, 1fr) minmax(230px, 1.2fr) minmax(280px, 1.8fr);
+    gap:10px;
+    margin-bottom:14px;
   }
   .cards-hub-subfilters{
     display:contents;
@@ -2205,10 +2205,10 @@
   @media(max-width:640px){
     .cards-hub-header{margin-bottom:8px !important;}
     .cards-hub-header h1{font-size:1.25rem !important;}
-    .cards-hub-controls{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
-    .cards-hub-subfilters{display:grid !important;grid-template-columns:1fr 1fr;gap:6px;}
-    .cards-hub-subfilters select{font-size:.75rem !important;padding:6px 8px !important;}
-    .cards-hub-controls #cards-deck-select{font-size:.82rem !important;padding:7px 10px !important;}
+    .cards-hub-controls{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+    .cards-hub-subfilters{display:grid !important;grid-template-columns:1fr 1fr;gap:8px;}
+    .cards-hub-subfilters select{font-size:.78rem !important;padding:8px 8px !important;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;}
+    .cards-hub-controls #cards-deck-select{font-size:.84rem !important;padding:8px 10px !important;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;}
     .fc-stage{margin:6px 0 !important;}
     .microstep-bar{padding:6px 10px !important;font-size:.82rem !important;margin-bottom:6px !important;}
     .fc-card{min-height:220px !important;padding:16px 18px !important;}
@@ -13808,10 +13808,16 @@ function viewPythonSkill(sid){
       const curCard = cards[cIdx] || {q: 'Карточки загружаются', a: ''};
       const srsPrev = typeof computeRemNoteIntervals === 'function' ? computeRemNoteIntervals(activeF + ':' + cIdx) : {again:{days:1},hard:{days:2},good:{days:3},easy:{days:7}};
 
+      const curQTotal = (pySkillViewState.sessionQueue && pySkillViewState.sessionQueue.length) || cards.length;
+      const isRepeatPhase = qPos >= cards.length;
+      const cardCounterLabel = isRepeatPhase
+        ? `Повтор ошибки: ${qPos - cards.length + 1} из ${curQTotal - cards.length}`
+        : `Карточка ${qPos + 1} из ${cards.length}`;
+
       bodyHTML = `
         <div class="fc-stage" style="margin-top:0;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:0.82rem;">
-            <span style="color:var(--ink-muted);font-weight:600;">Карточка ${qPos + 1} из ${cards.length}</span>
+            <span style="color:var(--ink-muted);font-weight:600;">${cardCounterLabel}</span>
             <span class="badge-sprout" style="display:inline-flex;align-items:center;gap:6px;font-size:0.75rem;padding:3px 10px;border-radius:999px;background:rgba(16,185,129,0.12);color:#10b981;font-weight:700;border:1px solid rgba(16,185,129,0.25);"><span>🌱</span><span>Первичное закрепление</span></span>
           </div>
           <div class="fc-card fc-card--3d ${pySkillViewState.cardFlipped?'fc-card--Answer':''}" data-py-flip-card style="border: 1.5px solid rgba(16,185,129,0.45); border-radius: 18px; background: rgba(16,185,129,0.03); box-shadow: 0 4px 24px rgba(0,0,0,0.2), 0 0 16px rgba(16,185,129,0.06); cursor: pointer;">
@@ -14199,10 +14205,13 @@ const _initCardsPos = (state && state.cardsHubPos && typeof state.cardsHubPos ==
 let cardsHubState = {
   echelonFilter: _initCardsPos.echelonFilter || 'all',
   unitFilter: _initCardsPos.unitFilter || 'all',
-  deckId: _initCardsPos.deckId || 'Ф-001',
+  deckId: (typeof _initCardsPos.deckId === 'string' && ALL_DECKS_COMBINED[_initCardsPos.deckId]) ? _initCardsPos.deckId : 'Ф-001',
   cardIdx: typeof _initCardsPos.cardIdx === 'number' ? _initCardsPos.cardIdx : 0,
   flipped: !!_initCardsPos.flipped,
-  completed: !!_initCardsPos.completed
+  completed: !!_initCardsPos.completed,
+  dueMode: !!_initCardsPos.dueMode,
+  dueQueue: [],
+  duePos: typeof _initCardsPos.duePos === 'number' ? _initCardsPos.duePos : 0
 };
 window.cardsHubState = cardsHubState;
 function saveCardsHubPosState(){
@@ -14214,11 +14223,146 @@ function saveCardsHubPosState(){
     cardIdx: cardsHubState.cardIdx || 0,
     flipped: !!cardsHubState.flipped,
     completed: !!cardsHubState.completed,
+    dueMode: !!cardsHubState.dueMode,
+    duePos: cardsHubState.duePos || 0,
     updatedAt: Date.now()
   };
   saveState(state);
 }
+
+function collectDueCardsQueue(){
+  ensureExtendedState();
+  const today = (typeof dateIsoKey === 'function') ? dateIsoKey() : new Date().toISOString().slice(0, 10);
+  const srsMap = state.cardSrs || {};
+  const ratings = state.cardRatings || {};
+  const queue = [];
+  const seen = new Set();
+
+  Object.keys(srsMap).forEach(k => {
+    const item = srsMap[k];
+    if(item && item.dueDate && item.dueDate <= today){
+      const parts = k.split(':');
+      const did = parts[0];
+      const cIdx = parseInt(parts[1], 10);
+      if(ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
+        queue.push({ deckId: did, cardIdx: cIdx });
+        seen.add(k);
+      }
+    }
+  });
+
+  Object.keys(ratings).forEach(k => {
+    const r = Number(ratings[k]);
+    if(r >= 1 && r <= 2 && !seen.has(k)){
+      const parts = k.split(':');
+      const did = parts[0];
+      const cIdx = parseInt(parts[1], 10);
+      if(ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
+        queue.push({ deckId: did, cardIdx: cIdx });
+        seen.add(k);
+      }
+    }
+  });
+
+  return queue;
+}
+
 function viewCardsHub(){
+  if(cardsHubState.dueMode){
+    if(!Array.isArray(cardsHubState.dueQueue) || cardsHubState.dueQueue.length === 0){
+      cardsHubState.dueQueue = collectDueCardsQueue();
+    }
+    const qLen = cardsHubState.dueQueue.length;
+    const duePos = Math.min(cardsHubState.duePos || 0, Math.max(0, qLen - 1));
+    if(cardsHubState.completed || qLen === 0 || cardsHubState.duePos >= qLen){
+      return `
+    <div class="container">
+      <div class="card" style="margin-top:20px;padding:36px 24px;text-align:center;border:1.5px solid rgba(16,185,129,0.35);border-radius:24px;background:radial-gradient(ellipse at top, rgba(16,185,129,0.12), transparent 70%), var(--surface);">
+        <div style="width:64px;height:64px;margin:0 auto 16px;border-radius:50%;background:rgba(16,185,129,0.18);color:#10b981;display:flex;align-items:center;justify-content:center;font-size:30px;border:1.5px solid rgba(16,185,129,0.45);box-shadow:0 0 20px rgba(16,185,129,0.25);">✓</div>
+        <div style="display:inline-block;padding:4px 12px;border-radius:999px;background:rgba(16,185,129,0.15);color:#34d399;font-size:0.75rem;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.06em;">Ежедневная очередь закрыта</div>
+        <h2 style="font-size:1.45rem;font-weight:800;color:var(--ink);margin:0 0 10px;">🎉 Все повторения на сегодня успешно выполнены!</h2>
+        <p style="font-size:0.92rem;color:var(--ink-muted);max-width:520px;margin:0 auto 24px;line-height:1.6;">
+          Отличная работа! Расписание интервального повторения обновлено. Новые карточки появятся по мере наступления срока повторения.
+        </p>
+        <div style="display:flex;gap:12px;justify-content:center;margin-bottom:24px;flex-wrap:wrap;">
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px 16px;">
+            <div style="font-size:0.75rem;color:var(--ink-muted);">Повторено сегодня</div>
+            <div style="font-size:1.15rem;font-weight:700;color:#10b981;">${qLen} ${typeof pluralizeRu === 'function' ? pluralizeRu(qLen, 'карточка', 'карточки', 'карточек') : 'карточек'}</div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary" data-hub-exit-due style="padding:14px 24px;border-radius:14px;font-weight:700;">🃏 Вернуться к общему каталогу колод</button>
+      </div>
+    </div>`;
+    }
+
+    const item = cardsHubState.dueQueue[duePos];
+    const dObj = ALL_DECKS_COMBINED[item.deckId] || {title: item.deckId, cards: []};
+    const cObj = (dObj.cards || [])[item.cardIdx] || {q: '', a: ''};
+    const cleanDeckName = (dObj.title || item.deckId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
+
+    return `
+    <div class="container">
+      <div class="cards-hub-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+        <div>
+          <span class="sr-only">Интервальное повторение RemNote · Режим очереди на сегодня</span>
+          <h1 style="margin:0;">🔥 Повторение на сегодня</h1>
+          <div style="font-size:0.84rem;color:var(--ink-muted);margin-top:2px;">
+            Колода: <span style="color:var(--gold);font-weight:600;">${cleanDeckName}</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <a href="#/docs" class="btn btn-ghost" style="padding:6px 12px;font-size:0.78rem;" title="Открыть инженерный справочник">💡 Шпаргалка</a>
+          <span class="cocoon-pill" style="color:var(--amber);">⚡ Очередь: <b>${duePos + 1} / ${qLen}</b></span>
+          <button type="button" class="btn btn-ghost" data-hub-exit-due style="padding:6px 12px;font-size:0.78rem;">✕ Выйти из очереди</button>
+        </div>
+      </div>
+      <div class="cards-hub-content" style="max-width:760px;margin:0 auto;">
+        <div class="fc-stage" style="margin-top:0;">
+          <div class="fc-card fc-card--3d ${cardsHubState.flipped ? 'fc-card--flipped fc-card--Answer' : ''}" data-hub-flip style="margin-top:0;border: 1.5px solid rgba(16,185,129,0.45); border-radius: 18px; background: rgba(16,185,129,0.03); box-shadow: 0 4px 24px rgba(0,0,0,0.2), 0 0 16px rgba(16,185,129,0.06); cursor: pointer;">
+            <div class="fc-card-inner">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div class="topic-badge" style="background:${cardsHubState.flipped ? 'rgba(16,185,129,0.2)' : 'rgba(59,130,246,0.15)'};color:${cardsHubState.flipped ? '#34d399' : '#60a5fa'};font-weight:700;">${cardsHubState.flipped ? 'Ответ' : 'Вопрос'}</div>
+                  ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(item.deckId + ':' + item.cardIdx) : ''}
+                </div>
+              </div>
+              <div class="fc-q">${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(cObj.q) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(cObj.q) : cObj.q)}</div>
+              ${cardsHubState.flipped ? `<div class="fc-a" style="margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);">${formatRichInlineText(cObj.a)}</div>` : ''}
+            </div>
+          </div>
+        </div>
+        ${cardsHubState.flipped ? (() => {
+          const srsPrev = typeof computeRemNoteIntervals === 'function' ? computeRemNoteIntervals(item.deckId + ':' + item.cardIdx) : {again:{days:1},hard:{days:2},good:{days:3},easy:{days:7}};
+          return `
+          <div class="fc-rate-row" style="margin-top:14px;">
+            <button type="button" class="btn btn-ghost" data-hub-rate="1" title="Повторить снова через ${srsPrev.again.days} дн">
+              <span>Снова</span>
+              <span class="btn-subtext" style="display:block;font-size:0.75rem;opacity:0.75;margin-top:2px;">${srsPrev.again.days} дн</span>
+            </button>
+            <button type="button" class="btn btn-burgundy" data-hub-rate="2" title="Повторить через ${srsPrev.hard.days} дн (+2 XP)">
+              <span>Трудно (+2 XP)</span>
+              <span class="btn-subtext" style="display:block;font-size:0.75rem;opacity:0.85;margin-top:2px;">${srsPrev.hard.days} дн</span>
+            </button>
+            <button type="button" class="btn btn-clay" data-hub-rate="3" title="Повторить через ${srsPrev.good.days} дн (+5 XP)">
+              <span>Хорошо (+5 XP)</span>
+              <span class="btn-subtext" style="display:block;font-size:0.75rem;opacity:0.85;margin-top:2px;">${srsPrev.good.days} дн</span>
+            </button>
+            <button type="button" class="btn btn-primary" data-hub-rate="4" title="Повторить через ${srsPrev.easy.days} дн (+10 XP)">
+              <span>Легко (+10 XP)</span>
+              <span class="btn-subtext" style="display:block;font-size:0.75rem;opacity:0.9;margin-top:2px;">${srsPrev.easy.days} дн</span>
+            </button>
+          </div>
+          <div style="margin-top:10px;display:flex;justify-content:flex-start;">
+            <button type="button" class="btn btn-ghost" data-hub-prev style="padding:8px 16px;border-radius:12px;font-size:0.84rem;">← Назад к предыдущей</button>
+          </div>`;
+        })() : `
+          <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
+            <button type="button" class="btn btn-ghost" data-hub-prev ${duePos===0?'disabled':''} style="padding:12px 18px;border-radius:14px;">← Назад</button>
+            <button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;padding:12px 20px;border-radius:14px;font-weight:800;" data-hub-flip>Показать ответ</button>
+          </div>`}
+      </div>
+    </div>`;
+  }
   const allDeckIds = Object.keys(ALL_DECKS_COMBINED).sort();
   if(!ALL_DECKS_COMBINED[cardsHubState.deckId]) cardsHubState.deckId = allDeckIds[0];
 
@@ -14231,7 +14375,7 @@ function viewCardsHub(){
     <option value="gaps" ${cardsHubState.echelonFilter==='gaps'?'selected':''}>🎯 Пробелы по диагностике</option>`;
 
   const unitPluralDecks = typeof pluralizeRu === 'function' ? pluralizeRu(allDeckIds.length, 'колода', 'колоды', 'колод') : 'колод';
-  const unitOpts = `<option value="all" ${cardsHubState.unitFilter==='all'?'selected':''}>Все 9 уроков Python (126 колод · 2 181 карточка) + все 7 модулей (${allDeckIds.length} ${unitPluralDecks})</option>` +
+  const unitOpts = `<option value="all" ${cardsHubState.unitFilter==='all'?'selected':''}>Все уроки и модули (${allDeckIds.length} ${unitPluralDecks})</option>` +
     ALL_UNITS_COMBINED.map(u => `<option value="${u.id}" ${cardsHubState.unitFilter===u.id?'selected':''}>[Эшелон ${getEffectiveUnitTier(u.id)}] ${cleanUnitTitle(u.id, u.title)}</option>`).join('');
 
   let filteredDecks = allDeckIds;
@@ -14298,6 +14442,8 @@ function viewCardsHub(){
               : `<span class="cocoon-pill">🌱 <b>0 изучено</b> · Старт повторения</span>`;
             return `${revPill}${srsStats.dueTodayCardsCount > 0 ? dueBtn : `<span class="cocoon-pill" style="color:var(--moss);">✓ Повторено на сегодня</span>`}<span class="cocoon-pill" style="color:#34d399;">👑 Закреплено: <b>${srsStats.masteredCardsCount || 0}</b></span>`;
           })()}
+          <a href="#/docs" class="btn btn-ghost" data-hub-cheatsheet style="padding:6px 11px;font-size:.78rem;" title="Открыть инженерный справочник">💡 Шпаргалка</a>
+          <a href="#/docs" class="btn btn-ghost" data-hub-cheatsheet style="padding:6px 11px;font-size:.78rem;" title="Открыть инженерный справочник">💡 Шпаргалка</a>
           ${primarySkill ? `<a href="#${primarySkill.routePrefix}/skill/${primarySkill.id}" class="btn btn-ghost" style="padding:6px 11px;font-size:.78rem;">💻 К практике темы ➔</a>` : ''}
         </div>
       </div>
@@ -14310,7 +14456,7 @@ function viewCardsHub(){
       </div>
       <div class="panel" style="padding:32px 24px;text-align:center;margin-top:20px;">
         <div style="font-size:3rem;margin-bottom:12px;">🏆</div>
-        <h2 style="margin:0 0 10px;">Все ${cards.length} карточек колоды «${cleanCurDeckTitle}» пройдены!</h2>
+        <h2 style="margin:0 0 10px;">Все ${cards.length} ${typeof pluralizeRu === 'function' ? pluralizeRu(cards.length, 'карточка', 'карточки', 'карточек') : 'карточек'} колоды «${cleanCurDeckTitle}» успешно пройдены!</h2>
         <p class="meta" style="max-width:540px;margin:0 auto 24px;line-height:1.55;">Колода успешно добавлена в интервальное повторение. Теперь закрепите теорию практическим написанием кода в тренажёре или переходите к следующей теме.</p>
         <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
           ${primarySkill ? `<a href="#${primarySkill.routePrefix}/skill/${primarySkill.id}" class="btn btn-primary btn-lg">💻 Перейти к практике темы</a>` : ''}
@@ -14337,6 +14483,7 @@ function viewCardsHub(){
               : `<span class="cocoon-pill">🌱 <b>0 изучено</b> · Старт повторения</span>`;
             return `${revPill}${dueBtn}`;
           })()}
+          <a href="#/docs" class="btn btn-ghost" data-hub-cheatsheet style="padding:6px 11px;font-size:.78rem;" title="Открыть инженерный справочник">💡 Шпаргалка</a>
           ${primarySkill ? `<a href="#${primarySkill.routePrefix}/skill/${primarySkill.id}" class="btn btn-ghost" style="padding:6px 11px;font-size:.78rem;">💻 К практике темы ➔</a>` : ''}
         </div>
       </div>
@@ -17529,8 +17676,8 @@ function applyRemNoteCardRating(cardKey, grade){
     lastGrade: g
   };
 
-  // Поддерживаем совместимость с cardRatings
-  state.cardRatings[cardKey] = Math.max(Number(state.cardRatings[cardKey]) || 0, g);
+  // Поддерживаем совместимость с cardRatings (фиксируем актуальную оценку сессии)
+  state.cardRatings[cardKey] = g;
   saveState(state);
 }
 
@@ -20371,6 +20518,13 @@ const psk = e.target.closest('[data-py-select-k]');
     return;
   }
   if(e.target.closest('[data-py-prev-card]')){
+    if(pySkillViewState.cardFlipped){
+      pySkillViewState.cardFlipped = false;
+      pySkillViewState.sprintCelebration = null;
+      saveReadingPosition();
+      render();
+      return;
+    }
     if(typeof pySkillViewState.sessionPos === 'number' && pySkillViewState.sessionPos > 0){
       pySkillViewState.sessionPos--;
       pySkillViewState.cardFlipped = false;
@@ -20511,7 +20665,7 @@ const psk = e.target.closest('[data-py-select-k]');
       if(typeof applyRemNoteCardRating === 'function'){
         applyRemNoteCardRating(ck, rating);
       } else {
-        state.cardRatings[ck] = Math.max(Number(state.cardRatings[ck]) || 0, rating || 0);
+        state.cardRatings[ck] = rating || 0;
       }
     }
     if(!wasStudied){
@@ -21086,7 +21240,31 @@ const psk = e.target.closest('[data-py-select-k]');
   }
 
   // Global Flashcards Hub actions
+  const exitDueBtn = e.target.closest('[data-hub-exit-due]');
+  if(exitDueBtn){
+    cardsHubState.dueMode = false;
+    cardsHubState.completed = false;
+    cardsHubState.flipped = false;
+    saveCardsHubPosState();
+    render();
+    return;
+  }
   if(e.target.closest('[data-hub-prev]')){
+    if(cardsHubState.flipped){
+      cardsHubState.flipped = false;
+      saveCardsHubPosState();
+      render();
+      return;
+    }
+    if(cardsHubState.dueMode){
+      if(cardsHubState.duePos > 0){
+        cardsHubState.duePos--;
+        cardsHubState.flipped = false;
+        saveCardsHubPosState();
+        render();
+      }
+      return;
+    }
     if(cardsHubState.cardIdx > 0){
       cardsHubState.cardIdx--;
       cardsHubState.flipped = false;
@@ -21122,6 +21300,39 @@ const psk = e.target.closest('[data-py-select-k]');
       else r = 3;
     }
     ensureExtendedState();
+
+    if(cardsHubState.dueMode){
+      const q = cardsHubState.dueQueue || [];
+      const curItem = q[cardsHubState.duePos];
+      if(curItem){
+        const ck = curItem.deckId + ':' + curItem.cardIdx;
+        const wasStudied = (state.cardRatings[ck] !== undefined && state.cardRatings[ck] > 0);
+        if(typeof applyRemNoteCardRating === 'function'){
+          applyRemNoteCardRating(ck, r);
+        } else {
+          state.cardRatings[ck] = r || 0;
+        }
+        if(!wasStudied){
+          if(r >= 3) awardXp(r === 4 ? 10 : 5);
+          else if(r === 2) awardXp(2);
+        }
+        if(r === 1){
+          cardsHubState.dueQueue.push(curItem);
+        }
+      }
+      if(cardsHubState.duePos + 1 < (cardsHubState.dueQueue || []).length){
+        cardsHubState.duePos++;
+        cardsHubState.flipped = false;
+      } else {
+        awardXp(25);
+        cardsHubState.completed = true;
+        cardsHubState.flipped = false;
+      }
+      saveCardsHubPosState();
+      render();
+      return;
+    }
+
     let wasStudied = false;
     if(cardsHubState.deckId){
       const ck = cardsHubState.deckId + ':' + (cardsHubState.cardIdx || 0);
@@ -21129,7 +21340,7 @@ const psk = e.target.closest('[data-py-select-k]');
       if(typeof applyRemNoteCardRating === 'function'){
         applyRemNoteCardRating(ck, r);
       } else {
-        state.cardRatings[ck] = Math.max(Number(state.cardRatings[ck]) || 0, r || 0);
+        state.cardRatings[ck] = r || 0;
       }
     }
     if(!wasStudied){
@@ -21173,13 +21384,25 @@ const psk = e.target.closest('[data-py-select-k]');
   const revDueBtn = e.target.closest('[data-hub-review-due]');
   if(revDueBtn){
     const srsStats = typeof getSpacedRepetitionStats === 'function' ? getSpacedRepetitionStats() : null;
-    if(srsStats && srsStats.dueDecks && srsStats.dueDecks.length > 0){
+    const dueQueue = typeof collectDueCardsQueue === 'function' ? collectDueCardsQueue() : [];
+    if(dueQueue.length > 0){
+      cardsHubState.dueMode = true;
+      cardsHubState.dueQueue = dueQueue;
+      cardsHubState.duePos = 0;
+      cardsHubState.flipped = false;
+      cardsHubState.completed = false;
+      saveCardsHubPosState();
+      render();
+      return;
+    } else if(srsStats && srsStats.dueDecks && srsStats.dueDecks.length > 0){
+      cardsHubState.dueMode = false;
       cardsHubState.deckId = srsStats.dueDecks[0];
       cardsHubState.completed = false;
       cardsHubState.cardIdx = 0;
       cardsHubState.flipped = false;
       saveCardsHubPosState();
       render();
+      return;
     }
     return;
   }
@@ -21919,6 +22142,8 @@ document.addEventListener('keydown', function(e){
       const rateGoodBtn = document.querySelector('[data-py-rate-card="3"]');
       if(rateGoodBtn){ e.preventDefault(); rateGoodBtn.click(); return; }
     }
+    const flipBtn = document.querySelector('[data-py-flip-card], [data-hub-flip]');
+    if(flipBtn){ e.preventDefault(); flipBtn.click(); return; }
     const pyNextBtn = document.querySelector('[data-chunk-more="py"], [data-py-next-step], [data-py-step-check-next]');
     if(pyNextBtn){ e.preventDefault(); pyNextBtn.click(); return; }
   }
