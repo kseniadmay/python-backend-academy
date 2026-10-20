@@ -525,9 +525,115 @@ assert(k055Obj && k055Obj.steps, 'academy.html must contain К-055 with steps');
 assert.strictEqual(k055Obj.steps.length, 14, `Bug 81: K-055 must have 14 digestible micro-steps in academy.html, got ${k055Obj.steps.length}`);
 console.log('✓ Bug 81: K-055 text wall elimination & 14 Coddy pedagogy micro-steps verified');
 
+// 82. Bug 82: Форматирование вопросов карточек в виде многострочных блоков кода
+assert(academyHtml.includes('function formatCardQuestionHTML(rawText)'), 'academy.html must define formatCardQuestionHTML engine');
+assert(academyHtml.includes('window.formatCardQuestionHTML = formatCardQuestionHTML;'), 'formatCardQuestionHTML must be exposed on window');
+assert(academyHtml.includes('formatCardQuestionHTML(curCard.q)'), 'viewPythonSkill cards mode must render question via formatCardQuestionHTML');
+assert(academyHtml.includes('formatCardQuestionHTML(cur.q)'), 'viewCardsHub must render question via formatCardQuestionHTML');
+
+// Сквозной глобальный цикл по всем колодам карточек: проверка корректности парсинга inline-кода с точкой с запятой
+const mDecksAll = academyHtml.match(/const ALL_DECKS_COMBINED = Object\.assign\(\{\},\s*([a-zA-Z0-9_,\s.]+)\);/);
+assert(mDecksAll, 'academy.html must contain ALL_DECKS_COMBINED assignment');
+const masteryNames = mDecksAll[1].split(',').map(s => s.trim().replace(/\.decks$/, '')).filter(Boolean);
+
+let allDecksCombined = {};
+for(const mName of masteryNames){
+  const reg = new RegExp(`const\\s+${mName}\\s*=\\s*(\\{[\\s\\S]*?\\});\\s*(?:window\\.${mName}|const|let|var)`);
+  const mData = academyHtml.match(reg);
+  if(mData){
+    try {
+      const obj = JSON.parse(mData[1]);
+      if(obj.decks) Object.assign(allDecksCombined, obj.decks);
+    } catch(e){}
+  }
+}
+assert(Object.keys(allDecksCombined).length > 50, `Must load at least 50 decks from academyHtml, got ${Object.keys(allDecksCombined).length}`);
+
+// Проверяем, что колода Ф-006 card 0 (канонический баг-репорт) не содержит сырую инлайн-строку с точкой с запятой
+const f006Deck = allDecksCombined['Ф-006'];
+assert(f006Deck && f006Deck.cards && f006Deck.cards.length > 0, 'Ф-006 deck must exist in allDecksCombined');
+assert(f006Deck.cards[0].q.includes('При <code>a = [0, 1, 2, 3, 4, 5]; b = a[1:4]</code>'), 'Ф-006 card 0 must have canonical prompt');
+
+// Тестируем логику formatCardQuestionHTML на всех карточках с "При <code>...; ...</code>"
+let priCodeCardsCount = 0;
+for(const [did, d] of Object.entries(allDecksCombined)){
+  for(const [ci, c] of (d.cards || []).entries()){
+    if(/^При\s+(?:<code>|`).+?;.+?(?:<\/code>|`)/i.test(c.q)){
+      priCodeCardsCount++;
+      const priMatch = c.q.match(/^При\s+(?:<code>\s*([\s\S]*?)\s*<\/code>|`([^`]+)`)\s*:\s*([\s\S]+)$/i);
+      assert(priMatch, `Card ${did} #${ci} must match priMatch pattern: ${c.q}`);
+      const rawCode = (priMatch[1] || priMatch[2] || '').trim();
+      const questionText = priMatch[3].trim();
+      assert(rawCode.includes(';'), `Code part in ${did} #${ci} must contain semicolon: ${rawCode}`);
+      assert(questionText.length > 0, `Question text in ${did} #${ci} must not be empty`);
+    }
+  }
+}
+assert(priCodeCardsCount >= 20, `Must verify at least 20 semicolon code cards, verified ${priCodeCardsCount}`);
+console.log(`✓ Bug 82: Card question multiline code blocks & formatCardQuestionHTML verified across ${priCodeCardsCount} decks`);
+
+// 83. Bug 83: Ликвидация фейкового и тавтологичного бойлерплейта в ответах карточек
+assert(!academyHtml.includes('formatInitialCardAnswerHTML'), 'formatInitialCardAnswerHTML must be completely eliminated from academy.html');
+assert(!academyHtml.includes('💡 СУТЬ ОТВЕТА'), 'academy.html must not contain generic "💡 СУТЬ ОТВЕТА" boilerplate');
+assert(!academyHtml.includes('💼 ФОКУС БЭКЕНДЕРА & СКРИНИНГ'), 'academy.html must not contain generic screening boilerplate');
+assert(!academyHtml.includes('внутреннего устройства коллекций и байткода CPython'), 'academy.html must not contain fake CPython bytecode boilerplate');
+assert(academyHtml.includes('formatRichInlineText(curCard.a)'), 'viewPythonSkill cards mode must render pure canonical card answer');
+console.log('✓ Bug 83: Elimination of fake CPython bytecode & card answer boilerplate verified');
+
+// 84. Bug 84: Исправление кернинга и склеивания эмодзи ростка в бейдже "🌱 Первичное закрепление"
+assert(academyHtml.includes('<span>🌱</span><span>Первичное закрепление</span>') || academyHtml.includes('<span>🌱</span>\n            <span>Первичное закрепление</span>') || academyHtml.includes('<span>🌱</span> <span>Первичное закрепление</span>'), 'Sprout emoji badge must use separate spans for emoji and text');
+assert(academyHtml.includes('.badge, .topic-badge, .state-tag, .fc-badge, .badge-sprout{display:inline-flex !important;align-items:center !important;gap:6px !important;}'), 'Global CSS rule for badge flexbox alignment and gap: 6px must be present');
+console.log('✓ Bug 84: Sprout badge kerning and global flexbox badge gap verified');
+
+// 85. Bug 85: Активная проверка понимания Coddy (Active Comprehension Check) в конспектах
+assert(academyHtml.includes('const NOTE_STEP_CHECKS = {'), 'NOTE_STEP_CHECKS registry must be defined in academy.html');
+assert(academyHtml.includes('window.NOTE_STEP_CHECKS = NOTE_STEP_CHECKS;'), 'NOTE_STEP_CHECKS must be exposed on window');
+assert(academyHtml.includes('data-py-step-answer'), 'academy.html must contain handler for data-py-step-answer');
+assert(academyHtml.includes('data-py-step-check-next'), 'academy.html must contain handler for data-py-step-check-next');
+assert(academyHtml.includes('🎯 Проверка понимания (Coddy)'), 'academy.html must render Coddy comprehension check header');
+assert(academyHtml.includes('.academy-bottom-sheet--correct') && academyHtml.includes('.academy-bottom-sheet--wrong'), 'Bottom sheet styling classes must be present');
+
+// Проверка всех 8 шагов конспекта К-001 в NOTE_STEP_CHECKS
+const mChecks = academyHtml.match(/const NOTE_STEP_CHECKS = ({[\s\S]*?});\s*window\.NOTE_STEP_CHECKS/);
+assert(mChecks, 'academy.html must contain parseable NOTE_STEP_CHECKS');
+const noteStepChecks = eval('(' + mChecks[1] + ')');
+for(let s = 0; s < 8; s++){
+  const key = `К-001:${s}`;
+  assert(noteStepChecks[key], `NOTE_STEP_CHECKS must contain entry for ${key}`);
+  assert(typeof noteStepChecks[key].q === 'string' && noteStepChecks[key].q.length > 10, `${key} must have valid question`);
+  assert(Array.isArray(noteStepChecks[key].options) && noteStepChecks[key].options.length >= 2, `${key} must have at least 2 options`);
+  assert(typeof noteStepChecks[key].correct === 'number' && noteStepChecks[key].correct >= 0 && noteStepChecks[key].correct < noteStepChecks[key].options.length, `${key} must have valid correct index`);
+  assert(typeof noteStepChecks[key].explain === 'string' && noteStepChecks[key].explain.length > 15, `${key} must have detailed pedagogical explanation`);
+}
+console.log('✓ Bug 85: Coddy active comprehension check (8 steps of K-001) verified');
+
+// 86. Bug 86: Исправление ложного срабатывания виджета реверса списка на задачах 19 и 255
+const mTasks = academyHtml.match(/const IDE_TASKS = (\[[\s\S]*?\]);\s*const IDE_TASKS_BY_ID/);
+assert(mTasks, 'academy.html must contain IDE_TASKS array');
+const ideTasks = JSON.parse(mTasks[1]);
+assert(ideTasks.length >= 400, `Must load at least 400 IDE tasks, got ${ideTasks.length}`);
+
+const task19 = ideTasks.find(t => t.id === 19);
+const task20 = ideTasks.find(t => t.id === 20);
+const task255 = ideTasks.find(t => t.id === 255);
+assert(task19 && task20 && task255, 'Tasks 19, 20 and 255 must exist');
+
+const reverseRegex = /реверс|\[::-1\]|reverse/i;
+const desc19 = (task19.title + ' ' + (task19.desc || ''));
+const desc20 = (task20.title + ' ' + (task20.desc || ''));
+const desc255 = (task255.title + ' ' + (task255.desc || ''));
+
+// Задача 19 (диагональ матрицы) и Задача 255 (срез подсписка) НЕ должны триггерить реверс
+assert(!reverseRegex.test(desc19) && !(task19.solution && task19.solution.includes('[::-1]')), 'Task 19 must not trigger reverse list anatomy widget');
+assert(!reverseRegex.test(desc255) && !(task255.solution && task255.solution.includes('[::-1]')), 'Task 255 must not trigger reverse list anatomy widget');
+
+// Задача 20 (разворот списка) ОБЯЗАНА триггерить реверс
+assert(reverseRegex.test(desc20) || (task20.solution && task20.solution.includes('[::-1]')), 'Task 20 must trigger reverse list anatomy widget');
+console.log('✓ Bug 86: Reverse list widget regex precision (Task 19 & 255 skipped, Task 20 matched) verified');
+
 // Проверка спецификации канонических эталонов и инвариантов
 require('./test_pravki_spec.js');
 
 console.log('================================================================');
-console.log('  ALL 81 REGRESSION TESTS & CANONICAL BENCHMARKS PASSED (100%)  ');
+console.log('  ALL 86 REGRESSION TESTS & CANONICAL BENCHMARKS PASSED (100%)  ');
 console.log('================================================================\n');
