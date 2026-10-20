@@ -1870,11 +1870,27 @@
   .fc-q{font-size:1.08rem;font-weight:600;line-height:1.55;white-space:pre-line;}
   .fc-a{font-size:1rem;line-height:1.65;white-space:pre-line;color:var(--ink);margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
   .fc-rate-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;}
-  @media (max-width:600px){.fc-rate-row{grid-template-columns:1fr 1fr;}}
+  @media (max-width:600px){
+    .fc-rate-row{grid-template-columns:1fr 1fr !important;gap:10px !important;}
+    .fc-rate-row .btn{min-height:48px !important;padding:10px 8px !important;font-size:0.86rem !important;white-space:nowrap !important;}
+  }
   .fc-rate-row .btn{
     padding:12px 14px !important;font-size:0.92rem !important;font-weight:700 !important;
     border-radius:14px !important;text-align:center;justify-content:center;
     transition:transform .12s, filter .15s, box-shadow .15s !important;
+  }
+  .srs-deck-filter-select{
+    background:rgba(255,255,255,0.04) !important;
+    border:1px solid rgba(255,255,255,0.12) !important;
+    color:var(--ink) !important;
+    border-radius:12px !important;
+    outline:none;
+    transition:border-color .2s, box-shadow .2s;
+    font-family:var(--font-b);
+  }
+  .srs-deck-filter-select:focus{
+    border-color:#10b981 !important;
+    box-shadow:0 0 12px rgba(16,185,129,0.25) !important;
   }
   .fc-rate-row .btn-ghost{
     background:rgba(255,255,255,0.04) !important;border:1.5px solid rgba(255,255,255,0.14) !important;color:#f1f5f9 !important;
@@ -2196,8 +2212,8 @@
     .fc-stage{margin:6px 0 !important;}
     .microstep-bar{padding:6px 10px !important;font-size:.82rem !important;margin-bottom:6px !important;}
     .fc-card{min-height:220px !important;padding:16px 18px !important;}
-    .fc-rate-row{margin-top:8px !important;gap:6px !important;}
-    .fc-rate-row .btn{padding:8px 6px !important;font-size:.78rem !important;}
+    .fc-rate-row{margin-top:10px !important;gap:8px !important;grid-template-columns:1fr 1fr !important;}
+    .fc-rate-row .btn{min-height:48px !important;padding:10px 8px !important;font-size:.84rem !important;}
   }
 
   /* ================= 3D TACTILE BUTTONS & CODDY AESTHETICS ================= */
@@ -13790,22 +13806,19 @@ function viewPythonSkill(sid){
       const qPos = Math.min(pySkillViewState.sessionPos || 0, pySkillViewState.sessionQueue.length - 1);
       const cIdx = pySkillViewState.sessionQueue[qPos] !== undefined ? pySkillViewState.sessionQueue[qPos] : 0;
       const curCard = cards[cIdx] || {q: 'Карточки загружаются', a: ''};
-      const remainingInQueue = pySkillViewState.sessionQueue.length - qPos;
+      const srsPrev = typeof computeRemNoteIntervals === 'function' ? computeRemNoteIntervals(activeF + ':' + cIdx) : {again:{days:1},hard:{days:2},good:{days:3},easy:{days:7}};
 
       bodyHTML = `
-        <div class="card" style="margin-top:0;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span style="font-size:0.80rem;color:var(--ink-muted);font-weight:600;">Карточка ${qPos + 1} из ${pySkillViewState.sessionQueue.length}</span>
-              <span style="font-size:0.72rem;padding:2px 8px;border-radius:999px;background:rgba(217,119,6,0.12);color:var(--amber);font-weight:700;">В очереди: ${remainingInQueue}</span>
-            </div>
+        <div class="fc-stage" style="margin-top:0;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:0.82rem;">
+            <span style="color:var(--ink-muted);font-weight:600;">Карточка ${qPos + 1} из ${cards.length}</span>
             <span class="badge-sprout" style="display:inline-flex;align-items:center;gap:6px;font-size:0.75rem;padding:3px 10px;border-radius:999px;background:rgba(16,185,129,0.12);color:#10b981;font-weight:700;border:1px solid rgba(16,185,129,0.25);"><span>🌱</span><span>Первичное закрепление</span></span>
           </div>
-          <div class="fc-card ${pySkillViewState.cardFlipped?'fc-card--Answer':''}" data-py-flip-card>
-            <div>
+          <div class="fc-card fc-card--3d ${pySkillViewState.cardFlipped?'fc-card--Answer':''}" data-py-flip-card style="border: 1.5px solid rgba(16,185,129,0.45); border-radius: 18px; background: rgba(16,185,129,0.03); box-shadow: 0 4px 24px rgba(0,0,0,0.2), 0 0 16px rgba(16,185,129,0.06); cursor: pointer;">
+            <div class="fc-card-inner">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
                 <div class="topic-badge" style="background:${pySkillViewState.cardFlipped ? 'rgba(16,185,129,0.2)' : 'rgba(59,130,246,0.15)'};color:${pySkillViewState.cardFlipped ? '#34d399' : '#60a5fa'};font-weight:700;">
-                  ${pySkillViewState.cardFlipped ? 'Ответ (Разбор)' : 'Вопрос'}
+                  ${pySkillViewState.cardFlipped ? 'Ответ' : 'Вопрос'}
                 </div>
               </div>
               <div class="fc-q">${formatCardQuestionHTML(curCard.q)}</div>
@@ -13813,16 +13826,29 @@ function viewPythonSkill(sid){
             </div>
           </div>
           ${pySkillViewState.cardFlipped ? `
-            <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-              <button type="button" class="btn btn-ghost" style="padding:14px 16px;border-radius:14px;border:1.5px solid rgba(245,158,11,0.35);background:rgba(245,158,11,0.08);color:#fbbf24;font-weight:700;font-size:0.90rem;display:flex;align-items:center;justify-content:center;gap:6px;" data-py-card-loop="repeat" title="Вернуть карточку в конец очереди текущей сессии">
-                <span>🔄 Еще не запомнил</span>
+            <div class="fc-rate-row" style="margin-top:14px;">
+              <button type="button" class="btn btn-ghost" data-py-rate-card="1" title="Повторить снова через ${srsPrev.again.days} дн">
+                <span>Снова</span>
+                <span class="btn-subtext" style="display:block;font-size:0.75rem;opacity:0.75;margin-top:2px;">${srsPrev.again.days} дн</span>
               </button>
-              <button type="button" class="btn-glass-emerald btn-sprint-cta" style="padding:14px 16px;border-radius:14px;font-weight:800;font-size:0.92rem;display:flex;align-items:center;justify-content:center;gap:6px;" data-py-card-loop="pass" title="Отметить карточку как усвоенную">
-                <span>✓ Понятно, запомнил ➔</span>
+              <button type="button" class="btn btn-burgundy" data-py-rate-card="2" title="Повторить через ${srsPrev.hard.days} дн (+2 XP)">
+                <span>Трудно (+2 XP)</span>
+                <span class="btn-subtext" style="display:block;font-size:0.75rem;opacity:0.85;margin-top:2px;">${srsPrev.hard.days} дн</span>
+              </button>
+              <button type="button" class="btn btn-clay" data-py-rate-card="3" title="Повторить через ${srsPrev.good.days} дн (+5 XP)">
+                <span>Хорошо (+5 XP)</span>
+                <span class="btn-subtext" style="display:block;font-size:0.75rem;opacity:0.85;margin-top:2px;">${srsPrev.good.days} дн</span>
+              </button>
+              <button type="button" class="btn btn-primary" data-py-rate-card="4" title="Повторить через ${srsPrev.easy.days} дн (+10 XP)">
+                <span>Легко (+10 XP)</span>
+                <span class="btn-subtext" style="display:block;font-size:0.75rem;opacity:0.9;margin-top:2px;">${srsPrev.easy.days} дн</span>
               </button>
             </div>
+            <div style="margin-top:10px;display:flex;justify-content:flex-start;">
+              <button type="button" class="btn btn-ghost" data-py-prev-card ${qPos === 0 ? 'disabled' : ''} style="padding:8px 16px;border-radius:12px;font-size:0.84rem;">← Назад к предыдущей</button>
+            </div>
           ` : `
-            <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
+            <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
               <button type="button" class="btn btn-ghost" data-py-prev-card ${qPos === 0 ? 'disabled' : ''} style="padding:12px 18px;border-radius:14px;">← Назад</button>
               <button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;padding:12px 20px;border-radius:14px;font-weight:800;" data-py-flip-card>Показать ответ</button>
             </div>
@@ -14204,8 +14230,9 @@ function viewCardsHub(){
     <option value="4" ${cardsHubState.echelonFilter==='4'?'selected':''}>👑 Эшелон 4 · Архитектурный резерв</option>
     <option value="gaps" ${cardsHubState.echelonFilter==='gaps'?'selected':''}>🎯 Пробелы по диагностике</option>`;
 
-  const unitOpts = `<option value="all" ${cardsHubState.unitFilter==='all'?'selected':''}>Все 9 уроков Python (126 колод · 2 181 карточка) + все 7 модулей (${allDeckIds.length} колод)</option>` +
-    ALL_UNITS_COMBINED.map(u => `<option value="${u.id}" ${cardsHubState.unitFilter===u.id?'selected':''}>[Эшелон ${getEffectiveUnitTier(u.id)}] Урок ${u.id} · ${cleanUnitTitle(u.id, u.title)}</option>`).join('');
+  const unitPluralDecks = typeof pluralizeRu === 'function' ? pluralizeRu(allDeckIds.length, 'колода', 'колоды', 'колод') : 'колод';
+  const unitOpts = `<option value="all" ${cardsHubState.unitFilter==='all'?'selected':''}>Все 9 уроков Python (126 колод · 2 181 карточка) + все 7 модулей (${allDeckIds.length} ${unitPluralDecks})</option>` +
+    ALL_UNITS_COMBINED.map(u => `<option value="${u.id}" ${cardsHubState.unitFilter===u.id?'selected':''}>[Эшелон ${getEffectiveUnitTier(u.id)}] ${cleanUnitTitle(u.id, u.title)}</option>`).join('');
 
   let filteredDecks = allDeckIds;
   if(cardsHubState.echelonFilter === 'gaps'){
@@ -14243,16 +14270,18 @@ function viewCardsHub(){
   const deckOpts = filteredDecks.map(fid => {
     const d = ALL_DECKS_COMBINED[fid];
     const done = state.reviewedDecks.includes(fid);
-    const dt = getDeckInterviewTier(fid);
     const cleanDeckTitle = (d.title || fid).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
     const cardsCount = (d.cards || []).length;
-    return `<option value="${fid}" ${fid===cardsHubState.deckId?'selected':''}>${done?'✓ ':''}[Эшелон ${dt}] ${cleanDeckTitle} · ${cardsCount} ${pluralizeRu(cardsCount, 'карточка', 'карточки', 'карточек')}</option>`;
+    const cardsPlural = typeof pluralizeRu === 'function' ? pluralizeRu(cardsCount, 'карточка', 'карточки', 'карточек') : 'карточек';
+    return `<option value="${fid}" ${fid===cardsHubState.deckId?'selected':''}>${done?'✓ ':''}${cleanDeckTitle} · ${cardsCount} ${cardsPlural}</option>`;
   }).join('');
 
   if(cardsHubState.completed && cards.length > 0){
     const curDeckIdx = filteredDecks.indexOf(cardsHubState.deckId);
     const nextDeckId = (curDeckIdx >= 0 && curDeckIdx + 1 < filteredDecks.length) ? filteredDecks[curDeckIdx + 1] : null;
     const nextDeck = nextDeckId ? ALL_DECKS_COMBINED[nextDeckId] : null;
+    const cleanCurDeckTitle = (deck.title || cardsHubState.deckId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
+    const cleanNextDeckTitle = nextDeck ? (nextDeck.title || nextDeckId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim() : '';
     return `
     <div class="container">
       <div class="cards-hub-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
@@ -14260,30 +14289,32 @@ function viewCardsHub(){
           <span class="sr-only">Интервальное повторение RemNote · 286 колод · 6 051 карточка</span>
           <h1 style="margin:0;">🎉 Колода изучена!</h1>
         </div>
-        <div style="display:flex;gap:8px;align-items:center;">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           ${(() => {
             const srsStats = typeof getSpacedRepetitionStats === 'function' ? getSpacedRepetitionStats() : {dueTodayCardsCount:0, masteredCardsCount:0};
-            return `<span class="cocoon-pill">Изучено: <b>${state.reviewedDecks.length}/${allDeckIds.length}</b></span>
-            ${srsStats.dueTodayCardsCount > 0 ? `<span class="cocoon-pill" style="border-color:rgba(251,113,133,0.45);color:#fb7185;">🔥 К повторению: <b>${srsStats.dueTodayCardsCount}</b></span>` : `<span class="cocoon-pill" style="color:var(--moss);">✓ Повторено на сегодня</span>`}
-            <span class="cocoon-pill" style="color:#34d399;">👑 Закреплено: <b>${srsStats.masteredCardsCount || 0}</b></span>`;
+            const dueBtn = srsStats.dueTodayCardsCount > 0 ? `<button type="button" class="btn btn-burgundy" data-hub-review-due style="padding:6px 12px;font-size:.78rem;font-weight:700;" title="Запустить повторение карточек, запланированных на сегодня">🔥 Повторить на сегодня (<b>${srsStats.dueTodayCardsCount}</b>) ➔</button>` : '';
+            const revPill = state.reviewedDecks.length > 0
+              ? `<span class="cocoon-pill">Изучено: <b>${state.reviewedDecks.length}/${allDeckIds.length}</b></span>`
+              : `<span class="cocoon-pill">🌱 <b>0 изучено</b> · Старт повторения</span>`;
+            return `${revPill}${srsStats.dueTodayCardsCount > 0 ? dueBtn : `<span class="cocoon-pill" style="color:var(--moss);">✓ Повторено на сегодня</span>`}<span class="cocoon-pill" style="color:#34d399;">👑 Закреплено: <b>${srsStats.masteredCardsCount || 0}</b></span>`;
           })()}
-          ${primarySkill ? `<a href="#${primarySkill.routePrefix}/skill/${primarySkill.id}" class="btn btn-ghost" style="padding:6px 11px;font-size:.78rem;">💻 К практике темы (${primarySkill.id}) →</a>` : ''}
+          ${primarySkill ? `<a href="#${primarySkill.routePrefix}/skill/${primarySkill.id}" class="btn btn-ghost" style="padding:6px 11px;font-size:.78rem;">💻 К практике темы ➔</a>` : ''}
         </div>
       </div>
       <div class="cards-hub-controls">
         <div class="cards-hub-subfilters">
-          <select id="cards-echelon-filter" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.82rem;">${echelonOpts}</select>
-          <select id="cards-unit-select" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.82rem;">${unitOpts}</select>
+          <select id="cards-echelon-filter" class="srs-deck-filter-select" style="min-height:auto;padding:8px 10px;font-size:.82rem;">${echelonOpts}</select>
+          <select id="cards-unit-select" class="srs-deck-filter-select" style="min-height:auto;padding:8px 10px;font-size:.82rem;">${unitOpts}</select>
         </div>
-        <select id="cards-deck-select" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.85rem;font-weight:600;">${deckOpts}</select>
+        <select id="cards-deck-select" class="srs-deck-filter-select" style="min-height:auto;padding:8px 10px;font-size:.85rem;font-weight:600;">${deckOpts}</select>
       </div>
       <div class="panel" style="padding:32px 24px;text-align:center;margin-top:20px;">
         <div style="font-size:3rem;margin-bottom:12px;">🏆</div>
-        <h2 style="margin:0 0 10px;">Все ${cards.length} карточек колоды «${deck.title}» пройдены!</h2>
+        <h2 style="margin:0 0 10px;">Все ${cards.length} карточек колоды «${cleanCurDeckTitle}» пройдены!</h2>
         <p class="meta" style="max-width:540px;margin:0 auto 24px;line-height:1.55;">Колода успешно добавлена в интервальное повторение. Теперь закрепите теорию практическим написанием кода в тренажёре или переходите к следующей теме.</p>
         <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-          ${primarySkill ? `<a href="#${primarySkill.routePrefix}/skill/${primarySkill.id}" class="btn btn-primary btn-lg">💻 Перейти к практике темы (${primarySkill.id})</a>` : ''}
-          ${nextDeckId ? `<button class="btn btn-clay btn-lg" data-hub-next-deck="${nextDeckId}">Следующая колода (${nextDeckId}: ${nextDeck.title}) →</button>` : ''}
+          ${primarySkill ? `<a href="#${primarySkill.routePrefix}/skill/${primarySkill.id}" class="btn btn-primary btn-lg">💻 Перейти к практике темы</a>` : ''}
+          ${nextDeckId ? `<button class="btn btn-clay btn-lg" data-hub-next-deck="${nextDeckId}">Следующая колода: ${cleanNextDeckTitle} ➔</button>` : ''}
           <button class="btn btn-ghost btn-lg" data-hub-restart-deck>🔄 Повторить колоду сначала</button>
         </div>
       </div>
@@ -14297,48 +14328,71 @@ function viewCardsHub(){
           <span class="sr-only">Интервальное повторение RemNote · 286 колод · 6 051 карточка (126 колод Python + 25 колод Web + 43 колоды Backend + 16 колод Алгоритмы + 32 колоды Базы данных + 17 колод Архитектура + 45 колод Инфраструктура)</span>
           <h1 style="margin:0;">🃏 Центр 3D Флеш-карточек</h1>
         </div>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <span class="cocoon-pill">Изучено колод: <b>${state.reviewedDecks.length} / ${allDeckIds.length}</b></span>
-          ${primarySkill ? `<a href="#${primarySkill.routePrefix}/skill/${primarySkill.id}" class="btn btn-ghost" style="padding:6px 11px;font-size:.78rem;">💻 К практике темы (${primarySkill.id}) →</a>` : ''}
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          ${(() => {
+            const srsStats = typeof getSpacedRepetitionStats === 'function' ? getSpacedRepetitionStats() : {dueTodayCardsCount:0, masteredCardsCount:0};
+            const dueBtn = srsStats.dueTodayCardsCount > 0 ? `<button type="button" class="btn btn-burgundy" data-hub-review-due style="padding:6px 12px;font-size:.78rem;font-weight:700;" title="Запустить повторение карточек, запланированных на сегодня">🔥 Повторить на сегодня (<b>${srsStats.dueTodayCardsCount}</b>) ➔</button>` : '';
+            const revPill = state.reviewedDecks.length > 0
+              ? `<span class="cocoon-pill">Изучено колод: <b>${state.reviewedDecks.length} / ${allDeckIds.length}</b></span>`
+              : `<span class="cocoon-pill">🌱 <b>0 изучено</b> · Старт повторения</span>`;
+            return `${revPill}${dueBtn}`;
+          })()}
+          ${primarySkill ? `<a href="#${primarySkill.routePrefix}/skill/${primarySkill.id}" class="btn btn-ghost" style="padding:6px 11px;font-size:.78rem;">💻 К практике темы ➔</a>` : ''}
         </div>
       </div>
       <div class="cards-hub-controls">
         <div class="cards-hub-subfilters">
-          <select id="cards-echelon-filter" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.82rem;">${echelonOpts}</select>
-          <select id="cards-unit-select" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.82rem;">${unitOpts}</select>
+          <select id="cards-echelon-filter" class="srs-deck-filter-select" style="min-height:auto;padding:8px 10px;font-size:.82rem;">${echelonOpts}</select>
+          <select id="cards-unit-select" class="srs-deck-filter-select" style="min-height:auto;padding:8px 10px;font-size:.82rem;">${unitOpts}</select>
         </div>
-        <select id="cards-deck-select" class="code-editor" style="min-height:auto;padding:8px 10px;font-size:.85rem;font-weight:600;">${deckOpts}</select>
+        <select id="cards-deck-select" class="srs-deck-filter-select" style="min-height:auto;padding:8px 10px;font-size:.85rem;font-weight:600;">${deckOpts}</select>
       </div>
       <div class="fc-stage" style="margin-top:16px;">
         ${buildFcStoriesBarHTML(deck.id, cards.length, cIdx)}
-        <div class="fc-card fc-card--3d ${cardsHubState.flipped ? 'fc-card--flipped fc-card--Answer' : ''}" data-hub-flip style="margin-top:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 6px;font-size:0.82rem;">
+          <span style="color:var(--ink-muted);font-weight:600;">Карточка ${cards.length ? cIdx + 1 : 0} из ${cards.length}</span>
+          <span style="color:#34d399;font-weight:700;">Интервальное повторение</span>
+        </div>
+        <div class="fc-card fc-card--3d ${cardsHubState.flipped ? 'fc-card--flipped fc-card--Answer' : ''}" data-hub-flip style="margin-top:0;border: 1.5px solid rgba(16,185,129,0.45); border-radius: 18px; background: rgba(16,185,129,0.03); box-shadow: 0 4px 24px rgba(0,0,0,0.2), 0 0 16px rgba(16,185,129,0.06); cursor: pointer;">
           <div class="fc-card-inner">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
               <div style="display:flex;align-items:center;gap:8px;">
-                <div class="topic-badge">${cardsHubState.flipped ? 'Ответ' : 'Вопрос'}</div>
+                <div class="topic-badge" style="background:${cardsHubState.flipped ? 'rgba(16,185,129,0.2)' : 'rgba(59,130,246,0.15)'};color:${cardsHubState.flipped ? '#34d399' : '#60a5fa'};font-weight:700;">${cardsHubState.flipped ? 'Ответ' : 'Вопрос'}</div>
                 ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(cardsHubState.deckId + ':' + cIdx) : ''}
               </div>
-              
             </div>
             <div class="fc-q">${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(cur.q) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(cur.q) : cur.q)}</div>
             ${cardsHubState.flipped ? `<div class="fc-a" style="margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);">${typeof formatRichInlineText === 'function' ? formatRichInlineText(cur.a) : cur.a}</div>` : ''}
           </div>
-          <div class="meta" style="margin-top:12px;text-align:center;">Карточка ${cards.length ? cIdx + 1 : 0} из ${cards.length}</div>
         </div>
         ${cardsHubState.flipped ? (() => {
           const srsPrev = typeof computeRemNoteIntervals === 'function' ? computeRemNoteIntervals(cardsHubState.deckId + ':' + cIdx) : {again:{days:1},hard:{days:2},good:{days:3},easy:{days:7}};
           return `
-          <div class="fc-rate-row" style="margin-top:12px;">
-            <button class="btn btn-ghost" data-hub-rate="1" title="Повторить снова">Снова</button>
-            <button class="btn btn-burgundy" data-hub-rate="2" title="Повторить через 2 дня (+2 XP)">Трудно (+2 XP)</button>
-            <button class="btn btn-clay" data-hub-rate="3" title="Повторить через 3 дня (+5 XP)">Хорошо (+5 XP)</button>
-            <button class="btn btn-primary" data-hub-rate="4" title="Повторить через 7 дней (+10 XP)">Легко (+10 XP)</button>
+          <div class="fc-rate-row" style="margin-top:14px;">
+            <button type="button" class="btn btn-ghost" data-hub-rate="1" title="Повторить снова через ${srsPrev.again.days} дн">
+              <span>Снова</span>
+              <span class="btn-subtext" style="display:block;font-size:0.75rem;opacity:0.75;margin-top:2px;">${srsPrev.again.days} дн</span>
+            </button>
+            <button type="button" class="btn btn-burgundy" data-hub-rate="2" title="Повторить через ${srsPrev.hard.days} дн (+2 XP)">
+              <span>Трудно (+2 XP)</span>
+              <span class="btn-subtext" style="display:block;font-size:0.75rem;opacity:0.85;margin-top:2px;">${srsPrev.hard.days} дн</span>
+            </button>
+            <button type="button" class="btn btn-clay" data-hub-rate="3" title="Повторить через ${srsPrev.good.days} дн (+5 XP)">
+              <span>Хорошо (+5 XP)</span>
+              <span class="btn-subtext" style="display:block;font-size:0.75rem;opacity:0.85;margin-top:2px;">${srsPrev.good.days} дн</span>
+            </button>
+            <button type="button" class="btn btn-primary" data-hub-rate="4" title="Повторить через ${srsPrev.easy.days} дн (+10 XP)">
+              <span>Легко (+10 XP)</span>
+              <span class="btn-subtext" style="display:block;font-size:0.75rem;opacity:0.9;margin-top:2px;">${srsPrev.easy.days} дн</span>
+            </button>
+          </div>
+          <div style="margin-top:10px;display:flex;justify-content:flex-start;">
+            <button type="button" class="btn btn-ghost" data-hub-prev ${cIdx===0?'disabled':''} style="padding:8px 16px;border-radius:12px;font-size:0.84rem;">← Назад к предыдущей</button>
           </div>`;
         })() : `
-          <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn btn-ghost" data-hub-prev ${cIdx===0?'disabled':''}>← Назад</button>
-            <button class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-hub-flip>Показать ответ</button>
-            <button class="btn btn-ghost" data-hub-next ${cIdx + 1 >= cards.length ? 'disabled' : ''}>Дальше →</button>
+          <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
+            <button type="button" class="btn btn-ghost" data-hub-prev ${cIdx===0?'disabled':''} style="padding:12px 18px;border-radius:14px;">← Назад</button>
+            <button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;padding:12px 20px;border-radius:14px;font-weight:800;" data-hub-flip>Показать ответ</button>
           </div>`}
       </div>
     </div>`;
@@ -20333,14 +20387,24 @@ const psk = e.target.closest('[data-py-select-k]');
     return;
   }
   if(e.target.closest('[data-py-next-card]')){
-    const fid = pySkillViewState.fId;
-    const deck = ALL_DECKS_COMBINED[fid] || {cards:[]};
-    if(pySkillViewState.cardIdx + 1 < (deck.cards || []).length){
-      pySkillViewState.cardIdx++;
+    const curQueue = Array.isArray(pySkillViewState.sessionQueue) ? pySkillViewState.sessionQueue : [];
+    const qPos = pySkillViewState.sessionPos || 0;
+    if(qPos + 1 < curQueue.length){
+      pySkillViewState.sessionPos = qPos + 1;
       pySkillViewState.cardFlipped = false;
       pySkillViewState.sprintCelebration = null;
       saveReadingPosition();
       render();
+    } else {
+      const fid = pySkillViewState.fId;
+      const deck = ALL_DECKS_COMBINED[fid] || {cards:[]};
+      if(pySkillViewState.cardIdx + 1 < (deck.cards || []).length){
+        pySkillViewState.cardIdx++;
+        pySkillViewState.cardFlipped = false;
+        pySkillViewState.sprintCelebration = null;
+        saveReadingPosition();
+        render();
+      }
     }
     return;
   }
@@ -20422,7 +20486,7 @@ const psk = e.target.closest('[data-py-select-k]');
     return;
   }
 
-  // Совместимость с классическими кнопками рейтинга (если вызваны программно)
+  // Обработка 4 кнопок интервального повторения SRS в уроке
   const prc = e.target.closest('[data-py-rate-card]');
   if(prc){
     pySkillViewState.sprintCelebration = null;
@@ -20435,11 +20499,14 @@ const psk = e.target.closest('[data-py-select-k]');
       else rating = 3;
     }
     const fid = pySkillViewState.fId;
-    const deck = ALL_DECKS_COMBINED[fid] || {cards:[]};
+    const curQueue = Array.isArray(pySkillViewState.sessionQueue) ? pySkillViewState.sessionQueue : [];
+    const qPos = pySkillViewState.sessionPos || 0;
+    const cIdx = curQueue[qPos] !== undefined ? curQueue[qPos] : (pySkillViewState.cardIdx || 0);
+
     ensureExtendedState();
     let wasStudied = false;
     if(fid){
-      const ck = fid + ':' + (pySkillViewState.cardIdx || 0);
+      const ck = fid + ':' + cIdx;
       wasStudied = (state.cardRatings[ck] !== undefined && state.cardRatings[ck] > 0);
       if(typeof applyRemNoteCardRating === 'function'){
         applyRemNoteCardRating(ck, rating);
@@ -20451,26 +20518,26 @@ const psk = e.target.closest('[data-py-select-k]');
       if(rating >= 3) awardXp(rating === 4 ? 10 : 5);
       else if(rating === 2) awardXp(2);
     }
-    if(pySkillViewState.cardIdx + 1 < (deck.cards || []).length){
-      pySkillViewState.cardIdx++;
-      pySkillViewState.cardFlipped = false;
+
+    if(rating === 1){
+      // Карточка не запомнена — возвращаем в конец очереди текущей сессии
+      curQueue.push(cIdx);
+      pySkillViewState.sessionRepeats = (pySkillViewState.sessionRepeats || 0) + 1;
     } else {
+      pySkillViewState.sessionLearned = (pySkillViewState.sessionLearned || 0) + 1;
+    }
+
+    pySkillViewState.sessionPos = qPos + 1;
+    pySkillViewState.cardFlipped = false;
+
+    if(pySkillViewState.sessionPos >= curQueue.length){
+      // Вся пачка карточек успешно закреплена!
+      pySkillViewState.sessionDone = true;
+      awardXp(15);
       if(fid && !state.reviewedDecks.includes(fid)) state.reviewedDecks.push(fid);
       if(pySkillViewState.sid) setSkillMP(pySkillViewState.sid, 50);
-      pySkillViewState.cardIdx = 0;
-      pySkillViewState.cardFlipped = false;
-      const sk = PY_SKILLS_BY_ID[pySkillViewState.sid];
-      if(sk && Array.isArray(sk.fIds)){
-        const fIdx = sk.fIds.indexOf(fid);
-        if(fIdx >= 0 && fIdx + 1 < sk.fIds.length){
-          pySkillViewState.fId = sk.fIds[fIdx + 1];
-        } else {
-          pySkillViewState.tab = 'code';
-        }
-      } else {
-        pySkillViewState.tab = 'code';
-      }
     }
+
     saveReadingPosition();
     render();
     return;
@@ -21095,6 +21162,19 @@ const psk = e.target.closest('[data-py-select-k]');
     const nd = nextDeckBtn.getAttribute('data-hub-next-deck');
     if(nd && ALL_DECKS_COMBINED[nd]){
       cardsHubState.deckId = nd;
+      cardsHubState.completed = false;
+      cardsHubState.cardIdx = 0;
+      cardsHubState.flipped = false;
+      saveCardsHubPosState();
+      render();
+    }
+    return;
+  }
+  const revDueBtn = e.target.closest('[data-hub-review-due]');
+  if(revDueBtn){
+    const srsStats = typeof getSpacedRepetitionStats === 'function' ? getSpacedRepetitionStats() : null;
+    if(srsStats && srsStats.dueDecks && srsStats.dueDecks.length > 0){
+      cardsHubState.deckId = srsStats.dueDecks[0];
       cardsHubState.completed = false;
       cardsHubState.cardIdx = 0;
       cardsHubState.flipped = false;
@@ -21791,6 +21871,16 @@ document.addEventListener('keydown', function(e){
     return;
   }
   if(e.code === 'Space' || e.key === ' ' || e.key === 'Spacebar'){
+    const isFlippedHub = (typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.flipped);
+    const isFlippedSkill = (typeof pySkillViewState !== 'undefined' && pySkillViewState && pySkillViewState.tab === 'cards' && pySkillViewState.cardFlipped);
+    if(isFlippedHub){
+      const rateGoodBtn = document.querySelector('[data-hub-rate="3"]');
+      if(rateGoodBtn){ e.preventDefault(); rateGoodBtn.click(); return; }
+    }
+    if(isFlippedSkill){
+      const rateGoodBtn = document.querySelector('[data-py-rate-card="3"]');
+      if(rateGoodBtn){ e.preventDefault(); rateGoodBtn.click(); return; }
+    }
     const flipBtn = document.querySelector('[data-py-flip-card], [data-hub-flip]');
     if(flipBtn){ e.preventDefault(); flipBtn.click(); return; }
     const pyNextBtn = document.querySelector('[data-chunk-more="py"], [data-py-next-step], [data-py-step-check-next]');
@@ -21819,6 +21909,16 @@ document.addEventListener('keydown', function(e){
   if(e.key === 'Enter' && !e.ctrlKey && !e.metaKey){
     const bsNext = document.querySelector('.academy-bottom-sheet [data-lesson-next], .academy-bottom-sheet [data-diag-next], .academy-bottom-sheet [data-py-step-check-next]');
     if(bsNext){ e.preventDefault(); bsNext.click(); return; }
+    const isFlippedHub = (typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.flipped);
+    const isFlippedSkill = (typeof pySkillViewState !== 'undefined' && pySkillViewState && pySkillViewState.tab === 'cards' && pySkillViewState.cardFlipped);
+    if(isFlippedHub){
+      const rateGoodBtn = document.querySelector('[data-hub-rate="3"]');
+      if(rateGoodBtn){ e.preventDefault(); rateGoodBtn.click(); return; }
+    }
+    if(isFlippedSkill){
+      const rateGoodBtn = document.querySelector('[data-py-rate-card="3"]');
+      if(rateGoodBtn){ e.preventDefault(); rateGoodBtn.click(); return; }
+    }
     const pyNextBtn = document.querySelector('[data-chunk-more="py"], [data-py-next-step], [data-py-step-check-next]');
     if(pyNextBtn){ e.preventDefault(); pyNextBtn.click(); return; }
   }

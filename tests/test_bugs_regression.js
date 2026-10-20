@@ -710,9 +710,51 @@ assert(
 );
 console.log('✓ Bug 89: Single quotes default standard enforced in rules and codebase verified');
 
+// 90. Bug 90: Clean Human UI в дропдауне уроков #cards-unit-select (запрет кодов Урок 1.1)
+assert(!academyHtml.includes('[Эшелон ${getEffectiveUnitTier(u.id)}] Урок ${u.id}'), 'Bug 90: cards-unit-select must not format options with raw unit codes [Эшелон ${getEffectiveUnitTier(u.id)}] Урок ${u.id}');
+assert(academyHtml.includes('[Эшелон ${getEffectiveUnitTier(u.id)}] ${cleanUnitTitle(u.id, u.title)}'), 'Bug 90: cards-unit-select must format options with cleanUnitTitle');
+console.log('✓ Bug 90: Clean Human UI in cards-unit-select (no technical unit codes) verified');
+
+// 91. Bug 91: Грамматика русского языка: корректная плюрализация слова «колода» в заголовке уроков
+assert(!academyHtml.includes('(${allDeckIds.length} колод)'), 'Bug 91: academy.html must not hardcode raw (${allDeckIds.length} колод)');
+assert(academyHtml.includes("pluralizeRu(allDeckIds.length, 'колода', 'колоды', 'колод')"), 'Bug 91: academy.html must use pluralizeRu for decks count in unit select');
+console.log('✓ Bug 91: Russian grammar pluralization for decks in unit select verified');
+
+// 92. Bug 92: Очистка названий колод от избыточных префиксов [Эшелон N] в #cards-deck-select
+assert(!academyHtml.includes("`[Эшелон ${dt}] ${cleanDeckTitle}"), 'Bug 92: deckOpts must not prefix every deck with [Эшелон ${dt}]');
+assert(academyHtml.includes("${done?'✓ ':''}${cleanDeckTitle} · ${cardsCount} ${cardsPlural}"), 'Bug 92: deckOpts must output clean readable deck title and pluralized cards count');
+console.log('✓ Bug 92: Clean deck titles without redundant echelon prefix in #cards-deck-select verified');
+
+// 93. Bug 93: Позитивный дофаминовый старт при 0 изученных колод вместо 0 / 261
+assert(academyHtml.includes("🌱 <b>0 изучено</b> · Старт повторения"), 'Bug 93: cards hub header must render encouraging start status when 0 decks reviewed');
+console.log('✓ Bug 93: Positive dopamine start status in cards hub header verified');
+
+// 94. Bug 94: Навигация «Назад» на стороне ответа карточки (защита от тупика и ложной оценки)
+assert(academyHtml.includes("data-hub-prev ${cIdx===0?'disabled':''} style=\"padding:8px 16px;border-radius:12px;font-size:0.84rem;\">← Назад к предыдущей"), 'Bug 94: viewCardsHub must render [data-hub-prev] button on answer face');
+assert(academyHtml.includes("data-py-prev-card ${qPos === 0 ? 'disabled' : ''} style=\"padding:8px 16px;border-radius:12px;font-size:0.84rem;\">← Назад к предыдущей"), 'Bug 94: viewPythonSkill must render [data-py-prev-card] button on answer face');
+console.log('✓ Bug 94: Zero-trap navigation ([data-hub-prev] / [data-py-prev-card]) on card answer face verified');
+
+// 95. Bug 95: Ликвидация нерейтингового пропуска «Дальше →» на лицевой стороне карточки
+assert(!academyHtml.includes("data-hub-next ${cIdx + 1 >= cards.length ? 'disabled' : ''}>Дальше →"), 'Bug 95: unrated [data-hub-next] button must be removed from question face in viewCardsHub');
+assert(!academyHtml.includes("data-py-next-card ${qPos + 1 >= pySkillViewState.sessionQueue.length ? 'disabled' : ''} style=\"padding:12px 18px;border-radius:14px;\">Дальше →"), 'Bug 95: unrated [data-py-next-card] button must be removed from question face in viewPythonSkill');
+console.log('✓ Bug 95: Elimination of unrated skip button on question face verified');
+
+// 96. Bug 96: Явные интервалы повторения на кнопках оценки для мобильных устройств (Mobile-First)
+assert(academyHtml.includes("${srsPrev.again.days} дн</span>") && academyHtml.includes("${srsPrev.hard.days} дн</span>") && academyHtml.includes("${srsPrev.good.days} дн</span>") && academyHtml.includes("${srsPrev.easy.days} дн</span>"), 'Bug 96: rating buttons must display visible next review interval in days via subtext');
+console.log('✓ Bug 96: Mobile-First visible review intervals on rating buttons verified');
+
+// 97. Bug 97: Кнопка быстрого повторения карточек на сегодня data-hub-review-due
+assert(academyHtml.includes('data-hub-review-due'), 'Bug 97: viewCardsHub must render [data-hub-review-due] button when dueTodayCardsCount > 0');
+assert(academyHtml.includes("const revDueBtn = e.target.closest('[data-hub-review-due]')"), 'Bug 97: event listener must handle [data-hub-review-due] click');
+console.log('✓ Bug 97: Due-today quick review queue integration in cards hub verified');
+
+// 98. Bug 98: Горячие клавиши на десктопе: Enter/Space для оценки «Хорошо», ArrowLeft для возврата
+assert(academyHtml.includes("if(isFlippedHub){\n      const rateGoodBtn = document.querySelector('[data-hub-rate=\"3\"]');"), 'Bug 98: Enter and Space must trigger rating 3 when card is flipped');
+console.log('✓ Bug 98: Desktop keyboard ergonomics on card answer face verified');
+
 // Проверка спецификации канонических эталонов и инвариантов
 require('./test_pravki_spec.js');
 
 console.log('================================================================');
-console.log('  ALL 89 REGRESSION TESTS & CANONICAL BENCHMARKS PASSED (100%)  ');
+console.log('  ALL 98 REGRESSION TESTS & CANONICAL BENCHMARKS PASSED (100%)  ');
 console.log('================================================================\n');
