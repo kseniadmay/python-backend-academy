@@ -2138,6 +2138,18 @@
     border-color: rgba(251, 191, 36, 0.4);
     background: rgba(251, 191, 36, 0.06);
   }
+  .dot-jewel.dot-card {
+    border-radius: 2.5px !important;
+  }
+  .dots-topic-divider {
+    flex-shrink: 0;
+    width: 1px;
+    height: 7px;
+    background: rgba(255, 255, 255, 0.12);
+    margin: 0 2px;
+    position: relative;
+    z-index: 3;
+  }
   .dots-necklace-label {
     font-size: 0.72rem;
     font-family: var(--font-m);
@@ -13148,24 +13160,42 @@ function viewPythonSkill(sid){
   const rawUnitTitle = curUnit.title || sk.title || '';
   const cleanUnitTitleVal = cleanUnitTitle(curUnit.id, rawUnitTitle);
 
-  // 1. Конспекты теории текущего навыка
-  const noteDots = (sk.kIds || []).map((kId, idx) => {
+  const kIds = sk.kIds || [];
+  const fIds = sk.fIds || [];
+  const activeF = pySkillViewState.fId || (fIds && fIds[0]);
+
+  // Непрерывная нить точек: тематические карточки идут сразу после соответствующего конспекта
+  const topicClusterDots = [];
+  kIds.forEach((kId, idx) => {
+    // 1. Точка конспекта темы
     const n = ALL_NOTES_COMBINED[kId] || { title: kId };
     const isDone = state.readNotes.includes(kId);
     const isActive = (pySkillViewState.tab === 'theory' && kId === activeK);
     const cleanNoteTitle = (n.title || kId).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="${escapeHtmlStr(cleanNoteTitle)}" data-py-select-k="${kId}" data-py-skill-id="${sk.id}"></span>`;
-  }).join('');
+    topicClusterDots.push(`<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="${escapeHtmlStr(cleanNoteTitle)}" data-py-select-k="${kId}" data-py-skill-id="${sk.id}"></span>`);
 
-  // 2. Флеш-карточки текущего навыка
-  const activeF = pySkillViewState.fId || (sk.fIds && sk.fIds[0]);
-  const cardDots = (sk.fIds || []).map((fid, idx) => {
-    const d = ALL_DECKS_COMBINED[fid] || {};
-    const isDone = state.reviewedDecks.includes(fid);
-    const isActive = (pySkillViewState.tab === 'cards' && (activeF === fid || (!activeF && idx === 0)));
-    const cleanDeckTitle = (d.title || fid).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
-    return `<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="${escapeHtmlStr(cleanDeckTitle)}" data-py-select-f="${fid}"></span>`;
-  }).join('');
+    // 2. Карточки, соответствующие этому конспекту (следуют сразу за конспектом темы)
+    const matchingFids = [];
+    if(kIds.length === fIds.length){
+      if(fIds[idx]) matchingFids.push(fIds[idx]);
+    } else if(kIds.length > 0 && fIds.length > 0){
+      fIds.forEach((fid, fIdx) => {
+        const ownerNoteIdx = Math.min(kIds.length - 1, Math.floor(fIdx * kIds.length / fIds.length));
+        if(ownerNoteIdx === idx) matchingFids.push(fid);
+      });
+    }
+    matchingFids.forEach(fid => {
+      const d = ALL_DECKS_COMBINED[fid] || {};
+      const isCardDone = state.reviewedDecks.includes(fid);
+      const isCardActive = (pySkillViewState.tab === 'cards' && (activeF === fid || (!activeF && idx === 0)));
+      const cleanDeckTitle = (d.title || fid).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
+      topicClusterDots.push(`<span class="dot-jewel dot-card ${isCardActive ? 'active' : (isCardDone ? 'done' : '')}" title="${escapeHtmlStr(cleanDeckTitle)}" data-py-select-f="${fid}"></span>`);
+    });
+
+    if(idx < kIds.length - 1){
+      topicClusterDots.push(`<span class="dots-topic-divider" title="Следующая тема" style="flex-shrink:0;width:1px;height:7px;background:rgba(255,255,255,0.12);margin:0 2px;"></span>`);
+    }
+  });
 
   // 3. Задачи практики кода текущего навыка
   const tIds = (sk.taskIds && sk.taskIds.length) ? sk.taskIds : [20, 19, 39, 255, 258];
@@ -13184,9 +13214,7 @@ function viewPythonSkill(sid){
 
   const dotsNecklaceHTML = `
     <div class="dots-necklace" id="radar-dots-necklace">
-      ${noteDots}
-      <span class="dots-stage-divider" title="Переход к карточкам (SRS)"></span>
-      ${cardDots}
+      ${topicClusterDots.join('')}
       <span class="dots-stage-divider" title="Переход к задачам в IDE"></span>
       ${taskDots}
       <span class="dots-stage-divider" title="Рубежный зачёт урока"></span>
@@ -13208,18 +13236,7 @@ function viewPythonSkill(sid){
     activeItemTitle = 'Рубежный зачёт: ' + cleanUnitTitleVal;
   }
 
-  // Деликатный заголовок: название юнита приглушено (Refined Eyebrow), активная тема, ожерелье и сегментированный степпер микро-шагов
-  const stepProgressSegmentsHTML = (pySkillViewState.tab === 'theory' && steps.length > 1) ? `
-    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;max-width:760px;margin:10px auto 0;width:100%;">
-      <div style="display:flex;justify-content:space-between;align-items:center;width:100%;font-size:0.76rem;color:var(--ink-muted);font-weight:600;">
-        <span class="step-counter-pill" style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:2px 10px;border-radius:999px;">Шаг ${stepIdx + 1} из ${steps.length}</span>
-        <span style="opacity:0.8;">Сессия ~2 мин · Активное микрообучение</span>
-      </div>
-      <div class="step-segmented-track" style="display:flex;gap:4px;width:100%;height:4px;border-radius:999px;overflow:hidden;">
-        ${steps.map((_, si) => `<div class="step-segment" style="flex:1;height:100%;border-radius:999px;background:${si <= stepIdx ? '#10b981' : 'rgba(255,255,255,0.12)'};transition:background .2s ease;"></div>`).join('')}
-      </div>
-    </div>` : '';
-
+  // Деликатный заголовок: название юнита приглушено (Refined Eyebrow), активная тема и ожерелье точек
   const eyebrowDotsHTML = `
     <div class="topic-eyebrow-track" style="max-width:100%;margin:16px 0 22px;padding:0 2px;">
       <div style="display:flex;flex-direction:column;gap:12px;width:100%;">
@@ -13230,7 +13247,6 @@ function viewPythonSkill(sid){
         <div style="display:flex;justify-content:center;width:100%;">
           ${dotsNecklaceHTML}
         </div>
-        ${stepProgressSegmentsHTML}
       </div>
     </div>`;
 
@@ -13287,6 +13303,18 @@ function viewPythonSkill(sid){
     }
 
     if(pySkillViewState.sessionDone || cards.length === 0){
+      const curFidx = (sk.fIds || []).indexOf(activeF);
+      const curKidx = (sk.kIds || []).indexOf(pySkillViewState.kId);
+      const topicIdx = (curFidx >= 0) ? curFidx : Math.max(0, curKidx);
+      const hasNextTopic = (topicIdx + 1 < (sk.kIds || []).length);
+      let nextActionBtnText = 'Перейти к практике в IDE (+15 XP)';
+      if(hasNextTopic){
+        const nextKid = sk.kIds[topicIdx + 1];
+        const nextNoteObj = ALL_NOTES_COMBINED[nextKid] || {};
+        const cleanNextNoteTitle = (nextNoteObj.title || nextKid).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+        nextActionBtnText = `К следующей теме: «${cleanNextNoteTitle}» (+10 XP)`;
+      }
+
       // Handoff Screen: экран завершения первичного ознакомления и передачи в долгосрочный тренажёр
       bodyHTML = `
         <div class="card" style="margin-top:0;padding:36px 24px;text-align:center;border:1.5px solid rgba(16,185,129,0.35);border-radius:24px;background:radial-gradient(ellipse at top, rgba(16,185,129,0.12), transparent 70%), var(--surface);">
@@ -13307,7 +13335,7 @@ function viewPythonSkill(sid){
             </div>
           </div>
           <button type="button" class="btn-glass-emerald btn-sprint-cta" style="width:100%;max-width:440px;padding:16px 24px;font-size:1rem;font-weight:800;border-radius:16px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:8px;" data-py-finish-cards-btn>
-            <span>Перейти к практике в IDE (+15 XP)</span>
+            <span>${escapeHtmlStr(nextActionBtnText)}</span>
             <span>➔</span>
           </button>
         </div>`;
@@ -19940,6 +19968,21 @@ const psk = e.target.closest('[data-py-select-k]');
       awardXp(15);
     }
     if(pySkillViewState.sid) setSkillMP(pySkillViewState.sid, 50);
+
+    // Привязываем активную колоду карточек строго к завершённому конспекту
+    const sk = PY_SKILLS_BY_ID[pySkillViewState.sid];
+    if(sk && Array.isArray(sk.kIds) && Array.isArray(sk.fIds)){
+      const kIdx = sk.kIds.indexOf(kid);
+      if(kIdx >= 0){
+        if(sk.kIds.length === sk.fIds.length && sk.fIds[kIdx]){
+          pySkillViewState.fId = sk.fIds[kIdx];
+        } else if(sk.fIds.length > 0){
+          const targetFidx = Math.min(sk.fIds.length - 1, Math.floor(kIdx * sk.fIds.length / sk.kIds.length));
+          pySkillViewState.fId = sk.fIds[targetFidx];
+        }
+      }
+    }
+
     // Прямой переход к тематическим карточкам темы (Clean 3-Stage Pipeline: Конспект ➔ Карточки ➔ IDE)
     pySkillViewState.tab = 'cards';
     pySkillViewState.sessionFid = null;
@@ -20067,24 +20110,34 @@ const psk = e.target.closest('[data-py-select-k]');
     return;
   }
 
-  // Кнопка перехода с экрана завершения карточек в IDE-практику
+  // Кнопка перехода с экрана завершения карточек: к следующей теме или в IDE-практику
   const finishCardsBtn = e.target.closest('[data-py-finish-cards-btn]');
   if(finishCardsBtn){
     pySkillViewState.sprintCelebration = null;
+    pySkillViewState.cardFlipped = false;
     const fid = pySkillViewState.fId;
     const sk = PY_SKILLS_BY_ID[pySkillViewState.sid];
-    pySkillViewState.cardFlipped = false;
-    if(sk && Array.isArray(sk.fIds)){
-      const fIdx = sk.fIds.indexOf(fid);
-      if(fIdx >= 0 && fIdx + 1 < sk.fIds.length){
-        pySkillViewState.fId = sk.fIds[fIdx + 1];
-        pySkillViewState.sessionFid = null;
-        pySkillViewState.sessionDone = false;
-      } else {
-        pySkillViewState.tab = 'code';
-      }
+    const kIds = (sk && sk.kIds) || [];
+    const fIds = (sk && sk.fIds) || [];
+    const curFidx = fIds.indexOf(fid);
+    const curKidx = kIds.indexOf(pySkillViewState.kId);
+    const topicIdx = (curFidx >= 0) ? curFidx : Math.max(0, curKidx);
+
+    if(topicIdx + 1 < kIds.length){
+      // Переход к следующему конспекту (Следующая тема)
+      const nextKid = kIds[topicIdx + 1];
+      pySkillViewState.tab = 'theory';
+      pySkillViewState.kId = nextKid;
+      pySkillViewState.stepIdx = 0;
+      pySkillViewState.chunkIdx = 0;
+      pySkillViewState.sessionFid = null;
+      pySkillViewState.sessionDone = false;
     } else {
+      // Все темы и карточки освоены — переход к практике в IDE
       pySkillViewState.tab = 'code';
+      if(sk && Array.isArray(sk.taskIds) && sk.taskIds.length > 0){
+        pySkillViewState.taskId = sk.taskIds[0];
+      }
     }
     saveReadingPosition();
     render();

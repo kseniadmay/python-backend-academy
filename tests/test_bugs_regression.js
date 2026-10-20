@@ -737,13 +737,13 @@ console.log('✓ Bugs 99-106: Flashcards & SRS Trainer Regression Suite verified
 require('./test_notes_presentation_regression.js');
 console.log('✓ Bugs 107-120: Notes Presentation & Active Micro-learning Regression Suite verified (14/14 PASS)');
 
-// 121-127. Bugs 121-127: Skill Screen Visual & Pedagogical Regression Suite (Defects 1..7)
+// 121-131. Bugs 121-131: Skill Screen Visual & Pedagogical Regression Suite (Defects 1..11)
 require('./test_skill_screen_regression.js');
-console.log('✓ Bugs 121-127: Skill Screen Visual & Pedagogical Regression Suite verified (7/7 PASS)');
+console.log('✓ Bugs 121-131: Skill Screen Visual & Pedagogical Regression Suite verified (11/11 PASS)');
 
 // Проверка спецификации канонических эталонов и инвариантов
 require('./test_pravki_spec.js');
 
 console.log('================================================================');
-console.log('  ALL 127 REGRESSION TESTS & CANONICAL BENCHMARKS PASSED (100%) ');
+console.log('  ALL 131 REGRESSION TESTS & CANONICAL BENCHMARKS PASSED (100%) ');
 console.log('================================================================\n');

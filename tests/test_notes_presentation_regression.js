@@ -35,7 +35,7 @@ function testBug107_SyntaxHighlightingDoubleQuotes(){
   console.log('✓ Bug 107: Syntax highlighting handles &quot; double quoted strings');
 }
 
-// Bug 108 (Defect 2): Видимый человеческий счётчик и сегментированный степпер микро-шагов текущего конспекта
+// Bug 108 (Defect 2): Ликвидация мусорных текстовых строк («Шаг X из Y», «Сессия ~2 мин») и чистота заголовка
 function testBug108_VisibleStepCounterAndSegmentedBar(){
   const vsSkillMatch = academyHtml.slice(
     academyHtml.indexOf('function viewPythonSkill('),
@@ -43,18 +43,18 @@ function testBug108_VisibleStepCounterAndSegmentedBar(){
   );
 
   assert(
-    vsSkillMatch.includes('Шаг ${stepIdx + 1} из ${steps.length}') ||
-    vsSkillMatch.includes('Шаг ${stepIdx+1} из ${steps.length}') ||
-    vsSkillMatch.includes('step-counter-pill'),
-    'Bug 108: viewPythonSkill must render a visible step counter ("Шаг X из Y") for current note steps'
+    !vsSkillMatch.includes('Шаг ${stepIdx + 1} из ${steps.length}'),
+    'Bug 108: viewPythonSkill must eliminate "Шаг X из Y" junk text from skill screen header'
   );
   assert(
-    vsSkillMatch.includes('step-segmented-track') ||
-    vsSkillMatch.includes('step-segment') ||
-    vsSkillMatch.includes('sprint-step-progress'),
-    'Bug 108: viewPythonSkill must render a segmented progress bar for current lesson steps'
+    !vsSkillMatch.includes('Сессия ~2 мин · Активное микрообучение'),
+    'Bug 108: viewPythonSkill must eliminate "Сессия ~2 мин · Активное микрообучение" junk text from skill screen header'
   );
-  console.log('✓ Bug 108: Visible human step counter and segmented step progress bar verified');
+  assert(
+    !vsSkillMatch.includes('step-counter-pill'),
+    'Bug 108: viewPythonSkill must eliminate step-counter-pill clutter from header'
+  );
+  console.log('✓ Bug 108: Elimination of junk text lines and clean skill screen header verified');
 }
 
 // Bug 109 (Defect 3): Разграничение понятий «Тема» и «Шаг» в навигации

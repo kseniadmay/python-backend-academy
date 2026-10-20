@@ -137,6 +137,81 @@ function testBug127_ComprehensionChecksEliminated(){
   console.log('✓ Bug 127: Complete elimination of comprehension check quizzes in favor of thematic flashcards and SRS verified');
 }
 
+// 8. Bug 128 (Defect 8): Полная ликвидация мусорных строк («Шаг 7 из 7», «Сессия ~2 мин») из шапки экрана навыка
+function testBug128_JunkStepCounterLinesEliminated(){
+  const vsSkillMatch = academyHtml.slice(
+    academyHtml.indexOf('function viewPythonSkill('),
+    academyHtml.indexOf('function viewCardsHub(')
+  );
+  assert(
+    !vsSkillMatch.includes('Шаг ${stepIdx + 1} из ${steps.length}'),
+    'Bug 128: "Шаг X из Y" junk text must be completely eliminated from skill screen header'
+  );
+  assert(
+    !vsSkillMatch.includes('Сессия ~2 мин · Активное микрообучение'),
+    'Bug 128: "Сессия ~2 мин · Активное микрообучение" junk text must be completely eliminated from skill screen header'
+  );
+  assert(
+    !vsSkillMatch.includes('step-counter-pill'),
+    'Bug 128: step-counter-pill class must be removed from skill header'
+  );
+  console.log('✓ Bug 128: Elimination of junk step counter lines and clean skill header verified');
+}
+
+// 9. Bug 129 (Defect 9): Архитектура парных точек тем (тематические карточки идут сразу после соответствующего конспекта)
+function testBug129_PairedDotsArchitecture(){
+  const vsSkillMatch = academyHtml.slice(
+    academyHtml.indexOf('function viewPythonSkill('),
+    academyHtml.indexOf('function viewCardsHub(')
+  );
+  assert(
+    vsSkillMatch.includes('topicClusterDots'),
+    'Bug 129: viewPythonSkill must build paired topicClusterDots sequence'
+  );
+  assert(
+    vsSkillMatch.includes('dot-jewel dot-card'),
+    'Bug 129: Card dots must use .dot-jewel.dot-card class to be visually paired with their note'
+  );
+  assert(
+    vsSkillMatch.includes('dots-topic-divider'),
+    'Bug 129: Subtle topic divider must separate thematic clusters'
+  );
+  console.log('✓ Bug 129: Paired dots architecture (cards immediately follow their note) verified');
+}
+
+// 10. Bug 130 (Defect 10): Сквозной переход от карточек к следующей теме или в практику IDE
+function testBug130_IntraSkillCardsToNextTopicTransition(){
+  const finishCardsHandler = academyHtml.slice(
+    academyHtml.indexOf("const finishCardsBtn = e.target.closest('[data-py-finish-cards-btn]');"),
+    academyHtml.indexOf("const prc = e.target.closest('[data-py-rate-card]');")
+  );
+  assert(
+    finishCardsHandler.includes("pySkillViewState.tab = 'theory';") &&
+    finishCardsHandler.includes('pySkillViewState.kId = nextKid;'),
+    'Bug 130: Finishing cards must transition to next topic theory note when more topics exist'
+  );
+  assert(
+    finishCardsHandler.includes("pySkillViewState.tab = 'code';"),
+    'Bug 130: Finishing cards on the last topic must transition directly to IDE practice'
+  );
+  console.log('✓ Bug 130: Seamless intra-skill transition from cards to next topic theory verified');
+}
+
+// 11. Bug 131 (Defect 11): Верификация загрузки реального бэкапа прогресса пользователя (user_progress_backup.json)
+function testBug131_UserProgressBackupLoad(){
+  const backupPath = path.join(rootDir, 'tests', 'fixtures', 'user_progress_backup.json');
+  assert(fs.existsSync(backupPath), `User backup fixture missing at ${backupPath}`);
+  const raw = fs.readFileSync(backupPath, 'utf-8');
+  const backup = JSON.parse(raw);
+  assert(backup.academyState, 'Backup must contain valid academyState');
+  assert(backup.academyState.xp >= 6000, `User XP must be >= 6000, got ${backup.academyState.xp}`);
+  assert(backup.academyState.streak >= 15, `User streak must be >= 15, got ${backup.academyState.streak}`);
+  assert(Array.isArray(backup.academyState.readNotes), 'readNotes must be an array');
+  assert(Array.isArray(backup.academyState.reviewedDecks), 'reviewedDecks must be an array');
+  assert(backup.academyState.readingPositions && backup.academyState.readingPositions['1.9.1'], 'Backup must preserve Skill 1.9.1 reading position');
+  console.log('✓ Bug 131: Real user progress backup verified (XP: ' + backup.academyState.xp + ', Streak: ' + backup.academyState.streak + ' days)');
+}
+
 // Экспорт и запуск всех тестов
 function runAllSkillScreenRegressionTests(){
   testBug121_NoCoddyMentionInSkillLayout();
@@ -146,8 +221,12 @@ function runAllSkillScreenRegressionTests(){
   testBug125_CleanHumanExamMilestoneTitle();
   testBug126_NoSolutionSpoilerQuickTokens();
   testBug127_ComprehensionChecksEliminated();
+  testBug128_JunkStepCounterLinesEliminated();
+  testBug129_PairedDotsArchitecture();
+  testBug130_IntraSkillCardsToNextTopicTransition();
+  testBug131_UserProgressBackupLoad();
   console.log('\n================================================================');
-  console.log('  ALL 7 SKILL SCREEN REGRESSION TESTS (BUGS 121..127) PASSED!   ');
+  console.log('  ALL 11 SKILL SCREEN REGRESSION TESTS (BUGS 121..131) PASSED!  ');
   console.log('================================================================\n');
 }
 
@@ -169,5 +248,9 @@ module.exports = {
   testBug124_SingleDominantCtaToCards,
   testBug125_CleanHumanExamMilestoneTitle,
   testBug126_NoSolutionSpoilerQuickTokens,
-  testBug127_ComprehensionChecksEliminated
+  testBug127_ComprehensionChecksEliminated,
+  testBug128_JunkStepCounterLinesEliminated,
+  testBug129_PairedDotsArchitecture,
+  testBug130_IntraSkillCardsToNextTopicTransition,
+  testBug131_UserProgressBackupLoad
 };
