@@ -585,27 +585,14 @@ assert(academyHtml.includes('<span>🌱</span><span>Первичное закр�
 assert(academyHtml.includes('.badge, .topic-badge, .state-tag, .fc-badge, .badge-sprout{display:inline-flex !important;align-items:center !important;gap:6px !important;}'), 'Global CSS rule for badge flexbox alignment and gap: 6px must be present');
 console.log('✓ Bug 84: Sprout badge kerning and global flexbox badge gap verified');
 
-// 85. Bug 85: Активная проверка понимания (Active Comprehension Check) в конспектах
-assert(academyHtml.includes('const NOTE_STEP_CHECKS = {'), 'NOTE_STEP_CHECKS registry must be defined in academy.html');
-assert(academyHtml.includes('window.NOTE_STEP_CHECKS = NOTE_STEP_CHECKS;'), 'NOTE_STEP_CHECKS must be exposed on window');
-assert(academyHtml.includes('data-py-step-answer'), 'academy.html must contain handler for data-py-step-answer');
-assert(academyHtml.includes('data-py-step-check-next'), 'academy.html must contain handler for data-py-step-check-next');
-assert(academyHtml.includes('🎯 Проверка понимания') && !academyHtml.includes('🎯 Проверка понимания (Coddy)'), 'academy.html must render clean comprehension check header without Coddy');
-assert(academyHtml.includes('.academy-bottom-sheet--correct') && academyHtml.includes('.academy-bottom-sheet--wrong'), 'Bottom sheet styling classes must be present');
-
-// Проверка всех 8 шагов конспекта К-001 в NOTE_STEP_CHECKS
-const mChecks = academyHtml.match(/const NOTE_STEP_CHECKS = ({[\s\S]*?});\s*window\.NOTE_STEP_CHECKS/);
-assert(mChecks, 'academy.html must contain parseable NOTE_STEP_CHECKS');
-const noteStepChecks = eval('(' + mChecks[1] + ')');
-for(let s = 0; s < 8; s++){
-  const key = `К-001:${s}`;
-  assert(noteStepChecks[key], `NOTE_STEP_CHECKS must contain entry for ${key}`);
-  assert(typeof noteStepChecks[key].q === 'string' && noteStepChecks[key].q.length > 10, `${key} must have valid question`);
-  assert(Array.isArray(noteStepChecks[key].options) && noteStepChecks[key].options.length >= 2, `${key} must have at least 2 options`);
-  assert(typeof noteStepChecks[key].correct === 'number' && noteStepChecks[key].correct >= 0 && noteStepChecks[key].correct < noteStepChecks[key].options.length, `${key} must have valid correct index`);
-  assert(typeof noteStepChecks[key].explain === 'string' && noteStepChecks[key].explain.length > 15, `${key} must have detailed pedagogical explanation`);
-}
-console.log('✓ Bug 85: Active comprehension check (8 steps of K-001) verified');
+// 85. Bug 85: Прямой переход от конспекта к тематическим карточкам (Direct Note-to-Cards Pipeline)
+assert(academyHtml.includes('data-py-finish-note'), 'academy.html must contain handler for data-py-finish-note');
+assert(academyHtml.includes('Закрепить в карточках (+10 XP) ➔'), 'Finish note CTA must lead directly to thematic flashcards');
+assert(academyHtml.includes("pySkillViewState.tab = 'cards'"), 'Finishing note must transition view to thematic flashcards');
+assert(!academyHtml.includes('data-py-start-check'), 'Comprehension check intermediate button must be completely eliminated');
+assert(!academyHtml.includes('data-py-step-answer'), 'data-py-step-answer handler must be completely eliminated');
+assert(academyHtml.includes('data-py-finish-cards-btn'), 'Handoff from thematic flashcards to IDE practice must be present');
+console.log('✓ Bug 85: Direct Note-to-Cards transition and elimination of comprehension quizzes verified');
 
 // 86. Bug 86: Исправление ложного срабатывания виджета реверса списка на задачах 19 и 255
 const mTasks = academyHtml.match(/const IDE_TASKS = (\[[\s\S]*?\]);\s*const IDE_TASKS_BY_ID/);
@@ -631,33 +618,23 @@ assert(!reverseRegex.test(desc255) && !(task255.solution && task255.solution.inc
 assert(reverseRegex.test(desc20) || (task20.solution && task20.solution.includes('[::-1]')), 'Task 20 must trigger reverse list anatomy widget');
 console.log('✓ Bug 86: Reverse list widget regex precision (Task 19 & 255 skipped, Task 20 matched) verified');
 
-// 87. Bug 87: Активное микрообучение для Навыка 1.9.1 (38 активных проверок понимания по 5 конспектам и Mobile-First 390px)
-const mChecks87 = academyHtml.match(/const NOTE_STEP_CHECKS = ({[\s\S]*?});\s*window\.NOTE_STEP_CHECKS/);
-assert(mChecks87, 'academy.html must contain parseable NOTE_STEP_CHECKS');
-const noteStepChecks87 = eval('(' + mChecks87[1] + ')');
+// 87. Bug 87: Активное первичное закрепление в тематических карточках для Навыка 1.9.1
+const mPyMastery87 = academyHtml.match(/const PY_MASTERY\s*=\s*(\{.*?\});\n/);
+assert(mPyMastery87, 'PY_MASTERY must be present');
+const pyMastery87 = JSON.parse(mPyMastery87[1]);
+const sk191_87 = pyMastery87.units.flatMap(u => u.skills).find(s => s.id === '1.9.1');
+assert(sk191_87, 'Skill 1.9.1 must exist in PY_MASTERY');
+assert.strictEqual(sk191_87.kIds.length, 5, 'Skill 1.9.1 must contain 5 micro-learning notes');
+assert.strictEqual(sk191_87.fIds.length, 5, 'Skill 1.9.1 must contain 5 paired thematic flashcard decks');
 
-const expectedSkills191 = {
-  'К-055': 14,
-  'К-056': 7,
-  'К-057': 6,
-  'К-222': 6,
-  'К-220': 5
-};
-
-let verified191StepsCount = 0;
-for(const [kid, stepCount] of Object.entries(expectedSkills191)){
-  for(let s = 0; s < stepCount; s++){
-    const key = `${kid}:${s}`;
-    assert(noteStepChecks87[key], `Bug 87: NOTE_STEP_CHECKS must contain entry for ${key}`);
-    assert(typeof noteStepChecks87[key].q === 'string' && noteStepChecks87[key].q.length > 10, `${key} must have valid question`);
-    assert(Array.isArray(noteStepChecks87[key].options) && noteStepChecks87[key].options.length === 3, `${key} must have exactly 3 options`);
-    assert(typeof noteStepChecks87[key].correct === 'number' && noteStepChecks87[key].correct >= 0 && noteStepChecks87[key].correct < 3, `${key} must have valid correct index`);
-    assert(typeof noteStepChecks87[key].explain === 'string' && noteStepChecks87[key].explain.length > 20, `${key} must have detailed pedagogical explanation`);
-    verified191StepsCount++;
-  }
+let verified191CardsCount = 0;
+for(const fid of sk191_87.fIds){
+  const deck = pyMastery87.decks[fid];
+  assert(deck && Array.isArray(deck.cards) && deck.cards.length >= 6, `Deck ${fid} must contain at least 6 cards`);
+  verified191CardsCount += deck.cards.length;
 }
-assert.strictEqual(verified191StepsCount, 38, 'Must verify all 38 steps of Skill 1.9.1');
-console.log(`✓ Bug 87: Active micro-learning comprehension checks (${verified191StepsCount} steps across 5 notes of Skill 1.9.1) verified`);
+assert(verified191CardsCount >= 38, `Skill 1.9.1 decks must contain >= 38 cards covering micro-learning steps, got ${verified191CardsCount}`);
+console.log(`✓ Bug 87: Thematic flashcards active learning (${verified191CardsCount} cards across 5 decks of Skill 1.9.1) verified`);
 
 // 88. Bug 88: Строгий инвариант запрета технического упоминания «Кодди» / «Coddy» в регламентах и UI
 const agentsMdPath = path.join(rootDir, 'AGENTS.md');
@@ -700,8 +677,8 @@ assert(
   'workspace-rule.md must define single quotes default invariant'
 );
 assert(
-  academyHtml.includes("'К-055:0'"),
-  'NOTE_STEP_CHECKS in academy.html must format dictionary step keys using single quotes'
+  academyHtml.includes("pySkillViewState.tab = 'cards'") || academyHtml.includes("pySkillViewState.tab === 'theory'"),
+  'JavaScript state updates in academy.html must format string values using single quotes'
 );
 const thisTestFile = fs.readFileSync(__filename, 'utf-8');
 assert(
@@ -760,9 +737,13 @@ console.log('✓ Bugs 99-106: Flashcards & SRS Trainer Regression Suite verified
 require('./test_notes_presentation_regression.js');
 console.log('✓ Bugs 107-120: Notes Presentation & Active Micro-learning Regression Suite verified (14/14 PASS)');
 
+// 121-127. Bugs 121-127: Skill Screen Visual & Pedagogical Regression Suite (Defects 1..7)
+require('./test_skill_screen_regression.js');
+console.log('✓ Bugs 121-127: Skill Screen Visual & Pedagogical Regression Suite verified (7/7 PASS)');
+
 // Проверка спецификации канонических эталонов и инвариантов
 require('./test_pravki_spec.js');
 
 console.log('================================================================');
-console.log('  ALL 120 REGRESSION TESTS & CANONICAL BENCHMARKS PASSED (100%) ');
+console.log('  ALL 127 REGRESSION TESTS & CANONICAL BENCHMARKS PASSED (100%) ');
 console.log('================================================================\n');

@@ -55,7 +55,7 @@ assert(academyHtml.includes('Легко (+10 XP)'), 'Cards must include SRS butt
 console.log('✓ 2. Flashcards SRS Benchmark: 4 кнопки повторения (+2/+5/+10 XP), шпаргалка и переворот подтверждены');
 
 // 3. Экран задачи и практики (эталон_практика_задача.png)
-assert(academyHtml.includes('practice-coddy-split'), 'Practice must feature desktop Split-View (.practice-coddy-split)');
+assert(academyHtml.includes('practice-atomic-split'), 'Practice must feature desktop Split-View (.practice-atomic-split)');
 assert(academyHtml.includes('Поток данных') || academyHtml.includes('I/O Flow'), 'Practice must feature DataFlow Transform Visualizer');
 assert(academyHtml.includes('Анатомия') || academyHtml.includes('slice-anatomy'), 'Practice must feature visual index anatomy diagrams');
 assert(academyHtml.includes('Наставник Сократ') || academyHtml.includes('socraticHints'), 'Practice must feature Socratic mentor scaffolding');
@@ -90,12 +90,12 @@ assert(academyHtml.includes('title="Откроется последовател�
 assert(academyHtml.includes('const isActive = Boolean(!firstUnreadK && firstUnreviewedF === s.id);'), '13-dots tracker must enforce single global focus');
 console.log('✓ 6. Dashboard Invariants: Single Focus, Friendly 0 XP Topbar, Friendly SRS Empty State & Clean Accordion confirmed');
 
-// 7. Active Micro-learning Pedagogical Benchmark (Эталон педагогики)
-assert(academyHtml.includes('const NOTE_STEP_CHECKS ='), 'Must define NOTE_STEP_CHECKS active recall map');
-assert(academyHtml.includes('data-py-start-check'), 'Must implement two-phase theory active recall transition');
-assert(academyHtml.includes('step-check-container') && academyHtml.includes('btn-step-check-opt'), 'Must render active comprehension check container with options');
-assert(academyHtml.includes('academy-bottom-sheet') && academyHtml.includes('academy-bottom-sheet--correct'), 'Must render tactile bottom sheet feedback drawer');
-console.log('✓ 7. Active Micro-learning Pedagogical Benchmark: 100% активный отклик (NOTE_STEP_CHECKS), неделимый атом, интерактивность и обучающая шторка подтверждены');
+// 7. Active Micro-learning Pedagogical Benchmark (Эталон педагогики: Конспект ➔ Тематические карточки ➔ Практика в IDE ➔ SRS)
+assert(academyHtml.includes("pySkillViewState.tab = 'cards'"), 'Must implement direct transition from note to thematic flashcards');
+assert(academyHtml.includes('data-py-finish-note'), 'Must provide Single Dominant CTA to finish note and enter flashcards');
+assert(academyHtml.includes('data-py-finish-cards-btn'), 'Must provide handoff from flashcards to IDE practice');
+assert(!academyHtml.includes('practice-coddy-split'), 'Must strictly eliminate practice-coddy-split class');
+console.log('✓ 7. Active Micro-learning Pedagogical Benchmark: прямой переход от конспекта к тематическим карточкам, неделимый атом и интеграция с SRS подтверждены');
 
 console.log('\n================================================================');
 console.log('  ALL CANONICAL BENCHMARK SPECIFICATIONS PASSED! (100% PERFECT) ');

@@ -57,7 +57,7 @@ function testBug108_VisibleStepCounterAndSegmentedBar(){
   console.log('✓ Bug 108: Visible human step counter and segmented step progress bar verified');
 }
 
-// Bug 109 (Defect 3): Разграничение понятий «Тема» и «Шаг» в навигации Bottom Sheet
+// Bug 109 (Defect 3): Разграничение понятий «Тема» и «Шаг» в навигации
 function testBug109_StepVsThemeTerminology(){
   const vsSkillMatch = academyHtml.slice(
     academyHtml.indexOf('function viewPythonSkill('),
@@ -69,13 +69,13 @@ function testBug109_StepVsThemeTerminology(){
     'Bug 109: Navigation within note steps must not call a step a "тема" (found "Дальше к следующей теме ➔")'
   );
   assert(
-    vsSkillMatch.includes('Дальше к следующему шагу ➔') || vsSkillMatch.includes('Следующий шаг ➔'),
-    'Bug 109: Navigation within note steps must use "Дальше к следующему шагу ➔" or "Следующий шаг ➔"'
+    vsSkillMatch.includes('Следующий шаг'),
+    'Bug 109: Navigation within note steps must use "Следующий шаг"'
   );
-  console.log('✓ Bug 109: Step vs Theme terminology invariant in bottom sheet verified');
+  console.log('✓ Bug 109: Step vs Theme terminology invariant in theory navigation verified');
 }
 
-// Bug 110 (Defect 4): Инвариант Single Dominant CTA и двухфазное разделение «Микро-ввод ➔ Активный отклик»
+// Bug 110 (Defect 4): Инвариант Single Dominant CTA и прямой переход от конспекта к тематическим карточкам
 function testBug110_SingleDominantCtaTheoryFlow(){
   const vsSkillMatch = academyHtml.slice(
     academyHtml.indexOf('function viewPythonSkill('),
@@ -84,27 +84,26 @@ function testBug110_SingleDominantCtaTheoryFlow(){
 
   assert(
     !vsSkillMatch.includes('👆 Ответьте на вопрос для продолжения'),
-    'Bug 110: Single Dominant CTA must not be replaced with passive text placeholder "👆 Ответьте на вопрос для продолжения"'
+    'Bug 110: Single Dominant CTA must not be replaced with passive text placeholder'
   );
   assert(
-    vsSkillMatch.includes('data-py-start-check') || vsSkillMatch.includes('data-py-step-phase'),
-    'Bug 110: viewPythonSkill must provide active Single Dominant CTA to transition into comprehension check'
+    vsSkillMatch.includes('data-py-finish-note') && vsSkillMatch.includes('Закрепить в карточках (+10 XP) ➔'),
+    'Bug 110: viewPythonSkill must provide Single Dominant CTA "Закрепить в карточках (+10 XP) ➔" on note completion'
   );
-  console.log('✓ Bug 110: Single Dominant CTA and phased active learning transition verified');
+  assert(
+    !vsSkillMatch.includes('data-py-start-check') && !vsSkillMatch.includes('data-py-step-answer'),
+    'Bug 110: Comprehension check quizzes must be eliminated in favor of immediate thematic flashcards'
+  );
+  console.log('✓ Bug 110: Single Dominant CTA and direct note-to-cards handoff verified');
 }
 
-// Bug 111 (Defect 5): Защита от потери обратных слэшей в регулярных выражениях NOTE_STEP_CHECKS
+// Bug 111 (Defect 5): Защита от повреждённых регулярных выражений и ликвидация квизов понимания
 function testBug111_NoCorruptedRegexEscapes(){
-  const checksMatch = academyHtml.slice(
-    academyHtml.indexOf('const NOTE_STEP_CHECKS ='),
-    academyHtml.indexOf('function getStepCheck(') !== -1 ? academyHtml.indexOf('function getStepCheck(') : academyHtml.indexOf('const NOTE_STEP_CHECKS =') + 26000
-  );
-
-  assert(!checksMatch.includes('r"d+"'), 'Bug 111: NOTE_STEP_CHECKS must not contain corrupted r"d+" (must be r"\\d+")');
-  assert(!checksMatch.includes('r"D"'), 'Bug 111: NOTE_STEP_CHECKS must not contain corrupted r"D" (must be r"\\D")');
-  assert(!checksMatch.includes('последовательность `s`'), 'Bug 111: NOTE_STEP_CHECKS must not contain corrupted `s` (must be `\\s`)');
-  assert(!checksMatch.includes('\x08'), 'Bug 111: NOTE_STEP_CHECKS must not contain ASCII backspace byte \\x08 (must be \\\\b)');
-  console.log('✓ Bug 111: NOTE_STEP_CHECKS regex backslashes strictly escaped (\\d, \\D, \\s, \\b, \\w)');
+  assert(!academyHtml.includes('r"d+"'), 'Bug 111: Must not contain corrupted r"d+" (must be r"\\d+")');
+  assert(!academyHtml.includes('r"D"'), 'Bug 111: Must not contain corrupted r"D" (must be r"\\D")');
+  assert(!academyHtml.includes('последовательность `s`'), 'Bug 111: Must not contain corrupted `s` (must be `\\s`)');
+  assert(!academyHtml.includes('\x08'), 'Bug 111: Must not contain ASCII backspace byte \\x08 (must be \\\\b)');
+  console.log('✓ Bug 111: Regex backslashes strictly escaped (\\d, \\D, \\s, \\b, \\w) and no corrupted quiz escapes');
 }
 
 // Bug 112 (Defect 6): Запрет хвостовых поясняющих комментариев в сниппетах конспектов (К-222:5)
@@ -227,99 +226,64 @@ function testBug116_ParagraphLengthLimit(){
   console.log('✓ Bug 116: Micro-learning paragraph length limit (<= 240 chars) verified in Unit 1.9.1');
 }
 
-// Вспомогательная функция для извлечения NOTE_STEP_CHECKS
-function getNoteStepChecksMap() {
-  const checkPos = academyHtml.indexOf('const NOTE_STEP_CHECKS =');
-  const checkEnd = academyHtml.indexOf('function getStepCheck(');
-  const checkSlice = academyHtml.slice(checkPos, checkEnd > 0 ? checkEnd : checkPos + 26000);
-  const cleanCode = checkSlice.slice(0, checkSlice.lastIndexOf('};') + 2).replace('const NOTE_STEP_CHECKS =', 'NOTE_STEP_CHECKS =');
-  const vm = require('vm');
-  const sandbox = {};
-  vm.createContext(sandbox);
-  vm.runInContext(cleanCode, sandbox);
-  return sandbox.NOTE_STEP_CHECKS || {};
+// Вспомогательная функция для извлечения данных PY_MASTERY
+function getPyMasteryData() {
+  const m = academyHtml.match(/const PY_MASTERY\s*=\s*(\{.*?\});\n/);
+  assert(m, 'PY_MASTERY must be present in academy.html');
+  return JSON.parse(m[1]);
 }
 
-// Bug 117 (Defect 11): 100% покрытие шагов конспектов активным откликом (Active Recall Coverage Benchmark)
+// Bug 117 (Defect 11): 100% покрытие тем конспектов тематическими карточками (Thematic Flashcards Coverage Benchmark)
 function testBug117_ActiveRecallCoverageBenchmark(){
-  const notes = getPyMasteryNotes();
-  const checksMap = getNoteStepChecksMap();
-  const targetKids = ['К-055', 'К-056', 'К-057', 'К-220', 'К-222'];
+  const pm = getPyMasteryData();
+  const sk191 = pm.units.flatMap(u => u.skills).find(s => s.id === '1.9.1');
+  assert(sk191, 'Bug 117: Skill 1.9.1 must exist in PY_MASTERY');
+  assert.strictEqual(sk191.kIds.length, 5, 'Bug 117: Skill 1.9.1 must contain 5 micro-learning notes');
+  assert.strictEqual(sk191.fIds.length, 5, 'Bug 117: Skill 1.9.1 must contain 5 paired thematic flashcard decks');
+
+  const violations = [];
+  sk191.fIds.forEach((fid, idx) => {
+    const kid = sk191.kIds[idx];
+    const deck = pm.decks[fid];
+    const note = pm.notes[kid];
+    if(!deck || !Array.isArray(deck.cards) || deck.cards.length === 0){
+      violations.push(`Deck ${fid} for note ${kid} has no cards`);
+    }
+    if(!note){
+      violations.push(`Note ${kid} is missing`);
+    }
+  });
+
+  assert(violations.length === 0, `Bug 117: Thematic flashcards coverage violation:\n  - ${violations.join('\n  - ')}`);
+  console.log('✓ Bug 117: 100% Thematic Flashcards Coverage benchmark (5 notes paired with 5 thematic decks) verified');
+}
+
+// Bug 118 (Defect 12): Эталонная глубина вопросов и ответов тематических карточек (Card Quality Benchmark)
+function testBug118_QuestionAndDistractorBenchmark(){
+  const pm = getPyMasteryData();
+  const sk191 = pm.units.flatMap(u => u.skills).find(s => s.id === '1.9.1');
   const violations = [];
 
-  for (const kid of targetKids) {
-    const note = notes[kid];
-    if (!note || !note.steps) continue;
-    note.steps.forEach((step, sidx) => {
-      const key = `${kid}:${sidx}`;
-      if (!checksMap[key]) {
-        violations.push(`Missing check for ${key} (${step.title})`);
+  for(const fid of sk191.fIds){
+    const deck = pm.decks[fid];
+    if(!deck) continue;
+    deck.cards.forEach((card, cidx) => {
+      const q = (card.q || '').trim();
+      const a = (card.a || '').trim();
+      if(q.length < 15){
+        violations.push(`${fid}:${cidx}: Card question too short (${q.length} chars)`);
+      }
+      if(a.length < 15){
+        violations.push(`${fid}:${cidx}: Card answer too short (${a.length} chars)`);
+      }
+      if(['да', 'нет', 'не знаю'].includes(a.toLowerCase())){
+        violations.push(`${fid}:${cidx}: Trivial answer "${a}"`);
       }
     });
   }
 
-  // Dangling checks
-  for (const key of Object.keys(checksMap)) {
-    const [kid, sidxStr] = key.split(':');
-    if (targetKids.includes(kid)) {
-      const sidx = parseInt(sidxStr, 10);
-      const note = notes[kid];
-      if (!note || sidx >= note.steps.length) {
-        violations.push(`Dangling check ${key} (max step index is ${note ? note.steps.length - 1 : 'none'})`);
-      }
-    }
-  }
-
-  assert(
-    violations.length === 0,
-    `Bug 117: Active recall coverage violation:\n  - ${violations.join('\n  - ')}`
-  );
-  console.log('✓ Bug 117: 100% Active Recall Coverage benchmark (38/38 steps paired) verified');
-}
-
-// Bug 118 (Defect 12): Эталонная анатомия вопросов проверки понимания (Question Quality & Distractors Benchmark)
-function testBug118_QuestionAndDistractorBenchmark(){
-  const checksMap = getNoteStepChecksMap();
-  const targetKids = ['К-055', 'К-056', 'К-057', 'К-220', 'К-222'];
-  const violations = [];
-
-  for (const [key, chk] of Object.entries(checksMap)) {
-    const [kid] = key.split(':');
-    if (!targetKids.includes(kid)) continue;
-
-    const q = (chk.q || '').trim();
-    const opts = chk.options || [];
-    const corr = chk.correct;
-    const exp = (chk.explain || '').trim();
-
-    if (q.length < 20 || !q.endsWith('?')) {
-      violations.push(`${key}: Question must end with ? and have >= 20 chars (got "${q}")`);
-    }
-    if (opts.length < 3 || opts.length > 4) {
-      violations.push(`${key}: Options count must be 3..4 (got ${opts.length})`);
-    }
-    if (typeof corr !== 'number' || corr < 0 || corr >= opts.length) {
-      violations.push(`${key}: Invalid correct index ${corr}`);
-    }
-    if (exp.length < 30) {
-      violations.push(`${key}: Explain must be >= 30 chars (got "${exp}")`);
-    }
-    const setOpts = new Set(opts);
-    if (setOpts.size !== opts.length) {
-      violations.push(`${key}: Duplicate options detected`);
-    }
-    for (const opt of opts) {
-      if (['да', 'нет', 'не знаю', 'невозможно'].includes(opt.trim().toLowerCase())) {
-        violations.push(`${key}: Trivial low-effort option "${opt}"`);
-      }
-    }
-  }
-
-  assert(
-    violations.length === 0,
-    `Bug 118: Question quality & distractor violations:\n  - ${violations.join('\n  - ')}`
-  );
-  console.log('✓ Bug 118: Question Quality & Distractors benchmark (deep options & explain) verified');
+  assert(violations.length === 0, `Bug 118: Flashcard quality violations:\n  - ${violations.join('\n  - ')}`);
+  console.log('✓ Bug 118: Thematic Flashcard Quality benchmark (deep questions & answers across Unit 1.9.1) verified');
 }
 
 // Bug 119 (Defect 13): Семантический каркас микро-шагов (Semantic Step Heading Invariant)
