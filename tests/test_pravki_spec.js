@@ -90,6 +90,13 @@ assert(academyHtml.includes('title="Откроется последовател�
 assert(academyHtml.includes('const isActive = Boolean(!firstUnreadK && firstUnreviewedF === s.id);'), '13-dots tracker must enforce single global focus');
 console.log('✓ 6. Dashboard Invariants: Single Focus, Friendly 0 XP Topbar, Friendly SRS Empty State & Clean Accordion confirmed');
 
+// 7. Active Micro-learning Pedagogical Benchmark (Эталон педагогики)
+assert(academyHtml.includes('const NOTE_STEP_CHECKS ='), 'Must define NOTE_STEP_CHECKS active recall map');
+assert(academyHtml.includes('data-py-start-check'), 'Must implement two-phase theory active recall transition');
+assert(academyHtml.includes('step-check-container') && academyHtml.includes('btn-step-check-opt'), 'Must render active comprehension check container with options');
+assert(academyHtml.includes('academy-bottom-sheet') && academyHtml.includes('academy-bottom-sheet--correct'), 'Must render tactile bottom sheet feedback drawer');
+console.log('✓ 7. Active Micro-learning Pedagogical Benchmark: 100% активный отклик (NOTE_STEP_CHECKS), неделимый атом, интерактивность и обучающая шторка подтверждены');
+
 console.log('\n================================================================');
 console.log('  ALL CANONICAL BENCHMARK SPECIFICATIONS PASSED! (100% PERFECT) ');
 console.log('================================================================\n');

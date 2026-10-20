@@ -756,13 +756,13 @@ console.log('✓ Bug 98: Desktop keyboard ergonomics on card answer face verifie
 require('./test_cards_trainer_regression.js');
 console.log('✓ Bugs 99-106: Flashcards & SRS Trainer Regression Suite verified (8/8 PASS)');
 
-// 107-113. Bugs 107-113: Notes Presentation & Active Micro-learning Regression Suite (Defects 1..7)
+// 107-120. Bugs 107-120: Notes Presentation & Active Micro-learning Regression Suite (Defects 1..14)
 require('./test_notes_presentation_regression.js');
-console.log('✓ Bugs 107-113: Notes Presentation & Active Micro-learning Regression Suite verified (7/7 PASS)');
+console.log('✓ Bugs 107-120: Notes Presentation & Active Micro-learning Regression Suite verified (14/14 PASS)');
 
 // Проверка спецификации канонических эталонов и инвариантов
 require('./test_pravki_spec.js');
 
 console.log('================================================================');
-console.log('  ALL 113 REGRESSION TESTS & CANONICAL BENCHMARKS PASSED (100%) ');
+console.log('  ALL 120 REGRESSION TESTS & CANONICAL BENCHMARKS PASSED (100%) ');
 console.log('================================================================\n');
