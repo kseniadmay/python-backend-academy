@@ -182,14 +182,14 @@ console.log('✓ Bug 29: Unit test two-phase selection (think before answer) ver
 assert(academyHtml.includes('# O(len(a) + len(b)) — объединение') && academyHtml.includes('# O(min(len(a), len(b))) — пересечение'), 'Bug 31: K-004 must have spaced operations with Big-O comments');
 console.log('✓ Bug 31: K-004 step 3 operations spacing and Big-O comments verified');
 
-// 32. Bug 32: Разделение шага 4 в К-004 на 2 микро-шага по педагогике Coddy (5 шагов вместо 4)
+// 32. Bug 32: Разделение шага 4 в К-004 на 2 микро-шага по активному микрообучению (5 шагов вместо 4)
 const k004ContentBatch4 = fs.readFileSync(k004Path, 'utf-8');
 assert(k004ContentBatch4.includes('## Сценарии применения frozenset') && k004ContentBatch4.includes('## Когда предпочесть обычный set'), 'Bug 32: K-004.md must split step 4 into 2 distinct micro-steps');
 const mK004Obj = academyHtml.match(/"К-004":\s*(\{[^}]*"steps":\s*\[.*?\]\s*\})/s);
 assert(mK004Obj, 'academy.html must contain parsed К-004');
 const parsedK004 = JSON.parse(mK004Obj[1]);
 assert.strictEqual(parsedK004.steps.length, 5, `К-004 must have exactly 5 micro-steps after pedagogical split, got ${parsedK004.steps.length}`);
-console.log('✓ Bug 32: K-004 split into 5 micro-steps (Home = Journey / Coddy pedagogy) verified');
+console.log('✓ Bug 32: K-004 split into 5 micro-steps (Home = Journey / Active learning pedagogy) verified');
 
 // 33. Bug 33: Наличие теоретических знаний в конспектах Юнита 1.1 для рубежного теста
 const k001ContentBatch4 = fs.readFileSync(k001Path, 'utf-8');
@@ -513,7 +513,7 @@ const f085Obj = pyMasteryData.decks['Ф-085'];
 assert(f085Obj.cards[1].q.includes('«динамическая»') && f085Obj.cards[1].a.includes('Динамическая строгая'), 'Bug 80: F-085 card 2 in academy.html must have clean typography and formatting');
 console.log('✓ Bug 80: F-085 card 2 typography and clean formatting verified');
 
-// 81. Bug 81: К-055: квантование теории регулярных выражений (14 микро-шагов по канону Кодди и Эшелона 1)
+// 81. Bug 81: К-055: квантование теории регулярных выражений (14 микро-шагов по канону активного микрообучения и Эшелона 1)
 const k055Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.9 · Инструменты', '📚 Конспекты', 'К-055. Регулярные выражения в Python_ модуль re.md');
 assert(fs.existsSync(k055Path), 'К-055.md missing');
 const k055Content = fs.readFileSync(k055Path, 'utf-8');
@@ -523,7 +523,7 @@ assert(!k055Content.includes('. – любой символ, кроме пере
 const k055Obj = pyMasteryData.notes['К-055'];
 assert(k055Obj && k055Obj.steps, 'academy.html must contain К-055 with steps');
 assert.strictEqual(k055Obj.steps.length, 14, `Bug 81: K-055 must have 14 digestible micro-steps in academy.html, got ${k055Obj.steps.length}`);
-console.log('✓ Bug 81: K-055 text wall elimination & 14 Coddy pedagogy micro-steps verified');
+console.log('✓ Bug 81: K-055 text wall elimination & 14 Active learning micro-steps verified');
 
 // 82. Bug 82: Форматирование вопросов карточек в виде многострочных блоков кода
 assert(academyHtml.includes('function formatCardQuestionHTML(rawText)'), 'academy.html must define formatCardQuestionHTML engine');
@@ -585,12 +585,12 @@ assert(academyHtml.includes('<span>🌱</span><span>Первичное закр�
 assert(academyHtml.includes('.badge, .topic-badge, .state-tag, .fc-badge, .badge-sprout{display:inline-flex !important;align-items:center !important;gap:6px !important;}'), 'Global CSS rule for badge flexbox alignment and gap: 6px must be present');
 console.log('✓ Bug 84: Sprout badge kerning and global flexbox badge gap verified');
 
-// 85. Bug 85: Активная проверка понимания Coddy (Active Comprehension Check) в конспектах
+// 85. Bug 85: Активная проверка понимания (Active Comprehension Check) в конспектах
 assert(academyHtml.includes('const NOTE_STEP_CHECKS = {'), 'NOTE_STEP_CHECKS registry must be defined in academy.html');
 assert(academyHtml.includes('window.NOTE_STEP_CHECKS = NOTE_STEP_CHECKS;'), 'NOTE_STEP_CHECKS must be exposed on window');
 assert(academyHtml.includes('data-py-step-answer'), 'academy.html must contain handler for data-py-step-answer');
 assert(academyHtml.includes('data-py-step-check-next'), 'academy.html must contain handler for data-py-step-check-next');
-assert(academyHtml.includes('🎯 Проверка понимания (Coddy)'), 'academy.html must render Coddy comprehension check header');
+assert(academyHtml.includes('🎯 Проверка понимания') && !academyHtml.includes('🎯 Проверка понимания (Coddy)'), 'academy.html must render clean comprehension check header without Coddy');
 assert(academyHtml.includes('.academy-bottom-sheet--correct') && academyHtml.includes('.academy-bottom-sheet--wrong'), 'Bottom sheet styling classes must be present');
 
 // Проверка всех 8 шагов конспекта К-001 в NOTE_STEP_CHECKS
@@ -605,7 +605,7 @@ for(let s = 0; s < 8; s++){
   assert(typeof noteStepChecks[key].correct === 'number' && noteStepChecks[key].correct >= 0 && noteStepChecks[key].correct < noteStepChecks[key].options.length, `${key} must have valid correct index`);
   assert(typeof noteStepChecks[key].explain === 'string' && noteStepChecks[key].explain.length > 15, `${key} must have detailed pedagogical explanation`);
 }
-console.log('✓ Bug 85: Coddy active comprehension check (8 steps of K-001) verified');
+console.log('✓ Bug 85: Active comprehension check (8 steps of K-001) verified');
 
 // 86. Bug 86: Исправление ложного срабатывания виджета реверса списка на задачах 19 и 255
 const mTasks = academyHtml.match(/const IDE_TASKS = (\[[\s\S]*?\]);\s*const IDE_TASKS_BY_ID/);
@@ -631,7 +631,7 @@ assert(!reverseRegex.test(desc255) && !(task255.solution && task255.solution.inc
 assert(reverseRegex.test(desc20) || (task20.solution && task20.solution.includes('[::-1]')), 'Task 20 must trigger reverse list anatomy widget');
 console.log('✓ Bug 86: Reverse list widget regex precision (Task 19 & 255 skipped, Task 20 matched) verified');
 
-// 87. Bug 87: Педагогика Кодди для Навыка 1.9.1 (38 активных проверок понимания по 5 конспектам и Mobile-First 390px)
+// 87. Bug 87: Активное микрообучение для Навыка 1.9.1 (38 активных проверок понимания по 5 конспектам и Mobile-First 390px)
 const mChecks87 = academyHtml.match(/const NOTE_STEP_CHECKS = ({[\s\S]*?});\s*window\.NOTE_STEP_CHECKS/);
 assert(mChecks87, 'academy.html must contain parseable NOTE_STEP_CHECKS');
 const noteStepChecks87 = eval('(' + mChecks87[1] + ')');
@@ -657,11 +657,62 @@ for(const [kid, stepCount] of Object.entries(expectedSkills191)){
   }
 }
 assert.strictEqual(verified191StepsCount, 38, 'Must verify all 38 steps of Skill 1.9.1');
-console.log(`✓ Bug 87: Coddy active comprehension checks (${verified191StepsCount} steps across 5 notes of Skill 1.9.1) verified`);
+console.log(`✓ Bug 87: Active micro-learning comprehension checks (${verified191StepsCount} steps across 5 notes of Skill 1.9.1) verified`);
+
+// 88. Bug 88: Строгий инвариант запрета технического упоминания «Кодди» / «Coddy» в регламентах и UI
+const agentsMdPath = path.join(rootDir, 'AGENTS.md');
+const workspaceRulePath = path.join(rootDir, '.agents', 'rules', 'workspace-rule.md');
+assert(fs.existsSync(agentsMdPath), 'AGENTS.md missing');
+assert(fs.existsSync(workspaceRulePath), 'workspace-rule.md missing');
+
+const agentsMdContent = fs.readFileSync(agentsMdPath, 'utf-8');
+const workspaceRuleContent = fs.readFileSync(workspaceRulePath, 'utf-8');
+
+assert(
+  agentsMdContent.includes('Категорический запрет на техническое упоминание «Кодди» / «Coddy»'),
+  'AGENTS.md must contain explicit ban rule on technical mentions of Coddy'
+);
+assert(
+  workspaceRuleContent.includes('Категорический запрет на техническое упоминание «Кодди» / «Coddy»'),
+  'workspace-rule.md must contain explicit ban rule on technical mentions of Coddy'
+);
+assert(!agentsMdContent.includes('# Coddy Pedagogical UI'), 'AGENTS.md must not contain legacy title # Coddy Pedagogical UI');
+assert(!agentsMdContent.includes('# Педагогическая методология и инварианты Кодди'), 'AGENTS.md must not contain legacy title with Кодди');
+assert(!workspaceRuleContent.includes('# Педагогическая методология и инварианты Кодди'), 'workspace-rule.md must not contain legacy title with Кодди');
+
+// Проверка чистоты UI-текста в academy.html
+assert(!academyHtml.includes('🎯 Проверка понимания (Coddy)'), 'academy.html must not contain Coddy in comprehension check badge');
+const cleanHtmlText = academyHtml
+  .replace(/<!--[\s\S]*?-->/g, '')
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/\/\/.*$/gm, '')
+  .replace(/<[^>]+>/g, ' ');
+assert(!/кодди/i.test(cleanHtmlText), 'academy.html visible UI text must never contain Russian word «кодди»');
+console.log('✓ Bug 88: Strict ban on technical and UI mentions of Coddy across rules and templates verified');
+
+// 89. Bug 89: Инвариант одинарных кавычек по умолчанию в регламентах и кодовой базе
+assert(
+  agentsMdContent.includes('Стандарт кавычек в коде по умолчанию: одинарные кавычки'),
+  'AGENTS.md must define single quotes default invariant'
+);
+assert(
+  workspaceRuleContent.includes('Стандарт кавычек в коде по умолчанию: одинарные кавычки'),
+  'workspace-rule.md must define single quotes default invariant'
+);
+assert(
+  academyHtml.includes("'К-055:0'"),
+  'NOTE_STEP_CHECKS in academy.html must format dictionary step keys using single quotes'
+);
+const thisTestFile = fs.readFileSync(__filename, 'utf-8');
+assert(
+  thisTestFile.includes("'use strict';"),
+  "test_bugs_regression.js must adhere to single quotes convention for 'use strict';"
+);
+console.log('✓ Bug 89: Single quotes default standard enforced in rules and codebase verified');
 
 // Проверка спецификации канонических эталонов и инвариантов
 require('./test_pravki_spec.js');
 
 console.log('================================================================');
-console.log('  ALL 87 REGRESSION TESTS & CANONICAL BENCHMARKS PASSED (100%)  ');
+console.log('  ALL 89 REGRESSION TESTS & CANONICAL BENCHMARKS PASSED (100%)  ');
 console.log('================================================================\n');

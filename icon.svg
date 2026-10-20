@@ -1,7 +1,89 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <rect width="512" height="512" rx="128" fill="#0d1016"/>
-  <path d="M256 96 C180 96 144 132 144 192 L144 240 L288 240 L288 264 L120 264 C70 264 48 300 48 360 C48 420 80 448 160 448 L192 448 L192 396 C192 344 216 320 268 320 L368 320 C408 320 440 288 440 248 L440 184 C440 128 400 96 256 96 Z" fill="#74AC82"/>
-  <circle cx="192" cy="156" r="22" fill="#0d1016"/>
-  <path d="M256 416 C332 416 368 380 368 320 L368 272 L224 272 L224 248 L392 248 C442 248 464 212 464 152 C464 92 432 64 352 64 L320 64 L320 116 C320 168 296 192 244 192 L144 192 C104 192 72 224 72 264 L72 328 C72 384 112 416 256 416 Z" fill="#DA9C63"/>
-  <circle cx="320" cy="356" r="22" fill="#0d1016"/>
+  <defs>
+    <!-- Dark Obsidian Radial Base -->
+    <radialGradient id="obsidian-bg" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#151922"/>
+      <stop offset="60%" stop-color="#0d1016"/>
+      <stop offset="100%" stop-color="#07080c"/>
+    </radialGradient>
+
+    <!-- Ambient Atmospheric Orbs (Matching platform ambient-orb burgundy and emerald) -->
+    <radialGradient id="orb-burgundy" cx="18%" cy="16%" r="52%">
+      <stop offset="0%" stop-color="#be123c" stop-opacity="0.38"/>
+      <stop offset="50%" stop-color="#be123c" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#be123c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="orb-emerald" cx="82%" cy="84%" r="52%">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.32"/>
+      <stop offset="50%" stop-color="#10b981" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Specular Glass Micro-Rim -->
+    <linearGradient id="glass-rim" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.28)"/>
+      <stop offset="35%" stop-color="rgba(255,255,255,0.08)"/>
+      <stop offset="70%" stop-color="rgba(190,18,60,0.15)"/>
+      <stop offset="100%" stop-color="rgba(16,185,129,0.25)"/>
+    </linearGradient>
+
+    <!-- Emerald Snake Gradient (Upper) -->
+    <linearGradient id="snake-emerald" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6ee7b7"/>
+      <stop offset="30%" stop-color="#10b981"/>
+      <stop offset="85%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+
+    <!-- Amber-to-Burgundy Snake Gradient (Lower) -->
+    <linearGradient id="snake-amber" x1="100%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="30%" stop-color="#f59e0b"/>
+      <stop offset="70%" stop-color="#e11d48"/>
+      <stop offset="100%" stop-color="#be123c"/>
+    </linearGradient>
+
+    <!-- 3D Shadow for Snakes -->
+    <filter id="shadow-snake" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000000" flood-opacity="0.55"/>
+    </filter>
+
+    <!-- Glowing Jewel Eyes Filter -->
+    <filter id="glow-jewel" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Base Squircle -->
+  <rect width="512" height="512" rx="116" fill="url(#obsidian-bg)"/>
+  <!-- Atmospheric Orbs -->
+  <rect width="512" height="512" rx="116" fill="url(#orb-burgundy)"/>
+  <rect width="512" height="512" rx="116" fill="url(#orb-emerald)"/>
+  <!-- Specular Glass Border -->
+  <rect x="1.5" y="1.5" width="509" height="509" rx="114.5" fill="none" stroke="url(#glass-rim)" stroke-width="2.5"/>
+
+  <!-- Canonical Python Emblem (Centered at 256, 256, scale 2.5, tx=118.5, ty=118.5) -->
+  <g transform="translate(118.5, 118.5) scale(2.5)">
+    <!-- Upper Emerald Serpent -->
+    <path fill="url(#snake-emerald)"
+          filter="url(#shadow-snake)"
+          d="M55.023-0.077c-25.971,0-26.25,10.081-26.25,12.156c0,3.148,0,12.594,0,12.594h26.75v3.781 c0,0-27.852,0-37.375,0c-7.949,0-17.938,4.833-17.938,26.25c0,19.673,7.792,27.281,15.656,27.281c2.335,0,9.344,0,9.344,0 s0-9.765,0-13.125c0-5.491,2.721-15.656,15.406-15.656c15.91,0,19.971,0,26.531,0c3.902,0,14.906-1.696,14.906-14.406 c0-13.452,0-17.89,0-24.219C82.054,11.426,81.515-0.077,55.023-0.077z"/>
+    <!-- Emerald Glowing Node (Upper Eye) -->
+    <circle cx="40.27" cy="13.2" r="5.6" fill="#10b981" opacity="0.4" filter="url(#glow-jewel)"/>
+    <circle cx="40.27" cy="13.2" r="4.8" fill="#ecfdf5"/>
+    <circle cx="40.27" cy="13.2" r="2.6" fill="#047857"/>
+
+    <!-- Lower Amber-Burgundy Serpent -->
+    <path fill="url(#snake-amber)"
+          filter="url(#shadow-snake)"
+          d="M55.397,109.923c25.959,0,26.282-10.271,26.282-12.156c0-3.148,0-12.594,0-12.594H54.897v-3.781 c0,0,28.032,0,37.375,0c8.009,0,17.938-4.954,17.938-26.25c0-23.322-10.538-27.281-15.656-27.281c-2.336,0-9.344,0-9.344,0 s0,10.216,0,13.125c0,5.491-2.631,15.656-15.406,15.656c-15.91,0-19.476,0-26.532,0c-3.892,0-14.906,1.896-14.906,14.406 c0,14.475,0,18.265,0,24.219C28.366,100.497,31.562,109.923,55.397,109.923z"/>
+    <!-- Amber-Burgundy Glowing Node (Lower Eye) -->
+    <circle cx="70.15" cy="96.64" r="5.6" fill="#f59e0b" opacity="0.4" filter="url(#glow-jewel)"/>
+    <circle cx="70.15" cy="96.64" r="4.8" fill="#fffbeb"/>
+    <circle cx="70.15" cy="96.64" r="2.6" fill="#9f1239"/>
+  </g>
 </svg>
