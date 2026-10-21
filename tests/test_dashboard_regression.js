@@ -275,6 +275,168 @@ function testBug142_GreedyDescriptorTrailPerfection(){
   console.log('✓ Bug 142: Greedy Descriptor Trail perfection, zero noise and clean typography verified');
 }
 
+function testBug143_GreedyDescriptorTrailStepNavigationAndConciseness(){
+  // 1. Zero (2 мин) in sidebar quickBtn
+  assert(
+    academyHtml.includes("quickBtn.innerHTML = '⚡ Микро-шаг';"),
+    'Bug 143: sidebar quickBtn must be concise without (2 мин)'
+  );
+  assert(
+    !academyHtml.includes('⚡ Быстрый микро-шаг (2 мин) ➔'),
+    'Bug 143: track focus card button must be concise without (2 мин)'
+  );
+  // 2. Interactive step navigation in popover
+  assert(
+    academyHtml.includes('path-popover-steps-list') && academyHtml.includes('path-popover-step'),
+    'Bug 143: popover must render interactive steps list for all lesson topics'
+  );
+  assert(
+    academyHtml.includes('pps-marker') && academyHtml.includes('pps-title'),
+    'Bug 143: popover steps must render status marker and topic title'
+  );
+  assert(
+    academyHtml.includes("e.target.closest('.path-popover-step')"),
+    'Bug 143: click listener must support direct jump via popover step'
+  );
+  // 3. Clean chapter title in gate cards without machine prefix
+  assert(
+    academyHtml.includes('cleanPrevTitle') && academyHtml.includes('cleanCurTitle'),
+    'Bug 143: chapter gate cards must clean machine prefixes from chapter titles'
+  );
+  // 4. Disambiguated active bubble counter
+  assert(
+    academyHtml.includes('${unitSkillsMastered}/${unitTotalSkills} тем'),
+    'Bug 143: active node bubble must label unit topics to avoid collision with chapter lessons'
+  );
+  // 5. Clean popover badge
+  assert(
+    academyHtml.includes('`Глава · ${trackTitleClean}`'),
+    'Bug 143: popover badge must use clean human label without machine ТРЕК prefix'
+  );
+  console.log('✓ Bug 143: Greedy Descriptor Trail step navigation, interactive stepper and extreme conciseness verified');
+}
+
+function testBug144_EchelonTrailChapterMappingAndRightRailSync(){
+  // 1. Correct chapter matching without slash mismatch in getEchelonUnitsAndChapters
+  assert(
+    academyHtml.includes("c.track === tr.key || c.track === (tr.routePrefix || '').replace(/^\\//, '')"),
+    'Bug 144: getEchelonUnitsAndChapters must match c.track to tr.key to prevent all chapters defaulting to Chapter 1'
+  );
+  // 2. Removal of duplicate CSS block (lines 3260-3591)
+  const pillBtnMatches = academyHtml.match(/\.path-echelon-pill-btn\s*\{/g) || [];
+  assert.strictEqual(
+    pillBtnMatches.length,
+    1,
+    'Bug 144: duplicate 332-line .path-echelon-pill-btn CSS block must be removed (expected exactly 1 definition)'
+  );
+  // 3. Pro hero breadcrumb preserves canonical breadcrumb
+  assert(
+    academyHtml.includes('ПРОГРАММА › ГЛАВА ${activeChap.num}'),
+    'Bug 144: pro hero card must contain canonical chapter breadcrumb'
+  );
+  // 4. Right rail dynamic synchronization with active echelon
+  assert(
+    academyHtml.includes("const curProg = (typeof getEchelonProgress === 'function') ? getEchelonProgress(curTierNum) : null;") &&
+    academyHtml.includes('const curPct = curProg ? curProg.pct : 0;'),
+    'Bug 144: renderCoddyRightRail must dynamically compute progress for curTierNum instead of hardcoded Echelon 1'
+  );
+  assert(
+    academyHtml.includes('${echUnits.length} тем'),
+    'Bug 144: right rail radar widget link must dynamically display total echelon topics'
+  );
+  // 5. Mobile safe buffer in .path-serpentine-wrap
+  assert(
+    academyHtml.includes('padding: 12px 10px calc(160px + env(safe-area-inset-bottom, 24px));'),
+    'Bug 144: .path-serpentine-wrap must include mobile bottom buffer to prevent tabbar collision'
+  );
+  console.log('✓ Bug 144: Echelon trail chapter mapping, right rail dynamic sync and zero duplicate CSS verified');
+}
+
+function testBug145_EchelonTrailSkillsAndPopoverAlignment(){
+  // 1. Popover click handler scoped to active echelon
+  assert(
+    academyHtml.includes("const { units: echUnits, chapters: echChapters } = (typeof getEchelonUnitsAndChapters === 'function')") &&
+    academyHtml.includes("const uChap = echChapters.find(cb => cb.units.some(x => x.id === uid));") &&
+    academyHtml.includes("let activeIdx = echUnits.findIndex(x => {"),
+    'Bug 145: popover node click handler must scope units, chapters and active index to current echelon'
+  );
+  // 2. Trail node chapter-scoped lesson numbering
+  assert(
+    academyHtml.includes("const uChap = chapterBreakpoints.find(cb => cb.units.some(x => x.id === u.id)) || curChapter;") &&
+    academyHtml.includes("const lessonNumInChap = (uChap.units.findIndex(x => x.id === u.id) >= 0) ? (uChap.units.findIndex(x => x.id === u.id) + 1) : (i + 1);"),
+    'Bug 145: viewPathSerpentine must compute lessonNumInChap within each unit chapter instead of defaulting to curChapter'
+  );
+  // 3. Challenge node accessible label and toast without technical unit codes
+  assert(
+    academyHtml.includes('Челлендж мастерства, проверка темы «${cleanUnitTitle(u.id, u.title)}»'),
+    'Bug 145: challenge node aria-label must use clean human title without technical unit id'
+  );
+  assert(
+    academyHtml.includes("showTactileToast('🔒 Челлендж откроется после прохождения предыдущих уроков')") &&
+    !academyHtml.includes("showTactileToast('🔒 Челлендж откроется после прохождения предыдущих юнитов')"),
+    'Bug 145: challenge node toast must use human term уроков instead of technical юнитов'
+  );
+  // 4. Service Worker cache increment
+  const swContent = fs.readFileSync(path.join(rootDir, 'sw.js'), 'utf-8');
+  assert(
+    swContent.includes('academy-pwa-v57') || swContent.includes('academy-pwa-v58'),
+    'Bug 145: Service Worker cache version must be incremented'
+  );
+  console.log('✓ Bug 145: Echelon trail skills and popover alignment across all tiers verified');
+}
+
+function testBug146_LessonCardResumePositionPersistence(){
+  // 1. Reading position persistence saves sessionPos and deckPositions
+  assert(
+    academyHtml.includes('const curPos = (typeof pySkillViewState.sessionPos === \'number\')') &&
+    academyHtml.includes('? pySkillViewState.sessionPos') &&
+    academyHtml.includes('updatedDeckPositions[pySkillViewState.fId] = {') &&
+    academyHtml.includes('sessionPos: curPos,') &&
+    academyHtml.includes('cardIdx: curPos,'),
+    'Bug 146: saveReadingPosition must persist sessionPos and per-deck deckPositions'
+  );
+
+  // 2. ensurePySkillState restores savedCardPos, sessionPos, sessionFid, and deckPositions
+  assert(
+    academyHtml.includes('const savedDeckInfo = (saved.deckPositions && saved.deckPositions[firstF]) || {};') &&
+    academyHtml.includes('const savedCardPos = (typeof savedDeckInfo.sessionPos === \'number\')') &&
+    academyHtml.includes('sessionPos: savedCardPos,') &&
+    academyHtml.includes('sessionFid: firstF,'),
+    'Bug 146: ensurePySkillState must restore cardIdx and sessionPos from saved readingPositions'
+  );
+
+  // 3. Intra-Session Loop initialization does not blindly reset sessionPos to 0
+  assert(
+    academyHtml.includes('const savedDeckInfo = (saved.deckPositions && saved.deckPositions[activeF]) || {};') &&
+    academyHtml.includes('pySkillViewState.sessionPos = isDone ? cards.length : Math.max(0, Math.min(savedCardPos, Math.max(0, cards.length - 1)));') &&
+    academyHtml.includes('pySkillViewState.cardIdx = pySkillViewState.sessionPos;'),
+    'Bug 146: Intra-Session Loop must restore sessionPos from saved deck progress rather than hardcoding 0'
+  );
+
+  // 4. Dot switcher [data-py-select-f] does not unconditionally wipe cardIdx to 0
+  assert(
+    academyHtml.includes('const isDifferentDeck = (pySkillViewState.fId !== targetFid);') &&
+    academyHtml.includes('} else if(pySkillViewState.sessionDone){') &&
+    !academyHtml.includes('pySkillViewState.cardIdx = 0;\n    pySkillViewState.cardFlipped = false;\n    pySkillViewState.sprintCelebration = null;\n    saveReadingPosition();'),
+    'Bug 146: [data-py-select-f] must not wipe cardIdx to 0 when clicking active deck'
+  );
+
+  // 5. Card rating and navigation event handlers keep cardIdx and sessionPos in sync
+  assert(
+    academyHtml.includes('pySkillViewState.sessionPos = qPos + 1;\n    pySkillViewState.cardIdx = pySkillViewState.sessionPos;\n    pySkillViewState.cardFlipped = false;') &&
+    academyHtml.includes('pySkillViewState.sessionPos--;\n      pySkillViewState.cardIdx = pySkillViewState.sessionPos;'),
+    'Bug 146: card handlers must keep sessionPos and cardIdx synchronized'
+  );
+
+  // 6. Service Worker cache increment to v58
+  const swContent = fs.readFileSync(path.join(rootDir, 'sw.js'), 'utf-8');
+  assert(
+    swContent.includes('\'academy-pwa-v58\''),
+    'Bug 146: Service Worker cache version must be incremented to academy-pwa-v58'
+  );
+  console.log('✓ Bug 146: Card position persistence, intra-session loop restore and SW v58 verified');
+}
+
 testBug134_SingleDominantCtaLabelNo2MinAndContinueFurther();
 testBug135_AccordionStatusMasteredVsLockedSemantics();
 testBug136_ZeroHardcodingAndLaconicPhrasingInDashboard();
@@ -284,7 +446,11 @@ testBug139_GreedyDescriptorPhaseTwoDashboardConciseness();
 testBug140_GreedyDescriptorPhaseThreeDashboardPerfection();
 testBug141_GreedyDescriptorPhaseFourMobileFoldAndSrsBalance();
 testBug142_GreedyDescriptorTrailPerfection();
+testBug143_GreedyDescriptorTrailStepNavigationAndConciseness();
+testBug144_EchelonTrailChapterMappingAndRightRailSync();
+testBug145_EchelonTrailSkillsAndPopoverAlignment();
+testBug146_LessonCardResumePositionPersistence();
 
 console.log('================================================================');
-console.log('  ALL DASHBOARD & TRAIL REGRESSION TESTS (BUGS 134..142) PASSED ');
+console.log('  ALL DASHBOARD & TRAIL REGRESSION TESTS (BUGS 134..146) PASSED ');
 console.log('================================================================\n');
