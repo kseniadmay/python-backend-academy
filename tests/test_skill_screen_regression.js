@@ -173,10 +173,14 @@ function testBug129_PairedDotsArchitecture(){
     'Bug 129: Card dots must use .dot-jewel.dot-card class to be visually paired with their note'
   );
   assert(
-    vsSkillMatch.includes('dots-topic-divider'),
-    'Bug 129: Subtle topic divider must separate thematic clusters'
+    !vsSkillMatch.includes('dots-topic-divider'),
+    'Bug 129: Divider between topics of notes and cards must be removed (only practice stage divider remains)'
   );
-  console.log('✓ Bug 129: Paired dots architecture (cards immediately follow their note) verified');
+  assert(
+    vsSkillMatch.includes('<span class="dots-stage-divider" title="Переход к задачам в IDE"></span>'),
+    'Bug 129: Stage divider with practice must be preserved'
+  );
+  console.log('✓ Bug 129: Paired dots architecture (cards immediately follow their note, zero intra-topic divider) verified');
 }
 
 // 10. Bug 130 (Defect 10): Сквозной переход от карточек к следующей теме или в практику IDE
@@ -212,6 +216,58 @@ function testBug131_UserProgressBackupLoad(){
   console.log('✓ Bug 131: Real user progress backup verified (XP: ' + backup.academyState.xp + ', Streak: ' + backup.academyState.streak + ' days)');
 }
 
+// 12. Bug 132 (Defect 12): Интерактивные кликабельные микро-точки шагов в футере карточки теории
+function testBug132_FooterStepMicroStepper(){
+  const vsSkillMatch = academyHtml.slice(
+    academyHtml.indexOf('function viewPythonSkill('),
+    academyHtml.indexOf('function viewCardsHub(')
+  );
+  assert(
+    vsSkillMatch.includes('step-footer-stepper'),
+    'Bug 132: viewPythonSkill must contain .step-footer-stepper in theory card footer'
+  );
+  assert(
+    vsSkillMatch.includes('step-micro-dot'),
+    'Bug 132: viewPythonSkill must render .step-micro-dot elements for step progress'
+  );
+  assert(
+    vsSkillMatch.includes('data-py-jump-step'),
+    'Bug 132: viewPythonSkill must support interactive step jumping via data-py-jump-step'
+  );
+  assert(
+    !vsSkillMatch.includes('step-footer-pct'),
+    'Bug 132: step-footer-pct badge must be removed from footer stepper'
+  );
+  assert(
+    !vsSkillMatch.includes('step-footer-text'),
+    'Bug 132: step-footer-text must be removed from footer stepper (only clean clickable dots remain)'
+  );
+  assert(
+    academyHtml.includes('.step-micro-dot {') && academyHtml.includes('.step-micro-dot.active'),
+    'Bug 132: CSS must include styling for .step-micro-dot and .step-micro-dot.active'
+  );
+  console.log('✓ Bug 132: Pure clickable step micro-dots (zero text/pill clutter) verified');
+}
+
+// Bug 133: Идеальное центрирование и равная ширина чанков (.feed-chunk) во избежание сдвига/ступеньки абзацев
+function testBug133_FeedChunkFullWidthAlignment(){
+  assert(
+    academyHtml.includes('.feed-chunk{\n    width:100%;\n    box-sizing:border-box;') ||
+    academyHtml.includes('.feed-chunk{width:100%;box-sizing:border-box;') ||
+    academyHtml.includes('.feed-chunk{\n    width:100%;'),
+    'Bug 133: .feed-chunk must have width:100% and box-sizing:border-box'
+  );
+  assert(
+    academyHtml.includes('.feed-chunk.lesson-theory {\n    width:100%;\n    max-width: 760px;'),
+    'Bug 133: .feed-chunk.lesson-theory must have width:100% to prevent flex content-shrink misalignment'
+  );
+  assert(
+    academyHtml.includes('.scroll-feed{\n    display:flex;flex-direction:column;gap:0;\n    align-items:stretch;'),
+    'Bug 133: .scroll-feed must enforce align-items:stretch for child chunks'
+  );
+  console.log('✓ Bug 133: Full-width alignment & zero horizontal offset across theory chunks verified');
+}
+
 // Экспорт и запуск всех тестов
 function runAllSkillScreenRegressionTests(){
   testBug121_NoCoddyMentionInSkillLayout();
@@ -225,8 +281,10 @@ function runAllSkillScreenRegressionTests(){
   testBug129_PairedDotsArchitecture();
   testBug130_IntraSkillCardsToNextTopicTransition();
   testBug131_UserProgressBackupLoad();
+  testBug132_FooterStepMicroStepper();
+  testBug133_FeedChunkFullWidthAlignment();
   console.log('\n================================================================');
-  console.log('  ALL 11 SKILL SCREEN REGRESSION TESTS (BUGS 121..131) PASSED!  ');
+  console.log('  ALL 13 SKILL SCREEN REGRESSION TESTS (BUGS 121..133) PASSED!  ');
   console.log('================================================================\n');
 }
 
@@ -252,5 +310,7 @@ module.exports = {
   testBug128_JunkStepCounterLinesEliminated,
   testBug129_PairedDotsArchitecture,
   testBug130_IntraSkillCardsToNextTopicTransition,
-  testBug131_UserProgressBackupLoad
+  testBug131_UserProgressBackupLoad,
+  testBug132_FooterStepMicroStepper,
+  testBug133_FeedChunkFullWidthAlignment
 };

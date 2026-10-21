@@ -48,8 +48,8 @@ console.log('✓ Bug 2 (Ф-004 card 6): for loop iteration answer verified');
 const f007Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.1 · Базовый синтаксис', '📇 Карточки', 'Ф-007. Строковые методы split() и join().md');
 assert(fs.existsSync(f007Path), 'Ф-007.md missing');
 const f007Content = fs.readFileSync(f007Path, 'utf-8');
-assert(f007Content.includes('Пустую строку `""` (вызов `"".join([\'h\', \'i\'])`)'), 'Ф-007 card 12 must wrap join call in backticks in markdown');
-assert(academyHtml.includes('Пустую строку <code>&quot;&quot;</code> (вызов <code>&quot;&quot;.join([&#x27;h&#x27;, &#x27;i&#x27;])</code>)'), 'academy.html must contain code tags for join() call in Ф-007');
+assert(f007Content.includes("Пустую строку `''` (вызов `''.join(['h', 'i'])`)") || f007Content.includes('Пустую строку `""` (вызов `"".join([\'h\', \'i\'])`)'), 'Ф-007 card 12 must wrap join call in backticks in markdown');
+assert(academyHtml.includes('Пустую строку <code>&#x27;&#x27;</code> (вызов <code>&#x27;&#x27;.join([&#x27;h&#x27;, &#x27;i&#x27;])</code>)') || academyHtml.includes('Пустую строку <code>&quot;&quot;</code> (вызов <code>&quot;&quot;.join([&#x27;h&#x27;, &#x27;i&#x27;])</code>)'), 'academy.html must contain code tags for join() call in Ф-007');
 assert(academyHtml.includes('Guaranteed markdown backticks conversion to <code> tags'), 'formatRichInlineText must guarantee markdown backtick conversion even when other tags exist');
 console.log('✓ Bug 3 (Ф-007 card 12): inline code formatting in card answer verified');
 
@@ -166,7 +166,7 @@ assert(academyHtml.includes("cleanNoteTitle = (n.title || kId).replace(/^К-\\d+
 console.log('✓ Bug 26: Strip technical prefix К-\\d+ from note dots and titles verified');
 
 // 27. Bug 27: Ясное и дидактичное условие задачи #258 про хэшируемость кортежа vs изменяемый список
-assert(academyHtml.includes('"id": 258') && academyHtml.includes("TypeError: unhashable type: 'list'") && academyHtml.includes('point_tuple: \\"запись в кэше\\"'), 'Bug 27: task 258 must clearly explain tuple hashability vs mutable list with explicit steps');
+assert((academyHtml.includes('"id": 258') || academyHtml.includes('"id":258')) && academyHtml.includes("TypeError: unhashable type: 'list'") && (academyHtml.includes("point_tuple: 'запись в кэше'") || academyHtml.includes('point_tuple: \\"запись в кэше\\"')), 'Bug 27: task 258 must clearly explain tuple hashability vs mutable list with explicit steps');
 console.log('✓ Bug 27: Task 258 tuple hashability and dictionary key invariants verified');
 
 // 28, 30. Bugs 28 & 30: Красивые блоки кода с подсветкой в вопросах рубежного теста
@@ -195,7 +195,7 @@ console.log('✓ Bug 32: K-004 split into 5 micro-steps (Home = Journey / Active
 const k001ContentBatch4 = fs.readFileSync(k001Path, 'utf-8');
 assert(k001ContentBatch4.includes('Мутабельность списка: `+=` vs `+`') && k001ContentBatch4.includes('__iadd__'), 'Bug 33: K-001 must explain in-place += vs new list +');
 assert(k001ContentBatch4.includes('IEEE 754') && k001ContentBatch4.includes('0.1 + 0.2 == 0.3'), 'Bug 33: K-001 must explain float precision and IEEE 754');
-assert(k001ContentBatch4.includes('short-circuit') && k001ContentBatch4.includes('[] or "default" and 42'), 'Bug 33: K-001 must explain and/or operator precedence');
+assert(k001ContentBatch4.includes('short-circuit') && (k001ContentBatch4.includes("[] or 'default' and 42") || k001ContentBatch4.includes('[] or "default" and 42')), 'Bug 33: K-001 must explain and/or operator precedence');
 const k003Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.1 · Базовый синтаксис', '📚 Конспекты', 'К-003. Срезы в Python – slice и синтаксис.md');
 assert(fs.existsSync(k003Path), 'К-003.md missing');
 const k003Content = fs.readFileSync(k003Path, 'utf-8');
@@ -737,13 +737,17 @@ console.log('✓ Bugs 99-106: Flashcards & SRS Trainer Regression Suite verified
 require('./test_notes_presentation_regression.js');
 console.log('✓ Bugs 107-120: Notes Presentation & Active Micro-learning Regression Suite verified (14/14 PASS)');
 
-// 121-131. Bugs 121-131: Skill Screen Visual & Pedagogical Regression Suite (Defects 1..11)
+// 121-133. Bugs 121-133: Skill Screen Visual & Pedagogical Regression Suite (Defects 1..13)
 require('./test_skill_screen_regression.js');
-console.log('✓ Bugs 121-131: Skill Screen Visual & Pedagogical Regression Suite verified (11/11 PASS)');
+console.log('✓ Bugs 121-133: Skill Screen Visual & Pedagogical Regression Suite verified (13/13 PASS)');
+
+// 134-139. Bugs 134-139: Dashboard Visual & Ergonomic Regression Suite (Defects 1..6)
+require('./test_dashboard_regression.js');
+console.log('✓ Bugs 134-139: Dashboard Visual & Ergonomic Regression Suite verified (6/6 PASS)');
 
 // Проверка спецификации канонических эталонов и инвариантов
 require('./test_pravki_spec.js');
 
 console.log('================================================================');
-console.log('  ALL 131 REGRESSION TESTS & CANONICAL BENCHMARKS PASSED (100%) ');
+console.log('  ALL 139 REGRESSION TESTS & CANONICAL BENCHMARKS PASSED (100%) ');
 console.log('================================================================\n');

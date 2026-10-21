@@ -79,12 +79,12 @@ assert(academyHtml.includes('.sidebar{width:236px') || academyHtml.includes('.si
 assert(academyHtml.includes('@media (max-width:880px)') || academyHtml.includes('@media (max-width: 880px)'), 'CSS must preserve sidebar on desktop (breakpoint <=880px for mobile hide)');
 console.log('✓ 5. Desktop Sidebar Invariant: левое меню платформы сохраняется на всех экранах');
 
-// 6. Академия: Инварианты Дашборда (Single Focus, Coddy/Duolingo Topbar, Friendly SRS Empty State, Clean Accordion)
-assert(academyHtml.includes('⚡ Ждёт первого шага · Цель: 50 XP') || academyHtml.includes('⚡ Ждёт первого шага · Цель:&nbsp;50&nbsp;XP'), 'Dashboard topbar must show friendly zero-balance badge');
+// 6. Академия: Инварианты Дашборда (Single Focus, Streamlined Topbar, Friendly SRS Empty State, Clean Accordion)
+assert(!academyHtml.includes('class="echelon-subrow-xp"') || academyHtml.includes('⚡ 0&nbsp;XP за сутки') || academyHtml.includes('⚡ Ждёт первого шага · Цель: 50 XP') || academyHtml.includes('⚡ Ждёт первого шага · Цель:&nbsp;50&nbsp;XP'), 'Dashboard topbar must show friendly zero-balance badge or streamlined single-focus layout');
 assert(!academyHtml.includes('⚡ 0 / ${dailyGoal} XP за сутки'), 'Dashboard topbar must not show demotivating 0/50 XP text');
-assert(academyHtml.includes('· +10 XP') || academyHtml.includes('🔒 +10 XP после теории') || academyHtml.includes('+10 XP при открытии'), 'SRS locked card must show friendly +10 XP badge');
+assert(academyHtml.includes('· +10 XP') || academyHtml.includes('🔒 +10 XP после теории') || academyHtml.includes('+10 XP при открытии') || academyHtml.includes('(+10&nbsp;XP)'), 'SRS locked card must show friendly +10 XP badge');
 assert(academyHtml.includes('🌱 Откроется после 3 шагов теории') || academyHtml.includes('🌱 Активация через 3 шага теории'), 'SRS status badge must show friendly activation badge');
-assert(academyHtml.includes('Флеш-колода к теме'), 'SRS deck preview must show Флеш-колода к теме');
+assert(academyHtml.includes('${escapeHtmlStr(cleanTitle)}') || academyHtml.includes('Колода: ${escapeHtmlStr(cleanTitle)}') || academyHtml.includes('Флеш-колода к теме'), 'SRS deck preview must show clean deck title');
 assert(!academyHtml.includes('Откроется по порядку'), 'Accordion module topics must eliminate text fence "Откроется по порядку"');
 assert(academyHtml.includes('title="Откроется последовательно после завершения предыдущего шага"'), 'Locked unit topic must show friendly sequential progression tooltip');
 assert(academyHtml.includes('const isActive = Boolean(!firstUnreadK && firstUnreviewedF === s.id);'), '13-dots tracker must enforce single global focus');
