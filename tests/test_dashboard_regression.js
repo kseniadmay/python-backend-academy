@@ -217,6 +217,64 @@ function testBug141_GreedyDescriptorPhaseFourMobileFoldAndSrsBalance(){
   console.log('✓ Bug 141: Greedy Descriptor Phase Four mobile fold and SRS balance verified');
 }
 
+function testBug142_GreedyDescriptorTrailPerfection(){
+  // 1. Zero "2 мин" in trail bubbles or buttons
+  assert(
+    !academyHtml.includes('НАЧАТЬ (2 МИН)'),
+    'Bug 142: path bubble and popover must not contain (2 МИН)'
+  );
+  assert(
+    !academyHtml.includes('ПРОДОЛЖИТЬ (2 МИН)'),
+    'Bug 142: path bubble and pro hero CTA must not contain (2 МИН)'
+  );
+  // 2. No technical unit codes in popover title
+  assert(
+    academyHtml.includes('`Урок ${lessonNumInChap} · ${cleanUnitTitle(u.id, u.title)}`'),
+    'Bug 142: popover title must use human lesson numbering instead of Юнит X.Y'
+  );
+  // 3. Clean Russian in popover status and skills label
+  assert(
+    academyHtml.includes('✅ Урок освоен на 100%') && academyHtml.includes('🔒 Откроется после предыдущих уроков'),
+    'Bug 142: popover status must use polished human language'
+  );
+  assert(
+    academyHtml.includes('Ключевые темы урока:'),
+    'Bug 142: popover skills label must be clean without machine unit code'
+  );
+  // 4. No forbidden РАЗДЕЛ in pro-hero breadcrumbs
+  assert(
+    !academyHtml.includes('РАЗДЕЛ ${activeChap.num} · ГЛАВА'),
+    'Bug 142: pro hero breadcrumbs must not use forbidden РАЗДЕЛ or tautology'
+  );
+  assert(
+    academyHtml.includes('ПРОГРАММА › ГЛАВА ${activeChap.num}'),
+    'Bug 142: pro hero breadcrumbs must be clean and canonical'
+  );
+  // 5. Mobile chapter visibility in banner
+  assert(
+    academyHtml.includes('.path-chapter-crumb-label .pcl-short') && academyHtml.includes('ГЛ. ${activeChapterNum}'),
+    'Bug 142: mobile banner must preserve chapter indicator via responsive pcl-short'
+  );
+  // 6. Compact right rail SRS copy and echelon synchronization
+  assert(
+    academyHtml.includes('Очередь пуста. Пройдите первый урок, чтобы открыть карточки к скринингу.'),
+    'Bug 142: right rail SRS empty state must be concise'
+  );
+  assert(
+    academyHtml.includes('const { units: echUnits, chapters: echChapters } = (typeof getEchelonUnitsAndChapters === \'function\')'),
+    'Bug 142: right rail must synchronize chapter units with active echelon'
+  );
+  assert(
+    academyHtml.includes('<span>Набрано: <strong>${dailyXp} XP</strong></span>'),
+    'Bug 142: daily goal summary in right rail must eliminate triple 50 XP repetition'
+  );
+  assert(
+    academyHtml.includes('cleanChTitle'),
+    'Bug 142: pro mode must strip duplicate Глава N: prefix from accordion title'
+  );
+  console.log('✓ Bug 142: Greedy Descriptor Trail perfection, zero noise and clean typography verified');
+}
+
 testBug134_SingleDominantCtaLabelNo2MinAndContinueFurther();
 testBug135_AccordionStatusMasteredVsLockedSemantics();
 testBug136_ZeroHardcodingAndLaconicPhrasingInDashboard();
@@ -225,7 +283,8 @@ testBug138_ExtremeConcisenessAndZeroVerbalClutter();
 testBug139_GreedyDescriptorPhaseTwoDashboardConciseness();
 testBug140_GreedyDescriptorPhaseThreeDashboardPerfection();
 testBug141_GreedyDescriptorPhaseFourMobileFoldAndSrsBalance();
+testBug142_GreedyDescriptorTrailPerfection();
 
 console.log('================================================================');
-console.log('  ALL DASHBOARD REGRESSION TESTS (BUGS 134..141) PASSED (100%)  ');
+console.log('  ALL DASHBOARD & TRAIL REGRESSION TESTS (BUGS 134..142) PASSED ');
 console.log('================================================================\n');

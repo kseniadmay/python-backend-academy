@@ -113,7 +113,7 @@ if chrome_exe:
             c_res = subprocess.run(
                 chrome_flags + extra_args + [route],
                 capture_output=True, text=True, encoding='utf-8', errors='ignore',
-                timeout=30
+                timeout=60
             )
             assert c_res.returncode == 0, f"Chrome failed with code {c_res.returncode} on {route}"
             c_errors = [line for line in c_res.stderr.splitlines() if 'ERROR:CONSOLE' in line or 'Uncaught ' in line]

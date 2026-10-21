@@ -2806,6 +2806,670 @@
     white-space: nowrap;
     flex-shrink: 0;
   }
+  .path-echelon-pill-btn {
+    border: none;
+    font: inherit;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .path-echelon-pill-btn:hover {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  }
+  .path-echelon-pill-btn:active {
+    transform: translateY(1px);
+    filter: brightness(0.95);
+  }
+  .path-echelon-pill-btn:focus-visible {
+    outline: 2px solid var(--amber, #f59e0b);
+    outline-offset: 2px;
+  }
+  .pep-chevron {
+    font-size: 0.65rem;
+    margin-left: 2px;
+    opacity: 0.8;
+    transition: transform 0.2s ease;
+  }
+  .path-echelon-pill-btn:hover .pep-chevron {
+    opacity: 1;
+    transform: translateY(1px);
+  }
+
+  /* Desktop / Tablet Quick-switch Tabs for Echelons */
+  .path-echelon-quick-tabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    padding: 4px;
+    border-radius: 14px;
+    background: rgba(22, 27, 36, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  html:not([data-theme="dark"]) .path-echelon-quick-tabs {
+    background: rgba(241, 245, 249, 0.88);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+  }
+  .path-eq-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 11px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--ink-muted, #94a3b8);
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .path-eq-tab:hover {
+    color: var(--ink, #f8fafc);
+    background: rgba(255, 255, 255, 0.06);
+  }
+  html:not([data-theme="dark"]) .path-eq-tab:hover {
+    color: #0f172a;
+    background: rgba(0, 0, 0, 0.05);
+  }
+  .path-eq-tab.active {
+    color: #f8fafc;
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  }
+  html:not([data-theme="dark"]) .path-eq-tab.active {
+    color: #0f172a;
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  }
+  .path-eq-tab.active.path-eq-tab--t1 { border-color: rgba(244, 63, 94, 0.45); color: #fecdd3; }
+  .path-eq-tab.active.path-eq-tab--t2 { border-color: rgba(245, 158, 11, 0.45); color: #fde68a; }
+  .path-eq-tab.active.path-eq-tab--t3 { border-color: rgba(59, 130, 246, 0.45); color: #bfdbfe; }
+  .path-eq-tab.active.path-eq-tab--t4 { border-color: rgba(168, 85, 247, 0.45); color: #e9d5ff; }
+  @media (max-width: 640px) {
+    .path-echelon-quick-tabs {
+      display: none; /* On smartphones, selection is accessed via the header echelon pill */
+    }
+  }
+
+  /* Echelon / Program Selector Modal & Bottom Sheet (Zen Glassmorphism) */
+  .path-echelon-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    z-index: 100010;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.24s ease;
+  }
+  .path-echelon-modal-backdrop.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .path-echelon-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.96);
+    width: 92%;
+    max-width: 580px;
+    max-height: 85vh;
+    overflow-y: auto;
+    background: rgba(18, 23, 32, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 24px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75);
+    z-index: 100011;
+    padding: 24px 26px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  html:not([data-theme="dark"]) .path-echelon-modal {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
+  }
+  .path-echelon-modal.is-open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  @media (max-width: 640px) {
+    .path-echelon-modal {
+      top: auto;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      transform: translateY(100%);
+      width: 100%;
+      max-width: 100%;
+      border-radius: 24px 24px 0 0;
+      padding: 18px 18px calc(24px + env(safe-area-inset-bottom, 16px));
+      max-height: 88vh;
+      border-bottom: none;
+    }
+    .path-echelon-modal.is-open {
+      transform: translateY(0);
+    }
+  }
+  .path-echelon-modal-handle {
+    display: none;
+    width: 38px;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.22);
+    margin: 0 auto 12px;
+  }
+  @media (max-width: 640px) {
+    .path-echelon-modal-handle { display: block; }
+  }
+  .path-echelon-modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .path-echelon-modal-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #f8fafc;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  html:not([data-theme="dark"]) .path-echelon-modal-title { color: #0f172a; }
+  .path-echelon-modal-sub {
+    font-size: 0.8rem;
+    color: var(--ink-muted, #94a3b8);
+    margin: 0;
+    line-height: 1.4;
+  }
+  .path-echelon-modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--ink-muted, #94a3b8);
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.16s ease;
+    flex-shrink: 0;
+  }
+  .path-echelon-modal-close:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #f8fafc;
+  }
+  .path-echelon-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .echelon-prog-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1.5px solid rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-align: left;
+    position: relative;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  html:not([data-theme="dark"]) .echelon-prog-card {
+    background: rgba(248, 250, 252, 0.92);
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+  .echelon-prog-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.22);
+    transform: translateY(-1px);
+  }
+  html:not([data-theme="dark"]) .echelon-prog-card:hover {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.16);
+  }
+  .echelon-prog-card.is-active {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(52, 211, 153, 0.65);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  }
+  html:not([data-theme="dark"]) .echelon-prog-card.is-active {
+    background: #ffffff;
+    border-color: rgba(16, 185, 129, 0.6);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.12);
+  }
+  .echelon-prog-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  .echelon-prog-card-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .echelon-prog-card-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .echelon-prog-card-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #f8fafc;
+    letter-spacing: -0.01em;
+  }
+  html:not([data-theme="dark"]) .echelon-prog-card-title { color: #0f172a; }
+  .echelon-prog-card-badge {
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .echelon-prog-card-desc {
+    font-size: 0.78rem;
+    line-height: 1.42;
+    color: var(--ink-soft, #cbd5e1);
+  }
+  html:not([data-theme="dark"]) .echelon-prog-card-desc { color: #475569; }
+  .echelon-prog-card-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 2px;
+  }
+  .echelon-prog-card-stats {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--ink-muted, #94a3b8);
+  }
+  .echelon-prog-card-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    border: none;
+    transition: all 0.16s ease;
+  }
+  .echelon-prog-card-btn--active {
+    background: rgba(52, 211, 153, 0.2);
+    color: #6ee7b7;
+    border: 1px solid rgba(52, 211, 153, 0.4);
+    pointer-events: none;
+  }
+  .echelon-prog-card-btn--select {
+    background: linear-gradient(180deg, #fbbf24, #d97706);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+  }
+  .echelon-prog-card-btn--select:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
+  .path-echelon-pill-btn {
+    border: none;
+    font: inherit;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .path-echelon-pill-btn:hover {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  }
+  .path-echelon-pill-btn:active {
+    transform: translateY(1px);
+    filter: brightness(0.95);
+  }
+  .path-echelon-pill-btn:focus-visible {
+    outline: 2px solid var(--amber, #f59e0b);
+    outline-offset: 2px;
+  }
+  .pep-chevron {
+    font-size: 0.65rem;
+    margin-left: 2px;
+    opacity: 0.8;
+    transition: transform 0.2s ease;
+  }
+  .path-echelon-pill-btn:hover .pep-chevron {
+    opacity: 1;
+    transform: translateY(1px);
+  }
+
+  /* Desktop / Tablet Quick-switch Tabs for Echelons */
+  .path-echelon-quick-tabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    padding: 4px;
+    border-radius: 14px;
+    background: rgba(22, 27, 36, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  html:not([data-theme="dark"]) .path-echelon-quick-tabs {
+    background: rgba(241, 245, 249, 0.88);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+  }
+  .path-eq-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 11px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--ink-muted, #94a3b8);
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .path-eq-tab:hover {
+    color: var(--ink, #f8fafc);
+    background: rgba(255, 255, 255, 0.06);
+  }
+  html:not([data-theme="dark"]) .path-eq-tab:hover {
+    color: #0f172a;
+    background: rgba(0, 0, 0, 0.05);
+  }
+  .path-eq-tab.active {
+    color: #f8fafc;
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  }
+  html:not([data-theme="dark"]) .path-eq-tab.active {
+    color: #0f172a;
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  }
+  .path-eq-tab.active.path-eq-tab--t1 { border-color: rgba(244, 63, 94, 0.45); color: #fecdd3; }
+  .path-eq-tab.active.path-eq-tab--t2 { border-color: rgba(245, 158, 11, 0.45); color: #fde68a; }
+  .path-eq-tab.active.path-eq-tab--t3 { border-color: rgba(59, 130, 246, 0.45); color: #bfdbfe; }
+  .path-eq-tab.active.path-eq-tab--t4 { border-color: rgba(168, 85, 247, 0.45); color: #e9d5ff; }
+  @media (max-width: 640px) {
+    .path-echelon-quick-tabs {
+      display: none; /* On smartphones, selection is accessed via the header echelon pill */
+    }
+  }
+
+  /* Echelon / Program Selector Modal & Bottom Sheet (Zen Glassmorphism) */
+  .path-echelon-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    z-index: 100010;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.24s ease;
+  }
+  .path-echelon-modal-backdrop.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .path-echelon-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.96);
+    width: 92%;
+    max-width: 580px;
+    max-height: 85vh;
+    overflow-y: auto;
+    background: rgba(18, 23, 32, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 24px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75);
+    z-index: 100011;
+    padding: 24px 26px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  html:not([data-theme="dark"]) .path-echelon-modal {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
+  }
+  .path-echelon-modal.is-open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  @media (max-width: 640px) {
+    .path-echelon-modal {
+      top: auto;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      transform: translateY(100%);
+      width: 100%;
+      max-width: 100%;
+      border-radius: 24px 24px 0 0;
+      padding: 18px 18px calc(24px + env(safe-area-inset-bottom, 16px));
+      max-height: 88vh;
+      border-bottom: none;
+    }
+    .path-echelon-modal.is-open {
+      transform: translateY(0);
+    }
+  }
+  .path-echelon-modal-handle {
+    display: none;
+    width: 38px;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.22);
+    margin: 0 auto 12px;
+  }
+  @media (max-width: 640px) {
+    .path-echelon-modal-handle { display: block; }
+  }
+  .path-echelon-modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .path-echelon-modal-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #f8fafc;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  html:not([data-theme="dark"]) .path-echelon-modal-title { color: #0f172a; }
+  .path-echelon-modal-sub {
+    font-size: 0.8rem;
+    color: var(--ink-muted, #94a3b8);
+    margin: 0;
+    line-height: 1.4;
+  }
+  .path-echelon-modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--ink-muted, #94a3b8);
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.16s ease;
+    flex-shrink: 0;
+  }
+  .path-echelon-modal-close:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #f8fafc;
+  }
+  .path-echelon-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .echelon-prog-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1.5px solid rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-align: left;
+    position: relative;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  html:not([data-theme="dark"]) .echelon-prog-card {
+    background: rgba(248, 250, 252, 0.92);
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+  .echelon-prog-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.22);
+    transform: translateY(-1px);
+  }
+  html:not([data-theme="dark"]) .echelon-prog-card:hover {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.16);
+  }
+  .echelon-prog-card.is-active {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(52, 211, 153, 0.65);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  }
+  html:not([data-theme="dark"]) .echelon-prog-card.is-active {
+    background: #ffffff;
+    border-color: rgba(16, 185, 129, 0.6);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.12);
+  }
+  .echelon-prog-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  .echelon-prog-card-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .echelon-prog-card-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .echelon-prog-card-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #f8fafc;
+    letter-spacing: -0.01em;
+  }
+  html:not([data-theme="dark"]) .echelon-prog-card-title { color: #0f172a; }
+  .echelon-prog-card-badge {
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .echelon-prog-card-desc {
+    font-size: 0.78rem;
+    line-height: 1.42;
+    color: var(--ink-soft, #cbd5e1);
+  }
+  html:not([data-theme="dark"]) .echelon-prog-card-desc { color: #475569; }
+  .echelon-prog-card-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 2px;
+  }
+  .echelon-prog-card-stats {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--ink-muted, #94a3b8);
+  }
+  .echelon-prog-card-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    border: none;
+    transition: all 0.16s ease;
+  }
+  .echelon-prog-card-btn--active {
+    background: rgba(52, 211, 153, 0.2);
+    color: #6ee7b7;
+    border: 1px solid rgba(52, 211, 153, 0.4);
+    pointer-events: none;
+  }
+  .echelon-prog-card-btn--select {
+    background: linear-gradient(180deg, #fbbf24, #d97706);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+  }
+  .echelon-prog-card-btn--select:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
   .echelon-pill--t1 {
     background: rgba(239, 68, 68, 0.15);
     color: #f87171;
@@ -2934,18 +3598,24 @@
     .path-chapter-count .pcc-short { display: inline !important; }
   }
   .path-echelon-pill .pep-short,
-  .path-screening-badge .psb-short {
+  .path-screening-badge .psb-short,
+  .path-chapter-crumb-label .pcl-short {
     display: none;
   }
   @media (max-width: 768px) {
+    .path-chapter-crumb-label .pcl-full { display: none !important; }
+    .path-chapter-crumb-label .pcl-short { display: inline !important; }
     .path-chapter-banner {
       padding: 10px 14px;
       margin-bottom: 14px;
       gap: 5px;
     }
-    .path-chapter-banner .path-crumb-sep,
+    .path-chapter-banner .path-crumb-sep {
+      display: inline-block !important;
+      opacity: 0.6;
+    }
     .path-chapter-banner .path-chapter-crumb-label {
-      display: none !important;
+      display: inline-block !important;
     }
     .path-echelon-pill .pep-full,
     .path-screening-badge .psb-full {
@@ -10659,6 +11329,7 @@ function ensureExtendedState(target){
   if(!s.stackBranch || !['fastapi','django','both'].includes(s.stackBranch)) s.stackBranch = 'fastapi';
   if(!s.unitSortMode || !['priority','number'].includes(s.unitSortMode)) s.unitSortMode = 'priority';
   if(!s.pathViewMode || !['game','pro'].includes(s.pathViewMode)) s.pathViewMode = 'game';
+  if(s.selectedEchelon !== 'all' && (typeof s.selectedEchelon !== 'number' || s.selectedEchelon < 1 || s.selectedEchelon > 4)) s.selectedEchelon = 1;
   if(!s.pathNodeStyle || !['paw','button'].includes(s.pathNodeStyle)) s.pathNodeStyle = 'button'; // выбор Ксении: по умолчанию «Кнопки» (ближе к Coddy)
   if(!s.diagnosticGaps || !Array.isArray(s.diagnosticGaps)) s.diagnosticGaps = [];
   if(typeof s.diagCompleted !== 'boolean') s.diagCompleted = false;
@@ -15857,6 +16528,117 @@ function getPathChaptersMeta(allUnits){
   ];
 }
 
+
+function getEchelonUnitsAndChapters(echelonTier, allUnits){
+  const sourceUnits = allUnits || ALL_UNITS_COMBINED;
+  let units = [];
+  if(echelonTier === 'all'){
+    units = sourceUnits.slice();
+  } else {
+    const t = Number(echelonTier) || 1;
+    units = sourceUnits.filter(u => getEffectiveUnitTier(u.id) === t);
+  }
+  if(!units.length) units = sourceUnits.slice();
+
+  const chaptersMeta = [
+    { num: 1, title: 'Python Core', track: 'python', shortTitle: 'Python Core' },
+    { num: 2, title: 'Web & HTTP', track: 'web', shortTitle: 'Web & HTTP' },
+    { num: 3, title: 'Backend & Архитектура', track: 'backend', shortTitle: 'Backend & Архитектура' },
+    { num: 4, title: 'Алгоритмы и структуры данных', track: 'algorithms', shortTitle: 'Алгоритмы и структуры' },
+    { num: 5, title: 'Базы данных и SQL', track: 'databases', shortTitle: 'Базы данных и SQL' },
+    { num: 6, title: 'Системный дизайн', track: 'architecture', shortTitle: 'Системный дизайн' },
+    { num: 7, title: 'Инфраструктура и DevOps', track: 'infra', shortTitle: 'Инфраструктура и DevOps' }
+  ];
+
+  const chapters = [];
+  let currentChapter = null;
+  units.forEach((u, idx) => {
+    const tr = getTrackForUnit(u.id);
+    const meta = chaptersMeta.find(c => c.track === tr.routePrefix) || { num: 1, title: tr.title, track: tr.routePrefix, shortTitle: tr.title };
+    if(!currentChapter || currentChapter.track !== meta.track){
+      currentChapter = {
+        startIdx: idx,
+        num: meta.num,
+        chapterNum: meta.num,
+        title: `Глава ${meta.num}: ${meta.title}`,
+        shortTitle: meta.shortTitle,
+        track: meta.track,
+        unitsCount: 0,
+        units: []
+      };
+      chapters.push(currentChapter);
+    }
+    currentChapter.units.push(u);
+  });
+  chapters.forEach(c => {
+    c.unitsCount = c.units.length;
+  });
+  return { units, chapters };
+}
+window.getEchelonUnitsAndChapters = getEchelonUnitsAndChapters;
+
+function renderEchelonCardsModalHTML(curEchelon){
+  const curTier = (curEchelon === 'all') ? 'all' : (Number(curEchelon) || 1);
+  const tiers = [1, 2, 3, 4];
+  const cards = tiers.map(t => {
+    const em = INTERVIEW_ECHELONS[t] || INTERVIEW_ECHELONS[1];
+    const prog = (typeof getEchelonProgress === 'function') ? getEchelonProgress(t) : { units: [], skills: [], pct: 0 };
+    const tUnits = prog.units || [];
+    const tCompletedUnits = tUnits.filter(isUnitCompleted).length;
+    const tTotalUnits = tUnits.length;
+    const tPct = prog.pct || 0;
+    const isActive = (curTier === t);
+
+    return `
+      <div class="echelon-prog-card ${isActive ? 'is-active' : ''}" data-select-echelon="${t}" role="button" tabindex="0" aria-label="${escapeHtmlStr(em.label)}. ${tCompletedUnits} из ${tTotalUnits} уроков сдано.">
+        <div class="echelon-prog-card-top">
+          <div class="echelon-prog-card-title-wrap">
+            <span class="echelon-prog-card-icon">${em.icon}</span>
+            <span class="echelon-prog-card-title">${escapeHtmlStr(em.label.split(':')[0])} · ${escapeHtmlStr(em.focus)}</span>
+          </div>
+          <span class="echelon-prog-card-badge ${em.badgeClass}">${tPct}%</span>
+        </div>
+        <div class="echelon-prog-card-desc">${escapeHtmlStr(em.desc)}</div>
+        <div class="cd-bar cd-bar-track" style="height:5px;margin:2px 0;"><div class="cd-fill cd-bar-fill" style="width:${Math.max(5, tPct)}%;background:${em.gradient || em.color};"></div></div>
+        <div class="echelon-prog-card-meta-row">
+          <span class="echelon-prog-card-stats">${tCompletedUnits} из ${tTotalUnits} ${pluralizeRu(tTotalUnits, 'урока', 'уроков', 'уроков')} сдано</span>
+          ${isActive
+            ? '<span class="echelon-prog-card-btn echelon-prog-card-btn--active">ТЕКУЩАЯ ПРОГРАММА ✓</span>'
+            : `<button type="button" class="echelon-prog-card-btn echelon-prog-card-btn--select" data-select-echelon="${t}">ВЫБРАТЬ ПРОГРАММУ ➔</button>`}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const isAllActive = (curTier === 'all');
+  const allUnitsTotal = ALL_UNITS_COMBINED.length;
+  const allUnitsDone = ALL_UNITS_COMBINED.filter(isUnitCompleted).length;
+  const allPct = Math.round(allUnitsDone / allUnitsTotal * 100);
+
+  const allCard = `
+    <div class="echelon-prog-card ${isAllActive ? 'is-active' : ''}" data-select-echelon="all" role="button" tabindex="0" style="margin-top:4px;" aria-label="Сквозной курс, все 45 уроков.">
+      <div class="echelon-prog-card-top">
+        <div class="echelon-prog-card-title-wrap">
+          <span class="echelon-prog-card-icon">🌐</span>
+          <span class="echelon-prog-card-title">Сквозной курс · Все 7 глав программы</span>
+        </div>
+        <span class="echelon-prog-card-badge" style="background:rgba(255,255,255,0.08);color:#f8fafc;">${allPct}%</span>
+      </div>
+      <div class="echelon-prog-card-desc">Единый непрерывный маршрут через все 45 уроков от синтаксиса Python до системного дизайна и DevOps.</div>
+      <div class="cd-bar cd-bar-track" style="height:5px;margin:2px 0;"><div class="cd-fill cd-bar-fill" style="width:${Math.max(5, allPct)}%;"></div></div>
+      <div class="echelon-prog-card-meta-row">
+        <span class="echelon-prog-card-stats">${allUnitsDone} из ${allUnitsTotal} уроков сдано</span>
+        ${isAllActive
+          ? '<span class="echelon-prog-card-btn echelon-prog-card-btn--active">ТЕКУЩИЙ МАРШРУТ ✓</span>'
+          : '<button type="button" class="echelon-prog-card-btn echelon-prog-card-btn--select" data-select-echelon="all">ВЫБРАТЬ ВСЕ ➔</button>'}
+      </div>
+    </div>
+  `;
+
+  return cards + allCard;
+}
+window.renderEchelonCardsModalHTML = renderEchelonCardsModalHTML;
+
 function isUnitCompleted(u){
   return (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80));
 }
@@ -15865,24 +16647,29 @@ function renderPathMobileStatsHTML(totalCompletedUnits, streakText, curTier, act
   const chNum = activeChapterNum || 1;
   const chDone = (typeof chapterCompleted === 'number') ? chapterCompleted : 0;
   const chTot = (typeof chapterTotal === 'number') ? chapterTotal : 9;
-  const tierNum = curTier || 1;
+  const tierNum = (curTier === 'all') ? 1 : (Number(curTier) || 1);
+  const tierIcon = (typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[tierNum] && INTERVIEW_ECHELONS[tierNum].icon) || '🛡️';
+  const tierLabel = (curTier === 'all') ? 'Все' : tierNum;
   return `
     <div class="path-mobile-stats" role="status" aria-label="Статистика обучения">
-      <span class="pms-item pms-echelon" title="Текущий эшелон подготовки">${(typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[tierNum] && INTERVIEW_ECHELONS[tierNum].icon) || '🛡️'} <b>Эшелон ${tierNum}</b></span>
+      <span class="pms-item pms-echelon" data-open-echelon-modal="1" role="button" tabindex="0" title="Нажмите, чтобы сменить программу / эшелон">${tierIcon} <b>Эшелон ${tierLabel}</b> <span style="font-size:0.68rem;opacity:0.8;">▾</span></span>
       <span class="pms-item" title="Пройдено в главе ${chNum}">📘 <b>Гл. ${chNum}: ${chDone}/${chTot}</b></span>
       <span class="pms-item" title="Стрик активности">🔥 <b>${state.streak || 0}</b> ${streakText}</span>
       <span class="pms-item" title="Накопленный опыт">⚡ <b>${state.xp || 0} XP</b></span>
     </div>`;
 }
 
-function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum){
-  const chaptersMeta = getPathChaptersMeta(ALL_UNITS_COMBINED);
+function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum, selectedEchelonOverride){
+  const curEchNum = (selectedEchelonOverride !== undefined) ? selectedEchelonOverride : ((state && state.selectedEchelon) || 1);
+  const { units: echUnits, chapters: echChapters } = (typeof getEchelonUnitsAndChapters === 'function')
+    ? getEchelonUnitsAndChapters(curEchNum, ALL_UNITS_COMBINED)
+    : { units: ALL_UNITS_COMBINED, chapters: getPathChaptersMeta(ALL_UNITS_COMBINED) };
   const e1 = (typeof getEchelonProgress === 'function') ? getEchelonProgress(1) : null;
   const e1Pct = e1 ? e1.pct : 0;
   const e1Remaining = e1 ? e1.skills.filter(s => getSkillMP(s.id) < 100).length : 0;
-  const curChap = chaptersMeta.find(c => c.num === activeChapterNum) || chaptersMeta[0];
+  const curChap = (echChapters && echChapters.find(c => (c.chapterNum || c.num) === activeChapterNum)) || (echChapters && echChapters[0]) || { num: 1, chapterNum: 1, title: 'Python Core', units: echUnits };
   const curChapCompleted = curChap ? curChap.units.filter(isUnitCompleted).length : 0;
-  const curChapTotal = curChap ? curChap.units.length : 9;
+  const curChapTotal = curChap ? curChap.units.length : echUnits.length;
 
   // Real dynamic mastery calculation for screening radar themes
   const r1Mp = (typeof getSkillMP === 'function') ? Math.round(getSkillMP('1.1.1')) : 0;
@@ -15911,19 +16698,19 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)
         </div>
       </div>
 
-      <!-- Widget 1: Screening Readiness — мотивирующая графа «До 1-го скрининга %» (по ТЗ) -->
+      <!-- Widget 1: Screening Readiness — мотивирующая графа с динамическим эшелоном -->
       <div class="panel coddy-rail-card">
         <div class="coddy-rail-card-head">
-          <div class="coddy-rail-badge">🎯 До 1-го скрининга</div>
+          <div class="coddy-rail-badge" data-open-echelon-modal="1" role="button" tabindex="0" style="cursor:pointer;" title="Нажмите, чтобы сменить эшелон">${(typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[curEchNum] && INTERVIEW_ECHELONS[curEchNum].icon) || '🎯'} До ${(typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[curEchNum] && INTERVIEW_ECHELONS[curEchNum].targetLabel) || 'скрининга'} ▾</div>
           <a href="#/mock" class="coddy-rail-link">Симулятор</a>
         </div>
         <div class="coddy-rail-meter">
           ${e1Pct > 0
-            ? `<span class="coddy-rail-meter-value">${e1Pct}%</span><span class="meta">готовности к тех-скринингу</span>`
-            : `<span class="coddy-rail-meter-value" style="font-size:1.35rem;color:var(--amber,#fbbf24);">СТАРТ</span><span class="meta">базовый тех-скрининг</span>`}
+            ? `<span class="coddy-rail-meter-value">${e1Pct}%</span><span class="meta">готовности к скринингу</span>`
+            : `<span class="coddy-rail-meter-value" style="font-size:1.35rem;color:var(--amber,#fbbf24);">СТАРТ</span><span class="meta">базовый скрининг</span>`}
         </div>
         <div class="cd-bar cd-bar-track" role="progressbar" aria-label="Готовность к техническому скринингу" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${e1Pct}"><div class="cd-fill cd-bar-fill" style="width:${Math.max(8, e1Pct)}%;"></div></div>
-        <div class="meta" style="font-size:.75rem;margin-top:7px;">${e1Pct > 0 ? `⏳ Освоено ${e1 ? e1.skills.filter(s => getSkillMP(s.id) >= 80).length : 0} из ${e1 ? e1.skills.length : 32} навыков Эшелона 1` : `• Фундамент тех-скрининга · Глава ${activeChapterNum}`}</div>
+        <div class="meta" style="font-size:.75rem;margin-top:7px;">${e1Pct > 0 ? `⏳ Освоено ${e1 ? e1.skills.filter(s => getSkillMP(s.id) >= 80).length : 0} из ${e1 ? e1.skills.length : 32} навыков Эшелона 1` : `• Фундамент программы · Глава ${activeChapterNum}`}</div>
       </div>
 
       <!-- Widget: Radar Screening Themes (Dynamic mastery from RemNote Knowledge Base) -->
@@ -15961,7 +16748,7 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)
         </div>
         <div style="font-size:0.78rem;color:var(--ink-muted);line-height:1.45;margin-top:6px;">
           ${totalCompletedUnits === 0
-            ? 'Очередь повторения пуста. Освойте первый урок, чтобы активировать карточки интервального повторения к скринингу.'
+            ? 'Очередь пуста. Пройдите первый урок, чтобы открыть карточки к скринингу.'
             : 'Интервальное повторение ключевых определений перед собеседованием: <span style="color:#f8fafc;font-weight:600;">Синтаксис, структуры данных</span>.'}
         </div>
       </div>
@@ -15970,14 +16757,14 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)
       <div class="panel coddy-rail-card">
         <div class="coddy-rail-card-head">
           <div class="coddy-rail-badge">🏆 Цель дня</div>
-          ${dailyPct > 0 ? `<span class="meta" style="font-size:0.75rem;font-weight:700;color:${dailyPct >= 100 ? 'var(--emerald)' : 'var(--amber,#fbbf24)'};">${dailyPct}%</span>` : `<span class="meta" style="font-size:0.72rem;font-weight:600;color:var(--amber,#fbbf24);">${dailyGoal} XP цель</span>`}
+          ${dailyPct > 0 ? `<span class="meta" style="font-size:0.75rem;font-weight:700;color:${dailyPct >= 100 ? 'var(--emerald)' : 'var(--amber,#fbbf24)'};">${dailyPct}%</span>` : `<span class="meta" style="font-size:0.72rem;font-weight:600;color:var(--amber,#fbbf24);">${dailyGoal} XP</span>`}
         </div>
         <div class="progress-bar-wrap" style="height:6px;margin:8px 0 6px;">
           <div class="progress-bar-fill" style="width:${dailyPct}%;background:linear-gradient(90deg,#fbbf24,#f59e0b);"></div>
         </div>
         <div class="coddy-rail-daily-summary" style="font-size:0.75rem;color:var(--ink-muted);display:flex;justify-content:space-between;">
-          <span>Сегодня: <strong>${dailyXp}/${dailyGoal} XP</strong></span>
-          <span>${dailyXp >= dailyGoal ? '✨ Выполнена' : `Ещё ${dailyGoal - dailyXp} XP`}</span>
+          <span>Набрано: <strong>${dailyXp} XP</strong></span>
+          <span>${dailyXp >= dailyGoal ? '✨ Выполнена' : `Осталось ${dailyGoal - dailyXp} XP`}</span>
         </div>
       </div>
 
@@ -16045,7 +16832,8 @@ function getSemanticTrailIcon(u, i, isChapterLast){
 function viewPathSerpentine(options){
   options = options || {};
   ensureExtendedState();
-  const allUnits = ALL_UNITS_COMBINED;
+  const curEchelon = (options.echelon !== undefined) ? options.echelon : ((state && state.selectedEchelon) || 1);
+  const { units: allUnits, chapters: chapterBreakpoints } = getEchelonUnitsAndChapters(curEchelon, ALL_UNITS_COMBINED);
   const usePawNodes = state.pathNodeStyle !== 'button';
   
   // Find which units are completed vs active vs locked
@@ -16058,12 +16846,10 @@ function viewPathSerpentine(options){
       activeUnitIndex = idx;
     }
   });
-  if(activeUnitIndex === -1) activeUnitIndex = allUnits.length - 1;
+  if(activeUnitIndex === -1) activeUnitIndex = Math.max(0, allUnits.length - 1);
 
-  // Track coordinates for each of the 45 nodes
-  // Chapter 1 starts at y=90 with clean breathing buffer below top chapter banner
-  // Each chapter transition adds +150px of breathing room for Coddy-style Section Gate Cards!
-  const chapterStartSet = new Set([9, 13, 21, 27, 33, 39]);
+  // Track coordinates for each node in this echelon
+  const chapterStartSet = new Set(chapterBreakpoints.slice(1).map(cb => cb.startIdx));
   let curY = 90;
   const coords = allUnits.map((u, i) => {
     if(i > 0){
@@ -16076,10 +16862,10 @@ function viewPathSerpentine(options){
     return { x, y: curY };
   });
 
-  const totalH = coords[coords.length - 1].y + 120;
+  const totalH = coords.length ? (coords[coords.length - 1].y + 120) : 400;
 
   // Build smooth Bezier path
-  let dPath = `M ${coords[0].x} ${coords[0].y}`;
+  let dPath = coords.length ? `M ${coords[0].x} ${coords[0].y}` : '';
   for(let i = 0; i < coords.length - 1; i++){
     const p1 = coords[i];
     const p2 = coords[i+1];
@@ -16089,7 +16875,7 @@ function viewPathSerpentine(options){
 
   // Build progress sub-path up to active unit
   let dProgress = '';
-  if(activeUnitIndex > 0){
+  if(activeUnitIndex > 0 && coords.length > 0){
     dProgress = `M ${coords[0].x} ${coords[0].y}`;
     for(let i = 0; i < Math.min(activeUnitIndex, coords.length - 1); i++){
       const p1 = coords[i];
@@ -16099,9 +16885,9 @@ function viewPathSerpentine(options){
     }
   }
 
-  // Dotted "path ahead" overlay from the active unit to the end (Coddy-style)
+  // Dotted "path ahead" overlay from active unit to end
   let dFuture = '';
-  if(activeUnitIndex < coords.length - 1){
+  if(activeUnitIndex < coords.length - 1 && coords.length > 0){
     dFuture = `M ${coords[activeUnitIndex].x} ${coords[activeUnitIndex].y}`;
     for(let i = activeUnitIndex; i < coords.length - 1; i++){
       const p1 = coords[i];
@@ -16112,16 +16898,14 @@ function viewPathSerpentine(options){
   }
 
   // Active unit metadata for top chapter banner
-  const curActiveUnit = allUnits[activeUnitIndex] || allUnits[0];
-  const activeTrack = getTrackForUnit(curActiveUnit.id);
-  const activeChapterNum = (typeof getPathChaptersMeta === 'function')
-    ? ((getPathChaptersMeta(allUnits).find(c => c.units.some(u => u.id === curActiveUnit.id)) || { num: 1 }).num)
-    : 1;
-  const chapterUnits = allUnits.filter(u => getTrackForUnit(u.id).routePrefix === activeTrack.routePrefix);
+  const curActiveUnit = allUnits[activeUnitIndex] || allUnits[0] || ALL_UNITS_COMBINED[0];
+  const curChapter = chapterBreakpoints.find(cb => cb.units.some(u => u.id === curActiveUnit.id)) || chapterBreakpoints[0] || { num: 1, chapterNum: 1, shortTitle: 'Python Core', units: allUnits };
+  const activeChapterNum = curChapter.chapterNum || curChapter.num || 1;
+  const chapterUnits = curChapter.units || allUnits;
   const totalInChapter = chapterUnits.length;
-  const completedInChapter = chapterUnits.filter(u => (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80))).length;
+  const completedInChapter = chapterUnits.filter(isUnitCompleted).length;
   const chapterSegmentsHTML = chapterUnits.map((u, uIdx) => {
-    const isPassed = (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80));
+    const isPassed = isUnitCompleted(u);
     const isActive = u.id === curActiveUnit.id;
     return `<div class="path-seg-bar ${isPassed ? 'done' : (isActive ? 'active' : '')}" title="Урок ${uIdx + 1}: ${escapeHtmlStr(cleanUnitTitle(u.id, u.title))}"></div>`;
   }).join('');
@@ -16130,107 +16914,80 @@ function viewPathSerpentine(options){
     ? `<span class="pcc-full">Начало · ${totalInChapter} ${pluralizeRu(totalInChapter, 'урок', 'урока', 'уроков')}</span><span class="pcc-short">0 / ${totalInChapter}</span>`
     : `<span class="pcc-full">${completedInChapter} из ${totalInChapter} сдано</span><span class="pcc-short">${completedInChapter} / ${totalInChapter}</span>`;
 
-  // Chapter markers: Chapter 1 has top ribbon, Chapters 2..7 have Coddy Section Gate Cards (Variant C, Hard Gate)
-  const chapterBreakpoints = [
-    { startIdx: 0, title: 'Глава 1: Python Core', chapterNum: 1, track: 'python', shortTitle: 'Python Core', unitsCount: 9 },
-    { startIdx: 9, title: 'Глава 2: Web & HTTP', chapterNum: 2, track: 'web', shortTitle: 'Web & HTTP', unitsCount: 4 },
-    { startIdx: 13, title: 'Глава 3: Backend & Архитектура', chapterNum: 3, track: 'backend', shortTitle: 'Backend & Архитектура', unitsCount: 8 },
-    { startIdx: 21, title: 'Глава 4: Алгоритмы и структуры данных', chapterNum: 4, track: 'algorithms', shortTitle: 'Алгоритмы и структуры', unitsCount: 6 },
-    { startIdx: 27, title: 'Глава 5: Базы данных и SQL', chapterNum: 5, track: 'databases', shortTitle: 'Базы данных и SQL', unitsCount: 6 },
-    { startIdx: 33, title: 'Глава 6: Системный дизайн', chapterNum: 6, track: 'architecture', shortTitle: 'Системный дизайн', unitsCount: 6 },
-    { startIdx: 39, title: 'Глава 7: Инфраструктура и DevOps', chapterNum: 7, track: 'infra', shortTitle: 'Инфраструктура и DevOps', unitsCount: 6 }
-  ];
-  // Последний юнит главы получает отдельную иконку трофея.
-  const chapterLastIdxSet = new Set(chapterBreakpoints.slice(1).map(cb => cb.startIdx - 1));
-  chapterLastIdxSet.add(allUnits.length - 1);
-
+  // Chapter gate cards between chapters in this echelon
   let markersSVG = '';
   chapterBreakpoints.forEach((cb, ci) => {
-    if(coords[cb.startIdx]){
-      if(cb.startIdx === 0){
-        // Chapter 1 is prominently headed by the top sticky chapter banner;
-        // no redundant ribbon needed in SVG, keeping header clean and airy
+    if(ci > 0 && coords[cb.startIdx]){
+      const prevCb = chapterBreakpoints[ci - 1];
+      const isPrevChapterDone = prevCb.units.length > 0 && prevCb.units.every(isUnitCompleted);
+      const curCompletedCount = cb.units.filter(isUnitCompleted).length;
+      const isCurChapterDone = cb.units.length > 0 && curCompletedCount === cb.units.length;
+      const gateStatus = !isPrevChapterDone ? 'locked' : (isCurChapterDone ? 'completed' : 'active');
+      const isLocked = (gateStatus === 'locked');
+
+      const prevY = coords[cb.startIdx - 1].y;
+      const cy = prevY + 180;
+
+      let hexFill = 'url(#pathButtonActive)';
+      let hexStroke = 'rgba(251, 191, 36, 0.95)';
+      let hexGlow = 'filter="drop-shadow(0 0 10px rgba(245, 158, 11, 0.65))"';
+      let hexText = `<text x="0" y="-48" text-anchor="middle" font-size="14" font-weight="900" fill="#ffffff">${cb.chapterNum}</text>`;
+
+      if(isLocked){
+        hexFill = 'url(#pathButtonLocked)';
+        hexStroke = 'rgba(190, 18, 60, 0.60)';
+        hexGlow = '';
+        hexText = `<text x="0" y="-49" text-anchor="middle" font-size="12" font-weight="900" fill="#fda4af">🔒</text>`;
+      } else if(isCurChapterDone){
+        hexFill = 'url(#pathButtonCompleted)';
+        hexStroke = 'rgba(52, 211, 153, 0.85)';
+        hexGlow = 'filter="drop-shadow(0 0 10px rgba(16, 185, 129, 0.55))"';
+        hexText = `<text x="0" y="-48" text-anchor="middle" font-size="15" font-weight="900" fill="#ffffff">✓</text>`;
+      }
+
+      const hexBadge = `
+        <g class="path-gate-hex-badge" ${hexGlow}>
+          <polygon points="0,-72 16,-63 16,-44 0,-35 -16,-44 -16,-63" fill="${hexFill}" stroke="${hexStroke}" stroke-width="1.8" stroke-linejoin="round"/>
+          <polygon points="0,-68 13,-60 13,-46 0,-38 -13,-46 -13,-60" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1" stroke-linejoin="round"/>
+          ${hexText}
+        </g>`;
+
+      let subText = '';
+      if(isLocked){
+        subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10.5" font-weight="600" fill="#fda4af">${cb.unitsCount} ${pluralizeRu(cb.unitsCount, 'урок', 'урока', 'уроков')} · Откроется после «${escapeHtmlStr(prevCb.shortTitle)}»</text>`;
+      } else if(isCurChapterDone){
+        subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10.5" font-weight="600" fill="#6ee7b7">✓ Все ${cb.unitsCount} из ${cb.unitsCount} уроков сданы · 100%</text>`;
       } else {
-        // Chapters 2..7 get Coddy-style Section Gate Cards (Variant C, Hard Gate)
-        const prevCb = chapterBreakpoints[ci - 1];
-        const prevUnits = allUnits.slice(prevCb.startIdx, cb.startIdx);
-        const isPrevChapterDone = prevUnits.length > 0 && prevUnits.every(isUnitCompleted);
+        const pct = Math.round(curCompletedCount / cb.unitsCount * 100);
+        subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10.5" font-weight="600" fill="#fcd34d">${curCompletedCount} из ${cb.unitsCount} ${pluralizeRu(cb.unitsCount, 'урока', 'уроков', 'уроков')} сдано · ${pct}%</text>`;
+      }
 
-        const nextStartIdx = (ci + 1 < chapterBreakpoints.length) ? chapterBreakpoints[ci + 1].startIdx : allUnits.length;
-        const curUnits = allUnits.slice(cb.startIdx, nextStartIdx);
-        const curCompletedCount = curUnits.filter(isUnitCompleted).length;
-        const isCurChapterDone = curUnits.length > 0 && curCompletedCount === curUnits.length;
-        const isCurChapterActive = isPrevChapterDone && !isCurChapterDone;
-
-        const gateStatus = !isPrevChapterDone ? 'locked' : (isCurChapterDone ? 'completed' : 'active');
-        const isLocked = (gateStatus === 'locked');
-
-        const prevY = coords[cb.startIdx - 1].y;
-        const nextY = coords[cb.startIdx].y;
-        // Position gate card with generous clearance (+180px) below the previous chapter's mastery challenge
-        const cy = prevY + 180;
-
-        let hexFill = 'url(#pathButtonActive)';
-        let hexStroke = 'rgba(251, 191, 36, 0.95)';
-        let hexGlow = 'filter="drop-shadow(0 0 10px rgba(245, 158, 11, 0.65))"';
-        let hexText = `<text x="0" y="-48" text-anchor="middle" font-size="14" font-weight="900" fill="#ffffff">${cb.chapterNum}</text>`;
-
-        if(isLocked){
-          hexFill = 'url(#pathButtonLocked)';
-          hexStroke = 'rgba(190, 18, 60, 0.60)';
-          hexGlow = '';
-          hexText = `<text x="0" y="-49" text-anchor="middle" font-size="12" font-weight="900" fill="#fda4af">🔒</text>`;
-        } else if(isCurChapterDone){
-          hexFill = 'url(#pathButtonCompleted)';
-          hexStroke = 'rgba(52, 211, 153, 0.85)';
-          hexGlow = 'filter="drop-shadow(0 0 10px rgba(16, 185, 129, 0.55))"';
-          hexText = `<text x="0" y="-48" text-anchor="middle" font-size="15" font-weight="900" fill="#ffffff">✓</text>`;
-        }
-
-        const hexBadge = `
-          <g class="path-gate-hex-badge" ${hexGlow}>
-            <polygon points="0,-72 16,-63 16,-44 0,-35 -16,-44 -16,-63" fill="${hexFill}" stroke="${hexStroke}" stroke-width="1.8" stroke-linejoin="round"/>
-            <polygon points="0,-68 13,-60 13,-46 0,-38 -13,-46 -13,-60" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1" stroke-linejoin="round"/>
-            ${hexText}
+      let btnContent = '';
+      if(isLocked){
+        btnContent = `
+          <g class="path-gate-btn path-gate-btn--locked" data-gate-track="${cb.track}" data-gate-locked="1" data-gate-prev-title="${escapeHtmlStr(prevCb.shortTitle)}" role="button" tabindex="0" aria-label="Глава ${cb.chapterNum} заблокирована. Завершите темы «${escapeHtmlStr(prevCb.shortTitle)}»." aria-disabled="true">
+            <rect x="-110" y="18" width="220" height="28" rx="14" fill="rgba(65, 12, 26, 0.75)" stroke="rgba(190, 18, 60, 0.55)" stroke-width="1.2"/>
+            <text x="0" y="36" text-anchor="middle" font-size="10.5" font-weight="800" fill="#fda4af" letter-spacing="0.06em">🔒 ГЛАВА ЗАКРЫТА</text>
           </g>`;
-
-        let subText = '';
-        if(isLocked){
-          subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10.5" font-weight="600" fill="#fda4af">${cb.unitsCount} ${pluralizeRu(cb.unitsCount, 'урок', 'урока', 'уроков')} · Откроется после «${escapeHtmlStr(prevCb.shortTitle)}»</text>`;
-        } else if(isCurChapterDone){
-          subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10.5" font-weight="600" fill="#6ee7b7">✓ Все ${cb.unitsCount} из ${cb.unitsCount} уроков сданы · 100%</text>`;
-        } else {
-          const pct = Math.round(curCompletedCount / cb.unitsCount * 100);
-          subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10.5" font-weight="600" fill="#fcd34d">${curCompletedCount} из ${cb.unitsCount} ${pluralizeRu(cb.unitsCount, 'урока', 'уроков', 'уроков')} сдано · ${pct}%</text>`;
-        }
-
-        let btnContent = '';
-        if(isLocked){
-          btnContent = `
-            <g class="path-gate-btn path-gate-btn--locked" data-gate-track="${cb.track}" data-gate-locked="1" data-gate-prev-title="${escapeHtmlStr(prevCb.shortTitle)}" role="button" tabindex="0" aria-label="Глава ${cb.chapterNum} заблокирована. Завершите темы «${escapeHtmlStr(prevCb.shortTitle)}»." aria-disabled="true">
-              <rect x="-110" y="18" width="220" height="28" rx="14" fill="rgba(65, 12, 26, 0.75)" stroke="rgba(190, 18, 60, 0.55)" stroke-width="1.2"/>
-              <text x="0" y="36" text-anchor="middle" font-size="10.5" font-weight="800" fill="#fda4af" letter-spacing="0.06em">🔒 ГЛАВА ЗАКРЫТА</text>
-            </g>`;
-        } else {
-          const btnLabel = isCurChapterDone ? 'ОБЗОР ГЛАВЫ ➔' : 'ПЕРЕЙТИ К ГЛАВЕ ➔';
-          btnContent = `
-            <g class="path-gate-btn path-gate-btn--unlocked" data-gate-track="${cb.track}" data-gate-locked="0" role="button" tabindex="0" aria-label="Перейти к главе ${cb.chapterNum}: ${escapeHtmlStr(cb.shortTitle)}" aria-keyshortcuts="Enter Space">
-              <rect class="path-gate-btn-rect" x="-110" y="18" width="220" height="28" rx="14" fill="url(#hexGradCompleted)" stroke="rgba(52, 211, 153, 0.60)" stroke-width="1.2" filter="drop-shadow(0 4px 12px rgba(16,185,129,0.40))"/>
-              <text x="0" y="36" text-anchor="middle" font-size="10.5" font-weight="900" fill="#ffffff" letter-spacing="0.06em">${btnLabel}</text>
-            </g>`;
-        }
-
-        markersSVG += `
-          <g class="path-section-gate path-chapter-ribbon path-section-gate--${gateStatus}" transform="translate(210, ${cy})">
-            <line x1="-195" y1="0" x2="-160" y2="0" stroke="rgba(190, 18, 60, 0.40)" stroke-width="1.5" stroke-dasharray="4 4"/>
-            <line x1="160" y1="0" x2="195" y2="0" stroke="rgba(190, 18, 60, 0.40)" stroke-width="1.5" stroke-dasharray="4 4"/>
-            <rect class="path-section-gate-bg" x="-155" y="-53" width="310" height="112" rx="18" fill="rgba(19, 24, 34, 0.94)" stroke="${isLocked ? 'rgba(190, 18, 60, 0.45)' : (isCurChapterDone ? 'rgba(16, 185, 129, 0.50)' : 'rgba(245, 158, 11, 0.60)')}" stroke-width="1.5" filter="drop-shadow(0 12px 28px rgba(0,0,0,0.65))"/>
-            ${hexBadge}
-            <text class="path-gate-title" x="0" y="-14" text-anchor="middle" font-size="12" font-weight="900" fill="#f8fafc" letter-spacing="0.08em">ГЛАВА ${cb.chapterNum}: ${escapeHtmlStr(cb.shortTitle.toUpperCase())}</text>
-            ${subText}
-            ${btnContent}
+      } else {
+        const btnLabel = isCurChapterDone ? 'ОБЗОР ГЛАВЫ ➔' : 'ПЕРЕЙТИ К ГЛАВЕ ➔';
+        btnContent = `
+          <g class="path-gate-btn path-gate-btn--unlocked" data-gate-track="${cb.track}" data-gate-locked="0" role="button" tabindex="0" aria-label="Перейти к главе ${cb.chapterNum}: ${escapeHtmlStr(cb.shortTitle)}" aria-keyshortcuts="Enter Space">
+            <rect class="path-gate-btn-rect" x="-110" y="18" width="220" height="28" rx="14" fill="url(#hexGradCompleted)" stroke="rgba(52, 211, 153, 0.60)" stroke-width="1.2" filter="drop-shadow(0 4px 12px rgba(16,185,129,0.40))"/>
+            <text x="0" y="36" text-anchor="middle" font-size="10.5" font-weight="900" fill="#ffffff" letter-spacing="0.06em">${btnLabel}</text>
           </g>`;
       }
+
+      markersSVG += `
+        <g class="path-section-gate path-chapter-ribbon path-section-gate--${gateStatus}" transform="translate(210, ${cy})">
+          <line x1="-195" y1="0" x2="-160" y2="0" stroke="rgba(190, 18, 60, 0.40)" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <line x1="160" y1="0" x2="195" y2="0" stroke="rgba(190, 18, 60, 0.40)" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <rect class="path-section-gate-bg" x="-155" y="-53" width="310" height="112" rx="18" fill="rgba(19, 24, 34, 0.94)" stroke="${isLocked ? 'rgba(190, 18, 60, 0.45)' : (isCurChapterDone ? 'rgba(16, 185, 129, 0.50)' : 'rgba(245, 158, 11, 0.60)')}" stroke-width="1.5" filter="drop-shadow(0 12px 28px rgba(0,0,0,0.65))"/>
+          ${hexBadge}
+          <text class="path-gate-title" x="0" y="-14" text-anchor="middle" font-size="12" font-weight="900" fill="#f8fafc" letter-spacing="0.08em">ГЛАВА ${cb.chapterNum}: ${escapeHtmlStr(cb.shortTitle.toUpperCase())}</text>
+          ${subText}
+          ${btnContent}
+        </g>`;
     }
   });
 
@@ -16239,7 +16996,7 @@ function viewPathSerpentine(options){
   allUnits.forEach((u, i) => {
     const { x, y } = coords[i];
     let status = 'locked';
-    if(i < activeUnitIndex || (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80))){
+    if(i < activeUnitIndex || isUnitCompleted(u)){
       status = 'completed';
     } else if(i === activeUnitIndex){
       status = 'active';
@@ -16257,9 +17014,7 @@ function viewPathSerpentine(options){
     let pulseHalo = '';
     let activeBubble = '';
     let radialProgressRing = '';
-    const cbIdx = chapterBreakpoints.reduce((acc, cb, ci) => (i >= cb.startIdx ? ci : acc), 0);
-    const isChapterLast = chapterLastIdxSet.has(i);
-    const iconName = getSemanticTrailIcon(u, i, isChapterLast);
+    const iconName = getSemanticTrailIcon(u, i, false);
 
     let unitProgPct = 0;
     let unitSkillsMastered = 0;
@@ -16281,8 +17036,8 @@ function viewPathSerpentine(options){
         const dashOffset = (circ * (1 - unitProgPct / 100)).toFixed(1);
         radialProgressRing = `<circle class="hex-progress-ring" cx="${x}" cy="${y}" r="38" fill="none" stroke="#fbbf24" stroke-width="3.5" stroke-dasharray="${circ}" stroke-dashoffset="${dashOffset}" stroke-linecap="round" transform="rotate(-90 ${x} ${y})" filter="drop-shadow(0 0 6px rgba(251,191,36,0.6))"/>`;
       }
-      const bubbleTxt = unitStarted ? (unitProgPct > 0 ? `ПРОДОЛЖИТЬ (2 МИН) ➔ · ${unitSkillsMastered}/${unitTotalSkills}` : 'ПРОДОЛЖИТЬ (2 МИН) ➔') : 'НАЧАТЬ (2 МИН) ➔';
-      const bubbleW = unitStarted ? (unitProgPct > 0 ? 198 : 144) : 126;
+      const bubbleTxt = unitStarted ? (unitProgPct > 0 ? `ПРОДОЛЖИТЬ ➔ · ${unitSkillsMastered}/${unitTotalSkills}` : 'ПРОДОЛЖИТЬ ➔') : 'НАЧАТЬ ➔';
+      const bubbleW = unitStarted ? (unitProgPct > 0 ? 152 : 118) : 96;
       const bubbleY = y - 44;
       activeBubble = `
         <g class="hex-active-tooltip hex-active-tooltip--direct" data-direct-unit="${u.id}" transform="translate(${x}, ${bubbleY})" role="button" tabindex="0" aria-label="${bubbleTxt}" title="Нажмите, чтобы сразу перейти к обучению">
@@ -16301,11 +17056,8 @@ function viewPathSerpentine(options){
       : trailIsometricButton(x, y, buttonGrad, isActive ? 'rgba(255,230,160,0.95)' : (isCompleted ? 'rgba(167,243,208,0.75)' : 'rgba(203,213,225,0.42)'), isActive ? 1.8 : 1.3);
 
     const buttonContent = usePawNodes ? centerIcon : `<g class="path-button-icon">${centerIcon}</g>`;
-    // Подпись темы: отображаем для всех 45 юнитов без лишних эмодзи ради безупречной чистоты и центрирования
-    const showUnderLabel = true;
     const underTitleFull = cleanUnitTitle(u.id, u.title);
     const shortTitle = (underTitleFull.length > 24) ? underTitleFull.slice(0, 22) + '…' : underTitleFull;
-    // Подпись всегда центрируется строго под гексагоном (зазор между главами 240px обеспечивает чистый воздух)
     const underLabelX = x;
     const underLabelAnchor = 'middle';
     const nodeStateLabel = isCompleted ? 'Пройден' : (isActive ? 'Текущий урок, доступен для продолжения' : 'Заблокирован: сначала пройдите предыдущие уроки');
@@ -16319,17 +17071,17 @@ function viewPathSerpentine(options){
         <circle cx="${x}" cy="${y}" r="34" fill="transparent" pointer-events="all"/>
         ${nodeShape}
         ${buttonContent}
-        ${showUnderLabel ? `<text class="hex-node-underlabel hex-node-underlabel--${status}" x="${underLabelX}" y="${y + 52}" text-anchor="${underLabelAnchor}">${escapeHtmlStr(shortTitle)}</text>` : ''}
+        <text class="hex-node-underlabel hex-node-underlabel--${status}" x="${underLabelX}" y="${y + 52}" text-anchor="${underLabelAnchor}">${escapeHtmlStr(shortTitle)}</text>
         ${activeBubble}
       </g>`;
   });
 
-  // «Челлендж мастерства» — боковые ветви-гексагоны на финишных юнитах глав (по референсу Coddy)
+  // «Челлендж мастерства» side branches for each chapter in this echelon
   let branchesSVG = '';
   chapterBreakpoints.forEach((cb, cIdx) => {
     const endIdx = (cIdx < chapterBreakpoints.length - 1) ? (chapterBreakpoints[cIdx + 1].startIdx - 1) : (allUnits.length - 1);
     const u = allUnits[endIdx];
-    if(!u) return;
+    if(!u || !coords[endIdx]) return;
     const { x, y } = coords[endIdx];
     const track = getTrackForUnit(u.id);
     const chDone = (state.passedUnitTests || []).includes(u.id);
@@ -16369,32 +17121,63 @@ function viewPathSerpentine(options){
       </g>`;
   });
 
-  const totalCompletedUnits = allUnits.filter(isUnitCompleted).length;
+  const totalCompletedUnits = ALL_UNITS_COMBINED.filter(isUnitCompleted).length;
   const streakText = (typeof pluralizeRu === 'function') ? pluralizeRu(state.streak || 0, 'день', 'дня', 'дней') : 'дн.';
+
+  // Echelon metadata
+  const curTierNum = (curEchelon === 'all') ? (curActiveUnit.tier || 1) : (Number(curEchelon) || 1);
+  const curEchelonMeta = (typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[curTierNum]) ? INTERVIEW_ECHELONS[curTierNum] : { shortLabel: `Эшелон ${curTierNum}`, icon: '🛡️', targetLabel: 'к скринингу' };
   const e1Top = (typeof getEchelonProgress === 'function') ? getEchelonProgress(1) : null;
   const e1PctTop = e1Top ? e1Top.pct : 0;
-  const echelonFull = (typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[curActiveUnit.tier] && INTERVIEW_ECHELONS[curActiveUnit.tier].shortLabel) || `Эшелон ${curActiveUnit.tier || 1}`;
-  const echelonShort = (typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[curActiveUnit.tier] && INTERVIEW_ECHELONS[curActiveUnit.tier].icon) ? `${INTERVIEW_ECHELONS[curActiveUnit.tier].icon} Эшелон ${curActiveUnit.tier || 1}` : `Эшелон ${curActiveUnit.tier || 1}`;
-  const screeningFull = e1PctTop > 0 ? `⚡ Готовность к тех-скринингу: ${e1PctTop}%` : '⚡ Старт тех-скрининга · База';
-  const screeningShort = e1PctTop > 0 ? `⚡ ${e1PctTop}% к скринингу` : '⚡ Старт · База';
+  const echProg = (typeof getEchelonProgress === 'function') ? getEchelonProgress(curTierNum) : null;
+  const echPct = echProg ? echProg.pct : 0;
+
+  const echelonFull = (curEchelon === 'all') ? '🌐 Все эшелоны' : `${curEchelonMeta.icon} Эшелон ${curTierNum}`;
+  const echelonShort = (curEchelon === 'all') ? '🌐 Все' : `${curEchelonMeta.icon} Эш. ${curTierNum}`;
+
+  let screeningFull = '';
+  let screeningShort = '';
+  if(curTierNum === 1 || curEchelon === 'all'){
+    screeningFull = e1PctTop > 0 ? `⚡ Готовность к тех-скринингу: ${e1PctTop}%` : '⚡ Базовый скрининг';
+    screeningShort = e1PctTop > 0 ? `⚡ ${e1PctTop}% к скринингу` : '⚡ База';
+  } else if(curTierNum === 2){
+    screeningFull = echPct > 0 ? `🎯 Готовность к тех-интервью: ${echPct}%` : '🎯 Тех-интервью';
+    screeningShort = echPct > 0 ? `🎯 ${echPct}% к интервью` : '🎯 Стек';
+  } else if(curTierNum === 3){
+    screeningFull = echPct > 0 ? `⚡ Готовность к лайвкодингу: ${echPct}%` : '⚡ Лайвкодинг';
+    screeningShort = echPct > 0 ? `⚡ ${echPct}% к лайвкодингу` : '⚡ Сервисы';
+  } else {
+    screeningFull = echPct > 0 ? `👑 Готовность к офферу: ${echPct}%` : '👑 Архитектура';
+    screeningShort = echPct > 0 ? `👑 ${echPct}% к офферу` : '👑 Оффер';
+  }
 
   return `
     <div class="coddy-path-layout">
       <div class="container path-serpentine-wrap">
-        <!-- Переключатель режимов game/pro перенесён в «⚙️ Настройки платформы» (по ТЗ — тех.информация не в топбаре) -->
+        <!-- Desktop Quick Echelon Switcher Tabs (Direct 1-click program selection) -->
+        <div class="path-echelon-quick-tabs" role="tablist" aria-label="Быстрый выбор эшелона программы">
+          <button type="button" class="path-eq-tab path-eq-tab--t1 ${curEchelon===1?'active':''}" data-select-echelon="1" title="Эшелон 1: Скрининг · Фундамент (14 уроков)">🛡️ 1. Скрининг</button>
+          <button type="button" class="path-eq-tab path-eq-tab--t2 ${curEchelon===2?'active':''}" data-select-echelon="2" title="Эшелон 2: Тех-интервью · Стек и БД (17 уроков)">🎯 2. Стек и БД</button>
+          <button type="button" class="path-eq-tab path-eq-tab--t3 ${curEchelon===3?'active':''}" data-select-echelon="3" title="Эшелон 3: Лайвкодинг · Сервисы (11 уроков)">⚡ 3. Продакшен</button>
+          <button type="button" class="path-eq-tab path-eq-tab--t4 ${curEchelon===4?'active':''}" data-select-echelon="4" title="Эшелон 4: Финал · Системный дизайн (3 урока)">👑 4. Системный дизайн</button>
+          <button type="button" class="path-eq-tab ${curEchelon==='all'?'active':''}" data-select-echelon="all" title="Сквозной курс (все 45 уроков)">🌐 Все 45</button>
+        </div>
 
-        <!-- Mobile compact stats strip (visible when the right rail is hidden) -->
-        ${renderPathMobileStatsHTML(totalCompletedUnits, streakText, curActiveUnit.tier || 1, activeChapterNum, completedInChapter, totalInChapter)}
+        <!-- Mobile compact stats strip -->
+        ${renderPathMobileStatsHTML(totalCompletedUnits, streakText, curEchelon, activeChapterNum, completedInChapter, totalInChapter)}
 
-        <!-- Top Chapter Banner (Three-tier layout) -->
+        <!-- Top Chapter Banner (Three-tier layout with Interactive Echelon Program Trigger) -->
         <div class="path-chapter-banner">
           <div class="path-chapter-banner-top">
             <div class="path-chapter-breadcrumb">
-              <span class="path-echelon-pill echelon-pill--t${curActiveUnit.tier || 1}"><span class="pep-full">${echelonFull}</span><span class="pep-short">${echelonShort}</span></span>
+              <button type="button" class="path-echelon-pill path-echelon-pill-btn echelon-pill--t${curTierNum}" data-open-echelon-modal="1" title="Нажмите, чтобы выбрать программу / эшелон подготовки" aria-haspopup="dialog">
+                <span class="pep-full">${echelonFull} <span class="pep-chevron">▾</span></span>
+                <span class="pep-short">${echelonShort} <span class="pep-chevron">▾</span></span>
+              </button>
               <span class="path-crumb-sep">›</span>
-              <span class="path-chapter-crumb-label">ГЛАВА ${activeChapterNum}</span>
+              <span class="path-chapter-crumb-label"><span class="pcl-full">ГЛАВА ${activeChapterNum}</span><span class="pcl-short">ГЛ. ${activeChapterNum}</span></span>
             </div>
-            <span class="path-screening-badge" title="Готовность к 1-му техническому скринингу"><span class="psb-full">${screeningFull}</span><span class="psb-short">${screeningShort}</span></span>
+            <span class="path-screening-badge" title="${escapeHtmlStr(screeningFull)}"><span class="psb-full">${screeningFull}</span><span class="psb-short">${screeningShort}</span></span>
           </div>
           <div class="path-chapter-title">Урок ${activeLessonNumInChap} · ${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</div>
           <div class="path-chapter-progress-row">
@@ -16446,7 +17229,7 @@ function viewPathSerpentine(options){
             <!-- Chapter ribbons -->
             ${markersSVG}
 
-            <!-- 45 3D Hexagonal Nodes -->
+            <!-- 3D Hexagonal Nodes -->
             ${nodesSVG}
 
             <!-- «Челлендж мастерства» side branches -->
@@ -16466,7 +17249,7 @@ function viewPathSerpentine(options){
               <div class="path-popover-status" id="popover-status">В процессе изучения</div>
               <div class="path-popover-skills" id="popover-skills"></div>
               <div class="path-popover-actions">
-                <button type="button" class="btn-3d-orange path-popover-cta" id="popover-cta-btn">НАЧАТЬ (2 МИН) ➔</button>
+                <button type="button" class="btn-3d-orange path-popover-cta" id="popover-cta-btn">НАЧАТЬ ➔</button>
               </div>
             </div>
           </div>
@@ -16476,9 +17259,25 @@ function viewPathSerpentine(options){
         <button type="button" class="path-jump-btn" id="path-jump-btn" title="Перейти к текущему уроку" aria-label="Перейти к текущему уроку">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
         </button>
+
+        <!-- Echelon / Program Selector Bottom Sheet & Modal -->
+        <div id="path-echelon-modal-backdrop" class="path-echelon-modal-backdrop" style="display:none;" aria-hidden="true"></div>
+        <div id="path-echelon-modal" class="path-echelon-modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="path-echelon-modal-title">
+          <div class="path-echelon-modal-handle"></div>
+          <div class="path-echelon-modal-head">
+            <div>
+              <h3 class="path-echelon-modal-title" id="path-echelon-modal-title">Программы подготовки к собеседованию</h3>
+              <p class="path-echelon-modal-sub">Выберите целевой эшелон. 3D-тропа перестроится под выбранную программу.</p>
+            </div>
+            <button type="button" class="path-echelon-modal-close" data-close-echelon-modal="1" aria-label="Закрыть">✕</button>
+          </div>
+          <div class="path-echelon-cards-list">
+            ${renderEchelonCardsModalHTML(curEchelon)}
+          </div>
+        </div>
       </div>
 
-      ${renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)}
+      ${renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum, curEchelon)}
     </div>`;
 }
 
@@ -16487,7 +17286,8 @@ let proCollapsedChapters = new Set();
 function viewProPath(options){
   options = options || {};
   ensureExtendedState();
-  const allUnits = ALL_UNITS_COMBINED;
+  const curEchelon = (options.echelon !== undefined) ? options.echelon : ((state && state.selectedEchelon) || 1);
+  const { units: allUnits, chapters } = getEchelonUnitsAndChapters(curEchelon, ALL_UNITS_COMBINED);
 
   // Find active unit
   let activeUnitIndex = -1;
@@ -16499,41 +17299,47 @@ function viewProPath(options){
       activeUnitIndex = idx;
     }
   });
-  if(activeUnitIndex === -1) activeUnitIndex = allUnits.length - 1;
+  if(activeUnitIndex === -1) activeUnitIndex = Math.max(0, allUnits.length - 1);
 
-  const curActiveUnit = allUnits[activeUnitIndex] || allUnits[0];
-  const activeTrack = getTrackForUnit(curActiveUnit.id);
-  const totalCompletedUnits = allUnits.filter(isUnitCompleted).length;
+  const curActiveUnit = allUnits[activeUnitIndex] || allUnits[0] || ALL_UNITS_COMBINED[0];
+  const totalCompletedUnits = ALL_UNITS_COMBINED.filter(isUnitCompleted).length;
   const streakText = (typeof pluralizeRu === 'function') ? pluralizeRu(state.streak || 0, 'день', 'дня', 'дней') : 'дн.';
 
-  // 7 Chapters
-  const chapters = getPathChaptersMeta(allUnits);
-
-  const activeChap = chapters.find(c => c.units.some(u => u.id === curActiveUnit.id)) || chapters[0];
-  const activeChapCompleted = activeChap.units.filter(u => (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80))).length;
+  const activeChap = chapters.find(c => c.units.some(u => u.id === curActiveUnit.id)) || chapters[0] || { num: 1, chapterNum: 1, title: 'Python Core', units: allUnits };
+  const activeChapCompleted = activeChap.units.filter(isUnitCompleted).length;
   const activeChapTotal = activeChap.units.length;
   const activeChapPct = Math.round(activeChapCompleted / activeChapTotal * 100);
   const activeChapSummary = activeChapCompleted === 0
     ? `Начни главу · ${activeChapTotal} ${pluralizeRu(activeChapTotal, 'урок', 'урока', 'уроков')}`
-    : `Глава ${activeChap.num}: ${escapeHtmlStr(activeChap.title)} · ${activeChapCompleted}/${activeChapTotal} уроков · ${activeChapPct}%`;
+    : `Глава ${activeChap.chapterNum || activeChap.num}: ${escapeHtmlStr(activeChap.title)} · ${activeChapCompleted}/${activeChapTotal} уроков · ${activeChapPct}%`;
 
   // Segments for active chapter
   const activeChapSegmentsHTML = activeChap.units.map(u => {
-    const isPassed = (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80));
+    const isPassed = isUnitCompleted(u);
     const isActive = u.id === curActiveUnit.id;
     return `<div class="path-seg-bar ${isPassed ? 'done' : (isActive ? 'active' : '')}" title="Урок ${activeChap.units.findIndex(x => x.id === u.id) + 1}: ${escapeHtmlStr(cleanUnitTitle(u.id, u.title))}"></div>`;
   }).join('');
 
-  // Hero Card HTML (exactly matching Coddy screenshot #2)
+  const curTierNum = (curEchelon === 'all') ? (curActiveUnit.tier || 1) : (Number(curEchelon) || 1);
+  const curEchelonMeta = (typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[curTierNum]) ? INTERVIEW_ECHELONS[curTierNum] : { shortLabel: `Эшелон ${curTierNum}`, icon: '🛡️' };
+  const echelonFull = (curEchelon === 'all') ? '🌐 Все эшелоны' : `${curEchelonMeta.icon} Эшелон ${curTierNum}`;
+
+  // Hero Card HTML
   const heroCardHTML = `
     <div class="pro-hero-card">
       <div class="pro-hero-card-head">
         <div class="pro-hero-card-left">
-          <div class="pro-hero-breadcrumb">ПРОГРАММА › РАЗДЕЛ ${activeChap.num} · ГЛАВА ${activeChap.num}</div>
+          <div class="pro-hero-breadcrumb-row" style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <button type="button" class="path-echelon-pill path-echelon-pill-btn echelon-pill--t${curTierNum}" data-open-echelon-modal="1" title="Нажмите, чтобы сменить программу / эшелон" aria-haspopup="dialog" style="padding:2px 8px;font-size:0.68rem;">
+              <span>${echelonFull}</span>
+              <span class="pep-chevron">▾</span>
+            </button>
+            <div class="pro-hero-breadcrumb">ПРОГРАММА › ГЛАВА ${activeChap.num}</div>
+          </div>
           <h2 class="pro-hero-title">Урок ${activeChap.units.findIndex(x => x.id === curActiveUnit.id) + 1} · ${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</h2>
           <div class="pro-hero-meta">${activeChapSummary}</div>
         </div>
-        <button type="button" class="btn-3d-orange pro-hero-cta" data-pro-start="${curActiveUnit.id}">ПРОДОЛЖИТЬ (2 МИН)</button>
+        <button type="button" class="btn-3d-orange pro-hero-cta" data-pro-start="${curActiveUnit.id}">ПРОДОЛЖИТЬ</button>
       </div>
 
       <div class="pro-hero-progress-track">
@@ -16545,23 +17351,22 @@ function viewProPath(options){
         <div class="path-chapter-segments">
           ${activeChapSegmentsHTML}
         </div>
-        <span class="path-chapter-count" title="${activeChapCompleted === 0 ? `Начни главу: в ней ${activeChapTotal} ${pluralizeRu(activeChapTotal, 'урок', 'урока', 'уроков')}` : `Завершено уроков: ${activeChapCompleted} из ${activeChapTotal}`}" aria-label="${activeChapCompleted === 0 ? `Начни главу: ${activeChapTotal} ${pluralizeRu(activeChapTotal, 'урок', 'урока', 'уроков')}` : `Завершено уроков: ${activeChapCompleted} из ${activeChapTotal}`}">${activeChapCompleted === 0 ? `Начни · ${activeChapTotal}` : `${activeChapCompleted} / ${activeChapTotal}`}</span>
+        <span class="path-chapter-count" title="${activeChapCompleted === 0 ? `Начни главу: в ней ${activeChapTotal} ${pluralizeRu(activeChapTotal, 'урок', 'урока', 'уроков')}` : `Завершено уроков: ${activeChapCompleted} из ${activeChapTotal}`}" aria-label="${activeChapCompleted === 0 ? `Начни главу: ${activeChapTotal} ${pluralizeRu(activeChapTotal, 'урок', 'урока', 'уроков')}` : `Завершено уроков: ${activeChapCompleted} из ${activeChapTotal}`}">${activeChapCompleted === 0 ? `0 / ${activeChapTotal}` : `${activeChapCompleted} / ${activeChapTotal}`}</span>
       </div>
     </div>
   `;
 
-  // Chapters list HTML (structured chapter box and lesson rows with icons and badges)
+  // Chapters list HTML
   const chaptersHTML = chapters.map(ch => {
-    const isCurChap = (ch.num === activeChap.num);
-    const chCompleted = ch.units.filter(u => (state.passedUnitTests || []).includes(u.id) || ((u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80))).length;
+    const isCurChap = ((ch.chapterNum || ch.num) === (activeChap.chapterNum || activeChap.num));
+    const chCompleted = ch.units.filter(isUnitCompleted).length;
     const chTotal = ch.units.length;
     const chPct = Math.round(chCompleted / chTotal * 100);
-    const isExpanded = isCurChap ? !proCollapsedChapters.has(ch.num) : proCollapsedChapters.has(ch.num);
+    const isExpanded = isCurChap ? !proCollapsedChapters.has(ch.chapterNum || ch.num) : proCollapsedChapters.has(ch.chapterNum || ch.num);
+    const cleanChTitle = (ch.title || '').replace(/^Глава\s+\d+:\s*/, '');
 
     const lessonsListHTML = ch.units.map(u => {
-      const isUnitTestPassed = (state.passedUnitTests || []).includes(u.id);
-      const allSkillsMastered = (u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80);
-      const isCompleted = isUnitTestPassed || allSkillsMastered;
+      const isCompleted = isUnitCompleted(u);
       const globalIdx = allUnits.findIndex(x => x.id === u.id);
       const isActive = (globalIdx === activeUnitIndex);
       const isLocked = (globalIdx > activeUnitIndex && !isCompleted);
@@ -16598,7 +17403,7 @@ function viewProPath(options){
             </div>
           </div>
           <div class="pro-lesson-tail">
-            ${isActive ? '<span class="pro-arrow" style="font-weight:bold;color:var(--amber);">→</span>' : (isLocked ? '<span style="font-size:0.75rem;color:var(--ink-muted);opacity:0.6;">4 темы</span>' : '')}
+            ${isActive ? '<span class="pro-arrow" style="font-weight:bold;color:var(--amber);">→</span>' : (isLocked ? `<span style="font-size:0.75rem;color:var(--ink-muted);opacity:0.6;">${(u.skills && u.skills.length) || 1} ${pluralizeRu((u.skills && u.skills.length) || 1, 'тема', 'темы', 'тем')}</span>` : '')}
           </div>
         </div>
       `;
@@ -16606,10 +17411,10 @@ function viewProPath(options){
 
     return `
       <div class="pro-chapter-box ${isCurChap ? 'pro-chapter-box--active' : ''}">
-        <div class="pro-chapter-header" data-toggle-chapter="${ch.num}">
+        <div class="pro-chapter-header" data-toggle-chapter="${ch.chapterNum || ch.num}">
           <div class="pro-chapter-header-left">
-            <div class="pro-chapter-num">ГЛАВА ${ch.num}</div>
-            <div class="pro-chapter-title">${escapeHtmlStr(ch.title)}</div>
+            <div class="pro-chapter-num">ГЛАВА ${ch.chapterNum || ch.num}</div>
+            <div class="pro-chapter-title">${escapeHtmlStr(cleanChTitle)}</div>
           </div>
           <div class="pro-chapter-header-right">
             <span class="pro-chapter-stat" style="white-space:nowrap;">${chCompleted}/${chTotal} · ${chPct}%</span>
@@ -16624,19 +17429,42 @@ function viewProPath(options){
   return `
     <div class="coddy-path-layout">
       <div class="container path-pro-wrap">
-        <!-- Переключатель режимов game/pro перенесён в «⚙️ Настройки платформы» (по ТЗ — тех.информация не в топбаре) -->
+        <!-- Desktop Quick Echelon Switcher Tabs -->
+        <div class="path-echelon-quick-tabs" role="tablist" aria-label="Быстрый выбор эшелона программы">
+          <button type="button" class="path-eq-tab path-eq-tab--t1 ${curEchelon===1?'active':''}" data-select-echelon="1" title="Эшелон 1: Скрининг · Фундамент (14 уроков)">🛡️ 1. Скрининг</button>
+          <button type="button" class="path-eq-tab path-eq-tab--t2 ${curEchelon===2?'active':''}" data-select-echelon="2" title="Эшелон 2: Тех-интервью · Стек и БД (17 уроков)">🎯 2. Стек и БД</button>
+          <button type="button" class="path-eq-tab path-eq-tab--t3 ${curEchelon===3?'active':''}" data-select-echelon="3" title="Эшелон 3: Лайвкодинг · Сервисы (11 уроков)">⚡ 3. Продакшен</button>
+          <button type="button" class="path-eq-tab path-eq-tab--t4 ${curEchelon===4?'active':''}" data-select-echelon="4" title="Эшелон 4: Финал · Системный дизайн (3 урока)">👑 4. Системный дизайн</button>
+          <button type="button" class="path-eq-tab ${curEchelon==='all'?'active':''}" data-select-echelon="all" title="Сквозной курс (все 45 уроков)">🌐 Все 45</button>
+        </div>
 
-        <!-- Mobile compact stats strip (visible when the right rail is hidden) -->
-        ${renderPathMobileStatsHTML(totalCompletedUnits, streakText, curActiveUnit.tier || 1)}
+        <!-- Mobile compact stats strip -->
+        ${renderPathMobileStatsHTML(totalCompletedUnits, streakText, curEchelon, activeChap.chapterNum || activeChap.num, activeChapCompleted, activeChapTotal)}
 
         <!-- Top Hero Card of Current Lesson -->
         ${heroCardHTML}
 
         <!-- Structured Chapters List -->
         ${chaptersHTML}
+
+        <!-- Echelon / Program Selector Bottom Sheet & Modal -->
+        <div id="path-echelon-modal-backdrop" class="path-echelon-modal-backdrop" style="display:none;" aria-hidden="true"></div>
+        <div id="path-echelon-modal" class="path-echelon-modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="path-echelon-modal-title">
+          <div class="path-echelon-modal-handle"></div>
+          <div class="path-echelon-modal-head">
+            <div>
+              <h3 class="path-echelon-modal-title" id="path-echelon-modal-title">Программы подготовки к собеседованию</h3>
+              <p class="path-echelon-modal-sub">Выберите целевой эшелон. 3D-тропа перестроится под выбранную программу.</p>
+            </div>
+            <button type="button" class="path-echelon-modal-close" data-close-echelon-modal="1" aria-label="Закрыть">✕</button>
+          </div>
+          <div class="path-echelon-cards-list">
+            ${renderEchelonCardsModalHTML(curEchelon)}
+          </div>
+        </div>
       </div>
 
-      ${renderCoddyRightRail(totalCompletedUnits, streakText, activeChap.num)}
+      ${renderCoddyRightRail(totalCompletedUnits, streakText, activeChap.chapterNum || activeChap.num, curEchelon)}
     </div>
   `;
 }
@@ -19204,6 +20032,66 @@ document.addEventListener('click', async function(e){
     return;
   }
 
+  // Echelon Program Selector Triggers & Modal Actions
+  if(e.target.closest('[data-open-echelon-modal]')){
+    const modal = document.getElementById('path-echelon-modal');
+    const backdrop = document.getElementById('path-echelon-modal-backdrop');
+    if(modal && backdrop){
+      modal.style.display = 'block';
+      backdrop.style.display = 'block';
+      // Force repaint then add open class
+      void modal.offsetWidth;
+      modal.classList.add('is-open');
+      backdrop.classList.add('is-open');
+      if(typeof navigator !== 'undefined' && navigator.vibrate){
+        try{ navigator.vibrate(10); }catch(vErr){}
+      }
+    }
+    return;
+  }
+
+  if(e.target.closest('[data-close-echelon-modal]') || e.target.id === 'path-echelon-modal-backdrop'){
+    const modal = document.getElementById('path-echelon-modal');
+    const backdrop = document.getElementById('path-echelon-modal-backdrop');
+    if(modal) modal.classList.remove('is-open');
+    if(backdrop) backdrop.classList.remove('is-open');
+    setTimeout(() => {
+      if(modal && !modal.classList.contains('is-open')) modal.style.display = 'none';
+      if(backdrop && !backdrop.classList.contains('is-open')) backdrop.style.display = 'none';
+    }, 240);
+    return;
+  }
+
+  const selectEchBtn = e.target.closest('[data-select-echelon]');
+  if(selectEchBtn){
+    const rawVal = selectEchBtn.getAttribute('data-select-echelon');
+    const targetEch = (rawVal === 'all') ? 'all' : (parseInt(rawVal, 10) || 1);
+    ensureExtendedState();
+    state.selectedEchelon = targetEch;
+    saveState(state);
+
+    const modal = document.getElementById('path-echelon-modal');
+    const backdrop = document.getElementById('path-echelon-modal-backdrop');
+    if(modal) modal.classList.remove('is-open');
+    if(backdrop) backdrop.classList.remove('is-open');
+    if(modal) modal.style.display = 'none';
+    if(backdrop) backdrop.style.display = 'none';
+
+    if(typeof navigator !== 'undefined' && navigator.vibrate){
+      try{ navigator.vibrate(12); }catch(vErr){}
+    }
+    render();
+    if(typeof showTactileToast === 'function'){
+      if(targetEch === 'all'){
+        showTactileToast('🌐 Выбран сквозной курс (все 45 уроков)');
+      } else {
+        const em = (typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[targetEch]) ? INTERVIEW_ECHELONS[targetEch] : { icon: '🛡️', shortLabel: `Эшелон ${targetEch}` };
+        showTactileToast(`${em.icon} Программа переключена: ${em.shortLabel}`);
+      }
+    }
+    return;
+  }
+
   // Path Mode Switcher ('game' | 'pro')
   const modeBtn = e.target.closest('[data-set-path-mode]');
   if(modeBtn){
@@ -21301,11 +22189,14 @@ const psk = e.target.closest('[data-py-select-k]');
         const pSkills = document.getElementById('popover-skills');
         const pCta = document.getElementById('popover-cta-btn');
 
+        const chapterUnits = ALL_UNITS_COMBINED.filter(x => getTrackForUnit(x.id).routePrefix === track.routePrefix);
+        const uIdx = ALL_UNITS_COMBINED.findIndex(x => x.id === uid);
+        const lessonNumInChap = (chapterUnits.findIndex(x => x.id === u.id) >= 0) ? (chapterUnits.findIndex(x => x.id === u.id) + 1) : (uIdx + 1);
+
         if(pBadge) pBadge.textContent = `ТРЕК · ${track.title.split('Матрица Мастерства').pop().trim() || track.title}`;
-        if(pTitle) pTitle.textContent = `Юнит ${u.id}: ${u.title.replace(/^Юнит\s+[\d.]+\s*·\s*/, '')}`;
+        if(pTitle) pTitle.textContent = `Урок ${lessonNumInChap} · ${cleanUnitTitle(u.id, u.title)}`;
 
         const isPassed = (state.passedUnitTests || []).includes(u.id) || ((u.skills||[]).length > 0 && (u.skills||[]).every(s => getSkillMP(s.id) >= 80));
-        const uIdx = ALL_UNITS_COMBINED.findIndex(x => x.id === uid);
         let activeIdx = ALL_UNITS_COMBINED.findIndex(x => {
           const pass = (state.passedUnitTests || []).includes(x.id) || ((x.skills||[]).length > 0 && (x.skills||[]).every(s => getSkillMP(s.id) >= 80));
           return !pass;
@@ -21315,17 +22206,20 @@ const psk = e.target.closest('[data-py-select-k]');
         const isLocked = (uIdx > activeIdx && !isPassed);
 
         if(pStatus){
-          if(isPassed) pStatus.textContent = '✅ Юнит завершён (освоен на 100%)';
-          else if(isActive) pStatus.textContent = '🏆 Текущая цель курса';
-          else if(isLocked) pStatus.textContent = 'Пройдите уроки выше, чтобы открыть это!';
+          if(isPassed) pStatus.textContent = '✅ Урок освоен на 100%';
+          else if(isActive) pStatus.textContent = '🎯 Текущая цель курса';
+          else if(isLocked) pStatus.textContent = '🔒 Откроется после предыдущих уроков';
           else pStatus.textContent = '📖 Доступен для изучения';
         }
 
         if(pSkills){
           const skillItems = (u.skills || []).slice(0, 3);
           const noteCount = (u.skills || []).reduce((acc, s) => acc + (s.kIds ? s.kIds.length : 1), 0);
+          const notePlural = (typeof pluralizeRu === 'function') ? pluralizeRu(noteCount, 'тема', 'темы', 'тем') : 'тем';
+          const skillCount = (u.skills || []).length;
+          const skillPlural = (typeof pluralizeRu === 'function') ? pluralizeRu(skillCount, 'навык', 'навыка', 'навыков') : 'навыков';
           pSkills.innerHTML = skillItems.length
-            ? `<div class="path-popover-meta-row" style="font-size:0.75rem;color:var(--ink-muted);margin-bottom:8px;display:flex;gap:12px;"><span>📚 <b>${noteCount}</b> тем-конспектов</span><span>🎯 <b>${(u.skills||[]).length}</b> навыков</span></div><div class="path-popover-skills-label">Ключевые навыки юнита:</div><div class="path-popover-skills-list">${skillItems.map(s => `<div class="path-popover-skill">${escapeHtmlStr(s.title)}</div>`).join('')}</div>`
+            ? `<div class="path-popover-meta-row" style="font-size:0.75rem;color:var(--ink-muted);margin-bottom:8px;display:flex;gap:12px;"><span>📚 <b>${noteCount}</b> ${notePlural}</span><span>🎯 <b>${skillCount}</b> ${skillPlural}</span></div><div class="path-popover-skills-label">Ключевые темы урока:</div><div class="path-popover-skills-list">${skillItems.map(s => `<div class="path-popover-skill">${escapeHtmlStr(s.title)}</div>`).join('')}</div>`
             : '';
         }
 
