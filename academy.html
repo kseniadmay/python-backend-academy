@@ -14516,6 +14516,13 @@ function collectDueCardsQueue(){
   Object.keys(ratings).forEach(k => {
     const r = Number(ratings[k]);
     if(r >= 1 && r <= 2 && !seen.has(k)){
+      // Фикс: пропускаем карточки, повторённые сегодня (lastReview === today).
+      // После оценки "Трудно" (2) или "Опять" (1) applyRemNoteCardRating ставит
+      // dueDate = завтра, поэтому блок SRS выше их не подхватывает. Но cardRatings[k]
+      // остаётся 1 или 2, и без этой проверки они немедленно попадают в новую
+      // очередь того же дня — накапливая «долг» после каждой сессии.
+      const srsEntry = srsMap[k];
+      if(srsEntry && srsEntry.lastReview === today) return;
       const parts = k.split(':');
       const did = parts[0];
       const cIdx = parseInt(parts[1], 10);
