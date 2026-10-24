@@ -14546,6 +14546,9 @@ function viewPythonSkill(sid){
             <span>${escapeHtmlStr(nextActionBtnText)}</span>
             <span>➔</span>
           </button>
+          <div style="margin-top:12px;">
+            <button type="button" class="btn btn-ghost" data-py-restart-deck style="font-size:0.82rem;padding:6px 14px;border-radius:10px;color:var(--ink-muted);" title="Сбросить сессию и заново пройти карточки этой темы">🔄 Пройти карточки заново</button>
+          </div>
         </div>`;
     } else {
       const qPos = Math.min(pySkillViewState.sessionPos || 0, pySkillViewState.sessionQueue.length - 1);
@@ -15228,8 +15231,11 @@ function viewPythonUnitTest(unitId, trackKey){
 
 /* ================= GLOBAL FLASHCARDS HUB (#/cards) ================= */
 const _initCardsPos = (state && state.cardsHubPos && typeof state.cardsHubPos === 'object') ? state.cardsHubPos : {};
-// Фикс: восстанавливаем сохранённую dueQueue из state (если была сохранена и не устарела)
-const _savedDueQueue = (Array.isArray(_initCardsPos.dueQueue) && _initCardsPos.dueQueue.length > 0)
+const _todayKey = (typeof dateIsoKey === 'function') ? dateIsoKey() : new Date().toISOString().slice(0, 10);
+// Проверяем актуальность сохранения: если день сменился, сбрасываем завершённость очереди на сегодня
+const _isSameDay = (_initCardsPos.savedDate === _todayKey);
+
+const _savedDueQueue = (_isSameDay && Array.isArray(_initCardsPos.dueQueue) && _initCardsPos.dueQueue.length > 0 && !_initCardsPos.completed)
   ? _initCardsPos.dueQueue.filter(item =>
       item && typeof item.deckId === 'string' && typeof item.cardIdx === 'number' &&
       ALL_DECKS_COMBINED[item.deckId] && ALL_DECKS_COMBINED[item.deckId].cards &&
@@ -15242,29 +15248,30 @@ let cardsHubState = {
   deckId: (typeof _initCardsPos.deckId === 'string' && ALL_DECKS_COMBINED[_initCardsPos.deckId]) ? _initCardsPos.deckId : 'Ф-001',
   cardIdx: typeof _initCardsPos.cardIdx === 'number' ? _initCardsPos.cardIdx : 0,
   flipped: !!_initCardsPos.flipped,
-  completed: !!_initCardsPos.completed,
-  dueMode: !!_initCardsPos.dueMode,
+  completed: _isSameDay ? !!_initCardsPos.completed : false,
+  dueMode: _isSameDay ? !!_initCardsPos.dueMode : false,
   dueQueue: _savedDueQueue,
-  // Фикс: если очередь восстановлена из сохранения — позиция всегда 0,
-  // т.к. в state.cardsHubPos.dueQueue хранится уже срезанный хвост (slice от duePos)
-  duePos: (_savedDueQueue.length > 0) ? 0 : (typeof _initCardsPos.duePos === 'number' ? _initCardsPos.duePos : 0)
+  duePos: (_savedDueQueue.length > 0 && !_initCardsPos.completed) ? 0 : (typeof _initCardsPos.duePos === 'number' ? _initCardsPos.duePos : 0)
 };
 window.cardsHubState = cardsHubState;
 function saveCardsHubPosState(){
   ensureExtendedState();
+  const today = (typeof dateIsoKey === 'function') ? dateIsoKey() : new Date().toISOString().slice(0, 10);
+  const isDone = !!cardsHubState.completed;
   state.cardsHubPos = {
     echelonFilter: cardsHubState.echelonFilter || 'all',
     unitFilter: cardsHubState.unitFilter || 'all',
     deckId: cardsHubState.deckId || 'Ф-001',
     cardIdx: cardsHubState.cardIdx || 0,
     flipped: !!cardsHubState.flipped,
-    completed: !!cardsHubState.completed,
-    dueMode: !!cardsHubState.dueMode,
-    duePos: cardsHubState.duePos || 0,
-    // Фикс: сохраняем оставшуюся часть dueQueue (начиная с текущей позиции)
-    dueQueue: Array.isArray(cardsHubState.dueQueue)
-      ? cardsHubState.dueQueue.slice(cardsHubState.duePos || 0)
-      : [],
+    completed: isDone,
+    dueMode: isDone ? false : !!cardsHubState.dueMode,
+    duePos: isDone ? 0 : (cardsHubState.duePos || 0),
+    // Фикс залипания: при завершении сессии очередь очищается, не оставляя висячий хвост из 1 карточки
+    dueQueue: (isDone || !Array.isArray(cardsHubState.dueQueue))
+      ? []
+      : cardsHubState.dueQueue.slice(cardsHubState.duePos || 0),
+    savedDate: today,
     updatedAt: Date.now()
   };
   saveState(state);
@@ -15278,6 +15285,7 @@ function collectDueCardsQueue(){
   const queue = [];
   const seen = new Set();
 
+  // 1. Карточки с наступившим сроком по календарю SRS (dueDate <= today)
   Object.keys(srsMap).forEach(k => {
     const item = srsMap[k];
     if(item && item.dueDate && item.dueDate <= today){
@@ -15291,15 +15299,15 @@ function collectDueCardsQueue(){
     }
   });
 
+  // 2. Карточки со слабыми оценками (1..2), ещё не имеющие расписания в cardSrs
   Object.keys(ratings).forEach(k => {
     const r = Number(ratings[k]);
     if(r >= 1 && r <= 2 && !seen.has(k)){
-      // Фикс: пропускаем карточки, повторённые сегодня (lastReview === today).
-      // После оценки "Трудно" (2) или "Опять" (1) applyRemNoteCardRating ставит
-      // dueDate = завтра, поэтому блок SRS выше их не подхватывает. Но cardRatings[k]
-      // остаётся 1 или 2, и без этой проверки они немедленно попадают в новую
-      // очередь того же дня — накапливая «долг» после каждой сессии.
       const srsEntry = srsMap[k];
+      // Фикс залипания: если карточка уже поставлена на учёт в SRS (есть srsEntry с dueDate),
+      // она управляется исключительно своим календарным интервалом из блока 1 выше.
+      // Нельзя возвращать её в ежедневную очередь раньше её dueDate!
+      if(srsEntry && srsEntry.dueDate) return;
       if(srsEntry && srsEntry.lastReview === today) return;
       const parts = k.split(':');
       const did = parts[0];
@@ -15311,15 +15319,13 @@ function collectDueCardsQueue(){
     }
   });
 
-  // Фикс: сортировка — сначала просроченные по дате (самые старые первыми),
-  // затем слабые карточки без даты (rating 1 перед rating 2)
+  // Сортировка: сначала самые просроченные по дате, затем слабые нерасписанные карточки
   queue.sort((a, b) => {
     const aHasDate = !!a.dueDate;
     const bHasDate = !!b.dueDate;
     if(aHasDate && bHasDate) return a.dueDate < b.dueDate ? -1 : a.dueDate > b.dueDate ? 1 : 0;
     if(aHasDate && !bHasDate) return -1;
     if(!aHasDate && bHasDate) return 1;
-    // Оба без даты — сортируем по рейтингу (1 = хуже → первее)
     return (a.rating || 0) - (b.rating || 0);
   });
 
@@ -18938,25 +18944,43 @@ function getSpacedRepetitionStats(){
   let weakCardsCount = 0;
   let dueTodayCardsCount = 0;
   let masteredCardsCount = 0;
+  const countedDueKeys = new Set();
 
-  Object.keys(ratings).forEach(k => {
-    const r = Number(ratings[k]);
-    if(r >= 1 && r <= 2){
-      weakCardsCount++;
-      const did = k.split(':')[0];
-      if(ALL_DECKS_COMBINED[did]) weakDecks.add(did);
-    }
-  });
-
+  // 1. Календарные повторения по FSRS / SuperMemo-2
   Object.keys(srsMap).forEach(k => {
     const item = srsMap[k];
     if(item && item.dueDate){
       if(item.dueDate <= today){
-        dueTodayCardsCount++;
-        const did = k.split(':')[0];
-        if(ALL_DECKS_COMBINED[did]) dueTodayDecks.add(did);
+        const parts = k.split(':');
+        const did = parts[0];
+        const cIdx = parseInt(parts[1], 10);
+        if(ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
+          dueTodayCardsCount++;
+          dueTodayDecks.add(did);
+          countedDueKeys.add(k);
+        }
       }
       if(item.interval >= 21) masteredCardsCount++;
+    }
+  });
+
+  // 2. Карточки со слабой оценкой (1..2), ещё не имеющие календарной записи в cardSrs
+  Object.keys(ratings).forEach(k => {
+    const r = Number(ratings[k]);
+    if(r >= 1 && r <= 2){
+      weakCardsCount++;
+      const srsEntry = srsMap[k];
+      if(!countedDueKeys.has(k) && (!srsEntry || !srsEntry.dueDate)){
+        if(srsEntry && srsEntry.lastReview === today) return;
+        const parts = k.split(':');
+        const did = parts[0];
+        const cIdx = parseInt(parts[1], 10);
+        if(ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
+          dueTodayCardsCount++;
+          dueTodayDecks.add(did);
+          countedDueKeys.add(k);
+        }
+      }
     }
   });
 
@@ -19095,26 +19119,22 @@ viewDashboard = function(){
   if(e3.pct >= 100){ readinessRank = 'Прод-разработчик (Junior+)'; rankIcon = '⚡'; }
   if(e4.pct >= 100){ readinessRank = 'Готов к офферу (Middle)'; rankIcon = '👑'; }
 
-  // Интервальное повторение (SRS)
+  // Интервальное повторение (SRS) — единый канонический источник правды
   const srs = getSpacedRepetitionStats();
   const allDecksList = Object.values(ALL_DECKS_COMBINED || {});
-  let dueTodayCardsCount = 0;
+  const dueQueueCards = (typeof collectDueCardsQueue === 'function') ? collectDueCardsQueue() : [];
+  const dueTodayCardsCount = dueQueueCards.length;
   let hasReviewedAnyCard = false;
   allDecksList.forEach(d => {
     (d.cards || []).forEach((c, cIdx) => {
       const ck = d.id + ':' + cIdx;
-      const r = state.cardRatings[ck] || 0;
-      if(r > 0) hasReviewedAnyCard = true;
-      if(r > 0 && r < 4) dueTodayCardsCount++;
+      if((state.cardRatings && state.cardRatings[ck] > 0) || (state.cardSrs && state.cardSrs[ck])) hasReviewedAnyCard = true;
     });
   });
   const isSrsAllDone = dueTodayCardsCount === 0;
 
   const dueDecks = allDecksList.filter(d => {
-    return (d.cards || []).some((c, cIdx) => {
-      const r = state.cardRatings[d.id + ':' + cIdx] || 0;
-      return r > 0 && r < 4;
-    });
+    return dueQueueCards.some(item => item.deckId === d.id);
   });
   const focusDeckObj = (focusSk && focusSk.deckIds && ALL_DECKS_COMBINED[focusSk.deckIds[0]]) || null;
   const targetDeckId = (dueDecks.length > 0 && dueDecks[0].id) || (focusDeckObj && focusDeckObj.id) || (allDecksList[0] && allDecksList[0].id) || '';
@@ -20695,6 +20715,8 @@ document.addEventListener('click', async function(e){
     if(did && ALL_DECKS_COMBINED[did]){
       cardsHubState.deckId = did;
       cardsHubState.cardIdx = 0;
+      cardsHubState.dueMode = false;
+      cardsHubState.completed = false;
       cardsHubState.flipped = false;
       saveCardsHubPosState();
       try{ playSound('flip'); }catch(e){}
@@ -21838,7 +21860,12 @@ const psk = e.target.closest('[data-py-select-k]');
     }
     if(qPos + 1 < curQueue.length){
       pySkillViewState.sessionPos = qPos + 1;
-      pySkillViewState.cardIdx = pySkillViewState.sessionPos;
+      const nextQPos = pySkillViewState.sessionPos;
+      const fidCards = (skipFid && ALL_DECKS_COMBINED[skipFid] && ALL_DECKS_COMBINED[skipFid].cards) || [];
+      const nextCIdx = curQueue[nextQPos] !== undefined
+        ? curQueue[nextQPos]
+        : Math.min(nextQPos, Math.max(0, fidCards.length - 1));
+      pySkillViewState.cardIdx = nextCIdx;
       pySkillViewState.cardFlipped = false;
       pySkillViewState.sprintCelebration = null;
       saveReadingPosition();
@@ -21879,7 +21906,12 @@ const psk = e.target.closest('[data-py-select-k]');
       curQueue.push(cIdx);
       pySkillViewState.sessionRepeats = (pySkillViewState.sessionRepeats || 0) + 1;
       pySkillViewState.sessionPos = qPos + 1;
-      pySkillViewState.cardIdx = pySkillViewState.sessionPos;
+      const nextQPos = pySkillViewState.sessionPos;
+      const fidCards = (fid && ALL_DECKS_COMBINED[fid] && ALL_DECKS_COMBINED[fid].cards) || [];
+      const nextCIdx = curQueue[nextQPos] !== undefined
+        ? curQueue[nextQPos]
+        : Math.min(nextQPos, Math.max(0, fidCards.length - 1));
+      pySkillViewState.cardIdx = nextCIdx;
       pySkillViewState.cardFlipped = false;
     } else if(action === 'pass'){
       // Карточка первично освоена и регистрируется в долгосрочной базе FSRS
@@ -21908,6 +21940,26 @@ const psk = e.target.closest('[data-py-select-k]');
       if(pySkillViewState.sid) setSkillMP(pySkillViewState.sid, 50);
     }
 
+    saveReadingPosition();
+    render();
+    return;
+  }
+
+  // Кнопка перезапуска карточек темы из экрана хэндовера
+  const restartDeckBtn = e.target.closest('[data-py-restart-deck]');
+  if(restartDeckBtn){
+    pySkillViewState.sprintCelebration = null;
+    pySkillViewState.sessionFid = null;
+    pySkillViewState.sessionQueue = null;
+    pySkillViewState.sessionPos = 0;
+    pySkillViewState.cardIdx = 0;
+    pySkillViewState.sessionDone = false;
+    pySkillViewState.sessionRepeats = 0;
+    pySkillViewState.sessionLearned = 0;
+    pySkillViewState.cardFlipped = false;
+    if(state.readingPositions && state.readingPositions[pySkillViewState.sid] && state.readingPositions[pySkillViewState.sid].deckPositions && pySkillViewState.fId){
+      delete state.readingPositions[pySkillViewState.sid].deckPositions[pySkillViewState.fId];
+    }
     saveReadingPosition();
     render();
     return;
@@ -22001,7 +22053,12 @@ const psk = e.target.closest('[data-py-select-k]');
     }
 
     pySkillViewState.sessionPos = qPos + 1;
-    pySkillViewState.cardIdx = pySkillViewState.sessionPos;
+    const nextQPos = pySkillViewState.sessionPos;
+    const fidCards = (fid && ALL_DECKS_COMBINED[fid] && ALL_DECKS_COMBINED[fid].cards) || [];
+    const nextCIdx = curQueue[nextQPos] !== undefined
+      ? curQueue[nextQPos]
+      : Math.min(nextQPos, Math.max(0, fidCards.length - 1));
+    pySkillViewState.cardIdx = nextCIdx;
     pySkillViewState.cardFlipped = false;
 
     if(pySkillViewState.sessionPos >= curQueue.length){
@@ -22564,6 +22621,8 @@ const psk = e.target.closest('[data-py-select-k]');
   if(exitDueBtn){
     cardsHubState.dueMode = false;
     cardsHubState.completed = false;
+    cardsHubState.dueQueue = [];
+    cardsHubState.duePos = 0;
     cardsHubState.flipped = false;
     saveCardsHubPosState();
     render();
@@ -22646,6 +22705,8 @@ const psk = e.target.closest('[data-py-select-k]');
       } else {
         awardXp(25);
         cardsHubState.completed = true;
+        cardsHubState.dueQueue = [];
+        cardsHubState.duePos = 0;
         cardsHubState.flipped = false;
       }
       saveCardsHubPosState();
