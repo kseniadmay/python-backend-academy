@@ -17372,15 +17372,7 @@ function viewPathSerpentine(options){
   const chapterUnits = curChapter.units || allUnits;
   const totalInChapter = chapterUnits.length;
   const completedInChapter = chapterUnits.filter(isUnitCompleted).length;
-  const chapterSegmentsHTML = chapterUnits.map((u, uIdx) => {
-    const isPassed = isUnitCompleted(u);
-    const isActive = u.id === curActiveUnit.id;
-    return `<div class="path-seg-bar ${isPassed ? 'done' : (isActive ? 'active' : '')}" title="Урок ${uIdx + 1}: ${escapeHtmlStr(cleanUnitTitle(u.id, u.title))}"></div>`;
-  }).join('');
   const activeLessonNumInChap = Math.max(1, chapterUnits.findIndex(u => u.id === curActiveUnit.id) + 1);
-  const chapterProgressLabel = completedInChapter === 0
-    ? `<span class="pcc-full">Начало · ${totalInChapter} ${pluralizeRu(totalInChapter, 'урок', 'урока', 'уроков')}</span><span class="pcc-short">0 / ${totalInChapter}</span>`
-    : `<span class="pcc-full">${completedInChapter} из ${totalInChapter} сдано</span><span class="pcc-short">${completedInChapter} / ${totalInChapter}</span>`;
 
   // Chapter gate cards between chapters in this echelon
   let markersSVG = '';
@@ -17656,12 +17648,6 @@ function viewPathSerpentine(options){
             <span class="path-screening-badge" title="${escapeHtmlStr(screeningFull)}"><span class="psb-full">${screeningFull}</span><span class="psb-short">${screeningShort}</span></span>
           </div>
           <div class="path-chapter-title">Урок ${activeLessonNumInChap} · ${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</div>
-          <div class="path-chapter-progress-row">
-            <div class="path-chapter-segments">
-              ${chapterSegmentsHTML}
-            </div>
-            <span class="path-chapter-count" title="${completedInChapter === 0 ? `Начни главу: в ней ${totalInChapter} ${pluralizeRu(totalInChapter, 'урок', 'урока', 'уроков')}` : `Завершено уроков: ${completedInChapter} из ${totalInChapter}`}" aria-label="${completedInChapter === 0 ? `Начни главу: ${totalInChapter} ${pluralizeRu(totalInChapter, 'урок', 'урока', 'уроков')}` : `Завершено уроков: ${completedInChapter} из ${totalInChapter}`}">${chapterProgressLabel}</span>
-          </div>
         </div>
 
         <!-- S-Curve SVG Trail -->
@@ -17789,12 +17775,6 @@ function viewProPath(options){
     ? `Начни главу · ${activeChapTotal} ${pluralizeRu(activeChapTotal, 'урок', 'урока', 'уроков')}`
     : `Глава ${activeChap.chapterNum || activeChap.num}: ${escapeHtmlStr(activeChap.title)} · ${activeChapCompleted}/${activeChapTotal} уроков · ${activeChapPct}%`;
 
-  // Segments for active chapter
-  const activeChapSegmentsHTML = activeChap.units.map(u => {
-    const isPassed = isUnitCompleted(u);
-    const isActive = u.id === curActiveUnit.id;
-    return `<div class="path-seg-bar ${isPassed ? 'done' : (isActive ? 'active' : '')}" title="Урок ${activeChap.units.findIndex(x => x.id === u.id) + 1}: ${escapeHtmlStr(cleanUnitTitle(u.id, u.title))}"></div>`;
-  }).join('');
 
   const curTierNum = (curEchelon === 'all') ? (curActiveUnit.tier || 1) : (Number(curEchelon) || 1);
   const curEchelonMeta = (typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[curTierNum]) ? INTERVIEW_ECHELONS[curTierNum] : { shortLabel: `Эшелон ${curTierNum}`, icon: '🛡️' };
@@ -17820,14 +17800,6 @@ function viewProPath(options){
 
       <div class="pro-hero-progress-track">
         <div class="pro-hero-progress-fill" style="width:${activeChapPct}%;"></div>
-      </div>
-
-      <div class="path-chapter-progress-row" style="margin-top:4px;">
-        <span class="path-chapter-target-icon">🎯</span>
-        <div class="path-chapter-segments">
-          ${activeChapSegmentsHTML}
-        </div>
-        <span class="path-chapter-count" title="${activeChapCompleted === 0 ? `Начни главу: в ней ${activeChapTotal} ${pluralizeRu(activeChapTotal, 'урок', 'урока', 'уроков')}` : `Завершено уроков: ${activeChapCompleted} из ${activeChapTotal}`}" aria-label="${activeChapCompleted === 0 ? `Начни главу: ${activeChapTotal} ${pluralizeRu(activeChapTotal, 'урок', 'урока', 'уроков')}` : `Завершено уроков: ${activeChapCompleted} из ${activeChapTotal}`}">${activeChapCompleted === 0 ? `0 / ${activeChapTotal}` : `${activeChapCompleted} / ${activeChapTotal}`}</span>
       </div>
     </div>
   `;
