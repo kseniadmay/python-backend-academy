@@ -379,7 +379,7 @@ function testBug145_EchelonTrailSkillsAndPopoverAlignment(){
   // 4. Service Worker cache increment
   const swContent = fs.readFileSync(path.join(rootDir, 'sw.js'), 'utf-8');
   assert(
-    swContent.includes('academy-pwa-v57') || swContent.includes('academy-pwa-v58'),
+    /academy-pwa-v(5[7-9]|[6-9]\d)/.test(swContent),
     'Bug 145: Service Worker cache version must be incremented'
   );
   console.log('✓ Bug 145: Echelon trail skills and popover alignment across all tiers verified');
@@ -431,7 +431,7 @@ function testBug146_LessonCardResumePositionPersistence(){
   // 6. Service Worker cache increment to v58
   const swContent = fs.readFileSync(path.join(rootDir, 'sw.js'), 'utf-8');
   assert(
-    swContent.includes('\'academy-pwa-v58\''),
+    /academy-pwa-v(5[8-9]|[6-9]\d)/.test(swContent),
     'Bug 146: Service Worker cache version must be incremented to academy-pwa-v58'
   );
   console.log('✓ Bug 146: Card position persistence, intra-session loop restore and SW v58 verified');
