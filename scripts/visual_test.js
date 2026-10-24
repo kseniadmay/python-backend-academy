@@ -328,19 +328,19 @@ function diffShots(pm, pngjs, currentPath, baselinePath, diffPath) {
         }).catch(() => {});
 
         if (shot.action === 'pro') {
-          // Переключатель режимов перенесён в «⚙️ Настройки платформы» — открываем модалку и кликаем карточку pro.
-          // Клик через evaluate: первая найденная кнопка [data-open-settings-modal] — в скрытом десктопном сайдбаре,
-          // обычный Playwright-клик на mobile повиснет на ожидании видимости.
           await page.evaluate(() => {
-            const gear = document.querySelector('.topbar [data-open-settings-modal]') || document.querySelector('[data-open-settings-modal]');
-            if (gear) gear.click();
+            const btn = document.querySelector('.path-mode-btn[data-set-path-mode="pro"]');
+            if (btn) {
+              btn.click();
+            } else {
+              const gear = document.querySelector('.topbar [data-open-settings-modal]') || document.querySelector('[data-open-settings-modal]');
+              if (gear) gear.click();
+              const m = document.getElementById('settings-modal');
+              const card = m && m.querySelector('[data-set-path-mode="pro"]');
+              if (card) card.click();
+            }
           }).catch(() => {});
-          await page.evaluate(() => {
-            const m = document.getElementById('settings-modal');
-            const card = m && m.querySelector('[data-set-path-mode="pro"]');
-            if (card) card.click();
-          }).catch(() => {});
-          await page.keyboard.press('Escape').catch(() => {}); // закрыть модалку, чтобы не перекрывала кадр
+          await page.keyboard.press('Escape').catch(() => {});
         }
         await page.waitForTimeout(RENDER_SETTLE_MS);
 
