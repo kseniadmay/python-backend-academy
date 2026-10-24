@@ -16946,9 +16946,11 @@ const cleanUnitTitle = function(id, title){
 function renderPathModeSwitcherHTML(){
   const mode = (state && state.pathViewMode === 'pro') ? 'pro' : 'game';
   return `
-    <div class="path-mode-switcher" role="radiogroup" aria-label="Режим плана обучения">
-      <button type="button" class="path-mode-btn ${mode==='game'?'active':''}" data-set-path-mode="game" role="radio" aria-checked="${mode==='game'}" title="Игровой режим с 3D-тропой">🎮 Игровой</button>
-      <button type="button" class="path-mode-btn ${mode==='pro'?'active':''}" data-set-path-mode="pro" role="radio" aria-checked="${mode==='pro'}" title="Профессиональный режим со списком глав">💼 Профессиональный</button>
+    <div class="path-mode-switcher-wrap">
+      <div class="path-mode-switcher" role="radiogroup" aria-label="Режим плана обучения">
+        <button type="button" class="path-mode-btn ${mode==='game'?'active':''}" data-set-path-mode="game" role="radio" aria-checked="${mode==='game'}" title="Игровой режим с 3D-тропой">🎮 Игровой</button>
+        <button type="button" class="path-mode-btn ${mode==='pro'?'active':''}" data-set-path-mode="pro" role="radio" aria-checked="${mode==='pro'}" title="Профессиональный режим со списком глав">💼 Профессиональный</button>
+      </div>
     </div>
   `;
 }
@@ -17144,7 +17146,7 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum,
       <!-- Widget 1: Screening Readiness — мотивирующая графа с динамическим эшелоном -->
       <div class="panel coddy-rail-card">
         <div class="coddy-rail-card-head">
-          <div class="coddy-rail-badge" data-open-echelon-modal="1" role="button" tabindex="0" style="cursor:pointer;" title="Нажмите, чтобы сменить эшелон">${echMeta.icon} До ${echMeta.targetLabel} ▾</div>
+          <div class="coddy-rail-badge" data-open-echelon-modal="1" role="button" tabindex="0" style="cursor:pointer;" title="Нажмите, чтобы сменить эшелон">${echMeta.icon} До ${(curTierNum === 1 ? 'скрининга' : (curTierNum === 2 ? 'тех-интервью' : (curTierNum === 3 ? 'лайвкодинга' : 'оффера')))} ▾</div>
           <a href="#/mock" class="coddy-rail-link">Симулятор</a>
         </div>
         <div class="coddy-rail-meter">
@@ -17603,6 +17605,8 @@ function viewPathSerpentine(options){
   return `
     <div class="coddy-path-layout">
       <div class="container path-serpentine-wrap">
+        ${renderPathModeSwitcherHTML()}
+
         <!-- Desktop Quick Echelon Switcher Tabs (Direct 1-click program selection) -->
         <div class="path-echelon-quick-tabs" role="tablist" aria-label="Быстрый выбор эшелона программы">
           <button type="button" class="path-eq-tab path-eq-tab--t1 ${curEchelon===1?'active':''}" data-select-echelon="1" title="Эшелон 1: Скрининг · Фундамент (14 уроков)">🛡️ 1. Скрининг</button>
@@ -17878,6 +17882,8 @@ function viewProPath(options){
   return `
     <div class="coddy-path-layout">
       <div class="container path-pro-wrap">
+        ${renderPathModeSwitcherHTML()}
+
         <!-- Desktop Quick Echelon Switcher Tabs -->
         <div class="path-echelon-quick-tabs" role="tablist" aria-label="Быстрый выбор эшелона программы">
           <button type="button" class="path-eq-tab path-eq-tab--t1 ${curEchelon===1?'active':''}" data-select-echelon="1" title="Эшелон 1: Скрининг · Фундамент (14 уроков)">🛡️ 1. Скрининг</button>
