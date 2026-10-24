@@ -284,6 +284,17 @@ function diffShots(pm, pngjs, currentPath, baselinePath, diffPath) {
         await page.addInitScript(seeded
           ? `try{localStorage.setItem('academy_state_v1', ${JSON.stringify(JSON.stringify(SEED_STATE))});}catch(e){}`
           : `try{localStorage.removeItem('academy_state_v1');}catch(e){}`);
+        await page.addInitScript(`
+          try {
+            const _origScroll = Element.prototype.scrollIntoView;
+            Element.prototype.scrollIntoView = function(arg) {
+              if (typeof arg === 'object' && arg !== null) {
+                return _origScroll.call(this, Object.assign({}, arg, { behavior: 'instant' }));
+              }
+              return _origScroll.call(this, arg);
+            };
+          } catch(e) {}
+        `);
 
         const pageErrors = [];
         const consoleErrors = [];

@@ -17040,7 +17040,7 @@ function renderEchelonCardsModalHTML(curEchelon){
         <div class="echelon-prog-card-desc">${escapeHtmlStr(em.desc)}</div>
         <div class="cd-bar cd-bar-track" style="height:5px;margin:2px 0;"><div class="cd-fill cd-bar-fill" style="width:${Math.max(5, tPct)}%;background:${em.gradient || em.color};"></div></div>
         <div class="echelon-prog-card-meta-row">
-          <span class="echelon-prog-card-stats">${tCompletedUnits} из ${tTotalUnits} ${pluralizeRu(tTotalUnits, 'урока', 'уроков', 'уроков')} сдано</span>
+          <span class="echelon-prog-card-stats">${tCompletedUnits} из ${tTotalUnits} ${pluralizeRu(tTotalUnits, 'урок', 'урока', 'уроков')} сдано</span>
           ${isActive
             ? '<span class="echelon-prog-card-btn echelon-prog-card-btn--active">ТЕКУЩАЯ ПРОГРАММА ✓</span>'
             : `<button type="button" class="echelon-prog-card-btn echelon-prog-card-btn--select" data-select-echelon="${t}">ВЫБРАТЬ ПРОГРАММУ ➔</button>`}
@@ -17087,11 +17087,11 @@ function renderPathMobileStatsHTML(totalCompletedUnits, streakText, curTier, act
   const chDone = (typeof chapterCompleted === 'number') ? chapterCompleted : 0;
   const chTot = (typeof chapterTotal === 'number') ? chapterTotal : 9;
   const tierNum = (curTier === 'all') ? 1 : (Number(curTier) || 1);
-  const tierIcon = (typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[tierNum] && INTERVIEW_ECHELONS[tierNum].icon) || '🛡️';
-  const tierLabel = (curTier === 'all') ? 'Все' : tierNum;
+  const tierIcon = (curTier === 'all') ? '🌐' : ((typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[tierNum] && INTERVIEW_ECHELONS[tierNum].icon) || '🛡️');
+  const tierLabel = (curTier === 'all') ? 'Все эшелоны' : `Эшелон ${tierNum}`;
   return `
     <div class="path-mobile-stats" role="status" aria-label="Статистика обучения">
-      <span class="pms-item pms-echelon" data-open-echelon-modal="1" role="button" tabindex="0" title="Нажмите, чтобы сменить программу / эшелон">${tierIcon} <b>Эшелон ${tierLabel}</b> <span style="font-size:0.68rem;opacity:0.8;">▾</span></span>
+      <span class="pms-item pms-echelon" data-open-echelon-modal="1" role="button" tabindex="0" title="Нажмите, чтобы сменить программу / эшелон">${tierIcon} <b>${tierLabel}</b> <span style="font-size:0.68rem;opacity:0.8;">▾</span></span>
       <span class="pms-item" title="Пройдено в главе ${chNum}">📘 <b>Гл. ${chNum}: ${chDone}/${chTot}</b></span>
       <span class="pms-item" title="Стрик активности">🔥 <b>${state.streak || 0}</b> ${streakText}</span>
       <span class="pms-item" title="Накопленный опыт">⚡ <b>${state.xp || 0} XP</b></span>
@@ -17407,7 +17407,7 @@ function viewPathSerpentine(options){
         subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10.5" font-weight="600" fill="#6ee7b7">✓ Все ${cb.unitsCount} из ${cb.unitsCount} уроков сданы · 100%</text>`;
       } else {
         const pct = Math.round(curCompletedCount / cb.unitsCount * 100);
-        subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10.5" font-weight="600" fill="#fcd34d">${curCompletedCount} из ${cb.unitsCount} ${pluralizeRu(cb.unitsCount, 'урока', 'уроков', 'уроков')} сдано · ${pct}%</text>`;
+        subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10.5" font-weight="600" fill="#fcd34d">${curCompletedCount} из ${cb.unitsCount} ${pluralizeRu(cb.unitsCount, 'урок', 'урока', 'уроков')} сдано · ${pct}%</text>`;
       }
 
       let btnContent = '';
@@ -17720,7 +17720,7 @@ function viewPathSerpentine(options){
           <div class="path-echelon-modal-head">
             <div>
               <h3 class="path-echelon-modal-title" id="path-echelon-modal-title">Программы подготовки к собеседованию</h3>
-              <p class="path-echelon-modal-sub">Выберите целевой эшелон. 3D-тропа перестроится под выбранную программу.</p>
+              <p class="path-echelon-modal-sub">Выберите целевой эшелон. Маршрут обучения перестроится под выбранную программу.</p>
             </div>
             <button type="button" class="path-echelon-modal-close" data-close-echelon-modal="1" aria-label="Закрыть">✕</button>
           </div>
@@ -17909,7 +17909,7 @@ function viewProPath(options){
           <div class="path-echelon-modal-head">
             <div>
               <h3 class="path-echelon-modal-title" id="path-echelon-modal-title">Программы подготовки к собеседованию</h3>
-              <p class="path-echelon-modal-sub">Выберите целевой эшелон. 3D-тропа перестроится под выбранную программу.</p>
+              <p class="path-echelon-modal-sub">Выберите целевой эшелон. Маршрут обучения перестроится под выбранную программу.</p>
             </div>
             <button type="button" class="path-echelon-modal-close" data-close-echelon-modal="1" aria-label="Закрыть">✕</button>
           </div>
