@@ -108,8 +108,8 @@ if chrome_exe:
             td_ctx = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
         except TypeError:
             td_ctx = tempfile.TemporaryDirectory()
-        extra_args = [f'--user-data-dir={td}'] if sys.platform != 'darwin' else []
         with td_ctx as td:
+            extra_args = [f'--user-data-dir={td}'] if sys.platform != 'darwin' else []
             c_res = subprocess.run(
                 chrome_flags + extra_args + [route],
                 capture_output=True, text=True, encoding='utf-8', errors='ignore',
@@ -137,8 +137,8 @@ if os.path.isfile(IDE_PATH) and chrome_exe:
         td_ide_ctx = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
     except TypeError:
         td_ide_ctx = tempfile.TemporaryDirectory()
-    extra_ide_args = [f'--user-data-dir={td_ide}'] if sys.platform != 'darwin' else []
     with td_ide_ctx as td_ide:
+        extra_ide_args = [f'--user-data-dir={td_ide}'] if sys.platform != 'darwin' else []
         ide_res = subprocess.run(
             chrome_flags + extra_ide_args + [ide_uri],
             capture_output=True, text=True, encoding='utf-8', errors='ignore',

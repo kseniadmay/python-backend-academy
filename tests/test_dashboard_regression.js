@@ -19,7 +19,7 @@ console.log('   BUGS 134..136 VERIFICATION (CANONICAL BENCHMARK)             ');
 console.log('================================================================\n');
 
 assert(fs.existsSync(academyPath), `academy.html missing at ${academyPath}`);
-const academyHtml = fs.readFileSync(academyPath, 'utf-8');
+const academyHtml = fs.readFileSync(academyPath, 'utf-8').replace(/\r\n/g, '\n');
 
 // 1. Bug 134 (Defect 1): Устранение тайминга (2 мин) из кнопок действия и лаконичная формулировка CTA
 function testBug134_SingleDominantCtaLabelNo2MinAndContinueFurther(){

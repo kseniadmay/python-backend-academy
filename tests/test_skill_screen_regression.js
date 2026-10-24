@@ -19,7 +19,7 @@ console.log('   BUGS 121..127 VERIFICATION (CANONICAL BENCHMARK)             ');
 console.log('================================================================\n');
 
 assert(fs.existsSync(academyPath), `academy.html missing at ${academyPath}`);
-const academyHtml = fs.readFileSync(academyPath, 'utf-8');
+const academyHtml = fs.readFileSync(academyPath, 'utf-8').replace(/\r\n/g, '\n');
 
 // 1. Bug 121 (Defect 1): Полный запрет технического упоминания «Coddy» в классах и разметке сплит-режима практики
 function testBug121_NoCoddyMentionInSkillLayout(){

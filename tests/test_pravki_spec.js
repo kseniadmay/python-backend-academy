@@ -24,12 +24,15 @@ console.log('================================================================\n'
 assert(fs.existsSync(academyPath), `academy.html missing at ${academyPath}`);
 assert(fs.existsSync(etalonyPath), `Эталоны.html missing at ${etalonyPath}`);
 
-const academyHtml = fs.readFileSync(academyPath, 'utf-8');
-const etalonyHtml = fs.readFileSync(etalonyPath, 'utf-8');
+const academyHtmlRaw = fs.readFileSync(academyPath, 'utf-8');
+const etalonyHtmlRaw = fs.readFileSync(etalonyPath, 'utf-8');
 
 // 0. Строгая идентичность канонических файлов
-assert.strictEqual(academyHtml, etalonyHtml, 'academy.html и Эталоны.html обязаны быть строго побайтово идентичны!');
+assert.strictEqual(academyHtmlRaw, etalonyHtmlRaw, 'academy.html и Эталоны.html обязаны быть строго побайтово идентичны!');
 console.log('✓ 0. Canonical Benchmark Invariant: academy.html === Эталоны.html (100% MATCH)');
+
+const academyHtml = academyHtmlRaw.replace(/\r\n/g, '\n');
+const etalonyHtml = etalonyHtmlRaw.replace(/\r\n/g, '\n');
 
 // 1. Экран теории и конспекта (#/python/skill/1.1.1, эталон_конспект_теория.png)
 assert(academyHtml.includes('echelon-topbar-clean'), 'Topbar must use .echelon-topbar-clean');

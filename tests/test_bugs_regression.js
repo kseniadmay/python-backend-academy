@@ -20,12 +20,17 @@ console.log('================================================================\n'
 assert(fs.existsSync(academyPath), `academy.html missing`);
 assert(fs.existsSync(etalonyPath), `Эталоны.html missing`);
 
-const academyHtml = fs.readFileSync(academyPath, 'utf-8');
-const etalonyHtml = fs.readFileSync(etalonyPath, 'utf-8');
+const academyHtmlRaw = fs.readFileSync(academyPath, 'utf-8');
+const etalonyHtmlRaw = fs.readFileSync(etalonyPath, 'utf-8');
 
 // 0. Строгая идентичность канонических файлов
-assert.strictEqual(academyHtml, etalonyHtml, 'academy.html и Эталоны.html обязаны быть строго побайтово идентичны!');
+assert.strictEqual(academyHtmlRaw, etalonyHtmlRaw, 'academy.html и Эталоны.html обязаны быть строго побайтово идентичны!');
 console.log('✓ Invariant 0: academy.html === Эталоны.html (100% MATCH)');
+
+const academyHtml = academyHtmlRaw.replace(/\r\n/g, '\n');
+const etalonyHtml = etalonyHtmlRaw.replace(/\r\n/g, '\n');
+
+
 
 // 1. Bug 1: Ф-002 card 5: корректность all() и генераторного выражения без списковых скобок
 const f002Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.1 · Базовый синтаксис', '📇 Карточки', 'Ф-002. Методы проверки вхождения подмножества.md');
@@ -619,7 +624,7 @@ assert(reverseRegex.test(desc20) || (task20.solution && task20.solution.includes
 console.log('✓ Bug 86: Reverse list widget regex precision (Task 19 & 255 skipped, Task 20 matched) verified');
 
 // 87. Bug 87: Активное первичное закрепление в тематических карточках для Навыка 1.9.1
-const mPyMastery87 = academyHtml.match(/const PY_MASTERY\s*=\s*(\{.*?\});\n/);
+const mPyMastery87 = academyHtml.match(/const PY_MASTERY = ({[\s\S]*?});\s*(?:const|let|var|function)/);
 assert(mPyMastery87, 'PY_MASTERY must be present');
 const pyMastery87 = JSON.parse(mPyMastery87[1]);
 const sk191_87 = pyMastery87.units.flatMap(u => u.skills).find(s => s.id === '1.9.1');

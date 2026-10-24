@@ -18,7 +18,7 @@ console.log('   BUGS 107..120 VERIFICATION (PEDAGOGICAL BENCHMARK)           ');
 console.log('================================================================\n');
 
 assert(fs.existsSync(academyPath), `academy.html missing at ${academyPath}`);
-const academyHtml = fs.readFileSync(academyPath, 'utf-8');
+const academyHtml = fs.readFileSync(academyPath, 'utf-8').replace(/\r\n/g, '\n');
 
 // Bug 107 (Defect 1): Подсветка синтаксиса строк в двойных кавычках и &quot;
 function testBug107_SyntaxHighlightingDoubleQuotes(){
@@ -134,7 +134,7 @@ function testBug113_StrictBanOnCoddy(){
 
 // Вспомогательная функция для извлечения PY_MASTERY.notes
 function getPyMasteryNotes() {
-  const m = academyHtml.match(/const PY_MASTERY\s*=\s*(\{.*?\});\n/);
+  const m = academyHtml.match(/const PY_MASTERY = ({[\s\S]*?});\s*(?:const|let|var|function)/);
   assert(m, 'Bug 114-116: PY_MASTERY must be present in academy.html');
   const data = JSON.parse(m[1]);
   return data.notes || {};
@@ -228,7 +228,7 @@ function testBug116_ParagraphLengthLimit(){
 
 // Вспомогательная функция для извлечения данных PY_MASTERY
 function getPyMasteryData() {
-  const m = academyHtml.match(/const PY_MASTERY\s*=\s*(\{.*?\});\n/);
+  const m = academyHtml.match(/const PY_MASTERY = ({[\s\S]*?});\s*(?:const|let|var|function)/);
   assert(m, 'PY_MASTERY must be present in academy.html');
   return JSON.parse(m[1]);
 }

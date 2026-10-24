@@ -29,17 +29,17 @@ def run_platinum_audit():
     else:
         raise AssertionError(f"Neither dir ({project_dir}) nor zip ({project_zip}) found!")
     
-    print(f"[OK] Total files: {len(names)} (expected 525)")
-    assert len(names) == 525, f"Expected 525 files, got {len(names)}"
+    print(f"[OK] Total files: {len(names)} (expected 526)")
+    assert len(names) == 526, f"Expected 526 files, got {len(names)}"
     
     notes = [n for n in names if '📚 Конспекты' in n and n.endswith('.md')]
     cards = [n for n in names if '📇 Карточки' in n and n.endswith('.md')]
     maps = [n for n in names if '00 · 🗺️ Карта Мастерства.md' in n]
     
     assert len(notes) == 238, f"Expected 238 notes, got {len(notes)}"
-    assert len(cards) == 286, f"Expected 286 cards, got {len(cards)}"
+    assert len(cards) == 287, f"Expected 287 cards, got {len(cards)}"
     assert len(maps) == 1, f"Expected 1 map, got {len(maps)}"
-    print(f"[OK] 238 Notes, 286 Cards, 1 Map verified")
+    print(f"[OK] 238 Notes, 287 Cards, 1 Map verified")
     
     # 2. Глубокий аудит конспектов
     note_errors = []

@@ -472,7 +472,7 @@ for root, dirs, files in os.walk(BASE_REMNOTE):
     dirs.sort()
     for fn in sorted(files):
         if fn.endswith('.md'):
-            m = re.match(r'^([КФ]-\d+)\.\s*(.*)\.md$', fn)
+            m = re.match(r'^([КФ]-\d+(?:@\d+)?)\.\s*(.*)\.md$', fn)
             if m:
                 cid, ctitle = m.group(1), _clean_display_title(m.group(2))
                 full_p = os.path.join(root, fn)
