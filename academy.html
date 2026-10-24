@@ -4144,8 +4144,12 @@
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
   }
   .pro-chapter-box--active {
-    border-color: rgba(245, 158, 11, 0.45);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(245, 158, 11, 0.25);
+    border-color: rgba(225, 29, 72, 0.40);
+    box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.10), 0 12px 32px rgba(0, 0, 0, 0.45), 0 0 24px rgba(225, 29, 72, 0.10);
+  }
+  html:not([data-theme="dark"]) .pro-chapter-box--active {
+    border-color: rgba(225, 29, 72, 0.35);
+    box-shadow: 0 8px 24px rgba(225, 29, 72, 0.12);
   }
   .pro-chapter-header {
     display: flex;
@@ -4223,12 +4227,13 @@
     background: rgba(0, 0, 0, 0.03);
   }
   .pro-lesson-row--active {
-    background: rgba(245, 158, 11, 0.08);
-    box-shadow: inset 3px 0 0 #f59e0b;
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.09) 0%, rgba(22, 27, 36, 0.3) 100%);
+    border-left: 3px solid #10b981;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
   html:not([data-theme="dark"]) .pro-lesson-row--active {
-    background: rgba(245, 158, 11, 0.07);
-    box-shadow: inset 3px 0 0 #d97706;
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.10) 0%, rgba(255, 255, 255, 0.6) 100%);
+    border-left: 3px solid #059669;
   }
   .pro-lesson-row--locked {
     opacity: 0.55;
@@ -4242,23 +4247,32 @@
     align-items: center;
     justify-content: center;
   }
-  .pro-icon-play {
-    width: 34px;
-    height: 34px;
+  .pro-icon-active {
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #ff7a00, #ea580c);
-    color: #ffffff;
+    background: rgba(16, 185, 129, 0.14);
+    border: 1.5px solid rgba(52, 211, 153, 0.6);
+    color: #34d399;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
+    font-size: 11px;
     padding-left: 2px;
-    box-shadow: 0 4px 12px rgba(255, 122, 0, 0.45);
-    animation: proPlayPulse 2s infinite ease-in-out;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+    transition: all 0.2s ease;
   }
-  @keyframes proPlayPulse {
-    0%, 100% { transform: scale(1); box-shadow: 0 4px 12px rgba(255, 122, 0, 0.45); }
-    50% { transform: scale(1.06); box-shadow: 0 6px 18px rgba(255, 122, 0, 0.65); }
+  .pro-focus-chip {
+    font-family: var(--font-m, 'JetBrains Mono', monospace);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(16, 185, 129, 0.14);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.35);
+    white-space: nowrap;
   }
   .pro-icon-done {
     width: 34px;
@@ -17994,7 +18008,7 @@ function viewProPath(options){
       let statusClass = isCompleted ? 'pro-lesson-row--completed' : (isActive ? 'pro-lesson-row--active' : 'pro-lesson-row--locked');
       let iconHtml = '';
       if(isActive){
-        iconHtml = '<div class="pro-icon-play" aria-label="Текущий урок">▶</div>';
+        iconHtml = '<div class="pro-icon-active" aria-label="Текущий урок">▶</div>';
       } else if(isCompleted){
         iconHtml = '<div class="pro-icon-done" aria-label="Пройден">✓</div>';
       } else {
@@ -18011,7 +18025,7 @@ function viewProPath(options){
       ).join(' ');
 
       return `
-        <div class="pro-lesson-row ${statusClass}" data-unit-id="${u.id}" role="button" tabindex="${isLocked ? '-1' : '0'}" style="${isActive ? 'box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.4), 0 8px 24px rgba(0,0,0,0.4); background: rgba(245, 158, 11, 0.05);' : ''}">
+        <div class="pro-lesson-row ${statusClass}" data-unit-id="${u.id}" role="button" tabindex="${isLocked ? '-1' : '0'}">
           <div class="pro-lesson-status-icon">${iconHtml}</div>
           <div class="pro-lesson-info" style="display:flex;flex-direction:column;gap:5px;">
             <div class="pro-lesson-title" style="font-weight:${isActive ? '700' : '600'}; color:${isActive ? '#f8fafc' : (isCompleted ? 'var(--ink)' : 'var(--ink-muted)')};">
@@ -18023,7 +18037,7 @@ function viewProPath(options){
             </div>
           </div>
           <div class="pro-lesson-tail">
-            ${isActive ? '<span class="pro-arrow" style="font-weight:bold;color:var(--amber);">→</span>' : (isCompleted ? '<span class="pro-stat-chip" style="font-size:0.72rem;font-weight:700;color:var(--emerald,#34d399);">100% MP</span>' : (isLocked ? `<span style="font-size:0.75rem;color:var(--ink-muted);opacity:0.6;">${(u.skills && u.skills.length) || 1} ${pluralizeRu((u.skills && u.skills.length) || 1, 'тема', 'темы', 'тем')}</span>` : ''))}
+            ${isActive ? '<span class="pro-focus-chip">В ФОКУСЕ</span>' : (isCompleted ? '<span class="pro-stat-chip" style="font-size:0.72rem;font-weight:700;color:var(--emerald,#34d399);">100% MP</span>' : (isLocked ? `<span style="font-size:0.75rem;color:var(--ink-muted);opacity:0.6;">${(u.skills && u.skills.length) || 1} ${pluralizeRu((u.skills && u.skills.length) || 1, 'тема', 'темы', 'тем')}</span>` : ''))}
           </div>
         </div>
       `;
