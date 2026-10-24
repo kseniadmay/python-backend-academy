@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: CI/CD Pipeline & Deploy to zetalink
 
 on:
   push:
@@ -33,3 +33,29 @@ jobs:
 
       - name: Run Verification Pipeline (RemNote + PWA + Headless Chrome)
         run: python verify_all.py --quick
+
+  deploy:
+    name: Auto Deploy to zetalink VPS
+    needs: verify
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: SSH Remote Deployment to zetalink
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          script: |
+            set -e
+            echo "🚀 Начало автоматического деплоя на сервер zetalink..."
+            cd /home/fury/python-backend-academy
+
+            echo "📦 Получение свежего кода из GitHub..."
+            git pull origin main
+
+            echo "🔄 Перезапуск службы Академии..."
+            systemctl --user restart academy.service
+
+            echo "✅ Сервер zetalink успешно обновлён и работает!"

@@ -64,7 +64,10 @@ for f in files:
                     continue
                 if 'type=' in attrs and not any(t in attrs for t in ['javascript', 'module']):
                     continue
-                c = subprocess.run(['node', '--check'], input=code, text=True, capture_output=True)
+                cmd = ['node', '--check']
+                if 'module' in attrs:
+                    cmd = ['node', '--input-type=module', '--check']
+                c = subprocess.run(cmd, input=code, text=True, capture_output=True)
                 if c.returncode != 0:
                     print(f"[HOOK ERROR] Ошибка синтаксиса inline JS в {f}:\n{c.stderr}")
                     sys.exit(1)

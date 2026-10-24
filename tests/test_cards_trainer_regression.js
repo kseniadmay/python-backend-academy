@@ -135,6 +135,69 @@ function testEnterKeyFlipErgonomics(){
   );
 }
 
+
+// Тест-кейс 9: Отсутствие дублирования кнопки «💡 Шпаргалка» на экране завершения колоды
+function testNoDuplicateCheatSheetInCompletedHub(){
+  const start = academyHtml.indexOf('if(cardsHubState.completed && cards.length > 0){');
+  const ret1 = academyHtml.indexOf('return `\n    <div class="container', start);
+  const end = academyHtml.indexOf('return `\n    <div class="container', ret1 + 10);
+  const completedBlock = academyHtml.slice(start, end);
+  const matches = completedBlock.match(/data-hub-cheatsheet/g);
+  assert(
+    matches && matches.length === 1,
+    `Defect 9: Completed deck screen must have exactly 1 cheatsheet button, found ${matches ? matches.length : 0}`
+  );
+}
+
+// Тест-кейс 10: Мобильная эргономика селекторов фильтров (min-width: 0 против переполнения на 390px)
+function testMobileSelectEllipsisNoOverflow(){
+  assert(
+    academyHtml.includes('.cards-hub-subfilters select{') &&
+    academyHtml.includes('min-width:0 !important;width:100% !important;box-sizing:border-box !important;'),
+    'Defect 10: .cards-hub-subfilters select must have min-width:0 and width:100% to prevent overflow on mobile'
+  );
+}
+
+// Тест-кейс 11: Прогрессия интервалов SM-2 при повторных оценках «Трудно» (reps + 1)
+function testHardRatingIntervalProgression(){
+  const srsFnCode = academyHtml.slice(
+    academyHtml.indexOf('function computeRemNoteIntervals'),
+    academyHtml.indexOf('function applyRemNoteCardRating')
+  );
+  assert(
+    !srsFnCode.includes('hard:  { days: hardDays,  ease: Math.max(1.30, +(ease - 0.15).toFixed(2)), reps: Math.max(1, reps)'),
+    'Defect 11: computeRemNoteIntervals must not freeze reps at Math.max(1, reps) on hard rating'
+  );
+  assert(
+    srsFnCode.includes('hard:  { days: hardDays,  ease: Math.max(1.30, +(ease - 0.15).toFixed(2)), reps: reps + 1'),
+    'Defect 11: computeRemNoteIntervals must increment reps (reps + 1) on hard rating for interval progression'
+  );
+}
+
+// Тест-кейс 12: Интерактивный Stories Bar в общем хабе колод и в режиме очереди дня
+function testInteractiveStoriesBarInHubAndDue(){
+  assert(
+    academyHtml.includes('data-hub-goto-card="${i}"'),
+    'Defect 12: buildFcStoriesBarHTML must render clickable data-hub-goto-card segments'
+  );
+  assert(
+    academyHtml.includes('data-hub-goto-due='),
+    'Defect 12: viewCardsHub dueMode must render clickable due stories bar'
+  );
+  assert(
+    academyHtml.includes('cardsHubState.cardIdx = parseInt(hGotoCard.getAttribute'),
+    'Defect 12: event handler must support direct jump via data-hub-goto-card'
+  );
+}
+
+// Тест-кейс 13: Эргономичная подпись «← К вопросу» на стороне ответа карточки
+function testAnswerFaceButtonLabel(){
+  assert(
+    academyHtml.includes('← К вопросу'),
+    'Defect 13: card answer face must render unambiguous "← К вопросу" button'
+  );
+}
+
 // Экспорт или прямой прогон
 module.exports = {
   testCleanHumanUiDueMode,
@@ -144,7 +207,12 @@ module.exports = {
   testSrsRatingDowngradeOnLapse,
   testLessonCardCounterOverflow,
   testCardsCheatSheetButton,
-  testEnterKeyFlipErgonomics
+  testEnterKeyFlipErgonomics,
+  testNoDuplicateCheatSheetInCompletedHub,
+  testMobileSelectEllipsisNoOverflow,
+  testHardRatingIntervalProgression,
+  testInteractiveStoriesBarInHubAndDue,
+  testAnswerFaceButtonLabel
 };
 
 if(require.main === module){
@@ -157,7 +225,12 @@ if(require.main === module){
     ['5. Снижение рейтинга в SRS при ошибке', testSrsRatingDowngradeOnLapse],
     ['6. Счётчик сессионного цикла урока', testLessonCardCounterOverflow],
     ['7. Кнопка «Шпаргалка» в хабе карточек', testCardsCheatSheetButton],
-    ['8. Клавиша Enter для переворота вопроса', testEnterKeyFlipErgonomics]
+    ['8. Клавиша Enter для переворота вопроса', testEnterKeyFlipErgonomics],
+    ['9. Нет дублирования шпаргалки в завершении', testNoDuplicateCheatSheetInCompletedHub],
+    ['10. Мобильная эргономика селекторов колод', testMobileSelectEllipsisNoOverflow],
+    ['11. Прогрессия интервалов SM-2 на «Трудно»', testHardRatingIntervalProgression],
+    ['12. Интерактивный Stories Bar в каталоге и дне', testInteractiveStoriesBarInHubAndDue],
+    ['13. Эргономичная подпись «← К вопросу»', testAnswerFaceButtonLabel]
   ];
 
   let failed = 0;

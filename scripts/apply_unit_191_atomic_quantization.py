@@ -484,16 +484,16 @@ new_academy_content = academy_content[:m.start(1)] + new_json_str + academy_cont
 print(f'\nРазмер academy.html: было {len(academy_content)}, стало {len(new_academy_content)} байт')
 
 # Сохранение в academy.html
-with open(ACADEMY_PATH, 'w', encoding='utf-8') as f:
+with open(ACADEMY_PATH, 'w', encoding='utf-8', newline='\n') as f:
     f.write(new_academy_content)
 print(f'✓ academy.html сохранён ({len(new_academy_content)} символов)')
 
 # Синхронизация с Эталонами
-with open(ETALON_DIR_PATH, 'w', encoding='utf-8') as f:
+with open(ETALON_DIR_PATH, 'w', encoding='utf-8', newline='\n') as f:
     f.write(new_academy_content)
 print('✓ Эталоны/Эталоны.html синхронизирован')
 
-with open(ETALON_ROOT_PATH, 'w', encoding='utf-8') as f:
+with open(ETALON_ROOT_PATH, 'w', encoding='utf-8', newline='\n') as f:
     f.write(new_academy_content)
 print('✓ Эталоны.html синхронизирован')
 

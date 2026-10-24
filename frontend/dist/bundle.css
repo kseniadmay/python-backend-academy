@@ -1,0 +1,618 @@
+/* ==========================================================================
+   Python Backend Academy — Master Modular Stylesheet
+   ========================================================================== */
+
+/* --- variables.css --- */
+/* ==========================================================================
+   Academy Theme Variables: 60/30/10 Light & Evening Obsidian Dark
+   ========================================================================== */
+
+:root, :root[data-theme="light"] {
+  --paper: #faf8f5;
+  --surface: rgba(255, 255, 255, 0.88);
+  --surface-2: rgba(15, 23, 42, 0.045);
+  --ink: #0f172a;
+  --ink-soft: #334155;
+  --ink-muted: #475569;
+  --line: rgba(0, 0, 0, 0.07);
+  --line-soft: rgba(0, 0, 0, 0.045);
+  --hairline-light: rgba(0, 0, 0, 0.07);
+  
+  --emerald: #145a46;
+  --emerald-soft: rgba(20, 90, 70, 0.10);
+  --amber: #d97706;
+  --amber-soft: rgba(217, 119, 6, 0.11);
+  --bordeaux: #6b1d2f;
+  --bordeaux-soft: rgba(107, 29, 47, 0.09);
+  
+  --moss: #145a46;
+  --moss-deep: #0f4536;
+  --moss-soft: rgba(20, 90, 70, 0.10);
+  --clay: #d97706;
+  --clay-deep: #92400e;
+  --clay-soft: rgba(217, 119, 6, 0.11);
+  
+  --shadow-1: 0 10px 30px -10px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --glass-border: rgba(0, 0, 0, 0.07);
+  --orb-burgundy: rgba(107, 29, 47, 0.07);
+  --orb-emerald: rgba(20, 90, 70, 0.07);
+
+  --font-d: 'Onest', 'Golos Text', sans-serif;
+  --font-b: 'Onest', 'Golos Text', sans-serif;
+  --font-m: 'JetBrains Mono', monospace;
+  --tabbar-h: 68px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d1016;
+    --surface: rgba(22, 27, 36, 0.74);
+    --surface-2: rgba(30, 37, 49, 0.66);
+    --ink: #f8fafc;
+    --ink-soft: #cbd5e1;
+    --ink-muted: #94a3b8;
+    --line: rgba(255, 255, 255, 0.09);
+    --line-soft: rgba(255, 255, 255, 0.05);
+    
+    --emerald: #10b981;
+    --emerald-soft: rgba(16, 185, 129, 0.16);
+    --amber: #f59e0b;
+    --amber-soft: rgba(245, 158, 11, 0.16);
+    --bordeaux: #fb7185;
+    --bordeaux-soft: rgba(190, 18, 60, 0.22);
+    
+    --moss: #10b981;
+    --moss-deep: #6ee7b7;
+    --moss-soft: rgba(16, 185, 129, 0.18);
+    --clay: #f59e0b;
+    --clay-deep: #fde68a;
+    --clay-soft: rgba(245, 158, 11, 0.16);
+    
+    --shadow-1: 0 16px 40px -12px rgba(0, 0, 0, 0.55);
+    --glass-border: rgba(255, 255, 255, 0.10);
+    --orb-burgundy: rgba(190, 18, 60, 0.24);
+    --orb-emerald: rgba(16, 185, 129, 0.20);
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper: #0d1016;
+  --surface: rgba(22, 27, 36, 0.74);
+  --surface-2: rgba(30, 37, 49, 0.66);
+  --ink: #f8fafc;
+  --ink-soft: #cbd5e1;
+  --ink-muted: #94a3b8;
+  --line: rgba(255, 255, 255, 0.09);
+  --line-soft: rgba(255, 255, 255, 0.05);
+  
+  --emerald: #10b981;
+  --emerald-soft: rgba(16, 185, 129, 0.16);
+  --amber: #f59e0b;
+  --amber-soft: rgba(245, 158, 11, 0.16);
+  --bordeaux: #fb7185;
+  --bordeaux-soft: rgba(190, 18, 60, 0.22);
+  
+  --moss: #10b981;
+  --moss-deep: #6ee7b7;
+  --moss-soft: rgba(16, 185, 129, 0.18);
+  --clay: #f59e0b;
+  --clay-deep: #fde68a;
+  --clay-soft: rgba(245, 158, 11, 0.16);
+  
+  --shadow-1: 0 16px 40px -12px rgba(0, 0, 0, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --orb-burgundy: rgba(190, 18, 60, 0.24);
+  --orb-emerald: rgba(16, 185, 129, 0.20);
+}
+
+/* --- base.css --- */
+/* ==========================================================================
+   Academy Base & Typography (Onest & Golos Text)
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-b);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-d);
+  margin: 0;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+h1 {
+  font-weight: 700;
+  font-size: clamp(1.5rem, 1.2rem + 1.3vw, 2.1rem);
+  line-height: 1.15;
+}
+
+h2 {
+  font-weight: 600;
+  font-size: 1.3rem;
+  line-height: 1.25;
+}
+
+h3 {
+  font-weight: 600;
+  font-size: 1.02rem;
+  line-height: 1.3;
+}
+
+p {
+  margin: 0 0 0.7em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+}
+
+ul, ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--emerald);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.meta {
+  font-size: 0.83rem;
+  color: var(--ink-soft);
+}
+
+.muted {
+  color: var(--ink-muted);
+}
+
+code, .mono {
+  font-family: var(--font-m);
+}
+
+/* --- glassmorphism.css --- */
+/* ==========================================================================
+   Zen Glassmorphism & Atmospheric Lighting
+   ========================================================================== */
+
+.glass-surface {
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-1);
+}
+
+.glass-card {
+  background: var(--surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-1);
+  transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.2s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+/* Световые атмосферные сферы */
+.ambient-orb {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(80px);
+  z-index: 0;
+  opacity: 0.6;
+}
+
+.ambient-orb-burgundy {
+  width: 480px;
+  height: 480px;
+  top: -120px;
+  left: -80px;
+  background: radial-gradient(circle, var(--orb-burgundy) 0%, transparent 70%);
+}
+
+.ambient-orb-emerald {
+  width: 520px;
+  height: 520px;
+  top: 30%;
+  right: -140px;
+  background: radial-gradient(circle, var(--orb-emerald) 0%, transparent 70%);
+}
+
+/* --- components/sidebar.css --- */
+/* ==========================================================================
+   Desktop Sidebar (236px Invariant) & Mobile Bottom Tabbar
+   ========================================================================== */
+
+.desktop-sidebar {
+  width: 236px;
+  min-width: 236px;
+  max-width: 236px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid var(--glass-border);
+  z-index: 40;
+  padding: 16px 12px;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-family: var(--font-d);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  transition: all 0.15s ease;
+}
+
+.sidebar-link:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.sidebar-link.active {
+  background: var(--surface-2);
+  color: var(--emerald);
+  font-weight: 600;
+}
+
+/* Мобильная навигация */
+@media (max-width: 880px) {
+  .desktop-sidebar {
+    display: none;
+  }
+}
+
+/* --- components/trail.css --- */
+/* ==========================================================================
+   3D Serpentine Path & 13 Jewel Dots Necklace
+   ========================================================================== */
+
+.trail-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 32px 16px 96px;
+}
+
+/* Ожерелье 13 ювелирных бусин */
+.necklace-dots-track {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  margin-bottom: 24px;
+}
+
+.dot-jewel {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--line);
+  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
+  cursor: pointer;
+}
+
+.dot-jewel.done {
+  background: var(--emerald);
+  box-shadow: 0 0 8px var(--emerald-soft);
+}
+
+.dot-jewel.active {
+  background: var(--amber);
+  transform: scale(1.35);
+  box-shadow: 0 0 12px var(--amber-soft);
+}
+
+/* Единственный доминирующий CTA (Single Dominant CTA) */
+.single-dominant-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 440px;
+  padding: 16px 28px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  font-family: var(--font-d);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+  box-shadow: 0 12px 32px -8px rgba(16, 185, 129, 0.45);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.single-dominant-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px -8px rgba(16, 185, 129, 0.6);
+}
+
+.single-dominant-cta:active {
+  transform: translateY(1px);
+}
+
+/* --- components/reader.css --- */
+/* ==========================================================================
+   Clean Theory Reader (No Card Clutter) & Micro-Steps
+   ========================================================================== */
+
+.reader-container {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 24px 20px 80px;
+  background: transparent;
+}
+
+.reader-step-heading {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--ink);
+}
+
+.reader-text-chunk {
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+
+/* Блоки кода с мобильной эргономикой */
+.reader-code-snippet {
+  background: #090c10;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 16px 0 20px;
+  overflow-x: auto;
+  font-family: var(--font-m);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #e6edf3;
+}
+
+.reader-code-snippet pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Контраст Junior vs Senior / O(1) vs O(N) */
+.contrast-card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 18px 0;
+}
+
+@media (max-width: 600px) {
+  .contrast-card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- components/cards.css --- */
+/* ==========================================================================
+   3D Flashcards Flip Physics & SRS Micro-Loop
+   ========================================================================== */
+
+.flashcard-stage {
+  perspective: 1200px;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto 24px;
+}
+
+.flashcard-inner {
+  position: relative;
+  width: 100%;
+  min-height: 280px;
+  transform-style: preserve-3d;
+  transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.3, 1);
+  cursor: pointer;
+}
+
+.flashcard-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.flashcard-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.flashcard-back {
+  transform: rotateY(180deg);
+}
+
+/* Кнопки интервального повторения SRS */
+.srs-ratings-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.srs-btn {
+  padding: 12px 8px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: center;
+  transition: transform 0.1s ease;
+}
+
+.srs-btn:active {
+  transform: scale(0.97);
+}
+
+.srs-btn-again {
+  background: rgba(178, 58, 52, 0.15);
+  color: #ef4444;
+}
+
+.srs-btn-hard {
+  background: rgba(217, 119, 6, 0.15);
+  color: #f59e0b;
+}
+
+.srs-btn-good {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.srs-btn-easy {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+/* --- components/ide.css --- */
+/* ==========================================================================
+   Practice Trainer: Split-View, Token Chips & Socratic Scaffolding
+   ========================================================================== */
+
+.practice-split-grid {
+  display: grid;
+  grid-template-columns: 48% 52%;
+  gap: 16px;
+  width: 100%;
+  height: calc(100vh - 80px);
+  padding: 16px;
+}
+
+@media (max-width: 992px) {
+  .practice-split-grid {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+}
+
+.practice-context-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.practice-editor-col {
+  display: flex;
+  flex-direction: column;
+  background: #090c10;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+/* Экранные синтаксические чипсы токенов */
+.tokens-chips-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.token-chip {
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--emerald);
+  font-family: var(--font-m);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.token-chip:hover {
+  background: rgba(16, 185, 129, 0.15);
+}
+
+/* Блок наставника Сократа */
+.socratic-mentor-card {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(107, 29, 47, 0.08);
+  border: 1px solid rgba(251, 113, 133, 0.18);
+  color: var(--ink);
+  font-size: 0.92rem;
+}
+
