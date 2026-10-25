@@ -211,26 +211,26 @@ for _tn, _tf in _t_list:
         18: 'assert frequency_analysis(["a", "b", "a"])[0] == ("a", 2)',
         253: 'assert (x, y, z) == (10, 20, 30) and x == 10 and y == 20 and z == 30, "Кортеж должен быть распакован в переменные x=10, y=20, z=30"',
         254: 'assert a == b and a is not b and c is a, "a и b равны по значению, но не идентичны в памяти; c ссылается на a"',
-        255: 'assert first_three == [0, 1, 2] and last_two == [8, 9], "first_three должен быть [:3], last_two должен быть [-2:]"',
+        255: 'assert first_three == [10, 20, 30] and last_two == [50, 60], "first_three должен быть [:3], last_two должен быть [-2:]"',
         256: 'assert squares == [1, 4, 9, 16, 25], "squares должен содержать список квадратов чисел nums"',
         257: 'assert retries == 3 and config.get("timeout") == 30, "retries должен получить дефолтное значение 3"',
         258: 'assert isinstance(point_list, list) and point_list == [99, 20], "Список point_list должен содержать [99, 20]\\nassert isinstance(point_tuple, tuple) and point_tuple == (10, 20), \\"Кортеж point_tuple должен быть (10, 20)\\"\\nassert isinstance(cache, dict) and cache.get(point_tuple) == \\"запись в кэше\\", \\"Словарь cache должен содержать point_tuple как ключ со значением записи в кэше\\""',
         282: 'assert t1 is not None and t2 is not None and not t1.is_alive() and not t2.is_alive(), "Потоки t1 и t2 должны быть запущены и завершены"',
-        283: 'assert match is not None and match.group() == "INV-2026-001", "Строка text должна соответствовать шаблону регулярного выражения"',
-        297: 'assert items == [1, 2, 3, 4, 5], "Список items должен быть дополнен через append(3) и extend([4, 5])"',
+        283: 'assert is_valid_username("alex123") is True and is_valid_username("a") is False, "Имя пользователя должно валидироваться регулярным выражением"',
+        297: 'assert "banana" in cart, "Список cart должен быть дополнен через append"',
         306: 'assert hasattr(BankAccount, "_BankAccount__balance") or "_BankAccount__balance" in BankAccount(100).__dict__, "Атрибут баланса должен использовать name mangling __balance"',
         309: 'assert callable(greet) and greet("мир") == "Привет, мир!", "Функция greet(name) должна возвращать приветственную строку"',
-        319: 'assert hasattr(User, "__dataclass_fields__"), "Класс User должен быть декорирован @dataclass"',
-        322: 'assert callable(log_execution), "Декоратор log_execution должен быть определен"',
-        323: 'assert pipeline == [double, square] and result == 36, "Пайплайн должен применить double (3*2=6) и затем square (6**2=36)"',
-        329: 'assert User.from_string("Alex,30").name == "Alex" and User.from_string("Alex,30").age == 30, "Фабричный метод from_string должен создавать экземпляр User(name, age)"',
+        319: 'assert hasattr(Point, "__dataclass_fields__"), "Класс Point должен быть декорирован @dataclass"',
+        322: 'assert callable(announce), "Декоратор announce должен быть определен"',
+        323: 'assert callable(add) and callable(sub) and callable(mul), "Функции add, sub, mul должны быть определены"',
+        329: 'assert hasattr(Pizza, "margherita"), "Фабричный метод margherita должен быть определен"',
         341: 'assert c1.count == 2 and c2.count == 1, "Счетчики независимых экземпляров c1 и c2 должны быть изолированы"',
         343: 'assert rex.bark() == Dog.bark(rex) == "Рекс гавкает!", "Вызов rex.bark() и Dog.bark(rex) должны возвращать одинаковый результат"',
-        344: '_ug = UserGroup(["a", "b"]); assert "UserGroup" in repr(_ug) and "2" in repr(_ug), "__repr__ должен отображать имя класса и размер группы"',
+        344: '_sc = ShoppingCart(); assert "ShoppingCart" in repr(_sc), "__repr__ должен отображать имя класса ShoppingCart"',
         351: 'assert "division by zero" in str(_exc.value) if "_exc" in globals() else True, "Тест должен проверить выброс ZeroDivisionError"',
         352: 'assert pytest.approx is not None, "Тест должен использовать pytest.approx для проверки float"',
-        366: 'assert log_file.suffix == ".txt" and str(log_file).endswith(".txt"), "Файловый путь должен иметь расширение .txt"',
-        374: 'assert flattened == [1, 2, 3, 4, 5, 6], "Список flattened должен содержать уплощенные элементы матрицы"',
+        366: 'assert "with_suffix" in str(__USER_CODE__), "Используйте метод with_suffix модуля pathlib"',
+        374: 'assert callable(flatten_batches), "Функция flatten_batches должна быть определена"',
         22: 'assert is_valid_username("alex123") is True and is_valid_username("ab") is False',
         23: '_t_obj = Temperature(25); assert _t_obj.celsius == 25',
         31: '_g = build_adjacency_list(3, [(0, 1), (1, 2)]); assert 1 in _g[0] and 0 in _g[1]',
@@ -675,6 +675,15 @@ if tasks_match:
 else:
     ide_lines = ide_content.split('\n')
     TASKS_381 = json.loads(ide_lines[317].strip()[len('const TASKS = '):-1])
+_TIER1_ENRICH_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'content', 'tier1_enrichment.json')
+_TIER1_ENRICH = {}
+if os.path.isfile(_TIER1_ENRICH_PATH):
+    try:
+        with open(_TIER1_ENRICH_PATH, encoding='utf-8') as _ef:
+            _TIER1_ENRICH = json.load(_ef)
+    except Exception as _e:
+        print("Warning: failed to load tier1_enrichment.json:", _e)
+
 for _t in TASKS_381:
     _lvl = _t.get('level', 1)
     _t['tier'] = TIER_MAP.get(_lvl, f'🥚 Уровень {_lvl}')
@@ -698,9 +707,32 @@ for _t in TASKS_381:
             f"<p class='meta'>{html.escape(_doc_m.group(1).strip())}</p>" if _doc_m else ""
         )
     _t['hint'] = _TASK_OVERRIDES[_t['id']]['hint'] if (_t['id'] in _TASK_OVERRIDES and 'hint' in _TASK_OVERRIDES[_t['id']]) else generate_pedagogical_hint(_t)
+    _t_str_id = str(_t['id'])
+    if _t_str_id in _TIER1_ENRICH or _t['id'] in _TIER1_ENRICH:
+        _enr = _TIER1_ENRICH.get(_t_str_id) or _TIER1_ENRICH.get(_t['id'])
+        if _enr:
+            if not (_t['id'] in _TASK_OVERRIDES and 'hint' in _TASK_OVERRIDES[_t['id']]):
+                _t['hint'] = _enr.get('hint', _t['hint'])
+            _io_in = _enr.get('io_in', '')
+            _io_out = _enr.get('io_out', '')
+            if _io_in and _io_out:
+                _t['io_flow'] = {'in': _io_in, 'out': _io_out}
+                _io_html = (
+                    f"<div class=\"io-flow-block\">"
+                    f"<div class=\"io-flow-label\">⚡ Поток данных (I/O Flow)</div>"
+                    f"<div class=\"io-flow-row\">"
+                    f"<span class=\"io-pill io-pill-in\">Вход: <code>{html.escape(_io_in)}</code></span>"
+                    f"<span class=\"io-arrow\">➔</span>"
+                    f"<span class=\"io-pill io-pill-out\">Ожидание: <code>{html.escape(_io_out)}</code></span>"
+                    f"</div></div>"
+                )
+                if 'io-flow-block' not in _t['desc']:
+                    _t['desc'] = _t['desc'] + _io_html
     _t['tests'] = _TASK_OVERRIDES[_t['id']]['tests'] if (_t['id'] in _TASK_OVERRIDES and 'tests' in _TASK_OVERRIDES[_t['id']]) else build_test_for_task(_t)
     if _t['id'] in _TASK_OVERRIDES and 'initialCode' in _TASK_OVERRIDES[_t['id']]:
         _t['initialCode'] = _TASK_OVERRIDES[_t['id']]['initialCode']
+
+
 
 TASKS_BY_ID = {t['id']: t for t in TASKS_381}
 
