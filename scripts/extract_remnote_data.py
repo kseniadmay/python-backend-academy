@@ -5,6 +5,7 @@ _CLOUD_ROOT = r'C:\Users\fury6\OneDrive\Python_Backend_Academy'
 _REL_REMNOTE = os.path.normpath(os.path.join(_HERE, '..', 'knowledge_base'))
 _REL_IDE_HTML = os.path.normpath(os.path.join(_HERE, '..', 'practice_ide.html'))
 _REL_ACADEMY_HTML = os.path.normpath(os.path.join(_HERE, '..', 'academy.html'))
+_CANONICAL_TASKS_PATH = os.path.normpath(os.path.join(_HERE, '..', 'data', 'content', 'tasks.json'))
 
 BASE_REMNOTE = _REL_REMNOTE if os.path.isdir(_REL_REMNOTE) else os.path.join(_CLOUD_ROOT, 'knowledge_base')
 IDE_HTML_PATH = _REL_IDE_HTML if os.path.isfile(_REL_IDE_HTML) else (
@@ -12,9 +13,14 @@ IDE_HTML_PATH = _REL_IDE_HTML if os.path.isfile(_REL_IDE_HTML) else (
     if os.path.isfile(os.path.join(_CLOUD_ROOT, 'practice_ide.html'))
     else r'C:\Users\fury6\Downloads\Практика кода — тренажёр с IDE.html'
 )
-TASKS_SOURCE_PATH = IDE_HTML_PATH if os.path.isfile(IDE_HTML_PATH) else _REL_ACADEMY_HTML
+TASKS_SOURCE_PATH = (
+    _CANONICAL_TASKS_PATH if os.path.isfile(_CANONICAL_TASKS_PATH)
+    else IDE_HTML_PATH if os.path.isfile(IDE_HTML_PATH)
+    else _REL_ACADEMY_HTML
+)
+_TASKS_FROM_CANONICAL = TASKS_SOURCE_PATH == _CANONICAL_TASKS_PATH
 
-# 1. Load and enrich all 401 tasks from Практика кода — тренажёр с IDE.html
+# 1. Load and enrich tasks from canonical JSON, with legacy HTML fallback
 TIER_MAP = {
     1: '🥚 Уровень 1',
     2: '🐣 Уровень 2',
@@ -669,21 +675,25 @@ _TASK_OVERRIDES = {
 
 }
 
-with open(TASKS_SOURCE_PATH, encoding='utf-8') as f:
-    ide_content = f.read()
-tasks_match = re.search(r'const TASKS = (\[[\s\S]*?\]);\n', ide_content)
-if tasks_match:
-    TASKS_381 = json.loads(tasks_match.group(1))
+if _TASKS_FROM_CANONICAL:
+    with open(TASKS_SOURCE_PATH, encoding='utf-8') as f:
+        TASKS_381 = json.load(f)
 else:
-    embedded_tasks_match = re.search(
-        r'const IDE_TASKS = ([\s\S]*?);\s*const IDE_TASKS_BY_ID\s*=',
-        ide_content,
-    )
-    if embedded_tasks_match:
-        TASKS_381 = json.loads(embedded_tasks_match.group(1))
+    with open(TASKS_SOURCE_PATH, encoding='utf-8') as f:
+        ide_content = f.read()
+    tasks_match = re.search(r'const TASKS = (\[[\s\S]*?\]);\n', ide_content)
+    if tasks_match:
+        TASKS_381 = json.loads(tasks_match.group(1))
     else:
-        ide_lines = ide_content.split('\n')
-        TASKS_381 = json.loads(ide_lines[317].strip()[len('const TASKS = '):-1])
+        embedded_tasks_match = re.search(
+            r'const IDE_TASKS = ([\s\S]*?);\s*const IDE_TASKS_BY_ID\s*=',
+            ide_content,
+        )
+        if embedded_tasks_match:
+            TASKS_381 = json.loads(embedded_tasks_match.group(1))
+        else:
+            ide_lines = ide_content.split('\n')
+            TASKS_381 = json.loads(ide_lines[317].strip()[len('const TASKS = '):-1])
 _TIER1_ENRICH_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'content', 'tier1_enrichment.json')
 _TIER1_ENRICH = {}
 if os.path.isfile(_TIER1_ENRICH_PATH):
@@ -695,32 +705,35 @@ if os.path.isfile(_TIER1_ENRICH_PATH):
 
 for _t in TASKS_381:
     _lvl = _t.get('level', 1)
-    _t['tier'] = TIER_MAP.get(_lvl, f'🥚 Уровень {_lvl}')
-    _t['topic'] = '🐍 Python Core' if 240 <= _t['id'] <= 381 else '🌐 Backend & SQL'
-    if _t['id'] in _TASK_OVERRIDES:
+    if not _TASKS_FROM_CANONICAL:
+        _t['tier'] = TIER_MAP.get(_lvl, f'🥚 Уровень {_lvl}')
+        _t['topic'] = '🐍 Python Core' if 240 <= _t['id'] <= 381 else '🌐 Backend & SQL'
+    if not _TASKS_FROM_CANONICAL and _t['id'] in _TASK_OVERRIDES:
         _ov = _TASK_OVERRIDES[_t['id']]
         if 'title' in _ov: _t['title'] = _ov['title']
         if 'solution' in _ov: _t['code'] = _ov['solution']
-    _code = clean_ref_code(_t['id'], _t.get('code', ''))
+    _code = clean_ref_code(_t['id'], _t.get('code', _t.get('solution', '')))
     _t['code'] = _code
-    _t['solution'] = _code
-    _t['initialCode'] = build_starter_for_task(_t)
+    if not _TASKS_FROM_CANONICAL:
+        _t['solution'] = _code
+        _t['initialCode'] = build_starter_for_task(_t)
     _stripped_code = _code.strip()
     _doc_m = None
     if _stripped_code.startswith('"""') or _stripped_code.startswith("'''"):
         _doc_m = re.match(r'^(?:"""|\'\'\')(.*?)(?:"""|\'\'\')', _stripped_code, re.S)
-    if _t['id'] in _TASK_OVERRIDES and 'desc' in _TASK_OVERRIDES[_t['id']]:
+    if not _TASKS_FROM_CANONICAL and _t['id'] in _TASK_OVERRIDES and 'desc' in _TASK_OVERRIDES[_t['id']]:
         _t['desc'] = _TASK_OVERRIDES[_t['id']]['desc']
-    else:
+    elif not _TASKS_FROM_CANONICAL:
         _t['desc'] = f"<p><strong>Задание:</strong> {html.escape(_t['title'])}.</p>" + (
             f"<p class='meta'>{html.escape(_doc_m.group(1).strip())}</p>" if _doc_m else ""
         )
-    _t['hint'] = _TASK_OVERRIDES[_t['id']]['hint'] if (_t['id'] in _TASK_OVERRIDES and 'hint' in _TASK_OVERRIDES[_t['id']]) else generate_pedagogical_hint(_t)
+    if not _TASKS_FROM_CANONICAL:
+        _t['hint'] = _TASK_OVERRIDES[_t['id']]['hint'] if (_t['id'] in _TASK_OVERRIDES and 'hint' in _TASK_OVERRIDES[_t['id']]) else generate_pedagogical_hint(_t)
     _t_str_id = str(_t['id'])
     if _t_str_id in _TIER1_ENRICH or _t['id'] in _TIER1_ENRICH:
         _enr = _TIER1_ENRICH.get(_t_str_id) or _TIER1_ENRICH.get(_t['id'])
         if _enr:
-            if not (_t['id'] in _TASK_OVERRIDES and 'hint' in _TASK_OVERRIDES[_t['id']]):
+            if _TASKS_FROM_CANONICAL or not (_t['id'] in _TASK_OVERRIDES and 'hint' in _TASK_OVERRIDES[_t['id']]):
                 _t['hint'] = _enr.get('hint', _t['hint'])
             _io_in = _enr.get('io_in', '')
             _io_out = _enr.get('io_out', '')
@@ -737,8 +750,9 @@ for _t in TASKS_381:
                 )
                 if 'io-flow-block' not in _t['desc']:
                     _t['desc'] = _t['desc'] + _io_html
-    _t['tests'] = _TASK_OVERRIDES[_t['id']]['tests'] if (_t['id'] in _TASK_OVERRIDES and 'tests' in _TASK_OVERRIDES[_t['id']]) else build_test_for_task(_t)
-    if _t['id'] in _TASK_OVERRIDES and 'initialCode' in _TASK_OVERRIDES[_t['id']]:
+    if not _TASKS_FROM_CANONICAL:
+        _t['tests'] = _TASK_OVERRIDES[_t['id']]['tests'] if (_t['id'] in _TASK_OVERRIDES and 'tests' in _TASK_OVERRIDES[_t['id']]) else build_test_for_task(_t)
+    if not _TASKS_FROM_CANONICAL and _t['id'] in _TASK_OVERRIDES and 'initialCode' in _TASK_OVERRIDES[_t['id']]:
         _t['initialCode'] = _TASK_OVERRIDES[_t['id']]['initialCode']
 
 
