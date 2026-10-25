@@ -4,6 +4,7 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 _CLOUD_ROOT = r'C:\Users\fury6\OneDrive\Python_Backend_Academy'
 _REL_REMNOTE = os.path.normpath(os.path.join(_HERE, '..', 'knowledge_base'))
 _REL_IDE_HTML = os.path.normpath(os.path.join(_HERE, '..', 'practice_ide.html'))
+_REL_ACADEMY_HTML = os.path.normpath(os.path.join(_HERE, '..', 'academy.html'))
 
 BASE_REMNOTE = _REL_REMNOTE if os.path.isdir(_REL_REMNOTE) else os.path.join(_CLOUD_ROOT, 'knowledge_base')
 IDE_HTML_PATH = _REL_IDE_HTML if os.path.isfile(_REL_IDE_HTML) else (
@@ -11,6 +12,7 @@ IDE_HTML_PATH = _REL_IDE_HTML if os.path.isfile(_REL_IDE_HTML) else (
     if os.path.isfile(os.path.join(_CLOUD_ROOT, 'practice_ide.html'))
     else r'C:\Users\fury6\Downloads\Практика кода — тренажёр с IDE.html'
 )
+TASKS_SOURCE_PATH = IDE_HTML_PATH if os.path.isfile(IDE_HTML_PATH) else _REL_ACADEMY_HTML
 
 # 1. Load and enrich all 401 tasks from Практика кода — тренажёр с IDE.html
 TIER_MAP = {
@@ -667,14 +669,21 @@ _TASK_OVERRIDES = {
 
 }
 
-with open(IDE_HTML_PATH, encoding='utf-8') as f:
+with open(TASKS_SOURCE_PATH, encoding='utf-8') as f:
     ide_content = f.read()
 tasks_match = re.search(r'const TASKS = (\[[\s\S]*?\]);\n', ide_content)
 if tasks_match:
     TASKS_381 = json.loads(tasks_match.group(1))
 else:
-    ide_lines = ide_content.split('\n')
-    TASKS_381 = json.loads(ide_lines[317].strip()[len('const TASKS = '):-1])
+    embedded_tasks_match = re.search(
+        r'const IDE_TASKS = ([\s\S]*?);\s*const IDE_TASKS_BY_ID\s*=',
+        ide_content,
+    )
+    if embedded_tasks_match:
+        TASKS_381 = json.loads(embedded_tasks_match.group(1))
+    else:
+        ide_lines = ide_content.split('\n')
+        TASKS_381 = json.loads(ide_lines[317].strip()[len('const TASKS = '):-1])
 _TIER1_ENRICH_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'content', 'tier1_enrichment.json')
 _TIER1_ENRICH = {}
 if os.path.isfile(_TIER1_ENRICH_PATH):
