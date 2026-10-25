@@ -806,7 +806,7 @@ else:
     border: 1px solid rgba(16, 185, 129, 0.4) !important;
     border-radius: 22px !important;
     padding: 26px 24px !important;
-    min-height: 220px !important;
+    min-height: clamp(165px, 22vh, 225px) !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), 0 0 20px rgba(16, 185, 129, 0.08) !important;
     transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease !important;
   }
@@ -2205,7 +2205,7 @@ else:
     border:1.5px solid var(--line);
     border-radius:22px;
     padding:26px 24px;
-    min-height:220px;
+    min-height:clamp(165px, 22vh, 225px);
     display:flex;
     flex-direction:column;
     justify-content:space-between;
@@ -2608,7 +2608,7 @@ else:
     .cards-hub-controls #cards-deck-select{font-size:.82rem !important;padding:7px 10px !important;}
     .fc-stage{margin:6px 0 !important;}
     .microstep-bar{padding:6px 10px !important;font-size:.82rem !important;margin-bottom:6px !important;}
-    .fc-card{min-height:220px !important;padding:16px 18px !important;}
+    .fc-card{min-height:clamp(165px, 24vh, 220px) !important;padding:16px 18px !important;}
     .fc-rate-row{margin-top:8px !important;gap:6px !important;}
     .fc-rate-row .btn{padding:8px 6px !important;font-size:.78rem !important;}
   }
@@ -2902,7 +2902,7 @@ else:
     .cards-hub-controls #cards-deck-select{font-size:.82rem !important;padding:7px 10px !important;}
     .fc-stage{margin:6px 0 !important;}
     .microstep-bar{padding:6px 10px !important;font-size:.82rem !important;margin-bottom:6px !important;}
-    .fc-card{min-height:220px !important;padding:16px 18px !important;}
+    .fc-card{min-height:clamp(165px, 24vh, 220px) !important;padding:16px 18px !important;}
     .fc-rate-row{margin-top:8px !important;gap:6px !important;}
     .fc-rate-row .btn{padding:8px 6px !important;font-size:.78rem !important;}
   }
@@ -8076,7 +8076,18 @@ function formatRichInlineText(rawStr){
     const highlighted = (typeof highlightPythonTokens === 'function') ? highlightPythonTokens(escapeHtmlStr(codeInner.trim())) : escapeHtmlStr(codeInner.trim());
     return `<pre class="quiz-question-code fc-code-block" style="margin:10px 0;text-align:left;"><code>${highlighted}</code></pre>`;
   });
-  s = s.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+  s = s.replace(/`([^`\n]+)`/g, function(_, codeInner){
+    const clean = String(codeInner || '')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#x27;/g, "'")
+      .replace(/&#39;/g, "'");
+    const reescaped = escapeHtmlStr(clean);
+    const highlighted = (typeof highlightPythonTokens === 'function') ? highlightPythonTokens(reescaped) : reescaped;
+    return `<code>${highlighted}</code>`;
+  });
   // Format Big-O notation and mathematical styling
   s = s.replace(/\$([^\$\n]+)\$/g, '<span class="math-formula">$1</span>');
   s = s.replace(/\bO\((?:n\^2|n²)\)/g, '<span class="math-formula">O(n²)</span>');
