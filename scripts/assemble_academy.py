@@ -15395,11 +15395,17 @@ setTimeout(runProgressSync, 1200);
 '''
     html_out = html_out.replace(sync_init_marker, sync_init_marker + '\n' + sync_client_js, 1)
 
-# Canonical SSOT Invariant: preserve validated upgrades from standards/standards.html
+# Canonical SSOT Invariant: preserve validated upgrades from standards/standards.html while injecting fresh canonical IDE_TASKS
 if os.path.isfile(CANONICAL_STANDARDS_PATH):
     with open(CANONICAL_STANDARDS_PATH, 'r', encoding='utf-8') as f_canonical:
         canonical_disk_html = f_canonical.read()
     if 'dot-jewel' in canonical_disk_html and 'toggleDashAccordion' in canonical_disk_html:
+        canonical_disk_html = re.sub(
+            r'const IDE_TASKS\s*=\s*\[[\s\S]*?\];\s*(const IDE_TASKS_BY_ID)',
+            lambda m: f'const IDE_TASKS = {ide_tasks_json};\n{m.group(1)}',
+            canonical_disk_html,
+            count=1
+        )
         html_out = canonical_disk_html
 
 with open(OUT_HTML_PATH, 'w', encoding='utf-8', newline='\n') as f:
