@@ -44,8 +44,8 @@
         "a": "Генераторные выражения (generator expressions)"
       },
       {
-        "q": "Почему list comprehension <code>[f(x) for x in seq]</code> в CPython работает быстрее обычного цикла <code>for</code> с <code>res.append(f(x))</code>?",
-        "a": "В обычном цикле на каждой итерации интерпретатор ищет атрибут <code>.append</code> у списка и выполняет полноценный вызов Python-метода. А в list comprehension компилятор использует специальную быструю инструкцию байткода <code>LIST_APPEND</code>, которая вставляет элемент напрямую в C-массив без поиска и вызова метода"
+        "q": "Почему list comprehension <code>[f(x) for x in seq]</code> в CPython быстрее цикла <code>for</code> с <code>res.append()</code>?",
+        "a": "В comprehension используется специализированная инструкция байткода <code>LIST_APPEND</code>, исключающая поиск атрибута и вызов метода на каждой итерации"
       },
       {
         "q": "Какова главная особенность результата set comprehension <code>{...}</code>?",
@@ -68,8 +68,8 @@
         "a": "При сложной логике с несколькими условиями или при вложенности глубже двух уровней — в таких случаях чище и понятнее написать обычный цикл <code>for</code>"
       },
       {
-        "q": "Как в list comprehension работает фильтрация элементов <code>[x for x in seq if условие]</code>, и почему там нельзя написать <code>else</code>?",
-        "a": "Фильтр с ключевым словом <code>if</code> ставится <strong>в самом конце</strong> (после <code>for</code>) и решает, включать ли элемент в итоговый список (да/нет). Ветка <code>else</code> после <code>for</code> вызовет <code>SyntaxError</code>, потому что у фильтра нет действия «иначе»; если нужно подставить другое значение вместо отсеивания, используйте тернарный <code>x if условие else y</code> <strong>перед</strong> <code>for</code>"
+        "q": "Как в list comprehension работает фильтрация элементов <code>[x for x in seq if cond]</code>, и почему там нельзя <code>else</code>?",
+        "a": "Фильтрующий <code>if</code> без <code>else</code> ставится после <code>for</code> и отсеивает элементы. Тернарный выбор с <code>else</code> (<code>x if cond else y</code>) ставится перед <code>for</code>"
       },
       {
         "q": "Что вернёт set comprehension <code>{len(word) for word in [&#x27;apple&#x27;, &#x27;pie&#x27;, &#x27;cat&#x27;]}</code>?",
@@ -1094,7 +1094,7 @@
         "a": "Каждый символ строки добавится как отдельный элемент; <code>a.extend(&#x27;abc&#x27;)</code> → <code>[&#x27;a&#x27;, &#x27;b&#x27;, &#x27;c&#x27;]</code>"
       },
       {
-        "q": "a = [1, 2, 3] a.extend([4, 5]) - Что произойдёт со списком <code>a</code> после выполнения метода <code>.extend()</code>: <code>a = [1, 2, 3]; a.extend([4, 5])</code>?",
+        "q": "Что произойдёт со списком <code>a</code> после выполнения метода <code>.extend()</code>: <code>a = [1, 2, 3]; a.extend([4, 5])</code>?",
         "a": "<code>[1, 2, 3, 4, 5]</code>"
       },
       {
@@ -1194,11 +1194,11 @@
     "title": "Моржовый оператор",
     "cards": [
       {
-        "q": "if (n := len(items)) &gt; 10: - Что будет содержать переменная <code>n</code> и будет ли она доступна после блока <code>if</code>: <code>items = [1, 2, 3, 4, 5]; if (n := len(items)) &gt; 3:; print(f&#x27;Items count: {n}&#x27;)</code>?",
+        "q": "Что будет содержать переменная <code>n</code> и доступна ли она после блока <code>if (n := len(items)) &gt; 3</code>?",
         "a": "Длину списка <code>items</code>; при этом <code>n</code> остаётся доступной и после блока <code>if</code>"
       },
       {
-        "q": "data = get_data() if data: process(data) - Как переписать следующий код с помощью моржового оператора <code>:=</code>, исключив дублирование вызова: <code>data = get_data(); if data:; process(data)</code>?",
+        "q": "Как переписать <code>data = get_data(); if data: process(data)</code> с помощью моржового оператора <code>:=</code>?",
         "a": "- if (data := get_data()): process(data)"
       },
       {
@@ -2282,8 +2282,8 @@
         "a": "Вызывает <code>greet</code> три раза подряд"
       },
       {
-        "q": "Как устроен декоратор для замера времени выполнения функции (<code>@timer</code>): <code>import time; from functools import wraps; def timer(func):; @wraps(func); def wrapper(*args, **kwargs):; start = time.perf_counter(); result = func(*args, **kwargs); elapsed = time.perf_counter() - start; print(f&#x27;{func.__name__} took {elapsed:.4f}s&#x27;); return result; return wrapper</code>?",
-        "a": "<code>start = time.time()</code> вызывается перед вызовом оригинальной функции"
+        "q": "Как устроен базовый шаблон декоратора для замера времени выполнения (<code>@timer</code>)?",
+        "a": "Сохранить <code>start = time.perf_counter()</code> перед вызовом <code>func()</code>, после вызова вычислить <code>elapsed</code> и вернуть результат &gt;&gt; <code>start = time.time()</code> вызывается перед вызовом оригинальной функции"
       },
       {
         "q": "Можно ли применять несколько декораторов к одной функции? Как они взаимодействуют?",
@@ -2438,8 +2438,8 @@
     "title": "Модуль functools",
     "cards": [
       {
-        "q": "Что выведет <code>square(5)</code> при использовании <code>functools.partial</code>: <code>from functools import partial; def power(base, exp):; return base ** exp; square = partial(power, exp=2); print(square(5))</code>?",
-        "a": "<code>25</code>"
+        "q": "Что выведет <code>square(5)</code> при <code>square = partial(power, exp=2)</code> для <code>power(base, exp): return base ** exp</code>?",
+        "a": "<code>25</code> (вызов <code>power(5, exp=2)</code>) &gt;&gt; <code>25</code>"
       },
       {
         "q": "В чём практическая разница между вызовами <code>square(5)</code> (через <code>partial(power, exp=2)</code>) и прямым <code>power(5, 2)</code>?",
@@ -2450,24 +2450,24 @@
         "a": "<code>before</code>, затем <code>Hello</code>"
       },
       {
-        "q": "Что выведет следующий код с <code>functools.partial</code>: <code>from functools import partial; def power(base, exp):; return base ** exp; cube = partial(power, exp=3); print(cube(3))</code>?",
-        "a": "<code>27</code>"
+        "q": "Что выведет <code>cube(3)</code> при <code>cube = partial(power, exp=3)</code> для <code>power(base, exp): return base ** exp</code>?",
+        "a": "<code>27</code> (вызов <code>power(3, exp=3)</code>) &gt;&gt; <code>27</code>"
       },
       {
-        "q": "Что вернут <code>greet.__name__</code> и <code>greet.__doc__</code>, если декоратор НЕ использует <code>@functools.wraps</code>: <code>def my_decorator(func):; def wrapper(*args, **kwargs):; &#x27;&#x27;&#x27;Wrapper doc&#x27;&#x27;&#x27;; return func(*args, **kwargs); return wrapper; @my_decorator; def greet():; &#x27;&#x27;&#x27;Greet doc&#x27;&#x27;&#x27;; pass</code>?",
-        "a": "<code>&#x27;wrapper&#x27;</code> и <code>None</code>"
+        "q": "Что произойдёт с <code>__name__</code> и <code>__doc__</code> декорируемой функции, если декоратор НЕ использует <code>@functools.wraps</code>?",
+        "a": "Они перезапишутся метаданными функции-обёртки: <code>&#x27;wrapper&#x27;</code> и docstring обёртки &gt;&gt; <code>&#x27;wrapper&#x27;</code> и <code>None</code>"
       },
       {
-        "q": "Что выведет <code>print(greet.__name__)</code>, если декоратор использует <code>@functools.wraps</code>: <code>from functools import wraps; def my_decorator(func):; @wraps(func); def wrapper(*args, **kwargs):; return func(*args, **kwargs); return wrapper; @my_decorator; def greet():; pass; print(greet.__name__)</code>?",
-        "a": "<code>&#x27;greet&#x27;</code>"
+        "q": "Что выведет <code>print(greet.__name__)</code>, если декоратор использует <code>@functools.wraps(func)</code>?",
+        "a": "Имя исходной функции <code>&#x27;greet&#x27;</code> (метаданные корректно сохранены) &gt;&gt; <code>&#x27;greet&#x27;</code>"
       },
       {
         "q": "Что обязательно должна возвращать функция <code>wrapper</code> внутри декоратора?",
         "a": "Результат вызова оригинальной функции <code>func(*args, **kwargs)</code>"
       },
       {
-        "q": "Что вернёт <code>greet.__doc__</code>, если декоратор использует <code>@functools.wraps</code>: <code>from functools import wraps; def my_decorator(func):; @wraps(func); def wrapper(*args, **kwargs):; return func(*args, **kwargs); return wrapper; @my_decorator; def greet():; &#x27;&#x27;&#x27;Greets the user&#x27;&#x27;&#x27;; pass; print(greet.__doc__)</code>?",
-        "a": "<code>&#x27;Greets the user&#x27;</code>"
+        "q": "Что вернёт <code>greet.__doc__</code>, если декоратор использует <code>@functools.wraps(func)</code>?",
+        "a": "Докстринг исходной функции <code>&#x27;Greets the user&#x27;</code> &gt;&gt; <code>&#x27;Greets the user&#x27;</code>"
       },
       {
         "q": "Что такое <code>partial</code>?",
@@ -2672,8 +2672,8 @@
         "a": "Один раз при определении функции; не при каждом вызове"
       },
       {
-        "q": "Что произойдёт при многократных вызовах функции с изменяемым дефолтным аргументом <code>add_item(1)</code>: <code>def add_item(val, lst=[]):; lst.append(val); return lst</code>?",
-        "a": "Список накапливает элементы: <code>add_item(1)</code> → <code>[1]</code>, <code>add_item(2)</code> → <code>[1, 2]</code>"
+        "q": "Что произойдёт при повторных вызовах <code>add_item(1)</code> для <code>def add_item(val, lst=[]): lst.append(val); return lst</code>?",
+        "a": "Дефолтный список создаётся один раз при компиляции функции: результаты будут <code>[1]</code>, затем <code>[1, 1]</code>, <code>[1, 1, 1]</code> &gt;&gt; Список накапливает элементы: <code>add_item(1)</code> → <code>[1]</code>, <code>add_item(2)</code> → <code>[1, 2]</code>"
       },
       {
         "q": "Распространяется ли ловушка изменяемых аргументов по умолчанию на словари (<code>d={}</code>)? Как её избежать?",
@@ -2936,8 +2936,8 @@
         "a": "Выбрасывается <code>StopIteration</code>"
       },
       {
-        "q": "Что вернёт 4-й вызов <code>next(gen)</code> для генератора чисел Фибоначчи: <code>def fibonacci():; a, b = 0, 1; while True:; yield a; a, b = b, a + b; gen = fibonacci()</code>?",
-        "a": "<code>2</code>"
+        "q": "Что вернёт 4-й вызов <code>next(gen)</code> для генератора Фибоначчи с <code>yield a</code> (<code>0, 1, 1, 2, 3...</code>)?",
+        "a": "<code>2</code> &gt;&gt; <code>2</code>"
       },
       {
         "q": "До какого момента выполняется код генератора при вызове <code>next(gen)</code>?",
@@ -2948,8 +2948,8 @@
         "a": "Возвращает значение вызывающему коду и приостанавливает выполнение"
       },
       {
-        "q": "Что вернёт второй вызов <code>next(gen)</code> для генератора Фибоначчи: <code>def fibonacci():; a, b = 0, 1; while True:; yield a; a, b = b, a + b; gen = fibonacci()</code>?",
-        "a": "<code>1</code>"
+        "q": "Что вернёт 2-й вызов <code>next(gen)</code> для генератора Фибоначчи с <code>yield a</code> (<code>0, 1, 1, 2...</code>)?",
+        "a": "<code>1</code> &gt;&gt; <code>1</code>"
       },
       {
         "q": "Что делает функция-генератор при достижении инструкции yield?",
@@ -2980,8 +2980,8 @@
         "a": "Да; <code>yield from iterable</code> лаконично заменяет <code>for x in iterable: yield x</code>"
       },
       {
-        "q": "В какой момент выполняется строка <code>a, b = b, a + b</code> в генераторе Фибоначчи: <code>def fibonacci():; a, b = 0, 1; while True:; yield a; a, b = b, a + b</code>?",
-        "a": "После возобновления при следующем <code>next()</code>"
+        "q": "В какой момент выполняется код после <code>yield a</code> внутри генератора?",
+        "a": "Только при следующем возобновлении генератора вызовом <code>next()</code> или на следующем шаге цикла &gt;&gt; После возобновления при следующем <code>next()</code>"
       },
       {
         "q": "Что означает <code>*iterables</code> в <code>def chain(*iterables)</code>?",
@@ -6252,8 +6252,8 @@
         "a": "<code>re.match()</code>"
       },
       {
-        "q": "Какая функция модуля <code>re</code> используется для замены подстрок по регулярному выражению? - <code>re.sub()</code>; пример: - import re text = &#x27;Цена: 123 руб.&#x27; result = re.sub(r&#x27;\\d+&#x27;, &#x27;XXX&#x27;, text) print(result)",
-        "a": "&gt; Цена: XXX руб."
+        "q": "Какая функция модуля <code>re</code> используется для замены подстрок по шаблону?",
+        "a": "<code>re.sub(pattern, repl, string)</code> &gt;&gt; &gt; Цена: XXX руб."
       },
       {
         "q": "Какая функция <code>re</code> выполняет поиск совпадения по всей строке?",
