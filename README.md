@@ -1,7 +1,10 @@
 # Python Backend Academy
 
+[![CI](https://github.com/kseniadmay/python-backend-academy/actions/workflows/ci.yml/badge.svg)](https://github.com/kseniadmay/python-backend-academy/actions/workflows/ci.yml)
+[![Tests: 100% Pass](https://img.shields.io/badge/tests-100%25%20passed-brightgreen.svg?style=flat-square)](#тестирование)
 [![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB.svg?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![PWA: Offline Ready](https://img.shields.io/badge/PWA-offline--ready-blue.svg?style=flat-square)](#возможности)
 [![Demo](https://img.shields.io/badge/Demo-Online-4F46E5.svg?style=flat-square&logo=render&logoColor=white)](https://python-backend-academy.onrender.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
