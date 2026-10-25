@@ -109,18 +109,17 @@ def step_bundle_css() -> bool:
 
 
 def step_sync_etalons() -> bool:
-    """[3/4] Синхронизация канонических эталонов SPA"""
-    logger.info('[3/4] Проверка и синхронизация эталонов...')
+    """[3/4] Синхронизация рабочего SPA из канонического эталона"""
     academy_html = _ROOT / 'academy.html'
     standards_html = _ROOT / 'standards' / 'standards.html'
 
-    if not academy_html.is_file():
-        logger.error('  ❌ Файл academy.html не найден')
+    logger.info('[3/4] Синхронизация рабочего SPA из канонического эталона...')
+    if not standards_html.is_file():
+        logger.error('  ❌ Канонический эталон standards/standards.html не найден')
         return False
 
-    # Синхронизация 1:1 с каноническим эталоном
-    standards_html.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(academy_html, standards_html)
+    # standards/standards.html — источник истины; academy.html является рабочей копией.
+    shutil.copy2(standards_html, academy_html)
 
     hash_main = get_file_hash(academy_html)
     hash_standards = get_file_hash(standards_html)

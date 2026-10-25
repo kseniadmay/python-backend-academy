@@ -6,7 +6,9 @@ root = os.path.dirname(here)
 academy_html = os.path.join(root, 'academy.html')
 standards_path = os.path.join(root, 'standards', 'standards.html')
 
-os.makedirs(os.path.dirname(standards_path), exist_ok=True)
-shutil.copy2(academy_html, standards_path)
-print(f"Copied {academy_html} -> {standards_path} ({os.path.getsize(standards_path)} bytes)")
+if not os.path.isfile(standards_path):
+    raise FileNotFoundError(f'Canonical standard not found: {standards_path}')
+
+shutil.copy2(standards_path, academy_html)
+print(f"Copied {standards_path} -> {academy_html} ({os.path.getsize(academy_html)} bytes)")
 

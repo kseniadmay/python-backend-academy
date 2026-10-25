@@ -14,11 +14,12 @@ from generate_new_lessons import NEW_LESSONS
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _CLOUD_DIR = r'C:\Users\fury6\OneDrive\Python_Backend_Academy'
 _UNPACKED_ROOT = os.path.normpath(os.path.join(_HERE, '..'))
+CANONICAL_STANDARDS_PATH = os.path.join(_UNPACKED_ROOT, 'standards', 'standards.html')
 _IS_UNPACKED_ARCHIVE = os.path.isdir(os.path.join(_UNPACKED_ROOT, 'knowledge_base'))
 if os.path.isfile(IDE_HTML_PATH):
     from test_all_401_tasks import full_env_code
 else:
-    with open(os.path.join(_UNPACKED_ROOT, 'academy.html'), encoding='utf-8') as f:
+    with open(CANONICAL_STANDARDS_PATH, encoding='utf-8') as f:
         _existing_academy_html = f.read()
     _prelude_match = re.search(
         r'const BRYTHON_PRELUDE = ("(?:\\.|[^"\\])*");',
@@ -3772,7 +3773,7 @@ else:
   /* ================= 3D SERPENTINE S-CURVE TRAIL (#/path) ================= */
   .path-serpentine-wrap {
     position: relative;
-    max-width: 520px;
+    max-width: 620px;
     margin: 0 auto;
     padding: 16px 12px 140px;
     user-select: none;
@@ -3782,6 +3783,10 @@ else:
     width: 100%;
     height: auto;
     overflow: visible;
+  }
+  @media (min-width: 641px) {
+    .path-serpentine-wrap { max-width: 620px; }
+    .path-serpentine { max-width: 560px; }
   }
   .hex-3d-node {
     cursor: pointer;
@@ -15390,10 +15395,10 @@ setTimeout(runProgressSync, 1200);
 '''
     html_out = html_out.replace(sync_init_marker, sync_init_marker + '\n' + sync_client_js, 1)
 
-# Canonical SSOT Invariant: if academy.html exists on disk with validated upgrades, preserve it
-if os.path.isfile(CLOUD_HTML_PATH):
-    with open(CLOUD_HTML_PATH, 'r', encoding='utf-8') as f_cloud:
-        canonical_disk_html = f_cloud.read()
+# Canonical SSOT Invariant: preserve validated upgrades from standards/standards.html
+if os.path.isfile(CANONICAL_STANDARDS_PATH):
+    with open(CANONICAL_STANDARDS_PATH, 'r', encoding='utf-8') as f_canonical:
+        canonical_disk_html = f_canonical.read()
     if 'dot-jewel' in canonical_disk_html and 'toggleDashAccordion' in canonical_disk_html:
         html_out = canonical_disk_html
 
