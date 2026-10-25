@@ -5,8 +5,8 @@ import hashlib
 
 def run_platinum_audit():
     _here = os.path.dirname(os.path.abspath(__file__))
-    project_dir = os.path.normpath(os.path.join(_here, '..', 'RemNote_Python_Mastery_FIXED'))
-    project_zip = os.path.normpath(os.path.join(_here, '..', 'RemNote_Python_Mastery_FIXED.zip'))
+    project_dir = os.path.normpath(os.path.join(_here, '..', 'knowledge_base'))
+    project_zip = os.path.normpath(os.path.join(_here, '..', 'knowledge_base.zip'))
     
     if os.path.isdir(project_dir):
         names = []

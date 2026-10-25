@@ -2,10 +2,10 @@ import os, re, glob, json, html, ast, copy, textwrap
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _CLOUD_ROOT = r'C:\Users\fury6\OneDrive\Python_Backend_Academy'
-_REL_REMNOTE = os.path.normpath(os.path.join(_HERE, '..', 'RemNote_Python_Mastery_FIXED'))
+_REL_REMNOTE = os.path.normpath(os.path.join(_HERE, '..', 'knowledge_base'))
 _REL_IDE_HTML = os.path.normpath(os.path.join(_HERE, '..', 'practice_ide.html'))
 
-BASE_REMNOTE = _REL_REMNOTE if os.path.isdir(_REL_REMNOTE) else os.path.join(_CLOUD_ROOT, 'RemNote_Python_Mastery_FIXED')
+BASE_REMNOTE = _REL_REMNOTE if os.path.isdir(_REL_REMNOTE) else os.path.join(_CLOUD_ROOT, 'knowledge_base')
 IDE_HTML_PATH = _REL_IDE_HTML if os.path.isfile(_REL_IDE_HTML) else (
     os.path.join(_CLOUD_ROOT, 'practice_ide.html')
     if os.path.isfile(os.path.join(_CLOUD_ROOT, 'practice_ide.html'))
@@ -464,7 +464,7 @@ def _clean_display_title(s: str) -> str:
     s = re.sub(r'(?<!_)_(?=\s|$)', ':', s)
     return s.strip()
 
-# 2. Index all K-xxx and Ф-xxx files across RemNote_Python_Mastery_FIXED
+# 2. Index all K-xxx and Ф-xxx files across knowledge_base
 k_files_map = {}
 f_files_map = {}
 f_files_by_relpath = {}

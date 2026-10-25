@@ -9,7 +9,7 @@ const path = require('path');
 const assert = require('assert');
 
 const rootDir = path.resolve(__dirname, '..');
-const remnoteDir = path.join(rootDir, 'RemNote_Python_Mastery_FIXED');
+const remnoteDir = path.join(rootDir, 'knowledge_base');
 const academyPath = path.join(rootDir, 'academy.html');
 const etalonyPath = path.join(rootDir, 'standards', 'standards.html');
 

@@ -15,7 +15,7 @@ from test_all_401_tasks import full_env_code
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _CLOUD_DIR = r'C:\Users\fury6\OneDrive\Python_Backend_Academy'
 _UNPACKED_ROOT = os.path.normpath(os.path.join(_HERE, '..'))
-_IS_UNPACKED_ARCHIVE = os.path.isdir(os.path.join(_UNPACKED_ROOT, 'RemNote_Python_Mastery_FIXED'))
+_IS_UNPACKED_ARCHIVE = os.path.isdir(os.path.join(_UNPACKED_ROOT, 'knowledge_base'))
 
 ORIG_HTML_PATH = os.path.join(_HERE, 'academy.orig.html')
 _TG_DIR = r'C:\Users\fury6\Downloads\Telegram Desktop'
@@ -12805,11 +12805,11 @@ function buildHandoverMarkdown(){
 
 ## 1. Ключевые файлы и единая облачная папка проекта
 - **Единая облачная папка проекта (OneDrive)**: \`C:\\Users\\fury6\\OneDrive\\Python_Backend_Academy\` (ярлык на Рабочем столе: \`Python Backend Academy (Cloud).lnk\`)
-- **Единый архив проекта**: \`C:\\Users\\fury6\\OneDrive\\Python_Backend_Academy\\Python_Backend_Academy_Project.zip\`
+- **Единый архив проекта**: \`C:\\Users\\fury6\\OneDrive\\Python_Backend_Academy\\academy_backup.zip\`
 - **Подробный файл хэндовера**: \`C:\\Users\\fury6\\OneDrive\\Python_Backend_Academy\\HANDOVER_CONTEXT.md\` (и \`PROJECT_CONTEXT.md\`)
 - **Главный интерактивный курс (Single-File SPA)**: \`C:\\Users\\fury6\\OneDrive\\Python_Backend_Academy\\academy.html\` и \`C:\\Users\\fury6\\Downloads\\Telegram Desktop\\academy.html\` (собирается через \`C:\\Users\\fury6\\.gemini\\antigravity\\scratch\\assemble_academy.py\`)
 - **Автономный тренажёр кода с IDE (401 задача)**: \`C:\\Users\\fury6\\OneDrive\\Python_Backend_Academy\\practice_ide.html\`
-- **Каноническая база конспектов и карточек RemNote**: \`C:\\Users\\fury6\\OneDrive\\Python_Backend_Academy\\RemNote_Python_Mastery_FIXED\` (\`00 · 🗺️ Карта Мастерства.md\`: 7 модулей \`01 · 🐍 Python\`, \`02 · 🌐 Web\`, \`03 · ⚙️ Backend\`, \`04 · ⚡ Алгоритмы\`, \`05 · 🗄️ Базы данных\`, \`06 · 🏛️ Архитектура\`, \`07 · 🚀 Инфраструктура\`; всего 238 \`К-*\`, 286 \`Ф-*\` / 6 051 карточка)
+- **Каноническая база конспектов и карточек RemNote**: \`C:\\Users\\fury6\\OneDrive\\Python_Backend_Academy\\knowledge_base\` (\`00 · 🗺️ Карта Мастерства.md\`: 7 модулей \`01 · 🐍 Python\`, \`02 · 🌐 Web\`, \`03 · ⚙️ Backend\`, \`04 · ⚡ Алгоритмы\`, \`05 · 🗄️ Базы данных\`, \`06 · 🏛️ Архитектура\`, \`07 · 🚀 Инфраструктура\`; всего 238 \`К-*\`, 286 \`Ф-*\` / 6 051 карточка)
 
 ## 2. Что уже реализовано и верифицировано на 100% (Все 7 модулей 01–07 + Боссы + Mock Interview + 4 Эшелона Приоритетов!)
 1. **Модуль 01 (\`01 · 🐍 Python\`) — Вычитан на диске и вшит в \`#/python\`**:
@@ -15441,8 +15441,8 @@ if os.path.exists(SCRATCH_CONTEXT_PATH):
             f.write(context_doc)
     print("Successfully synced PROJECT_CONTEXT.md and HANDOVER_CONTEXT.md across scratch, Telegram Desktop, and OneDrive Cloud folder")
 
-# Automatically rebuild Python_Backend_Academy_Project.zip and sync scripts/mockups into OneDrive Cloud folder
-ARCHIVE_ZIP_PATH = os.path.join(_CLOUD_DIR, 'Python_Backend_Academy_Project.zip')
+# Automatically rebuild academy_backup.zip and sync scripts/mockups into OneDrive Cloud folder
+ARCHIVE_ZIP_PATH = os.path.join(_CLOUD_DIR, 'academy_backup.zip')
 PIPELINE_FILES = [
     'canonical_unit_tests.json',
     'canonical_extra_css.css',
@@ -15525,13 +15525,13 @@ if os.path.isdir(_CLOUD_DIR) and os.path.isdir(BASE_REMNOTE) and os.path.isfile(
                         full_p = os.path.join(root, fn)
                         rel_p = os.path.relpath(full_p, BASE_REMNOTE).replace(os.sep, '/')
                         rzf.write(full_p, rel_p)
-        zf.writestr('RemNote_Python_Mastery_FIXED.zip', rem_buf.getvalue())
+        zf.writestr('knowledge_base.zip', rem_buf.getvalue())
         for root, dirs, files in os.walk(BASE_REMNOTE):
             dirs.sort()
             for fn in sorted(files):
                 if fn.endswith('.md'):
                     full_p = os.path.join(root, fn)
-                    rel_p = 'RemNote_Python_Mastery_FIXED/' + os.path.relpath(full_p, BASE_REMNOTE).replace(os.sep, '/')
+                    rel_p = 'knowledge_base/' + os.path.relpath(full_p, BASE_REMNOTE).replace(os.sep, '/')
                     zf.write(full_p, rel_p)
         for pf in PIPELINE_FILES:
             pf_full = os.path.join(_HERE, pf)

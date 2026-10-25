@@ -153,9 +153,9 @@ if os.path.isfile(IDE_PATH) and chrome_exe:
         assert 'editorHost' in ide_out or 'CodeMirror' in ide_out, "Missing editor container in IDE HTML render"
         print(f"3. [PASS] Real Headless Chrome rendered standalone IDE trainer (0 console errors, {len(ide_out)} chars)")
 
-# 4. Verify Python_Backend_Academy_Project.zip structure and integrity
+# 4. Verify academy_backup.zip structure and integrity
 import zipfile
-zip_path = os.path.normpath(os.path.join(_HERE, '..', 'Python_Backend_Academy_Project.zip'))
+zip_path = os.path.normpath(os.path.join(_HERE, '..', 'academy_backup.zip'))
 if os.path.isfile(zip_path):
     with zipfile.ZipFile(zip_path, 'r') as zf:
         namelist = zf.namelist()
@@ -167,19 +167,19 @@ if os.path.isfile(zip_path):
             'manifest.json',
             'icon.svg',
             'sw.js',
-            'RemNote_Python_Mastery_FIXED.zip',
+            'knowledge_base.zip',
             'README.md',
             'scripts/assemble_academy.py',
             'scripts/test_all_401_tasks.py'
         ]
         for req in required_in_zip:
-            assert req in namelist, f"Missing required file '{req}' inside Python_Backend_Academy_Project.zip"
+            assert req in namelist, f"Missing required file '{req}' inside academy_backup.zip"
         # Validate nested RemNote zip integrity
-        rem_bytes = zf.read('RemNote_Python_Mastery_FIXED.zip')
+        rem_bytes = zf.read('knowledge_base.zip')
         import io
         with zipfile.ZipFile(io.BytesIO(rem_bytes)) as rzf:
             r_names = rzf.namelist()
             assert len(r_names) in (525, 526), f"Expected 525 or 526 files inside nested RemNote zip, got {len(r_names)}"
-    print(f"4. [PASS] Project archive Python_Backend_Academy_Project.zip verified ({len(namelist)} items, nested RemNote 525 items)!")
+    print(f"4. [PASS] Project archive academy_backup.zip verified ({len(namelist)} items, nested RemNote 525 items)!")
 
 
