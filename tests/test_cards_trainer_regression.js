@@ -198,6 +198,41 @@ function testAnswerFaceButtonLabel(){
   );
 }
 
+// Тест-кейс 14: Защита от блокировки кнопки «← К вопросу» на первой карточке в каталоге и уроке
+function testZeroTrapNavigationAnswerFaceCatalogAndLesson(){
+  // Каталог колод: сторона ответа
+  const catalogAnswerMatch = academyHtml.slice(
+    academyHtml.indexOf('cardsHubState.flipped ? (() => {', academyHtml.indexOf('function viewCardsHub')),
+    academyHtml.indexOf('})() : `\n          <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">', academyHtml.indexOf('function viewCardsHub'))
+  );
+  assert(
+    !catalogAnswerMatch.includes('data-hub-prev ${cIdx===0?\'disabled\':\'\'}'),
+    'Defect 14: data-hub-prev on answer face in catalog must not be disabled on cIdx === 0'
+  );
+
+  // Урок: сторона ответа
+  const lessonAnswerMatch = academyHtml.slice(
+    academyHtml.indexOf('pySkillViewState.cardFlipped ? `\n            <div class="fc-rate-row"'),
+    academyHtml.indexOf('` : `\n            <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">')
+  );
+  assert(
+    !lessonAnswerMatch.includes('data-py-prev-card ${qPos === 0 ? \'disabled\' : \'\'}'),
+    'Defect 14: data-py-prev-card on answer face in lesson must not be disabled on qPos === 0'
+  );
+}
+
+// Тест-кейс 15: Лаконичные заголовки эшелонов для предотвращения обрезки селектора на мобильных
+function testConciseEchelonLabels(){
+  assert(
+    academyHtml.includes('>🎯 Все 4 эшелона</option>'),
+    'Defect 15: echelonOpts must render concise label "🎯 Все 4 эшелона" without bloated suffixes'
+  );
+  assert(
+    academyHtml.includes('>🚨 Эшелон 1 · Скрининг и база</option>'),
+    'Defect 15: echelonOpts must render concise label for Echelon 1'
+  );
+}
+
 // Экспорт или прямой прогон
 module.exports = {
   testCleanHumanUiDueMode,
@@ -212,7 +247,9 @@ module.exports = {
   testMobileSelectEllipsisNoOverflow,
   testHardRatingIntervalProgression,
   testInteractiveStoriesBarInHubAndDue,
-  testAnswerFaceButtonLabel
+  testAnswerFaceButtonLabel,
+  testZeroTrapNavigationAnswerFaceCatalogAndLesson,
+  testConciseEchelonLabels
 };
 
 if(require.main === module){
@@ -230,7 +267,9 @@ if(require.main === module){
     ['10. Мобильная эргономика селекторов колод', testMobileSelectEllipsisNoOverflow],
     ['11. Прогрессия интервалов SM-2 на «Трудно»', testHardRatingIntervalProgression],
     ['12. Интерактивный Stories Bar в каталоге и дне', testInteractiveStoriesBarInHubAndDue],
-    ['13. Эргономичная подпись «← К вопросу»', testAnswerFaceButtonLabel]
+    ['13. Эргономичная подпись «← К вопросу»', testAnswerFaceButtonLabel],
+    ['14. Zero-Trap «← К вопросу» в каталоге и уроке', testZeroTrapNavigationAnswerFaceCatalogAndLesson],
+    ['15. Лаконичные метки эшелонов без переполнения', testConciseEchelonLabels]
   ];
 
   let failed = 0;
