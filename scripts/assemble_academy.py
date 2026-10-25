@@ -10,12 +10,23 @@ from build_python_mastery import (
     INFRA_UNITS, INFRA_NOTES_DATA, INFRA_DECKS_DATA,
 )
 from generate_new_lessons import NEW_LESSONS
-from test_all_401_tasks import full_env_code
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _CLOUD_DIR = r'C:\Users\fury6\OneDrive\Python_Backend_Academy'
 _UNPACKED_ROOT = os.path.normpath(os.path.join(_HERE, '..'))
 _IS_UNPACKED_ARCHIVE = os.path.isdir(os.path.join(_UNPACKED_ROOT, 'knowledge_base'))
+if os.path.isfile(IDE_HTML_PATH):
+    from test_all_401_tasks import full_env_code
+else:
+    with open(os.path.join(_UNPACKED_ROOT, 'academy.html'), encoding='utf-8') as f:
+        _existing_academy_html = f.read()
+    _prelude_match = re.search(
+        r'const BRYTHON_PRELUDE = ("(?:\\.|[^"\\])*");',
+        _existing_academy_html,
+    )
+    if not _prelude_match:
+        raise RuntimeError('Could not load the Python runtime from academy.html')
+    full_env_code = json.loads(_prelude_match.group(1))
 
 ORIG_HTML_PATH = os.path.join(_HERE, 'academy.orig.html')
 _TG_DIR = r'C:\Users\fury6\Downloads\Telegram Desktop'
