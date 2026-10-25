@@ -2572,11 +2572,11 @@
     position: absolute;
     z-index: 1000;
     box-sizing: border-box;
-    width: min(340px, calc(100vw - 32px));
+    width: min(330px, calc(100vw - 32px));
     background: linear-gradient(155deg, rgba(22, 27, 36, 0.92) 0%, rgba(13, 16, 22, 0.98) 100%);
     border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 22px;
-    padding: 16px 18px;
+    border-radius: 18px;
+    padding: 13px 15px;
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px);
     box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.15), 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 32px rgba(16, 185, 129, 0.08);
@@ -2735,13 +2735,13 @@
     background: rgba(71, 85, 105, 0.035);
   }
   .path-popover-steps-list {
-    max-height: 250px;
+    max-height: 125px;
     overflow-y: auto;
     padding-right: 4px;
     margin-right: -4px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
   }
   .path-popover-steps-list::-webkit-scrollbar { width: 4px; }
   .path-popover-steps-list::-webkit-scrollbar-track { background: transparent; }
@@ -2750,10 +2750,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    padding: 8px 10px;
+    gap: 7px;
+    padding: 5px 8px;
     border: 1px solid rgba(148, 163, 184, 0.12);
-    border-radius: 12px;
+    border-radius: 10px;
     background: rgba(148, 163, 184, 0.045);
     cursor: pointer;
     transition: background 0.16s ease, border-color 0.16s ease, transform 0.14s ease;
@@ -2854,18 +2854,18 @@
     color: #34d399;
   }
   .path-popover-actions {
-    margin-top: 16px;
+    margin-top: 10px;
   }
   .path-popover-cta {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 100%;
-    min-height: 46px;
-    padding: 11px 22px;
-    border-radius: 14px;
+    min-height: 42px;
+    padding: 9px 18px;
+    border-radius: 12px;
     font-family: var(--font-d, 'Unbounded', sans-serif);
-    font-size: 0.82rem;
+    font-size: 0.80rem;
     font-weight: 700;
     letter-spacing: 0.04em;
     cursor: pointer;
@@ -4009,15 +4009,15 @@
   .path-mode-switcher-wrap {
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     position: relative;
     z-index: 50;
   }
   .path-mode-switcher {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 4px;
+    gap: 3px;
+    padding: 3px;
     background: rgba(22, 27, 36, 0.65);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 999px;
@@ -4035,17 +4035,17 @@
     background: transparent;
     color: #94a3b8;
     font-family: var(--font-d, 'Unbounded', sans-serif);
-    font-size: 0.76rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.03em;
-    min-height: 40px;
-    padding: 8px 18px;
+    letter-spacing: 0.02em;
+    min-height: 32px;
+    padding: 4px 14px;
     border-radius: 999px;
     cursor: pointer;
     transition: all 0.20s cubic-bezier(0.34, 1.56, 0.64, 1);
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     user-select: none;
   }
   html:not([data-theme="dark"]) .path-mode-btn {
@@ -8707,12 +8707,12 @@
   }
   @media (max-width: 640px) {
     .path-mode-switcher-wrap {
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
     .path-mode-btn {
-      min-height: 36px;
-      padding: 6px 14px;
-      font-size: 0.72rem;
+      min-height: 30px;
+      padding: 4px 12px;
+      font-size: 0.68rem;
     }
     .path-mobile-stats {
       margin-bottom: 9px;
@@ -23461,9 +23461,8 @@ const psk = e.target.closest('[data-py-select-k]');
         if(pSkills){
           const skillsList = u.skills || [];
           const noteCount = skillsList.reduce((acc, s) => acc + (s.kIds ? s.kIds.length : 1), 0);
-          const notePlural = (typeof pluralizeRu === 'function') ? pluralizeRu(noteCount, 'конспект', 'конспекта', 'конспектов') : 'конспектов';
           const skillCount = skillsList.length;
-          const skillPlural = (typeof pluralizeRu === 'function') ? pluralizeRu(skillCount, 'тема', 'темы', 'тем') : 'тем';
+          const passedCount = skillsList.filter(s => (typeof getSkillMP === 'function' ? getSkillMP(s.id) : 0) >= 80).length;
           
           let activeSkillIndex = skillsList.findIndex(s => (getSkillMP(s.id) || 0) < 80);
           if(activeSkillIndex === -1 && skillsList.length > 0) activeSkillIndex = skillsList.length - 1;
@@ -23488,8 +23487,6 @@ const psk = e.target.closest('[data-py-select-k]');
             }
 
             const cleanSkillTitle = s.title.replace(/\s*\([^)]*\)$/, '');
-            const notesInSkill = (s.kIds && s.kIds.length) || 1;
-            const notesText = `${notesInSkill} ${pluralizeRu(notesInSkill, 'конспект', 'конспекта', 'конспектов')}`;
 
             return `
               <div class="path-popover-step path-popover-step--${statusClass}" data-target-route="#${track.routePrefix}/skill/${s.id}" role="button" tabindex="${isStepLocked ? '-1' : '0'}" title="${escapeHtmlStr(s.title)} (${statusText})">
@@ -23497,7 +23494,6 @@ const psk = e.target.closest('[data-py-select-k]');
                   <span class="pps-marker pps-marker--${statusClass}">${statusIcon}</span>
                   <div class="pps-text-wrap">
                     <span class="pps-title">${sIdx + 1}. ${escapeHtmlStr(cleanSkillTitle)}</span>
-                    <span class="pps-meta">${notesText} · Теория + Карточки + IDE</span>
                   </div>
                 </div>
                 <span class="pps-action-icon">${isStepPassed ? '✓' : (isStepActive ? '➔' : (isStepLocked ? '🔒' : '➔'))}</span>
@@ -23505,12 +23501,10 @@ const psk = e.target.closest('[data-py-select-k]');
           }).join('');
 
           pSkills.innerHTML = `
-            <div class="path-popover-meta-row" style="font-size:0.75rem;color:var(--ink-muted);margin-bottom:8px;display:flex;gap:12px;">
-              <span>🎯 <b>${skillCount}</b> ${skillPlural}</span>
-              <span>📚 <b>${noteCount}</b> ${notePlural}</span>
-              <span>⚡ <b>3 этапа</b> в теме</span>
+            <div class="path-popover-meta-row" style="font-size:0.73rem;color:var(--ink-muted);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
+              <span class="path-popover-skills-label" style="font-weight:700;color:var(--ink-soft);margin-bottom:0;">Ключевые темы урока:</span>
+              <span style="font-weight:700;color:${passedCount === skillCount ? 'var(--emerald)' : 'var(--amber)'};">${passedCount}/${skillCount} сдано</span>
             </div>
-            <div class="path-popover-skills-label">Ключевые темы урока:</div>
             <div class="path-popover-skills-list path-popover-steps-list">
               ${stepsHtml}
             </div>`;
