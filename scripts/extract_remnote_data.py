@@ -708,32 +708,32 @@ for _t in TASKS_381:
     if not _TASKS_FROM_CANONICAL:
         _t['tier'] = TIER_MAP.get(_lvl, f'🥚 Уровень {_lvl}')
         _t['topic'] = '🐍 Python Core' if 240 <= _t['id'] <= 381 else '🌐 Backend & SQL'
-    if not _TASKS_FROM_CANONICAL and _t['id'] in _TASK_OVERRIDES:
+    if _t['id'] in _TASK_OVERRIDES:
         _ov = _TASK_OVERRIDES[_t['id']]
         if 'title' in _ov: _t['title'] = _ov['title']
         if 'solution' in _ov: _t['code'] = _ov['solution']
     _code = clean_ref_code(_t['id'], _t.get('code', _t.get('solution', '')))
     _t['code'] = _code
-    if not _TASKS_FROM_CANONICAL:
-        _t['solution'] = _code
+    _t['solution'] = _code
+    if not _TASKS_FROM_CANONICAL or not _t.get('initialCode'):
         _t['initialCode'] = build_starter_for_task(_t)
     _stripped_code = _code.strip()
     _doc_m = None
     if _stripped_code.startswith('"""') or _stripped_code.startswith("'''"):
         _doc_m = re.match(r'^(?:"""|\'\'\')(.*?)(?:"""|\'\'\')', _stripped_code, re.S)
-    if not _TASKS_FROM_CANONICAL and _t['id'] in _TASK_OVERRIDES and 'desc' in _TASK_OVERRIDES[_t['id']]:
+    if _t['id'] in _TASK_OVERRIDES and 'desc' in _TASK_OVERRIDES[_t['id']]:
         _t['desc'] = _TASK_OVERRIDES[_t['id']]['desc']
     elif not _TASKS_FROM_CANONICAL:
         _t['desc'] = f"<p><strong>Задание:</strong> {html.escape(_t['title'])}.</p>" + (
             f"<p class='meta'>{html.escape(_doc_m.group(1).strip())}</p>" if _doc_m else ""
         )
-    if not _TASKS_FROM_CANONICAL:
+    if not _TASKS_FROM_CANONICAL or not _t.get('hint'):
         _t['hint'] = _TASK_OVERRIDES[_t['id']]['hint'] if (_t['id'] in _TASK_OVERRIDES and 'hint' in _TASK_OVERRIDES[_t['id']]) else generate_pedagogical_hint(_t)
     _t_str_id = str(_t['id'])
     if _t_str_id in _TIER1_ENRICH or _t['id'] in _TIER1_ENRICH:
         _enr = _TIER1_ENRICH.get(_t_str_id) or _TIER1_ENRICH.get(_t['id'])
         if _enr:
-            if _TASKS_FROM_CANONICAL or not (_t['id'] in _TASK_OVERRIDES and 'hint' in _TASK_OVERRIDES[_t['id']]):
+            if not (_t['id'] in _TASK_OVERRIDES and 'hint' in _TASK_OVERRIDES[_t['id']]):
                 _t['hint'] = _enr.get('hint', _t['hint'])
             _io_in = _enr.get('io_in', '')
             _io_out = _enr.get('io_out', '')
@@ -750,9 +750,8 @@ for _t in TASKS_381:
                 )
                 if 'io-flow-block' not in _t['desc']:
                     _t['desc'] = _t['desc'] + _io_html
-    if not _TASKS_FROM_CANONICAL:
-        _t['tests'] = _TASK_OVERRIDES[_t['id']]['tests'] if (_t['id'] in _TASK_OVERRIDES and 'tests' in _TASK_OVERRIDES[_t['id']]) else build_test_for_task(_t)
-    if not _TASKS_FROM_CANONICAL and _t['id'] in _TASK_OVERRIDES and 'initialCode' in _TASK_OVERRIDES[_t['id']]:
+    _t['tests'] = _TASK_OVERRIDES[_t['id']]['tests'] if (_t['id'] in _TASK_OVERRIDES and 'tests' in _TASK_OVERRIDES[_t['id']]) else build_test_for_task(_t)
+    if _t['id'] in _TASK_OVERRIDES and 'initialCode' in _TASK_OVERRIDES[_t['id']]:
         _t['initialCode'] = _TASK_OVERRIDES[_t['id']]['initialCode']
 
 
