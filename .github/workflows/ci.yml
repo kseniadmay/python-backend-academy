@@ -5,6 +5,13 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      fresh_clone:
+        description: 'Заново клонировать каталог Академии на VPS, сохранив конфигурацию и локальный прогресс'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   verify:
@@ -50,16 +57,84 @@ jobs:
           script: |
             set -e
             echo "🚀 Начало автоматического деплоя на сервер zetalink..."
-            cd /home/fury/python-backend-academy
 
-            echo "📦 Получение свежего кода из GitHub..."
-            git fetch origin main
-            git reset --hard origin/main
+            APP_DIR=/home/fury/python-backend-academy
+            if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.fresh_clone }}" = "true" ]; then
+              NEW_DIR="/home/fury/python-backend-academy.fresh-${{ github.run_id }}"
+              BACKUP_DIR="/home/fury/python-backend-academy.backup-${{ github.run_id }}"
+              FAILED_DIR="/home/fury/python-backend-academy.failed-${{ github.run_id }}"
 
-            echo "🏗️ Сборка академии из актуальных исходников..."
-            python3 scripts/assemble_academy.py
+              rollback_fresh_clone() {
+                result=$?
+                if [ "$result" -ne 0 ]; then
+                  if [ -d "$BACKUP_DIR" ]; then
+                    echo "⚠️ Ошибка переустановки; возвращаю предыдущий каталог Академии..."
+                    systemctl --user stop academy.service || true
+                    if [ -e "$APP_DIR" ]; then mv "$APP_DIR" "$FAILED_DIR" || true; fi
+                    if mv "$BACKUP_DIR" "$APP_DIR"; then
+                      systemctl --user restart academy.service || true
+                      if [ -e "$FAILED_DIR" ]; then rm -rf -- "$FAILED_DIR" || true; fi
+                    fi
+                  fi
+                  if [ -e "$NEW_DIR" ]; then rm -rf -- "$NEW_DIR" || true; fi
+                fi
+              }
+              trap rollback_fresh_clone EXIT
 
-            echo "🔄 Перезапуск службы Академии..."
-            systemctl --user restart academy.service
+              if [ ! -d "$APP_DIR/.git" ]; then
+                echo "❌ Текущий каталог проекта не найден или не является Git-клоном; остановка без удаления данных."
+                exit 1
+              fi
+              if [ -e "$NEW_DIR" ] || [ -e "$BACKUP_DIR" ] || [ -e "$FAILED_DIR" ]; then
+                echo "❌ Найден каталог предыдущего незавершённого переустановочного запуска; остановка без удаления данных."
+                exit 1
+              fi
+
+              echo "📥 Клонирую чистую копию main во временный каталог..."
+              git clone --depth 1 --single-branch --branch main https://github.com/kseniadmay/python-backend-academy.git "$NEW_DIR"
+
+              # Сохраняем только runtime-конфигурацию и локальный sync-state Академии.
+              if [ -f "$APP_DIR/.env" ]; then install -m 600 "$APP_DIR/.env" "$NEW_DIR/.env"; fi
+              if [ -f "$APP_DIR/data/progress_sync.json" ]; then
+                mkdir -p "$NEW_DIR/data"
+                install -m 600 "$APP_DIR/data/progress_sync.json" "$NEW_DIR/data/progress_sync.json"
+              fi
+
+              echo "🛑 Останавливаю службу для безопасной замены каталога..."
+              systemctl --user stop academy.service
+              mv "$APP_DIR" "$BACKUP_DIR"
+              mv "$NEW_DIR" "$APP_DIR"
+
+              echo "🏗️ Собираю чистую копию Академии..."
+              cd "$APP_DIR"
+              python3 scripts/assemble_academy.py
+
+              echo "🔄 Запускаю службу Академии..."
+              systemctl --user restart academy.service
+              healthy=0
+              for attempt in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
+                if curl --fail --silent http://127.0.0.1:8765/healthz >/dev/null; then healthy=1; break; fi
+                sleep 2
+              done
+              if [ "$healthy" -ne 1 ]; then
+                echo "❌ Академия не прошла health-check; возвращаю предыдущую установку."
+                exit 1
+              fi
+
+              echo "🧹 Удаляю резервную копию старого кода после успешной проверки..."
+              rm -rf -- "$BACKUP_DIR"
+              trap - EXIT
+            else
+              cd "$APP_DIR"
+              echo "📦 Получение свежего кода из GitHub..."
+              git fetch origin main
+              git reset --hard origin/main
+
+              echo "🏗️ Сборка академии из актуальных исходников..."
+              python3 scripts/assemble_academy.py
+
+              echo "🔄 Перезапуск службы Академии..."
+              systemctl --user restart academy.service
+            fi
 
             echo "✅ Сервер zetalink успешно обновлён и работает!"
