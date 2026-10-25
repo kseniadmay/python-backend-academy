@@ -1,4 +1,4 @@
-const CACHE_NAME = 'academy-pwa-v60';
+const CACHE_NAME = 'academy-pwa-v61';
 const ASSETS_TO_CACHE = [
   './',
   'index.html',
@@ -32,6 +32,10 @@ self.addEventListener('fetch', (event) => {
 
   // Skip external APIs like github.com
   if (url.origin !== self.location.origin) return;
+
+  // Progress and content APIs must always reach the server; caching them can
+  // resurrect stale progress after another device has synchronized.
+  if (url.pathname === '/healthz' || url.pathname.startsWith('/api/')) return;
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {

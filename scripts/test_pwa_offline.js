@@ -235,13 +235,27 @@ const ACTIVE_CACHE_NAME = activeCacheMatch[1];
   });
   assert(!postIntercepted, 'POST-запросы не должны перехватываться сервис-воркером');
 
+  let apiIntercepted = false;
+  swEvents['fetch']({
+    request: { method: 'GET', url: 'https://pwa-offline-test.local/api/v1/sync' },
+    respondWith: () => { apiIntercepted = true; }
+  });
+  assert(!apiIntercepted, 'GET-запросы API не должны кэшироваться сервис-воркером');
+
+  let healthIntercepted = false;
+  swEvents['fetch']({
+    request: { method: 'GET', url: 'https://pwa-offline-test.local/healthz' },
+    respondWith: () => { healthIntercepted = true; }
+  });
+  assert(!healthIntercepted, 'Health-check не должен кэшироваться сервис-воркером');
+
   let externalIntercepted = false;
   swEvents['fetch']({
     request: { method: 'GET', url: 'https://cdn.example.com/lib.js' },
     respondWith: () => { externalIntercepted = true; }
   });
   assert(!externalIntercepted, 'Внешние URL (cross-origin) не должны перехватываться локальным сервис-воркером');
-  console.log('✓ 4.4. Фильтрация методов и cross-origin доменов работает корректно');
+  console.log('✓ 4.4. POST, API, health-check и cross-origin запросы не попадают в кэш');
 
   console.log('\n========================================================');
   console.log('  [PASS] ВСЕ ТЕСТЫ PWA И ОФФЛАЙН-КОНТУРА УСПЕШНО ПРОЙДЕНЫ!');

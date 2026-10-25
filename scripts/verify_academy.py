@@ -39,7 +39,12 @@ def check_html_inline_scripts(html_file, label):
 
 c_acad = check_html_inline_scripts(HTML_PATH, 'academy.html')
 c_etalon = check_html_inline_scripts(ETALON_PATH, 'standards.html')
-c_ide = check_html_inline_scripts(IDE_PATH, 'practice_ide.html') if os.path.isfile(IDE_PATH) else 0
+ide_rel_path = os.path.relpath(IDE_PATH, os.path.dirname(_HERE)).replace(os.sep, '/')
+ide_is_tracked = subprocess.run(
+    ['git', 'ls-files', '--error-unmatch', ide_rel_path],
+    cwd=os.path.dirname(_HERE), capture_output=True, text=True
+).returncode == 0
+c_ide = check_html_inline_scripts(IDE_PATH, 'practice_ide.html') if os.path.isfile(IDE_PATH) and ide_is_tracked else 0
 c_idx = check_html_inline_scripts(INDEX_PATH, 'index.html') if os.path.isfile(INDEX_PATH) else 0
 print(f"1. [PASS] node --check passed with 0 syntax errors across {c_acad + c_etalon + c_ide + c_idx} scripts (academy: {c_acad}, etalon: {c_etalon}, IDE: {c_ide}, index: {c_idx})!", flush=True)
 
