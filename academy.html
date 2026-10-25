@@ -15605,7 +15605,7 @@ let cardsHubState = {
   cardIdx: typeof _initCardsPos.cardIdx === 'number' ? _initCardsPos.cardIdx : 0,
   flipped: !!_initCardsPos.flipped,
   completed: _isSameDay ? !!_initCardsPos.completed : false,
-  dueMode: _isSameDay ? !!_initCardsPos.dueMode : false,
+  dueMode: true,
   dueQueue: _savedDueQueue,
   duePos: (_savedDueQueue.length > 0 && !_initCardsPos.completed) ? 0 : (typeof _initCardsPos.duePos === 'number' ? _initCardsPos.duePos : 0)
 };
@@ -15621,7 +15621,7 @@ function saveCardsHubPosState(){
     cardIdx: cardsHubState.cardIdx || 0,
     flipped: !!cardsHubState.flipped,
     completed: isDone,
-    dueMode: isDone ? false : !!cardsHubState.dueMode,
+    dueMode: true,
     duePos: isDone ? 0 : (cardsHubState.duePos || 0),
     // Фикс залипания: при завершении сессии очередь очищается, не оставляя висячий хвост из 1 карточки
     dueQueue: (isDone || !Array.isArray(cardsHubState.dueQueue))
@@ -15689,6 +15689,7 @@ function collectDueCardsQueue(){
 }
 
 function viewCardsHub(){
+  cardsHubState.dueMode = true;
   if(cardsHubState.dueMode){
     if(!Array.isArray(cardsHubState.dueQueue) || cardsHubState.dueQueue.length === 0){
       cardsHubState.dueQueue = collectDueCardsQueue();
@@ -15696,22 +15697,29 @@ function viewCardsHub(){
     const qLen = cardsHubState.dueQueue.length;
     const duePos = Math.min(cardsHubState.duePos || 0, Math.max(0, qLen - 1));
     if(cardsHubState.completed || qLen === 0 || cardsHubState.duePos >= qLen){
+      const wasCompletedToday = (cardsHubState.completed || (cardsHubState.duePos >= qLen && qLen > 0));
       return `
-    <div class="container cards-hub-container" style="padding-bottom:84px;">
-      <div class="card" style="margin-top:20px;padding:36px 24px;text-align:center;border:1.5px solid rgba(16,185,129,0.35);border-radius:24px;background:radial-gradient(ellipse at top, rgba(16,185,129,0.12), transparent 70%), var(--surface);">
+    <div class="container cards-hub-container" style="padding-bottom:84px;max-width:760px;margin:0 auto;">
+      <div class="card" style="margin-top:20px;padding:40px 24px;text-align:center;border:1.5px solid rgba(16,185,129,0.35);border-radius:24px;background:radial-gradient(ellipse at top, rgba(16,185,129,0.12), transparent 70%), var(--surface);box-shadow:0 8px 32px rgba(0,0,0,0.25);">
         <div style="width:64px;height:64px;margin:0 auto 16px;border-radius:50%;background:rgba(16,185,129,0.18);color:#10b981;display:flex;align-items:center;justify-content:center;font-size:30px;border:1.5px solid rgba(16,185,129,0.45);box-shadow:0 0 20px rgba(16,185,129,0.25);">✓</div>
-        <div style="display:inline-block;padding:4px 12px;border-radius:999px;background:rgba(16,185,129,0.15);color:#34d399;font-size:0.75rem;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.06em;">Ежедневная очередь закрыта</div>
-        <h2 style="font-size:1.45rem;font-weight:800;color:var(--ink);margin:0 0 10px;">🎉 Все повторения на сегодня успешно выполнены!</h2>
+        <div style="display:inline-block;padding:4px 12px;border-radius:999px;background:rgba(16,185,129,0.15);color:#34d399;font-size:0.75rem;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.06em;">Центр 3D Флеш-карточек · ${wasCompletedToday ? 'Очередь закрыта' : 'Очередь свободна'}</div>
+        <h2 style="font-size:1.45rem;font-weight:800;color:var(--ink);margin:0 0 10px;">${wasCompletedToday ? '🎉 Все повторения на сегодня успешно выполнены!' : '🎉 Нет карточек, требующих повторения прямо сейчас'}</h2>
         <p style="font-size:0.92rem;color:var(--ink-muted);max-width:520px;margin:0 auto 24px;line-height:1.6;">
-          Отличная работа! Расписание интервального повторения обновлено. Новые карточки появятся по мере наступления срока повторения.
+          ${wasCompletedToday
+            ? 'Отличная работа! Расписание интервального повторения обновлено. Новые карточки появятся по мере наступления срока кривой забывания.'
+            : 'Все пройденные карточки надёжно закреплены в памяти. Алгоритм вызовет их автоматически, когда подойдёт срок повторения. Продолжай двигаться по Тропе!'}
         </p>
         <div style="display:flex;gap:12px;justify-content:center;margin-bottom:24px;flex-wrap:wrap;">
-          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px 16px;">
-            <div style="font-size:0.75rem;color:var(--ink-muted);">Повторено сегодня</div>
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px 18px;">
+            <div style="font-size:0.75rem;color:var(--ink-muted);">Повторено за сегодня</div>
             <div style="font-size:1.15rem;font-weight:700;color:#10b981;">${qLen} ${typeof pluralizeRu === 'function' ? pluralizeRu(qLen, 'карточка', 'карточки', 'карточек') : 'карточек'}</div>
           </div>
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px 18px;">
+            <div style="font-size:0.75rem;color:var(--ink-muted);">Ударный режим</div>
+            <div style="font-size:1.15rem;font-weight:700;color:var(--gold);">🔥 ${state.streak || 1} ${typeof pluralizeRu === 'function' ? pluralizeRu(state.streak || 1, 'день', 'дня', 'дней') : 'дней'}</div>
+          </div>
         </div>
-        <button type="button" class="btn btn-primary" data-hub-exit-due style="padding:14px 24px;border-radius:14px;font-weight:700;">🃏 Вернуться к общему каталогу колод</button>
+        <a href="#/" class="btn btn-primary" style="padding:14px 28px;border-radius:14px;font-weight:700;display:inline-flex;align-items:center;gap:8px;text-decoration:none;box-shadow:0 0 20px rgba(16,185,129,0.35);">🗺️ Продолжить изучение на Тропе ➔</a>
       </div>
     </div>`;
     }
@@ -15722,19 +15730,18 @@ function viewCardsHub(){
     const cleanDeckName = (dObj.title || item.deckId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
 
     return `
-    <div class="container cards-hub-container" style="padding-bottom:84px;">
+    <div class="container cards-hub-container" style="padding-bottom:84px;max-width:760px;margin:0 auto;">
       <div class="cards-hub-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
         <div>
-          <span class="sr-only">Интервальное повторение RemNote · Режим очереди на сегодня</span>
-          <h1 style="margin:0;">🔥 Повторение на сегодня</h1>
+          <h1 style="margin:0;font-size:1.45rem;font-weight:800;">🃏 Центр 3D Флеш-карточек</h1>
           <div style="font-size:0.84rem;color:var(--ink-muted);margin-top:2px;">
-            Колода: <span style="color:var(--gold);font-weight:600;">${cleanDeckName}</span>
+            🔥 Повторение на сегодня · Тема: <span style="color:var(--gold);font-weight:600;">${cleanDeckName}</span>
           </div>
         </div>
         <div class="cards-hub-header-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           <a href="#/docs" class="btn btn-ghost" style="padding:6px 12px;font-size:0.78rem;" title="Открыть инженерный справочник">💡 Шпаргалка</a>
           <span class="cocoon-pill" style="color:var(--amber);">⚡ Очередь: <b>${duePos + 1} / ${qLen}</b></span>
-          <button type="button" class="btn btn-ghost" data-hub-exit-due style="padding:6px 12px;font-size:0.78rem;">✕ Выйти из очереди</button>
+          <a href="#/" class="btn btn-ghost" style="padding:6px 12px;font-size:0.78rem;text-decoration:none;" title="Вернуться к карте обучения">🗺️ На Тропу</a>
         </div>
       </div>
       <div class="cards-hub-content" style="max-width:760px;margin:0 auto;">
@@ -15782,7 +15789,7 @@ function viewCardsHub(){
             </button>
           </div>
           <div style="margin-top:10px;display:flex;justify-content:flex-start;">
-            <button type="button" class="btn btn-ghost" data-hub-prev style="padding:8px 16px;border-radius:12px;font-size:0.84rem;">← Назад к предыдущей</button>
+            <button type="button" class="btn btn-ghost" data-hub-prev style="padding:8px 16px;border-radius:12px;font-size:0.84rem;">← К вопросу</button>
           </div>`;
         })() : `
           <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
@@ -20912,6 +20919,7 @@ render = function(){
     root.innerHTML = viewMockInterview();
     navRoute = '/mock';
   } else if(route === '/cards'){
+    cardsHubState.dueMode = true;
     root.innerHTML = viewCardsHub();
     navRoute = '/cards';
   } else if(route === '/practice' || route.indexOf('/practice?') === 0){
