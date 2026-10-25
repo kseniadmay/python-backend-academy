@@ -1,171 +1,68 @@
 # Python Backend Academy
 
-<div align="center">
+[![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB.svg?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Demo](https://img.shields.io/badge/Demo-Online-4F46E5.svg?style=flat-square&logo=render&logoColor=white)](https://python-backend-academy.onrender.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-onrender.com-4F46E5?style=for-the-badge&logo=render&logoColor=white)](https://python-backend-academy.onrender.com)
-[![Python](https://img.shields.io/badge/Python-3.13-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Pydantic](https://img.shields.io/badge/Pydantic-v2-E92063?style=for-the-badge&logo=pydantic&logoColor=white)](https://docs.pydantic.dev/)
-[![CI/CD](https://img.shields.io/badge/CI%2FCD-passing-10B981?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/kseniadmay/python-backend-academy/actions)
+Интерактивная платформа для изучения Python-бэкенда: практика в браузере, конспекты и интервальное повторение.
 
-Интерактивная среда для изучения бэкенда на Python: практика кода в браузере, конспекты тем и интервальное повторение.
+## Возможности
 
-[Быстрый старт](#быстрый-старт) • [Программа](#программа) • [Архитектура](#архитектура) • [API](#api) • [Тестирование](#тестирование)
+- **401 задача с автотестами**: проверка кода прямо в браузере (Brython / WebAssembly).
+- **238 конспектов**: теория по ключевым темам бэкенда и вопросам собеседований.
+- **287 колод карточек**: интервальное повторение по алгоритму SuperMemo-2.
+- **Бэкенд на FastAPI**: REST API, синхронизация прогресса и автодокументация Swagger.
+- **Офлайн-режим (PWA)**: автономная работа без подключения к сети.
 
-</div>
+## Модули курса
 
----
+1. **Python Core** — модель памяти, структуры данных, итераторы, ООП, типизация.
+2. **Web и протоколы** — HTTP/HTTPS, WebSockets, сокеты, REST API.
+3. **Бэкенд и API** — FastAPI, Django, асинхронный Python (`asyncio`), Pydantic.
+4. **Алгоритмы** — оценка сложности Big-O, поиск, структуры данных, графы.
+5. **Базы данных** — PostgreSQL, транзакции, индексы, SQLAlchemy ORM.
+6. **Архитектура** — Clean Architecture, SOLID, паттерны проектирования.
+7. **Инфраструктура** — Docker, CI/CD, Celery, Redis.
 
-## О платформе
+## Быстрый запуск
 
-Платформа объединяет теоретическую базу и полноценную среду для кодинга без необходимости настраивать окружение на компьютере:
-
-- **401 задача с автопроверкой**: интерактивный редактор и мгновенный запуск тестов в браузере на движке Brython 3.13 (WebAssembly).
-- **238 структурированных конспектов**: теория по ключевым темам бэкенда с фокусом на вопросах технических собеседований.
-- **287 колод для повторения**: более 6 000 флешкарт с алгоритмом разнесённого повторения SuperMemo-2.
-- **Синхронизация прогресса**: бэкенд на FastAPI сохраняет статус решённых задач и черновики кода между устройствами.
-- **Автономная работа (PWA)**: платформа функционирует без подключения к интернету через Service Worker.
-
----
-
-## Быстрый старт
-
-### Вариант 1. Запуск сервера FastAPI (рекомендуется)
+### С сервером (FastAPI)
 ```cmd
 .\start_fastapi.cmd
 ```
-*Или через консоль:* `python -m backend.run`  
-- Веб-интерфейс: [http://127.0.0.1:8080](http://127.0.0.1:8080)
+*Или:* `python -m backend.run`  
+- Интерфейс: [http://127.0.0.1:8080](http://127.0.0.1:8080)
 - Документация Swagger: [http://127.0.0.1:8080/docs](http://127.0.0.1:8080/docs)
-- Спецификация ReDoc: [http://127.0.0.1:8080/redoc](http://127.0.0.1:8080/redoc)
 
-### Вариант 2. Запуск со смартфона или планшета
-```cmd
-.\start_mobile.cmd
-```
-Скрипт определяет IP-адрес в локальной сети Wi-Fi, запускает защищённый туннель Cloudflare и выводит QR-код для мобильного браузера.
+### Автономно (без сервера)
+Откройте файл `academy.html` в любом браузере.
 
-### Вариант 3. Автономный запуск в браузере
-Откройте файл `academy.html` в браузере или запустите локальный веб-сервер:
-```bash
-python -m http.server 8080
-```
-Затем перейдите по адресу: [http://localhost:8080/academy.html#/](http://localhost:8080/academy.html#/)
-
----
-
-## Программа
-
-Курс состоит из 7 сквозных модулей:
-
-1. **Python Core**: модель памяти CPython, типы данных, итераторы, генераторы, ООП и система типов.
-2. **Web и протоколы**: HTTP/HTTPS, WebSockets, сетевые сокеты, заголовки, TCP/UDP и принципы REST API.
-3. **Бэкенд и API**: FastAPI, Django, асинхронное программирование (`asyncio`), DTO-валидация с Pydantic V2.
-4. **Алгоритмы и структуры данных**: анализ сложности Big-O, поиск, связные списки, деревья, графы.
-5. **Базы данных**: PostgreSQL, ACID-транзакции, уровни изоляции, B-Tree индексы, работа с ORM.
-6. **Архитектура**: чистая архитектура (Clean Architecture), принципы SOLID, шаблоны GoF, 12-Factor App.
-7. **Инфраструктура**: Docker, сборка контейнеров, CI/CD пайплайны, очереди Celery, Redis и мониторинг.
-
----
-
-## Архитектура
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      Фронтенд (UI)                          │
-│   Модульный интерфейс (frontend/) или монолит (academy.html)│
-│   Интерактивная карта • Редактор кода • Карточки повторения │
-└──────────────┬───────────────────────────────┬──────────────┘
-               │                               │
-               ▼                               ▼
-┌─────────────────────────────┐ ┌─────────────────────────────┐
-│    Кэш Service Worker       │ │   Запуск Python в браузере  │
-│   (автономная работа офлайн)│ │     (Brython / Pyodide)     │
-└──────────────┬──────────────┘ └─────────────────────────────┘
-               │
-               │ REST API
-               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                     Бэкенд на FastAPI                       │
-│                                                             │
-│   ├── app/core/      Конфигурация, безопасность, CORS       │
-│   ├── app/schemas/   Pydantic-схемы валидации данных        │
-│   ├── app/services/  Синхронизация прогресса и база контента│
-│   └── app/api/       REST-роуты v1 и Swagger UI             │
-└──────────────┬───────────────────────────────┬──────────────┘
-               │                               │
-       ┌───────┴───────┐               ┌───────┴───────┐
-       ▼               ▼               ▼               ▼
-┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
-│  Локальный  │ │ Облачная БД │ │    Файлы    │ │ Скомпилиро- │
-│  JSON-файл  │ │ (PostgreSQL)│ │   контента  │ │ ванный CSS  │
-│progress_sync│ │ DATABASE_URL│ │data/content/│ │(dist/bundle)│
-└─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘
-```
-
----
-
-## API
-
-Сервер предоставляет REST API с интерактивной документацией Swagger (`/docs`):
-
-| Метод | Эндпоинт | Назначение |
-| :--- | :--- | :--- |
-| `GET` | `/api/v1/health` | Проверка состояния сервиса |
-| `GET` / `POST` | `/api/v1/sync` | Чтение и сохранение прогресса пользователя |
-| `GET` | `/api/v1/content/summary` | Сводка: счётчики модулей, задач и тем |
-| `GET` | `/api/v1/content/modules` | Каталог модулей программы и матрица навыков |
-| `GET` | `/api/v1/content/tasks` | Список практических задач с фильтрацией по модулю и теме |
-| `GET` | `/api/v1/content/search` | Поиск по конспектам и задачам (`?q=...`) |
-| `POST` | `/api/v1/feedback` | Отправка отзывов и отчётов об ошибках |
-
----
-
-## Структура репозитория
-
-```text
-Python_Backend_Academy/
-├── academy.html                 # Автономное приложение платформы
-├── start_fastapi.cmd            # Запуск бэкенда FastAPI для Windows
-├── start_mobile.cmd             # Запуск с мобильным доступом
-├── verify_all.py                # Скрипт сквозного тестирования
-│
-├── backend/                     # Бэкенд на FastAPI
-│   ├── run.py                   # Точка входа Uvicorn
-│   ├── app/                     # Исходный код: core, schemas, services, api
-│   └── tests/                   # Тесты API
-│
-├── frontend/                    # Модульный интерфейс
-│   ├── css/                     # Стили компонентов
-│   ├── dist/bundle.css          # Собранный бандл стилей
-│   └── js/                      # Логика клиента (api.js, state.js)
-│
-├── data/content/                # База контента: задачи, конспекты, карточки
-├── scripts/build.py             # Сборщик ассетов и проверка данных
-└── tests/                       # Регрессионные тесты интерфейса
-```
-
----
+### Со смартфона
+Запустите `.\start_mobile.cmd` для доступа по локальной сети через Cloudflare.
 
 ## Тестирование
 
 ```bash
-# Сборка ассетов и проверка целостности данных:
-python scripts/build.py
-
 # Тесты REST API:
 python -m unittest discover backend/tests
 
-# Быстрая проверка платформы:
-python verify_all.py --quick
+# Сборка ассетов и валидация данных:
+python scripts/build.py
 
-# Полный прогон всех тестов и 401 задачи:
-python verify_all.py
+# Сквозная проверка платформы:
+python verify_all.py --quick
 ```
 
----
+## Структура проекта
+
+- `academy.html` — автономное одностраничное приложение.
+- `backend/` — сервер на FastAPI (`core`, `schemas`, `services`, `api`).
+- `data/content/` — база данных курса (задачи, конспекты, колоды).
+- `frontend/` — модульные стили и скрипты интерфейса.
+- `scripts/` — сборщик (`build.py`) и утилиты.
+- `tests/` — регрессионные тесты.
 
 ## Лицензия
 
-Проект распространяется под лицензией [MIT](LICENSE).  
-Автор: [@kseniadmay](https://github.com/kseniadmay)
+[MIT](LICENSE)
