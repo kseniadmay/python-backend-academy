@@ -108,11 +108,14 @@ def build_test_for_task(t):
             last_def_idx = idx_n
 
     if last_def_idx >= 0:
-        checks.append('if "r" in globals() and hasattr(r, "_store"): r._store.clear()')
-        checks.append('if "r" in globals() and hasattr(r, "store"): r.store.clear()')
-        checks.append('if "closed" in globals() and isinstance(closed, list): closed.clear()')
-        checks.append('if "closed_resources" in globals() and isinstance(closed_resources, list): closed_resources.clear()')
-        checks.append('if "sent_notifications" in globals() and isinstance(sent_notifications, list): sent_notifications.clear()')
+        if 'r.' in c or '_store' in c or 'r = ' in c or 'Redis' in c:
+            checks.append('if "r" in globals() and hasattr(r, "_store"): r._store.clear()')
+            checks.append('if "r" in globals() and hasattr(r, "store"): r.store.clear()')
+        if 'closed' in c or 'closed_resources' in c:
+            checks.append('if "closed" in globals() and isinstance(closed, list): closed.clear()')
+            checks.append('if "closed_resources" in globals() and isinstance(closed_resources, list): closed_resources.clear()')
+        if 'sent_notifications' in c:
+            checks.append('if "sent_notifications" in globals() and isinstance(sent_notifications, list): sent_notifications.clear()')
         trailing_nodes = tree.body[last_def_idx + 1:]
         for tn in trailing_nodes:
             seg = ast.get_source_segment(c, tn)
@@ -349,11 +352,132 @@ def build_starter_for_task(t):
     res = '\n'.join(l.rstrip() for l in res.split('\n'))
     return res
 
+def generate_pedagogical_hint(t):
+    title = (t.get('title') or '').lower()
+    tier = t.get('tier', 'Уровень 1')
+    
+    if 'палиндром' in title or 'palindrome' in title:
+        return 'Шаг 1: Очисти строку (приведи к нижнему регистру, убери пробелы). Шаг 2: Используй два указателя (с начала и конца) и сдвигай их навстречу, проверяя совпадение символов.'
+    if 'бинарный поиск' in title or 'binary_search' in title:
+        return 'Шаг 1: Задай границы left = 0 и right = len(arr) - 1. Шаг 2: В цикле while left <= right вычисляй mid = (left + right) // 2. Шаг 3: Сравнивай элемент с target и сдвигай границы.'
+    if 'стек' in title or 'stack' in title:
+        return 'Шаг 1: Храни элементы во внутреннем списке self._items. Шаг 2: push добавляет через append(), pop удаляет с конца через pop() с проверкой на пустоту, peek возвращает последний элемент.'
+    if 'очеред' in title or 'queue' in title:
+        return 'Шаг 1: Используй список или collections.deque. Шаг 2: Добавляй в конец (append), извлекай из начала (popleft / pop(0)) с валидацией непустого состояния.'
+    if 'разворот списка' in title or '[::-1]' in title or 'срез' in title:
+        return 'Синтаксис срезов в Python: seq[start:stop:step]. Для получения инвертированной копии списка используй отрицательный шаг [::-1].'
+    if 'get(' in title or 'словаря через get' in title:
+        return 'Метод d.get(key, default) безопасно возвращает значение по ключу, а если ключ не найден в словаре — возвращает указанный default без вызова KeyError.'
+    if 'inner join' in title:
+        return 'Шаг 1: Укажи нужные поля в SELECT. Шаг 2: В секции FROM задай первую таблицу. Шаг 3: Свяжи со второй через INNER JOIN ... ON и добавь фильтр WHERE.'
+    if 'left join' in title:
+        return 'Шаг 1: Объедини таблицы через LEFT JOIN ... ON по первичному и внешнему ключу. Шаг 2: Чтобы найти записи без соответствий, проверь в WHERE поле правой таблицы: WHERE right_table.id IS NULL.'
+    if 'dockerfile' in title:
+        return 'Шаг 1: Задай сборочный этап (FROM python:... AS builder). Шаг 2: Установи рабочую директорию WORKDIR и скопируй файлы. Шаг 3: Скопируй собранные артефакты в чистый финальный образ.'
+    if 'ddl' in title or 'создания таблиц' in title or 'create table' in title:
+        return 'Шаг 1: Используй CREATE TABLE name (колонка ТИП ОГРАНИЧЕНИЕ). Шаг 2: Задай PRIMARY KEY и связи с родительскими таблицами через REFERENCES.'
+    if 'b-tree' in title or 'индекс' in title:
+        return 'Синтаксис создания индекса: CREATE INDEX idx_name ON table_name USING btree (column_name);'
+    if 'pytest.raises' in title:
+        return 'Используй контекстный менеджер with pytest.raises(ExpectedException) as exc_info: и проверяй текст ошибки через str(exc_info.value).'
+    if 'pytest.approx' in title:
+        return 'Для сравнения чисел с плавающей точкой используй pytest.approx: assert actual == pytest.approx(expected, rel=1e-3).'
+    if '@pytest.fixture' in title or 'фикстур' in title:
+        return 'Шаг 1: Оберни вспомогательную функцию декоратором @pytest.fixture. Шаг 2: Укажи имя фикстуры в качестве аргумента тестовой функции def test_*(fixture_name).'
+    if 'pathlib' in title or 'файловый путь' in title:
+        return 'Используй модуль pathlib.Path: методы .suffix (текущее расширение) и .with_suffix(".новое_расширение") возвращают обновлённый объект пути.'
+    if 'декоратор' in title or 'decorator' in title:
+        return 'Шаг 1: Определи функцию-декоратор, принимающую func. Шаг 2: Внутри объяви wrapper(*args, **kwargs), вызови func и верни результат. Шаг 3: Верни wrapper.'
+    if '@dataclass' in title or 'датакласс' in title:
+        return 'Импортируй dataclass из модуля dataclasses. Примени декоратор @dataclass к классу и объяви поля с явными аннотациями типов.'
+    if 'два указателя' in title or 'двумя указателями' in title:
+        return 'Шаг 1: Инициализируй два указателя (например, left = 0 и right = len(seq) - 1). Шаг 2: В цикле двигай указатели навстречу друг другу в зависимости от условия.'
+    if 'транзакци' in title or 'transaction' in title:
+        return 'Шаг 1: Открой транзакционный блок (BEGIN). Шаг 2: Выполни операции. Шаг 3: Зафиксируй изменения через COMMIT или откати через ROLLBACK при ошибке.'
+    if 'redis' in title:
+        return 'Используй стандартные команды Redis-клиента: r.set(key, value), r.get(key) и r.expire(key, seconds).'
+    if '__repr__' in title:
+        return 'Метод __repr__(self) должен возвращать точную, понятную разработчику строку вида ClassName(attr=val, ...), однозначно отражающую состояние объекта.'
+
+    return f'Шаг 1: Проверь сигнатуру и входные типы данных ({tier}). Шаг 2: Обработай граничные случаи (пустые коллекции, None, неверные типы). Шаг 3: Сформируй и верни ожидаемый результат.'
+
 _TASK_OVERRIDES = {
+    1: {
+        'title': 'Напишите INNER JOIN двух связанных таблиц',
+        'desc': '<p><strong>Задание:</strong> Напишите SQL-запрос выборки в строковой переменной <code>sql</code>, объединяющий таблицы <code>users</code> (алиас <code>u</code>) и <code>orders</code> (алиас <code>o</code>) через <code>INNER JOIN</code> по ключу <code>u.id = o.user_id</code>.</p><p class=\'meta\'>Выберите столбцы <code>u.username</code>, <code>o.id AS order_id</code>, <code>o.total_amount</code>, <code>o.status</code> и отфильтруйте заказы со статусом <code>\'completed\'</code>.</p>',
+    },
+    3: {
+        'title': 'Напишите production Dockerfile для Python приложения',
+        'desc': '<p><strong>Задание:</strong> Напишите многоэтапный production <code>Dockerfile</code> в строковой переменной <code>dockerfile</code> для Python-приложения на базе FastAPI/Uvicorn.</p><p class=\'meta\'>Первый этап <code>builder</code>: базовый образ <code>python:3.12-slim-bookworm</code>, рабочая директория <code>/app</code>, установка Poetry и экспорт <code>requirements.txt</code>. Финальный этап: установка зависимостей без кэша, запуск от непривилегированного пользователя <code>appuser</code>, порт <code>8000</code> и запуск <code>uvicorn main:app</code>.</p>',
+    },
+    4: {
+        'title': 'Напишите DDL создания таблиц пользователей и профилей (1:1)',
+        'desc': '<p><strong>Задание:</strong> Напишите DDL-запрос в строковой переменной <code>sql</code> для создания двух связанных таблиц со связью 1:1 (пользователи и профили).</p><p class=\'meta\'>Таблица <code>users</code>: поля <code>id SERIAL PRIMARY KEY</code>, <code>email VARCHAR(255) UNIQUE NOT NULL</code>, <code>created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP</code>.<br>Таблица <code>profiles</code>: <code>user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE</code>, <code>first_name VARCHAR(100)</code>, <code>last_name VARCHAR(100)</code>, <code>bio TEXT</code>.</p>',
+    },
+    8: {
+        'title': 'Создайте индекс B-Tree по полю email',
+        'desc': '<p><strong>Задание:</strong> Напишите SQL-команду создания B-Tree индекса в строковой переменной <code>sql</code>.</p><p class=\'meta\'>Создайте индекс с именем <code>idx_users_email</code> для таблицы <code>users</code> по столбцу <code>email</code> методом <code>USING btree</code>.</p>',
+    },
+    12: {
+        'title': 'Создайте составной первичный ключ из двух полей',
+        'desc': '<p><strong>Задание:</strong> Напишите DDL-запрос создания таблицы позиций заказа <code>order_items</code> с составным первичным ключом в переменной <code>sql</code>.</p><p class=\'meta\'>Поля таблицы: <code>order_id INTEGER NOT NULL</code>, <code>item_id INTEGER NOT NULL</code>, <code>quantity INTEGER NOT NULL DEFAULT 1</code>, <code>price NUMERIC(10, 2) NOT NULL</code>. Задайте составной первичный ключ <code>PRIMARY KEY (order_id, item_id)</code>.</p>',
+    },
     20: {
         'title': 'Разворот списка срезом [::-1]',
         'desc': '<p><strong>Задание:</strong> Создайте исходный список чисел <code>original</code> и получите его инвертированную копию <code>reversed_list</code> с помощью шага среза <code>[::-1]</code>.</p>',
-    }
+    },
+    24: {
+        'title': 'Напишите SELECT с условиями WHERE и сортировкой ORDER BY',
+        'desc': '<p><strong>Задание:</strong> Напишите SQL-запрос выборки пользователей в переменной <code>sql</code>.</p><p class=\'meta\'>Выберите столбцы <code>id</code>, <code>username</code>, <code>email</code>, <code>created_at</code> из таблицы <code>users</code>, где <code>is_active = TRUE</code>, отсортируйте по <code>created_at DESC</code> и ограничьте вывод <code>LIMIT 10</code>.</p>',
+    },
+    30: {
+        'title': 'Напишите подзапрос в секции WHERE с оператором IN',
+        'desc': '<p><strong>Задание:</strong> Напишите SQL-запрос выборки курсов с подзапросом в условии WHERE в переменной <code>sql</code>.</p><p class=\'meta\'>Выберите <code>title</code> и <code>price</code> из таблицы <code>courses</code>, где <code>author_id</code> входит (<code>IN</code>) в список идентификаторов верифицированных авторов из таблицы <code>authors</code> (<code>WHERE is_verified = TRUE</code>).</p>',
+    },
+    42: {
+        'title': 'Рассчитайте средний чек и число уникальных покупателей',
+        'desc': '<p><strong>Задание:</strong> Напишите SQL-запрос расчета аналитических метрик в переменной <code>sql</code>.</p><p class=\'meta\'>Из таблицы <code>orders</code> для заказов со статусом <code>\'completed\'</code> вычислите средний чек <code>ROUND(AVG(total_amount), 2) AS avg_order_value</code> и количество уникальных покупателей <code>COUNT(DISTINCT user_id) AS unique_customers</code>.</p>',
+    },
+    46: {
+        'title': 'Найдите и удалите неиспользуемые индексы в базе',
+        'desc': '<p><strong>Задание:</strong> Напишите системный SQL-запрос в переменной <code>sql</code> для выявления неиспользуемых индексов в базе PostgreSQL.</p><p class=\'meta\'>Используйте представление <code>pg_stat_user_indexes</code>. Выберите <code>schemaname</code>, <code>relname AS table_name</code>, <code>indexrelname AS index_name</code>, <code>idx_scan</code> для индексов, у которых число сканирований <code>idx_scan = 0</code> и имя индекса не оканчивается на первичный ключ (<code>indexrelname NOT LIKE \'%_pkey\'</code>).</p>',
+    },
+    51: {
+        'title': 'Используйте Savepoints для частичного отката операций',
+        'desc': '<p><strong>Задание:</strong> Напишите последовательность команд транзакции с точкой сохранения в переменной <code>sql</code>.</p><p class=\'meta\'>Начните транзакцию <code>BEGIN;</code>, создайте точку сохранения <code>SAVEPOINT sp1;</code>, выполните частичный откат <code>ROLLBACK TO SAVEPOINT sp1;</code> и завершите транзакцию <code>COMMIT;</code>.</p>',
+    },
+    58: {
+        'title': 'Выполните ALTER TABLE с добавлением колонки и DEFAULT',
+        'desc': '<p><strong>Задание:</strong> Напишите DDL-команду добавления новой колонки в переменную <code>sql</code>.</p><p class=\'meta\'>Используйте оператор <code>ALTER TABLE users ADD COLUMN</code> для добавления столбца <code>status VARCHAR(32) NOT NULL DEFAULT \'active\';</code>.</p>',
+    },
+    59: {
+        'title': 'Используйте оконную функцию ROW_NUMBER() с PARTITION BY',
+        'desc': '<p><strong>Задание:</strong> Напишите SQL-запрос с оконной функцией в переменной <code>sql</code>.</p><p class=\'meta\'>Из таблицы <code>orders</code> выберите <code>id</code>, <code>user_id</code>, <code>total_amount</code> и вычислите порядковый номер заказа для каждого пользователя через <code>ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at DESC) AS rn</code>.</p>',
+    },
+    61: {
+        'title': 'Настройте тайм-аут ожидания блокировки lock_timeout',
+        'desc': '<p><strong>Задание:</strong> Напишите команду конфигурации сессии PostgreSQL в переменной <code>sql</code>.</p><p class=\'meta\'>Установите максимальное время ожидания блокировки строк/таблиц в 2 секунды с помощью команды <code>SET lock_timeout = \'2s\';</code>.</p>',
+    },
+    63: {
+        'title': 'Создайте составной индекс с учетом селективности колонок',
+        'desc': '<p><strong>Задание:</strong> Напишите DDL-команду создания составного индекса в переменной <code>sql</code>.</p><p class=\'meta\'>Создайте индекс с именем <code>idx_orders_tenant_status_date</code> на таблице <code>orders</code> с полями <code>tenant_id</code>, <code>status</code> и <code>created_at DESC</code> в порядке убывания селективности.</p>',
+    },
+    79: {
+        'title': 'Опишите связь 1:N с каскадным удалением ON DELETE CASCADE',
+        'desc': '<p><strong>Задание:</strong> Напишите DDL создания дочерней таблицы со связью 1:N в переменной <code>sql</code>.</p><p class=\'meta\'>Создайте таблицу <code>posts</code> со столбцами: <code>id SERIAL PRIMARY KEY</code>, внешний ключ <code>user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE</code>, <code>title VARCHAR(255) NOT NULL</code> и <code>body TEXT NOT NULL</code>.</p>',
+    },
+    84: {
+        'title': 'Запустите воркер Celery отдельным контейнером в Compose',
+        'desc': '<p><strong>Задание:</strong> Опишите конфигурацию Docker Compose сервиса для воркера Celery в строковой переменной <code>compose_service</code>.</p><p class=\'meta\'>Опишите сервис <code>celery_worker</code>: сборочный контекст <code>build: .</code>, команду <code>command: celery -A tasks worker --loglevel=info --concurrency=4</code>, брокер <code>CELERY_BROKER_URL=redis://redis:6379/0</code> в <code>environment</code> и зависимости <code>depends_on</code> от <code>redis</code> и <code>postgres</code>.</p>',
+    },
+    87: {
+        'title': 'Используйте скалярный подзапрос в блоке SELECT',
+        'desc': '<p><strong>Задание:</strong> Напишите SQL-запрос со скалярным подзапросом в блоке SELECT в переменной <code>sql</code>.</p><p class=\'meta\'>Для каждого пользователя из таблицы <code>users u</code> выберите <code>u.id</code>, <code>u.username</code> и подсчитайте число его заказов через подзапрос <code>(SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count</code>.</p>',
+    },
+    91: {
+        'title': 'Используйте LEFT JOIN для поиска пользователей без заказов',
+        'desc': '<p><strong>Задание:</strong> Напишите SQL-запрос поиска пользователей без единого заказа в переменной <code>sql</code>.</p><p class=\'meta\'>Выполните <code>LEFT JOIN</code> таблицы <code>users u</code> с таблицей <code>orders o</code> по условию <code>u.id = o.user_id</code>. Выберите столбцы <code>u.id</code>, <code>u.username</code>, <code>u.email</code> и отфильтруйте записи, где <code>o.id IS NULL</code>.</p>',
+    },
 }
 
 with open(IDE_HTML_PATH, encoding='utf-8') as f:
@@ -375,14 +499,17 @@ for _t in TASKS_381:
     _t['code'] = _code
     _t['solution'] = _code
     _t['initialCode'] = build_starter_for_task(_t)
-    _doc_m = re.search(r'"""(.*?)"""', _code, re.S)
+    _stripped_code = _code.strip()
+    _doc_m = None
+    if _stripped_code.startswith('"""') or _stripped_code.startswith("'''"):
+        _doc_m = re.match(r'^(?:"""|\'\'\')(.*?)(?:"""|\'\'\')', _stripped_code, re.S)
     if _t['id'] in _TASK_OVERRIDES and 'desc' in _TASK_OVERRIDES[_t['id']]:
         _t['desc'] = _TASK_OVERRIDES[_t['id']]['desc']
     else:
         _t['desc'] = f"<p><strong>Задание:</strong> {html.escape(_t['title'])}.</p>" + (
             f"<p class='meta'>{html.escape(_doc_m.group(1).strip())}</p>" if _doc_m else ""
         )
-    _t['hint'] = f"Обрати внимание на сигнатуру и инварианты задачи «{_t['title']}» ({_t['tier']})."
+    _t['hint'] = generate_pedagogical_hint(_t)
     _t['tests'] = build_test_for_task(_t)
 
 TASKS_BY_ID = {t['id']: t for t in TASKS_381}
