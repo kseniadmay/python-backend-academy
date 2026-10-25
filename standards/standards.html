@@ -8592,7 +8592,7 @@
     z-index: 1;
   }
   html[data-theme="dark"] body:has(.path-serpentine-wrap) .ambient-orb--burgundy {
-    background: rgba(93, 113, 137, 0.12) !important;
+    background: var(--orb-burgundy) !important;
   }
   .path-serpentine-svg .path-track-bg {
     stroke: rgba(105, 116, 132, 0.54) !important;
@@ -8722,6 +8722,89 @@
   }
   html[data-theme="dark"] .hex-node-underlabel--locked {
     fill: #d5dee8 !important;
+  }
+  /* Refined learning trail: clearer route, calmer labels, more room to explore. */
+  html[data-theme="dark"] .path-serpentine {
+    max-width: 620px;
+    border: 1px solid rgba(137, 179, 168, 0.22) !important;
+    border-radius: 28px !important;
+    background:
+      radial-gradient(ellipse 72% 34% at 18% 8%, rgba(92, 142, 153, 0.14), transparent 74%),
+      radial-gradient(ellipse 72% 42% at 84% 58%, rgba(16, 185, 129, 0.10), transparent 76%),
+      linear-gradient(165deg, rgba(22, 29, 38, 0.96), rgba(12, 19, 24, 0.98)) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10),
+      0 26px 64px rgba(0, 0, 0, 0.30),
+      0 0 48px rgba(16, 185, 129, 0.07) !important;
+  }
+  html[data-theme="dark"] .path-serpentine::before {
+    inset: 9px;
+    border-color: rgba(195, 218, 209, 0.07);
+    background: linear-gradient(155deg, rgba(255, 255, 255, 0.04), transparent 28%, rgba(16, 185, 129, 0.035));
+  }
+  html[data-theme="dark"] .path-serpentine-svg .path-track-bg {
+    stroke: rgba(103, 151, 148, 0.42) !important;
+    stroke-width: 17px !important;
+    filter: drop-shadow(0 0 14px rgba(93, 170, 151, 0.22));
+  }
+  html[data-theme="dark"] .path-serpentine-svg .path-track-groove {
+    stroke: rgba(12, 20, 25, 0.78) !important;
+    stroke-width: 9px !important;
+  }
+  html[data-theme="dark"] .path-serpentine-svg .path-track-future {
+    stroke: rgba(181, 207, 202, 0.56) !important;
+    stroke-width: 3.5px !important;
+    stroke-dasharray: 5 9;
+  }
+  .hex-node-underlabel {
+    font-family: 'Onest', var(--font-b, sans-serif) !important;
+    stroke-width: 2.8px !important;
+    paint-order: stroke fill;
+  }
+  html[data-theme="dark"] .hex-node-underlabel {
+    fill: #e5efeb;
+    stroke: rgba(10, 16, 20, 0.90);
+    filter: drop-shadow(0 2px 7px rgba(0, 0, 0, 0.52));
+  }
+  html[data-theme="dark"] .hex-node-underlabel--locked {
+    fill: #c4d0d8 !important;
+  }
+  @media (max-width: 640px) {
+    html[data-theme="dark"] .path-serpentine {
+      max-width: 100%;
+      border-radius: 23px !important;
+    }
+    html[data-theme="dark"] .path-serpentine::before {
+      inset: 7px;
+    }
+    .hex-node-underlabel {
+      stroke-width: 2.5px !important;
+    }
+    .path-banner-mobile-row {
+      justify-content: flex-start;
+    }
+    .path-banner-mobile-row .path-chapter-crumb-label,
+    .path-banner-mobile-row .path-crumb-sep {
+      display: none !important;
+    }
+  }
+  /* Keep the learning route as the sole desktop focal point. */
+  body:has(.path-serpentine-wrap) .coddy-right-rail {
+    display: none !important;
+  }
+  .coddy-path-layout:has(.path-serpentine-wrap) {
+    max-width: 800px;
+  }
+  .coddy-path-layout:has(.path-serpentine-wrap) .path-serpentine-wrap {
+    max-width: 720px;
+    width: 100%;
+  }
+  .coddy-path-layout:has(.path-serpentine-wrap) .path-serpentine {
+    max-width: 660px;
+  }
+  @media (max-width: 640px) {
+    .coddy-path-layout:has(.path-serpentine-wrap) .path-serpentine-wrap {
+      max-width: 100%;
+    }
   }
 </style>
 <link rel="manifest" href="manifest.json">
@@ -17601,15 +17684,16 @@ function renderPathMobileStatsHTML(totalCompletedUnits, streakText, curTier, act
   const chNum = activeChapterNum || 1;
   const chDone = (typeof chapterCompleted === 'number') ? chapterCompleted : 0;
   const chTot = (typeof chapterTotal === 'number') ? chapterTotal : 9;
-  const tierNum = (curTier === 'all') ? 1 : (Number(curTier) || 1);
-  const tierIcon = (curTier === 'all') ? '🌐' : ((typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[tierNum] && INTERVIEW_ECHELONS[tierNum].icon) || '🛡️');
-  const tierLabel = (curTier === 'all') ? 'Все эшелоны' : `Эшелон ${tierNum}`;
+  const streakCount = Number(state.streak) || 0;
+  const xpCount = Number(state.xp) || 0;
+  const chapterLabel = chDone > 0 ? `Гл. ${chNum}: ${chDone}/${chTot}` : `Гл. ${chNum} · Старт`;
+  const streakLabel = streakCount > 0 ? `${streakCount} ${streakText}` : 'Начать серию';
+  const xpLabel = xpCount > 0 ? `${xpCount} XP` : 'Первые XP впереди';
   return `
-    <div class="path-mobile-stats" role="status" aria-label="Статистика обучения">
-      <span class="pms-item pms-echelon" data-open-echelon-modal="1" role="button" tabindex="0" title="Нажмите, чтобы сменить программу / эшелон">${tierIcon} <b>${tierLabel}</b> <span style="font-size:0.68rem;opacity:0.8;">▾</span></span>
-      <span class="pms-item" title="Пройдено в главе ${chNum}">📘 <b>Гл. ${chNum}: ${chDone}/${chTot}</b></span>
-      <span class="pms-item" title="Стрик активности">🔥 <b>${state.streak || 0}</b> ${streakText}</span>
-      <span class="pms-item" title="Накопленный опыт">⚡ <b>${state.xp || 0} XP</b></span>
+    <div class="path-mobile-stats" role="status" aria-label="Прогресс главы и серия занятий">
+      <span class="pms-item" title="Пройдено в главе ${chNum}">📘 <b>${chapterLabel}</b></span>
+      <span class="pms-item" title="Стрик активности">🔥 <b>${streakLabel}</b></span>
+      <span class="pms-item" title="Накопленный опыт">⚡ <b>${xpLabel}</b></span>
     </div>`;
 }
 
