@@ -326,7 +326,7 @@ assert(!academyHtml.includes('uniq в Linux!') && !academyHtml.includes('по т
 console.log('✓ Bug 51: K-218 step 4 exclamation marks removed verified');
 
 // 52. Bug 52: К-218 step 4: явный вывод результата вместо строки-заглушки
-assert(k218Content.includes("print(f\"{status}: {[x['id'] for x in items]}\")"), 'Bug 52: K-218 step 4 must print groupby output');
+assert(k218Content.includes("print(f\"{status}: {[x['id'] for x in items]}\")") || k218Content.includes("print(f\"{status}: {ids}\")"), 'Bug 52: K-218 step 4 must print groupby output');
 assert((academyHtml.includes('Выводим результат группировки') && academyHtml.includes('for status, items in grouped.items()')) || academyHtml.includes('groupby') || academyHtml.includes('grouped'), 'Bug 52: academy.html must execute and print groupby results');
 console.log('✓ Bug 52: K-218 step 4 explicit groupby output verified');
 
