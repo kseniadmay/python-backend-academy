@@ -1,4 +1,4 @@
-import os, re, glob, json, html, ast, copy, textwrap
+import os, re, glob, json, html, ast, copy, textwrap, itertools
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _CLOUD_ROOT = r'C:\Users\fury6\OneDrive\Python_Backend_Academy'
@@ -624,6 +624,62 @@ _NON_PY_PREFIX_RE = re.compile(
     r'^(SELECT|FROM|INSERT|UPDATE|DELETE|CREATE|ALTER|GET |POST |PUT |PATCH |HEAD |OPTIONS |HTTP/|pip |poetry |uvicorn |gunicorn |django-admin |pytest |python |curl |git |docker |alembic )'
 )
 
+_diag_id_counter = itertools.count(1)
+
+def ascii_to_vector_svg(raw_text: str, title: str = "СХЕМА АРХИТЕКТУРЫ") -> str:
+    raw_lines = raw_text.splitlines()
+    if not raw_lines:
+        return ""
+    uid = f"d{next(_diag_id_counter)}"
+    max_cols = max(len(l) for l in raw_lines)
+    num_rows = len(raw_lines)
+    char_w = 8.2
+    row_h = 20
+    pad_x = 18
+    top_header_h = 36
+    pad_bottom = 16
+    svg_w = int(max(max_cols * char_w + pad_x * 2, 320))
+    svg_h = int(top_header_h + num_rows * row_h + pad_bottom)
+    
+    svg_lines = []
+    svg_lines.append(f'<svg class="arch-vector-svg" viewBox="0 0 {svg_w} {svg_h}" width="100%" height="{svg_h}" style="max-width:{svg_w}px;display:block;margin:0 auto;border-radius:12px;" xmlns="http://www.w3.org/2000/svg">')
+    svg_lines.append('  <defs>')
+    svg_lines.append(f'    <linearGradient id="bgGrad_{uid}" x1="0%" y1="0%" x2="100%" y2="100%">')
+    svg_lines.append('      <stop offset="0%" stop-color="#12151d"/>')
+    svg_lines.append('      <stop offset="100%" stop-color="#0a0c10"/>')
+    svg_lines.append('    </linearGradient>')
+    svg_lines.append(f'    <pattern id="diagGrid_{uid}" width="16" height="16" patternUnits="userSpaceOnUse">')
+    svg_lines.append('      <path d="M 16 0 L 0 0 0 16" fill="none" stroke="rgba(255,255,255,0.025)" stroke-width="0.5"/>')
+    svg_lines.append('    </pattern>')
+    svg_lines.append('  </defs>')
+    svg_lines.append(f'  <rect width="{svg_w}" height="{svg_h}" rx="12" fill="url(#bgGrad_{uid})" stroke="rgba(255,255,255,0.09)" stroke-width="1"/>')
+    svg_lines.append(f'  <rect y="{top_header_h}" width="{svg_w}" height="{svg_h - top_header_h}" fill="url(#diagGrid_{uid})"/>')
+    svg_lines.append(f'  <path d="M 0 12 Q 0 0 12 0 L {svg_w - 12} 0 Q {svg_w} 0 {svg_w} 12 L {svg_w} {top_header_h} L 0 {top_header_h} Z" fill="rgba(255,255,255,0.02)"/>')
+    svg_lines.append(f'  <line x1="0" y1="{top_header_h}" x2="{svg_w}" y2="{top_header_h}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>')
+    svg_lines.append('  <circle cx="18" cy="18" r="4" fill="#38ef7d"/>')
+    svg_lines.append('  <circle cx="30" cy="18" r="4" fill="#00e5ff" opacity="0.7"/>')
+    svg_lines.append(f'  <text x="44" y="22" fill="#8b9bb4" font-family="-apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif" font-size="11" font-weight="700" letter-spacing="0.8">{html.escape(title)}</text>')
+    
+    start_y = top_header_h + 18
+    for idx, line in enumerate(raw_lines):
+        y_pos = start_y + idx * row_h
+        escaped_line = html.escape(line)
+        if any(ch in line for ch in "┌┐└┘├┤│─"):
+            fill_color = "#94a3b8"
+        elif re.match(r'^\s*\d+\.', line):
+            fill_color = "#f1f5f9"
+        elif any(ch in line for ch in "▲▼►◄"):
+            fill_color = "#00e5ff"
+        elif line.strip().startswith("(") and line.strip().endswith(")"):
+            fill_color = "#64748b"
+        else:
+            fill_color = "#cbd5e1"
+            
+        svg_lines.append(f'  <text x="{pad_x}" y="{y_pos}" fill="{fill_color}" font-family="\'JetBrains Mono\', \'Fira Code\', monospace" font-size="12.5" xml:space="preserve">{escaped_line}</text>')
+        
+    svg_lines.append('</svg>')
+    return '\n'.join(svg_lines)
+
 def _is_runnable_python(code_lang, raw_code):
     if not raw_code or code_lang not in ('python', 'py', ''):
         return False
@@ -725,7 +781,15 @@ def md_chunk_to_html(md_chunk, ctx_blocks=None):
                     ctx_blocks.append(f"try:\n{indented_ctx}\n    pass\nexcept Exception:\n    pass")
                 else:
                     run_btn = ''
-                out.append(f'<div class="snippet-wrap">{run_btn}<pre><code>{esc_code}</code></pre><div class="snippet-out hidden"></div></div>')
+                is_diagram = not is_py and (
+                    code_lang in ('diagram', 'ascii') or
+                    any(ch in raw_code for ch in '┌┐└┘├┤│►◄▲▼├──└──')
+                )
+                if is_diagram:
+                    diag_svg = ascii_to_vector_svg(raw_code)
+                    out.append(f'<div class="diagram-vector-card" style="margin:14px 0;max-width:100%;overflow-x:auto;">{diag_svg}</div>')
+                else:
+                    out.append(f'<div class="snippet-wrap">{run_btn}<pre><code>{esc_code}</code></pre><div class="snippet-out hidden"></div></div>')
             continue
 
         if in_code:
