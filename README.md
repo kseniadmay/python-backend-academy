@@ -48,7 +48,7 @@
 
 ```bash
 # Тесты REST API:
-python -m unittest discover backend/tests
+python -m unittest
 
 # Сборка ассетов и валидация данных:
 python scripts/build.py
