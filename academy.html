@@ -1868,7 +1868,8 @@
     content:"";position:absolute;inset:0;pointer-events:none;
     background:linear-gradient(125deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 45%);
   }
-  .fc-card:hover{border-color:var(--moss);box-shadow:0 10px 24px rgba(28,32,26,.12);}
+  .fc-card:hover{border-color:var(--moss);box-shadow:0 12px 28px rgba(16,185,129,0.14);transform:translateY(-2px);}
+  .fc-card:active{transform:scale(0.99) translateY(0);}
   .fc-card--Answer{
     background:linear-gradient(135deg, rgba(16, 185, 129, 0.14) 0%, rgba(16, 185, 129, 0.04) 50%, rgba(18, 23, 33, 0.88) 100%), var(--surface) !important;
     border-color:rgba(16, 185, 129, 0.65) !important;
@@ -2270,8 +2271,11 @@
     display:contents;
   }
   @media(max-width:640px){
-    .cards-hub-header{margin-bottom:8px !important;}
+    .cards-hub-header{margin-bottom:8px !important;gap:8px !important;}
     .cards-hub-header h1{font-size:1.25rem !important;}
+    .cards-hub-header-actions{display:flex !important;gap:6px !important;overflow-x:auto !important;max-width:100% !important;padding-bottom:4px !important;-webkit-overflow-scrolling:touch !important;scrollbar-width:none !important;flex-wrap:nowrap !important;}
+    .cards-hub-header-actions::-webkit-scrollbar{display:none;}
+    .cards-hub-header-actions .cocoon-pill, .cards-hub-header-actions .btn{white-space:nowrap !important;flex-shrink:0 !important;}
     .cards-hub-controls{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
     .cards-hub-subfilters{display:grid !important;grid-template-columns:1fr 1fr;gap:8px;}
     .cards-hub-subfilters select{min-width:0 !important;width:100% !important;box-sizing:border-box !important;font-size:.78rem !important;padding:8px 8px !important;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;}
@@ -15727,7 +15731,7 @@ function viewCardsHub(){
             Колода: <span style="color:var(--gold);font-weight:600;">${cleanDeckName}</span>
           </div>
         </div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <div class="cards-hub-header-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           <a href="#/docs" class="btn btn-ghost" style="padding:6px 12px;font-size:0.78rem;" title="Открыть инженерный справочник">💡 Шпаргалка</a>
           <span class="cocoon-pill" style="color:var(--amber);">⚡ Очередь: <b>${duePos + 1} / ${qLen}</b></span>
           <button type="button" class="btn btn-ghost" data-hub-exit-due style="padding:6px 12px;font-size:0.78rem;">✕ Выйти из очереди</button>
@@ -15858,7 +15862,7 @@ function viewCardsHub(){
           <span class="sr-only">Интервальное повторение RemNote · 286 колод · 6 051 карточка</span>
           <h1 style="margin:0;">🎉 Колода изучена!</h1>
         </div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <div class="cards-hub-header-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           ${(() => {
             const srsStats = typeof getSpacedRepetitionStats === 'function' ? getSpacedRepetitionStats() : {dueTodayCardsCount:0, masteredCardsCount:0};
             const dueBtn = srsStats.dueTodayCardsCount > 0 ? `<button type="button" class="btn btn-burgundy" data-hub-review-due style="padding:6px 12px;font-size:.78rem;font-weight:700;" title="Запустить повторение карточек, запланированных на сегодня">🔥 Повторить на сегодня (<b>${srsStats.dueTodayCardsCount}</b>) ➔</button>` : '';
@@ -15898,7 +15902,7 @@ function viewCardsHub(){
           <span class="sr-only">Интервальное повторение RemNote · 286 колод · 6 051 карточка (126 колод Python + 25 колод Web + 43 колоды Backend + 16 колод Алгоритмы + 32 колоды Базы данных + 17 колод Архитектура + 45 колод Инфраструктура)</span>
           <h1 style="margin:0;">🃏 Центр 3D Флеш-карточек</h1>
         </div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <div class="cards-hub-header-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           ${(() => {
             const srsStats = typeof getSpacedRepetitionStats === 'function' ? getSpacedRepetitionStats() : {dueTodayCardsCount:0, masteredCardsCount:0};
             const dueBtn = srsStats.dueTodayCardsCount > 0 ? `<button type="button" class="btn btn-burgundy" data-hub-review-due style="padding:6px 12px;font-size:.78rem;font-weight:700;" title="Запустить повторение карточек, запланированных на сегодня">🔥 Повторить на сегодня (<b>${srsStats.dueTodayCardsCount}</b>) ➔</button>` : '';
@@ -24024,6 +24028,51 @@ document.addEventListener('keydown', function(e){
     if(pyNextBtn){ e.preventDefault(); pyNextBtn.click(); return; }
   }
 });
+
+// Mobile touch swipe gestures for 3D flashcards (Hub & Skill cards)
+(function initFlashcardTouchGestures(){
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartTime = 0;
+  let activeCard = null;
+
+  document.addEventListener('touchstart', function(e){
+    const card = e.target.closest('.fc-card');
+    if(!card) return;
+    const touch = e.changedTouches ? e.changedTouches[0] : e;
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+    touchStartTime = Date.now();
+    activeCard = card;
+  }, { passive: true });
+
+  document.addEventListener('touchend', function(e){
+    if(!activeCard) return;
+    activeCard = null;
+    const touch = e.changedTouches ? e.changedTouches[0] : e;
+    const dx = touch.clientX - touchStartX;
+    const dy = touch.clientY - touchStartY;
+    const dt = Date.now() - touchStartTime;
+
+    // Horizontal swipe: |dx| > 45px, mostly horizontal (|dx| > 1.35 * |dy|), within 650ms
+    if(Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.35 && dt < 650){
+      if(dx < 0){
+        // Swipe left -> Next card or rate 'good'
+        const nextBtn = document.querySelector('[data-py-next-card]:not([disabled]), [data-hub-next]:not([disabled])');
+        if(nextBtn){
+          nextBtn.click();
+        } else {
+          const rateBtn = document.querySelector('[data-py-rate-card="3"], [data-hub-rate="3"]');
+          if(rateBtn) rateBtn.click();
+        }
+      } else {
+        // Swipe right -> Previous card
+        const prevBtn = document.querySelector('[data-py-prev-card]:not([disabled]), [data-hub-prev]:not([disabled])');
+        if(prevBtn) prevBtn.click();
+      }
+    }
+  }, { passive: true });
+})();
 
 // Register PWA Service Worker (HTTP/HTTPS only to prevent file:// SecurityError)
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
