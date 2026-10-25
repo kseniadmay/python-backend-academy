@@ -3641,6 +3641,14 @@
     color: var(--ink, #f8fafc);
     font-weight: 800;
   }
+  .path-mobile-stats .pms-echelon {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
 
   /* Floating Jump-to-Active Button (Coddy dark rounded square with amber arrow) */
   .path-jump-btn {
@@ -17684,13 +17692,18 @@ function renderPathMobileStatsHTML(totalCompletedUnits, streakText, curTier, act
   const chNum = activeChapterNum || 1;
   const chDone = (typeof chapterCompleted === 'number') ? chapterCompleted : 0;
   const chTot = (typeof chapterTotal === 'number') ? chapterTotal : 9;
+  const tierNum = (curTier === 'all') ? 1 : (Number(curTier) || 1);
+  const tierIcon = (curTier === 'all') ? '🌐' : ((typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[tierNum] && INTERVIEW_ECHELONS[tierNum].icon) || '🛡️');
+  const tierLabel = (curTier === 'all') ? 'Все эшелоны' : `Эшелон ${tierNum}`;
+  const tierShortLabel = (curTier === 'all') ? 'Все' : `Эш. ${tierNum}`;
   const streakCount = Number(state.streak) || 0;
   const xpCount = Number(state.xp) || 0;
-  const chapterLabel = chDone > 0 ? `Гл. ${chNum}: ${chDone}/${chTot}` : `Гл. ${chNum} · Старт`;
+  const chapterLabel = chDone > 0 ? `Гл. ${chNum}: ${chDone}/${chTot}` : `Гл. ${chNum} · Начало`;
   const streakLabel = streakCount > 0 ? `${streakCount} ${streakText}` : 'Начать серию';
   const xpLabel = xpCount > 0 ? `${xpCount} XP` : 'Первые XP впереди';
   return `
-    <div class="path-mobile-stats" role="status" aria-label="Прогресс главы и серия занятий">
+    <div class="path-mobile-stats" role="status" aria-label="Программа, прогресс главы и серия занятий">
+      <button type="button" class="pms-item pms-echelon" data-open-echelon-modal="1" title="${tierLabel} · Нажмите, чтобы сменить программу" aria-label="${tierLabel}, сменить программу">${tierIcon} <b>${tierShortLabel}</b> <span aria-hidden="true">▾</span></button>
       <span class="pms-item" title="Пройдено в главе ${chNum}">📘 <b>${chapterLabel}</b></span>
       <span class="pms-item" title="Стрик активности">🔥 <b>${streakLabel}</b></span>
       <span class="pms-item" title="Накопленный опыт">⚡ <b>${xpLabel}</b></span>
