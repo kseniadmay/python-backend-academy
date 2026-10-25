@@ -15,7 +15,7 @@ INDEX_PATH = os.path.normpath(os.path.join(_HERE, '..', 'index.html'))
 assert os.path.isfile(HTML_PATH), f"academy.html missing: {HTML_PATH}"
 assert os.path.isfile(ETALON_PATH), f"standards/standards.html missing: {ETALON_PATH}"
 
-# Verify Canonical Benchmark Invariant: academy.html and Эталоны.html must be strictly identical
+# Verify Canonical Benchmark Invariant: academy.html and standards.html must be strictly identical
 with open(HTML_PATH, encoding='utf-8') as f1, open(ETALON_PATH, encoding='utf-8') as f2:
     assert f1.read() == f2.read(), "academy.html and standards.html must be strictly identical (Canonical Benchmark Invariant)!"
 
@@ -162,8 +162,8 @@ if os.path.isfile(zip_path):
         assert len(namelist) >= 545, f"Expected >= 545 files in project zip, got {len(namelist)}"
         required_in_zip = [
             'academy.html',
-            'academy.html',
-            'academy.html',
+            'practice_ide.html',
+            'standards/standards.html',
             'manifest.json',
             'icon.svg',
             'sw.js',

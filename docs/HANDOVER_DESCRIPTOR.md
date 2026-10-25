@@ -26,10 +26,10 @@
    - Вся работа ведется **ТОЛЬКО** в `/Users/fury/OneDrive/Python_Backend_Academy`.
    - Строго запрещено создавать или использовать папки в `/scratch`, `~/.gemini/antigravity/scratch` или клонировать репозиторий в другие места.
    - Зафиксировано в: `.agents/rules/workspace-rule.md`, `~/.gemini/antigravity/rules/onedrive-repo-rule.md`, `~/.gemini/config/rules/onedrive-repo-rule.md`.
-2. **Побайтовое равенство эталонов (`academy.html === Эталоны/Эталоны.html`)**:
-   - `Эталоны/Эталоны.html` — канонический источник истины.
-   - Любое изменение в `academy.html` обязано зеркально вноситься в `Эталоны/Эталоны.html`.
-   - Проверка: `cmp -s academy.html "Эталоны/Эталоны.html"` (должно возвращать 0).
+2. **Побайтовое равенство эталонов (`academy.html === standards/standards.html`)**:
+   - `standards/standards.html` — канонический источник истины.
+   - Любое изменение в `academy.html` обязано зеркально вноситься в `standards/standards.html`.
+   - Проверка: `python scripts/build.py` (подтверждает 100% побайтовое соответствие).
 3. **Запрет несогласованных коммитов (`AGENTS.md`)**:
    - **НИКОГДА** не выполнять `git commit` без прямого предварительного согласия пользователя («Готовы закоммитить эти изменения?»).
 4. **Стиль сообщений коммитов**:
@@ -125,7 +125,7 @@ flowchart TD
     C -- "Нет" --> D["Четкий вердикт:<br/>'Улучшения не требуются, экран идеален'"]
     C -- "Да" --> E["Подготовка системного<br/>Промпта Генератору"]
     E --> F["Пользователь поручает:<br/>'Внедряй'"]
-    F --> G["Синхронная правка:<br/>academy.html + Эталоны/Эталоны.html"]
+    F --> G["Синхронная правка:<br/>academy.html + standards/standards.html"]
     G --> H["Запуск тестов:<br/>python3 verify_all.py --quick (100% PASS)<br/>+ проверка скриншота через visual_test.js"]
     H --> I["Отчет пользователю +<br/>Запрос разрешения на коммит"]
     I --> J{"Пользователь<br/>одобрил пуш/коммит?"}
@@ -152,7 +152,7 @@ node scripts/visual_test.js --only <screen_name>
 python3 verify_all.py --quick
 
 # 5. Проверить побайтовую идентичность эталона и рабочего файла
-cmp -s academy.html "Эталоны/Эталоны.html" && echo "100% MATCH" || echo "MISMATCH!"
+python scripts/build.py
 
 # 6. Проверить синтаксис JS через установленный нод-шим
 /Users/fury/.gemini/antigravity/bin/node --check academy.html

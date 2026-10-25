@@ -340,7 +340,9 @@ _sys.modules["aio_pika"] = _mod_aiopika
 
 import os
 _ide_candidates = [
+    os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "practice_ide.html")),
     os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "Практика кода — тренажёр с IDE.html")),
+    "practice_ide.html",
     "Практика кода — тренажёр с IDE.html"
 ]
 _found_ide = next((p for p in _ide_candidates if os.path.isfile(p)), None)
@@ -1837,8 +1839,12 @@ assert r2 == {"issues": [], "probes_healthy": True, "ready": True}, r2
 
         # 4) Verify standalone IDE trainer file on disk
         import json as _json_disk
-        _ide_path = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'Практика кода — тренажёр с IDE.html'))
-        if os.path.isfile(_ide_path):
+        _ide_candidates_disk = [
+            os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'practice_ide.html')),
+            os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'Практика кода — тренажёр с IDE.html'))
+        ]
+        _ide_path = next((p for p in _ide_candidates_disk if os.path.isfile(p)), None)
+        if _ide_path and os.path.isfile(_ide_path):
             with _real_io.open(_ide_path, 'r', encoding='utf-8') as _f:
                 _ide_content = _f.read()
             assert '__ACADEMY_SYNC_V1__:' in _ide_content, "Missing __ACADEMY_SYNC_V1__: in standalone IDE"

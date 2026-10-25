@@ -3,7 +3,7 @@ import os, re, glob, json, html, ast, copy, textwrap
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _CLOUD_ROOT = r'C:\Users\fury6\OneDrive\Python_Backend_Academy'
 _REL_REMNOTE = os.path.normpath(os.path.join(_HERE, '..', 'RemNote_Python_Mastery_FIXED'))
-_REL_IDE_HTML = os.path.normpath(os.path.join(_HERE, '..', 'Практика кода — тренажёр с IDE.html'))
+_REL_IDE_HTML = os.path.normpath(os.path.join(_HERE, '..', 'practice_ide.html'))
 
 BASE_REMNOTE = _REL_REMNOTE if os.path.isdir(_REL_REMNOTE) else os.path.join(_CLOUD_ROOT, 'RemNote_Python_Mastery_FIXED')
 IDE_HTML_PATH = _REL_IDE_HTML if os.path.isfile(_REL_IDE_HTML) else (

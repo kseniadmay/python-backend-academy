@@ -1,5 +1,5 @@
 # 🧭 HANDOVER & PROJECT CONTEXT — База знаний и хэндовер переноса для ИИ
-**Проект**: Интерактивная платформа и база знаний «Junior+ Python Backend Developer» (`academy.html` + `Практика кода — тренажёр с IDE.html` + `RemNote_Python_Mastery_FIXED`)  
+**Проект**: Интерактивная платформа и база знаний «Junior+ Python Backend Developer» (`academy.html` + `practice_ide.html` + `RemNote_Python_Mastery_FIXED`)  
 **Единая облачная папка проекта**: `C:\Users\fury6\OneDrive\Python_Backend_Academy` (ярлык на Рабочем столе: `C:\Users\fury6\OneDrive\Desktop\Python Backend Academy (Cloud).lnk`)  
 **Эталонный архив проекта**: `C:\Users\fury6\OneDrive\Python_Backend_Academy\Python_Backend_Academy_Project.zip`  
 **Последнее обновление**: 12.10.2026 (Аудит, чистка правил, интеграция Zen-практики, 100% PASS verify_all)  
@@ -64,11 +64,11 @@
 
 - **Формат приложения**:
   1. Главный автономный **Single-File SPA** `academy.html` (`~5.8 МБ`, вшиты все 7 треков Khan Academy Mastery: `#/python`, `#/web`, `#/backend`, `#/algorithms`, `#/databases`, `#/architecture`, `#/infra` + `#/map` + `#/practice` + `#/cards`).
-  2. Автономный тренажёр с IDE `Практика кода — тренажёр с IDE.html` (`~361 КБ` / `369 943 байта`, 401 задача с CodeMirror и Brython 3.13.0).
+  2. Автономный тренажёр с IDE `practice_ide.html` (`~361 КБ` / `369 943 байта`, 401 задача с CodeMirror и Brython 3.13.0).
   3. Каноническая база знаний `RemNote_Python_Mastery_FIXED` (`525` `.md`-файлов: мастер-индекс + **238 конспектов `К-*`** + **286 файлов колод `Ф-*`**).
 - **Версия Python в курсе**: Идиоматичный современный **Python 3.11+ / 3.13** (современный тайпинг `list[str]`, `X | Y`, `match/case`, `dataclass`, `asyncio`, `SQLAlchemy 2.0`, `FastAPI` + `Pydantic v2`).
 - **Двухконтурный браузерный Python-движок (Dual-Engine)**:
-  1. **Brython `3.13.0` (Primary Engine, `< 50 мс`)**: мгновенный запуск в браузере без ожидания загрузки WASM. Встроены полные шимы и полифиллы (`wrapper` в `Практика кода — тренажёр с IDE.html` и `full_env_code` в `academy.html`):
+  1. **Brython `3.13.0` (Primary Engine, `< 50 мс`)**: мгновенный запуск в браузере без ожидания загрузки WASM. Встроены полные шимы и полифиллы (`wrapper` в `practice_ide.html` и `full_env_code` в `academy.html`):
      - `unittest.mock` (патч `MagicMixin.__enter__`/`__exit__`, `_copy_func_details`, `_CODE_ATTRS`);
      - `hmac` (`HMAC`, `new`, `digest`, `compare_digest`) и `bcrypt` (`gensalt`, `hashpw`, `checkpw`);
      - in-memory SQL-движок `sqlite3` (`CREATE TABLE`, `INSERT`, `SELECT ... WHERE`, `executemany`, `commit`, `rollback`);
@@ -80,7 +80,7 @@
   2. **Pyodide `0.26.4` (Fallback WASM Engine)**: полноценный CPython в WebAssembly (исправлен баг старой версии `314.0.7`).
 - **Персистентность (`localStorage`, 100% без сервера)**:
   - `py_backend_academy_v1` — единый JSON состояния (`xp`, `streak`, `lastActiveDate`, `dailyXp`, `activityLog`, `completedLessons`, `completedTasks`, `readNotes`, `reviewedDecks`, `passedUnitTests`, `cards`, `diag`).
-  - `practice-ide-status` и `practice-ide-drafts` — общая шина синхронизации решённых задач и черновиков кода между `academy.html` и `Практика кода — тренажёр с IDE.html`.
+  - `practice-ide-status` и `practice-ide-drafts` — общая шина синхронизации решённых задач и черновиков кода между `academy.html` и `practice_ide.html`.
 
 ---
 
@@ -176,7 +176,7 @@
 - **Расположение**: `C:\Users\fury6\OneDrive\Python_Backend_Academy\RemNote_Python_Mastery_FIXED\00 · 🗺️ Карта Мастерства.md`.
 - Сведён единый мастер-индекс на **7 модулей (`01 · 🐍 Python`, `02 · 🌐 Web`, `03 · ⚙️ Backend`, `04 · ⚡ Алгоритмы`, `05 · 🗄️ Базы данных`, `06 · 🏛️ Архитектура`, `07 · 🚀 Инфраструктура`), 45 юнитов и 126 навыков (238 `К-*`, 286 `Ф-*`, 100% валидных ссылок)**.
 
-### ✅ 9. Доработка и проверка тренажёра `Практика кода — тренажёр с IDE.html`, `#/practice`, Боссов модулей (`#/<track>/boss`) и Симулятора собеседования (`#/mock`)
+### ✅ 9. Доработка и проверка тренажёра `practice_ide.html`, `#/practice`, Боссов модулей (`#/<track>/boss`) и Симулятора собеседования (`#/mock`)
 - **401 задача** по 7 уровням (`🥚 1` .. `👑 7`), все **401 из 401 задач** привязаны к навыкам 7 модулей (`SKILL_TASK_IDS`), шимы под **Brython 3.13.0** (включая расширенный чистый Python-шим `sqlite3`), **401/401 PASS** авто-тестами, **458/458 PASS** всех Python-сниппетов из всех **238** теоретических конспектов (`К-*`), и **100% PASS** в Headless Chrome.
 - **7 Боссов модулей (`MODULE_BOSS_TASKS`, маршруты `#/<track>/boss`)**: комплексные финальные задачи уровня `👑 Уровень 7` для каждого из 7 треков (`#/python/boss`, `#/web/boss`, `#/backend/boss`, `#/algorithms/boss`, `#/databases/boss`, `#/architecture/boss`, `#/infra/boss`) с живой проверкой кода в браузере, 4-уровневыми сократовскими наводками (Scaffold Fading) и наградой `+100 XP` + `100 MP` по модулю.
 - **Интерактивный Симулятор собеседования (`#/mock` / `#/interview-sim`)**: объединяет секцию **Live-Coding с 20-минутным таймером** (пул задач + случайная задача из 401 + 4-уровневые сократовские наводки без спойлеров кода) и тренажёр **Поведенческого интервью по методике STAR (Situation, Task, Action, Result)** с автоматической проверкой ответа по чек-листу Senior-интервьюера.
@@ -197,7 +197,7 @@
 ---
 
 ##### ✅ 12. Дизайн-интервью (`/grill-me`) и полный мобильный редизайн «Мягкий Кокон / Вечерний Обсидиан + Coddy Scroll-Reveal» (Завершено и верифицировано на 100%)
-В ходе мобильного визуального тестирования (зафиксированного в канонических эталонах `Эталоны/`) реализованы и проверены на мобильном экране `390x844` все правила дизайна против визуальной тяжести:
+В ходе мобильного визуального тестирования (зафиксированного в канонических эталонах `standards/`) реализованы и проверены на мобильном экране `390x844` все правила дизайна против визуальной тяжести:
 1. **Эстетика и палитра эталона «Вечерний Обсидиан»**:
    - **Основная тема по умолчанию — «Вечерний Обсидиан» (`data-theme="dark"`, `#0d1016`)**: жёстко задана на корневом `<html lang="ru" data-theme="dark">` и защищена однократной миграцией `academy-obsidian-v2` в `localStorage`. Глубокий обсидиановый фон с мягкими размытыми световыми сферами Бургунди (`rgba(190, 18, 60, 0.24)`) и Изумруда (`rgba(16, 185, 129, 0.20)`) позади карточек матового стекла (`backdrop-filter: blur(20px..22px)`).
    - **Светлая тема — «Эфемерный Пергамент» (`data-theme="light"`, `#faf8f5`)**: правило 60/30/10, волосковые границы `rgba(15, 23, 42, 0.07)` и контраст текста `#0f172a` (WCAG AAA).
@@ -222,7 +222,7 @@
    - Полная автоматическая миграция исторических полей схемы `py_backend_academy_v1` (`lastActiveDate -> lastVisit`, `activityLog / dailyXp -> dailyXpByDate`, `completedTasks -> practice-ide-status`, `cards -> cardRatings / reviewedDecks`, `diag -> diagCompleted / diagScore / diagnosticGaps`).
    - Вызов `bumpStreak()` отложен до завершения многоисточниковой гидратации (`hydrateAndMergeAllProgressSources()`), автоматически расходует заморозки стрика (`streakFreezes`) при пропуске дней и никогда не сбрасывает накопленный стрик возвращающегося ученика при обновлении.
 2. **Многоуровневое резервирование (`localStorage` + `window.name` + `IndexedDB` + Cross-Tab `storage` Sync)**:
-   - Каждое сохранение в `academy.html` и в автономном тренажёре `Практика кода — тренажёр с IDE.html` синхронно зеркалируется во все текущие и исторические ключи `localStorage` (`academy_state_v1`, `py_backend_academy_v1`, `py-backend-academy-v2`, `academy_state_backup_v1`, `practice-ide-status`, `practice-ide-status-backup`), в `window.name` (`__ACADEMY_SYNC_V1__:`) для бесшовного перехода по `file://` и асинхронно в базу `IndexedDB` (`AcademyProgressDB` / `snapshots`).
+   - Каждое сохранение в `academy.html` и в автономном тренажёре `practice_ide.html` синхронно зеркалируется во все текущие и исторические ключи `localStorage` (`academy_state_v1`, `py_backend_academy_v1`, `py-backend-academy-v2`, `academy_state_backup_v1`, `practice-ide-status`, `practice-ide-status-backup`), в `window.name` (`__ACADEMY_SYNC_V1__:`) для бесшовного перехода по `file://` и асинхронно в базу `IndexedDB` (`AcademyProgressDB` / `snapshots`).
    - Перед записью `saveState()` и `saveStatus()` выполняют неразрушающее слияние с текущим содержимым `localStorage`, а обработчик `window.addEventListener('storage', ...)` синхронизирует открытые вкладки в реальном времени.
    - При `QuotaExceededError` автоматически вытесняются только старые черновики задач `practice-ide-drafts` с полным сохранением прогресса и `state.lessonDrafts`.
 3. **Непрерывность всех активностей и автосохранение черновиков кода на лету**:
@@ -310,7 +310,7 @@
 Согласование с Ксенией (она же — пользователь чата): изучены покадрово её 3 референс-видео Coddy SQL-курса из `Референсы/` (80 кадров: `Референсы/_frames/v1..v3/`, контактные листы `_sheets/`, 13 ключевых кадров в `scripts/visual_report/refs/`), собрана страница согласования «проблема → референс → решение» `scripts/visual_report/designer_batch_review.html`. Вердикт Ксении: «примени всё как в Coddy, только оставь цвета и стекло». Реализовано (все правки в `assemble_academy.py`, кроме IDE-файла):
 1. **V6 skill-ридер desktop**: модули «CPython Memory Layout» и Tap-to-Fill перенесены из правой «Лаборатории» в центральную колонку (новая карточка «🔬 Смотри в память», в fullNote-режиме — после шагов); справа остались только интерактив: экспресс-песочница + блиц-карточка. Мёртвая зона центра устранена. Инлайн-код в теории (`p>code, li>code`) — изумрудные чипы-«ключевые слова» как в Coddy (светлая тема — приглушённые).
 2. **V7 practice desktop**: один механизм навигации по задачам — инлайн-свайпер `‹ N/M ›` в шапке задачи (класс `.prac-inline-swiper`); сняты селект-список `#prac-task-select`, дублирующий свайпер и чип «⚙️ Фильтры ▾» с дравером (обработчики удалены). Фильтры-чипы и поиск сохранены.
-3. **V19/V30 IDE-тренажёр** (`Практика кода — тренажёр с IDE.html`, прямой файл): единственная тема — платформенный «Вечерний Обсидиан» (`#0d1016`/`#131822`/`#161d2b`, emerald `#10b981`, gold→amber `#f59e0b`, bordeaux `#fb7185`), тёплый пергамент и media-query-ветки удалены; serif Fraunces → Onest (шрифт-линк обновлён, оффлайн — фолбэк Inter); радиус 12px.
+3. **V19/V30 IDE-тренажёр** (`practice_ide.html`, прямой файл): единственная тема — платформенный «Вечерний Обсидиан» (`#0d1016`/`#131822`/`#161d2b`, emerald `#10b981`, gold→amber `#f59e0b`, bordeaux `#fb7185`), тёплый пергамент и media-query-ветки удалены; serif Fraunces → Onest (шрифт-линк обновлён, оффлайн — фолбэк Inter); радиус 12px.
 4. **V31 дашборд**: матрица 7 треков в 2 колонки на ≥900px (grid), плитки/строки плотнее (padding 8–14px, num 1.28rem, квадратики 13px) — «Мои результаты» влезает в первый экран 1440×900 с целью дня.
 5. **V10 practice mobile**: контент вкладки растягивается до таб-бара (`min-height:calc(100dvh - 340px)`), последний блок (кнопка подсказок) прижат вниз `margin-top:auto` — как CTA у Coddy.
 6. **#/map снят с маршрутов**: редирект на дашборд («Мои результаты») в роутере; пункт «Карта навыков» убран из NAV_ITEMS; карточка «🗺️ Полная карта Backend» удалена с дашборда; 5 ссылок мока «К карте навыков» → «К результатам» на `#/`; navRoute diagnostic/topic/lesson → `/`. `viewMap` оставлен в коде (не достигаем) вместе с «Приоритетной архитектурой». Кадры `map_tree`/`map_path` удалены из `visual_test.js` — **42 кадра** (было 44), устаревшие эталоны карты удалены.
@@ -397,7 +397,7 @@
    - Мгновенная шторка Bottom Sheet даёт обучающую обратную связь: изумрудная `✓ Правильно! Материал усвоен (+10 XP)` или рубиновая `✕ Не совсем так` с дружелюбным разбором ментальной модели без демотивирующего штрафа.
 3. **Верификация и защита от регрессий**:
    - В `tests/test_bugs_regression.js` добавлен автоматический тест **Bug 87**, проверяющий наличие, структуру и валидность всех 38 проверок Навыка 1.9.1 (87/87 тестов PASS).
-   - Подтверждено побайтовое равенство эталонов (`academy.html === Эталоны/Эталоны.html === Эталоны.html`).
+   - Подтверждено побайтовое равенство эталонов (`academy.html === standards/standards.html === standards/standards.html`).
    - `python verify_all.py --quick` — 100% PASS.
 
 ### ✅ 29. Ликвидация промежуточных квизов, парная архитектура точек тем с карточками и сквозная верификация прогресса (20.10.2026)
@@ -422,9 +422,9 @@
 
 ### 🏛️ Утверждённый статус эталонов (Canonical Benchmarks)
 Единственным утверждённым **КАНОНИЧЕСКИМ ЭТАЛОНОМ (BENCHMARK)** архитектуры, вёрстки, стилей и логики экранов платформы для всех последующих сессий и доработок является:
-- `C:\Users\fury6\OneDrive\Python_Backend_Academy\Эталоны.html` — полный автономный канонический HTML-эталон платформы со всеми скриптами, стилями, экранами и интерактивной механикой.
+- `C:\Users\fury6\OneDrive\Python_Backend_Academy\standards/standards.html` — полный автономный канонический HTML-эталон платформы со всеми скриптами, стилями, экранами и интерактивной механикой.
 
-Все остальные разрозненные макеты, старые мокапы и альтернативные правила создания экранов упразднены и удалены. Любые экраны обязаны строго соответствовать `Эталоны.html`.
+Все остальные разрозненные макеты, старые мокапы и альтернативные правила создания экранов упразднены и удалены. Любые экраны обязаны строго соответствовать `standards/standards.html`.
 
 ---
 
@@ -477,7 +477,7 @@
   - Цель дня и повторение: «🎯 Цель дня» (прогресс дневного XP) и компактный переход к карточкам «🃏 Повторение карточек».
 
 #### 4. Каноническая эссенция эталонов для применения ко всем экранам платформы
-Единая система правил и инвариантов, извлечённая из утверждённых эталонов (`Эталоны/` и `tests/test_pravki_spec.js`):
+Единая система правил и инвариантов, извлечённая из утверждённых эталонов (`standards/` и `tests/test_pravki_spec.js`):
 1. **Desktop Sidebar Invariant**: сайдбар `236px` на десктопе сохраняется абсолютно на всех экранах (скрывается только на мобильных `≤ 880px`). Никаких «глухих» полноэкранных режимов.
 2. **Единый топбар эшелона (`.echelon-topbar-clean`)**:
    - Бордовый заголовок эшелона (`.echelon-bordeaux-title`).
@@ -512,7 +512,7 @@
 ## 6. Статус верификации и синхронизации
 
 1. **Единая облачная папка и чистый Рабочий стол**:
-   - Все файлы проекта (`academy.html`, `Практика кода — тренажёр с IDE.html`, `HANDOVER_CONTEXT.md`, `PROJECT_CONTEXT.md`, `Python_Backend_Academy_Project.zip`, `RemNote_Python_Mastery_FIXED.zip`, `RemNote_Python_Mastery_FIXED/`, `scripts/`, `Эталоны/`, `verify_all.py`, `verify_all.cmd`) синхронизированы в `C:\Users\fury6\OneDrive\Python_Backend_Academy`.
+   - Все файлы проекта (`academy.html`, `practice_ide.html`, `HANDOVER_CONTEXT.md`, `PROJECT_CONTEXT.md`, `Python_Backend_Academy_Project.zip`, `RemNote_Python_Mastery_FIXED.zip`, `RemNote_Python_Mastery_FIXED/`, `scripts/`, `standards/`, `verify_all.py`, `verify_all.cmd`) синхронизированы в `C:\Users\fury6\OneDrive\Python_Backend_Academy`.
    - На Рабочем столе (`C:\Users\fury6\OneDrive\Desktop`) оставлен только ярлык `Python Backend Academy (Cloud).lnk`.
 2. **Авто-тесты и конвейеры верификации (100% PASS)**:
    - `verify_all.py` / `verify_all.cmd` — единый **6-этапный мастер-конвейер верификации (100% PERFECT)**:
@@ -524,7 +524,7 @@
      - `[6/6]` **Автоматическое визуальное тестирование** (`visual_test.js`) — PASS (детали ниже).
    - **Автоматическое визуальное тестирование `scripts/visual_test.js` (06.10.2026)**: снимает ВСЕ представления проекта — дашборд, `#/path` (game+pro), `#/map` (tree+path), все 7 треков, страницу юнита `#/python/skill/1.1.1`, `#/practice`, `#/cards`, `#/mock`, `#/docs`, `#/sandbox` и экраны автономного IDE-тренажёра — в матрице desktop 1440x900 + mobile 390x844@2x, в двух состояниях: новичок и сеедированный прогресс «середина курса» (localStorage `academy_state_v1`: 4 юнита, стрик 6, 520 XP; итого 44 кадра). На каждый кадр — зонды: JS-ошибки страницы, горизонтальный overflow, пустой рендер (FAIL), console.error и упавшие HTTP-запросы (WARN); плюс попиксельный pixel-diff против эталонов `scripts/visual_baselines/` (допуск 0.1%). Отчёт: `scripts/visual_report/report.md` + `report.json` (в .gitignore). После ОСОЗНАННЫХ правок UI эталоны переснимаются: `node scripts/visual_test.js --update` (закоммитить `scripts/visual_baselines/`). Зависимости (playwright-core, pixelmatch, pngjs) ставятся автоматически в `%LOCALAPPDATA%\pba-visual-deps` (вне OneDrive); браузер — системный Chrome/Edge. Важно: DOM-ассерты проверяют НАЛИЧИЕ элементов, а visual_test — то, как страница реально ВЫГЛЯДИТ; оба контура дополняют друг друга.
    - `audit_pipeline.py` — параллельный аудит всех тестовых скриптов конвейера: **ровно 87 из 87 скриптов конвейера проходят успешно (87/87 PASS, 0 FAIL, 0 TIMEOUT)**.
-   - `sw.js` и `test_pwa_offline.js` — Service Worker v4 с оффлайн-кэшированием автономного тренажёра «Практика кода — тренажёр с IDE.html» (401 задача).
+   - `sw.js` и `test_pwa_offline.js` — Service Worker v4 с оффлайн-кэшированием автономного тренажёра «practice_ide.html» (401 задача).
    - `install_hooks.py` + `quick_precommit_check.py` — кроссплатформенный Git Pre-commit хук (bash + Windows `pre-commit.bat`) с in-memory валидацией inline JS в HTML (<0.2с).
    - `index.html` обновлён метатегами PWA, темой «Вечерний Обсидиан» (`#0d1016`), шрифтом `Onest` и автоматической регистрацией Service Worker.
      - **Атомарный рефакторинг конспектов 1-го эшелона (24.10.2026)**: все 91 конспект Эшелона 1 (473 интерактивных шага в 14 юнитах: `1.1–1.4, 1.9`, `2.2–2.3`, `4.1, 4.2, 4.4`, `5.1–5.3`, `7.1`) приведены к лаконичной красоте и строгой атомарности. Полностью устранены сквозные нумерации шагов (`1. `, `2. ` и т.д.) в заголовках и тегах `<h4>`, вычищены мусорные мета-штампы вроде `«Ментальная модель: ...»` и boilerplate-приставки (`«Живая проверка: ...»`, `«Практикум в Python 3.13: ...»`). Выполнена точечная полировка заголовков 39 конспектов и 37 шагов: устранены тавтологии («в Python», перевод терминов в скобках), публицистические клише («ловушки», «почему», «успех с оттенками») и кликбейты заменены на строгие инженерные формулировки.
@@ -542,7 +542,7 @@
 
 ```markdown
 1. Текущее состояние платформы (12.10.2026):
-- Платформа «Junior+ Python Backend Developer» (`academy.html` + `Практика кода — тренажёр с IDE.html` + база `RemNote_Python_Mastery_FIXED`) полностью стабильна и выверена.
+- Платформа «Junior+ Python Backend Developer» (`academy.html` + `practice_ide.html` + база `RemNote_Python_Mastery_FIXED`) полностью стабильна и выверена.
 - Конвейер верификации `python verify_all.py --quick` проходит со строго 100% PASS (все 4 этапа: Platinum, E2E DOM 454 ассерта, PWA Offline, Headless Chrome 15 маршрутов + клик по табу).
 - Визуальный регрессионный тест `node scripts/visual_test.js` проходит на 100% (42/42 PASS, 0 FAIL).
 
@@ -550,7 +550,7 @@
 - Интегрирована новая Zen-карточка вечерней практики кода в `academy.html` и мастер-шаблон `scripts/assemble_academy.py`.
 - Исправлен контракт данных `buildTaskSpecDetails(tObj)`: гарантирован возврат `{ zenIoStrip, sliceVisual, quickTokens }` с 0 утечек `undefined` или `null` в DOM.
 - Устранено раздувание контекста (Context Bloat): отключены посторонние плагины (science, flutter, firebase, GCP), удалены теневые папки.
-- Синхронизированы правила: утверждён единый Single Source of Truth (`Эталоны/Эталоны.html`), упразднены все разрозненные мокапы и прототипы, активирован Zero-Error Headless Chrome Pre-Flight.
+- Синхронизированы правила: утверждён единый Single Source of Truth (`standards/standards.html`), упразднены все разрозненные мокапы и прототипы, активирован Zero-Error Headless Chrome Pre-Flight.
 - Папка оцифрованного гардероба `scratch/acloset_catalog` надёжно защищена и нетронута.
 
 3. Где лежат файлы:
@@ -572,7 +572,7 @@
 Текущий статус:
 - verify_all.py --quick: 100% PASS (4 этапа).
 - visual_test.js: 42/42 PASS (0 FAIL).
-- Single Source of Truth (`Эталоны/Эталоны.html`) и Zero-Error Pre-Flight активированы.
+- Single Source of Truth (`standards/standards.html`) и Zero-Error Pre-Flight активированы.
 - Zen-практика синхронизирована с academy.html и scripts/assemble_academy.py.
 
 ## 8. Трёхэтапный сквозной цикл темы и аудит экрана навыка (20.10.2026)
@@ -605,13 +605,13 @@
 6. **Статус автотестов**:
    - `verify_all.py --quick`: 100% PASS (все этапы).
    - `test_bugs_regression.js`: 133/133 PASS (100%).
-   - Побайтовое соответствие: `academy.html === Эталоны/Эталоны.html === Эталоны.html` (100% MATCH).
+   - Побайтовое соответствие: `academy.html === standards/standards.html === standards/standards.html` (100% MATCH).
 
 ### 24.10.2026 — Атомизация и педагогическая компрессия карточек 1-го эшелона
 - **Объём работ**: Оптимизированы 116 колод первого эшелона (`1.1–1.4`, `1.9`, `2.2–2.3`, `4.1`, `4.2`, `4.4`, `5.1–5.3`, `7.1`).
 - **Вопросы**: 43 перегруженных вопроса (>120 символов) очищены от стен кода с точками с запятой, тавтологий и дублирующих сниппетов, сжаты в строгий блиц-формат (<90 символов).
 - **Ответы**: 11 длинных ответов-эссе сокращены до лаконичных технических выжимок рантайма CPython (байтокод `LIST_APPEND`, `idempotency-key` захват в кэше, суффиксы `pathlib`, `WebSocket` дуплекс).
-- **Синхронизация**: Полная синхронизация 6 файлов платформы (`academy.html`, `Эталоны.html`, `Эталоны/Эталоны.html`, `canonical_pro_screen_benchmark.html`, `live_server_index.html`, `Academy — Python Backend.html`).
+- **Синхронизация**: Полная синхронизация 6 файлов платформы (`academy.html`, `standards/standards.html`, `standards/standards.html`, `canonical_pro_screen_benchmark.html`, `live_server_index.html`, `Academy — Python Backend.html`).
 - **Верификация**: `verify_platinum.py` (526 файлов RemNote), `verify_academy.py` (0 консольных ошибок Headless Chrome на 12 роутах) — 100% PASS.
 
 ### 24.10.2026 — Ликвидация залипания очередей интервального повторения (SRS & FSRS Engine)
