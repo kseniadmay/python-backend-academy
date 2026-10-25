@@ -7,8 +7,8 @@ _REL_IDE_HTML = os.path.normpath(os.path.join(_HERE, '..', 'Практика к�
 
 BASE_REMNOTE = _REL_REMNOTE if os.path.isdir(_REL_REMNOTE) else os.path.join(_CLOUD_ROOT, 'RemNote_Python_Mastery_FIXED')
 IDE_HTML_PATH = _REL_IDE_HTML if os.path.isfile(_REL_IDE_HTML) else (
-    os.path.join(_CLOUD_ROOT, 'Практика кода — тренажёр с IDE.html')
-    if os.path.isfile(os.path.join(_CLOUD_ROOT, 'Практика кода — тренажёр с IDE.html'))
+    os.path.join(_CLOUD_ROOT, 'practice_ide.html')
+    if os.path.isfile(os.path.join(_CLOUD_ROOT, 'practice_ide.html'))
     else r'C:\Users\fury6\Downloads\Практика кода — тренажёр с IDE.html'
 )
 

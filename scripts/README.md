@@ -12,7 +12,7 @@
 | [`build.py`](build.py) | **Главный мастер-пайплайн сборки**: валидация JSON-схем, компиляция CSS, проверка побайтовой синхронизации эталонов |
 | [`assemble_academy.py`](assemble_academy.py) | Конструктор монолитного SPA `academy.html` из исходных шаблонов и контента |
 | [`export_canonical_content.py`](export_canonical_content.py) | Экспорт канонических данных из монолита в структурированные файлы `data/content/` |
-| [`sync_etalons.py`](sync_etalons.py) | Двухконтурная синхронизация эталонов (`Эталоны.html` и `Эталоны/Эталоны.html`) |
+| [`sync_etalons.py`](sync_etalons.py) | Синхронизация канонического эталона (`standards/standards.html`) |
 | [`install_hooks.py`](install_hooks.py) | Установка Git pre-commit хуков локального контроля качества |
 
 ### 2. Экстракторы и генераторы контента

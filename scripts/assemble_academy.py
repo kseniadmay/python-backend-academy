@@ -15389,7 +15389,7 @@ if _IS_UNPACKED_ARCHIVE:
             f.write(html_out)
 
 # Canonical Benchmark: sync Эталоны.html and Эталоны/Эталоны.html with assembled academy.html
-for target_name in ['Эталоны.html', os.path.join('Эталоны', 'Эталоны.html')]:
+for target_name in [os.path.join('standards', 'standards.html')]:
     p = os.path.join(_UNPACKED_ROOT, target_name)
     os.makedirs(os.path.dirname(p), exist_ok=True)
     with open(p, 'w', encoding='utf-8', newline='\n') as f:
@@ -15497,9 +15497,9 @@ if os.path.isdir(_CLOUD_DIR) and os.path.isdir(BASE_REMNOTE) and os.path.isfile(
         if os.path.isfile(context_src):
             zf.write(context_src, 'PROJECT_CONTEXT.md')
         zf.write(html_src, 'academy.html')
-        zf.write(IDE_HTML_PATH, 'Практика кода — тренажёр с IDE.html')
+        zf.write(IDE_HTML_PATH, 'practice_ide.html')
         extra_root_files = [
-            'Эталоны.html',
+            os.path.join('standards', 'standards.html'),
             'manifest.json',
             'icon.svg',
             'sw.js',
@@ -15508,7 +15508,7 @@ if os.path.isdir(_CLOUD_DIR) and os.path.isdir(BASE_REMNOTE) and os.path.isfile(
             os.path.join('docs', 'README.md'),
             os.path.join('docs', 'FEEDBACK_BACKLOG.md'),
             os.path.join('docs', 'UI_VISUALIZATION_IMPROVEMENTS_CATALOG.md'),
-            'Запустить_с_Телефона.bat',
+            'start_mobile.cmd',
             'verify_all.cmd',
             'verify_all.py'
         ]

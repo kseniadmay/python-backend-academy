@@ -11,7 +11,7 @@ const assert = require('assert');
 
 const rootDir = path.resolve(__dirname, '..');
 const academyPath = path.join(rootDir, 'academy.html');
-const etalonyPath = path.join(rootDir, 'Эталоны', 'Эталоны.html');
+const etalonyPath = path.join(rootDir, 'standards', 'standards.html');
 
 console.log('================================================================');
 console.log('   FLASHCARDS & SRS TRAINER REGRESSION TEST SUITE               ');

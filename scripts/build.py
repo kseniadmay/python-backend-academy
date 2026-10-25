@@ -112,23 +112,20 @@ def step_sync_etalons() -> bool:
     """[3/4] Синхронизация канонических эталонов SPA"""
     logger.info('[3/4] Проверка и синхронизация эталонов...')
     academy_html = _ROOT / 'academy.html'
-    root_etalon = _ROOT / 'Эталоны.html'
-    sub_etalon = _ROOT / 'Эталоны' / 'Эталоны.html'
+    standards_html = _ROOT / 'standards' / 'standards.html'
 
     if not academy_html.is_file():
         logger.error('  ❌ Файл academy.html не найден')
         return False
 
-    # Синхронизация 1:1
-    shutil.copy2(academy_html, root_etalon)
-    sub_etalon.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(academy_html, sub_etalon)
+    # Синхронизация 1:1 с каноническим эталоном
+    standards_html.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(academy_html, standards_html)
 
     hash_main = get_file_hash(academy_html)
-    hash_root = get_file_hash(root_etalon)
-    hash_sub = get_file_hash(sub_etalon)
+    hash_standards = get_file_hash(standards_html)
 
-    if hash_main == hash_root == hash_sub:
+    if hash_main == hash_standards:
         logger.info(f'  ✓ 100% побайтовая идентичность эталонов подтверждена (SHA-256: {hash_main})')
         return True
     else:

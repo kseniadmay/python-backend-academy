@@ -11,21 +11,21 @@ const assert = require('assert');
 const rootDir = path.resolve(__dirname, '..');
 const remnoteDir = path.join(rootDir, 'RemNote_Python_Mastery_FIXED');
 const academyPath = path.join(rootDir, 'academy.html');
-const etalonyPath = path.join(rootDir, 'Эталоны', 'Эталоны.html');
+const etalonyPath = path.join(rootDir, 'standards', 'standards.html');
 
 console.log('================================================================');
 console.log('   REGRESSION TEST SUITE: BUGS 1..80 VERIFICATION               ');
 console.log('================================================================\n');
 
 assert(fs.existsSync(academyPath), `academy.html missing`);
-assert(fs.existsSync(etalonyPath), `Эталоны.html missing`);
+assert(fs.existsSync(etalonyPath), `standards.html missing`);
 
 const academyHtmlRaw = fs.readFileSync(academyPath, 'utf-8');
 const etalonyHtmlRaw = fs.readFileSync(etalonyPath, 'utf-8');
 
 // 0. Строгая идентичность канонических файлов
-assert.strictEqual(academyHtmlRaw, etalonyHtmlRaw, 'academy.html и Эталоны.html обязаны быть строго побайтово идентичны!');
-console.log('✓ Invariant 0: academy.html === Эталоны.html (100% MATCH)');
+assert.strictEqual(academyHtmlRaw, etalonyHtmlRaw, 'academy.html и standards.html обязаны быть строго побайтово идентичны!');
+console.log('✓ Invariant 0: academy.html === standards.html (100% MATCH)');
 
 const academyHtml = academyHtmlRaw.replace(/\r\n/g, '\n');
 const etalonyHtml = etalonyHtmlRaw.replace(/\r\n/g, '\n');

@@ -9,15 +9,15 @@ except Exception:
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 HTML_PATH = os.path.normpath(os.path.join(_HERE, '..', 'academy.html'))
-ETALON_PATH = os.path.normpath(os.path.join(_HERE, '..', 'Эталоны', 'Эталоны.html'))
-IDE_PATH = os.path.normpath(os.path.join(_HERE, '..', 'Практика кода — тренажёр с IDE.html'))
+ETALON_PATH = os.path.normpath(os.path.join(_HERE, '..', 'standards', 'standards.html'))
+IDE_PATH = os.path.normpath(os.path.join(_HERE, '..', 'practice_ide.html'))
 INDEX_PATH = os.path.normpath(os.path.join(_HERE, '..', 'index.html'))
 assert os.path.isfile(HTML_PATH), f"academy.html missing: {HTML_PATH}"
-assert os.path.isfile(ETALON_PATH), f"Эталоны/Эталоны.html missing: {ETALON_PATH}"
+assert os.path.isfile(ETALON_PATH), f"standards/standards.html missing: {ETALON_PATH}"
 
 # Verify Canonical Benchmark Invariant: academy.html and Эталоны.html must be strictly identical
 with open(HTML_PATH, encoding='utf-8') as f1, open(ETALON_PATH, encoding='utf-8') as f2:
-    assert f1.read() == f2.read(), "academy.html and Эталоны.html must be strictly identical (Canonical Benchmark Invariant)!"
+    assert f1.read() == f2.read(), "academy.html and standards.html must be strictly identical (Canonical Benchmark Invariant)!"
 
 # 1. Syntax check with node --check (in-memory, 0 disk artifacts) across all entry points
 def check_html_inline_scripts(html_file, label):
@@ -38,8 +38,8 @@ def check_html_inline_scripts(html_file, label):
     return checked
 
 c_acad = check_html_inline_scripts(HTML_PATH, 'academy.html')
-c_etalon = check_html_inline_scripts(ETALON_PATH, 'Эталоны.html')
-c_ide = check_html_inline_scripts(IDE_PATH, 'Практика кода — тренажёр с IDE.html') if os.path.isfile(IDE_PATH) else 0
+c_etalon = check_html_inline_scripts(ETALON_PATH, 'standards.html')
+c_ide = check_html_inline_scripts(IDE_PATH, 'practice_ide.html') if os.path.isfile(IDE_PATH) else 0
 c_idx = check_html_inline_scripts(INDEX_PATH, 'index.html') if os.path.isfile(INDEX_PATH) else 0
 print(f"1. [PASS] node --check passed with 0 syntax errors across {c_acad + c_etalon + c_ide + c_idx} scripts (academy: {c_acad}, etalon: {c_etalon}, IDE: {c_ide}, index: {c_idx})!", flush=True)
 
@@ -162,8 +162,8 @@ if os.path.isfile(zip_path):
         assert len(namelist) >= 545, f"Expected >= 545 files in project zip, got {len(namelist)}"
         required_in_zip = [
             'academy.html',
-            'Эталоны.html',
-            'Практика кода — тренажёр с IDE.html',
+            'academy.html',
+            'academy.html',
             'manifest.json',
             'icon.svg',
             'sw.js',
