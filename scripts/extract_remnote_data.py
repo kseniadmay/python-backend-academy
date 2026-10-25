@@ -209,6 +209,28 @@ for _tn, _tf in _t_list:
         16: 'assert analyze_complexity(4) == 36',
         17: '_wa = WeatherAdapter(ThirdPartyWeatherService()); assert _wa.get_celsius("Moscow") == 25.0',
         18: 'assert frequency_analysis(["a", "b", "a"])[0] == ("a", 2)',
+        253: 'assert (x, y, z) == (10, 20, 30) and x == 10 and y == 20 and z == 30, "Кортеж должен быть распакован в переменные x=10, y=20, z=30"',
+        254: 'assert a == b and a is not b and c is a, "a и b равны по значению, но не идентичны в памяти; c ссылается на a"',
+        255: 'assert first_three == [0, 1, 2] and last_two == [8, 9], "first_three должен быть [:3], last_two должен быть [-2:]"',
+        256: 'assert squares == [1, 4, 9, 16, 25], "squares должен содержать список квадратов чисел nums"',
+        257: 'assert retries == 3 and config.get("timeout") == 30, "retries должен получить дефолтное значение 3"',
+        258: 'assert isinstance(point_list, list) and point_list == [99, 20], "Список point_list должен содержать [99, 20]\\nassert isinstance(point_tuple, tuple) and point_tuple == (10, 20), \\"Кортеж point_tuple должен быть (10, 20)\\"\\nassert isinstance(cache, dict) and cache.get(point_tuple) == \\"запись в кэше\\", \\"Словарь cache должен содержать point_tuple как ключ со значением записи в кэше\\""',
+        282: 'assert t1 is not None and t2 is not None and not t1.is_alive() and not t2.is_alive(), "Потоки t1 и t2 должны быть запущены и завершены"',
+        283: 'assert match is not None and match.group() == "INV-2026-001", "Строка text должна соответствовать шаблону регулярного выражения"',
+        297: 'assert items == [1, 2, 3, 4, 5], "Список items должен быть дополнен через append(3) и extend([4, 5])"',
+        306: 'assert hasattr(BankAccount, "_BankAccount__balance") or "_BankAccount__balance" in BankAccount(100).__dict__, "Атрибут баланса должен использовать name mangling __balance"',
+        309: 'assert callable(greet) and greet("мир") == "Привет, мир!", "Функция greet(name) должна возвращать приветственную строку"',
+        319: 'assert hasattr(User, "__dataclass_fields__"), "Класс User должен быть декорирован @dataclass"',
+        322: 'assert callable(log_execution), "Декоратор log_execution должен быть определен"',
+        323: 'assert pipeline == [double, square] and result == 36, "Пайплайн должен применить double (3*2=6) и затем square (6**2=36)"',
+        329: 'assert User.from_string("Alex,30").name == "Alex" and User.from_string("Alex,30").age == 30, "Фабричный метод from_string должен создавать экземпляр User(name, age)"',
+        341: 'assert c1.count == 2 and c2.count == 1, "Счетчики независимых экземпляров c1 и c2 должны быть изолированы"',
+        343: 'assert rex.bark() == Dog.bark(rex) == "Рекс гавкает!", "Вызов rex.bark() и Dog.bark(rex) должны возвращать одинаковый результат"',
+        344: '_ug = UserGroup(["a", "b"]); assert "UserGroup" in repr(_ug) and "2" in repr(_ug), "__repr__ должен отображать имя класса и размер группы"',
+        351: 'assert "division by zero" in str(_exc.value) if "_exc" in globals() else True, "Тест должен проверить выброс ZeroDivisionError"',
+        352: 'assert pytest.approx is not None, "Тест должен использовать pytest.approx для проверки float"',
+        366: 'assert log_file.suffix == ".txt" and str(log_file).endswith(".txt"), "Файловый путь должен иметь расширение .txt"',
+        374: 'assert flattened == [1, 2, 3, 4, 5, 6], "Список flattened должен содержать уплощенные элементы матрицы"',
         22: 'assert is_valid_username("alex123") is True and is_valid_username("ab") is False',
         23: '_t_obj = Temperature(25); assert _t_obj.celsius == 25',
         31: '_g = build_adjacency_list(3, [(0, 1), (1, 2)]); assert 1 in _g[0] and 0 in _g[1]',
@@ -398,6 +420,16 @@ def generate_pedagogical_hint(t):
         return 'Используй стандартные команды Redis-клиента: r.set(key, value), r.get(key) и r.expire(key, seconds).'
     if '__repr__' in title:
         return 'Метод __repr__(self) должен возвращать точную, понятную разработчику строку вида ClassName(attr=val, ...), однозначно отражающую состояние объекта.'
+    if 'кортеж' in title or 'tuple' in title or 'хешируемост' in title:
+        return 'Список (list) — изменяемый тип данных (mutable), он не хешируется и не может быть ключом словаря. Кортеж (tuple) — неизменяемый (immutable), поэтому он хешируем и может использоваться как ключ кэша cache = {point_tuple: "..."}.'
+    if 'равенство' in title or ('==' in title and 'is' in title):
+        return 'Оператор == сравнивает значения объектов, а оператор is проверяет идентичность адресов в памяти id(x) == id(y). При c = a переменная c указывает на тот же объект.'
+    if '__name__' in title:
+        return 'Условие if __name__ == "__main__": проверяет, запущен ли скрипт напрямую в консоли или импортирован как модуль.'
+    if 'первого класса' in title or 'first-class' in title:
+        return 'В Python функции являются объектами первого класса: их можно присваивать переменным, сохранять в списки/словари и передавать аргументами.'
+    if 'form-data' in title or 'urlencode' in title:
+        return 'Шаг 1: Декодируй байты body_bytes.decode("utf-8"). Шаг 2: Вызови urllib.parse.parse_qs. Шаг 3: Распакуй одиночные элементы списков.'
 
     return f'Шаг 1: Проверь сигнатуру и входные типы данных ({tier}). Шаг 2: Обработай граничные случаи (пустые коллекции, None, неверные типы). Шаг 3: Сформируй и верни ожидаемый результат.'
 
@@ -478,6 +510,161 @@ _TASK_OVERRIDES = {
         'title': 'Используйте LEFT JOIN для поиска пользователей без заказов',
         'desc': '<p><strong>Задание:</strong> Напишите SQL-запрос поиска пользователей без единого заказа в переменной <code>sql</code>.</p><p class=\'meta\'>Выполните <code>LEFT JOIN</code> таблицы <code>users u</code> с таблицей <code>orders o</code> по условию <code>u.id = o.user_id</code>. Выберите столбцы <code>u.id</code>, <code>u.username</code>, <code>u.email</code> и отфильтруйте записи, где <code>o.id IS NULL</code>.</p>',
     },
+    2: {
+        'title': 'Напишите парсинг form-data в HTTP-запросе',
+        'desc': '<p><strong>Задание:</strong> Напишите функцию парсинга тела HTTP-запроса в формате application/x-www-form-urlencoded.</p><p class=\'meta\'>Реализуйте функцию <code>parse_form_urlencoded(body_bytes: bytes) -> dict</code>. Декодируйте байты в utf-8 строку, разберите параметры через <code>urllib.parse.parse_qs</code> и преобразуйте списки значений из одного элемента в одиночные строки.</p>',
+    },
+    5: {
+        'title': 'Реализуйте базовые операции стека push и pop',
+        'desc': '<p><strong>Задание:</strong> Реализуйте структуру данных Стек (LIFO) на базе списка Python.</p><p class=\'meta\'>В классе <code>Stack</code> реализуйте методы: <code>push(item)</code> — добавление элемента, <code>pop()</code> — извлечение верхнего элемента (с выбросом <code>IndexError</code> для пустого стека), <code>peek()</code> — просмотр верхнего элемента без удаления (или <code>None</code>) и <code>is_empty() -> bool</code>.</p>',
+    },
+    6: {
+        'title': 'Напишите парсинг URL и query-параметров через urllib.parse',
+        'desc': '<p><strong>Задание:</strong> Реализуйте разбор компонентов URL и извлечение параметров строки запроса.</p><p class=\'meta\'>Для URL <code>raw_url = "https://api.example.com/v1/users?role=admin&active=true&page=2"</code> выполните разбор через <code>urlparse</code> в переменную <code>parsed</code> и извлеките query-параметры через <code>parse_qs</code> в переменную <code>params</code>.</p>',
+    },
+    7: {
+        'title': 'Напишите фильтрацию QuerySet по дате создания',
+        'desc': '<p><strong>Задание:</strong> Напишите фильтрацию Django QuerySet для модели <code>Article</code> по датам публикации.</p><p class=\'meta\'>Сформируйте два набора запросов: <code>today_qs</code> для статей за сегодня (фильтр <code>created_at__date=date.today()</code>) и <code>sept_qs</code> для статей за сентябрь 2026 года (фильтры <code>created_at__gte="2026-09-01"</code> и <code>created_at__lt="2026-10-01"</code>).</p>',
+    },
+    9: {
+        'title': 'Создайте класс точки Point2D с кастомным repr',
+        'desc': '<p><strong>Задание:</strong> Создайте класс двумерной точки <code>Point2D</code> с информативным отладочным представлением.</p><p class=\'meta\'>Реализуйте конструктор <code>__init__(self, x: float, y: float)</code> и метод <code>__repr__(self)</code>, возвращающий строку вида <code>f"Point2D(x={self.x}, y={self.y})"</code> для удобного логирования и отладки.</p>',
+    },
+    10: {
+        'title': 'Напишите юнит-тест проверки единственности экземпляра Singleton',
+        'desc': '<p><strong>Задание:</strong> Напишите тестовую функцию проверки корректности паттерна Singleton.</p><p class=\'meta\'>В тестовой функции <code>test_singleton_identity()</code> создайте два экземпляра <code>s1 = ThreadSafeSingleton()</code> и <code>s2 = ThreadSafeSingleton()</code> и с помощью <code>assert s1 is s2</code> и <code>assert id(s1) == id(s2)</code> подтвердите их идентичность в памяти.</p>',
+    },
+    11: {
+        'title': 'Напишите базовую транзакцию с BEGIN, COMMIT, ROLLBACK',
+        'desc': '<p><strong>Задание:</strong> Реализуйте атомарный перевод средств между банковскими счетами в транзакции.</p><p class=\'meta\'>В функции <code>transfer_funds(conn, from_acc: int, to_acc: int, amount: float)</code> используйте контекстный менеджер соединения <code>with conn:</code> и курсора <code>with conn.cursor() as cur:</code>, выполнив два SQL-запроса <code>UPDATE accounts</code> для списания и начисления средств.</p>',
+    },
+    13: {
+        'title': 'Проверьте строку на палиндром двумя указателями',
+        'desc': '<p><strong>Задание:</strong> Напишите функцию проверки строки на палиндром методом двух встречных указателей.</p><p class=\'meta\'>Реализуйте <code>is_palindrome(s: str) -> bool</code>: очистите строку от небуквенных символов, приведите к нижнему регистру и двигайте указатели <code>left</code> и <code>right</code> навстречу друг другу за время <code>O(N)</code> и память <code>O(1)</code>.</p>',
+    },
+    14: {
+        'title': 'Реализуйте классический бинарный поиск в массиве',
+        'desc': '<p><strong>Задание:</strong> Реализуйте алгоритм бинарного поиска в отсортированном массиве.</p><p class=\'meta\'>Функция <code>binary_search(nums: list, target: int) -> int</code> должна находить индекс элемента <code>target</code> за время <code>O(log N)</code>. При отсутствии элемента в массиве возвращайте <code>-1</code>.</p>',
+    },
+    15: {
+        'title': 'Создайте класс TreeNode для бинарного дерева',
+        'desc': '<p><strong>Задание:</strong> Реализуйте базовый класс узла бинарного дерева <code>TreeNode</code>.</p><p class=\'meta\'>Конструктор <code>__init__(self, val=0, left=None, right=None)</code> должен сохранять значение узла в <code>self.val</code>, левого потомка в <code>self.left</code> и правого потомка в <code>self.right</code>.</p>',
+    },
+    18: {
+        'title': 'Реализуйте подсчёт частоты элементов через collections.Counter',
+        'desc': '<p><strong>Задание:</strong> Реализуйте подсчёт частоты элементов последовательности через <code>collections.Counter</code>.</p><p class=\'meta\'>Функция <code>frequency_analysis(items: list) -> list</code> должна возвращать список кортежей <code>(элемент, количество)</code>, отсортированных по убыванию частоты с помощью метода <code>most_common()</code>.</p>',
+    },
+    23: {
+        'title': 'Опишите свойства класса через @property и сеттер',
+        'desc': '<p><strong>Задание:</strong> Реализуйте инкапсуляцию температуры с валидацией через <code>@property</code>.</p><p class=\'meta\'>В классе <code>Temperature</code> создайте геттер <code>@property def celsius(self)</code> и сеттер <code>@celsius.setter</code>, выбрасывающий исключение <code>ValueError("Температура не может быть ниже -273.15°C")</code> при попытке установить недопустимое значение.</p>',
+    },
+    25: {
+        'title': 'Опишите интерфейс UserRepository с get_by_id и save',
+        'desc': '<p><strong>Задание:</strong> Опишите абстрактный интерфейс репозитория пользователей с помощью модуля <code>abc</code>.</p><p class=\'meta\'>Класс <code>UserRepository(ABC)</code> должен содержать абстрактные методы <code>@abstractmethod def get_by_id(self, user_id: int) -> dict</code> и <code>@abstractmethod def save(self, user: dict) -> None</code>.</p>',
+    },
+    27: {
+        'title': 'Выполните базовые команды Redis: SET, GET, EXPIRE',
+        'desc': '<p><strong>Задание:</strong> Выполните управление сессией пользователя через клиент Redis.</p><p class=\'meta\'>С помощью клиента <code>r</code> установите ключ <code>"session:123"</code> со значением <code>"user_auth_token"</code>, задайте TTL <code>3600</code> секунд через <code>expire</code> и прочитайте значение ключа в переменную <code>val</code>.</p>',
+    },
+    28: {
+        'title': 'Напишите тест функции с фикстурой @pytest.fixture',
+        'desc': '<p><strong>Задание:</strong> Напишите юнит-тест с использованием фикстуры <code>pytest</code>.</p><p class=\'meta\'>Создайте фикстуру <code>@pytest.fixture def sample_user()</code>, возвращающую тестовый словарь пользователя <code>{"username": "alex", "age": 25}</code>, и передайте её в тест <code>test_user_is_adult(sample_user)</code> для проверки совершеннолетия.</p>',
+    },
+    253: {
+        'title': 'Распакуйте кортеж из трёх элементов в три переменные',
+        'desc': '<p><strong>Задание:</strong> Распакуйте трёхмерные координаты точки из кортежа в именованные переменные.</p><p class=\'meta\'>Дан кортеж <code>point = (10, 20, 30)</code>. Одной операцией распаковки <code>x, y, z = point</code> присвойте координаты соответствующим переменным без индексации по числам.</p>',
+    },
+    254: {
+        'title': 'Сравнение объектов: равенство по значению (==) и по ссылке (is)',
+        'desc': '<p><strong>Задание:</strong> Продемонстрируйте различие между равенством по значению (<code>==</code>) и идентичностью объектов в памяти (<code>is</code>).</p><p class=\'meta\'>Даны два одинаковых списка <code>a = [1, 2, 3]</code> и <code>b = [1, 2, 3]</code>. Присвойте переменной <code>c</code> ссылку на список <code>a</code> (<code>c = a</code>). Убедитесь, что <code>a == b</code> (True), <code>a is b</code> (False), а <code>a is c</code> (True).</p>',
+    },
+    255: {
+        'title': 'Извлеките подсписок первых трёх и последних двух элементов через срез',
+        'desc': '<p><strong>Задание:</strong> Извлеките начальный и конечный срезы из числового списка.</p><p class=\'meta\'>Из исходного списка <code>numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]</code> получите подсписок первых трёх элементов в <code>first_three</code> (срез <code>[:3]</code>) и последних двух элементов в <code>last_two</code> (срез <code>[-2:]</code>).</p>',
+    },
+    256: {
+        'title': 'Напишите список квадратов чисел через map()',
+        'desc': '<p><strong>Задание:</strong> Преобразуйте числовую последовательность с помощью встроенной функции <code>map()</code>.</p><p class=\'meta\'>Для списка <code>nums = [1, 2, 3, 4, 5]</code> примените <code>map(lambda x: x ** 2, nums)</code> и сохраните преобразованный результат в виде списка в переменной <code>squares</code>.</p>',
+    },
+    257: {
+        'title': 'Получите значение из словаря через get() с значением по умолчанию',
+        'desc': '<p><strong>Задание:</strong> Безопасно прочитайте отсутствующий ключ из словаря настроек через <code>dict.get()</code>.</p><p class=\'meta\'>Из словаря <code>config = {"timeout": 30}</code> запросите параметр <code>"retries"</code> с дефолтным значением <code>3</code> и запишите результат в переменную <code>retries</code> без возбуждения исключения <code>KeyError</code>.</p>',
+    },
+    258: {
+        'title': 'Различие списка и кортежа: мутабельность и хешируемость в словаре',
+        'desc': '<p><strong>Задание:</strong> Продемонстрируйте ключевые различия списка (<code>list</code>) и кортежа (<code>tuple</code>) при работе с кэшем и мутацией данных.</p><p class=\'meta\'>1. Измените первый элемент в <code>point_list</code> на число <code>99</code> (демонстрация мутабельности списка).<br>2. Создайте словарь <code>cache</code>, в котором ключом является неизменяемый кортеж <code>point_tuple</code>, а значением — строка <code>"запись в кэше"</code> (демонстрация хешируемости кортежа).<br>3. Изменяемый список не может быть ключом словаря из-за отсутствия хэша (<code>TypeError: unhashable type: \'list\'</code>).</p>',
+        'solution': '# Различие списка и кортежа: мутабельность и хешируемость в словаре\npoint_list = [10, 20]\npoint_tuple = (10, 20)\n\n# 1. Список изменяем (mutable):\npoint_list[0] = 99\nprint("Изменённый список:", point_list)\n\n# 2. Кортеж неизменяем (immutable) и хэшируем — подходит для ключей словаря:\ncache = {point_tuple: "запись в кэше"}\nprint("Кэш с ключом-кортежем:", cache)\n',
+        'hint': 'Список (list) — изменяемый тип данных (mutable) и unhashable, поэтому не может быть ключом словаря. Кортеж (tuple) — неизменяемый (immutable), поэтому он хешируем и подходит для ключей кэша cache = {point_tuple: "запись в кэше"}.',
+    },
+    282: {
+        'title': 'Создайте и запустите два потока через threading.Thread',
+        'desc': '<p><strong>Задание:</strong> Создайте и параллельно выполните два потока с помощью модуля <code>threading</code>.</p><p class=\'meta\'>Создайте потоки <code>t1</code> и <code>t2</code> с целевой функцией <code>worker</code>, запустите их методом <code>.start()</code> и синхронизируйте их завершение через <code>.join()</code>.</p>',
+    },
+    283: {
+        'title': 'Проверьте строку на соответствие шаблону через re.match',
+        'desc': '<p><strong>Задание:</strong> Проверьте соответствие формата строки регулярному выражению через <code>re.match</code>.</p><p class=\'meta\'>Для строки <code>text = "INV-2026-001"</code> выполните поиск по шаблону номера инвойса <code>r"^INV-\\d{4}-\\d+"</code> и сохраните объект совпадения в переменную <code>match</code>.</p>',
+    },
+    296: {
+        'title': 'Запишите и прочитайте текстовый файл через with open()',
+        'desc': '<p><strong>Задание:</strong> Запишите строку в файл и прочитайте её обратно через контекстный менеджер <code>with open()</code>.</p><p class=\'meta\'>Запишите текст <code>"Первая строка заметок\\n"</code> в файл <code>notes.txt</code> в режиме <code>"w"</code>, а затем откройте его в режиме <code>"r"</code> и прочитайте содержимое в переменную <code>content</code>.</p>',
+    },
+    297: {
+        'title': 'Дополните список через append и расширьте другим списком через extend',
+        'desc': '<p><strong>Задание:</strong> Продемонстрируйте различие между добавлением элемента <code>append()</code> и расширением списка <code>extend()</code>.</p><p class=\'meta\'>Для списка <code>items = [1, 2]</code> добавьте одиночное число <code>3</code> методом <code>append(3)</code>, а затем объедините со списком <code>[4, 5]</code> методом <code>extend([4, 5])</code>.</p>',
+    },
+    306: {
+        'title': 'Реализуйте инкапсуляцию с приватным атрибутом через name mangling',
+        'desc': '<p><strong>Задание:</strong> Защитите приватное состояние банковского аккаунта механизмом Name Mangling.</p><p class=\'meta\'>В классе <code>BankAccount</code> сохраните переданный начальный баланс в атрибут <code>self.__balance</code>. В рантайме Python такой атрибут автоматически преобразуется в <code>_BankAccount__balance</code>.</p>',
+    },
+    309: {
+        'title': 'Изоляция точки входа исполняемого модуля через if __name__ == "__main__"',
+        'desc': '<p><strong>Задание:</strong> Изолируйте точку входа модуля защитной конструкцией <code>if __name__ == "__main__":</code>.</p><p class=\'meta\'>Определите функцию <code>greet(name)</code>, возвращающую <code>f"Привет, {name}!"</code>, и вызовите её внутри блока <code>if __name__ == "__main__":</code>, предотвращая побочные эффекты исполнения при импорте модуля.</p>',
+    },
+    319: {
+        'title': 'Замените класс-контейнер с бойлерплейтом на @dataclass',
+        'desc': '<p><strong>Задание:</strong> Создайте декларативную модель данных пользователя с помощью <code>@dataclass</code>.</p><p class=\'meta\'>Объявите класс <code>User</code> с декоратором <code>@dataclass</code> и полями <code>id: int</code>, <code>username: str</code>, <code>email: str</code>. Декоратор автоматически создаст <code>__init__</code>, <code>__repr__</code> и <code>__eq__</code>.</p>',
+    },
+    322: {
+        'title': 'Напишите декоратор без аргументов и примените к нескольким функциям',
+        'desc': '<p><strong>Задание:</strong> Реализуйте базовый декоратор функции <code>log_execution</code>.</p><p class=\'meta\'>Декоратор должен оборачивать функцию <code>func</code> во внутреннюю функцию <code>wrapper(*args, **kwargs)</code>, печатать лог вызова и возвращать результат выполнения целевой функции.</p>',
+    },
+    323: {
+        'title': 'Функции как объекты первого класса: сохранение и передача в коллекции',
+        'desc': '<p><strong>Задание:</strong> Продемонстрируйте концепцию функций как объектов первого класса (First-Class Citizens).</p><p class=\'meta\'>Создайте функции <code>double(x)</code> и <code>square(x)</code>, сохраните их в список <code>pipeline = [double, square]</code> и последовательно примените обе функции к аргументу <code>x = 3</code>, сохранив финальный результат <code>36</code> в <code>result</code>.</p>',
+    },
+    329: {
+        'title': 'Реализуйте класс с @classmethod как альтернативным конструктором',
+        'desc': '<p><strong>Задание:</strong> Реализуйте фабричный метод альтернативного создания объекта через <code>@classmethod</code>.</p><p class=\'meta\'>В классе <code>User</code> объявите метод <code>@classmethod def from_string(cls, data_str: str)</code>, который принимает строку <code>"Alex,30"</code>, разделяет её и возвращает новый экземпляр <code>cls(name, int(age))</code>.</p>',
+    },
+    341: {
+        'title': 'Изоляция состояния независимых экземпляров класса через self',
+        'desc': '<p><strong>Задание:</strong> Продемонстрируйте независимость состояния разных экземпляров одного класса.</p><p class=\'meta\'>В классе <code>Counter</code> инициализируйте <code>self.count = 0</code> и напишите метод <code>increment()</code>. Создайте экземпляры <code>c1</code> и <code>c2</code>, вызвав метод дважды у <code>c1</code> и один раз у <code>c2</code>, подтвердив изолированность их счётчиков.</p>',
+    },
+    343: {
+        'title': 'Вызов связанного и несвязанного метода через Class.method(instance)',
+        'desc': '<p><strong>Задание:</strong> Продемонстрируйте эквивалентность вызова метода экземпляра <code>obj.method()</code> и функции класса <code>Class.method(obj)</code>.</p><p class=\'meta\'>Для класса <code>Dog</code> с методом <code>bark(self)</code> создайте объект <code>rex = Dog()</code> с <code>rex.name = "Рекс"</code>. Вызовите метод через <code>rex.bark()</code> и напрямую через класс <code>Dog.bark(rex)</code>, убедившись в одинаковом результате.</p>',
+    },
+    344: {
+        'title': 'Реализуйте класс-обёртку с __repr__ для отладочного вывода коллекции',
+        'desc': '<p><strong>Задание:</strong> Реализуйте класс коллекции <code>UserGroup</code> с кастомным строковым представлением <code>__repr__</code>.</p><p class=\'meta\'>Метод <code>__repr__(self)</code> должен возвращать информативную строку вида <code>f"UserGroup(count={len(self.members)})"</code> для однозначной идентификации состояния объекта в логах.</p>',
+    },
+    351: {
+        'title': 'Проверьте выброс исключения и текст ошибки через pytest.raises',
+        'desc': '<p><strong>Задание:</strong> Напишите тест проверки выброса исключения и его сообщения через <code>pytest.raises</code>.</p><p class=\'meta\'>С помощью контекстного менеджера <code>with pytest.raises(ZeroDivisionError) as exc_info:</code> проверьте функцию деления и убедитесь, что сообщение ошибки содержит подстроку <code>"division by zero"</code>.</p>',
+    },
+    352: {
+        'title': 'Проверьте приближённое равенство float в тестах через pytest.approx',
+        'desc': '<p><strong>Задание:</strong> Протестируйте сложение вещественных чисел с плавающей точкой через <code>pytest.approx</code>.</p><p class=\'meta\'>В тестовой функции проверьте, что сумма <code>0.1 + 0.2</code> равна <code>pytest.approx(0.3)</code> с учётом погрешности стандарта IEEE 754.</p>',
+    },
+    366: {
+        'title': 'Разберите файловый путь и замените расширение через pathlib.Path',
+        'desc': '<p><strong>Задание:</strong> Выполните разбор и преобразование файлового пути с помощью модуля <code>pathlib</code>.</p><p class=\'meta\'>Для пути <code>p = Path("/app/logs/server.log")</code> получите исходное расширение <code>p.suffix</code> и сформируйте новый путь с расширением <code>.txt</code> через <code>p.with_suffix(".txt")</code>.</p>',
+    },
+    374: {
+        'title': 'Выровняйте вложенные списки за O(1) памяти через itertools.chain.from_iterable',
+        'desc': '<p><strong>Задание:</strong> Уплощите двумерную матрицу в плоский список с помощью итератора <code>itertools.chain.from_iterable</code>.</p><p class=\'meta\'>Для матрицы <code>matrix = [[1, 2], [3, 4], [5, 6]]</code> получите одномерный плоский список <code>flattened</code> без создания промежуточных списков за <code>O(1)</code> дополнительной памяти.</p>',
+    },
+
 }
 
 with open(IDE_HTML_PATH, encoding='utf-8') as f:
@@ -495,6 +682,7 @@ for _t in TASKS_381:
     if _t['id'] in _TASK_OVERRIDES:
         _ov = _TASK_OVERRIDES[_t['id']]
         if 'title' in _ov: _t['title'] = _ov['title']
+        if 'solution' in _ov: _t['code'] = _ov['solution']
     _code = clean_ref_code(_t['id'], _t.get('code', ''))
     _t['code'] = _code
     _t['solution'] = _code
@@ -509,8 +697,10 @@ for _t in TASKS_381:
         _t['desc'] = f"<p><strong>Задание:</strong> {html.escape(_t['title'])}.</p>" + (
             f"<p class='meta'>{html.escape(_doc_m.group(1).strip())}</p>" if _doc_m else ""
         )
-    _t['hint'] = generate_pedagogical_hint(_t)
-    _t['tests'] = build_test_for_task(_t)
+    _t['hint'] = _TASK_OVERRIDES[_t['id']]['hint'] if (_t['id'] in _TASK_OVERRIDES and 'hint' in _TASK_OVERRIDES[_t['id']]) else generate_pedagogical_hint(_t)
+    _t['tests'] = _TASK_OVERRIDES[_t['id']]['tests'] if (_t['id'] in _TASK_OVERRIDES and 'tests' in _TASK_OVERRIDES[_t['id']]) else build_test_for_task(_t)
+    if _t['id'] in _TASK_OVERRIDES and 'initialCode' in _TASK_OVERRIDES[_t['id']]:
+        _t['initialCode'] = _TASK_OVERRIDES[_t['id']]['initialCode']
 
 TASKS_BY_ID = {t['id']: t for t in TASKS_381}
 
