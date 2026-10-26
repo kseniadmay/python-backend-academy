@@ -8928,21 +8928,50 @@
       display: none !important;
     }
   }
-  /* Keep the learning route as the sole desktop focal point. */
-  body:has(.path-serpentine-wrap) .coddy-right-rail {
-    display: none !important;
-  }
+  /* Balanced desktop layout: 3D Serpentine Path + Smart Right Rail companion */
   .coddy-path-layout:has(.path-serpentine-wrap) {
-    max-width: 800px;
+    max-width: 1040px;
+    gap: 36px;
   }
   .coddy-path-layout:has(.path-serpentine-wrap) .path-serpentine-wrap {
-    max-width: 720px;
+    max-width: 680px;
     width: 100%;
   }
   .coddy-path-layout:has(.path-serpentine-wrap) .path-serpentine {
-    max-width: 660px;
+    max-width: 640px;
+  }
+  @media (max-width: 1040px) {
+    .coddy-path-layout:has(.path-serpentine-wrap) {
+      max-width: 760px;
+      gap: 0;
+    }
+    .coddy-right-rail {
+      display: none !important;
+    }
   }
   @media (max-width: 640px) {
+    .path-serpentine-wrap {
+      padding: 4px 10px calc(180px + env(safe-area-inset-bottom, 32px)) !important;
+    }
+    .path-mode-switcher-wrap {
+      margin-bottom: 6px !important;
+      transform: scale(0.92);
+    }
+    .path-mobile-stats {
+      margin: 0 auto 8px !important;
+      padding: 6px 12px !important;
+    }
+    .path-chapter-banner {
+      padding: 8px 14px !important;
+      margin-bottom: 8px !important;
+      border-radius: 18px !important;
+    }
+    .path-banner-mobile-row {
+      display: none !important;
+    }
+    .path-chapter-title {
+      font-size: 1rem !important;
+    }
     .coddy-path-layout:has(.path-serpentine-wrap) .path-serpentine-wrap {
       max-width: 100%;
     }
@@ -18263,7 +18292,7 @@ function viewPathSerpentine(options){
 
     const topGrad = isCompleted ? 'url(#hexGradCompleted)' : (isActive ? 'url(#hexGradActive)' : 'url(#hexGradLocked)');
     const buttonGrad = isCompleted ? 'url(#pathButtonCompleted)' : (isActive ? 'url(#pathButtonActive)' : 'url(#pathButtonLocked)');
-    const strokeColor = isCompleted ? 'rgba(255,255,255,0.3)' : (isActive ? '#a7f3d0' : 'rgba(148,163,184,0.28)');
+    const strokeColor = isCompleted ? 'rgba(255,255,255,0.3)' : (isActive ? '#a7f3d0' : 'rgba(148,163,184,0.40)');
     const strokeWidth = isActive ? 2 : 1.5;
 
     let centerIcon = '';
@@ -18306,7 +18335,7 @@ function viewPathSerpentine(options){
           </g>
         </g>`;
     } else {
-      centerIcon = trailIconCenter(x, y + (usePawNodes ? 5 : 0), iconName, usePawNodes ? 18 : 24, '#c8d2e0');
+      centerIcon = trailIconCenter(x, y + (usePawNodes ? 5 : 0), iconName, usePawNodes ? 18 : 24, '#cbd5e1');
     }
 
     const nodeShape = usePawNodes
