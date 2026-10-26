@@ -1,13 +1,13 @@
 /**
- * test_coddy_interface.js
+ * test_active_interface.js
  *
- * Исчерпывающий тестовый набор верификации философии и интерфейса Coddy
+ * Исчерпывающий тестовый набор верификации методологии и эргономики интерфейса
  * для интерактивной платформы «Junior+ Python Backend Academy» (academy.html).
  *
  * Группы тестов:
- * [1/6] Педагогическая философия и механика микро-обучения Coddy (Micro-learning, Chunk Feed & Scaffolding)
- * [2/6] 3D-Тропа обучения Coddy (#/path): Геометрия Безье, 45 нод, Popover, Jump-кнопка и Right Rail
- * [3/6] Адаптивная 4-вкладочная мобильная IDE (#/practice): Табы, Сократический скаффолдинг, Замок решения, Редактор
+ * [1/6] Педагогическая методология и механика микрообучения (Micro-learning, Chunk Feed & Scaffolding)
+ * [2/6] Тропа обучения (#/path): Геометрия Безье, 45 нод, Popover, Jump-кнопка и Right Rail
+ * [3/6] Адаптивная мобильная IDE (#/practice): Табы, Сократический скаффолдинг, Замок решения, Редактор
  * [4/6] Аудио-компаньон теории (window.theoryAudioPlayer): Фонетика, UI-бар, Скорость, Отказоустойчивость
  * [5/6] Эфемеризация, цветовая гармония (60/30/10) и доступность (WCAG AAA Contrast > 14:1)
  * [6/6] Рендеринг в реальном Headless Chrome (Desktop 1440x900 и Mobile 390x844 iPhone)
@@ -20,7 +20,7 @@ const assert = require('assert');
 const { spawnSync } = require('child_process');
 
 console.log('================================================================');
-console.log('  CODDY PHILOSOPHY & UI VISUALIZATION TEST SUITE (100% BOOST)   ');
+console.log('  ACTIVE LEARNING & UI VISUALIZATION TEST SUITE (100% BOOST)    ');
 console.log('================================================================\n');
 
 const startTime = Date.now();

@@ -37,7 +37,7 @@
 | [`verify_platinum.py`](verify_platinum.py) | Комплексная проверка платиновых инвариантов базы знаний |
 | [`test_all_401_tasks.py`](test_all_401_tasks.py) | Прогон сквозного набора тестов для всех 401 задач тренажёра |
 | [`audit_pipeline.py`](audit_pipeline.py) | Параллельный запуск всех этапов тестирования платформы |
-| [`test_coddy_interface.js`](test_coddy_interface.js) | Стресс-тест эргономики интерфейса (тропа, свайпы, Single Dominant CTA) |
+| [`test_active_interface.js`](test_active_interface.js) | Стресс-тест эргономики интерфейса (тропа, свайпы, Single Dominant CTA) |
 | [`test_pwa_offline.js`](test_pwa_offline.js) | Тестирование PWA, Service Worker и офлайн-кэширования |
 | [`visual_test.js`](visual_test.js) | Визуальное регрессионное тестирование по 40 эталонным снимкам |
 | [`audit_pedagogy_benchmark.js`](audit_pedagogy_benchmark.js) | Педагогический аудит плотности шагов и скаффолдинга |

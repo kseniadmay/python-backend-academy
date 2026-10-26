@@ -643,24 +643,24 @@ console.log(`✓ Bug 87: Thematic flashcards active learning (${verified191Cards
 
 // 88. Bug 88: Строгий инвариант запрета технического упоминания «Кодди» / «Coddy» в регламентах и UI
 const agentsMdPath = path.join(rootDir, 'AGENTS.md');
-const workspaceRulePath = path.join(rootDir, '.agents', 'rules', 'workspace-rule.md');
+const projectContextPath = path.join(rootDir, 'PROJECT_CONTEXT.md');
 assert(fs.existsSync(agentsMdPath), 'AGENTS.md missing');
-assert(fs.existsSync(workspaceRulePath), 'workspace-rule.md missing');
+assert(fs.existsSync(projectContextPath), 'PROJECT_CONTEXT.md missing');
 
 const agentsMdContent = fs.readFileSync(agentsMdPath, 'utf-8');
-const workspaceRuleContent = fs.readFileSync(workspaceRulePath, 'utf-8');
+const projectContextContent = fs.readFileSync(projectContextPath, 'utf-8');
 
 assert(
   agentsMdContent.includes('Категорический запрет на техническое упоминание «Кодди» / «Coddy»'),
   'AGENTS.md must contain explicit ban rule on technical mentions of Coddy'
 );
 assert(
-  workspaceRuleContent.includes('Категорический запрет на техническое упоминание «Кодди» / «Coddy»'),
-  'workspace-rule.md must contain explicit ban rule on technical mentions of Coddy'
+  projectContextContent.includes('Категорический запрет на техническое упоминание «Кодди» / «Coddy»'),
+  'PROJECT_CONTEXT.md must contain explicit ban rule on technical mentions of Coddy'
 );
 assert(!agentsMdContent.includes('# Coddy Pedagogical UI'), 'AGENTS.md must not contain legacy title # Coddy Pedagogical UI');
 assert(!agentsMdContent.includes('# Педагогическая методология и инварианты Кодди'), 'AGENTS.md must not contain legacy title with Кодди');
-assert(!workspaceRuleContent.includes('# Педагогическая методология и инварианты Кодди'), 'workspace-rule.md must not contain legacy title with Кодди');
+assert(!projectContextContent.includes('# Педагогическая методология и инварианты Кодди'), 'PROJECT_CONTEXT.md must not contain legacy title with Кодди');
 
 // Проверка чистоты UI-текста в academy.html
 assert(!academyHtml.includes('🎯 Проверка понимания (Coddy)'), 'academy.html must not contain Coddy in comprehension check badge');
@@ -678,8 +678,8 @@ assert(
   'AGENTS.md must define single quotes default invariant'
 );
 assert(
-  workspaceRuleContent.includes('Стандарт кавычек в коде по умолчанию: одинарные кавычки'),
-  'workspace-rule.md must define single quotes default invariant'
+  projectContextContent.includes('Стандарт кавычек в коде по умолчанию: одинарные кавычки'),
+  'PROJECT_CONTEXT.md must define single quotes default invariant'
 );
 assert(
   academyHtml.includes("pySkillViewState.tab = 'cards'") || academyHtml.includes("pySkillViewState.tab === 'theory'"),
