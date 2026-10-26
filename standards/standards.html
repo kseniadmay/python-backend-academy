@@ -15780,7 +15780,9 @@ function collectDueCardsQueue(){
 }
 
 function viewCardsHub(){
-  cardsHubState.dueMode = true;
+  if(cardsHubState.dueMode !== false){
+    cardsHubState.dueMode = true;
+  }
   if(cardsHubState.dueMode){
     if(!Array.isArray(cardsHubState.dueQueue) || cardsHubState.dueQueue.length === 0){
       cardsHubState.dueQueue = collectDueCardsQueue();
@@ -15810,7 +15812,10 @@ function viewCardsHub(){
             <div style="font-size:1.15rem;font-weight:700;color:var(--gold);">🔥 ${state.streak || 1} ${typeof pluralizeRu === 'function' ? pluralizeRu(state.streak || 1, 'день', 'дня', 'дней') : 'дней'}</div>
           </div>
         </div>
-        <a href="#/" class="btn btn-primary" style="padding:14px 28px;border-radius:14px;font-weight:700;display:inline-flex;align-items:center;gap:8px;text-decoration:none;box-shadow:0 0 20px rgba(16,185,129,0.35);">🗺️ Продолжить изучение на Тропе ➔</a>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+          <a href="#/" class="btn btn-primary" style="padding:14px 28px;border-radius:14px;font-weight:700;display:inline-flex;align-items:center;gap:8px;text-decoration:none;box-shadow:0 0 20px rgba(16,185,129,0.35);">🗺️ Продолжить изучение на Тропе ➔</a>
+          <button type="button" class="btn btn-ghost" data-hub-exit-due style="padding:14px 20px;border-radius:14px;font-weight:600;">📚 Выбрать тему в каталоге колод</button>
+        </div>
       </div>
     </div>`;
     }
@@ -15832,6 +15837,7 @@ function viewCardsHub(){
         <div class="cards-hub-header-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           <a href="#/docs" class="btn btn-ghost" style="padding:6px 12px;font-size:0.78rem;" title="Открыть инженерный справочник">💡 Шпаргалка</a>
           <span class="cocoon-pill" style="color:var(--amber);">⚡ Очередь: <b>${duePos + 1} / ${qLen}</b></span>
+          <button type="button" class="btn btn-ghost" data-hub-exit-due style="padding:6px 12px;font-size:0.78rem;" title="Перейти к каталогу всех 260 колод">📚 Все колоды</button>
           <a href="#/" class="btn btn-ghost" style="padding:6px 12px;font-size:0.78rem;text-decoration:none;" title="Вернуться к карте обучения">🗺️ На Тропу</a>
         </div>
       </div>
@@ -15937,6 +15943,7 @@ function viewCardsHub(){
   const curDeckTier = getDeckInterviewTier(deck.id);
   const linkedSkills = DECK_TO_SKILLS_MAP[deck.id] || [];
   const primarySkill = linkedSkills[0] || ALL_PY_SKILLS[0];
+  const cleanCurDeckTitle = (deck.title || cardsHubState.deckId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
 
   const deckOpts = filteredDecks.map(fid => {
     const d = ALL_DECKS_COMBINED[fid];
@@ -15951,26 +15958,26 @@ function viewCardsHub(){
     const curDeckIdx = filteredDecks.indexOf(cardsHubState.deckId);
     const nextDeckId = (curDeckIdx >= 0 && curDeckIdx + 1 < filteredDecks.length) ? filteredDecks[curDeckIdx + 1] : null;
     const nextDeck = nextDeckId ? ALL_DECKS_COMBINED[nextDeckId] : null;
-    const cleanCurDeckTitle = (deck.title || cardsHubState.deckId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
     const cleanNextDeckTitle = nextDeck ? (nextDeck.title || nextDeckId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim() : '';
     return `
-    <div class="container cards-hub-container" style="padding-bottom:84px;">
+    <div class="container cards-hub-container" style="padding-bottom:84px;max-width:760px;margin:0 auto;">
       <div class="cards-hub-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
         <div>
           <span class="sr-only">Интервальное повторение RemNote · 286 колод · 6 051 карточка</span>
-          <h1 style="margin:0;">🎉 Колода изучена!</h1>
+          <h1 style="margin:0;font-size:1.45rem;font-weight:800;">🎉 Колода изучена!</h1>
+          <div style="font-size:0.84rem;color:var(--ink-muted);margin-top:2px;">
+            Тема: <span style="color:var(--gold);font-weight:600;">${cleanCurDeckTitle}</span>
+          </div>
         </div>
         <div class="cards-hub-header-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           ${(() => {
             const srsStats = typeof getSpacedRepetitionStats === 'function' ? getSpacedRepetitionStats() : {dueTodayCardsCount:0, masteredCardsCount:0};
             const dueBtn = srsStats.dueTodayCardsCount > 0 ? `<button type="button" class="btn btn-burgundy" data-hub-review-due style="padding:6px 12px;font-size:.78rem;font-weight:700;" title="Запустить повторение карточек, запланированных на сегодня">🔥 Повторить на сегодня (<b>${srsStats.dueTodayCardsCount}</b>) ➔</button>` : '';
-            const revPill = state.reviewedDecks.length > 0
-              ? `<span class="cocoon-pill">Изучено: <b>${state.reviewedDecks.length}/${allDeckIds.length}</b></span>`
-              : `<span class="cocoon-pill">🌱 <b>0 изучено</b> · Старт повторения</span>`;
-            return `${revPill}${srsStats.dueTodayCardsCount > 0 ? dueBtn : `<span class="cocoon-pill" style="color:var(--moss);">✓ Повторено на сегодня</span>`}<span class="cocoon-pill" style="color:#34d399;">👑 Закреплено: <b>${srsStats.masteredCardsCount || 0}</b></span>`;
+            return `${dueBtn}`;
           })()}
           <a href="#/docs" class="btn btn-ghost" data-hub-cheatsheet style="padding:6px 11px;font-size:.78rem;" title="Открыть инженерный справочник">💡 Шпаргалка</a>
           ${primarySkill ? `<a href="#${primarySkill.routePrefix}/skill/${primarySkill.id}" class="btn btn-ghost" style="padding:6px 11px;font-size:.78rem;">💻 К практике темы ➔</a>` : ''}
+          <a href="#/" class="btn btn-ghost" style="padding:6px 11px;font-size:.78rem;text-decoration:none;" title="Вернуться к карте обучения">🗺️ На Тропу</a>
         </div>
       </div>
       <div class="cards-hub-controls">
@@ -15994,34 +16001,48 @@ function viewCardsHub(){
   }
 
   return `
-    <div class="container">
+    <div class="container cards-hub-container" style="max-width:760px;margin:0 auto;padding-bottom:84px;">
       <div class="cards-hub-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
         <div>
           <span class="sr-only">Интервальное повторение RemNote · 286 колод · 6 051 карточка (126 колод Python + 25 колод Web + 43 колоды Backend + 16 колод Алгоритмы + 32 колоды Базы данных + 17 колод Архитектура + 45 колод Инфраструктура)</span>
-          <h1 style="margin:0;">🃏 Центр 3D Флеш-карточек</h1>
+          <h1 style="margin:0;font-size:1.45rem;font-weight:800;">🃏 Центр 3D Флеш-карточек</h1>
+          <div style="font-size:0.84rem;color:var(--ink-muted);margin-top:2px;">
+            Интервальное повторение RemNote · <span style="color:var(--gold);font-weight:600;">${cleanCurDeckTitle}</span>
+          </div>
         </div>
         <div class="cards-hub-header-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           ${(() => {
             const srsStats = typeof getSpacedRepetitionStats === 'function' ? getSpacedRepetitionStats() : {dueTodayCardsCount:0, masteredCardsCount:0};
             const dueBtn = srsStats.dueTodayCardsCount > 0 ? `<button type="button" class="btn btn-burgundy" data-hub-review-due style="padding:6px 12px;font-size:.78rem;font-weight:700;" title="Запустить повторение карточек, запланированных на сегодня">🔥 Повторить на сегодня (<b>${srsStats.dueTodayCardsCount}</b>) ➔</button>` : '';
             const revPill = state.reviewedDecks.length > 0
-              ? `<span class="cocoon-pill">Изучено: <b>${state.reviewedDecks.length} / ${allDeckIds.length}</b></span>`
-              : `<span class="cocoon-pill">🌱 <b>0 изучено</b> · Старт повторения</span>`;
-            const dueTodayStatus = srsStats.dueTodayCardsCount > 0 ? dueBtn : `<span class="cocoon-pill" style="color:var(--moss);">✓ Повторено на сегодня</span>`;
-            const masteredPill = `<span class="cocoon-pill" style="color:#34d399;">👑 Закреплено: <b>${srsStats.masteredCardsCount || 0}</b></span>`;
-            return `${revPill}${dueTodayStatus}${masteredPill}`;
+              ? `<span class="cocoon-pill" style="font-size:0.78rem;">Изучено: <b>${state.reviewedDecks.length} / ${allDeckIds.length}</b></span>`
+              : `<span class="cocoon-pill" style="font-size:0.78rem;">🌱 <b>0 изучено</b> · Старт повторения</span>`;
+            return `${dueBtn}${revPill}`;
           })()}
           <a href="#/docs" class="btn btn-ghost" data-hub-cheatsheet style="padding:6px 11px;font-size:.78rem;" title="Открыть инженерный справочник">💡 Шпаргалка</a>
           ${primarySkill ? `<a href="#${primarySkill.routePrefix}/skill/${primarySkill.id}" class="btn btn-ghost" style="padding:6px 11px;font-size:.78rem;">💻 К практике темы ➔</a>` : ''}
+          <a href="#/" class="btn btn-ghost" style="padding:6px 11px;font-size:.78rem;text-decoration:none;" title="Вернуться к карте обучения">🗺️ На Тропу</a>
         </div>
       </div>
-      <div class="cards-hub-controls">
-        <div class="cards-hub-subfilters">
-          <select id="cards-echelon-filter" class="srs-deck-filter-select" style="min-height:auto;padding:8px 10px;font-size:.82rem;">${echelonOpts}</select>
-          <select id="cards-unit-select" class="srs-deck-filter-select" style="min-height:auto;padding:8px 10px;font-size:.82rem;">${unitOpts}</select>
+      <details class="cards-hub-filter-details" style="margin-bottom:14px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:2px;transition:all 0.2s ease;">
+        <summary class="cards-hub-filter-summary" style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;cursor:pointer;user-select:none;font-size:0.86rem;color:var(--ink);border-radius:12px;list-style:none;">
+          <span style="display:flex;align-items:center;gap:8px;min-width:0;overflow:hidden;">
+            <span style="color:var(--emerald);flex-shrink:0;">📚</span>
+            <span style="font-weight:700;color:var(--ink);text-overflow:ellipsis;white-space:nowrap;overflow:hidden;">${cleanCurDeckTitle}</span>
+            <span class="cocoon-pill" style="font-size:0.75rem;padding:2px 8px;flex-shrink:0;color:var(--gold);">🔥 ${cards.length} ${typeof pluralizeRu === 'function' ? pluralizeRu(cards.length, 'карточка', 'карточки', 'карточек') : 'карточек'}</span>
+          </span>
+          <span style="font-size:0.78rem;color:var(--ink-muted);display:inline-flex;align-items:center;gap:4px;flex-shrink:0;margin-left:8px;">
+            ⚙️ Сменить тему <span style="font-size:0.7rem;">▾</span>
+          </span>
+        </summary>
+        <div class="cards-hub-controls" style="padding:10px 10px 6px;">
+          <div class="cards-hub-subfilters">
+            <select id="cards-echelon-filter" class="srs-deck-filter-select" style="min-height:auto;padding:8px 10px;font-size:.82rem;">${echelonOpts}</select>
+            <select id="cards-unit-select" class="srs-deck-filter-select" style="min-height:auto;padding:8px 10px;font-size:.82rem;">${unitOpts}</select>
+          </div>
+          <select id="cards-deck-select" class="srs-deck-filter-select" style="min-height:auto;padding:8px 10px;font-size:.85rem;font-weight:600;">${deckOpts}</select>
         </div>
-        <select id="cards-deck-select" class="srs-deck-filter-select" style="min-height:auto;padding:8px 10px;font-size:.85rem;font-weight:600;">${deckOpts}</select>
-      </div>
+      </details>
       <div class="fc-stage" style="margin-top:16px;">
         ${buildFcStoriesBarHTML(deck.id, cards.length, cIdx)}
         <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 6px;font-size:0.82rem;">
