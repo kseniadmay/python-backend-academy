@@ -1,4 +1,4 @@
-const CACHE_NAME = 'academy-pwa-v70';
+const CACHE_NAME = 'academy-pwa-v71';
 const ASSETS_TO_CACHE = [
   './',
   'index.html',
@@ -26,34 +26,47 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests for local assets
-  if (event.request.method !== 'GET') return;
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
   const url = new URL(event.request.url);
 
-  // Skip external APIs like github.com
-  if (url.origin !== self.location.origin) return;
+  // Не перехватываем сторонние домены
+  if (url.origin !== self.location.origin) {
+    return;
+  }
 
-  // Progress and content APIs must always reach the server; caching them can
-  // resurrect stale progress after another device has synchronized.
-  if (url.pathname === '/healthz' || url.pathname.startsWith('/api/')) return;
+  // Не кэшируем API запросы и healthz
+  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/healthz')) {
+    return;
+  }
 
+  // Network-First стратегия с бесшовным Cache-Fallback для оффлайна
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      const fetchPromise = fetch(event.request).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200) {
+    fetch(event.request)
+      .then((networkResponse) => {
+        if (
+          networkResponse &&
+          networkResponse.status === 200 &&
+          networkResponse.type === 'basic'
+        ) {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseToCache);
           });
         }
         return networkResponse;
-      }).catch(() => {
-        // Network failed (offline / PC off) - return cached
-        return cachedResponse;
-      });
-
-      // Stale-while-revalidate: return cached instantly if available, else network
-      return cachedResponse || fetchPromise;
-    })
+      })
+      .catch(() => {
+        return caches.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          if (event.request.mode === 'navigate') {
+            return caches.match('academy.html');
+          }
+        });
+      })
   );
 });
