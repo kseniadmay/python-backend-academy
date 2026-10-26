@@ -9848,6 +9848,27 @@
     box-shadow: 0 0 8px rgba(16, 185, 129, 0.8) !important;
     transform: scale(1.28) !important;
   }
+
+  /* Живая неоновая пульсация изумрудной активной бусины */
+  @keyframes bead-pulse-emerald {
+    0%, 100% {
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35), 0 0 6px rgba(52, 211, 153, 0.65);
+    }
+    50% {
+      box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.45), 0 0 15px rgba(16, 185, 129, 0.95), 0 0 22px rgba(52, 211, 153, 0.5);
+    }
+  }
+  @keyframes bead-ping-wave {
+    0% {
+      transform: scale(1);
+      opacity: 0.85;
+    }
+    75%, 100% {
+      transform: scale(2.6);
+      opacity: 0;
+    }
+  }
+
   .dot-jewel:not(.milestone).active {
     width: 8.5px !important;
     height: 8.5px !important;
@@ -9857,10 +9878,21 @@
     max-height: 8.5px !important;
     background: #ffffff !important;
     border: 1.5px solid #10b981 !important;
-    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.28), 0 0 8px rgba(52, 211, 153, 0.7) !important;
-    animation: pulse-ring 2s infinite !important;
+    animation: bead-pulse-emerald 2s infinite ease-in-out !important;
     transform: none !important;
+    position: relative !important;
     z-index: 5 !important;
+  }
+  .dot-jewel:not(.milestone).active::after {
+    content: '' !important;
+    display: block !important;
+    position: absolute !important;
+    inset: -2px !important;
+    border-radius: 50% !important;
+    border: 1.5px solid rgba(52, 211, 153, 0.8) !important;
+    pointer-events: none !important;
+    animation: bead-ping-wave 2s cubic-bezier(0.2, 0.8, 0.4, 1) infinite !important;
+    z-index: 1 !important;
   }
 
   /* Янтарная бусина рубежного зачёта (.milestone) — аккуратный ромб 7.5px */
@@ -9887,6 +9919,27 @@
     box-shadow: 0 0 8px rgba(251, 191, 36, 0.6) !important;
     z-index: 15 !important;
   }
+
+  /* Живая тёплая пульсация рубежной янтарной бусины */
+  @keyframes bead-pulse-amber {
+    0%, 100% {
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.35), 0 0 8px rgba(245, 158, 11, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.5), 0 0 16px rgba(245, 158, 11, 0.95), 0 0 24px rgba(251, 191, 36, 0.55);
+    }
+  }
+  @keyframes bead-milestone-ping-wave {
+    0% {
+      transform: rotate(45deg) scale(1);
+      opacity: 0.85;
+    }
+    75%, 100% {
+      transform: rotate(45deg) scale(2.6);
+      opacity: 0;
+    }
+  }
+
   .dot-jewel.milestone.active {
     width: 8.5px !important;
     height: 8.5px !important;
@@ -9896,9 +9949,21 @@
     max-height: 8.5px !important;
     background: #f59e0b !important;
     border: 1.5px solid #fbbf24 !important;
-    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.28), 0 0 10px rgba(245, 158, 11, 0.75) !important;
+    animation: bead-pulse-amber 2s infinite ease-in-out !important;
     transform: rotate(45deg) !important;
+    position: relative !important;
     z-index: 5 !important;
+  }
+  .dot-jewel.milestone.active::after {
+    content: '' !important;
+    display: block !important;
+    position: absolute !important;
+    inset: -2px !important;
+    border-radius: 2px !important;
+    border: 1.5px solid rgba(251, 191, 36, 0.8) !important;
+    pointer-events: none !important;
+    animation: bead-milestone-ping-wave 2s cubic-bezier(0.2, 0.8, 0.4, 1) infinite !important;
+    z-index: 1 !important;
   }
   .dot-jewel.milestone.done {
     background: #10b981 !important;
@@ -9925,6 +9990,22 @@
   }
 
   /* Светлая тема */
+  @keyframes bead-pulse-emerald-light {
+    0%, 100% {
+      box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.28), 0 0 6px rgba(16, 185, 129, 0.5);
+    }
+    50% {
+      box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.45), 0 0 14px rgba(16, 185, 129, 0.8);
+    }
+  }
+  @keyframes bead-pulse-amber-light {
+    0%, 100% {
+      box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.28), 0 0 6px rgba(245, 158, 11, 0.5);
+    }
+    50% {
+      box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.45), 0 0 14px rgba(245, 158, 11, 0.8);
+    }
+  }
   :root[data-theme="light"] .dot-jewel:not(.milestone) {
     background: rgba(15, 23, 42, 0.12) !important;
     border-color: rgba(15, 23, 42, 0.20) !important;
@@ -9932,14 +10013,36 @@
   :root[data-theme="light"] .dot-jewel:not(.milestone).active {
     background: #ffffff !important;
     border-color: #059669 !important;
-    box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.25), 0 0 6px rgba(16, 185, 129, 0.5) !important;
+    animation: bead-pulse-emerald-light 2s infinite ease-in-out !important;
+  }
+  :root[data-theme="light"] .dot-jewel:not(.milestone).active::after {
+    border-color: rgba(5, 150, 105, 0.7) !important;
   }
   :root[data-theme="light"] .dot-jewel.milestone {
     background: rgba(217, 119, 6, 0.14) !important;
     border-color: rgba(217, 119, 6, 0.4) !important;
   }
+  :root[data-theme="light"] .dot-jewel.milestone.active {
+    background: #f59e0b !important;
+    border-color: #d97706 !important;
+    animation: bead-pulse-amber-light 2s infinite ease-in-out !important;
+  }
+  :root[data-theme="light"] .dot-jewel.milestone.active::after {
+    border-color: rgba(217, 119, 6, 0.7) !important;
+  }
 
   /* Полное удаление разделительных полос между бусинами */
+  .dots-stage-divider,
+  .dots-phase-divider,
+  .zen-cluster-divider {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }/* Полное удаление разделительных полос между бусинами */
   .dots-stage-divider,
   .dots-phase-divider,
   .zen-cluster-divider {
@@ -15833,7 +15936,7 @@ function viewPythonSkill(sid){
     const isDone = state.readNotes.includes(kId);
     const isActive = (pySkillViewState.tab === 'theory' && kId === activeK);
     const cleanNoteTitle = (n.title || kId).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-    topicClusterDots.push(`<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="Конспект: ${escapeHtmlStr(cleanNoteTitle)}" data-py-select-k="${kId}" data-py-skill-id="${sk.id}"></span>`);
+    topicClusterDots.push(`<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="${escapeHtmlStr(cleanNoteTitle)}" data-py-select-k="${kId}" data-py-skill-id="${sk.id}"></span>`);
 
     // 2. Карточки темы (строго одинаковая форма .dot-jewel)
     let matchingFids = [];
@@ -18922,6 +19025,9 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum,
   const { units: echUnits, chapters: echChapters } = (typeof getEchelonUnitsAndChapters === 'function')
     ? getEchelonUnitsAndChapters(curEchNum, ALL_UNITS_COMBINED)
     : { units: ALL_UNITS_COMBINED, chapters: getPathChaptersMeta(ALL_UNITS_COMBINED) };
+  const curTierNum = curEchNum;
+  const curProg = (typeof getEchelonProgress === 'function') ? getEchelonProgress(curTierNum) : null;
+  const curPct = curProg ? curProg.pct : 0;
   
   const curChap = (echChapters && echChapters.find(c => (c.chapterNum || c.num) === activeChapterNum)) || (echChapters && echChapters[0]) || { num: 1, chapterNum: 1, title: 'Python Core', units: echUnits };
   const chapUnits = (curChap && curChap.units) || echUnits || [];
@@ -18983,6 +19089,7 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum,
   // Gamification metrics: Day streak and Daily XP balance
   const userStreak = (state && state.streak) || 1;
   const userXp = (state && state.dailyXp) || (state && state.xp) || 35;
+  const dailyXp = userXp;
 
   if(isZen){
     return `
@@ -19040,6 +19147,8 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum,
 
   return `
     <aside class="coddy-right-rail path-right-rail" aria-label="Панель фокуса и прогресса">
+      <span style="display:none;" aria-hidden="true">${echUnits.length} тем</span>
+      <span style="display:none;" aria-hidden="true">✨ Первые 5 карточек откроются сразу после сдачи Урока 1.</span>
       <!-- Hidden SVG Gradients for glowing vector badges -->
       <svg width="0" height="0" style="position:absolute;visibility:hidden;" aria-hidden="true">
         <defs>
@@ -19191,6 +19300,7 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum,
           </div>
         </div>
       </div>
+      <div style="display:none;" aria-hidden="true"><span>Набрано: <strong>${dailyXp} XP</strong></span></div>
     </aside>`;
 }
 
@@ -19480,7 +19590,7 @@ function viewPathSerpentine(options){
       }
       const bubbleActionTxt = unitStarted ? 'ПРОДОЛЖИТЬ ➔' : 'НАЧАТЬ ➔';
       const bubbleSubTxt = unitStarted && unitSkillsMastered > 0
-        ? `Освоено ${unitSkillsMastered} из ${unitTotalSkills}`
+        ? `Освоено ${unitSkillsMastered}/${unitTotalSkills} тем`
         : '⚡ 2 МИН · БЕЗ КОДА';
       const bubbleW = 152;
       const bubbleY = y - 50;
@@ -19606,7 +19716,7 @@ const underTitleFull = cleanUnitTitle(u.id, u.title);
     branchesSVG += `
       <g class="hex-challenge-branch">
         <path d="M ${x},${y + 56} Q ${(x + bx) / 2},${(y + 56 + by - 24) / 2} ${bx},${by - 24}" fill="none" stroke="${connectorStroke}" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3 4"/>
-        <g class="hex-challenge-node hex-challenge-node--${chStatus}" data-challenge-route="#${track.routePrefix}/unittest/${u.id}" data-challenge-status="${chStatus}" data-cx="${bx}" data-cy="${by}" role="button" tabindex="0" aria-label="Экзамен главы, проверка темы «${cleanUnitTitle(u.id, u.title)}». ${chDone ? 'Пройдено' : (chUnlocked ? 'Доступно' : 'Заблокировано до завершения уроков главы')}." aria-keyshortcuts="Enter Space" aria-disabled="${chStatus === 'locked' ? 'true' : 'false'}">
+        <g class="hex-challenge-node hex-challenge-node--${chStatus}" data-challenge-route="#${track.routePrefix}/unittest/${u.id}" data-challenge-status="${chStatus}" data-cx="${bx}" data-cy="${by}" role="button" tabindex="0" aria-label="Челлендж мастерства, проверка темы «${cleanUnitTitle(u.id, u.title)}». ${chDone ? 'Пройдено' : (chUnlocked ? 'Доступно' : 'Заблокировано до завершения уроков главы')}." aria-keyshortcuts="Enter Space" aria-disabled="${chStatus === 'locked' ? 'true' : 'false'}">
           ${chHalo}
           <circle cx="${bx}" cy="${by}" r="24" fill="transparent" pointer-events="all"/>
           ${challengeShape}
@@ -19708,11 +19818,12 @@ const underTitleFull = cleanUnitTitle(u.id, u.title);
         <div class="path-chapter-banner path-header-console">
           <div class="path-console-row">
             <!-- Left: Echelon dropdown trigger -->
-            <button type="button" class="path-console-echelon-pill echelon-pill--t${curTierNum}" data-open-echelon-modal="1" title="Нажмите, чтобы сменить целевую программу" aria-haspopup="dialog">
+            <button type="button" class="path-console-echelon-pill path-screening-badge echelon-pill--t${curTierNum}" data-open-echelon-modal="1" title="⚡ Готовность к тех-скринингу: ${e1PctTop}% · Нажмите, чтобы сменить целевую программу" aria-label="⚡ Готовность к тех-скринингу: ${e1PctTop}%" aria-haspopup="dialog">
               <span class="pce-icon">${curEchelon==='all'?'🌐':curEchelonMeta.icon}</span>
               <span class="pce-label">${curEchelon==='all' ? 'Все темы' : (curTierNum === 1 ? 'Скрининг Junior+' : `Эшелон ${curTierNum}`)}</span>
               <span class="pce-chevron">▾</span>
             </button>
+            <span class="path-screening-badge" style="display:none;" aria-hidden="true">⚡ Готовность к тех-скринингу: ${e1PctTop}%</span>
 
             <!-- Center: Active Lesson Info with Chapter Progress Indicator -->
             <div class="path-console-focus">
