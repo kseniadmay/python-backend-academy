@@ -2421,13 +2421,24 @@
     outline: none;
     transform-box: fill-box;
     transform-origin: center;
-    transition: transform 0.24s ease;
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.20s ease;
   }
   .hex-3d-node:hover {
-    transform: scale(1.035);
+    transform: scale(1.045);
   }
   .hex-3d-node:active {
-    transform: scale(0.985);
+    transform: scale(0.93) translateY(2px);
+  }
+  .hex-active-tooltip {
+    cursor: pointer;
+    outline: none;
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.20s ease;
+  }
+  .hex-active-tooltip:hover {
+    transform: scale(1.05);
+  }
+  .hex-active-tooltip:active {
+    transform: scale(0.93);
   }
   .hex-3d-node:active .path-button-face,
   .hex-3d-node:active .path-button-icon,
@@ -3787,6 +3798,75 @@
     flex-direction: column;
     gap: 10px;
     padding: 10px 0 16px;
+    transition: width 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .coddy-right-rail--zen {
+    width: 52px !important;
+    padding: 10px 0 16px;
+    align-items: center;
+  }
+  .coddy-rail-zen-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 6px;
+    background: rgba(22, 27, 36, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+  html:not([data-theme="dark"]) .coddy-rail-zen-pill {
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  .coddy-rail-zen-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .coddy-rail-zen-pct {
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: var(--emerald, #34d399);
+    font-family: var(--font-d, 'Unbounded', sans-serif);
+  }
+  .coddy-rail-zen-val {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #94a3b8;
+  }
+  .coddy-rail-zen-btn {
+    border: none;
+    background: rgba(255, 255, 255, 0.06);
+    color: #94a3b8;
+    border-radius: 8px;
+    padding: 3px 6px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .coddy-rail-zen-btn:hover {
+    background: rgba(52, 211, 153, 0.16);
+    color: #34d399;
+    transform: scale(1.08);
+  }
+  .coddy-rail-zen-btn:active {
+    transform: scale(0.92);
+  }
+  .coddy-rail-zen-btn--expand {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    color: #34d399;
   }
   @media (max-width: 1040px) {
     .coddy-right-rail { display: none !important; }
@@ -4012,6 +4092,16 @@
     margin-bottom: 10px;
     position: relative;
     z-index: 50;
+    transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  body.path-scrolled .path-mode-switcher-wrap {
+    opacity: 0.38;
+    transform: translateY(-2px);
+  }
+  body.path-scrolled .path-mode-switcher-wrap:hover,
+  body.path-scrolled .path-mode-switcher-wrap:focus-within {
+    opacity: 1;
+    transform: translateY(0);
   }
   .path-mode-switcher {
     display: inline-flex;
@@ -11591,6 +11681,7 @@ function ensureExtendedState(target){
   if(typeof s.schemaVersion !== 'number') s.schemaVersion = ACADEMY_SCHEMA_VERSION;
   if(typeof s.updatedAt !== 'number') s.updatedAt = Date.now();
   if(typeof s.streak !== 'number') s.streak = 0;
+  if(typeof s.zenRailCollapsed !== 'boolean') s.zenRailCollapsed = false;
   if(typeof s.bestStreak !== 'number') s.bestStreak = s.streak || 0;
   if(s.lastVisit === undefined) s.lastVisit = null;
   // Migrate legacy lastActiveDate -> lastVisit
@@ -17724,6 +17815,8 @@ function renderPathMobileStatsHTML(totalCompletedUnits, streakText, curTier, act
 }
 
 function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum, selectedEchelonOverride){
+  ensureExtendedState();
+  const isZen = !!(state && state.zenRailCollapsed);
   const curEchNum = (selectedEchelonOverride !== undefined) ? selectedEchelonOverride : ((state && state.selectedEchelon) || 1);
   const { units: echUnits, chapters: echChapters } = (typeof getEchelonUnitsAndChapters === 'function')
     ? getEchelonUnitsAndChapters(curEchNum, ALL_UNITS_COMBINED)
@@ -17750,6 +17843,29 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum,
   else if(curTierNum === 3) radarTitle = '⚡ Радар лайвкодинга';
   else if(curTierNum === 4) radarTitle = '👑 Радар архитектуры';
 
+  if(isZen){
+    return `
+    <aside class="coddy-right-rail coddy-right-rail--zen" aria-label="Панель прогресса (свёрнута)">
+      <div class="coddy-rail-zen-pill">
+        <button type="button" class="coddy-rail-zen-btn coddy-rail-zen-btn--expand" data-toggle-zen-rail="1" title="Развернуть радар подготовки" aria-label="Развернуть радар подготовки">
+          <span style="font-size:0.95rem;">⤢</span>
+        </button>
+        <div class="coddy-rail-zen-item" title="Эшелон ${curTierNum}: ${curPct}%">
+          <span style="font-size:1rem;">${echMeta.icon}</span>
+          <span class="coddy-rail-zen-pct">${curPct}%</span>
+        </div>
+        <div class="coddy-rail-zen-item" title="Стрик активности">
+          <span style="font-size:0.95rem;">🔥</span>
+          <span class="coddy-rail-zen-val">${state.streak || 0}</span>
+        </div>
+        <div class="coddy-rail-zen-item" title="Накопленный опыт">
+          <span style="font-size:0.95rem;">⚡</span>
+          <span class="coddy-rail-zen-val">${state.xp || 0}</span>
+        </div>
+      </div>
+    </aside>`;
+  }
+
   return `
     <aside class="coddy-right-rail">
       <!-- Top Stats Row (Coddy style) -->
@@ -17766,6 +17882,7 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum,
           <span class="coddy-rail-stat-icon">⚡</span>
           <span class="coddy-rail-stat-val">${state.xp || 0} XP</span>
         </div>
+        <button type="button" class="coddy-rail-zen-btn" data-toggle-zen-rail="1" title="Дзен-режим: скрыть радар для максимального фокуса на тропе" aria-label="Свернуть радар">🧘</button>
       </div>
 
       <!-- Widget 1: Screening Readiness — мотивирующая графа с динамическим эшелоном -->
@@ -20957,6 +21074,11 @@ render = function(){
             const rect = activeNode.getBoundingClientRect();
             const vh = window.innerHeight || 800;
             const isVisible = (rect.top >= 60 && rect.bottom <= vh - 60);
+            if(window.scrollY > 30){
+              document.body.classList.add('path-scrolled');
+            } else {
+              document.body.classList.remove('path-scrolled');
+            }
             if(isVisible){
               jumpBtn.classList.add('is-hidden');
             } else {
@@ -20979,6 +21101,7 @@ render = function(){
       }catch(err){}
     }, 60);
   } else if(route === '/map'){
+    document.body.classList.remove('path-scrolled');
     root.innerHTML = viewMap();
     navRoute = '/path';
   } else if(route === '/sandbox'){
@@ -21182,6 +21305,21 @@ document.addEventListener('click', async function(e){
         const em = (typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[targetEch]) ? INTERVIEW_ECHELONS[targetEch] : { icon: '🛡️', shortLabel: `Эшелон ${targetEch}` };
         showTactileToast(`${em.icon} Программа переключена: ${em.shortLabel}`);
       }
+    }
+    return;
+  }
+
+  const zenToggleBtn = e.target.closest('[data-toggle-zen-rail]');
+  if(zenToggleBtn){
+    ensureExtendedState();
+    state.zenRailCollapsed = !state.zenRailCollapsed;
+    saveState(state);
+    if(typeof navigator !== 'undefined' && navigator.vibrate){
+      try{ navigator.vibrate(10); }catch(vErr){}
+    }
+    render();
+    if(typeof showTactileToast === 'function'){
+      showTactileToast(state.zenRailCollapsed ? '🧘 Дзен-режим включён: фокус на тропе' : '🎯 Радар подготовки развёрнут');
     }
     return;
   }
