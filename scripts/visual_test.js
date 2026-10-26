@@ -159,6 +159,7 @@ function serve() {
 // ---------------------------------------------------------------- матрица кадров
 const VIEWPORTS = {
   desktop: { width: 1440, height: 900, dpr: 1 },
+  tablet: { width: 768, height: 1024, dpr: 1 },
   mobile: { width: 390, height: 844, dpr: 2, isMobile: true, hasTouch: true }
 };
 
@@ -193,6 +194,19 @@ add('unittest_start_modal', { hash: '#/python/unittest/1.5' });
 add('dashboard_seed', { hash: '#/', seed: true });
 add('path_game_seed', { hash: '#/path', seed: true });
 add('path_pro_seed', { hash: '#/path', action: 'pro', seed: true });
+
+// --- Светлая тема «Утренний Шёлк» (Morning Silk)
+add('dashboard_light', { hash: '#/', theme: 'light', viewports: ['desktop', 'mobile'] });
+add('path_game_light', { hash: '#/path', theme: 'light', viewports: ['desktop', 'mobile'] });
+add('cards_hub_light', { hash: '#/cards', theme: 'light', viewports: ['desktop', 'mobile'] });
+add('practice_hub_light', { hash: '#/practice', theme: 'light', viewports: ['desktop', 'mobile'] });
+
+// --- Планшетные вьюпорты (Tablet 768px)
+add('dashboard_tablet', { hash: '#/', viewports: ['tablet'] });
+add('path_tablet', { hash: '#/path', viewports: ['tablet'] });
+
+// --- Интерактивные состояния
+add('path_popover_active', { hash: '#/path', action: 'open_popover', viewports: ['mobile', 'desktop'] });
 
 
 // ---------------------------------------------------------------- пиксельный diff
@@ -327,6 +341,17 @@ function diffShots(pm, pngjs, currentPath, baselinePath, diffPath) {
           `
         }).catch(() => {});
 
+        if (shot.theme) {
+          await page.evaluate(t => {
+            document.documentElement.setAttribute('data-theme', t);
+            try {
+              const st = JSON.parse(localStorage.getItem('py_backend_academy_v1') || '{}');
+              st.theme = t;
+              localStorage.setItem('py_backend_academy_v1', JSON.stringify(st));
+            } catch(e) {}
+          }, shot.theme).catch(() => {});
+        }
+
         if (shot.action === 'pro') {
           await page.evaluate(() => {
             const btn = document.querySelector('.path-mode-btn[data-set-path-mode="pro"]');
@@ -342,19 +367,70 @@ function diffShots(pm, pngjs, currentPath, baselinePath, diffPath) {
           }).catch(() => {});
           await page.keyboard.press('Escape').catch(() => {});
         }
+
+        if (shot.action === 'open_popover') {
+          await page.evaluate(() => {
+            const node = document.querySelector('.hex-btn') || document.querySelector('[data-direct-unit]') || document.querySelector('.hex-node');
+            if (node) node.click();
+          }).catch(() => {});
+          await page.waitForTimeout(600);
+        }
         await page.waitForTimeout(RENDER_SETTLE_MS);
 
         // --- зонды
-        const probe = await page.evaluate(() => ({
-          hOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-          htmlLen: document.body ? document.body.innerHTML.length : 0,
-          textLen: document.body ? (document.body.innerText || '').length : 0
-        })).catch(() => ({ hOverflow: -1, htmlLen: 0, textLen: 0 }));
+        const probe = await page.evaluate(() => {
+          function getLum(r, g, b) {
+            const a = [r, g, b].map(v => {
+              v /= 255;
+              return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+            });
+            return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+          }
+          function parseRgba(c) {
+            const m = (c || '').match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+            if (!m) return null;
+            return { r: parseInt(m[1]), g: parseInt(m[2]), b: parseInt(m[3]), a: m[4] !== undefined ? parseFloat(m[4]) : 1 };
+          }
+          function getEffectiveBg(el) {
+            let cur = el;
+            while (cur && cur !== document.documentElement) {
+              const s = window.getComputedStyle(cur);
+              const c = parseRgba(s.backgroundColor);
+              if (c && c.a > 0.3) return [c.r, c.g, c.b];
+              cur = cur.parentElement;
+            }
+            const isDark = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark';
+            return isDark ? [11, 15, 23] : [248, 250, 252];
+          }
+
+          let minRatio = 21;
+          const els = Array.from(document.querySelectorAll('h1, h2, h3, .lesson-title, p'));
+          for (const el of els.slice(0, 30)) {
+            const rect = el.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) continue;
+            const s = window.getComputedStyle(el);
+            if (s.display === 'none' || s.visibility === 'hidden' || s.opacity === '0') continue;
+            const fg = parseRgba(s.color);
+            if (!fg || fg.a === 0) continue;
+            const bg = getEffectiveBg(el);
+            const lumFg = getLum(fg.r, fg.g, fg.b);
+            const lumBg = getLum(bg[0], bg[1], bg[2]);
+            const ratio = (Math.max(lumFg, lumBg) + 0.05) / (Math.min(lumFg, lumBg) + 0.05);
+            if (ratio < minRatio) minRatio = ratio;
+          }
+          return {
+            hOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+            htmlLen: document.body ? document.body.innerHTML.length : 0,
+            textLen: document.body ? (document.body.innerText || '').length : 0,
+            wcagMinRatio: Number(minRatio.toFixed(2))
+          };
+        }).catch(() => ({ hOverflow: -1, htmlLen: 0, textLen: 0, wcagMinRatio: 21 }));
 
         const issues = [];
         if (probe.htmlLen < 10000) issues.push(`подозрительно пустой рендер (htmlLen=${probe.htmlLen})`);
         if (probe.hOverflow > 0) issues.push(`горизонтальный overflow ${probe.hOverflow}px`);
         if (pageErrors.length) issues.push('JS-ошибки: ' + pageErrors.slice(0, 2).join(' | '));
+        if (probe.wcagMinRatio < 4.5 && probe.htmlLen > 10000) issues.push(`WCAG AA contrast violation: min ratio ${probe.wcagMinRatio}:1 (< 4.5:1)`);
 
         const file = path.join(OUT_DIR, `${label}.png`);
         await page.screenshot({ path: file, animations: 'disabled' }).catch(e => issues.push('скриншот не удался: ' + e.message));

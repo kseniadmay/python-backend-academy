@@ -6,30 +6,34 @@
 
 ## 📋 Состав сьюта тестов
 
-| Файл | Описание |
+| Файл / Каталог | Описание |
 |---|---|
-| [`test_backend_api.py`](test_backend_api.py) | **Модульные тесты FastAPI API**: интеграционный запуск тестов REST API, синхронизации и сервисов из корня репозитория. |
-| [`test_bugs_regression.js`](test_bugs_regression.js) | **Главный регрессионный сьют**: проверяет AST-валидность сниппетов Python, структуру флешкарт RemNote, корректность разметки формул, отсутствие синтаксических ошибок в конспектах и 100% идентичность `academy.html` каноническому файлу `standards/standards.html`. |
+| [`test_descriptor_suite.js`](test_descriptor_suite.js) | **Сьют Строгого Дескриптора (17 инвариантов)**: побайтовое соответствие эталонов, Clean Human UI, Active Rescue, Non-Destructive Peeking, Execution Watchdog 2000ms, iOS Zoom Guard 16px, Single Dominant CTA, запрет 3D/Coddy, фикстуры и DDL схемы. |
+| [`test_backend_database.py`](test_backend_database.py) | **Тестовый комплекс реляционной базы данных (SQLite)**: валидация схемы 9 таблиц, ACID-транзакции, откат при сбоях, внешние ключи, индексация, алгоритм SRS и сохранение черновиков IDE. |
+| [`test_backend_concurrency.py`](test_backend_concurrency.py) | **Стресс-тесты конкурентности и отказоустойчивости**: многопоточная запись в SQLite (режим WAL, 10 потоков без блокировок), миграция схем v1/v2 ➔ v3, краш-рекавери на диске и лимиты полезной нагрузки. |
+| [`test_backend_api.py`](test_backend_api.py) | **Модульные тесты FastAPI API**: интеграционный запуск тестов REST API, синхронизации и сервисов из корня репозитория (29 тестов). |
+| [`test_bugs_regression.js`](test_bugs_regression.js) | **Главный регрессионный сьют**: комплексный прогон всех 146 багов, канонических бенчмарков и сьюта Строгого Дескриптора со 100% PASS. |
 | [`test_pravki_spec.js`](test_pravki_spec.js) | **Спецификация канонических эталонов интерфейса**: теория, флешкарты SRS, практика со сплит-вью, модалка рубежного теста, дашборд и микрообучение. |
 | [`test_dashboard_regression.js`](test_dashboard_regression.js) | Регрессионный тест дашборда: лаконичный вид, кокон фокуса, сегментный прогресс и адаптивность. |
-| [`test_cards_trainer_regression.js`](test_cards_trainer_regression.js) | Тестирование механики 3D-флешкарт: интервальное повторение SRS, перевороты и начисление XP. |
+| [`test_cards_trainer_regression.js`](test_cards_trainer_regression.js) | Тестирование механики флешкарт: интервальное повторение SRS, перевороты, оценка «Не знаю» и начисление XP. |
 | [`test_notes_presentation_regression.js`](test_notes_presentation_regression.js) | Контроль типографики ридера конспектов: Onest, отступы, подсветка синтаксиса и Single CTA. |
 | [`test_skill_screen_regression.js`](test_skill_screen_regression.js) | Тестирование экрана навыков, цепи микро-шагов и дерева эшелонов. |
+| [`fixtures/`](fixtures/) | **Каноническая база фикстур и DDL-схема тестовой БД**: `test_db_schema.sql`, `fixture_factory.py`, 8 эталонных профилей (fresh, intermediate, advanced, conflict, corrupted, v1_legacy, v2_legacy, backup). |
 
 ---
 
 ## 🚀 Запуск тестов
 
 ```bash
-# Запуск модульных тестов FastAPI бэкенда (15 тестов)
-python -m unittest
+# 1. Запуск сьюта Строгого Дескриптора (17 архитектурных инвариантов)
+node tests/test_descriptor_suite.js
 
-# Запуск регрессионного сьюта
+# 2. Запуск полного инженерного бэкенд-комплекса (29 тестов: REST, SQLite, Concurrency WAL, Migrations)
+python -m unittest tests/test_backend_api.py
+
+# 3. Запуск комплексного регрессионного сьюта (163 проверки)
 node tests/test_bugs_regression.js
 
-# Запуск спецификации канонических эталонов
-node tests/test_pravki_spec.js
-
-# Запуск полного регрессионного конвейера
+# 4. Запуск полного конвейера верификации
 python verify_all.py --quick
 ```

@@ -753,6 +753,10 @@ console.log('✓ Bugs 134-139: Dashboard Visual & Ergonomic Regression Suite ver
 // Проверка спецификации канонических эталонов и инвариантов
 require('./test_pravki_spec.js');
 
+// Invariants 147-163. Strict Descriptor Quality & Architectural Invariants Suite (17 Invariants)
+require('./test_descriptor_suite.js');
+console.log('✓ Invariants 147-163: Strict Descriptor Architectural Invariants verified (17/17 PASS)');
+
 console.log('================================================================');
 console.log('  ALL 139 REGRESSION TESTS & CANONICAL BENCHMARKS PASSED (100%) ');
 console.log('================================================================\n');

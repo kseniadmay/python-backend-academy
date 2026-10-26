@@ -14,8 +14,10 @@ if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
 from backend.tests.test_api import TestBackendApi
+from tests.test_backend_database import TestBackendDatabase
+from tests.test_backend_concurrency import TestBackendConcurrencyAndResilience
 
-__all__ = ['TestBackendApi']
+__all__ = ['TestBackendApi', 'TestBackendDatabase', 'TestBackendConcurrencyAndResilience']
 
 if __name__ == '__main__':
     unittest.main()
