@@ -1850,7 +1850,11 @@
     display:flex;gap:3px;width:100%;margin-bottom:10px;height:5px;
   }
   .fc-story-seg{
-    flex:1;height:100%;border-radius:99px;background:var(--line);transition:background .25s,transform .2s;
+    flex:1;height:100%;border-radius:99px;background:var(--line);transition:background .25s,transform .2s,filter .2s;
+  }
+  .fc-story-seg:hover{
+    transform:scaleY(1.75);
+    filter:brightness(1.25);
   }
   .fc-story-seg.seg--easy, .fc-story-seg.fc-story-seg--r4, .fc-story-seg.fc-story-seg--r3{background:var(--emerald);}
   .fc-story-seg.seg--hard, .fc-story-seg.fc-story-seg--r2{background:var(--amber);}
@@ -1861,7 +1865,7 @@
     background:var(--surface);border:1.5px solid var(--line);border-radius:24px;padding:28px 26px;
     min-height:clamp(165px, 22vh, 225px);display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;
     box-shadow:var(--shadow-1);transform-style:preserve-3d;
-    transition:border-color .22s,background .25s,box-shadow .25s;
+    transition:border-color .22s,background .25s,box-shadow .25s,transform .2s;
     position:relative;overflow:hidden;touch-action:pan-y;
   }
   .fc-card::after{
@@ -1880,7 +1884,7 @@
     0%{transform:rotateY(-14deg) scale(0.98);}
     100%{transform:rotateY(0deg) scale(1);}
   }
-  .fc-q{font-size:1.08rem;font-weight:600;line-height:1.55;white-space:pre-line;}
+  .fc-q{font-size:1.14rem;font-weight:600;line-height:1.6;white-space:pre-line;letter-spacing:-0.01em;}
   .fc-a{font-size:1rem;line-height:1.65;white-space:pre-line;color:var(--ink);margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
   .fc-rate-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;}
   @media (max-width:600px){
@@ -12819,6 +12823,7 @@ window.buildCodeEditorWithGutterHTML = buildCodeEditorWithGutterHTML;
 function buildFcStoriesBarHTML(deckId, totalCards, curIdx){
   ensureExtendedState();
   const ratings = state.cardRatings || {};
+  const deck = (typeof ALL_DECKS_COMBINED !== 'undefined') ? ALL_DECKS_COMBINED[deckId] : null;
   const count = Math.max(1, Math.min(60, Number(totalCards) || 1));
   const segs = [];
   for(let i = 0; i < count; i++){
@@ -12829,7 +12834,10 @@ function buildFcStoriesBarHTML(deckId, totalCards, curIdx){
     else if(r === 3) cls += ' fc-story-seg--r3 seg--easy';
     else if(r === 2) cls += ' fc-story-seg--r2 seg--hard';
     else if(r === 1) cls += ' fc-story-seg--r1 seg--again';
-    segs.push(`<div class="${cls}" data-hub-goto-card="${i}" style="cursor:pointer;" title="Карточка ${i+1}"></div>`);
+    const cObj = deck && deck.cards ? deck.cards[i] : null;
+    const rawQ = cObj && cObj.q ? cObj.q.replace(/<[^>]+>/g, '').replace(/[\r\n]+/g, ' ').trim() : '';
+    const previewQ = rawQ ? ` · ${rawQ.slice(0, 50)}${rawQ.length > 50 ? '…' : ''}` : '';
+    segs.push(`<div class="${cls}" data-hub-goto-card="${i}" style="cursor:pointer;" title="Карточка ${i+1}${previewQ.replace(/"/g, '&quot;')}"></div>`);
   }
   return `<div class="fc-stories-bar" aria-label="Прогресс колоды">${segs.join('')}</div>`;
 }
@@ -15868,7 +15876,11 @@ function viewCardsHub(){
             let cls = 'fc-story-seg';
             if(idx === duePos) cls += ' fc-story-seg--active seg--current';
             else if(idx < duePos) cls += ' fc-story-seg--r3 seg--easy';
-            return `<div class="${cls}" data-hub-goto-due="${idx}" style="cursor:pointer;" title="Карточка ${idx+1}"></div>`;
+            const dqDeck = (typeof ALL_DECKS_COMBINED !== 'undefined') ? ALL_DECKS_COMBINED[dq.deckId] : null;
+            const dqCard = dqDeck && dqDeck.cards ? dqDeck.cards[dq.cardIdx] : null;
+            const rawQ = dqCard && dqCard.q ? dqCard.q.replace(/<[^>]+>/g, '').replace(/[\r\n]+/g, ' ').trim() : '';
+            const previewQ = rawQ ? ` · ${rawQ.slice(0, 50)}${rawQ.length > 50 ? '…' : ''}` : '';
+            return `<div class="${cls}" data-hub-goto-due="${idx}" style="cursor:pointer;" title="Карточка ${idx+1}${previewQ.replace(/"/g, '&quot;')}"></div>`;
           }).join('')}
         </div>
         <div class="fc-stage" style="margin-top:0;">
