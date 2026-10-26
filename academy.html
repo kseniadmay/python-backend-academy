@@ -3918,10 +3918,105 @@
     .path-jump-btn {
       bottom: calc(96px + env(safe-area-inset-bottom, 16px));
       right: 16px;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
+      width: 44px !important;
+      height: 44px !important;
+      min-height: 44px !important;
+      padding: 0 !important;
+      border-radius: 50% !important;
+      justify-content: center !important;
+      align-items: center !important;
     }
+    .path-jump-btn .path-hud-label {
+      display: none !important;
+    }
+    .path-jump-btn .path-hud-arrow {
+      margin: 0 !important;
+    }
+  }
+
+  /* Header Console Progress Bar */
+  .path-console-focus {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .pcf-top-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--ink, #f8fafc);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pcf-progress-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pcf-bar-track {
+    width: 68px;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  html:not([data-theme="dark"]) .pcf-bar-track {
+    background: rgba(0, 0, 0, 0.08);
+  }
+  .pcf-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #10b981, #34d399);
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .pcf-progress-text {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--ink-muted, #94a3b8);
+    white-space: nowrap;
+  }
+
+  /* Light Theme Locked Nodes & Exam Pill Polish */
+  html:not([data-theme="dark"]) .hex-node--locked .path-button-top {
+    fill: #f1f5f9 !important;
+    stroke: #cbd5e1 !important;
+  }
+  html:not([data-theme="dark"]) .hex-node--locked .path-button-face path {
+    fill: #e2e8f0 !important;
+    stroke: rgba(0, 0, 0, 0.05) !important;
+  }
+  html:not([data-theme="dark"]) .hex-node--locked ellipse {
+    fill: rgba(0, 0, 0, 0.06) !important;
+  }
+  html:not([data-theme="dark"]) .path-button-rim {
+    fill: #cbd5e1 !important;
+    stroke: rgba(0, 0, 0, 0.08) !important;
+  }
+  html:not([data-theme="dark"]) .hex-branch-pill rect {
+    fill: rgba(255, 255, 255, 0.94) !important;
+    stroke: rgba(0, 0, 0, 0.10) !important;
+  }
+  html:not([data-theme="dark"]) .hex-node--locked .path-lock-icon rect {
+    fill: #94a3b8 !important;
+  }
+  html:not([data-theme="dark"]) .hex-node--locked .path-lock-icon path {
+    stroke: #94a3b8 !important;
+  }
+  html:not([data-theme="dark"]) .hex-node--locked .path-lock-icon circle {
+    fill: #f8fafc !important;
+  }
+
+  /* WCAG AAA Focus-Visible Ring */
+  .hex-3d-node:focus-visible,
+  .hex-challenge-node:focus-visible,
+  .hex-active-tooltip:focus-visible {
+    outline: 2px solid #34d399 !important;
+    outline-offset: 4px !important;
   }
 
   /* Desktop 3-column Layout & Coddy Right Rail */
@@ -18346,9 +18441,16 @@ function trailPawShape(x, y, fill, stroke, strokeWidth){
   const parts = '<circle cx="-15" cy="-14" r="6.2"/><circle cx="-5" cy="-22" r="6.2"/><circle cx="5" cy="-22" r="6.2"/><circle cx="15" cy="-14" r="6.2"/><path d="M-18 6c-1-7 3-16 9-17 4-.7 6 3 9 3s5-3.7 9-3c6 1 10 10 9 17-1 7-8 11-16 6-2-1-3-1-5 0-8 5-15 1-16-6z"/>';
   return `<g class="path-node-paw" transform="translate(${x} ${y})"><g transform="translate(0 2)" fill="rgba(0,0,0,0.30)" stroke="none">${parts}</g><g class="path-paw-face" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linejoin="round">${parts}</g></g>`;
 }
+function trailLockIcon(x, y, color){
+  return `<g class="path-lock-icon" pointer-events="none">
+    <rect x="${x - 7}" y="${y - 4}" width="14" height="11" rx="2.5" fill="${color}" opacity="0.85"/>
+    <path d="M${x - 4.5} ${y - 4} v-3.5 a4.5 4.5 0 0 1 9 0 v3.5" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round"/>
+    <circle cx="${x}" cy="${y + 1.5}" r="1.3" fill="rgba(10, 14, 20, 0.9)"/>
+  </g>`;
+}
 function trailIsometricButton(x, y, fill, stroke, strokeWidth){
   const shadowY = y + 16;
-  return `<ellipse cx="${x}" cy="${shadowY}" rx="22" ry="7" fill="rgba(0,0,0,0.32)" filter="drop-shadow(0 4px 10px rgba(0,0,0,0.50))"/><g class="path-button-face"><path d="M${x - 24} ${y - 3} A 24 24 0 0 0 ${x + 24} ${y - 3} v 6 a 24 24 0 0 1 -48 0 Z" fill="rgba(10, 14, 20, 0.90)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/><circle class="path-button-top" cx="${x}" cy="${y - 3}" r="24" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}"/><path d="M${x - 15} ${y - 15} A 19 19 0 0 1 ${x + 15} ${y - 15}" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.3" stroke-linecap="round"/></g>`;
+  return `<ellipse cx="${x}" cy="${shadowY}" rx="22" ry="7" fill="rgba(0,0,0,0.32)" filter="drop-shadow(0 4px 10px rgba(0,0,0,0.50))"/><g class="path-button-face"><path class="path-button-rim" d="M${x - 24} ${y - 3} A 24 24 0 0 0 ${x + 24} ${y - 3} v 6 a 24 24 0 0 1 -48 0 Z" fill="rgba(10, 14, 20, 0.90)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/><circle class="path-button-top" cx="${x}" cy="${y - 3}" r="24" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}"/><path d="M${x - 15} ${y - 15} A 19 19 0 0 1 ${x + 15} ${y - 15}" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.3" stroke-linecap="round"/></g>`;
 }
 // Тематические иконки по главам (циклятся внутри главы)
 const TRAIL_CHAPTER_ICONS = [
@@ -18596,22 +18698,23 @@ function viewPathSerpentine(options){
         const dashOffset = (circ * (1 - unitProgPct / 100)).toFixed(1);
         radialProgressRing = `<circle class="hex-progress-ring" cx="${x}" cy="${y - (usePawNodes ? 0 : 3)}" r="34" fill="none" stroke="#6ee7b7" stroke-width="3" stroke-dasharray="${circ}" stroke-dashoffset="${dashOffset}" stroke-linecap="round" transform="rotate(-90 ${x} ${y - (usePawNodes ? 0 : 3)})" filter="drop-shadow(0 0 8px rgba(52,211,153,0.7))"/>`;
       }
-      const bubbleTxt = unitStarted
-        ? (unitSkillsMastered > 0 ? `ПРОДОЛЖИТЬ ➔ · ${unitSkillsMastered}/${unitTotalSkills} тем` : 'ПРОДОЛЖИТЬ ➔')
-        : 'НАЧАТЬ ➔';
-      const bubbleW = unitStarted ? (unitSkillsMastered > 0 ? 168 : 118) : 96;
-      const bubbleY = y - 44;
+      const bubbleActionTxt = unitStarted ? 'ПРОДОЛЖИТЬ ➔' : 'НАЧАТЬ ➔';
+      const bubbleSubTxt = unitStarted && unitSkillsMastered > 0
+        ? `Освоено ${unitSkillsMastered} из ${unitTotalSkills} тем`
+        : '⚡ 3 микро-шага · без кода';
+      const bubbleW = 168;
+      const bubbleY = y - 46;
       activeBubble = `
-        <g class="hex-active-tooltip hex-active-tooltip--direct" data-direct-unit="${u.id}" transform="translate(${x}, ${bubbleY})" role="button" tabindex="0" aria-label="${bubbleTxt}" title="Нажмите, чтобы сразу перейти к обучению (2 минуты, без набора кода)">
+        <g class="hex-active-tooltip hex-active-tooltip--direct" data-direct-unit="${u.id}" transform="translate(${x}, ${bubbleY})" role="button" tabindex="0" aria-label="${bubbleActionTxt}: ${bubbleSubTxt}" title="Нажмите, чтобы сразу перейти к обучению">
           <g class="hex-active-tooltip__inner">
-            <rect x="${-bubbleW/2}" y="-18" width="${bubbleW}" height="24" rx="12" fill="url(#pathBubbleGrad)" filter="drop-shadow(0 4px 14px rgba(16,185,129,0.52))"/>
-            <polygon points="-5,6 5,6 0,11" fill="#059669"/>
-            <text x="0" y="-2" text-anchor="middle" font-family="var(--font-d, 'Unbounded', sans-serif)" font-size="9" font-weight="700" fill="#ffffff" letter-spacing="0.04em">${bubbleTxt}</text>
-            <text x="0" y="-23" text-anchor="middle" font-family="'Onest', var(--font-b, sans-serif)" font-size="8.5" font-weight="700" fill="#a7f3d0" letter-spacing="0.02em">💡 3 микро-шага · 0 клавиатуры</text>
+            <rect x="${-bubbleW/2}" y="-34" width="${bubbleW}" height="38" rx="14" fill="url(#pathBubbleGrad)" stroke="rgba(255,255,255,0.22)" stroke-width="1" filter="drop-shadow(0 6px 18px rgba(16,185,129,0.55))"/>
+            <polygon points="-6,4 6,4 0,10" fill="#059669"/>
+            <text x="0" y="-19" text-anchor="middle" font-family="'Onest', var(--font-b, sans-serif)" font-size="8.5" font-weight="700" fill="#a7f3d0" letter-spacing="0.02em">${bubbleSubTxt}</text>
+            <text x="0" y="-5" text-anchor="middle" font-family="var(--font-d, 'Unbounded', sans-serif)" font-size="10" font-weight="800" fill="#ffffff" letter-spacing="0.04em">${bubbleActionTxt}</text>
           </g>
         </g>`;
     } else {
-      centerIcon = trailIconCenter(x, y - (usePawNodes ? 0 : 3), iconName, usePawNodes ? 18 : 24, '#94a3b8');
+      centerIcon = trailLockIcon(x, y - (usePawNodes ? 0 : 3), '#94a3b8');
     }
 
     const nodeShape = usePawNodes
@@ -18693,12 +18796,15 @@ function viewPathSerpentine(options){
     branchesSVG += `
       <g class="hex-challenge-branch">
         <path d="M ${x},${y + 24} Q ${x},${(y + by) / 2} ${bx},${by - 22}" fill="none" stroke="${connectorStroke}" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3 4"/>
-        <g class="hex-challenge-node hex-challenge-node--${chStatus}" data-challenge-route="#${track.routePrefix}/unittest/${u.id}" data-challenge-status="${chStatus}" data-cx="${bx}" data-cy="${by}" role="button" tabindex="0" aria-label="Челлендж мастерства, проверка темы «${cleanUnitTitle(u.id, u.title)}». ${chDone ? 'Пройдено' : (chUnlocked ? 'Доступно' : 'Заблокировано до прохождения предыдущих уроков')}." aria-keyshortcuts="Enter Space" aria-disabled="${chStatus === 'locked' ? 'true' : 'false'}">
+        <g class="hex-challenge-node hex-challenge-node--${chStatus}" data-challenge-route="#${track.routePrefix}/unittest/${u.id}" data-challenge-status="${chStatus}" data-cx="${bx}" data-cy="${by}" role="button" tabindex="0" aria-label="Экзамен главы, проверка темы «${cleanUnitTitle(u.id, u.title)}». ${chDone ? 'Пройдено' : (chUnlocked ? 'Доступно' : 'Заблокировано до завершения уроков главы')}." aria-keyshortcuts="Enter Space" aria-disabled="${chStatus === 'locked' ? 'true' : 'false'}">
           ${chHalo}
           <circle cx="${bx}" cy="${by}" r="24" fill="transparent" pointer-events="all"/>
           ${challengeShape}
           ${challengeContent}
-          <text class="hex-branch-label" x="${bx}" y="${by + 36}" text-anchor="middle">ЧЕЛЛЕНДЖ<tspan x="${bx}" dy="12">МАСТЕРСТВА</tspan></text>
+          <g class="hex-branch-pill" pointer-events="none">
+            <rect x="${bx - 44}" y="${by + 30}" width="88" height="20" rx="10" fill="rgba(15, 23, 42, 0.88)" stroke="${chDone ? 'rgba(52, 211, 153, 0.40)' : (chUnlocked ? 'rgba(244, 63, 94, 0.45)' : 'rgba(148, 163, 184, 0.20)')}" stroke-width="1" filter="drop-shadow(0 2px 8px rgba(0,0,0,0.5))"/>
+            <text class="hex-branch-label" x="${bx}" y="${by + 43.5}" text-anchor="middle" font-family="'Onest', sans-serif" font-size="9" font-weight="700" fill="${chDone ? '#34d399' : (chUnlocked ? '#fb7185' : '#94a3b8')}">${chDone ? '✓ СДАНО' : '🏆 ЭКЗАМЕН'}</text>
+          </g>
         </g>
       </g>`;
   });
@@ -18800,12 +18906,20 @@ function viewPathSerpentine(options){
               <span class="psb-short">${screeningShort}</span>
             </button>
 
-            <!-- Center: Active Lesson Info with Zero-Keyboard badge -->
+            <!-- Center: Active Lesson Info with Chapter Progress Indicator -->
             <div class="path-console-focus">
-              <span class="pcf-chap">ГЛ. ${activeChapterNum}</span>
-              <span class="path-crumb-sep">›</span>
-              <span class="pcf-title">Урок ${activeLessonNumInChap} · ${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</span>
-              <span class="pcf-badge">⚡ 2 МИН · БЕЗ КОДА</span>
+              <div class="pcf-top-row">
+                <span class="pcf-chap">ГЛ. ${activeChapterNum}</span>
+                <span class="path-crumb-sep">›</span>
+                <span class="pcf-title">Урок ${activeLessonNumInChap} · ${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</span>
+              </div>
+              <div class="pcf-progress-row" title="Прогресс главы ${activeChapterNum}: ${completedInChapter} из ${totalInChapter} уроков">
+                <div class="pcf-bar-track">
+                  <div class="pcf-bar-fill" style="width: ${Math.round((completedInChapter / (totalInChapter || 1)) * 100)}%;"></div>
+                </div>
+                <span class="pcf-progress-text">${completedInChapter}/${totalInChapter} уроков</span>
+                <span class="pcf-badge">⚡ 2 МИН · БЕЗ КОДА</span>
+              </div>
             </div>
 
             <!-- Right: Compact Mode Switcher -->
