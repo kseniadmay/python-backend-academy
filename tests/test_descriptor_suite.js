@@ -89,8 +89,8 @@ console.log('✓ Invariant 1: Strict Ban on technical Coddy mentions verified');
 // 3. Инвариант 2: Запрет термина «3D» / «3d» как лексического шума
 // -----------------------------------------------------------------------------
 assert(
-  !academyHtml.includes('3D-тропа') && !academyHtml.includes('3D тропа'),
-  'Invariant 2: UI text must not contain "3D-тропа"'
+  !/3d[- ]?троп/i.test(academyHtml),
+  'Invariant 2: UI text must not contain "3D-тропа" (any case/inflection)'
 );
 assert(
   !academyHtml.includes('3D-карточ') && !academyHtml.includes('3D карточ'),
