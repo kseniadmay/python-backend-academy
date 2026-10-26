@@ -17987,7 +17987,7 @@ function renderPathModeSwitcherHTML(){
   return `
     <div class="path-mode-switcher-wrap">
       <div class="path-mode-switcher" role="radiogroup" aria-label="Режим плана обучения">
-        <button type="button" class="path-mode-btn ${mode==='game'?'active':''}" data-set-path-mode="game" role="radio" aria-checked="${mode==='game'}" title="Игровой режим с 3D-тропой">🎮 Игровой</button>
+        <button type="button" class="path-mode-btn ${mode==='game'?'active':''}" data-set-path-mode="game" role="radio" aria-checked="${mode==='game'}" title="Игровой режим: Тропа курса">🎮 Игровой</button>
         <button type="button" class="path-mode-btn ${mode==='pro'?'active':''}" data-set-path-mode="pro" role="radio" aria-checked="${mode==='pro'}" title="Профессиональный режим со списком глав">💼 Профессиональный</button>
       </div>
     </div>
@@ -18347,7 +18347,7 @@ function viewPathSerpentine(options){
   ensureExtendedState();
   const curEchelon = (options.echelon !== undefined) ? options.echelon : ((state && state.selectedEchelon) || 1);
   const { units: allUnits, chapters: chapterBreakpoints } = getEchelonUnitsAndChapters(curEchelon, ALL_UNITS_COMBINED);
-  const usePawNodes = state.pathNodeStyle !== 'button';
+  const usePawNodes = state.pathNodeStyle === 'paw';
   
   // Find which units are completed vs active vs locked
   let activeUnitIndex = -1;
@@ -18759,7 +18759,7 @@ function viewPathSerpentine(options){
             <!-- Right: Compact Mode Switcher -->
             <div class="path-console-mode-toggle">
               <div class="path-mode-switcher path-mode-switcher--mini" role="radiogroup" aria-label="Режим плана обучения">
-                <button type="button" class="path-mode-btn ${state.pathViewMode==='game'?'active':''}" data-set-path-mode="game" title="Игровой режим с 3D-тропой">🎮 Тропа</button>
+                <button type="button" class="path-mode-btn ${state.pathViewMode==='game'?'active':''}" data-set-path-mode="game" title="Игровой режим: Тропа курса">🎮 Тропа</button>
                 <button type="button" class="path-mode-btn ${state.pathViewMode==='pro'?'active':''}" data-set-path-mode="pro" title="Профессиональный режим со списком глав">💼 Список</button>
               </div>
             </div>
@@ -19075,14 +19075,14 @@ viewMap = function(){
 
   const modeSwitcherHTML = `
     <div class="subtabs subtabs--compact" style="margin-bottom:16px;">
-      <button class="subtab ${mode==='path'?'active':''}" data-map-mode="path">🏔 3D-Тропа курса (Serpentine)</button>
+      <button class="subtab ${mode==='path'?'active':''}" data-map-mode="path">🏔 Тропа курса (Serpentine)</button>
       <button class="subtab ${mode==='tree'?'active':''}" data-map-mode="tree">🗺 Дерево и Эшелоны собеседования</button>
     </div>`;
 
   if(mode === 'path'){
     return `
       <div class="container" style="padding-bottom:10px;">
-        <h1 style="margin-bottom:6px;">Карта навыков: Интерактивная 3D-Тропа обучения</h1>
+        <h1 style="margin-bottom:6px;">Карта навыков: Интерактивная Тропа обучения</h1>
         <p class="meta" style="margin-bottom:14px;">Математическая извилистая S-трасса соединяет все 45 уроков курса в единое непрерывное приключение.</p>
         ${modeSwitcherHTML}
       </div>
@@ -20558,7 +20558,7 @@ viewDashboard = function(){
     </div>`;
 };
 NAV_ITEMS.splice(0, NAV_ITEMS.length,
-  {route:'/path', icon:'path', label:'3D-Тропа', shortLabel:'3D-Тропа', mobileTab:true, group:'learn'},
+  {route:'/path', icon:'path', label:'Тропа', shortLabel:'Тропа', mobileTab:true, group:'learn'},
   {route:'/', icon:'home', label:'Дашборд', shortLabel:'Дашборд', mobileTab:true, group:'learn'},
   {route:'/practice', icon:'code', label:'Практика IDE', shortLabel:'IDE', mobileTab:true, group:'trainer'},
   {route:'/cards', icon:'cards', label:'Карточки', shortLabel:'Карточки', mobileTab:true, group:'trainer'},
@@ -20720,7 +20720,7 @@ function openMobileDrawer(){
       <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-muted);margin-bottom:8px;">Разделы платформы</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;">
         <a href="#/" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);">🏠 Дашборд</a>
-        <a href="#/path" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);">🗺️ 3D-Тропа</a>
+        <a href="#/path" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);">🗺️ Тропа</a>
         <a href="#/map" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);">📚 Карта модулей</a>
         <a href="#/practice" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);">💻 Практика IDE</a>
         <a href="#/cards" class="btn btn-ghost" onclick="closeMobileDrawer();" style="text-decoration:none;justify-content:flex-start;font-size:0.84rem;padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);">🃏 Карточки</a>
@@ -20808,7 +20808,7 @@ function openSettingsModal(){
         <div class="settings-section-title">🧭 Разделы платформы</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;margin-top:10px;">
           <a href="#/" class="btn btn-ghost" onclick="closeSettingsModal();" style="text-decoration:none;justify-content:flex-start;font-size:0.82rem;padding:9px 12px;border-radius:12px;">🏠 Дашборд</a>
-          <a href="#/path" class="btn btn-ghost" onclick="closeSettingsModal();" style="text-decoration:none;justify-content:flex-start;font-size:0.82rem;padding:9px 12px;border-radius:12px;">🗺️ 3D-Тропа</a>
+          <a href="#/path" class="btn btn-ghost" onclick="closeSettingsModal();" style="text-decoration:none;justify-content:flex-start;font-size:0.82rem;padding:9px 12px;border-radius:12px;">🗺️ Тропа</a>
           <a href="#/map" class="btn btn-ghost" onclick="closeSettingsModal();" style="text-decoration:none;justify-content:flex-start;font-size:0.82rem;padding:9px 12px;border-radius:12px;">📚 Карта модулей</a>
           <a href="#/practice" class="btn btn-ghost" onclick="closeSettingsModal();" style="text-decoration:none;justify-content:flex-start;font-size:0.82rem;padding:9px 12px;border-radius:12px;">💻 Практика IDE</a>
           <a href="#/cards" class="btn btn-ghost" onclick="closeSettingsModal();" style="text-decoration:none;justify-content:flex-start;font-size:0.82rem;padding:9px 12px;border-radius:12px;">🃏 Карточки</a>
@@ -21731,7 +21731,7 @@ document.addEventListener('click', async function(e){
       window.scrollTo({ top: 0, behavior: 'instant' });
       render();
       if(typeof isSettingsModalOpen !== 'undefined' && isSettingsModalOpen && typeof showTactileToast === 'function'){
-        showTactileToast(targetMode === 'pro' ? '💼 Включён профессиональный режим' : '🎮 Включён игровой режим 3D-тропы');
+        showTactileToast(targetMode === 'pro' ? '💼 Включён профессиональный режим' : '🎮 Включён игровой режим Тропы');
       }
     }
     return;
@@ -23955,6 +23955,34 @@ const psk = e.target.closest('[data-py-select-k]');
     }
     const openedByKeyboard = e.detail === 0;
     const uid = hexNode.getAttribute('data-unit-id');
+
+    // One-Tap Direct Launch для активного урока
+    if(uid && typeof ALL_UNITS_COMBINED !== 'undefined'){
+      const curEchelon = (state && state.selectedEchelon) || 1;
+      const { units: echUnits } = (typeof getEchelonUnitsAndChapters === 'function')
+        ? getEchelonUnitsAndChapters(curEchelon, ALL_UNITS_COMBINED)
+        : { units: ALL_UNITS_COMBINED };
+      let actIdx = echUnits.findIndex(x => {
+        const pass = (state.passedUnitTests || []).includes(x.id) || ((x.skills||[]).length > 0 && (x.skills||[]).every(sk => getSkillMP(sk.id) >= 80));
+        return !pass;
+      });
+      if(actIdx === -1) actIdx = Math.max(0, echUnits.length - 1);
+      const clickedIdx = echUnits.findIndex(x => x.id === uid);
+      if(clickedIdx === actIdx){
+        const unitObj = ALL_UNITS_COMBINED.find(x => x.id === uid);
+        if(unitObj){
+          const trk = getTrackForUnit(uid);
+          const actSk = (unitObj.skills || []).find(sk => (getSkillMP(sk.id) || 0) < 80) || (unitObj.skills && unitObj.skills[0]);
+          const targetSkId = actSk ? actSk.id : '';
+          const popover = document.getElementById('path-anchored-popover');
+          const backdrop = document.getElementById('path-popover-backdrop');
+          if(backdrop) backdrop.style.display = 'none';
+          if(popover) popover.style.display = 'none';
+          location.hash = targetSkId ? `#${trk.routePrefix}/skill/${targetSkId}` : `#${trk.routePrefix}`;
+          return;
+        }
+      }
+    }
     const popover = document.getElementById('path-anchored-popover');
     if(popover && uid && typeof ALL_UNITS_COMBINED !== 'undefined'){
       popover.setAttribute('data-return-focus-unit', uid);
