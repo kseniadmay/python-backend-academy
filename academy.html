@@ -1879,9 +1879,11 @@
     display:inline-flex;align-items:center;justify-content:center;
     margin-left:6px;padding:1px 5px;font-family:var(--font-m, monospace);
     font-size:0.68rem;font-weight:700;line-height:1.2;border-radius:5px;
-    background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.22);
-    color:inherit;opacity:0.85;vertical-align:middle;pointer-events:none;
-    transition:background .2s,border-color .2s;
+    background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.20);
+    border-bottom:2px solid rgba(255,255,255,0.30);
+    box-shadow:0 1px 2px rgba(0,0,0,0.22);
+    color:inherit;opacity:0.92;vertical-align:middle;pointer-events:none;
+    transition:background .2s,border-color .2s,transform .1s;
   }
   @media (hover: none) and (pointer: coarse){
     .fc-kbd-hint{display:none !important;}
@@ -1897,8 +1899,11 @@
     100%{transform:rotateY(0deg) scale(1);}
   }
   .fc-q{font-size:1.14rem;font-weight:600;line-height:1.6;white-space:pre-line;letter-spacing:-0.01em;}
-  .fc-a{font-size:1rem;line-height:1.65;white-space:pre-line;color:var(--ink);margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
-  .cards-hub-container{min-height:calc(100vh - 130px);display:flex;flex-direction:column;justify-content:flex-start;padding-top:14px;}
+  .fc-a{font-size:1rem;line-height:1.65;white-space:pre-line;color:var(--ink);margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);animation:fcAnswerReveal .24s cubic-bezier(0.16,1,0.3,1) both;}
+  @keyframes fcAnswerReveal{0%{opacity:0;transform:translateY(6px);}100%{opacity:1;transform:translateY(0);}}
+  .fc-q pre, .fc-a pre{overflow-x:auto;max-width:100%;border-radius:10px;padding:12px;scrollbar-width:thin;scrollbar-color:rgba(16,185,129,0.35) transparent;}
+  .fc-q code, .fc-a code{word-break:break-word;}
+  .cards-hub-container{min-height:calc(100vh - 130px);display:flex;flex-direction:column;justify-content:flex-start;padding-top:14px;padding-bottom:calc(var(--tabbar-h, 68px) + 36px + env(safe-area-inset-bottom, 16px)) !important;}
   .fc-rate-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;}
   @media (max-width:600px){
     .fc-rate-row{grid-template-columns:1fr 1fr !important;gap:10px !important;}
@@ -1907,7 +1912,13 @@
   .fc-rate-row .btn{
     padding:12px 14px !important;font-size:0.92rem !important;font-weight:700 !important;
     border-radius:14px !important;text-align:center;justify-content:center;
-    transition:transform .12s, filter .15s, box-shadow .15s !important;
+    transition:transform .14s cubic-bezier(0.34,1.56,0.64,1), filter .15s, box-shadow .18s !important;
+  }
+  .fc-rate-row .btn:hover{
+    transform:translateY(-2px) !important;
+  }
+  .fc-rate-row .btn:active{
+    transform:scale(0.97) translateY(0) !important;
   }
   .srs-deck-filter-select{
     background-color:rgba(18,24,38,0.78) !important;
@@ -2339,7 +2350,7 @@
     .cards-hub-controls{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
     .cards-hub-subfilters{display:grid !important;grid-template-columns:1fr 1fr;gap:8px;}
     .cards-hub-subfilters select{min-width:0 !important;width:100% !important;box-sizing:border-box !important;font-size:.78rem !important;padding:8px 8px !important;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;}
-    .cards-hub-container{padding-bottom:90px !important;}
+    .cards-hub-container{padding-bottom:calc(var(--tabbar-h, 68px) + 40px + env(safe-area-inset-bottom, 20px)) !important;}
     .cards-hub-controls #cards-deck-select{font-size:.84rem !important;padding:8px 10px !important;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;}
     .fc-stage{margin:6px 0 !important;}
     .microstep-bar{padding:6px 10px !important;font-size:.82rem !important;margin-bottom:6px !important;}
@@ -16041,8 +16052,8 @@ function viewCardsHub(){
             </button>
           </div>
           <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-            <button type="button" class="btn btn-ghost" data-hub-prev style="padding:8px 16px;border-radius:12px;font-size:0.84rem;">← К вопросу</button>
-            <div class="fc-swipe-guide" style="display:none;justify-content:center;align-items:center;gap:12px;font-size:0.75rem;color:var(--ink-muted);user-select:none;opacity:0.88;">
+            <button type="button" class="btn btn-ghost btn-hub-turn-back" data-hub-prev style="padding:9px 18px;border-radius:12px;font-size:0.84rem;font-weight:600;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);box-shadow:0 2px 6px rgba(0,0,0,0.18);transition:all .18s ease;">← К вопросу</button>
+            <div class="fc-swipe-guide" style="display:none;justify-content:center;align-items:center;gap:10px;font-size:0.74rem;color:var(--ink-muted);user-select:none;padding:6px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:999px;">
               <span style="display:inline-flex;align-items:center;gap:4px;"><span style="color:#f43f5e;">👈</span> Свайп влево: Снова</span>
               <span style="opacity:0.35;">·</span>
               <span style="display:inline-flex;align-items:center;gap:4px;">Свайп вправо: Легко <span style="color:#34d399;">👉</span></span>
@@ -16243,8 +16254,8 @@ function viewCardsHub(){
             </button>
           </div>
           <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-            <button type="button" class="btn btn-ghost" data-hub-prev style="padding:8px 16px;border-radius:12px;font-size:0.84rem;">← К вопросу</button>
-            <div class="fc-swipe-guide" style="display:none;justify-content:center;align-items:center;gap:12px;font-size:0.75rem;color:var(--ink-muted);user-select:none;opacity:0.88;">
+            <button type="button" class="btn btn-ghost btn-hub-turn-back" data-hub-prev style="padding:9px 18px;border-radius:12px;font-size:0.84rem;font-weight:600;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);box-shadow:0 2px 6px rgba(0,0,0,0.18);transition:all .18s ease;">← К вопросу</button>
+            <div class="fc-swipe-guide" style="display:none;justify-content:center;align-items:center;gap:10px;font-size:0.74rem;color:var(--ink-muted);user-select:none;padding:6px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:999px;">
               <span style="display:inline-flex;align-items:center;gap:4px;"><span style="color:#f43f5e;">👈</span> Свайп влево: Снова</span>
               <span style="opacity:0.35;">·</span>
               <span style="display:inline-flex;align-items:center;gap:4px;">Свайп вправо: Легко <span style="color:#34d399;">👉</span></span>
