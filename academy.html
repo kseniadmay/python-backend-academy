@@ -9400,9 +9400,9 @@
     fill: rgba(203, 213, 225, 0.75) !important;
   }
   html[data-theme="dark"] .hex-node-underlabel--locked {
-    fill: rgba(148, 163, 184, 0.50) !important;
-    font-weight: 400 !important;
-    opacity: 0.75 !important;
+    fill: rgba(203, 213, 225, 0.88) !important;
+    font-weight: 500 !important;
+    opacity: 0.92 !important;
     stroke: none !important;
   }
   @media (max-width: 640px) {
@@ -9452,15 +9452,16 @@
   }
   @media (max-width: 640px) {
     .path-serpentine-wrap {
-      padding: 4px 10px calc(180px + env(safe-area-inset-bottom, 32px)) !important;
+      padding: 4px 10px calc(240px + env(safe-area-inset-bottom, 40px)) !important;
     }
     .path-mode-switcher-wrap {
-      margin-bottom: 6px !important;
-      transform: scale(0.92);
+      display: none !important;
     }
     .path-mobile-stats {
-      margin: 0 auto 12px !important;
-      padding: 6px 14px !important;
+      margin: 0 auto 14px !important;
+      padding: 6px 12px !important;
+      max-width: 96% !important;
+      justify-content: space-around !important;
     }
     .path-chapter-banner {
       display: none !important;
@@ -18413,12 +18414,12 @@ function renderPathMobileStatsHTML(totalCompletedUnits, streakText, curTier, act
   const tierNum = (curTier === 'all') ? 1 : (Number(curTier) || 1);
   const tierIcon = (curTier === 'all') ? '🌐' : ((typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[tierNum] && INTERVIEW_ECHELONS[tierNum].icon) || '🛡️');
   const tierLabel = (curTier === 'all') ? 'Все эшелоны' : `Эшелон ${tierNum}`;
-  const tierShortLabel = (curTier === 'all') ? 'Все' : `Эш. ${tierNum}`;
+  const tierShortLabel = (curTier === 'all') ? 'Все' : (curTier == 1 ? 'Скрининг' : `Эшелон ${tierNum}`);
   const streakCount = Number(state.streak) || 0;
   const xpCount = Number(state.xp) || 0;
-  const chapterLabel = chDone > 0 ? `Гл. ${chNum}: ${chDone}/${chTot}` : `Гл. ${chNum} · Начало`;
-  const streakLabel = streakCount > 0 ? `${streakCount} ${streakText}` : 'Начать серию';
-  const xpLabel = xpCount > 0 ? `${xpCount} XP` : 'Первые XP впереди';
+  const chapterLabel = chDone > 0 ? `Гл. ${chNum}: ${chDone}/${chTot}` : `Гл. ${chNum}: 0/${chTot}`;
+  const streakLabel = streakCount > 0 ? `${streakCount} ${streakText}` : '1 день';
+  const xpLabel = xpCount > 0 ? `${xpCount} XP` : '0 XP';
   return `
     <div class="path-mobile-stats" role="status" aria-label="Программа, прогресс главы и серия занятий">
       <button type="button" class="pms-item pms-echelon" data-open-echelon-modal="1" title="${tierLabel} · Нажмите, чтобы сменить программу" aria-label="${tierLabel}, сменить программу">${tierIcon} <b>${tierShortLabel}</b> <span aria-hidden="true">▾</span></button>
@@ -18667,7 +18668,7 @@ function viewPathSerpentine(options){
     return { x, y: curY };
   });
 
-  const totalH = coords.length ? (coords[coords.length - 1].y + 160) : 400;
+  const totalH = coords.length ? (coords[coords.length - 1].y + 240) : 420;
 
   // Build smooth Bezier path
   let dPath = coords.length ? `M ${coords[0].x} ${coords[0].y}` : '';
@@ -18819,14 +18820,14 @@ function viewPathSerpentine(options){
     let radialProgressRing = '';
     let triadOrbit = '';
 
-    // Fog of Mastery: progressive depth for distant locked lessons
+    // Fog of Mastery: progressive depth for distant locked lessons (Enchanted Glass Teaser)
     let fogStyle = '';
     if(status === 'locked'){
       const dist = i - activeUnitIndex;
-      if(dist === 1) fogStyle = 'opacity:0.88;';
-      else if(dist === 2) fogStyle = 'opacity:0.68;';
-      else if(dist === 3) fogStyle = 'opacity:0.48;';
-      else fogStyle = 'opacity:0.28;filter:grayscale(0.5);';
+      if(dist === 1) fogStyle = 'opacity:0.92;';
+      else if(dist === 2) fogStyle = 'opacity:0.82;';
+      else if(dist === 3) fogStyle = 'opacity:0.72;';
+      else fogStyle = 'opacity:0.60;';
     }
 
     if(isCompleted){
@@ -18861,7 +18862,7 @@ function viewPathSerpentine(options){
         ? `Освоено ${unitSkillsMastered} из ${unitTotalSkills} тем`
         : '⚡ 3 микро-шага · без кода';
       const bubbleW = 168;
-      const bubbleY = y - 46;
+      const bubbleY = y - 56;
       activeBubble = `
         <g class="hex-active-tooltip hex-active-tooltip--direct" data-direct-unit="${u.id}" transform="translate(${x}, ${bubbleY})" role="button" tabindex="0" aria-label="${bubbleActionTxt}: ${bubbleSubTxt}" title="Нажмите, чтобы сразу перейти к обучению">
           <g class="hex-active-tooltip__inner">
@@ -19046,14 +19047,10 @@ function viewPathSerpentine(options){
         <div class="path-chapter-banner path-header-console">
           <div class="path-console-row">
             <!-- Left: Echelon dropdown trigger -->
-            <button type="button" class="path-console-echelon-pill echelon-pill--t${curTierNum}" data-open-echelon-modal="1" title="Нажмите, чтобы сменить целевую программу / эшелон" aria-haspopup="dialog">
+            <button type="button" class="path-console-echelon-pill echelon-pill--t${curTierNum}" data-open-echelon-modal="1" title="Нажмите, чтобы сменить целевую программу" aria-haspopup="dialog">
               <span class="pce-icon">${curEchelon==='all'?'🌐':curEchelonMeta.icon}</span>
-              <span class="pce-label">${echelonFull}</span>
+              <span class="pce-label">${curEchelon==='all' ? 'Все темы' : (curTierNum === 1 ? 'Скрининг Junior+' : `Эшелон ${curTierNum}`)}</span>
               <span class="pce-chevron">▾</span>
-            </button>
-            <button type="button" class="path-screening-badge" data-open-echelon-modal="1" title="${escapeHtmlStr(screeningFull)} · Нажмите для обзора программы" aria-label="${escapeHtmlStr(screeningFull)}">
-              <span class="psb-full">${screeningFull}</span>
-              <span class="psb-short">${screeningShort}</span>
             </button>
 
             <!-- Center: Active Lesson Info with Chapter Progress Indicator -->
@@ -19153,7 +19150,29 @@ function viewPathSerpentine(options){
                 <stop offset="0%" stop-color="rgba(148, 163, 184, 0.08)"/>
                 <stop offset="100%" stop-color="rgba(10, 14, 20, 0.02)"/>
               </linearGradient>
+              <radialGradient id="biomeEmerald" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#10b981" stop-opacity="0.14"/>
+                <stop offset="65%" stop-color="#059669" stop-opacity="0.04"/>
+                <stop offset="100%" stop-color="#0b0f17" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="biomeSapphire" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.12"/>
+                <stop offset="65%" stop-color="#1d4ed8" stop-opacity="0.03"/>
+                <stop offset="100%" stop-color="#0b0f17" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="biomeAmber" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.14"/>
+                <stop offset="65%" stop-color="#b45309" stop-opacity="0.03"/>
+                <stop offset="100%" stop-color="#0b0f17" stop-opacity="0"/>
+              </radialGradient>
             </defs>
+
+            <!-- Ambient Spatial Biomes (Ethereal Depth & Zero Black Void) -->
+            <g class="path-ambient-biomes" pointer-events="none">
+              <ellipse cx="210" cy="180" rx="220" ry="170" fill="url(#biomeEmerald)"/>
+              <ellipse cx="210" cy="680" rx="230" ry="180" fill="url(#biomeSapphire)"/>
+              <ellipse cx="210" cy="1180" rx="230" ry="180" fill="url(#biomeAmber)"/>
+            </g>
 
             <!-- Luminous Ethereal Guide Track with Photon Flow -->
             <path class="path-track-bg" d="${dPath}" fill="none" stroke="rgba(148,163,184,0.12)" stroke-width="2.6" stroke-linecap="round"/>
@@ -19161,7 +19180,7 @@ function viewPathSerpentine(options){
               <path class="path-track-progress" d="${dProgress}" fill="none" stroke="url(#pathProgressGrad)" stroke-width="3.2" stroke-linecap="round" style="filter:drop-shadow(0 0 8px rgba(52,211,153,0.70)) drop-shadow(0 0 16px rgba(16,185,129,0.35));"/>
               <path class="path-track-pulse-stream" d="${dProgress}" fill="none" stroke="#a7f3d0" stroke-width="1.8" stroke-linecap="round" opacity="0.9" style="filter:drop-shadow(0 0 6px #6ee7b7);"/>
             ` : ''}
-            ${dFuture ? `<path class="path-track-future" d="${dFuture}" fill="none" stroke="rgba(148,163,184,0.20)" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 6"/>` : ''}
+            ${dFuture ? `<path class="path-track-future" d="${dFuture}" fill="none" stroke="rgba(148,163,184,0.28)" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="6 6"/>` : ''}
 
             <!-- Chapter ribbons -->
             ${markersSVG}
