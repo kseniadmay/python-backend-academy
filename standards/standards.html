@@ -1898,10 +1898,11 @@
   }
   .fc-q{font-size:1.14rem;font-weight:600;line-height:1.6;white-space:pre-line;letter-spacing:-0.01em;}
   .fc-a{font-size:1rem;line-height:1.65;white-space:pre-line;color:var(--ink);margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
+  .cards-hub-container{min-height:calc(100vh - 130px);display:flex;flex-direction:column;justify-content:flex-start;padding-top:14px;}
   .fc-rate-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;}
   @media (max-width:600px){
     .fc-rate-row{grid-template-columns:1fr 1fr !important;gap:10px !important;}
-    .fc-rate-row .btn{min-height:48px !important;padding:10px 8px !important;font-size:0.86rem !important;white-space:nowrap !important;}
+    .fc-rate-row .btn{min-height:54px !important;padding:10px 8px !important;font-size:0.88rem !important;display:flex !important;flex-direction:column !important;align-items:center !important;justify-content:center !important;}
   }
   .fc-rate-row .btn{
     padding:12px 14px !important;font-size:0.92rem !important;font-weight:700 !important;
@@ -15773,7 +15774,7 @@ let cardsHubState = {
   cardIdx: typeof _initCardsPos.cardIdx === 'number' ? _initCardsPos.cardIdx : 0,
   flipped: !!_initCardsPos.flipped,
   completed: _isSameDay ? !!_initCardsPos.completed : false,
-  dueMode: true,
+  dueMode: _initCardsPos.dueMode !== false,
   dueQueue: _savedDueQueue,
   duePos: (_savedDueQueue.length > 0 && !_initCardsPos.completed) ? 0 : (typeof _initCardsPos.duePos === 'number' ? _initCardsPos.duePos : 0)
 };
@@ -15789,7 +15790,7 @@ function saveCardsHubPosState(){
     cardIdx: cardsHubState.cardIdx || 0,
     flipped: !!cardsHubState.flipped,
     completed: isDone,
-    dueMode: true,
+    dueMode: cardsHubState.dueMode !== false,
     duePos: isDone ? 0 : (cardsHubState.duePos || 0),
     // Фикс залипания: при завершении сессии очередь очищается, не оставляя висячий хвост из 1 карточки
     dueQueue: (isDone || !Array.isArray(cardsHubState.dueQueue))
@@ -15904,18 +15905,17 @@ function viewCardsHub(){
 
     return `
     <div class="container cards-hub-container" style="padding-bottom:84px;max-width:760px;margin:0 auto;">
-      <div class="cards-hub-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+      <div class="cards-hub-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
         <div>
-          <h1 style="margin:0;font-size:1.45rem;font-weight:800;">🃏 Центр 3D Флеш-карточек</h1>
+          <h1 style="margin:0;font-size:1.45rem;font-weight:800;">Центр 3D Флеш-карточек</h1>
           <div style="font-size:0.84rem;color:var(--ink-muted);margin-top:2px;">
-            🔥 Повторение на сегодня · Тема: <span style="color:var(--gold);font-weight:600;">${cleanDeckName}</span>
+            Суточный поток · Тема: <span style="color:var(--gold);font-weight:600;">${cleanDeckName}</span>
           </div>
         </div>
         <div class="cards-hub-header-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-          <a href="#/docs" class="btn btn-ghost" style="padding:6px 12px;font-size:0.78rem;" title="Открыть инженерный справочник">💡 Шпаргалка</a>
-          <span class="cocoon-pill" style="color:var(--amber);">⚡ Очередь: <b>${duePos + 1} / ${qLen}</b></span>
-          <button type="button" class="btn btn-ghost" data-hub-exit-due style="padding:6px 12px;font-size:0.78rem;" title="Перейти к каталогу всех 260 колод">📚 Все колоды</button>
-          <a href="#/" class="btn btn-ghost" style="padding:6px 12px;font-size:0.78rem;text-decoration:none;" title="Вернуться к карте обучения">🗺️ На Тропу</a>
+          <span class="cocoon-pill" style="font-size:0.80rem;font-weight:600;">${duePos + 1} / ${qLen}</span>
+          <button type="button" class="btn btn-ghost" data-hub-exit-due style="padding:6px 12px;font-size:0.78rem;" title="Перейти к каталогу всех 286 колод">Каталог колод</button>
+          <a href="#/" class="btn btn-ghost" style="padding:6px 12px;font-size:0.78rem;text-decoration:none;" title="Вернуться к карте обучения">На Тропу ➔</a>
         </div>
       </div>
       <div class="cards-hub-content" style="max-width:760px;margin:0 auto;">
@@ -15937,7 +15937,6 @@ function viewCardsHub(){
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
                 <div style="display:flex;align-items:center;gap:8px;">
                   <div class="topic-badge" style="background:${cardsHubState.flipped ? 'rgba(16,185,129,0.2)' : 'rgba(59,130,246,0.15)'};color:${cardsHubState.flipped ? '#34d399' : '#60a5fa'};font-weight:700;">${cardsHubState.flipped ? 'Ответ' : 'Вопрос'}</div>
-                  ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(item.deckId + ':' + item.cardIdx) : ''}
                 </div>
               </div>
               <div class="fc-q">${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(cObj.q) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(cObj.q) : cObj.q)}</div>
@@ -16053,7 +16052,7 @@ function viewCardsHub(){
         <div class="cards-hub-header-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           ${(() => {
             const srsStats = typeof getSpacedRepetitionStats === 'function' ? getSpacedRepetitionStats() : {dueTodayCardsCount:0, masteredCardsCount:0};
-            const dueBtn = srsStats.dueTodayCardsCount > 0 ? `<button type="button" class="btn btn-burgundy" data-hub-review-due style="padding:6px 12px;font-size:.78rem;font-weight:700;" title="Запустить повторение карточек, запланированных на сегодня">🔥 Повторить на сегодня (<b>${srsStats.dueTodayCardsCount}</b>) ➔</button>` : '';
+            const dueBtn = srsStats.dueTodayCardsCount > 0 ? `<button type="button" class="btn btn-burgundy" data-hub-review-due style="padding:6px 12px;font-size:.78rem;font-weight:700;" title="Запустить повторение карточек, запланированных на сегодня">🔥 Повторить на сегодня (<b>${srsStats.dueTodayCardsCount}</b>) ➔</button>` : `<button type="button" class="btn btn-ghost" data-hub-review-due style="padding:6px 12px;font-size:.78rem;" title="Вернуться к суточной очереди повторения">⚡ Суточная очередь</button>`;
             return `${dueBtn}`;
           })()}
           <a href="#/docs" class="btn btn-ghost" data-hub-cheatsheet style="padding:6px 11px;font-size:.78rem;" title="Открыть инженерный справочник">💡 Шпаргалка</a>
@@ -16086,7 +16085,7 @@ function viewCardsHub(){
       <div class="cards-hub-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
         <div>
           <span class="sr-only">Интервальное повторение RemNote · 286 колод · 6 051 карточка (126 колод Python + 25 колод Web + 43 колоды Backend + 16 колод Алгоритмы + 32 колоды Базы данных + 17 колод Архитектура + 45 колод Инфраструктура)</span>
-          <h1 style="margin:0;font-size:1.45rem;font-weight:800;">🃏 Центр 3D Флеш-карточек</h1>
+          <h1 style="margin:0;font-size:1.45rem;font-weight:800;">Центр 3D Флеш-карточек</h1>
           <div style="font-size:0.84rem;color:var(--ink-muted);margin-top:2px;">
             Интервальное повторение RemNote · <span style="color:var(--gold);font-weight:600;">${cleanCurDeckTitle}</span>
           </div>
@@ -21148,7 +21147,9 @@ render = function(){
     root.innerHTML = viewMockInterview();
     navRoute = '/mock';
   } else if(route === '/cards'){
-    cardsHubState.dueMode = true;
+    if(cardsHubState.dueMode !== false){
+      cardsHubState.dueMode = true;
+    }
     root.innerHTML = viewCardsHub();
     navRoute = '/cards';
   } else if(route === '/practice' || route.indexOf('/practice?') === 0){
