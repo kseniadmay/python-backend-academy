@@ -2415,6 +2415,27 @@
     width: 100%;
     height: auto;
     overflow: visible;
+    will-change: transform;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+  .hex-node--prereq-target {
+    filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.75)) !important;
+    animation: prereqPulse 1.6s ease-in-out infinite alternate !important;
+  }
+  @keyframes prereqPulse {
+    from { transform: scale(1.02); filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.60)); }
+    to { transform: scale(1.09); filter: drop-shadow(0 0 22px rgba(245, 158, 11, 0.90)); }
+  }
+  .path-popover-cta--jump-active {
+    background: linear-gradient(135deg, #d97706, #b45309) !important;
+    color: #ffffff !important;
+    border-color: rgba(245, 158, 11, 0.40) !important;
+    box-shadow: 0 4px 16px rgba(217, 119, 6, 0.35) !important;
+  }
+  .path-popover-cta--jump-active:hover {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.50) !important;
   }
   .hex-3d-node {
     cursor: pointer;
@@ -18146,6 +18167,7 @@ function viewPathSerpentine(options){
       }
 
       const hexBadge = `
+        <rect x="-140" y="-85" width="280" height="170" rx="24" fill="${isLocked ? 'url(#gateAuraLockedGrad)' : 'url(#gateAuraGrad)'}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
         <g class="path-gate-hex-badge" ${hexGlow}>
           <polygon points="0,-72 16,-63 16,-44 0,-35 -16,-44 -16,-63" fill="${hexFill}" stroke="${hexStroke}" stroke-width="1.8" stroke-linejoin="round"/>
           <polygon points="0,-68 13,-60 13,-46 0,-38 -13,-46 -13,-60" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1" stroke-linejoin="round"/>
@@ -18437,6 +18459,14 @@ function viewPathSerpentine(options){
               <linearGradient id="pathBubbleGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="#6ee7b7"/>
                 <stop offset="100%" stop-color="#059669"/>
+              </linearGradient>
+              <linearGradient id="gateAuraGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(16, 185, 129, 0.12)"/>
+                <stop offset="100%" stop-color="rgba(10, 14, 20, 0.02)"/>
+              </linearGradient>
+              <linearGradient id="gateAuraLockedGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(148, 163, 184, 0.08)"/>
+                <stop offset="100%" stop-color="rgba(10, 14, 20, 0.02)"/>
               </linearGradient>
             </defs>
 
@@ -23571,6 +23601,7 @@ const psk = e.target.closest('[data-py-select-k]');
   // 3D Serpentine Path node click (Open anchored popover)
   const hexNode = e.target.closest('.hex-3d-node');
   if(hexNode){
+    document.querySelectorAll('.hex-node--prereq-target').forEach(el => el.classList.remove('hex-node--prereq-target'));
     if(typeof navigator !== 'undefined' && navigator.vibrate){
       try{ navigator.vibrate(10); }catch(vErr){}
     }
@@ -23610,10 +23641,15 @@ const psk = e.target.closest('[data-py-select-k]');
         const isActive = (uIdx === activeIdx);
         const isLocked = (uIdx > activeIdx && !isPassed);
 
+        const activeUnitObj = echUnits[activeIdx] || u;
         if(pStatus){
           if(isPassed) pStatus.textContent = '✅ Урок освоен на 100%';
           else if(isActive) pStatus.textContent = '🎯 Текущий урок';
-          else if(isLocked) pStatus.textContent = '🔒 Откроется после предыдущих уроков';
+          else if(isLocked) {
+            pStatus.innerHTML = '🔒 Откроется после предыдущих уроков (текущий: <span style="color:var(--amber);font-weight:700;">' + escapeHtmlStr(cleanUnitTitle(activeUnitObj.id, activeUnitObj.title)) + '</span>)';
+            const activeNodeEl = document.querySelector('.hex-3d-node[data-unit-id="' + activeUnitObj.id + '"]');
+            if(activeNodeEl) activeNodeEl.classList.add('hex-node--prereq-target');
+          }
           else pStatus.textContent = '📖 Доступен для изучения';
         }
 
@@ -23677,10 +23713,14 @@ const psk = e.target.closest('[data-py-select-k]');
           const targetSkillId = activeSkill ? activeSkill.id : '';
           pCta.setAttribute('data-target-route', `#${track.routePrefix}/skill/${targetSkillId}`);
 
+          pCta.removeAttribute('data-target-unit');
           if(isPassed){
             pCta.textContent = 'ОБЗОР УРОКА ➔';
           } else if(isLocked){
-            pCta.textContent = '🔒 ЗАБЛОКИРОВАНО';
+            pCta.disabled = false;
+            pCta.className = 'path-popover-cta path-popover-cta--jump-active';
+            pCta.setAttribute('data-target-unit', activeUnitObj.id);
+            pCta.textContent = 'ПЕРЕЙТИ К ТЕКУЩЕМУ ШАГУ ➔';
           } else if(unitStarted){
             const activeIdxInUnit = (u.skills || []).findIndex(s => s.id === targetSkillId);
             pCta.textContent = `ПРОДОЛЖИТЬ ТЕМУ ${activeIdxInUnit + 1} ➔`;
@@ -23747,6 +23787,7 @@ const psk = e.target.closest('[data-py-select-k]');
 
   // Popover backdrop tap closes mobile sheet
   if(e.target.closest('#path-popover-backdrop')){
+    document.querySelectorAll('.hex-node--prereq-target').forEach(el => el.classList.remove('hex-node--prereq-target'));
     const popover = document.getElementById('path-anchored-popover');
     const backdrop = document.getElementById('path-popover-backdrop');
     if(popover) popover.style.display = 'none';
@@ -23756,6 +23797,7 @@ const psk = e.target.closest('[data-py-select-k]');
 
   // Popover close and CTA button
   if(e.target.closest('#popover-close-btn')){
+    document.querySelectorAll('.hex-node--prereq-target').forEach(el => el.classList.remove('hex-node--prereq-target'));
     const popover = document.getElementById('path-anchored-popover');
     const backdrop = document.getElementById('path-popover-backdrop');
     if(backdrop) backdrop.style.display = 'none';
@@ -23769,11 +23811,21 @@ const psk = e.target.closest('[data-py-select-k]');
   }
   const popCta = e.target.closest('#popover-cta-btn');
   if(popCta){
+    document.querySelectorAll('.hex-node--prereq-target').forEach(el => el.classList.remove('hex-node--prereq-target'));
+    const targetUnitId = popCta.getAttribute('data-target-unit');
     const tr = popCta.getAttribute('data-target-route');
     const popover = document.getElementById('path-anchored-popover');
     const backdrop = document.getElementById('path-popover-backdrop');
     if(backdrop) backdrop.style.display = 'none';
     if(popover) popover.style.display = 'none';
+    if(targetUnitId){
+      const targetNode = document.querySelector('.hex-3d-node[data-unit-id="' + targetUnitId + '"]');
+      if(targetNode){
+        try { targetNode.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(err){}
+        setTimeout(() => { try { targetNode.dispatchEvent(new MouseEvent('click', { bubbles: true })); } catch(e){} }, 260);
+      }
+      return;
+    }
     if(tr && !popCta.disabled){
       location.hash = tr;
     }
