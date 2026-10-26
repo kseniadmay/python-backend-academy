@@ -5583,8 +5583,9 @@ function viewPathSerpentine(options){
     const chDone = (state.passedUnitTests || []).includes(u.id);
     const chUnlocked = endIdx <= activeUnitIndex;
     const chStatus = chDone ? 'done' : (chUnlocked ? 'open' : 'locked');
-    const bx = Math.max(64, Math.min(356, x + (x >= 210 ? 66 : -66)));
-    const by = y + 56;
+    const offsetDir = (x >= 210) ? 1 : -1;
+    const bx = Math.max(60, Math.min(360, x + offsetDir * 84));
+    const by = y + 54;
     const chGrad = chDone ? 'url(#hexGradCompleted)' : (chStatus === 'open' ? 'url(#hexGradChallenge)' : 'url(#hexGradLocked)');
     const chButtonGrad = chDone ? 'url(#pathButtonCompleted)' : (chStatus === 'open' ? 'url(#pathButtonChallenge)' : 'url(#pathButtonLocked)');
     const chStroke = chDone ? 'rgba(255,255,255,0.3)' : (chStatus === 'open' ? 'rgba(251,113,133,0.6)' : 'rgba(148,163,184,0.28)');
