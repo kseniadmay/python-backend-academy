@@ -5,7 +5,7 @@
 [![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB.svg?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![PWA: Offline Ready](https://img.shields.io/badge/PWA-offline--ready-blue.svg?style=flat-square)](#возможности)
-[![Demo](https://img.shields.io/badge/Demo-Online-4F46E5.svg?style=flat-square&logo=render&logoColor=white)](https://python-backend-academy.onrender.com)
+[![Demo](https://img.shields.io/badge/Demo-Online-4F46E5.svg?style=flat-square&logo=github&logoColor=white)](https://kseniadmay.github.io/python-backend-academy/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
 Интерактивная платформа для изучения Python-бэкенда: практика в браузере, конспекты и интервальное повторение.
