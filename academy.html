@@ -4281,6 +4281,267 @@
     .coddy-right-rail { display: none !important; }
     .coddy-path-layout { display: block; padding: 0; }
   }
+  /* Monolithic Glass HUD (Zen Aesthetic & Anti-Friction) */
+  .coddy-rail-hud {
+    background: linear-gradient(180deg, rgba(22, 27, 38, 0.85) 0%, rgba(13, 17, 24, 0.94) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+  html:not([data-theme="dark"]) .coddy-rail-hud {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(241, 245, 249, 0.96) 100%);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+  .coddy-rail-hud-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.025);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  html:not([data-theme="dark"]) .coddy-rail-hud-header {
+    background: rgba(0, 0, 0, 0.02);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  .coddy-rail-energy-group {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .coddy-rail-energy-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .coddy-rail-energy-val {
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: #f8fafc;
+    font-family: var(--font-d, 'Unbounded', sans-serif);
+  }
+  html:not([data-theme="dark"]) .coddy-rail-energy-val {
+    color: #0f172a;
+  }
+  .coddy-rail-energy-sub {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #94a3b8;
+  }
+  .coddy-rail-icon {
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .coddy-rail-icon--amber {
+    color: #f59e0b;
+    filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.45));
+  }
+  .coddy-rail-icon--emerald {
+    color: #10b981;
+    filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.45));
+  }
+  .coddy-rail-zen-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .coddy-rail-zen-toggle:hover {
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(52, 211, 153, 0.3);
+    transform: scale(1.06);
+  }
+  .coddy-rail-zen-toggle svg {
+    width: 15px;
+    height: 15px;
+  }
+  .coddy-rail-hud-body {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .coddy-rail-hud-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .coddy-rail-section-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #10b981;
+  }
+  .coddy-rail-pulse-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+    animation: pulseGlowDot 2s infinite ease-in-out;
+  }
+  @keyframes pulseGlowDot {
+    0%, 100% { opacity: 0.5; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.15); box-shadow: 0 0 10px #10b981; }
+  }
+  .coddy-rail-focus-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #f8fafc;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+  html:not([data-theme="dark"]) .coddy-rail-focus-title {
+    color: #0f172a;
+  }
+  .coddy-rail-reward-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 11px;
+    border-radius: 10px;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(52, 211, 153, 0.22);
+    font-size: 0.74rem;
+    color: #a7f3d0;
+  }
+  html:not([data-theme="dark"]) .coddy-rail-reward-pill {
+    background: rgba(16, 185, 129, 0.1);
+    color: #065f46;
+    border-color: rgba(16, 185, 129, 0.25);
+  }
+  .coddy-rail-reward-pill b {
+    color: #ffffff;
+    font-weight: 700;
+  }
+  html:not([data-theme="dark"]) .coddy-rail-reward-pill b {
+    color: #047857;
+  }
+  .coddy-rail-hud-section--horizon {
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  html:not([data-theme="dark"]) .coddy-rail-hud-section--horizon {
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+  }
+  .coddy-rail-horizon-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.74rem;
+  }
+  .coddy-rail-horizon-title {
+    font-weight: 700;
+    color: #94a3b8;
+  }
+  .coddy-rail-horizon-pct {
+    font-weight: 800;
+    font-size: 0.8rem;
+    color: #10b981;
+    font-family: var(--font-d, 'Unbounded', sans-serif);
+  }
+  .coddy-rail-stream {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .coddy-rail-stream-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    font-size: 0.75rem;
+    transition: all 0.15s ease;
+  }
+  .coddy-rail-stream-item.is-active {
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(52, 211, 153, 0.28);
+  }
+  .coddy-rail-stream-item.is-exam {
+    background: rgba(245, 158, 11, 0.05);
+    border: 1px solid rgba(245, 158, 11, 0.20);
+  }
+  .coddy-rail-stream-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .coddy-rail-stream-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #64748b;
+    flex-shrink: 0;
+  }
+  .coddy-rail-stream-dot.is-active {
+    background: #10b981;
+    box-shadow: 0 0 6px #10b981;
+  }
+  .coddy-rail-stream-dot.is-exam {
+    background: #f59e0b;
+    box-shadow: 0 0 6px #f59e0b;
+  }
+  .coddy-rail-stream-label {
+    font-weight: 600;
+    color: #94a3b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .coddy-rail-stream-item.is-active .coddy-rail-stream-label {
+    color: #f8fafc;
+    font-weight: 700;
+  }
+  html:not([data-theme="dark"]) .coddy-rail-stream-item.is-active .coddy-rail-stream-label {
+    color: #0f172a;
+  }
+  .coddy-rail-stream-badge {
+    font-size: 0.66rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #94a3b8;
+    flex-shrink: 0;
+  }
+  .coddy-rail-stream-badge--active {
+    background: rgba(16, 185, 129, 0.18);
+    color: #34d399;
+  }
+  .coddy-rail-stream-badge--amber {
+    background: rgba(245, 158, 11, 0.18);
+    color: #fbbf24;
+  }
+
   .coddy-rail-stats-row {
     display: flex;
     justify-content: space-between;
@@ -18481,129 +18742,143 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum,
     ? getEchelonUnitsAndChapters(curEchNum, ALL_UNITS_COMBINED)
     : { units: ALL_UNITS_COMBINED, chapters: getPathChaptersMeta(ALL_UNITS_COMBINED) };
   const curTierNum = (curEchNum === 'all') ? 1 : (Number(curEchNum) || 1);
-  const echMeta = (typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[curTierNum]) || { label: 'Эшелон 1', icon: '🛡️', focus: 'Фундамент', targetLabel: 'к скринингу' };
   const curProg = (typeof getEchelonProgress === 'function') ? getEchelonProgress(curTierNum) : null;
   const curPct = curProg ? curProg.pct : 0;
   const curChap = (echChapters && echChapters.find(c => (c.chapterNum || c.num) === activeChapterNum)) || (echChapters && echChapters[0]) || { num: 1, chapterNum: 1, title: 'Python Core', units: echUnits };
-  const curChapCompleted = curChap ? curChap.units.filter(isUnitCompleted).length : 0;
-  const curChapTotal = curChap ? curChap.units.length : echUnits.length;
+  const chapUnits = (curChap && curChap.units) || echUnits || [];
+  
+  // Find active unit in the chapter (first incomplete unit)
+  let activeUnit = chapUnits.find(u => !isUnitCompleted(u)) || chapUnits[0];
+  let activeIdx = chapUnits.indexOf(activeUnit);
+  let nextUnit = (activeIdx >= 0 && activeIdx + 1 < chapUnits.length) ? chapUnits[activeIdx + 1] : null;
 
-  // Real dynamic mastery calculation for screening radar themes
-  const r1Mp = (typeof getSkillMP === 'function') ? Math.round(getSkillMP('1.1.1')) : 0;
-  const r2Mp = (typeof getSkillMP === 'function') ? Math.round(getSkillMP('1.1.2')) : 0;
-  const r3Mp = (typeof getSkillMP === 'function') ? Math.round(getSkillMP('5.1.2')) : 0;
+  const activeTitle = activeUnit ? cleanUnitTitle(activeUnit.id, activeUnit.title) : 'Базовый синтаксис';
+  const nextTitle = nextUnit ? cleanUnitTitle(nextUnit.id, nextUnit.title) : 'Следующий урок';
+  const examUnlocked = chapUnits.length > 0 && chapUnits.every(isUnitCompleted);
 
-  const dailyGoal = Math.max(1, Number(state.dailyGoal) || 50);
-  const dailyXp = (typeof todayXp === 'function') ? todayXp() : 0;
-  const dailyPct = Math.min(100, Math.round(dailyXp / dailyGoal * 100));
-
-  let radarTitle = '📡 Радар скрининга';
-  if(curTierNum === 2) radarTitle = '🎯 Радар тех-интервью';
-  else if(curTierNum === 3) radarTitle = '⚡ Радар лайвкодинга';
-  else if(curTierNum === 4) radarTitle = '👑 Радар архитектуры';
+  const streakVal = state.streak || 0;
+  const xpVal = state.xp || 0;
 
   if(isZen){
     return `
-    <aside class="coddy-right-rail coddy-right-rail--zen" aria-label="Панель прогресса (свёрнута)">
+    <aside class="coddy-right-rail coddy-right-rail--zen" aria-label="Панель фокуса (свёрнута)">
       <div class="coddy-rail-zen-pill">
-        <button type="button" class="coddy-rail-zen-btn coddy-rail-zen-btn--expand" data-toggle-zen-rail="1" title="Развернуть радар подготовки" aria-label="Развернуть радар подготовки">
-          <span style="font-size:0.95rem;">⤢</span>
+        <button type="button" class="coddy-rail-zen-btn coddy-rail-zen-btn--expand" data-toggle-zen-rail="1" title="Развернуть панель фокуса" aria-label="Развернуть панель фокуса">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="15 3 21 3 21 9"/>
+            <polyline points="9 21 3 21 3 15"/>
+            <line x1="21" y1="3" x2="14" y2="10"/>
+            <line x1="3" y1="21" x2="10" y2="14"/>
+          </svg>
         </button>
-        <div class="coddy-rail-zen-item" title="Эшелон ${curTierNum}: ${curPct}%">
-          <span style="font-size:1rem;">${echMeta.icon}</span>
+        <div class="coddy-rail-zen-item" title="Готовность: ${curPct}%">
           <span class="coddy-rail-zen-pct">${curPct}%</span>
         </div>
-        <div class="coddy-rail-zen-item" title="Стрик активности">
-          <span style="font-size:0.95rem;">🔥</span>
-          <span class="coddy-rail-zen-val">${state.streak || 0}</span>
+        <div class="coddy-rail-zen-item" title="Стрик активности: ${streakVal} ${streakText}">
+          <svg class="coddy-rail-icon coddy-rail-icon--amber" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2.5c-.5 2-2 3.5-3 5.5-1.5 3-1 6 1 8.5-2.5-1-3.5-3.5-3-6C5.5 12 5 14 5 15.5 5 19.1 7.9 22 11.5 22s6.5-2.9 6.5-6.5c0-4-3-7.5-3.5-9.5-.5 1.5-1.5 2.5-2.5 3.5C12 7.5 12 5 12 2.5z"/>
+          </svg>
+          <span class="coddy-rail-zen-val">${streakVal}</span>
         </div>
-        <div class="coddy-rail-zen-item" title="Накопленный опыт">
-          <span style="font-size:0.95rem;">⚡</span>
-          <span class="coddy-rail-zen-val">${state.xp || 0}</span>
+        <div class="coddy-rail-zen-item" title="Накопленный опыт: ${xpVal} XP">
+          <svg class="coddy-rail-icon coddy-rail-icon--emerald" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M13 2L3 14h7v8l11-12h-7l2-8z"/>
+          </svg>
+          <span class="coddy-rail-zen-val">${xpVal}</span>
         </div>
       </div>
     </aside>`;
   }
 
   return `
-    <aside class="coddy-right-rail">
-      <!-- Top Stats Row (Coddy style) -->
-      <div class="coddy-rail-stats-row">
-        <div class="coddy-rail-stat" title="Пройдено в главе ${activeChapterNum}">
-          <span class="coddy-rail-stat-icon">📘</span>
-          <span class="coddy-rail-stat-val">Гл. ${activeChapterNum}: ${curChapCompleted}/${curChapTotal}</span>
+    <aside class="coddy-right-rail" aria-label="Панель фокуса и прогресса">
+      <div class="coddy-rail-hud">
+        <!-- HUD Header: Energy & Zen Collapse Toggle -->
+        <div class="coddy-rail-hud-header">
+          <div class="coddy-rail-energy-group">
+            <div class="coddy-rail-energy-item" title="Стрик активности: ${streakVal} ${streakText}">
+              <svg class="coddy-rail-icon coddy-rail-icon--amber" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2.5c-.5 2-2 3.5-3 5.5-1.5 3-1 6 1 8.5-2.5-1-3.5-3.5-3-6C5.5 12 5 14 5 15.5 5 19.1 7.9 22 11.5 22s6.5-2.9 6.5-6.5c0-4-3-7.5-3.5-9.5-.5 1.5-1.5 2.5-2.5 3.5C12 7.5 12 5 12 2.5z"/>
+              </svg>
+              <span class="coddy-rail-energy-val">${streakVal}</span>
+              <span class="coddy-rail-energy-sub">${streakText}</span>
+            </div>
+            <div class="coddy-rail-energy-item" title="Накопленный опыт: ${xpVal} XP">
+              <svg class="coddy-rail-icon coddy-rail-icon--emerald" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M13 2L3 14h7v8l11-12h-7l2-8z"/>
+              </svg>
+              <span class="coddy-rail-energy-val">${xpVal}</span>
+              <span class="coddy-rail-energy-sub">XP</span>
+            </div>
+          </div>
+          <button type="button" class="coddy-rail-zen-toggle" data-toggle-zen-rail="1" title="Дзен-режим: скрыть панель для максимального фокуса на тропе" aria-label="Свернуть панель">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="3" ry="3"/>
+              <line x1="15" y1="3" x2="15" y2="21"/>
+            </svg>
+          </button>
         </div>
-        <div class="coddy-rail-stat" title="Стрик активности">
-          <span class="coddy-rail-stat-icon">🔥</span>
-          <span class="coddy-rail-stat-val">${state.streak || 0} ${streakText}</span>
+
+        <div class="coddy-rail-hud-body">
+          <!-- Section 1: Active Focus (100% Match with Serpentine Path) -->
+          <div class="coddy-rail-hud-section">
+            <div class="coddy-rail-section-tag">
+              <span class="coddy-rail-pulse-dot"></span>
+              <span>В фокусе</span>
+            </div>
+            <div class="coddy-rail-focus-title">${escapeHtmlStr(activeTitle)}</div>
+            <div class="coddy-rail-reward-pill">
+              <svg class="coddy-rail-icon coddy-rail-icon--emerald" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M13 2L3 14h7v8l11-12h-7l2-8z"/>
+              </svg>
+              <span>Награда за шаг: <b>+35 XP</b> · <b>5 карточек</b></span>
+            </div>
+          </div>
+
+          <!-- Section 2: Horizon of Milestones (Stream & Exam) -->
+          <div class="coddy-rail-hud-section coddy-rail-hud-section--horizon">
+            <div class="coddy-rail-horizon-head">
+              <span class="coddy-rail-horizon-title">Готовность к скринингу</span>
+              <span class="coddy-rail-horizon-pct">${curPct}%</span>
+            </div>
+            <div class="cd-bar cd-bar-track" style="margin-top:2px;height:4px;border-radius:2px;background:rgba(255,255,255,0.08);">
+              <div class="cd-fill cd-bar-fill" style="width:${Math.max(6, curPct)}%;height:100%;border-radius:2px;background:linear-gradient(90deg,#34d399,#059669);"></div>
+            </div>
+
+            <div class="coddy-rail-stream">
+              <!-- Active Step -->
+              <div class="coddy-rail-stream-item is-active">
+                <div class="coddy-rail-stream-left">
+                  <div class="coddy-rail-stream-dot is-active"></div>
+                  <span class="coddy-rail-stream-label">${escapeHtmlStr(activeTitle)}</span>
+                </div>
+                <span class="coddy-rail-stream-badge coddy-rail-stream-badge--active">Сейчас</span>
+              </div>
+
+              <!-- Next Step -->
+              <div class="coddy-rail-stream-item">
+                <div class="coddy-rail-stream-left">
+                  <div class="coddy-rail-stream-dot"></div>
+                  <span class="coddy-rail-stream-label">${escapeHtmlStr(nextTitle)}</span>
+                </div>
+                <span class="coddy-rail-stream-badge">Дальше</span>
+              </div>
+
+              <!-- Chapter Exam Milestone -->
+              <div class="coddy-rail-stream-item is-exam">
+                <div class="coddy-rail-stream-left">
+                  <div class="coddy-rail-stream-dot is-exam"></div>
+                  <span class="coddy-rail-stream-label">Рубежный зачёт</span>
+                </div>
+                <span class="coddy-rail-stream-badge coddy-rail-stream-badge--amber">${examUnlocked ? 'Доступен' : 'Финал гл.'}</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="coddy-rail-stat" title="Накопленный опыт">
-          <span class="coddy-rail-stat-icon">⚡</span>
-          <span class="coddy-rail-stat-val">${state.xp || 0} XP</span>
-        </div>
-        <button type="button" class="coddy-rail-zen-btn" data-toggle-zen-rail="1" title="Дзен-режим: скрыть радар для максимального фокуса на тропе" aria-label="Свернуть радар">🧘</button>
       </div>
-
-      <!-- Unified Screening Pulse Module (Zero Clutter & Flow Architecture) -->
-      <div class="panel coddy-rail-card coddy-rail-card--pulse" style="padding:14px 16px;background:linear-gradient(180deg,rgba(22,27,36,0.85) 0%,rgba(15,20,28,0.92) 100%);border:1px solid rgba(255,255,255,0.08);border-radius:18px;box-shadow:0 12px 32px rgba(0,0,0,0.40);">
-        <!-- Block 1: Readiness Level -->
-        <div class="coddy-rail-card-head" style="margin-bottom:8px;">
-          <div class="coddy-rail-badge" data-open-echelon-modal="1" role="button" tabindex="0" style="cursor:pointer;font-weight:800;color:#f8fafc;" title="Нажмите, чтобы сменить целевую программу">${echMeta.icon} ${curTierNum === 1 ? 'Скрининг Junior+' : `Эшелон ${curTierNum}`} ▾</div>
-          <a href="#/mock" class="coddy-rail-link" style="font-weight:700;">Симулятор</a>
-        </div>
-        <div class="coddy-rail-meter" style="display:flex;align-items:baseline;gap:8px;">
-          ${curPct > 0
-            ? `<span class="coddy-rail-meter-value" style="font-size:1.4rem;font-weight:900;color:var(--emerald,#10b981);">${curPct}%</span><span class="meta" style="font-size:0.75rem;">готовности к скринингу</span>`
-            : `<span class="coddy-rail-meter-value" style="font-size:1.3rem;font-weight:900;color:var(--amber,#fbbf24);">СТАРТ</span><span class="meta" style="font-size:0.75rem;">фундамент скрининга</span>`}
-        </div>
-        <div class="cd-bar cd-bar-track" style="margin-top:6px;height:5px;border-radius:3px;background:rgba(255,255,255,0.08);"><div class="cd-fill cd-bar-fill" style="width:${Math.max(8, curPct)}%;height:100%;border-radius:3px;background:linear-gradient(90deg,#34d399,#059669);"></div></div>
-
-        <!-- Block 2: Daily Focus & Momentum -->
-        <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);">
-          <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.76rem;margin-bottom:6px;">
-            <span style="font-weight:800;color:#f8fafc;">🎯 Фокус сессии</span>
-            <span style="color:var(--amber,#fbbf24);font-weight:800;font-size:0.72rem;">${dailyPct > 0 ? `${dailyPct}%` : `Цель: ${dailyGoal} XP`}</span>
-          </div>
-          <div class="progress-bar-wrap" style="height:5px;margin-bottom:7px;border-radius:3px;background:rgba(255,255,255,0.08);">
-            <div class="progress-bar-fill" style="width:${Math.max(4, dailyPct)}%;height:100%;border-radius:3px;background:linear-gradient(90deg,#fbbf24,#f59e0b);"></div>
-          </div>
-          <div style="font-size:0.75rem;color:var(--ink-muted);line-height:1.45;">
-            ${dailyXp === 0 ? '✨ Сдайте <b>Урок 1</b> ➔ откроются <b>5 карточек</b> и начислится <b>+35 XP</b>.' : `Набрано <b>${dailyXp} XP</b> из ${dailyGoal} XP на сегодня.`}
-          </div>
-        </div>
-
-        <!-- Block 3: Screening Radar Stream -->
-        <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-            <span style="font-size:0.76rem;font-weight:800;color:#f8fafc;">📡 Радар тем</span>
-            <a href="#/map" class="coddy-rail-link" style="font-size:0.72rem;font-weight:700;">${echUnits.length} тем ➔</a>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:8px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.76rem;">
-              <span style="color:${r1Mp > 0 ? '#f8fafc' : '#f8fafc'};font-weight:600;">Сложность O(n) & срезы</span>
-              <span style="color:var(--emerald,#10b981);font-weight:800;font-size:0.72rem;">${r1Mp > 0 ? r1Mp + '%' : '⚡ Урок 1'}</span>
-            </div>
-            <div class="cd-bar cd-bar-track" style="height:4px;border-radius:2px;background:rgba(255,255,255,0.08);"><div class="cd-fill cd-bar-fill" style="width:${Math.max(r1Mp > 0 ? r1Mp : 18, 0)}%;height:100%;border-radius:2px;background:var(--emerald,#10b981);"></div></div>
-
-            <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.76rem;margin-top:2px;">
-              <span style="color:rgba(148,163,184,0.75);">Хеш-таблицы & dict/set</span>
-              <span style="color:rgba(148,163,184,0.75);font-weight:600;font-size:0.72rem;">${r2Mp > 0 ? r2Mp + '%' : '🔒 Урок 2'}</span>
-            </div>
-            <div class="cd-bar cd-bar-track" style="height:4px;border-radius:2px;background:rgba(255,255,255,0.08);"><div class="cd-fill cd-bar-fill" style="width:${Math.max(r2Mp > 0 ? r2Mp : 8, 0)}%;height:100%;border-radius:2px;background:rgba(255,255,255,0.12);"></div></div>
-
-            <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.76rem;margin-top:2px;">
-              <span style="color:rgba(148,163,184,0.75);">SQL JOIN & индексы</span>
-              <span style="color:rgba(148,163,184,0.75);font-weight:600;font-size:0.72rem;">${r3Mp > 0 ? r3Mp + '%' : '🔒 Урок 5'}</span>
-            </div>
-            <div class="cd-bar cd-bar-track" style="height:4px;border-radius:2px;background:rgba(255,255,255,0.08);"><div class="cd-fill cd-bar-fill" style="width:${Math.max(r3Mp > 0 ? r3Mp : 5, 0)}%;height:100%;border-radius:2px;background:rgba(255,255,255,0.12);"></div></div>
-          </div>
-        </div>
-      </div>
-
     </aside>`;
 }
 
-// Набор контурных иконок для узлов тропы (референс: тёмно-серый гекс + светлая иконка вместо замка)
 const TRAIL_ICON_PATHS = {
   star: '<path d="M12 3l2.7 5.5 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.8 1-6.1L3.2 9.4l6.1-.9z"/>',
   book: '<path d="M6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5v-13A2.5 2.5 0 0 1 6.5 3z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20"/>',
