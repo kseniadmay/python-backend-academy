@@ -9452,7 +9452,7 @@
   }
   @media (max-width: 640px) {
     .path-serpentine-wrap {
-      padding: 4px 10px calc(240px + env(safe-area-inset-bottom, 40px)) !important;
+      padding: 4px 10px calc(280px + env(safe-area-inset-bottom, 44px)) !important;
     }
     .path-mode-switcher-wrap {
       display: none !important;
@@ -9476,6 +9476,16 @@
       max-width: 100%;
     }
   }
+
+  @keyframes pathBiomeBreathe {
+    0% { transform: scale(0.97); opacity: 0.85; }
+    100% { transform: scale(1.03); opacity: 1.15; }
+  }
+  .path-ambient-biomes {
+    animation: pathBiomeBreathe 7s ease-in-out infinite alternate;
+    transform-origin: 210px 400px;
+  }
+
 </style>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0d1016" media="(prefers-color-scheme: dark)">
@@ -18500,73 +18510,59 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum,
         <button type="button" class="coddy-rail-zen-btn" data-toggle-zen-rail="1" title="Дзен-режим: скрыть радар для максимального фокуса на тропе" aria-label="Свернуть радар">🧘</button>
       </div>
 
-      <!-- Widget 1: Screening Readiness — мотивирующая графа с динамическим эшелоном -->
-      <div class="panel coddy-rail-card">
-        <div class="coddy-rail-card-head">
-          <div class="coddy-rail-badge" data-open-echelon-modal="1" role="button" tabindex="0" style="cursor:pointer;" title="Нажмите, чтобы сменить эшелон">${echMeta.icon} До ${(curTierNum === 1 ? 'скрининга' : (curTierNum === 2 ? 'тех-интервью' : (curTierNum === 3 ? 'лайвкодинга' : 'оффера')))} ▾</div>
-          <a href="#/mock" class="coddy-rail-link">Симулятор</a>
+      <!-- Unified Screening Pulse Module (Zero Clutter & Flow Architecture) -->
+      <div class="panel coddy-rail-card coddy-rail-card--pulse" style="padding:14px 16px;background:linear-gradient(180deg,rgba(22,27,36,0.85) 0%,rgba(15,20,28,0.92) 100%);border:1px solid rgba(255,255,255,0.08);border-radius:18px;box-shadow:0 12px 32px rgba(0,0,0,0.40);">
+        <!-- Block 1: Readiness Level -->
+        <div class="coddy-rail-card-head" style="margin-bottom:8px;">
+          <div class="coddy-rail-badge" data-open-echelon-modal="1" role="button" tabindex="0" style="cursor:pointer;font-weight:800;color:#f8fafc;" title="Нажмите, чтобы сменить целевую программу">${echMeta.icon} ${curTierNum === 1 ? 'Скрининг Junior+' : `Эшелон ${curTierNum}`} ▾</div>
+          <a href="#/mock" class="coddy-rail-link" style="font-weight:700;">Симулятор</a>
         </div>
-        <div class="coddy-rail-meter">
+        <div class="coddy-rail-meter" style="display:flex;align-items:baseline;gap:8px;">
           ${curPct > 0
-            ? `<span class="coddy-rail-meter-value">${curPct}%</span><span class="meta">готовности ${echMeta.targetLabel}</span>`
-            : `<span class="coddy-rail-meter-value" style="font-size:1.35rem;color:var(--amber,#fbbf24);">СТАРТ</span><span class="meta">${echMeta.focus.toLowerCase()}</span>`}
+            ? `<span class="coddy-rail-meter-value" style="font-size:1.4rem;font-weight:900;color:var(--emerald,#10b981);">${curPct}%</span><span class="meta" style="font-size:0.75rem;">готовности к скринингу</span>`
+            : `<span class="coddy-rail-meter-value" style="font-size:1.3rem;font-weight:900;color:var(--amber,#fbbf24);">СТАРТ</span><span class="meta" style="font-size:0.75rem;">фундамент скрининга</span>`}
         </div>
-        <div class="cd-bar cd-bar-track" role="progressbar" aria-label="Готовность: ${escapeHtmlStr(echMeta.label)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${curPct}"><div class="cd-fill cd-bar-fill" style="width:${Math.max(8, curPct)}%;"></div></div>
-        <div class="meta" style="font-size:.75rem;margin-top:7px;">${curPct > 0 ? `⏳ Освоено ${curProg ? curProg.skills.filter(s => getSkillMP(s.id) >= 80).length : 0} из ${curProg ? curProg.skills.length : 32} навыков Эшелона ${curTierNum}` : `• ${echMeta.focus} · Глава ${activeChapterNum}`}</div>
-      </div>
+        <div class="cd-bar cd-bar-track" style="margin-top:6px;height:5px;border-radius:3px;background:rgba(255,255,255,0.08);"><div class="cd-fill cd-bar-fill" style="width:${Math.max(8, curPct)}%;height:100%;border-radius:3px;background:linear-gradient(90deg,#34d399,#059669);"></div></div>
 
-      <!-- Widget: Radar Screening Themes (Dynamic mastery from RemNote Knowledge Base) -->
-      <div class="panel coddy-rail-card">
-        <div class="coddy-rail-card-head">
-          <div class="coddy-rail-badge">${radarTitle}</div>
-          <a href="#/map" class="coddy-rail-link" title="Перейти к карте компетенций">${echUnits.length} тем</a>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:7px;margin-top:8px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;">
-            <span style="color:${r1Mp > 0 ? '#f8fafc' : 'var(--ink-muted)'};">Сложность O(n) & срезы</span>
-            <span style="color:${r1Mp > 0 ? 'var(--emerald)' : 'rgba(148,163,184,0.7)'};font-weight:${r1Mp > 0 ? '700' : '600'};font-size:0.74rem;">${r1Mp > 0 ? r1Mp + '%' : '⚡ Старт в Уроке 1'}</span>
+        <!-- Block 2: Daily Focus & Momentum -->
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.76rem;margin-bottom:6px;">
+            <span style="font-weight:800;color:#f8fafc;">🎯 Фокус сессии</span>
+            <span style="color:var(--amber,#fbbf24);font-weight:800;font-size:0.72rem;">${dailyPct > 0 ? `${dailyPct}%` : `Цель: ${dailyGoal} XP`}</span>
           </div>
-          <div class="cd-bar cd-bar-track" style="height:4px;"><div class="cd-fill cd-bar-fill" style="width:${Math.max(r1Mp > 0 ? r1Mp : 15, 0)}%;background:${r1Mp > 0 ? 'var(--emerald)' : 'rgba(255,255,255,0.06)'};"></div></div>
-          
-          <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;margin-top:2px;">
-            <span style="color:${r2Mp > 0 ? '#f8fafc' : 'var(--ink-muted)'};">Хеш-таблицы & dict/set</span>
-            <span style="color:${r2Mp > 0 ? 'var(--amber)' : 'rgba(148,163,184,0.7)'};font-weight:${r2Mp > 0 ? '700' : '600'};font-size:0.74rem;">${r2Mp > 0 ? r2Mp + '%' : '🔒 Урок 2'}</span>
+          <div class="progress-bar-wrap" style="height:5px;margin-bottom:7px;border-radius:3px;background:rgba(255,255,255,0.08);">
+            <div class="progress-bar-fill" style="width:${Math.max(4, dailyPct)}%;height:100%;border-radius:3px;background:linear-gradient(90deg,#fbbf24,#f59e0b);"></div>
           </div>
-          <div class="cd-bar cd-bar-track" style="height:4px;"><div class="cd-fill cd-bar-fill" style="width:${Math.max(r2Mp > 0 ? r2Mp : 10, 0)}%;background:${r2Mp > 0 ? 'var(--amber)' : 'rgba(255,255,255,0.06)'};"></div></div>
-
-          <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;margin-top:2px;">
-            <span style="color:${r3Mp > 0 ? '#f8fafc' : 'var(--ink-muted)'};">SQL JOIN & индексы</span>
-            <span style="color:${r3Mp > 0 ? 'var(--emerald)' : 'rgba(148,163,184,0.7)'};font-weight:${r3Mp > 0 ? '700' : '600'};font-size:0.74rem;">${r3Mp > 0 ? r3Mp + '%' : '🔒 Урок 5'}</span>
+          <div style="font-size:0.75rem;color:var(--ink-muted);line-height:1.45;">
+            ${dailyXp === 0 ? '✨ Сдайте <b>Урок 1</b> ➔ откроются <b>5 карточек</b> и начислится <b>+35 XP</b>.' : `Набрано <b>${dailyXp} XP</b> из ${dailyGoal} XP на сегодня.`}
           </div>
-          <div class="cd-bar cd-bar-track" style="height:4px;"><div class="cd-fill cd-bar-fill" style="width:${Math.max(r3Mp > 0 ? r3Mp : 5, 0)}%;background:${r3Mp > 0 ? 'var(--emerald)' : 'rgba(255,255,255,0.06)'};"></div></div>
         </div>
-      </div>
 
-      <!-- Widget: SRS Flashcards Queue (Contextual based on learner progress) -->
-      <div class="panel coddy-rail-card">
-        <div class="coddy-rail-card-head">
-          <div class="coddy-rail-badge">🧠 Очередь SRS</div>
-          <a href="#/cards" class="coddy-rail-link">${totalCompletedUnits === 0 ? 'Колоды' : '12 карточек'}</a>
-        </div>
-        <div style="font-size:0.78rem;color:var(--ink-muted);line-height:1.45;margin-top:6px;">
-          ${totalCompletedUnits === 0
-            ? '<span style="color:#f8fafc;font-weight:600;">✨ Первые 5 карточек</span> откроются сразу после сдачи Урока 1.'
-            : 'Интервальное повторение ключевых определений перед собеседованием: <span style="color:#f8fafc;font-weight:600;">Синтаксис, структуры данных</span>.'}
-        </div>
-      </div>
+        <!-- Block 3: Screening Radar Stream -->
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span style="font-size:0.76rem;font-weight:800;color:#f8fafc;">📡 Радар тем</span>
+            <a href="#/map" class="coddy-rail-link" style="font-size:0.72rem;font-weight:700;">${echUnits.length} тем ➔</a>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.76rem;">
+              <span style="color:${r1Mp > 0 ? '#f8fafc' : '#f8fafc'};font-weight:600;">Сложность O(n) & срезы</span>
+              <span style="color:var(--emerald,#10b981);font-weight:800;font-size:0.72rem;">${r1Mp > 0 ? r1Mp + '%' : '⚡ Урок 1'}</span>
+            </div>
+            <div class="cd-bar cd-bar-track" style="height:4px;border-radius:2px;background:rgba(255,255,255,0.08);"><div class="cd-fill cd-bar-fill" style="width:${Math.max(r1Mp > 0 ? r1Mp : 18, 0)}%;height:100%;border-radius:2px;background:var(--emerald,#10b981);"></div></div>
 
-      <!-- Widget 4: Daily goal (streak lives in the topbar pill, no duplicate) -->
-      <div class="panel coddy-rail-card">
-        <div class="coddy-rail-card-head">
-          <div class="coddy-rail-badge">🏆 Цель дня</div>
-          ${dailyPct > 0 ? `<span class="meta" style="font-size:0.75rem;font-weight:700;color:${dailyPct >= 100 ? 'var(--emerald)' : 'var(--amber,#fbbf24)'};">${dailyPct}%</span>` : `<span class="meta" style="font-size:0.72rem;font-weight:600;color:var(--amber,#fbbf24);">${dailyGoal} XP</span>`}
-        </div>
-        <div class="progress-bar-wrap" style="height:6px;margin:8px 0 6px;">
-          <div class="progress-bar-fill" style="width:${dailyPct}%;background:linear-gradient(90deg,#fbbf24,#f59e0b);"></div>
-        </div>
-        <div class="coddy-rail-daily-summary" style="font-size:0.75rem;color:var(--ink-muted);display:flex;justify-content:space-between;">
-          <span>Набрано: <strong>${dailyXp} XP</strong></span>
-          <span>${dailyXp >= dailyGoal ? '✨ Выполнена' : (dailyXp === 0 ? '🎯 1 урок = +35 XP' : `Осталось ${dailyGoal - dailyXp} XP`)}</span>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.76rem;margin-top:2px;">
+              <span style="color:rgba(148,163,184,0.75);">Хеш-таблицы & dict/set</span>
+              <span style="color:rgba(148,163,184,0.75);font-weight:600;font-size:0.72rem;">${r2Mp > 0 ? r2Mp + '%' : '🔒 Урок 2'}</span>
+            </div>
+            <div class="cd-bar cd-bar-track" style="height:4px;border-radius:2px;background:rgba(255,255,255,0.08);"><div class="cd-fill cd-bar-fill" style="width:${Math.max(r2Mp > 0 ? r2Mp : 8, 0)}%;height:100%;border-radius:2px;background:rgba(255,255,255,0.12);"></div></div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.76rem;margin-top:2px;">
+              <span style="color:rgba(148,163,184,0.75);">SQL JOIN & индексы</span>
+              <span style="color:rgba(148,163,184,0.75);font-weight:600;font-size:0.72rem;">${r3Mp > 0 ? r3Mp + '%' : '🔒 Урок 5'}</span>
+            </div>
+            <div class="cd-bar cd-bar-track" style="height:4px;border-radius:2px;background:rgba(255,255,255,0.08);"><div class="cd-fill cd-bar-fill" style="width:${Math.max(r3Mp > 0 ? r3Mp : 5, 0)}%;height:100%;border-radius:2px;background:rgba(255,255,255,0.12);"></div></div>
+          </div>
         </div>
       </div>
 
@@ -18668,7 +18664,7 @@ function viewPathSerpentine(options){
     return { x, y: curY };
   });
 
-  const totalH = coords.length ? (coords[coords.length - 1].y + 240) : 420;
+  const totalH = coords.length ? (coords[coords.length - 1].y + 300) : 520;
 
   // Build smooth Bezier path
   let dPath = coords.length ? `M ${coords[0].x} ${coords[0].y}` : '';
@@ -18859,21 +18855,26 @@ function viewPathSerpentine(options){
       }
       const bubbleActionTxt = unitStarted ? 'ПРОДОЛЖИТЬ ➔' : 'НАЧАТЬ ➔';
       const bubbleSubTxt = unitStarted && unitSkillsMastered > 0
-        ? `Освоено ${unitSkillsMastered} из ${unitTotalSkills} тем`
-        : '⚡ 3 микро-шага · без кода';
-      const bubbleW = 168;
-      const bubbleY = y - 56;
+        ? `Освоено ${unitSkillsMastered} из ${unitTotalSkills}`
+        : '⚡ 2 МИН · БЕЗ КОДА';
+      const bubbleW = 148;
+      const bubbleY = y - 54;
       activeBubble = `
         <g class="hex-active-tooltip hex-active-tooltip--direct" data-direct-unit="${u.id}" transform="translate(${x}, ${bubbleY})" role="button" tabindex="0" aria-label="${bubbleActionTxt}: ${bubbleSubTxt}" title="Нажмите, чтобы сразу перейти к обучению">
           <g class="hex-active-tooltip__inner">
-            <rect x="${-bubbleW/2}" y="-34" width="${bubbleW}" height="38" rx="14" fill="url(#pathBubbleGrad)" stroke="rgba(255,255,255,0.22)" stroke-width="1" filter="drop-shadow(0 6px 18px rgba(16,185,129,0.55))"/>
-            <polygon points="-6,4 6,4 0,10" fill="#059669"/>
-            <text x="0" y="-19" text-anchor="middle" font-family="'Onest', var(--font-b, sans-serif)" font-size="8.5" font-weight="700" fill="#a7f3d0" letter-spacing="0.02em">${bubbleSubTxt}</text>
-            <text x="0" y="-5" text-anchor="middle" font-family="var(--font-d, 'Unbounded', sans-serif)" font-size="10" font-weight="800" fill="#ffffff" letter-spacing="0.04em">${bubbleActionTxt}</text>
+            <rect x="${-bubbleW/2}" y="-30" width="${bubbleW}" height="30" rx="15" fill="url(#pathBubbleGrad)" stroke="rgba(255,255,255,0.32)" stroke-width="1.2" filter="drop-shadow(0 8px 24px rgba(16,185,129,0.55))"/>
+            <text x="0" y="-18" text-anchor="middle" font-family="'Onest', var(--font-b, sans-serif)" font-size="8" font-weight="700" fill="#a7f3d0" letter-spacing="0.05em">${bubbleSubTxt}</text>
+            <text x="0" y="-6" text-anchor="middle" font-family="var(--font-d, 'Unbounded', sans-serif)" font-size="9.5" font-weight="900" fill="#ffffff" letter-spacing="0.05em">${bubbleActionTxt}</text>
           </g>
         </g>`;
     } else {
-      centerIcon = trailLockIcon(x, y - (usePawNodes ? 0 : 3), '#94a3b8');
+      const semIcon = trailIconCenter(x, y - (usePawNodes ? 0 : 3), iconName, usePawNodes ? 20 : 22, 'rgba(203, 213, 225, 0.72)');
+      const miniLock = `
+        <g class="path-node-minilock" transform="translate(${x + 16}, ${y + 13})">
+          <circle cx="0" cy="0" r="7.5" fill="#0f172a" stroke="rgba(148, 163, 184, 0.50)" stroke-width="1"/>
+          <text x="0" y="3" text-anchor="middle" font-size="7.5" fill="#94a3b8">🔒</text>
+        </g>`;
+      centerIcon = `<g class="path-node-locked-inner">${semIcon}${miniLock}</g>`;
     }
 
     const nodeShape = usePawNodes
@@ -18882,9 +18883,12 @@ function viewPathSerpentine(options){
 
     const buttonContent = usePawNodes ? centerIcon : `<g class="path-button-icon">${centerIcon}</g>`;
     const underTitleFull = cleanUnitTitle(u.id, u.title);
-    const shortTitle = (underTitleFull.length > 20) ? underTitleFull.slice(0, 18) + '…' : underTitleFull;
+    let shortTitle = underTitleFull;
+    if(shortTitle.length > 28){
+      shortTitle = shortTitle.slice(0, 26).trim() + '…';
+    }
     const underLabelX = x;
-    const pillW = Math.max(88, Math.min(164, shortTitle.length * 6.8 + 22));
+    const pillW = Math.max(96, Math.min(196, shortTitle.length * 7.2 + 24));
     const underLabelPill = `
       <g class="hex-underlabel-pill-wrap" transform="translate(${underLabelX}, ${y + 44})" pointer-events="none">
         <rect x="${-pillW/2}" y="-12" width="${pillW}" height="22" rx="11" fill="rgba(10, 14, 20, 0.85)" stroke="${isActive ? 'rgba(52, 211, 153, 0.40)' : (isCompleted ? 'rgba(167, 243, 208, 0.22)' : 'rgba(255, 255, 255, 0.08)')}" stroke-width="1" filter="drop-shadow(0 4px 10px rgba(0,0,0,0.55))"/>
