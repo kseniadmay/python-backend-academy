@@ -4194,6 +4194,18 @@
     margin: 0 auto;
     padding: 0 16px;
   }
+  /* ==========================================================================
+     Zen Obsidian Glass HUD (Aesthetic Anti-Friction Rail)
+     ========================================================================== */
+  @keyframes hexPopHighlight {
+    0% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(16, 185, 129, 0)); }
+    50% { transform: scale(1.10); filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.85)); }
+    100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(16, 185, 129, 0)); }
+  }
+  .hex-node--active-pop {
+    animation: hexPopHighlight 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
+  }
+
   .coddy-right-rail {
     width: 300px;
     flex-shrink: 0;
@@ -4207,10 +4219,10 @@
     flex-direction: column;
     gap: 10px;
     padding: 10px 0 16px;
-    transition: width 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
   }
   .coddy-right-rail--zen {
-    width: 52px !important;
+    width: 54px !important;
     padding: 10px 0 16px;
     align-items: center;
   }
@@ -4218,17 +4230,19 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     padding: 12px 6px;
-    background: rgba(22, 27, 36, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(15, 23, 42, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.10);
     border-radius: 999px;
-    backdrop-filter: blur(16px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
   }
   html:not([data-theme="dark"]) .coddy-rail-zen-pill {
     background: rgba(255, 255, 255, 0.88);
     border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   }
   .coddy-rail-zen-item {
     display: flex;
@@ -4237,7 +4251,7 @@
     gap: 2px;
   }
   .coddy-rail-zen-pct {
-    font-size: 0.68rem;
+    font-size: 0.70rem;
     font-weight: 800;
     color: var(--emerald, #34d399);
     font-family: var(--font-d, 'Unbounded', sans-serif);
@@ -4251,20 +4265,18 @@
     border: none;
     background: rgba(255, 255, 255, 0.06);
     color: #94a3b8;
-    border-radius: 8px;
-    padding: 3px 6px;
+    border-radius: 50%;
     cursor: pointer;
-    font-size: 0.75rem;
     line-height: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .coddy-rail-zen-btn:hover {
-    background: rgba(52, 211, 153, 0.16);
+    background: rgba(52, 211, 153, 0.18);
     color: #34d399;
-    transform: scale(1.08);
+    transform: scale(1.10);
   }
   .coddy-rail-zen-btn:active {
     transform: scale(0.92);
@@ -4272,44 +4284,58 @@
   .coddy-rail-zen-btn--expand {
     width: 32px;
     height: 32px;
-    border-radius: 50%;
     background: rgba(16, 185, 129, 0.12);
-    border: 1px solid rgba(52, 211, 153, 0.3);
+    border: 1px solid rgba(52, 211, 153, 0.35);
     color: #34d399;
   }
+  .coddy-rail-zen-btn--play {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: 1px solid rgba(52, 211, 153, 0.40);
+    color: #ffffff;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.45);
+  }
+  .coddy-rail-zen-btn--play:hover {
+    box-shadow: 0 0 18px rgba(16, 185, 129, 0.70);
+    transform: scale(1.12);
+  }
+
   @media (max-width: 1040px) {
     .coddy-right-rail { display: none !important; }
     .coddy-path-layout { display: block; padding: 0; }
   }
-  /* Monolithic Glass HUD (Zen Aesthetic & Anti-Friction) */
+
+  /* Monolithic Zen Glass HUD */
   .coddy-rail-hud {
-    background: linear-gradient(180deg, rgba(22, 27, 38, 0.85) 0%, rgba(13, 17, 24, 0.94) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.72) 0%, rgba(10, 14, 23, 0.78) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.10);
     border-radius: 20px;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.50), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     overflow: hidden;
     display: flex;
     flex-direction: column;
     padding: 0;
   }
   html:not([data-theme="dark"]) .coddy-rail-hud {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(241, 245, 249, 0.96) 100%);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.90) 0%, rgba(241, 245, 249, 0.94) 100%);
     border: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   }
+
   .coddy-rail-hud-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.025);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   }
   html:not([data-theme="dark"]) .coddy-rail-hud-header {
     background: rgba(0, 0, 0, 0.02);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   }
   .coddy-rail-energy-group {
     display: flex;
@@ -4375,6 +4401,7 @@
     width: 15px;
     height: 15px;
   }
+
   .coddy-rail-hud-body {
     padding: 14px 16px;
     display: flex;
@@ -4408,8 +4435,36 @@
     0%, 100% { opacity: 0.5; transform: scale(0.9); }
     50% { opacity: 1; transform: scale(1.15); box-shadow: 0 0 10px #10b981; }
   }
+
+  /* Focus Card (Zero Friction Direct Touchpoint) */
+  .coddy-rail-focus-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: pointer;
+  }
+  .coddy-rail-focus-card:hover {
+    background: rgba(16, 185, 129, 0.05);
+    border-color: rgba(52, 211, 153, 0.28);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  }
+  html:not([data-theme="dark"]) .coddy-rail-focus-card {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.06);
+  }
+  html:not([data-theme="dark"]) .coddy-rail-focus-card:hover {
+    background: rgba(16, 185, 129, 0.06);
+    border-color: rgba(16, 185, 129, 0.25);
+  }
+
   .coddy-rail-focus-title {
-    font-size: 1.05rem;
+    font-size: 0.98rem;
     font-weight: 800;
     color: #f8fafc;
     line-height: 1.35;
@@ -4418,15 +4473,16 @@
   html:not([data-theme="dark"]) .coddy-rail-focus-title {
     color: #0f172a;
   }
+
   .coddy-rail-reward-pill {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 7px 11px;
-    border-radius: 10px;
+    padding: 6px 10px;
+    border-radius: 9px;
     background: rgba(16, 185, 129, 0.08);
     border: 1px solid rgba(52, 211, 153, 0.22);
-    font-size: 0.74rem;
+    font-size: 0.72rem;
     color: #a7f3d0;
   }
   html:not([data-theme="dark"]) .coddy-rail-reward-pill {
@@ -4441,9 +4497,41 @@
   html:not([data-theme="dark"]) .coddy-rail-reward-pill b {
     color: #047857;
   }
+
+  /* Single Dominant CTA */
+  .coddy-rail-cta-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 9px 14px;
+    border-radius: 11px;
+    border: none;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    font-family: var(--font-b, 'Onest', sans-serif);
+    font-size: 0.80rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+    transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+    margin-top: 2px;
+  }
+  .coddy-rail-cta-btn:hover {
+    background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.50);
+    transform: translateY(-1px) scale(1.02);
+  }
+  .coddy-rail-cta-btn:active {
+    transform: translateY(1px) scale(0.98);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.30);
+  }
+
+  /* Horizon Section */
   .coddy-rail-hud-section--horizon {
     padding-top: 12px;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
   }
   html:not([data-theme="dark"]) .coddy-rail-hud-section--horizon {
     border-top: 1px solid rgba(0, 0, 0, 0.06);
@@ -4479,15 +4567,28 @@
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid rgba(255, 255, 255, 0.04);
     font-size: 0.75rem;
-    transition: all 0.15s ease;
+    transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .coddy-rail-stream-item.is-active {
-    background: rgba(16, 185, 129, 0.08);
-    border: 1px solid rgba(52, 211, 153, 0.28);
+  .coddy-rail-stream-item--clickable {
+    cursor: pointer;
+    user-select: none;
+  }
+  .coddy-rail-stream-item--clickable:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.14);
+    transform: translateX(2px);
+  }
+  html:not([data-theme="dark"]) .coddy-rail-stream-item--clickable:hover {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.12);
   }
   .coddy-rail-stream-item.is-exam {
     background: rgba(245, 158, 11, 0.05);
     border: 1px solid rgba(245, 158, 11, 0.20);
+  }
+  .coddy-rail-stream-item.is-exam:hover {
+    background: rgba(245, 158, 11, 0.10);
+    border-color: rgba(245, 158, 11, 0.35);
   }
   .coddy-rail-stream-left {
     display: flex;
@@ -4502,10 +4603,6 @@
     background: #64748b;
     flex-shrink: 0;
   }
-  .coddy-rail-stream-dot.is-active {
-    background: #10b981;
-    box-shadow: 0 0 6px #10b981;
-  }
   .coddy-rail-stream-dot.is-exam {
     background: #f59e0b;
     box-shadow: 0 0 6px #f59e0b;
@@ -4517,13 +4614,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .coddy-rail-stream-item.is-active .coddy-rail-stream-label {
-    color: #f8fafc;
-    font-weight: 700;
-  }
-  html:not([data-theme="dark"]) .coddy-rail-stream-item.is-active .coddy-rail-stream-label {
-    color: #0f172a;
-  }
   .coddy-rail-stream-badge {
     font-size: 0.66rem;
     font-weight: 700;
@@ -4533,13 +4623,13 @@
     color: #94a3b8;
     flex-shrink: 0;
   }
-  .coddy-rail-stream-badge--active {
-    background: rgba(16, 185, 129, 0.18);
-    color: #34d399;
-  }
   .coddy-rail-stream-badge--amber {
     background: rgba(245, 158, 11, 0.18);
     color: #fbbf24;
+  }
+  .coddy-rail-stream-badge--distance {
+    background: rgba(99, 102, 241, 0.16);
+    color: #a5b4fc;
   }
 
   .coddy-rail-stats-row {
@@ -18756,19 +18846,29 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum,
   const nextTitle = nextUnit ? cleanUnitTitle(nextUnit.id, nextUnit.title) : 'Следующий урок';
   const examUnlocked = chapUnits.length > 0 && chapUnits.every(isUnitCompleted);
 
+  const completedInChap = chapUnits.filter(isUnitCompleted).length;
+  const totalInChap = chapUnits.length;
+  const remainingInChap = totalInChap - completedInChap;
+
   const streakVal = state.streak || 0;
   const xpVal = state.xp || 0;
+  const chNum = curChap.chapterNum || curChap.num || 1;
 
   if(isZen){
     return `
     <aside class="coddy-right-rail coddy-right-rail--zen" aria-label="Панель фокуса (свёрнута)">
       <div class="coddy-rail-zen-pill">
-        <button type="button" class="coddy-rail-zen-btn coddy-rail-zen-btn--expand" data-toggle-zen-rail="1" title="Развернуть панель фокуса" aria-label="Развернуть панель фокуса">
+        <button type="button" class="coddy-rail-zen-btn coddy-rail-zen-btn--expand" data-toggle-zen-rail="1" title="Развернуть радар подготовки" aria-label="Развернуть радар">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <polyline points="15 3 21 3 21 9"/>
             <polyline points="9 21 3 21 3 15"/>
             <line x1="21" y1="3" x2="14" y2="10"/>
             <line x1="3" y1="21" x2="10" y2="14"/>
+          </svg>
+        </button>
+        <button type="button" class="coddy-rail-zen-btn coddy-rail-zen-btn--play" data-rail-start-active="${activeUnit ? activeUnit.id : ''}" title="Продолжить: ${escapeHtmlStr(activeTitle)}" aria-label="Продолжить урок">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" stroke="none" aria-hidden="true">
+            <polygon points="6 3 20 12 6 21 6 3"/>
           </svg>
         </button>
         <div class="coddy-rail-zen-item" title="Готовность: ${curPct}%">
@@ -18820,22 +18920,31 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum,
         </div>
 
         <div class="coddy-rail-hud-body">
-          <!-- Section 1: Active Focus (100% Match with Serpentine Path) -->
+          <!-- Section 1: Active Focus Hero (No Dead-End: Dominant Action CTA) -->
           <div class="coddy-rail-hud-section">
             <div class="coddy-rail-section-tag">
               <span class="coddy-rail-pulse-dot"></span>
-              <span>В фокусе</span>
+              <span>В фокусе · Гл. ${chNum}</span>
             </div>
-            <div class="coddy-rail-focus-title">${escapeHtmlStr(activeTitle)}</div>
-            <div class="coddy-rail-reward-pill">
-              <svg class="coddy-rail-icon coddy-rail-icon--emerald" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M13 2L3 14h7v8l11-12h-7l2-8z"/>
-              </svg>
-              <span>Награда за шаг: <b>+35 XP</b> · <b>5 карточек</b></span>
+            <div class="coddy-rail-focus-card" data-rail-jump-unit="${activeUnit ? activeUnit.id : ''}" title="Нажмите, чтобы показать урок на тропе">
+              <div class="coddy-rail-focus-title">${escapeHtmlStr(activeTitle)}</div>
+              <div class="coddy-rail-reward-pill">
+                <svg class="coddy-rail-icon coddy-rail-icon--emerald" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M13 2L3 14h7v8l11-12h-7l2-8z"/>
+                </svg>
+                <span>Награда: <b>+35 XP</b> · <b>5 карточек</b></span>
+              </div>
+              <button type="button" class="coddy-rail-cta-btn" data-rail-start-active="${activeUnit ? activeUnit.id : ''}">
+                <span>${examUnlocked ? 'Повторить шаг' : 'Продолжить урок'}</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
             </div>
           </div>
 
-          <!-- Section 2: Horizon of Milestones (Stream & Exam) -->
+          <!-- Section 2: Horizon of Milestones (Upcoming Milestones & Boss Distance) -->
           <div class="coddy-rail-hud-section coddy-rail-hud-section--horizon">
             <div class="coddy-rail-horizon-head">
               <span class="coddy-rail-horizon-title">Готовность к скринингу</span>
@@ -18846,31 +18955,25 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum,
             </div>
 
             <div class="coddy-rail-stream">
-              <!-- Active Step -->
-              <div class="coddy-rail-stream-item is-active">
-                <div class="coddy-rail-stream-left">
-                  <div class="coddy-rail-stream-dot is-active"></div>
-                  <span class="coddy-rail-stream-label">${escapeHtmlStr(activeTitle)}</span>
-                </div>
-                <span class="coddy-rail-stream-badge coddy-rail-stream-badge--active">Сейчас</span>
-              </div>
-
-              <!-- Next Step -->
-              <div class="coddy-rail-stream-item">
+              <!-- Next Step (if available) -->
+              ${nextUnit ? `
+              <div class="coddy-rail-stream-item coddy-rail-stream-item--clickable" data-rail-jump-unit="${nextUnit.id}" title="Показать на тропе: ${escapeHtmlStr(nextTitle)}">
                 <div class="coddy-rail-stream-left">
                   <div class="coddy-rail-stream-dot"></div>
                   <span class="coddy-rail-stream-label">${escapeHtmlStr(nextTitle)}</span>
                 </div>
                 <span class="coddy-rail-stream-badge">Дальше</span>
-              </div>
+              </div>` : ''}
 
-              <!-- Chapter Exam Milestone -->
-              <div class="coddy-rail-stream-item is-exam">
+              <!-- Chapter Exam Milestone with accurate distance -->
+              <div class="coddy-rail-stream-item is-exam coddy-rail-stream-item--clickable" data-rail-jump-exam="${chNum}" title="Рубежный зачёт главы ${chNum}">
                 <div class="coddy-rail-stream-left">
                   <div class="coddy-rail-stream-dot is-exam"></div>
                   <span class="coddy-rail-stream-label">Рубежный зачёт</span>
                 </div>
-                <span class="coddy-rail-stream-badge coddy-rail-stream-badge--amber">${examUnlocked ? 'Доступен' : 'Финал гл.'}</span>
+                <span class="coddy-rail-stream-badge ${examUnlocked ? 'coddy-rail-stream-badge--amber' : 'coddy-rail-stream-badge--distance'}">
+                  ${examUnlocked ? 'Доступен 🔥' : (remainingInChap > 0 ? `Ещё ${remainingInChap} ${remainingInChap === 1 ? 'шаг' : (remainingInChap < 5 ? 'шага' : 'шагов')}` : 'Финал гл.')}
+                </span>
               </div>
             </div>
           </div>
@@ -22429,6 +22532,60 @@ document.addEventListener('click', async function(e){
     render();
     if(typeof showTactileToast === 'function'){
       showTactileToast(state.zenRailCollapsed ? '🧘 Дзен-режим включён: фокус на тропе' : '🎯 Радар подготовки развёрнут');
+    }
+    return;
+  }
+
+  // Right Rail: Direct Launch Active Lesson (Hero Single CTA & Zen Play)
+  const railStartBtn = e.target.closest('[data-rail-start-active]');
+  if(railStartBtn){
+    const uid = railStartBtn.getAttribute('data-rail-start-active');
+    if(uid && typeof ALL_UNITS_COMBINED !== 'undefined'){
+      const unitObj = ALL_UNITS_COMBINED.find(x => x.id === uid);
+      if(unitObj){
+        if(typeof navigator !== 'undefined' && navigator.vibrate){
+          try{ navigator.vibrate(14); }catch(vErr){}
+        }
+        const trk = getTrackForUnit(uid);
+        const actSk = (unitObj.skills || []).find(sk => (typeof getSkillMP === 'function' ? getSkillMP(sk.id) : 0) < 80) || (unitObj.skills && unitObj.skills[0]);
+        const targetSkId = actSk ? actSk.id : '';
+        location.hash = targetSkId ? `#${trk.routePrefix}/skill/${targetSkId}` : `#${trk.routePrefix}`;
+        return;
+      }
+    }
+  }
+
+  // Right Rail: Jump to Path Node with highlight & spring camera
+  const railJumpBtn = e.target.closest('[data-rail-jump-unit]');
+  if(railJumpBtn && !e.target.closest('[data-rail-start-active]')){
+    const uid = railJumpBtn.getAttribute('data-rail-jump-unit');
+    if(uid){
+      if(typeof navigator !== 'undefined' && navigator.vibrate){
+        try{ navigator.vibrate(10); }catch(vErr){}
+      }
+      const targetNode = document.querySelector(`.hex-3d-node[data-unit-id="${uid}"]`);
+      if(targetNode){
+        targetNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        try{ targetNode.focus(); }catch(fErr){}
+        targetNode.classList.add('hex-node--active-pop');
+        setTimeout(() => targetNode.classList.remove('hex-node--active-pop'), 1200);
+      }
+    }
+    return;
+  }
+
+  // Right Rail: Jump to Exam / Boss Node
+  const railExamBtn = e.target.closest('[data-rail-jump-exam]');
+  if(railExamBtn){
+    if(typeof navigator !== 'undefined' && navigator.vibrate){
+      try{ navigator.vibrate(12); }catch(vErr){}
+    }
+    const examNode = document.querySelector('.hex-challenge-node') || document.querySelector('.hex-3d-node:last-of-type');
+    if(examNode){
+      examNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      try{ examNode.focus(); }catch(fErr){}
+      examNode.classList.add('hex-node--active-pop');
+      setTimeout(() => examNode.classList.remove('hex-node--active-pop'), 1200);
     }
     return;
   }
