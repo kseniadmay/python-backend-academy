@@ -1910,17 +1910,60 @@
     transition:transform .12s, filter .15s, box-shadow .15s !important;
   }
   .srs-deck-filter-select{
-    background:rgba(255,255,255,0.04) !important;
-    border:1px solid rgba(255,255,255,0.12) !important;
+    background-color:rgba(18,24,38,0.78) !important;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2334d399' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+    background-repeat:no-repeat !important;
+    background-position:calc(100% - 10px) center !important;
+    background-size:12px !important;
+    -webkit-appearance:none !important;
+    -moz-appearance:none !important;
+    appearance:none !important;
+    padding-right:28px !important;
+    border:1px solid rgba(16,185,129,0.22) !important;
     color:var(--ink) !important;
     border-radius:12px !important;
     outline:none;
-    transition:border-color .2s, box-shadow .2s;
+    cursor:pointer;
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    transition:border-color .2s, box-shadow .2s, background-color .2s;
     font-family:var(--font-b);
+    box-shadow:0 2px 8px rgba(0,0,0,0.18);
+  }
+  .srs-deck-filter-select:hover{
+    border-color:rgba(16,185,129,0.48) !important;
+    background-color:rgba(22,30,46,0.92) !important;
+    box-shadow:0 4px 14px rgba(16,185,129,0.14) !important;
   }
   .srs-deck-filter-select:focus{
     border-color:#10b981 !important;
-    box-shadow:0 0 12px rgba(16,185,129,0.25) !important;
+    box-shadow:0 0 0 3px rgba(16,185,129,0.22), 0 0 16px rgba(16,185,129,0.25) !important;
+  }
+  .srs-deck-filter-select option{
+    background-color:#0f172a !important;
+    color:#f8fafc !important;
+    padding:8px 12px;
+  }
+  .cards-hub-filter-details[open]{
+    border-color:rgba(16,185,129,0.3) !important;
+    background:radial-gradient(ellipse at top, rgba(16,185,129,0.08), transparent 70%), rgba(15,23,42,0.6) !important;
+    box-shadow:0 8px 24px rgba(0,0,0,0.25) !important;
+  }
+  .cards-hub-filter-summary:hover{
+    background:rgba(255,255,255,0.04) !important;
+  }
+  .cards-hub-filter-details[open] .cards-hub-filter-summary span:last-child span{
+    transform:rotate(180deg);
+    display:inline-block;
+    transition:transform .2s ease;
+  }
+  .fc-swipe-guide{
+    display:none;
+  }
+  @media (pointer: coarse), (max-width: 640px){
+    .fc-swipe-guide{
+      display:flex !important;
+    }
   }
   .fc-rate-row .btn-ghost{
     background:rgba(255,255,255,0.04) !important;border:1.5px solid rgba(255,255,255,0.14) !important;color:#f1f5f9 !important;
@@ -15123,8 +15166,13 @@ function viewPythonSkill(sid){
                 <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.easy.days} дн</span>
               </button>
             </div>
-            <div style="margin-top:10px;display:flex;justify-content:flex-start;">
+            <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
               <button type="button" class="btn btn-ghost" data-py-prev-card style="padding:8px 16px;border-radius:12px;font-size:0.84rem;">← К вопросу</button>
+              <div class="fc-swipe-guide" style="display:none;justify-content:center;align-items:center;gap:12px;font-size:0.75rem;color:var(--ink-muted);user-select:none;opacity:0.88;">
+                <span style="display:inline-flex;align-items:center;gap:4px;"><span style="color:#f43f5e;">👈</span> Свайп влево: Снова</span>
+                <span style="opacity:0.35;">·</span>
+                <span style="display:inline-flex;align-items:center;gap:4px;">Свайп вправо: Легко <span style="color:#34d399;">👉</span></span>
+              </div>
             </div>
           ` : `
             <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
@@ -15965,8 +16013,13 @@ function viewCardsHub(){
               <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.easy.days} дн</span>
             </button>
           </div>
-          <div style="margin-top:10px;display:flex;justify-content:flex-start;">
+          <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
             <button type="button" class="btn btn-ghost" data-hub-prev style="padding:8px 16px;border-radius:12px;font-size:0.84rem;">← К вопросу</button>
+            <div class="fc-swipe-guide" style="display:none;justify-content:center;align-items:center;gap:12px;font-size:0.75rem;color:var(--ink-muted);user-select:none;opacity:0.88;">
+              <span style="display:inline-flex;align-items:center;gap:4px;"><span style="color:#f43f5e;">👈</span> Свайп влево: Снова</span>
+              <span style="opacity:0.35;">·</span>
+              <span style="display:inline-flex;align-items:center;gap:4px;">Свайп вправо: Легко <span style="color:#34d399;">👉</span></span>
+            </div>
           </div>`;
         })() : `
           <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
@@ -16162,8 +16215,13 @@ function viewCardsHub(){
               <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.easy.days} дн</span>
             </button>
           </div>
-          <div style="margin-top:10px;display:flex;justify-content:flex-start;">
+          <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
             <button type="button" class="btn btn-ghost" data-hub-prev style="padding:8px 16px;border-radius:12px;font-size:0.84rem;">← К вопросу</button>
+            <div class="fc-swipe-guide" style="display:none;justify-content:center;align-items:center;gap:12px;font-size:0.75rem;color:var(--ink-muted);user-select:none;opacity:0.88;">
+              <span style="display:inline-flex;align-items:center;gap:4px;"><span style="color:#f43f5e;">👈</span> Свайп влево: Снова</span>
+              <span style="opacity:0.35;">·</span>
+              <span style="display:inline-flex;align-items:center;gap:4px;">Свайп вправо: Легко <span style="color:#34d399;">👉</span></span>
+            </div>
           </div>`;
         })() : `
           <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
@@ -24271,10 +24329,22 @@ document.addEventListener('keydown', function(e){
     if(pyNextBtn){ e.preventDefault(); pyNextBtn.click(); return; }
   }
   if(e.key === 'ArrowLeft'){
+    const isFlippedHub = (typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.flipped);
+    const isFlippedSkill = (typeof pySkillViewState !== 'undefined' && pySkillViewState && pySkillViewState.tab === 'cards' && pySkillViewState.cardFlipped);
+    if(isFlippedHub || isFlippedSkill){
+      const againBtn = document.querySelector('[data-py-rate-card="1"], [data-hub-rate="1"]');
+      if(againBtn){ e.preventDefault(); againBtn.click(); return; }
+    }
     const prevBtn = document.querySelector('[data-py-prev-card]:not([disabled]), [data-hub-prev]:not([disabled])');
     if(prevBtn){ e.preventDefault(); prevBtn.click(); return; }
   }
   if(e.key === 'ArrowRight'){
+    const isFlippedHub = (typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.flipped);
+    const isFlippedSkill = (typeof pySkillViewState !== 'undefined' && pySkillViewState && pySkillViewState.tab === 'cards' && pySkillViewState.cardFlipped);
+    if(isFlippedHub || isFlippedSkill){
+      const easyBtn = document.querySelector('[data-py-rate-card="4"], [data-hub-rate="4"]') || document.querySelector('[data-py-rate-card="3"], [data-hub-rate="3"]');
+      if(easyBtn){ e.preventDefault(); easyBtn.click(); return; }
+    }
     const nextBtn = document.querySelector('[data-py-next-card]:not([disabled]), [data-hub-next]:not([disabled])');
     if(nextBtn){ e.preventDefault(); nextBtn.click(); return; }
   }
@@ -24316,6 +24386,7 @@ document.addEventListener('keydown', function(e){
   let touchStartY = 0;
   let touchStartTime = 0;
   let activeCard = null;
+  let isSwipingCard = false;
 
   document.addEventListener('touchstart', function(e){
     const card = e.target.closest('.fc-card');
@@ -24325,34 +24396,129 @@ document.addEventListener('keydown', function(e){
     touchStartY = touch.clientY;
     touchStartTime = Date.now();
     activeCard = card;
+    isSwipingCard = false;
+    card.style.transition = 'none';
+  }, { passive: true });
+
+  document.addEventListener('touchmove', function(e){
+    if(!activeCard) return;
+    const touch = e.changedTouches ? e.changedTouches[0] : e;
+    const dx = touch.clientX - touchStartX;
+    const dy = touch.clientY - touchStartY;
+    if(Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 0.75){
+      isSwipingCard = true;
+      const rot = Math.max(-14, Math.min(14, dx * 0.07)).toFixed(2);
+      activeCard.style.transform = 'translate3d(' + dx + 'px, ' + (dy * 0.15) + 'px, 0) rotate(' + rot + 'deg)';
+      const isFlipped = activeCard.classList.contains('fc-card--flipped') || activeCard.classList.contains('fc-card--Answer') ||
+        (typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.flipped) ||
+        (typeof pySkillViewState !== 'undefined' && pySkillViewState && pySkillViewState.tab === 'cards' && pySkillViewState.cardFlipped);
+      if(isFlipped){
+        if(dx < -25){
+          activeCard.style.boxShadow = '0 12px 32px rgba(225,29,72,0.38), 0 0 20px rgba(225,29,72,0.22)';
+          activeCard.style.borderColor = 'rgba(244,63,94,0.7)';
+        } else if(dx > 25){
+          activeCard.style.boxShadow = '0 12px 32px rgba(16,185,129,0.38), 0 0 20px rgba(16,185,129,0.22)';
+          activeCard.style.borderColor = 'rgba(52,211,153,0.8)';
+        } else {
+          activeCard.style.boxShadow = '';
+          activeCard.style.borderColor = '';
+        }
+      }
+    }
   }, { passive: true });
 
   document.addEventListener('touchend', function(e){
     if(!activeCard) return;
+    const card = activeCard;
     activeCard = null;
     const touch = e.changedTouches ? e.changedTouches[0] : e;
     const dx = touch.clientX - touchStartX;
     const dy = touch.clientY - touchStartY;
     const dt = Date.now() - touchStartTime;
 
-    // Horizontal swipe: |dx| > 45px, mostly horizontal (|dx| > 1.35 * |dy|), within 650ms
-    if(Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.35 && dt < 650){
-      if(dx < 0){
-        // Swipe left -> Next card or rate 'good'
-        try { triggerTactileHaptic(12); } catch(_e){}
-        const nextBtn = document.querySelector('[data-py-next-card]:not([disabled]), [data-hub-next]:not([disabled])');
-        if(nextBtn){
-          nextBtn.click();
+    const isFlipped = card.classList.contains('fc-card--flipped') || card.classList.contains('fc-card--Answer') ||
+      (typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.flipped) ||
+      (typeof pySkillViewState !== 'undefined' && pySkillViewState && pySkillViewState.tab === 'cards' && pySkillViewState.cardFlipped);
+
+    // Горизонтальный свайп: |dx| > 50px при преобладании горизонтального вектора
+    if(Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.15 && dt < 700){
+      if(dx < -50){
+        // Свайп влево
+        if(isFlipped){
+          // Ответная сторона: Снова (1)
+          card.style.transition = 'transform 0.22s cubic-bezier(0.2, 0.8, 0.4, 1), opacity 0.2s';
+          card.style.transform = 'translate3d(-120%, 0, 0) rotate(-16deg)';
+          card.style.opacity = '0';
+          try { if(typeof triggerTactileHaptic === 'function') triggerTactileHaptic(15); else if(navigator.vibrate) navigator.vibrate(15); } catch(_e){}
+          setTimeout(function(){
+            card.style.transform = ''; card.style.opacity = ''; card.style.boxShadow = ''; card.style.borderColor = '';
+            const againBtn = document.querySelector('[data-py-rate-card="1"], [data-hub-rate="1"]');
+            if(againBtn) againBtn.click();
+          }, 180);
+          return;
         } else {
-          const rateBtn = document.querySelector('[data-py-rate-card="3"], [data-hub-rate="3"]');
-          if(rateBtn) rateBtn.click();
+          // Лицевая сторона: перевернуть к ответу
+          card.style.transition = 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)';
+          card.style.transform = ''; card.style.boxShadow = ''; card.style.borderColor = '';
+          const flipBtn = card.querySelector('[data-hub-flip]') || document.querySelector('[data-hub-flip], [data-py-flip-card]');
+          if(flipBtn){
+            try { if(typeof triggerTactileHaptic === 'function') triggerTactileHaptic(12); } catch(_e){}
+            flipBtn.click();
+            return;
+          }
         }
       } else {
-        // Swipe right -> Previous card
-        try { triggerTactileHaptic(12); } catch(_e){}
-        const prevBtn = document.querySelector('[data-py-prev-card]:not([disabled]), [data-hub-prev]:not([disabled])');
-        if(prevBtn) prevBtn.click();
+        // Свайп вправо
+        if(isFlipped){
+          // Ответная сторона: Легко (+10 XP) или Хорошо (+5 XP)
+          card.style.transition = 'transform 0.22s cubic-bezier(0.2, 0.8, 0.4, 1), opacity 0.2s';
+          card.style.transform = 'translate3d(120%, 0, 0) rotate(16deg)';
+          card.style.opacity = '0';
+          try { if(typeof triggerTactileHaptic === 'function') triggerTactileHaptic(15); else if(navigator.vibrate) navigator.vibrate([10, 25]); } catch(_e){}
+          setTimeout(function(){
+            card.style.transform = ''; card.style.opacity = ''; card.style.boxShadow = ''; card.style.borderColor = '';
+            const easyBtn = document.querySelector('[data-py-rate-card="4"], [data-hub-rate="4"]') || document.querySelector('[data-py-rate-card="3"], [data-hub-rate="3"]');
+            if(easyBtn) easyBtn.click();
+          }, 180);
+          return;
+        } else {
+          // Лицевая сторона: перевернуть к ответу
+          card.style.transition = 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)';
+          card.style.transform = ''; card.style.boxShadow = ''; card.style.borderColor = '';
+          const flipBtn = card.querySelector('[data-hub-flip]') || document.querySelector('[data-hub-flip], [data-py-flip-card]');
+          if(flipBtn){
+            try { if(typeof triggerTactileHaptic === 'function') triggerTactileHaptic(12); } catch(_e){}
+            flipBtn.click();
+            return;
+          }
+        }
       }
+    } else if(dy < -45 && Math.abs(dy) > Math.abs(dx) * 1.2 && dt < 600 && !isFlipped){
+      // Вертикальный свайп вверх на вопросе -> перевернуть к ответу
+      card.style.transition = 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      card.style.transform = ''; card.style.boxShadow = ''; card.style.borderColor = '';
+      const flipBtn = card.querySelector('[data-hub-flip]') || document.querySelector('[data-hub-flip], [data-py-flip-card]');
+      if(flipBtn){
+        try { if(typeof triggerTactileHaptic === 'function') triggerTactileHaptic(12); } catch(_e){}
+        flipBtn.click();
+        return;
+      }
+    }
+
+    // Spring rebound при отпускании без преодоления порога
+    card.style.transition = 'transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s, border-color 0.25s';
+    card.style.transform = '';
+    card.style.boxShadow = '';
+    card.style.borderColor = '';
+  }, { passive: true });
+
+  document.addEventListener('touchcancel', function(){
+    if(activeCard){
+      activeCard.style.transition = 'transform 0.3s ease-out, box-shadow 0.25s, border-color 0.25s';
+      activeCard.style.transform = '';
+      activeCard.style.boxShadow = '';
+      activeCard.style.borderColor = '';
+      activeCard = null;
     }
   }, { passive: true });
 
