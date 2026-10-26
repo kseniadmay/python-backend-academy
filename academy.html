@@ -1874,6 +1874,18 @@
   }
   .fc-card:hover{border-color:var(--moss);box-shadow:0 12px 28px rgba(16,185,129,0.14);transform:translateY(-2px);}
   .fc-card:active{transform:scale(0.99) translateY(0);}
+  .fc-card--3d{will-change:transform;transform-style:preserve-3d;transition:transform 0.1s ease-out, border-color .22s, background .25s, box-shadow .25s;}
+  .fc-kbd-hint{
+    display:inline-flex;align-items:center;justify-content:center;
+    margin-left:6px;padding:1px 5px;font-family:var(--font-m, monospace);
+    font-size:0.68rem;font-weight:700;line-height:1.2;border-radius:5px;
+    background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.22);
+    color:inherit;opacity:0.85;vertical-align:middle;pointer-events:none;
+    transition:background .2s,border-color .2s;
+  }
+  @media (hover: none) and (pointer: coarse){
+    .fc-kbd-hint{display:none !important;}
+  }
   .fc-card--Answer{
     background:linear-gradient(135deg, rgba(16, 185, 129, 0.14) 0%, rgba(16, 185, 129, 0.04) 50%, rgba(18, 23, 33, 0.88) 100%), var(--surface) !important;
     border-color:rgba(16, 185, 129, 0.65) !important;
@@ -12678,6 +12690,13 @@ const SoundFx = {
 };
 window.SoundFx = SoundFx;
 
+function triggerTactileHaptic(ms){
+  if(typeof navigator !== 'undefined' && navigator.vibrate){
+    try { navigator.vibrate(ms || 12); } catch(_e){}
+  }
+}
+window.triggerTactileHaptic = triggerTactileHaptic;
+
 function playSound(kind){
   if(!state || !state.soundEnabled) return;
   if(kind === 'xp') SoundFx.playXp();
@@ -15058,19 +15077,19 @@ function viewPythonSkill(sid){
           ${pySkillViewState.cardFlipped ? `
             <div class="fc-rate-row" style="margin-top:14px;">
               <button type="button" class="btn btn-ghost" data-py-rate-card="1" title="Повторить снова через ${srsPrev.again.days} дн">
-                <span>Снова</span>
+                <span>Снова <kbd class="fc-kbd-hint">1</kbd></span>
                 <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.again.days} дн</span>
               </button>
               <button type="button" class="btn btn-burgundy" data-py-rate-card="2" title="Повторить через ${srsPrev.hard.days} дн (+2 XP)">
-                <span>Трудно (+2 XP)</span>
+                <span>Трудно (+2 XP) <kbd class="fc-kbd-hint">2</kbd></span>
                 <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.hard.days} дн</span>
               </button>
               <button type="button" class="btn btn-clay" data-py-rate-card="3" title="Повторить через ${srsPrev.good.days} дн (+5 XP)">
-                <span>Хорошо (+5 XP)</span>
+                <span>Хорошо (+5 XP) <kbd class="fc-kbd-hint">3</kbd></span>
                 <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.good.days} дн</span>
               </button>
               <button type="button" class="btn btn-primary" data-py-rate-card="4" title="Повторить через ${srsPrev.easy.days} дн (+10 XP)">
-                <span>Легко (+10 XP)</span>
+                <span>Легко (+10 XP) <kbd class="fc-kbd-hint">4</kbd></span>
                 <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.easy.days} дн</span>
               </button>
             </div>
@@ -15080,7 +15099,7 @@ function viewPythonSkill(sid){
           ` : `
             <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
               <button type="button" class="btn btn-ghost" data-py-prev-card ${qPos === 0 ? 'disabled' : ''} style="padding:12px 18px;border-radius:14px;">← Назад</button>
-              <button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;padding:12px 20px;border-radius:14px;font-weight:800;" data-py-flip-card title="Перевернуть карточку (Enter или Пробел)">Показать ответ</button>
+              <button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;padding:12px 20px;border-radius:14px;font-weight:800;" data-py-flip-card title="Перевернуть карточку (Enter или Пробел)">Показать ответ <kbd class="fc-kbd-hint">Space</kbd></button>
             </div>
           `}
         </div>`;
@@ -15902,19 +15921,19 @@ function viewCardsHub(){
           return `
           <div class="fc-rate-row" style="margin-top:14px;">
             <button type="button" class="btn btn-ghost" data-hub-rate="1" title="Повторить снова через ${srsPrev.again.days} дн">
-              <span>Снова</span>
+              <span>Снова <kbd class="fc-kbd-hint">1</kbd></span>
               <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.again.days} дн</span>
             </button>
             <button type="button" class="btn btn-burgundy" data-hub-rate="2" title="Повторить через ${srsPrev.hard.days} дн (+2 XP)">
-              <span>Трудно (+2 XP)</span>
+              <span>Трудно (+2 XP) <kbd class="fc-kbd-hint">2</kbd></span>
               <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.hard.days} дн</span>
             </button>
             <button type="button" class="btn btn-clay" data-hub-rate="3" title="Повторить через ${srsPrev.good.days} дн (+5 XP)">
-              <span>Хорошо (+5 XP)</span>
+              <span>Хорошо (+5 XP) <kbd class="fc-kbd-hint">3</kbd></span>
               <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.good.days} дн</span>
             </button>
             <button type="button" class="btn btn-primary" data-hub-rate="4" title="Повторить через ${srsPrev.easy.days} дн (+10 XP)">
-              <span>Легко (+10 XP)</span>
+              <span>Легко (+10 XP) <kbd class="fc-kbd-hint">4</kbd></span>
               <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.easy.days} дн</span>
             </button>
           </div>
@@ -15924,7 +15943,7 @@ function viewCardsHub(){
         })() : `
           <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
             <button type="button" class="btn btn-ghost" data-hub-prev ${duePos===0?'disabled':''} style="padding:12px 18px;border-radius:14px;">← Назад</button>
-            <button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;padding:12px 20px;border-radius:14px;font-weight:800;" data-hub-flip title="Перевернуть карточку (Enter или Пробел)">Показать ответ</button>
+            <button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;padding:12px 20px;border-radius:14px;font-weight:800;" data-hub-flip title="Перевернуть карточку (Enter или Пробел)">Показать ответ <kbd class="fc-kbd-hint">Space</kbd></button>
           </div>`}
       </div>
     </div>`;
@@ -16099,19 +16118,19 @@ function viewCardsHub(){
           return `
           <div class="fc-rate-row" style="margin-top:14px;">
             <button type="button" class="btn btn-ghost" data-hub-rate="1" title="Повторить снова через ${srsPrev.again.days} дн">
-              <span>Снова</span>
+              <span>Снова <kbd class="fc-kbd-hint">1</kbd></span>
               <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.again.days} дн</span>
             </button>
             <button type="button" class="btn btn-burgundy" data-hub-rate="2" title="Повторить через ${srsPrev.hard.days} дн (+2 XP)">
-              <span>Трудно (+2 XP)</span>
+              <span>Трудно (+2 XP) <kbd class="fc-kbd-hint">2</kbd></span>
               <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.hard.days} дн</span>
             </button>
             <button type="button" class="btn btn-clay" data-hub-rate="3" title="Повторить через ${srsPrev.good.days} дн (+5 XP)">
-              <span>Хорошо (+5 XP)</span>
+              <span>Хорошо (+5 XP) <kbd class="fc-kbd-hint">3</kbd></span>
               <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.good.days} дн</span>
             </button>
             <button type="button" class="btn btn-primary" data-hub-rate="4" title="Повторить через ${srsPrev.easy.days} дн (+10 XP)">
-              <span>Легко (+10 XP)</span>
+              <span>Легко (+10 XP) <kbd class="fc-kbd-hint">4</kbd></span>
               <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.easy.days} дн</span>
             </button>
           </div>
@@ -16121,7 +16140,7 @@ function viewCardsHub(){
         })() : `
           <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
             <button type="button" class="btn btn-ghost" data-hub-prev ${cIdx===0?'disabled':''} style="padding:12px 18px;border-radius:14px;">← Назад</button>
-            <button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;padding:12px 20px;border-radius:14px;font-weight:800;" data-hub-flip title="Перевернуть карточку (Enter или Пробел)">Показать ответ</button>
+            <button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;padding:12px 20px;border-radius:14px;font-weight:800;" data-hub-flip title="Перевернуть карточку (Enter или Пробел)">Показать ответ <kbd class="fc-kbd-hint">Space</kbd></button>
           </div>`}
       </div>
     </div>`;
@@ -22468,6 +22487,8 @@ const psk = e.target.closest('[data-py-select-k]');
   if(e.target.closest('[data-py-flip-card]')){
     pySkillViewState.cardFlipped = !pySkillViewState.cardFlipped;
     pySkillViewState.sprintCelebration = null;
+    try { playSound('flip'); } catch(_e){}
+    try { triggerTactileHaptic(10); } catch(_e){}
     render();
     return;
   }
@@ -22596,6 +22617,7 @@ const psk = e.target.closest('[data-py-select-k]');
   const prc = e.target.closest('[data-py-rate-card]');
   if(prc){
     pySkillViewState.sprintCelebration = null;
+    try { triggerTactileHaptic(14); } catch(_e){}
     const rawRate = prc.getAttribute('data-py-rate-card');
     let rating = parseInt(rawRate, 10);
     if(isNaN(rating)){
@@ -23252,6 +23274,8 @@ const psk = e.target.closest('[data-py-select-k]');
   if(e.target.closest('[data-hub-flip]')){
     cardsHubState.flipped = !cardsHubState.flipped;
     saveCardsHubPosState();
+    try { playSound('flip'); } catch(_e){}
+    try { triggerTactileHaptic(10); } catch(_e){}
     render();
     return;
   }
@@ -23267,6 +23291,7 @@ const psk = e.target.closest('[data-py-select-k]');
   }
   const hRate = e.target.closest('[data-hub-rate]');
   if(hRate){
+    try { triggerTactileHaptic(14); } catch(_e){}
     const rawRate = hRate.getAttribute('data-hub-rate');
     let r = parseInt(rawRate, 10);
     if(isNaN(r)){
@@ -24283,6 +24308,7 @@ document.addEventListener('keydown', function(e){
     if(Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.35 && dt < 650){
       if(dx < 0){
         // Swipe left -> Next card or rate 'good'
+        try { triggerTactileHaptic(12); } catch(_e){}
         const nextBtn = document.querySelector('[data-py-next-card]:not([disabled]), [data-hub-next]:not([disabled])');
         if(nextBtn){
           nextBtn.click();
@@ -24292,11 +24318,34 @@ document.addEventListener('keydown', function(e){
         }
       } else {
         // Swipe right -> Previous card
+        try { triggerTactileHaptic(12); } catch(_e){}
         const prevBtn = document.querySelector('[data-py-prev-card]:not([disabled]), [data-hub-prev]:not([disabled])');
         if(prevBtn) prevBtn.click();
       }
     }
   }, { passive: true });
+
+  // Desktop 3D Parallax tilt effect for .fc-card--3d
+  document.addEventListener('mousemove', function(e){
+    if(window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return;
+    const card = e.target.closest('.fc-card--3d');
+    if(!card) return;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    const rotX = ((cy - y) / cy * 4.5).toFixed(2);
+    const rotY = ((x - cx) / cx * 4.5).toFixed(2);
+    card.style.transform = 'perspective(1200px) rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg) translateY(-2px)';
+  });
+
+  document.addEventListener('mouseout', function(e){
+    const card = e.target.closest('.fc-card--3d');
+    if(card && (!e.relatedTarget || !card.contains(e.relatedTarget))){
+      card.style.transform = '';
+    }
+  });
 })();
 
 // Register PWA Service Worker (HTTP/HTTPS only to prevent file:// SecurityError)
