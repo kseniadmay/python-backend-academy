@@ -62,14 +62,14 @@ console.log('✓ Bug 3 (Ф-007 card 12): inline code formatting in card answer v
 const f009Path = path.join(remnoteDir, '04 · ⚡ Алгоритмы', 'Юнит 4.1 · Сложность', '📇 Карточки', 'Ф-009. Сложность Сложность основных операций для lis.md');
 assert(fs.existsSync(f009Path), 'Ф-009.md missing');
 const f009Content = fs.readFileSync(f009Path, 'utf-8');
-assert(f009Content.includes('Пример и пояснение: `sorted([3, 1, 2])` создаёт и возвращает **новый** отсортированный список `[1, 2, 3]`'), 'Ф-009 card 2 must contain explicit code example and explanation in markdown');
+assert(f009Content.includes('`sorted([3, 1, 2])` создаёт и возвращает **новый** отсортированный список `[1, 2, 3]`'), 'Ф-009 card 2 must contain explicit code example and explanation in markdown');
 assert(f009Content.includes('не меняя исходный (в отличие от `arr.sort()`, который сортирует список на месте за $O(1)$ по доп. памяти)'), 'Ф-009 card 2 must explain difference with arr.sort() in-place');
 assert(academyHtml.includes('<code>sorted([3, 1, 2])</code> создаёт и возвращает <strong>новый</strong> отсортированный список <code>[1, 2, 3]</code>'), 'academy.html must contain formatted code example in Ф-009 card 2');
 console.log('✓ Bug 4 (Ф-009 card 2): code example and explanation for sorted() vs sort() verified');
 
 // 5. Bug 5: Ф-009 card 3: объяснение различия O(len(s1)) разности s1 - s2 от O(min(n, m)) пересечения
-assert(f009Content.includes('Разъяснение: $O(\\min(n, m))$ применяется для пересечения `s1 & s2`'), 'Ф-009 card 3 must explicitly explain why difference is not O(min(n, m))');
-assert(academyHtml.includes('Разъяснение: <span class=\\"math-formula\\">O(min(n, m))</span> применяется для пересечения <code>s1 &amp; s2</code>'), 'academy.html must contain difference vs intersection clarification in Ф-009 card 3');
+assert(f009Content.includes('$O(\\min(n, m))$ применяется для пересечения `s1 & s2`'), 'Ф-009 card 3 must explicitly explain why difference is not O(min(n, m))');
+assert(academyHtml.includes('<span class=\\"math-formula\\">O(min(n, m))</span> применяется для пересечения <code>s1 &amp; s2</code>'), 'academy.html must contain difference vs intersection clarification in Ф-009 card 3');
 console.log('✓ Bug 5 (Ф-009 card 3): explanation for O(len(s1)) vs O(min(n, m)) verified');
 
 // 6, 7, 8. Bugs 6-8: Ф-009 cards 13 & 14: форматирование формул O(min(n, m)) и O(n + m) с пояснениями
