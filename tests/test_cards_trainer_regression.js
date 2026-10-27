@@ -233,6 +233,24 @@ function testConciseEchelonLabels(){
   );
 }
 
+// Тест-кейс 16: Гарантия вместимости карточки и контролов на мобильном экране (Mobile Screen Fit)
+function testDailyDueMobileCardFitsScreen(){
+  assert(
+    !academyHtml.includes('.layout-main,\n    .fc-stage {') &&
+    !academyHtml.includes('.layout-main,\r\n    .fc-stage {'),
+    'Defect 16: .fc-stage must not have redundant 92px bottom padding that pushes mobile buttons off screen'
+  );
+  assert(
+    academyHtml.includes('.fc-stage{margin:4px 0 !important;padding-bottom:0 !important;}'),
+    'Defect 16: .fc-stage must reset padding-bottom to 0 on mobile'
+  );
+  assert(
+    academyHtml.includes('max-height:clamp(180px, 34vh, 275px) !important;') &&
+    academyHtml.includes('overflow-y:auto !important;'),
+    'Defect 16: .fc-card must have max-height and overflow-y:auto to fit on mobile viewports without pushing action buttons off screen'
+  );
+}
+
 // Экспорт или прямой прогон
 module.exports = {
   testCleanHumanUiDueMode,
@@ -249,7 +267,8 @@ module.exports = {
   testInteractiveStoriesBarInHubAndDue,
   testAnswerFaceButtonLabel,
   testZeroTrapNavigationAnswerFaceCatalogAndLesson,
-  testConciseEchelonLabels
+  testConciseEchelonLabels,
+  testDailyDueMobileCardFitsScreen
 };
 
 if(require.main === module){
@@ -269,7 +288,8 @@ if(require.main === module){
     ['12. Интерактивный Stories Bar в каталоге и дне', testInteractiveStoriesBarInHubAndDue],
     ['13. Эргономичная подпись «← К вопросу»', testAnswerFaceButtonLabel],
     ['14. Zero-Trap «← К вопросу» в каталоге и уроке', testZeroTrapNavigationAnswerFaceCatalogAndLesson],
-    ['15. Лаконичные метки эшелонов без переполнения', testConciseEchelonLabels]
+    ['15. Лаконичные метки эшелонов без переполнения', testConciseEchelonLabels],
+    ['16. Гарантия вместимости карточки на мобильном экране', testDailyDueMobileCardFitsScreen]
   ];
 
   let failed = 0;
