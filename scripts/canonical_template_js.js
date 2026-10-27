@@ -2563,7 +2563,15 @@ function decorateCodeBlocksWithRunBtn(htmlStr){
 // Split a micro-step's HTML into small progressive chunks (paragraphs, tables, code blocks, Junior vs Senior callouts)
 function splitStepHtmlIntoChunks(htmlStr){
   let cleanIn = String(htmlStr || '').trim();
-  cleanIn = cleanIn.replace(/^<div\s+class=["']lesson-theory["'][^>]*>/i, '').replace(/<\/div>\s*$/i, '').trim();
+  if(/^<div\s+class=["']lesson-theory["'][^>]*>/i.test(cleanIn) && /<\/div>\s*$/i.test(cleanIn)){
+    if(/^<div\s+class=["']lesson-theory["'][^>]*>/i.test(cleanIn) && /<\/div>\s*$/i.test(cleanIn)){
+    if(/^<div\s+class=["']lesson-theory["'][^>]*>/i.test(cleanIn) && /<\/div>\s*$/i.test(cleanIn)){
+    if(/^<div\s+class=["']lesson-theory["'][^>]*>/i.test(cleanIn) && /<\/div>\s*$/i.test(cleanIn)){
+    cleanIn = cleanIn.replace(/^<div\s+class=["']lesson-theory["'][^>]*>/i, '').replace(/<\/div>\s*$/i, '').trim();
+  }
+  }
+  }
+  }
   const decorated = (typeof decorateCodeBlocksWithRunBtn === 'function') ? decorateCodeBlocksWithRunBtn(cleanIn) : cleanIn;
   const s = String(decorated || '').trim();
   if(!s) return [''];
