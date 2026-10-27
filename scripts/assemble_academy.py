@@ -15412,6 +15412,12 @@ if os.path.isfile(CANONICAL_STANDARDS_PATH):
             canonical_disk_html,
             count=1
         )
+        canonical_disk_html = re.sub(
+            r'const ALGO_MASTERY\s*=\s*\{[\s\S]*?\};\s*(const DB_MASTERY)',
+            lambda m: f'const ALGO_MASTERY = {algo_mastery_json};\n{m.group(1)}',
+            canonical_disk_html,
+            count=1
+        )
         html_out = canonical_disk_html
 
 with open(OUT_HTML_PATH, 'w', encoding='utf-8', newline='\n') as f:
