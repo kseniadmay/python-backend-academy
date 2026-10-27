@@ -2564,7 +2564,7 @@ function decorateCodeBlocksWithRunBtn(htmlStr){
 function splitStepHtmlIntoChunks(htmlStr){
   let cleanIn = String(htmlStr || '').trim();
   cleanIn = cleanIn.replace(/^<div\s+class=["']lesson-theory["'][^>]*>/i, '').replace(/<\/div>\s*$/i, '').trim();
-  const decorated = decorateCodeBlocksWithRunBtn(cleanIn);
+  const decorated = (typeof decorateCodeBlocksWithRunBtn === 'function') ? decorateCodeBlocksWithRunBtn(cleanIn) : cleanIn;
   const s = String(decorated || '').trim();
   if(!s) return [''];
   const rawBlocks = [];
@@ -2609,13 +2609,31 @@ function splitStepHtmlIntoChunks(htmlStr){
     const tail = s.slice(lastEnd).trim();
     if(tail) rawBlocks.push(tail);
   }
+
+  function isHeadingBlock(b){
+    if(/^<h[1-6]\b/i.test(b)) return true;
+    const plain = b.replace(/<[^>]+>/g, '').trim();
+    if(/^<p\b/i.test(b) && /^<strong>[\s\S]*<\/strong>$/i.test(b.replace(/^<p\b[^>]*>/i, '').replace(/<\/p>$/i, '').trim())){
+      if(plain.length < 120 && !plain.endsWith('.')) return true;
+    }
+    return false;
+  }
+
+  function isLeadInBlock(b, nextB){
+    if(!/^<p\b/i.test(b)) return false;
+    const plain = b.replace(/<[^>]+>/g, '').trim();
+    if(/[:—–]\s*$/i.test(plain) && plain.length < 400 && nextB) return true;
+    return false;
+  }
+
   const merged = [];
   let pending = '';
   for(let i = 0; i < rawBlocks.length; i++){
     const b = rawBlocks[i];
-    const isHeading = /^<h[1-6]\b/i.test(b);
-    const isLeadInColon = /^<p\b/i.test(b) && /:\s*(?:<\/(?:strong|b|em|i|code)>\s*)*<\/p>\s*$/i.test(b) && b.length < 300 && (i + 1 < rawBlocks.length);
-    if(isHeading || isLeadInColon){
+    const nextB = (i + 1 < rawBlocks.length) ? rawBlocks[i + 1] : null;
+    const isH = isHeadingBlock(b);
+    const isLeadIn = isLeadInBlock(b, nextB);
+    if(isH || isLeadIn){
       pending = pending ? (pending + '\n' + b) : b;
     } else if(pending){
       merged.push(pending + '\n' + b);
@@ -2628,15 +2646,26 @@ function splitStepHtmlIntoChunks(htmlStr){
     if(merged.length > 0) merged[merged.length - 1] += '\n' + pending;
     else merged.push(pending);
   }
+
   const finalChunks = [];
   for(let i = 0; i < merged.length; i++){
     const c = merged[i];
     const plainLen = c.replace(/<[^>]+>/g, '').trim().length;
-    if(i === 1 && finalChunks.length === 1 && finalChunks[0].replace(/<[^>]+>/g, '').trim().length < 350 && /^<h[1-6]\b/i.test(c)){
+    if(i === 1 && finalChunks.length === 1 && finalChunks[0].replace(/<[^>]+>/g, '').trim().length < 350 && isHeadingBlock(c)){
       finalChunks[0] += '\n' + c;
       continue;
     }
-    if(finalChunks.length > 0 && plainLen < 75 && !/^<h[1-6]\b/i.test(c)){
+    const isVisualContrastCard = /class=["'][^"']*(?:theory-contrast-card|visual-contrast|contrast-grid)[^"']*["']/i.test(c);
+    if(finalChunks.length > 0 && isVisualContrastCard && finalChunks[finalChunks.length - 1].replace(/<[^>]+>/g, '').trim().length < 450){
+      finalChunks[finalChunks.length - 1] += '\n' + c;
+      continue;
+    }
+    const isCodeSnippet = /class=["'][^"']*(?:snippet-wrap|code-snippet-wrap)[^"']*["']/i.test(c) || /^<pre\b/i.test(c);
+    if(finalChunks.length > 0 && isCodeSnippet && (finalChunks.length === 1 || finalChunks[finalChunks.length - 1].replace(/<[^>]+>/g, '').trim().length < 900)){
+      finalChunks[finalChunks.length - 1] += '\n' + c;
+      continue;
+    }
+    if(finalChunks.length > 0 && plainLen < 75 && !isHeadingBlock(c) && !isCodeSnippet){
       finalChunks[finalChunks.length - 1] += '\n' + c;
     } else {
       finalChunks.push(c);
