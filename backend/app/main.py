@@ -44,6 +44,24 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
+NO_STORE_HEADERS = {
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+    'Pragma': 'no-cache',
+    'Expires': '0',
+    'Surrogate-Control': 'no-store',
+}
+
+
+@app.middleware('http')
+async def add_no_store_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    response.headers['Surrogate-Control'] = 'no-store'
+    return response
+
+
 # Подключение API роутеров
 app.include_router(legacy_router)
 app.include_router(api_v1_router)
@@ -60,7 +78,7 @@ async def serve_spa_or_static(full_path: str, request: Request) -> Response:
         return FileResponse(
             root_dir / 'academy.html',
             media_type='text/html; charset=utf-8',
-            headers={'Cache-Control': 'no-cache'}
+            headers=NO_STORE_HEADERS
         )
 
     target_file = root_dir / clean_path
@@ -69,9 +87,9 @@ async def serve_spa_or_static(full_path: str, request: Request) -> Response:
     try:
         resolved_file = target_file.resolve()
         if not str(resolved_file).startswith(str(root_dir.resolve())):
-            return FileResponse(root_dir / 'academy.html', media_type='text/html; charset=utf-8')
+            return FileResponse(root_dir / 'academy.html', media_type='text/html; charset=utf-8', headers=NO_STORE_HEADERS)
     except Exception:
-        return FileResponse(root_dir / 'academy.html', media_type='text/html; charset=utf-8')
+        return FileResponse(root_dir / 'academy.html', media_type='text/html; charset=utf-8', headers=NO_STORE_HEADERS)
 
     if resolved_file.is_file():
         # Специфические MIME-типы для PWA и ассетов
@@ -91,12 +109,12 @@ async def serve_spa_or_static(full_path: str, request: Request) -> Response:
         return FileResponse(
             resolved_file,
             media_type=media_type,
-            headers={'Cache-Control': 'no-cache'}
+            headers=NO_STORE_HEADERS
         )
 
     # SPA Fallback для роутов
     return FileResponse(
         root_dir / 'academy.html',
         media_type='text/html; charset=utf-8',
-        headers={'Cache-Control': 'no-cache'}
+        headers=NO_STORE_HEADERS
     )

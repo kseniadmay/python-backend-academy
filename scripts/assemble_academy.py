@@ -1083,7 +1083,7 @@ else:
 
   /* Ambient background orbs for Evening Obsidian / Ephemeral Parchment */
   .ambient-orb{
-    position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(80px);
+    position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(80px);transform:translateZ(0);will-change:transform;contain:strict;
   }
   .ambient-orb--burgundy{
     width:480px;height:480px;top:-120px;left:-100px;background:radial-gradient(circle, rgba(190, 18, 60, 0.32) 0%, rgba(190, 18, 60, 0) 70%) !important;
@@ -3260,7 +3260,7 @@ else:
 }
 
 .fc-card--3d:hover {
-  transform: perspective(1400px) rotateY(-2deg) translateY(-2px) !important;
+  transform: translateY(-2px) !important;
   border-color: var(--zen-emerald-border, rgba(16, 185, 129, 0.35)) !important;
   box-shadow: var(--zen-shadow-island), 0 0 28px -6px var(--zen-emerald-glow) !important;
 }

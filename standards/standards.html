@@ -273,7 +273,7 @@
 
   /* Ambient background orbs for Evening Obsidian / Ephemeral Parchment */
   .ambient-orb{
-    position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(68px);
+    position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(68px);transform:translateZ(0);will-change:transform;contain:strict;
   }
   .ambient-orb--burgundy{
     width:380px;height:380px;top:-90px;left:-80px;background:var(--orb-burgundy);
@@ -1876,7 +1876,7 @@
   }
   .fc-card:hover{border-color:var(--moss);box-shadow:0 12px 28px rgba(16,185,129,0.14);transform:translateY(-2px);}
   .fc-card:active{transform:scale(0.99) translateY(0);}
-  .fc-card--3d{will-change:transform;transform-style:preserve-3d;transition:transform 0.1s ease-out, border-color .22s, background .25s, box-shadow .25s;}
+  .fc-card--3d{will-change:transform;transition:border-color .22s ease, background .25s ease, box-shadow .25s ease, transform .22s cubic-bezier(0.16, 1, 0.3, 1);}
   .fc-kbd-hint{
     display:inline-flex;align-items:center;justify-content:center;
     margin-left:6px;padding:1px 5px;font-family:var(--font-m, monospace);
@@ -26575,28 +26575,6 @@ document.addEventListener('keydown', function(e){
       activeCard = null;
     }
   }, { passive: true });
-
-  // Desktop 3D Parallax tilt effect for .fc-card--3d
-  document.addEventListener('mousemove', function(e){
-    if(window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return;
-    const card = e.target.closest('.fc-card--3d');
-    if(!card) return;
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const cx = rect.width / 2;
-    const cy = rect.height / 2;
-    const rotX = ((cy - y) / cy * 4.5).toFixed(2);
-    const rotY = ((x - cx) / cx * 4.5).toFixed(2);
-    card.style.transform = 'perspective(1200px) rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg) translateY(-2px)';
-  });
-
-  document.addEventListener('mouseout', function(e){
-    const card = e.target.closest('.fc-card--3d');
-    if(card && (!e.relatedTarget || !card.contains(e.relatedTarget))){
-      card.style.transform = '';
-    }
-  });
 })();
 
 // Register PWA Service Worker (HTTP/HTTPS only to prevent file:// SecurityError)

@@ -154,6 +154,10 @@ const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
 
     if (req.method === 'OPTIONS') {
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -457,7 +461,10 @@ const server = http.createServer((req, res) => {
         res.writeHead(200, {
             'Content-Type': contentType,
             'Content-Length': stat.size,
-            'Cache-Control': 'no-cache',
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'Surrogate-Control': 'no-store',
             'Access-Control-Allow-Origin': '*'
         });
 
