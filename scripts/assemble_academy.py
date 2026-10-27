@@ -15406,6 +15406,12 @@ if os.path.isfile(CANONICAL_STANDARDS_PATH):
             canonical_disk_html,
             count=1
         )
+        canonical_disk_html = re.sub(
+            r'const WEB_MASTERY\s*=\s*\{[\s\S]*?\};\s*(const BACKEND_MASTERY)',
+            lambda m: f'const WEB_MASTERY = {web_mastery_json};\n{m.group(1)}',
+            canonical_disk_html,
+            count=1
+        )
         html_out = canonical_disk_html
 
 with open(OUT_HTML_PATH, 'w', encoding='utf-8', newline='\n') as f:
