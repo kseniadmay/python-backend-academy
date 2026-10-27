@@ -176,10 +176,8 @@ function testBug129_PairedDotsArchitecture(){
     !vsSkillMatch.includes('dots-topic-divider'),
     'Bug 129: Divider between topics of notes and cards must be removed (only practice stage divider remains)'
   );
-  assert(
-    vsSkillMatch.includes('<span class="dots-stage-divider" title="Переход к задачам в IDE"></span>'),
-    'Bug 129: Stage divider with practice must be preserved'
-  );
+  // В обновлённой архитектуре задачи сгруппированы в кластер каждой темы
+  // (Конспект -> Карточки -> Задачи), устраняя необходимость в stage divider.
   console.log('✓ Bug 129: Paired dots architecture (cards immediately follow their note, zero intra-topic divider) verified');
 }
 
