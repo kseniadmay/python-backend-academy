@@ -251,6 +251,28 @@ function testDailyDueMobileCardFitsScreen(){
   );
 }
 
+// Тест-кейс 17: Скользящее окно Stories Bar и защита от горизонтального переполнения при больших очередях карточек
+function testDailyDueSlidingWindowNoHorizontalOverflow(){
+  // 1. Проверяем наличие скользящего окна в dueQueue (ограничение до 28 сегментов)
+  assert(
+    academyHtml.includes('maxSegs = 28') &&
+    academyHtml.includes('start = Math.max(0, duePos - half);'),
+    'Defect 17: viewCardsHub dueQueue must use sliding window (max 28 segments) to prevent overflow with 300+ cards'
+  );
+  // 2. Проверяем flex-shrink и overflow для .fc-stories-bar и сегментов
+  assert(
+    academyHtml.includes('.fc-stories-bar{gap:2px !important;width:100% !important;max-width:100% !important;min-width:0 !important;box-sizing:border-box !important;overflow:hidden !important;}') &&
+    academyHtml.includes('.fc-story-seg{flex:1 1 0 !important;min-width:0 !important;box-sizing:border-box !important;}'),
+    'Defect 17: .fc-stories-bar and .fc-story-seg must have overflow:hidden and flex:1 1 0 with min-width:0 on mobile'
+  );
+  // 3. Проверяем кнопку «Показать ответ» на min-width:0 и text-overflow:ellipsis
+  assert(
+    academyHtml.includes('class="btn-glass-emerald btn-sprint-cta" style="flex:1;min-width:0;') &&
+    academyHtml.includes('text-overflow:ellipsis;'),
+    'Defect 17: btn-sprint-cta must have min-width:0 and ellipsis protection'
+  );
+}
+
 // Экспорт или прямой прогон
 module.exports = {
   testCleanHumanUiDueMode,
@@ -268,7 +290,8 @@ module.exports = {
   testAnswerFaceButtonLabel,
   testZeroTrapNavigationAnswerFaceCatalogAndLesson,
   testConciseEchelonLabels,
-  testDailyDueMobileCardFitsScreen
+  testDailyDueMobileCardFitsScreen,
+  testDailyDueSlidingWindowNoHorizontalOverflow
 };
 
 if(require.main === module){
@@ -289,7 +312,8 @@ if(require.main === module){
     ['13. Эргономичная подпись «← К вопросу»', testAnswerFaceButtonLabel],
     ['14. Zero-Trap «← К вопросу» в каталоге и уроке', testZeroTrapNavigationAnswerFaceCatalogAndLesson],
     ['15. Лаконичные метки эшелонов без переполнения', testConciseEchelonLabels],
-    ['16. Гарантия вместимости карточки на мобильном экране', testDailyDueMobileCardFitsScreen]
+    ['16. Гарантия вместимости карточки на мобильном экране', testDailyDueMobileCardFitsScreen],
+    ['17. Скользящее окно Stories Bar и защита от горизонтального переполнения', testDailyDueSlidingWindowNoHorizontalOverflow]
   ];
 
   let failed = 0;

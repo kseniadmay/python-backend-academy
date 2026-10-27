@@ -1847,10 +1847,12 @@
 
   /* ---------- Section 6: 3D Flashcards Flip Physics, Gloss & Segmented Stories Bar ---------- */
   .fc-stories-bar{
-    display:flex;gap:3px;width:100%;margin-bottom:10px;height:5px;
+    display:flex;gap:3px;width:100%;max-width:100%;min-width:0;margin-bottom:10px;height:5px;
+    box-sizing:border-box;overflow:hidden;
   }
   .fc-story-seg{
-    flex:1;height:100%;border-radius:99px;background:var(--line);transition:background .25s,transform .2s,filter .2s;
+    flex:1 1 0;min-width:0;box-sizing:border-box;
+    height:100%;border-radius:99px;background:var(--line);transition:background .25s,transform .2s,filter .2s;
   }
   .fc-story-seg:hover{
     transform:scaleY(1.75);
@@ -2371,11 +2373,16 @@
     .cards-hub-controls{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
     .cards-hub-subfilters{display:grid !important;grid-template-columns:1fr 1fr;gap:8px;}
     .cards-hub-subfilters select{min-width:0 !important;width:100% !important;box-sizing:border-box !important;font-size:.78rem !important;padding:8px 8px !important;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;}
-    .cards-hub-container{padding-top:4px !important;padding-bottom:calc(var(--tabbar-h, 68px) + 14px + env(safe-area-inset-bottom, 8px)) !important;}
+    .cards-hub-container{width:100% !important;max-width:100% !important;min-width:0 !important;box-sizing:border-box !important;padding-top:4px !important;padding-bottom:calc(var(--tabbar-h, 68px) + 14px + env(safe-area-inset-bottom, 8px)) !important;}
+    .cards-hub-content{width:100% !important;max-width:100% !important;min-width:0 !important;box-sizing:border-box !important;}
     .cards-hub-controls #cards-deck-select{font-size:.84rem !important;padding:8px 10px !important;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;}
     .fc-stage{margin:4px 0 !important;padding-bottom:0 !important;}
+    .fc-stage{width:100% !important;max-width:100% !important;min-width:0 !important;box-sizing:border-box !important;}
     .microstep-bar{padding:6px 10px !important;font-size:.82rem !important;margin-bottom:6px !important;}
     .fc-card{
+      width:100% !important;
+      max-width:100% !important;
+      box-sizing:border-box !important;
       min-height:clamp(120px, 18vh, 175px) !important;
       max-height:clamp(180px, 34vh, 275px) !important;
       padding:12px 14px !important;
@@ -2385,6 +2392,8 @@
       scrollbar-width:thin !important;
       scrollbar-color:rgba(16,185,129,0.35) transparent !important;
     }
+    .fc-stories-bar{gap:2px !important;width:100% !important;max-width:100% !important;min-width:0 !important;box-sizing:border-box !important;overflow:hidden !important;}
+    .fc-story-seg{flex:1 1 0 !important;min-width:0 !important;box-sizing:border-box !important;}
     .fc-card-inner{display:flex;flex-direction:column;min-height:100%;}
     .fc-q{font-size:0.98rem !important;line-height:1.45 !important;}
     .fc-a{font-size:0.90rem !important;line-height:1.45 !important;margin-top:10px !important;}
@@ -17150,16 +17159,35 @@ function viewCardsHub(){
       </div>
       <div class="cards-hub-content" style="max-width:760px;margin:0 auto;">
         <div class="fc-stories-bar" aria-label="Прогресс очереди дня">
-          ${cardsHubState.dueQueue.map((dq, idx) => {
-            let cls = 'fc-story-seg';
-            if(idx === duePos) cls += ' fc-story-seg--active seg--current';
-            else if(idx < duePos) cls += ' fc-story-seg--r3 seg--easy';
-            const dqDeck = (typeof ALL_DECKS_COMBINED !== 'undefined') ? ALL_DECKS_COMBINED[dq.deckId] : null;
-            const dqCard = dqDeck && dqDeck.cards ? dqDeck.cards[dq.cardIdx] : null;
-            const rawQ = dqCard && dqCard.q ? dqCard.q.replace(/<[^>]+>/g, '').replace(/[\r\n]+/g, ' ').trim() : '';
-            const previewQ = rawQ ? ` · ${rawQ.slice(0, 50)}${rawQ.length > 50 ? '…' : ''}` : '';
-            return `<div class="${cls}" data-hub-goto-due="${idx}" style="cursor:pointer;" title="Карточка ${idx+1}${previewQ.replace(/"/g, '&quot;')}"></div>`;
-          }).join('')}
+          ${(() => {
+            const maxSegs = 28;
+            const q = cardsHubState.dueQueue || [];
+            const qLen = q.length;
+            let start = 0;
+            let end = qLen;
+            if(qLen > maxSegs){
+              const half = Math.floor(maxSegs / 2);
+              start = Math.max(0, duePos - half);
+              end = start + maxSegs;
+              if(end > qLen){
+                end = qLen;
+                start = Math.max(0, end - maxSegs);
+              }
+            }
+            const segs = [];
+            for(let idx = start; idx < end; idx++){
+              const dq = q[idx];
+              let cls = 'fc-story-seg';
+              if(idx === duePos) cls += ' fc-story-seg--active seg--current';
+              else if(idx < duePos) cls += ' fc-story-seg--r3 seg--easy';
+              const dqDeck = (typeof ALL_DECKS_COMBINED !== 'undefined') ? ALL_DECKS_COMBINED[dq.deckId] : null;
+              const dqCard = dqDeck && dqDeck.cards ? dqDeck.cards[dq.cardIdx] : null;
+              const rawQ = dqCard && dqCard.q ? dqCard.q.replace(/<[^>]+>/g, '').replace(/[\r\n]+/g, ' ').trim() : '';
+              const previewQ = rawQ ? ` · ${rawQ.slice(0, 50)}${rawQ.length > 50 ? '…' : ''}` : '';
+              segs.push(`<div class="${cls}" data-hub-goto-due="${idx}" style="cursor:pointer;" title="Карточка ${idx+1}${previewQ.replace(/"/g, '&quot;')}"></div>`);
+            }
+            return segs.join('');
+          })()}
         </div>
         <div class="fc-stage" style="margin-top:0;">
           <div class="fc-card fc-card--3d ${cardsHubState.flipped ? 'fc-card--flipped fc-card--Answer' : ''}" data-hub-flip style="margin-top:0;border: 1.5px solid rgba(16,185,129,0.45); border-radius: 18px; background: rgba(16,185,129,0.03); box-shadow: 0 4px 24px rgba(0,0,0,0.2), 0 0 16px rgba(16,185,129,0.06); cursor: pointer;">
@@ -17204,9 +17232,9 @@ function viewCardsHub(){
             </div>
           </div>`;
         })() : `
-          <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
-            <button type="button" class="btn btn-ghost" data-hub-prev ${duePos===0?'disabled':''} style="padding:12px 18px;border-radius:14px;">← Назад</button>
-            <button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;padding:12px 20px;border-radius:14px;font-weight:800;" data-hub-flip title="Перевернуть карточку (Enter или Пробел)">Показать ответ <kbd class="fc-kbd-hint">Space</kbd></button>
+          <div style="margin-top:12px;display:flex;gap:10px;align-items:center;width:100%;max-width:100%;box-sizing:border-box;">
+            <button type="button" class="btn btn-ghost" data-hub-prev ${duePos===0?'disabled':''} style="padding:12px 18px;border-radius:14px;white-space:nowrap;flex-shrink:0;">← Назад</button>
+            <button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;min-width:0;padding:12px 20px;border-radius:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" data-hub-flip title="Перевернуть карточку (Enter или Пробел)">Показать ответ <kbd class="fc-kbd-hint">Space</kbd></button>
           </div>`}
       </div>
     </div>`;
