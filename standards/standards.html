@@ -12930,6 +12930,7 @@ function ensureExtendedState(target){
   if(typeof s.schemaVersion !== 'number') s.schemaVersion = ACADEMY_SCHEMA_VERSION;
   if(typeof s.updatedAt !== 'number') s.updatedAt = Date.now();
   if(typeof s.streak !== 'number') s.streak = 0;
+  if(!Array.isArray(s.bugReports)) s.bugReports = [];
   if(typeof s.zenRailCollapsed !== 'boolean') s.zenRailCollapsed = false;
   if(typeof s.bestStreak !== 'number') s.bestStreak = s.streak || 0;
   if(s.lastVisit === undefined) s.lastVisit = null;
@@ -13186,6 +13187,19 @@ function mergeProgressStates(baseRaw, incomingRaw){
       });
     }
   });
+
+  // Объединение баг-репортов без потерь по уникальным timestamp и тексту
+  const mergedBugReports = [];
+  const seenBugKeys = new Set();
+  (Array.isArray(a.bugReports) ? a.bugReports : []).concat(Array.isArray(b.bugReports) ? b.bugReports : []).forEach(item => {
+    if(!item || typeof item !== 'object') return;
+    const key = (item.timestamp || '') + '|' + (item.context || '') + '|' + (item.text || '');
+    if(!seenBugKeys.has(key)){
+      seenBugKeys.add(key);
+      mergedBugReports.push(item);
+    }
+  });
+  merged.bugReports = mergedBugReports;
 
   merged.readingPositions = Object.assign({}, a.readingPositions || {});
   Object.keys(b.readingPositions || {}).forEach(sid => {
