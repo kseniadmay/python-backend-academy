@@ -120,7 +120,7 @@ if chrome_exe:
         (base_uri + '#/map', 'Матрица'),
         (base_uri + '#/path', 'Python Core'),
         (base_uri + '#/practice', 'Практика кода'),
-        (base_uri + '#/cards', 'Центр 3D Флеш-карточек'),
+        (base_uri + '#/cards', 'Интервальное повторение'),
     ]
 
     def verify_single_route(item):
