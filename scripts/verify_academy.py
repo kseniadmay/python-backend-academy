@@ -107,7 +107,7 @@ if chrome_exe:
     ]
 
     routes = [
-        (base_uri, 'Готовность к тех-скринингу'),
+        (base_uri, 'Готовность к 1-му тех-скринингу'),
         (base_uri + '#/python', 'Матрица Мастерства Python'),
         (base_uri + '#/web', 'Матрица Мастерства Web'),
         (base_uri + '#/backend', 'Матрица Мастерства Backend'),
@@ -120,7 +120,7 @@ if chrome_exe:
         (base_uri + '#/map', 'Матрица'),
         (base_uri + '#/path', 'Python Core'),
         (base_uri + '#/practice', 'Практика кода'),
-        (base_uri + '#/cards', 'Интервальное повторение'),
+        (base_uri + '#/cards', 'Центр 3D Флеш-карточек'),
     ]
 
     def verify_single_route(item):
