@@ -8,6 +8,7 @@
 
 | Файл / Каталог | Описание |
 |---|---|
+| [`test_helpers.js`](test_helpers.js) | **Единый DRY-модуль тестового контекста**: централизованные пути, однократное кэшированное чтение `academy.html` / `standards.html` / `PROJECT_CONTEXT.md` / `AGENTS.md`, парсинг `PY_MASTERY` и проверка `Invariant 0`. |
 | [`test_descriptor_suite.js`](test_descriptor_suite.js) | **Сьют Строгого Дескриптора (17 инвариантов)**: побайтовое соответствие эталонов, Clean Human UI, Active Rescue, Non-Destructive Peeking, Execution Watchdog 2000ms, iOS Zoom Guard 16px, Single Dominant CTA, запрет 3D/Coddy, фикстуры и DDL схемы. |
 | [`test_backend_database.py`](test_backend_database.py) | **Тестовый комплекс реляционной базы данных (SQLite)**: валидация схемы 9 таблиц, ACID-транзакции, откат при сбоях, внешние ключи, индексация, алгоритм SRS и сохранение черновиков IDE. |
 | [`test_backend_concurrency.py`](test_backend_concurrency.py) | **Стресс-тесты конкурентности и отказоустойчивости**: многопоточная запись в SQLite (режим WAL, 10 потоков без блокировок), миграция схем v1/v2 ➔ v3, краш-рекавери на диске и лимиты полезной нагрузки. |
@@ -18,6 +19,7 @@
 | [`test_cards_trainer_regression.js`](test_cards_trainer_regression.js) | Тестирование механики флешкарт: интервальное повторение SRS, перевороты, оценка «Не знаю» и начисление XP. |
 | [`test_notes_presentation_regression.js`](test_notes_presentation_regression.js) | Контроль типографики ридера конспектов: Onest, отступы, подсветка синтаксиса и Single CTA. |
 | [`test_skill_screen_regression.js`](test_skill_screen_regression.js) | Тестирование экрана навыков, цепи микро-шагов и дерева эшелонов. |
+| [`test_server_api.js`](test_server_api.js) | Интеграционное тестирование Node.js сервера (`scripts/server.js`): REST API v1, синхронизация прогресса, очередь замечаний и редирект IDE. |
 | [`fixtures/`](fixtures/) | **Каноническая база фикстур и DDL-схема тестовой БД**: `test_db_schema.sql`, `fixture_factory.py`, 8 эталонных профилей (fresh, intermediate, advanced, conflict, corrupted, v1_legacy, v2_legacy, backup). |
 
 ---

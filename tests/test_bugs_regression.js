@@ -8,27 +8,23 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 
-const rootDir = path.resolve(__dirname, '..');
-const remnoteDir = path.join(rootDir, 'knowledge_base');
-const academyPath = path.join(rootDir, 'academy.html');
-const etalonyPath = path.join(rootDir, 'standards', 'standards.html');
+const {
+  rootDir,
+  remnoteDir,
+  getTestContext,
+  getPyMastery,
+  assertCanonicalEtalonSync
+} = require('./test_helpers.js');
 
 console.log('================================================================');
 console.log('   REGRESSION TEST SUITE: BUGS 1..80 VERIFICATION               ');
 console.log('================================================================\n');
 
-assert(fs.existsSync(academyPath), `academy.html missing`);
-assert(fs.existsSync(etalonyPath), `standards.html missing`);
-
-const academyHtmlRaw = fs.readFileSync(academyPath, 'utf-8');
-const etalonyHtmlRaw = fs.readFileSync(etalonyPath, 'utf-8');
-
 // 0. Строгая идентичность канонических файлов
-assert.strictEqual(academyHtmlRaw, etalonyHtmlRaw, 'academy.html и standards.html обязаны быть строго побайтово идентичны!');
+assertCanonicalEtalonSync();
 console.log('✓ Invariant 0: academy.html === standards.html (100% MATCH)');
 
-const academyHtml = academyHtmlRaw.replace(/\r\n/g, '\n');
-const etalonyHtml = etalonyHtmlRaw.replace(/\r\n/g, '\n');
+const { academyHtml, etalonyHtml, agentsMd: agentsMdContent, projectContext: projectContextContent } = getTestContext();
 
 
 
@@ -624,9 +620,7 @@ assert(reverseRegex.test(desc20) || (task20.solution && task20.solution.includes
 console.log('✓ Bug 86: Reverse list widget regex precision (Task 19 & 255 skipped, Task 20 matched) verified');
 
 // 87. Bug 87: Активное первичное закрепление в тематических карточках для Навыка 1.9.1
-const mPyMastery87 = academyHtml.match(/const PY_MASTERY = ({[\s\S]*?});\s*(?:const|let|var|function)/);
-assert(mPyMastery87, 'PY_MASTERY must be present');
-const pyMastery87 = JSON.parse(mPyMastery87[1]);
+const pyMastery87 = getPyMastery();
 const sk191_87 = pyMastery87.units.flatMap(u => u.skills).find(s => s.id === '1.9.1');
 assert(sk191_87, 'Skill 1.9.1 must exist in PY_MASTERY');
 assert.strictEqual(sk191_87.kIds.length, 5, 'Skill 1.9.1 must contain 5 micro-learning notes');
@@ -642,13 +636,8 @@ assert(verified191CardsCount >= 38, `Skill 1.9.1 decks must contain >= 38 cards 
 console.log(`✓ Bug 87: Thematic flashcards active learning (${verified191CardsCount} cards across 5 decks of Skill 1.9.1) verified`);
 
 // 88. Bug 88: Строгий инвариант запрета технического упоминания «Кодди» / «Coddy» в регламентах и UI
-const agentsMdPath = path.join(rootDir, 'AGENTS.md');
-const projectContextPath = path.join(rootDir, 'PROJECT_CONTEXT.md');
-assert(fs.existsSync(agentsMdPath), 'AGENTS.md missing');
-assert(fs.existsSync(projectContextPath), 'PROJECT_CONTEXT.md missing');
-
-const agentsMdContent = fs.readFileSync(agentsMdPath, 'utf-8');
-const projectContextContent = fs.readFileSync(projectContextPath, 'utf-8');
+assert(agentsMdContent.length > 0, 'AGENTS.md missing');
+assert(projectContextContent.length > 0, 'PROJECT_CONTEXT.md missing');
 
 assert(
   agentsMdContent.includes('Категорический запрет на техническое упоминание «Кодди» / «Coddy»'),

@@ -9,17 +9,14 @@
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
-
-const rootDir = path.resolve(__dirname, '..');
-const academyPath = path.join(rootDir, 'academy.html');
+const { rootDir, getTestContext } = require('./test_helpers.js');
 
 console.log('================================================================');
 console.log('   SKILL SCREEN VISUAL & PEDAGOGICAL REGRESSION SUITE           ');
 console.log('   BUGS 121..127 VERIFICATION (CANONICAL BENCHMARK)             ');
 console.log('================================================================\n');
 
-assert(fs.existsSync(academyPath), `academy.html missing at ${academyPath}`);
-const academyHtml = fs.readFileSync(academyPath, 'utf-8').replace(/\r\n/g, '\n');
+const { academyHtml, viewPythonSkillSlice: vsSkillMatch } = getTestContext();
 
 // 1. Bug 121 (Defect 1): Полный запрет технического упоминания «Coddy» в классах и разметке сплит-режима практики
 function testBug121_NoCoddyMentionInSkillLayout(){
@@ -66,10 +63,6 @@ function testBug123_DirectNoteToCardsTransition(){
 
 // 4. Bug 124 (Defect 4): Single Dominant CTA на финише конспекта для перехода к карточкам
 function testBug124_SingleDominantCtaToCards(){
-  const vsSkillMatch = academyHtml.slice(
-    academyHtml.indexOf('function viewPythonSkill('),
-    academyHtml.indexOf('function viewCardsHub(')
-  );
   assert(
     vsSkillMatch.includes('Закрепить в карточках (+10 XP) ➔') &&
     vsSkillMatch.includes('data-py-finish-note="${activeK}"'),
@@ -84,10 +77,6 @@ function testBug124_SingleDominantCtaToCards(){
 
 // 5. Bug 125 (Defect 5): Ликвидация технического кода юнита «Урок 1.1» в рубежном зачёте и тултипе нити точек
 function testBug125_CleanHumanExamMilestoneTitle(){
-  const vsSkillMatch = academyHtml.slice(
-    academyHtml.indexOf('function viewPythonSkill('),
-    academyHtml.indexOf('function viewCardsHub(')
-  );
   assert(
     !vsSkillMatch.includes('title="Рубежный зачёт урока ${sk.unitId}"'),
     'Bug 125: examDot title must not output technical unit ID like "Урок 1.1", must use clean topic title "Рубежный зачёт: ${cleanUnitTitleVal}"'
@@ -122,10 +111,6 @@ function testBug126_NoSolutionSpoilerQuickTokens(){
 
 // 7. Bug 127 (Defect 7): Полное упразднение проверок понимания в пользу тематических карточек и SRS
 function testBug127_ComprehensionChecksEliminated(){
-  const vsSkillMatch = academyHtml.slice(
-    academyHtml.indexOf('function viewPythonSkill('),
-    academyHtml.indexOf('function viewCardsHub(')
-  );
   assert(
     !vsSkillMatch.includes('stepCheckHTML'),
     'Bug 127: stepCheckHTML must be completely removed from viewPythonSkill'
@@ -139,10 +124,6 @@ function testBug127_ComprehensionChecksEliminated(){
 
 // 8. Bug 128 (Defect 8): Полная ликвидация мусорных строк («Шаг 7 из 7», «Сессия ~2 мин») из шапки экрана навыка
 function testBug128_JunkStepCounterLinesEliminated(){
-  const vsSkillMatch = academyHtml.slice(
-    academyHtml.indexOf('function viewPythonSkill('),
-    academyHtml.indexOf('function viewCardsHub(')
-  );
   assert(
     !vsSkillMatch.includes('Шаг ${stepIdx + 1} из ${steps.length}'),
     'Bug 128: "Шаг X из Y" junk text must be completely eliminated from skill screen header'
@@ -160,10 +141,6 @@ function testBug128_JunkStepCounterLinesEliminated(){
 
 // 9. Bug 129 (Defect 9): Архитектура парных точек тем (тематические карточки идут сразу после соответствующего конспекта)
 function testBug129_PairedDotsArchitecture(){
-  const vsSkillMatch = academyHtml.slice(
-    academyHtml.indexOf('function viewPythonSkill('),
-    academyHtml.indexOf('function viewCardsHub(')
-  );
   assert(
     vsSkillMatch.includes('topicClusterDots'),
     'Bug 129: viewPythonSkill must build paired topicClusterDots sequence'
@@ -216,10 +193,6 @@ function testBug131_UserProgressBackupLoad(){
 
 // 12. Bug 132 (Defect 12): Интерактивные кликабельные микро-точки шагов в футере карточки теории
 function testBug132_FooterStepMicroStepper(){
-  const vsSkillMatch = academyHtml.slice(
-    academyHtml.indexOf('function viewPythonSkill('),
-    academyHtml.indexOf('function viewCardsHub(')
-  );
   assert(
     vsSkillMatch.includes('step-footer-stepper'),
     'Bug 132: viewPythonSkill must contain .step-footer-stepper in theory card footer'

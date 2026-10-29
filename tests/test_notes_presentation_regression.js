@@ -5,20 +5,15 @@
  */
 
 'use strict';
-const fs = require('fs');
-const path = require('path');
 const assert = require('assert');
-
-const rootDir = path.resolve(__dirname, '..');
-const academyPath = path.join(rootDir, 'academy.html');
+const { getTestContext, getPyMastery } = require('./test_helpers.js');
 
 console.log('================================================================');
 console.log('   NOTES PRESENTATION & ACTIVE LEARNING REGRESSION SUITE        ');
 console.log('   BUGS 107..120 VERIFICATION (PEDAGOGICAL BENCHMARK)           ');
 console.log('================================================================\n');
 
-assert(fs.existsSync(academyPath), `academy.html missing at ${academyPath}`);
-const academyHtml = fs.readFileSync(academyPath, 'utf-8').replace(/\r\n/g, '\n');
+const { academyHtml, viewPythonSkillSlice: vsSkillMatch } = getTestContext();
 
 // Bug 107 (Defect 1): Подсветка синтаксиса строк в двойных кавычках и &quot;
 function testBug107_SyntaxHighlightingDoubleQuotes(){
@@ -37,10 +32,6 @@ function testBug107_SyntaxHighlightingDoubleQuotes(){
 
 // Bug 108 (Defect 2): Ликвидация мусорных текстовых строк («Шаг X из Y», «Сессия ~2 мин») и чистота заголовка
 function testBug108_VisibleStepCounterAndSegmentedBar(){
-  const vsSkillMatch = academyHtml.slice(
-    academyHtml.indexOf('function viewPythonSkill('),
-    academyHtml.indexOf('function viewCardsHub(')
-  );
 
   assert(
     !vsSkillMatch.includes('Шаг ${stepIdx + 1} из ${steps.length}'),
@@ -59,10 +50,6 @@ function testBug108_VisibleStepCounterAndSegmentedBar(){
 
 // Bug 109 (Defect 3): Разграничение понятий «Тема» и «Шаг» в навигации
 function testBug109_StepVsThemeTerminology(){
-  const vsSkillMatch = academyHtml.slice(
-    academyHtml.indexOf('function viewPythonSkill('),
-    academyHtml.indexOf('function viewCardsHub(')
-  );
 
   assert(
     !vsSkillMatch.includes('Дальше к следующей теме ➔'),
@@ -77,10 +64,6 @@ function testBug109_StepVsThemeTerminology(){
 
 // Bug 110 (Defect 4): Инвариант Single Dominant CTA и прямой переход от конспекта к тематическим карточкам
 function testBug110_SingleDominantCtaTheoryFlow(){
-  const vsSkillMatch = academyHtml.slice(
-    academyHtml.indexOf('function viewPythonSkill('),
-    academyHtml.indexOf('function viewCardsHub(')
-  );
 
   assert(
     !vsSkillMatch.includes('👆 Ответьте на вопрос для продолжения'),

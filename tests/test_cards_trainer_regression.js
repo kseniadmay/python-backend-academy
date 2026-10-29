@@ -5,27 +5,17 @@
  */
 
 'use strict';
-const fs = require('fs');
-const path = require('path');
 const assert = require('assert');
-
-const rootDir = path.resolve(__dirname, '..');
-const academyPath = path.join(rootDir, 'academy.html');
-const etalonyPath = path.join(rootDir, 'standards', 'standards.html');
+const { getTestContext } = require('./test_helpers.js');
 
 console.log('================================================================');
 console.log('   FLASHCARDS & SRS TRAINER REGRESSION TEST SUITE               ');
 console.log('================================================================\n');
 
-assert(fs.existsSync(academyPath), `academy.html missing at ${academyPath}`);
-const academyHtml = fs.readFileSync(academyPath, 'utf-8').replace(/\r\n/g, '\n');
+const { academyHtml, cardsDueModeSlice: dueModeMatch } = getTestContext();
 
 // Тест-кейс 1: Запрет утечки технических ID колод (Ф-xxx) в режиме очереди повторения на сегодня
 function testCleanHumanUiDueMode(){
-  const dueModeMatch = academyHtml.slice(
-    academyHtml.indexOf('if(cardsHubState.dueMode){'),
-    academyHtml.indexOf('const allDeckIds = Object.keys(ALL_DECKS_COMBINED)')
-  );
   assert(
     !dueModeMatch.includes('${item.deckId} ·'),
     'Defect 1: dueMode must not render technical deck ID ${item.deckId} in user UI'
@@ -38,10 +28,6 @@ function testCleanHumanUiDueMode(){
 
 // Тест-кейс 2: Защита от тупика навигации на ответе первой карточки (Zero-Trap Navigation on duePos === 0)
 function testZeroTrapNavigationDueMode(){
-  const dueModeMatch = academyHtml.slice(
-    academyHtml.indexOf('if(cardsHubState.dueMode){'),
-    academyHtml.indexOf('const allDeckIds = Object.keys(ALL_DECKS_COMBINED)')
-  );
   const dueAnswerFace = dueModeMatch.slice(
     dueModeMatch.indexOf('cardsHubState.flipped ? (() => {'),
     dueModeMatch.indexOf('})() :')
@@ -58,10 +44,6 @@ function testZeroTrapNavigationDueMode(){
 
 // Тест-кейс 3: Сохранение 3D-эстетики и стиля Zen Glassmorphism в режиме очереди дня
 function testGlassmorphismAestheticsDueMode(){
-  const dueModeMatch = academyHtml.slice(
-    academyHtml.indexOf('if(cardsHubState.dueMode){'),
-    academyHtml.indexOf('const allDeckIds = Object.keys(ALL_DECKS_COMBINED)')
-  );
   assert(
     !dueModeMatch.includes('class="fc-card ${cardsHubState.flipped ? \'flipped\' : \'\'}"'),
     'Defect 3: dueMode must not use non-existent .flipped class without 3D styles'

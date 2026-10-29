@@ -1,9 +1,7 @@
-import json
 import logging
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from backend.app.core.config import settings
+from backend.app.core.config import read_json_file, settings
 
 logger = logging.getLogger('academy.content')
 
@@ -16,16 +14,8 @@ class ContentService:
         self._cards: Optional[Dict[str, Any]] = None
         self._tasks: Optional[List[Dict[str, Any]]] = None
 
-    def _load_json(self, file_name: str) -> Any:
-        path = self.content_dir / file_name
-        if not path.exists():
-            return None
-        try:
-            with open(path, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except Exception as e:
-            logger.error('Ошибка загрузки %s: %s', path, e)
-            return None
+    def _load_json(self, file_name: str, default: Any = None) -> Any:
+        return read_json_file(self.content_dir / file_name, default=default, logger=logger)
 
     def get_manifest(self) -> Dict[str, Any]:
         if self._manifest is None:
@@ -41,21 +31,19 @@ class ContentService:
 
     def get_notes(self) -> Dict[str, Any]:
         if self._notes is None:
-            self._notes = self._load_json('notes.json') or {}
+            self._notes = self._load_json('notes.json', default={}) or {}
         return self._notes
 
     def get_note(self, note_id: str) -> Optional[Dict[str, Any]]:
-        notes = self.get_notes()
-        return notes.get(note_id)
+        return self.get_notes().get(note_id)
 
     def get_cards(self) -> Dict[str, Any]:
         if self._cards is None:
-            self._cards = self._load_json('cards.json') or {}
+            self._cards = self._load_json('cards.json', default={}) or {}
         return self._cards
 
     def get_deck(self, deck_id: str) -> Optional[Dict[str, Any]]:
-        cards = self.get_cards()
-        return cards.get(deck_id)
+        return self.get_cards().get(deck_id)
 
     def get_tasks(
         self,
@@ -63,7 +51,7 @@ class ContentService:
         topic: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         if self._tasks is None:
-            self._tasks = self._load_json('tasks.json') or []
+            self._tasks = self._load_json('tasks.json', default=[]) or []
 
         results = self._tasks
         if level is not None:
@@ -74,8 +62,7 @@ class ContentService:
         return results
 
     def get_task(self, task_id: int) -> Optional[Dict[str, Any]]:
-        tasks = self.get_tasks()
-        for t in tasks:
+        for t in self.get_tasks():
             if t.get('id') == task_id:
                 return t
         return None
@@ -86,22 +73,18 @@ class ContentService:
             return []
 
         results = []
-        # Поиск по конспектам
-        notes = self.get_notes()
-        for cid, note in notes.items():
+        for cid, note in self.get_notes().items():
             if q in note.get('title', '').lower():
                 results.append({
                     'type': 'note',
                     'id': cid,
                     'title': note.get('title'),
-                    'snippet': f"Конспект {cid}"
+                    'snippet': f'Конспект {cid}'
                 })
                 if len(results) >= limit:
                     return results
 
-        # Поиск по задачам
-        tasks = self.get_tasks()
-        for t in tasks:
+        for t in self.get_tasks():
             if q in t.get('title', '').lower() or q in t.get('desc', '').lower():
                 results.append({
                     'type': 'task',

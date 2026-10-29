@@ -1,6 +1,7 @@
 from enum import Enum
-from typing import Any, List, Optional
-from pydantic import BaseModel, Field
+from typing import List, Optional
+from pydantic import Field
+from backend.app.schemas.common import CompatBaseModel
 
 
 class StepType(str, Enum):
@@ -10,25 +11,25 @@ class StepType(str, Enum):
     MILESTONE_CHECKPOINT = 'MILESTONE_CHECKPOINT'
 
 
-class PracticalContrastSnippet(BaseModel):
+class PracticalContrastSnippet(CompatBaseModel):
     language: str = Field(default='python', description='Язык кода')
     code: str = Field(..., description='Эталонный сниппет кода')
     annotation: Optional[str] = Field(default=None, description='Подпись контраста сложности (например, O(1) vs O(N))')
 
 
-class MicroCheckOption(BaseModel):
+class MicroCheckOption(CompatBaseModel):
     id: str
     text: str
 
 
-class MicroCheck(BaseModel):
+class MicroCheck(CompatBaseModel):
     prompt: str
     options: List[MicroCheckOption]
     correctOptionId: str
     explanation: str
 
 
-class TheoryStep(BaseModel):
+class TheoryStep(CompatBaseModel):
     id: str
     stepType: StepType = StepType.THEORY
     topicTitle: str
@@ -40,7 +41,7 @@ class TheoryStep(BaseModel):
     rewardXp: int = Field(default=10, description='Награда XP за шаг')
 
 
-class InitialFlashcard(BaseModel):
+class InitialFlashcard(CompatBaseModel):
     id: str
     question: str
     coreAnswer: str
@@ -49,12 +50,12 @@ class InitialFlashcard(BaseModel):
     backendInsight: Optional[str] = None
 
 
-class SocraticHint(BaseModel):
+class SocraticHint(CompatBaseModel):
     level: int = Field(..., ge=0, le=3, description='Уровень скаффолдинга 0..3')
     hint: str
 
 
-class CodeTask(BaseModel):
+class CodeTask(CompatBaseModel):
     id: int
     tier: int = Field(..., ge=1, le=7, description='Уровень сложности 1..7')
     title: str
@@ -68,7 +69,7 @@ class CodeTask(BaseModel):
     rewardXp: int = Field(default=15)
 
 
-class Lesson(BaseModel):
+class Lesson(CompatBaseModel):
     id: str
     title: str
     chapterId: str

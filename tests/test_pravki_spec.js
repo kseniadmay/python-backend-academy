@@ -9,30 +9,18 @@
  */
 
 'use strict';
-const fs = require('fs');
-const path = require('path');
 const assert = require('assert');
-
-const rootDir = path.resolve(__dirname, '..');
-const academyPath = path.join(rootDir, 'academy.html');
-const etalonyPath = path.join(rootDir, 'standards', 'standards.html');
+const { getTestContext, assertCanonicalEtalonSync } = require('./test_helpers.js');
 
 console.log('================================================================');
 console.log('   CANONICAL BENCHMARK SPECIFICATION TEST SUITE (100% PASS)     ');
 console.log('================================================================\n');
 
-assert(fs.existsSync(academyPath), `academy.html missing at ${academyPath}`);
-assert(fs.existsSync(etalonyPath), `standards.html missing at ${etalonyPath}`);
-
-const academyHtmlRaw = fs.readFileSync(academyPath, 'utf-8');
-const etalonyHtmlRaw = fs.readFileSync(etalonyPath, 'utf-8');
-
 // 0. Строгая идентичность канонических файлов
-assert.strictEqual(academyHtmlRaw, etalonyHtmlRaw, 'academy.html и standards.html обязаны быть строго побайтово идентичны!');
+assertCanonicalEtalonSync();
 console.log('✓ 0. Canonical Benchmark Invariant: academy.html === standards.html (100% MATCH)');
 
-const academyHtml = academyHtmlRaw.replace(/\r\n/g, '\n');
-const etalonyHtml = etalonyHtmlRaw.replace(/\r\n/g, '\n');
+const { academyHtml } = getTestContext();
 
 // 1. Экран теории и конспекта (#/python/skill/1.1.1, эталон_конспект_теория.png)
 assert(academyHtml.includes('echelon-topbar-clean'), 'Topbar must use .echelon-topbar-clean');

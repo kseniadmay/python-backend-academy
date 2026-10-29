@@ -11,14 +11,12 @@
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
-
-const rootDir = path.resolve(__dirname, '..');
-const academyHtmlPath = path.join(rootDir, 'academy.html');
-const standardsHtmlPath = path.join(rootDir, 'standards', 'standards.html');
-const projectContextPath = path.join(rootDir, 'PROJECT_CONTEXT.md');
-const agentsMdPath = path.join(rootDir, 'AGENTS.md');
-const fixturesDir = path.join(rootDir, 'tests', 'fixtures');
-const schemaSqlPath = path.join(fixturesDir, 'test_db_schema.sql');
+const {
+  fixturesDir,
+  schemaSqlPath,
+  getTestContext,
+  assertCanonicalEtalonSync
+} = require('./test_helpers.js');
 
 console.log('================================================================');
 console.log('   STRICT DESCRIPTOR ARCHITECTURAL REGRESSION SUITE             ');
@@ -28,28 +26,13 @@ console.log('================================================================\n'
 // -----------------------------------------------------------------------------
 // 1. Инвариант 0: Канонический эталон (100% побайтовое соответствие)
 // -----------------------------------------------------------------------------
-assert(fs.existsSync(academyHtmlPath), 'academy.html missing');
-assert(fs.existsSync(standardsHtmlPath), 'standards/standards.html missing');
-const academyHtml = fs.readFileSync(academyHtmlPath, 'utf-8');
-const standardsHtml = fs.readFileSync(standardsHtmlPath, 'utf-8');
-
-assert.strictEqual(
-  academyHtml.length,
-  standardsHtml.length,
-  `Invariant 0: academy.html (${academyHtml.length} bytes) must match standards.html (${standardsHtml.length} bytes) length`
-);
-assert.strictEqual(
-  academyHtml,
-  standardsHtml,
-  'Invariant 0: academy.html must be 100% byte-for-byte identical to standards/standards.html'
-);
+assertCanonicalEtalonSync('Invariant 0: academy.html must be 100% byte-for-byte identical to standards/standards.html');
 console.log('✓ Invariant 0: Canonical Etalon 100% Byte Equality verified');
 
 // -----------------------------------------------------------------------------
 // 2. Инвариант 1: Запрет технического упоминания «Кодди» / «Coddy» в UI и регламентах
 // -----------------------------------------------------------------------------
-const projectContext = fs.readFileSync(projectContextPath, 'utf-8');
-const agentsMd = fs.readFileSync(agentsMdPath, 'utf-8');
+const { academyHtmlRaw: academyHtml, projectContext, agentsMd } = getTestContext();
 
 assert(
   agentsMd.includes('Категорический запрет на техническое упоминание «Кодди» / «Coddy»'),

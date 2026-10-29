@@ -1,6 +1,13 @@
-import re, subprocess, json, os, sys, shutil, tempfile
-from pathlib import Path
+import io
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+import zipfile
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
 try:
     sys.stdout.reconfigure(line_buffering=True)
@@ -8,56 +15,64 @@ except Exception:
     pass
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
+if _HERE not in sys.path:
+    sys.path.insert(0, _HERE)
+
+from quick_precommit_check import check_html_inline_scripts
+
 HTML_PATH = os.path.normpath(os.path.join(_HERE, '..', 'academy.html'))
 ETALON_PATH = os.path.normpath(os.path.join(_HERE, '..', 'standards', 'standards.html'))
 IDE_PATH = os.path.normpath(os.path.join(_HERE, '..', 'practice_ide.html'))
 INDEX_PATH = os.path.normpath(os.path.join(_HERE, '..', 'index.html'))
-assert os.path.isfile(HTML_PATH), f"academy.html missing: {HTML_PATH}"
-assert os.path.isfile(ETALON_PATH), f"standards/standards.html missing: {ETALON_PATH}"
+assert os.path.isfile(HTML_PATH), f'academy.html missing: {HTML_PATH}'
+assert os.path.isfile(ETALON_PATH), f'standards/standards.html missing: {ETALON_PATH}'
 
 # Verify Canonical Benchmark Invariant: academy.html and standards.html must be strictly identical
 with open(HTML_PATH, encoding='utf-8') as f1, open(ETALON_PATH, encoding='utf-8') as f2:
-    assert f1.read() == f2.read(), "academy.html and standards.html must be strictly identical (Canonical Benchmark Invariant)!"
+    assert f1.read() == f2.read(), 'academy.html and standards.html must be strictly identical (Canonical Benchmark Invariant)!'
 
-# 1. Syntax check with node --check (in-memory, 0 disk artifacts) across all entry points
-def check_html_inline_scripts(html_file, label):
-    with open(html_file, encoding='utf-8') as f:
-        content = f.read()
-    checked = 0
-    for m in re.finditer(r'<script(?:\s+([^>]*))?>([\s\S]*?)</script>', content, re.IGNORECASE):
-        attrs = m.group(1) or ''
-        code = m.group(2)
-        if not code.strip():
-            continue
-        if 'type=' in attrs and not any(t in attrs for t in ['javascript', 'module']):
-            continue
-        res = subprocess.run(['node', '--check'], input=code, text=True, capture_output=True)
-        assert res.returncode == 0, f"JS syntax error in {label}:\n{res.stderr}"
-        checked += 1
-    assert checked > 0, f"No inline scripts found in {label}"
-    return checked
-
-c_acad = check_html_inline_scripts(HTML_PATH, 'academy.html')
-c_etalon = check_html_inline_scripts(ETALON_PATH, 'standards.html')
+# 1. Syntax check with node --check (reusing shared check_html_inline_scripts from quick_precommit_check.py)
+c_acad = check_html_inline_scripts(HTML_PATH, 'academy.html', require_non_empty=True)
+c_etalon = check_html_inline_scripts(ETALON_PATH, 'standards.html', require_non_empty=True)
 ide_rel_path = os.path.relpath(IDE_PATH, os.path.dirname(_HERE)).replace(os.sep, '/')
 ide_is_tracked = subprocess.run(
     ['git', 'ls-files', '--error-unmatch', ide_rel_path],
     cwd=os.path.dirname(_HERE), capture_output=True, text=True
 ).returncode == 0
-c_ide = check_html_inline_scripts(IDE_PATH, 'practice_ide.html') if os.path.isfile(IDE_PATH) and ide_is_tracked else 0
-c_idx = check_html_inline_scripts(INDEX_PATH, 'index.html') if os.path.isfile(INDEX_PATH) else 0
-print(f"1. [PASS] node --check passed with 0 syntax errors across {c_acad + c_etalon + c_ide + c_idx} scripts (academy: {c_acad}, etalon: {c_etalon}, IDE: {c_ide}, index: {c_idx})!", flush=True)
+c_ide = check_html_inline_scripts(IDE_PATH, 'practice_ide.html', require_non_empty=True) if os.path.isfile(IDE_PATH) and ide_is_tracked else 0
+c_idx = check_html_inline_scripts(INDEX_PATH, 'index.html', require_non_empty=True) if os.path.isfile(INDEX_PATH) else 0
+print(f'1. [PASS] node --check passed with 0 syntax errors across {c_acad + c_etalon + c_ide + c_idx} scripts (academy: {c_acad}, etalon: {c_etalon}, IDE: {c_ide}, index: {c_idx})!', flush=True)
 
-# 2. Discover Chrome executable across standard installation paths and PATH
+
+# 2. Discover Chrome executable across standard installation paths and PATH, with preflight runnable check
+def _is_chrome_runnable(exe_path: str) -> bool:
+    try:
+        with tempfile.TemporaryDirectory() as td:
+            extra_args = [f'--user-data-dir={td}'] if sys.platform != 'darwin' else []
+            probe = subprocess.run(
+                [
+                    exe_path, '--headless', '--no-sandbox', '--disable-gpu',
+                    '--disable-background-networking', '--no-first-run',
+                    '--no-default-browser-check', '--dump-dom',
+                    *extra_args, 'about:blank'
+                ],
+                capture_output=True, text=True, encoding='utf-8', errors='ignore',
+                timeout=8
+            )
+            return probe.returncode == 0 and '<html' in (probe.stdout or '').lower()
+    except Exception:
+        return False
+
+
 def get_chrome_executable():
     # Check macOS Playwright cache first
     mac_pw = os.path.expanduser('~/Library/Caches/ms-playwright')
     if os.path.isdir(mac_pw):
-        for root, dirs, files in os.walk(mac_pw):
+        for root, _, files in os.walk(mac_pw):
             for f in files:
                 if f == 'Chromium' and 'Chromium.app/Contents/MacOS' in root:
                     pw_exe = os.path.join(root, f)
-                    if os.path.isfile(pw_exe):
+                    if os.path.isfile(pw_exe) and _is_chrome_runnable(pw_exe):
                         return pw_exe
 
     candidates = [
@@ -70,13 +85,14 @@ def get_chrome_executable():
         '/Applications/Chromium.app/Contents/MacOS/Chromium',
     ]
     for c in candidates:
-        if os.path.isfile(c):
+        if os.path.isfile(c) and _is_chrome_runnable(c):
             return c
     for cmd in ('google-chrome', 'chrome', 'chromium'):
         p = shutil.which(cmd)
-        if p:
+        if p and _is_chrome_runnable(p):
             return p
     return None
+
 
 chrome_exe = get_chrome_executable()
 
@@ -91,7 +107,7 @@ if chrome_exe:
     ]
 
     routes = [
-        (base_uri, 'Готовность к 1-му тех-скринингу'),
+        (base_uri, 'Готовность к тех-скринингу'),
         (base_uri + '#/python', 'Матрица Мастерства Python'),
         (base_uri + '#/web', 'Матрица Мастерства Web'),
         (base_uri + '#/backend', 'Матрица Мастерства Backend'),
@@ -104,7 +120,7 @@ if chrome_exe:
         (base_uri + '#/map', 'Матрица'),
         (base_uri + '#/path', 'Python Core'),
         (base_uri + '#/practice', 'Практика кода'),
-        (base_uri + '#/cards', 'Центр 3D Флеш-карточек'),
+        (base_uri + '#/cards', 'Интервальное повторение'),
     ]
 
     def verify_single_route(item):
@@ -120,22 +136,22 @@ if chrome_exe:
                 capture_output=True, text=True, encoding='utf-8', errors='ignore',
                 timeout=60
             )
-            assert c_res.returncode == 0, f"Chrome failed with code {c_res.returncode} on {route}"
+            assert c_res.returncode == 0, f'Chrome failed with code {c_res.returncode} on {route}'
             c_errors = [line for line in c_res.stderr.splitlines() if 'ERROR:CONSOLE' in line or 'Uncaught ' in line]
-            assert not c_errors, f"Console error in Chrome for {route}:\n" + "\n".join(c_errors)
+            assert not c_errors, f'Console error in Chrome for {route}:\n' + '\n'.join(c_errors)
             out = c_res.stdout
             m = re.search(r'<main id="view-root">([\s\S]*?)</main>', out)
             assert m and len(m.group(1).strip()) > 200, f"Empty <main id='view-root'> in Chrome for {route}"
-            assert expected_sub in m.group(1), f"Missing {expected_sub!r} in Chrome DOM for {route}"
-            return f"2. [PASS] Real Headless Chrome rendered {route} (0 console errors, {len(m.group(1))} chars in #view-root)"
+            assert expected_sub in m.group(1), f'Missing {expected_sub!r} in Chrome DOM for {route}'
+            return f'2. [PASS] Real Headless Chrome rendered {route} (0 console errors, {len(m.group(1))} chars in #view-root)'
 
     with ThreadPoolExecutor(max_workers=5) as executor:
         for msg in executor.map(verify_single_route, routes):
             print(msg, flush=True)
 else:
-    print("2. [SKIP] Headless Chrome binary not found on this OS, skipped browser DOM checks.")
+    print('2. [SKIP] Headless Chrome binary not runnable in this environment, skipped browser DOM checks.')
 
-# 3. Verify real Headless Chrome renders standalone IDE trainer (Практика кода — тренажёр с IDE.html)
+# 3. Verify real Headless Chrome renders standalone IDE trainer if present
 if os.path.isfile(IDE_PATH) and chrome_exe:
     ide_uri = Path(IDE_PATH).as_uri()
     try:
@@ -149,22 +165,21 @@ if os.path.isfile(IDE_PATH) and chrome_exe:
             capture_output=True, text=True, encoding='utf-8', errors='ignore',
             timeout=30
         )
-        assert ide_res.returncode == 0, f"Chrome failed on standalone IDE with code {ide_res.returncode}"
+        assert ide_res.returncode == 0, f'Chrome failed on standalone IDE with code {ide_res.returncode}'
         ide_c_errors = [line for line in ide_res.stderr.splitlines() if 'ERROR:CONSOLE' in line or 'Uncaught ' in line]
-        assert not ide_c_errors, f"Console error in Chrome for standalone IDE:\n" + "\n".join(ide_c_errors)
+        assert not ide_c_errors, f'Console error in Chrome for standalone IDE:\n' + '\n'.join(ide_c_errors)
         ide_out = ide_res.stdout
-        assert 'Все уровни' in ide_out and '401' in ide_out, f"Missing 'Все уровни' or '401' in IDE HTML render"
-        assert 'task-grid' in ide_out or 'task-card' in ide_out, "Missing task grid/cards in IDE HTML render"
-        assert 'editorHost' in ide_out or 'CodeMirror' in ide_out, "Missing editor container in IDE HTML render"
-        print(f"3. [PASS] Real Headless Chrome rendered standalone IDE trainer (0 console errors, {len(ide_out)} chars)")
+        assert 'Все уровни' in ide_out and '401' in ide_out, "Missing 'Все уровни' or '401' in IDE HTML render"
+        assert 'task-grid' in ide_out or 'task-card' in ide_out, 'Missing task grid/cards in IDE HTML render'
+        assert 'editorHost' in ide_out or 'CodeMirror' in ide_out, 'Missing editor container in IDE HTML render'
+        print(f'3. [PASS] Real Headless Chrome rendered standalone IDE trainer (0 console errors, {len(ide_out)} chars)')
 
 # 4. Verify academy_backup.zip structure and integrity
-import zipfile
 zip_path = os.path.normpath(os.path.join(_HERE, '..', 'academy_backup.zip'))
 if os.path.isfile(zip_path):
     with zipfile.ZipFile(zip_path, 'r') as zf:
         namelist = zf.namelist()
-        assert len(namelist) >= 545, f"Expected >= 545 files in project zip, got {len(namelist)}"
+        assert len(namelist) >= 545, f'Expected >= 545 files in project zip, got {len(namelist)}'
         required_in_zip = [
             'academy.html',
             'practice_ide.html',
@@ -179,12 +194,8 @@ if os.path.isfile(zip_path):
         ]
         for req in required_in_zip:
             assert req in namelist, f"Missing required file '{req}' inside academy_backup.zip"
-        # Validate nested RemNote zip integrity
         rem_bytes = zf.read('knowledge_base.zip')
-        import io
         with zipfile.ZipFile(io.BytesIO(rem_bytes)) as rzf:
             r_names = rzf.namelist()
-            assert len(r_names) in (525, 526), f"Expected 525 or 526 files inside nested RemNote zip, got {len(r_names)}"
-    print(f"4. [PASS] Project archive academy_backup.zip verified ({len(namelist)} items, nested RemNote 525 items)!")
-
-
+            assert len(r_names) in (525, 526), f'Expected 525 or 526 files inside nested RemNote zip, got {len(r_names)}'
+    print(f'4. [PASS] Project archive academy_backup.zip verified ({len(namelist)} items, nested RemNote 525 items)!')

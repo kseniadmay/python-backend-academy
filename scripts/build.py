@@ -4,15 +4,12 @@
 scripts/build.py
 
 Единый детерминированный конвейер сборки и верификации платформы Python Backend Academy.
-Собирает ассеты, валидирует схемы Pydantic, синхронизирует эталоны и контролирует инварианты.
+Собирает ассеты, валидирует схемы, синхронизирует эталоны и контролирует инварианты.
 """
 
-import hashlib
 import json
 import logging
-import os
 import re
-import shutil
 import sys
 import time
 from pathlib import Path
@@ -25,45 +22,33 @@ if str(_ROOT) not in sys.path:
 if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
+from sync_etalons import sync_canonical_etalons
+
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger('builder')
 
 
-def get_file_hash(path: Path) -> str:
-    h = hashlib.sha256()
-    with open(path, 'rb') as f:
-        while chunk := f.read(65536):
-            h.update(chunk)
-    return h.hexdigest()[:10]
-
-
 def step_validate_schemas() -> bool:
-    """[1/4] Валидация канонических данных контента через Pydantic"""
+    """[1/4] Валидация канонических данных контента"""
     logger.info('[1/4] Проверка целостности данных в data/content/...')
     content_dir = _ROOT / 'data' / 'content'
     required_files = ['manifest.json', 'tasks.json', 'notes.json', 'cards.json']
 
+    loaded = {}
     for rf in required_files:
         p = content_dir / rf
         if not p.is_file():
             logger.error('  ❌ Отсутствует обязательный файл: %s', rf)
             return False
-
-    with open(content_dir / 'manifest.json', 'r', encoding='utf-8') as f:
-        manifest = json.load(f)
-    with open(content_dir / 'tasks.json', 'r', encoding='utf-8') as f:
-        tasks = json.load(f)
-    with open(content_dir / 'notes.json', 'r', encoding='utf-8') as f:
-        notes = json.load(f)
-    with open(content_dir / 'cards.json', 'r', encoding='utf-8') as f:
-        cards = json.load(f)
+        with open(p, 'r', encoding='utf-8') as f:
+            loaded[rf] = json.load(f)
 
     logger.info(
         '  ✓ Схемы валидны: %d модулей, %d задач, %d конспектов, %d колод карточек',
-        len(manifest.get('modules', [])),
-        len(tasks),
-        len(notes),
-        len(cards)
+        len(loaded['manifest.json'].get('modules', [])),
+        len(loaded['tasks.json']),
+        len(loaded['notes.json']),
+        len(loaded['cards.json'])
     )
     return True
 
@@ -109,34 +94,25 @@ def step_bundle_css() -> bool:
 
 
 def step_sync_etalons() -> bool:
-    """[3/4] Синхронизация рабочего SPA из канонического эталона"""
-    academy_html = _ROOT / 'academy.html'
-    standards_html = _ROOT / 'standards' / 'standards.html'
-
+    """[3/4] Синхронизация рабочего SPA из канонического эталона через единый модуль sync_etalons"""
     logger.info('[3/4] Синхронизация рабочего SPA из канонического эталона...')
-    if not standards_html.is_file():
+    try:
+        is_identical, digest, _ = sync_canonical_etalons(_ROOT)
+    except FileNotFoundError:
         logger.error('  ❌ Канонический эталон standards/standards.html не найден')
         return False
 
-    # standards/standards.html — источник истины; academy.html является рабочей копией.
-    shutil.copy2(standards_html, academy_html)
-
-    hash_main = get_file_hash(academy_html)
-    hash_standards = get_file_hash(standards_html)
-
-    if hash_main == hash_standards:
-        logger.info(f'  ✓ 100% побайтовая идентичность эталонов подтверждена (SHA-256: {hash_main})')
+    if is_identical:
+        logger.info(f'  ✓ 100% побайтовая идентичность эталонов подтверждена (SHA-256: {digest})')
         return True
-    else:
-        logger.error('  ❌ Ошибка синхронизации эталонов: хэши не совпадают!')
-        return False
+
+    logger.error('  ❌ Ошибка синхронизации эталонов: хэши не совпадают!')
+    return False
 
 
 def step_preflight_checks() -> bool:
     """[4/4] Контроль критических инвариантов качества"""
     logger.info('[4/4] Контроль инвариантов качества и безопасности...')
-    # 1. Проверка отсутствия запрещенных токенов в коммитах и новых файлах
-    # (инварианты AGENTS.md: Clean Human UI, No Technical IDs)
     frontend_index = _ROOT / 'frontend' / 'index.html'
     if frontend_index.is_file():
         with open(frontend_index, 'r', encoding='utf-8') as f:

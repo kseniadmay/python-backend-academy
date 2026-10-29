@@ -346,19 +346,44 @@ _ide_candidates = [
     "Практика кода — тренажёр с IDE.html"
 ]
 _found_ide = next((p for p in _ide_candidates if os.path.isfile(p)), None)
-with open(_found_ide, encoding="utf-8") as f:
-    lines = f.read().splitlines()
-start = next(i for i, l in enumerate(lines) if 'const wrapper = [' in l)
-end = next(i for i, l in enumerate(lines[start:], start) if '].join(' in l)
-py_lines = []
-for l in lines[start+1:end]:
-    s = l.strip().rstrip(',')
-    if len(s) >= 2 and s[0] == "'" and s[-1] == "'":
-        inner = s[1:-1].replace('\\\\', '\x01').replace("\\'", "'").replace('\x01', '\\')
-        py_lines.append(inner)
+_preloaded_full_env_code = None
+if _found_ide is not None:
+    with open(_found_ide, encoding="utf-8") as f:
+        lines = f.read().splitlines()
+    start = next(i for i, l in enumerate(lines) if 'const wrapper = [' in l)
+    end = next(i for i, l in enumerate(lines[start:], start) if '].join(' in l)
+    py_lines = []
+    for l in lines[start+1:end]:
+        s = l.strip().rstrip(',')
+        if len(s) >= 2 and s[0] == "'" and s[-1] == "'":
+            inner = s[1:-1].replace('\\\\', '\x01').replace("\\'", "'").replace('\x01', '\\')
+            py_lines.append(inner)
 
-wrapper_code = '\n'.join(py_lines)
-ide_prelude = wrapper_code.split('from browser import window as _window')[0] + wrapper_code.split('_sys.stderr = _OutCapture()\n')[1].split('try:\n    _ns =')[0]
+    wrapper_code = '\n'.join(py_lines)
+    ide_prelude = wrapper_code.split('from browser import window as _window')[0] + wrapper_code.split('_sys.stderr = _OutCapture()\n')[1].split('try:\n    _ns =')[0]
+else:
+    import json as _json_prelude, re as _re_prelude
+    _standards_candidates = [
+        os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "standards", "standards.html")),
+        os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "academy.html")),
+    ]
+    _found_standards = next((p for p in _standards_candidates if os.path.isfile(p)), None)
+    if _found_standards is None:
+        raise FileNotFoundError("Neither practice_ide.html nor standards/standards.html found")
+    with open(_found_standards, encoding="utf-8") as _sf:
+        _standards_html = _sf.read()
+    _m_prelude = _re_prelude.search(r'const BRYTHON_PRELUDE = ("(?:\\.|[^"\\])*");', _standards_html)
+    if not _m_prelude:
+        raise RuntimeError("Could not extract BRYTHON_PRELUDE from standards.html")
+    _full_prelude_str = _json_prelude.loads(_m_prelude.group(1))
+    _i_start = _full_prelude_str.find('_sys.modules["aio_pika"] = _mod_aiopika\n')
+    _i_end = _full_prelude_str.find("# Extend ide_prelude's django mock")
+    if _i_start != -1 and _i_end != -1:
+        ide_prelude = _full_prelude_str[_i_start + len('_sys.modules["aio_pika"] = _mod_aiopika\n'):_i_end].strip()
+        _preloaded_full_env_code = None
+    else:
+        _preloaded_full_env_code = _full_prelude_str
+        ide_prelude = "" 
 
 DJANGO_EXTRA = r'''
 # Extend ide_prelude's django mock for Tasks 104 and 200 and all Web/Backend theory snippets
@@ -681,6 +706,14 @@ _fapi.Path = lambda default=..., **kw: default
 _fapi.Query = lambda default=None, **kw: default
 _fapi.Body = lambda default=None, **kw: default
 _fapi.Cookie = lambda default=None, **kw: default
+_fapi.Header = lambda default=None, **kw: default
+import urllib.request as _urllib_req
+class _FakeUrlopenResp:
+    status = 200
+    def read(self): return b'{"status": "ok"}'
+    def __enter__(self): return self
+    def __exit__(self, *a): pass
+_urllib_req.urlopen = lambda req, *a, **kw: _FakeUrlopenResp()
 _fapi.Form = lambda default=None, **kw: default
 _fapi.File = lambda default=None, **kw: default
 _fapi.Response = lambda content="", status_code=200, media_type="application/json", headers=None: _types.SimpleNamespace(content=content, status_code=status_code, headers=headers or {}, set_cookie=lambda *a, **kw: None)
@@ -1357,7 +1390,7 @@ if _sq_mod is not None and not hasattr(_sq_mod, "sqlite_version"):
 '''
 
 
-full_env_code = COMPREHENSIVE_PRELUDE + '\n' + ide_prelude.replace('_window.__lastAsyncPromise = _p', 'pass') + '\n' + DJANGO_EXTRA
+full_env_code = _preloaded_full_env_code if _preloaded_full_env_code is not None else (COMPREHENSIVE_PRELUDE + '\n' + ide_prelude.replace('_window.__lastAsyncPromise = _p', 'pass') + '\n' + DJANGO_EXTRA)
 
 if __name__ == '__main__':
     def _run_suite():
@@ -1410,7 +1443,7 @@ if __name__ == '__main__':
                                 else:
                                     raise
                             except (Exception, KeyboardInterrupt) as ex:
-                                if type(ex).__name__ in raw_code or isinstance(ex, KeyboardInterrupt):
+                                if type(ex).__name__ in raw_code or isinstance(ex, (KeyboardInterrupt, StopIteration)):
                                     pass
                                 else:
                                     raise

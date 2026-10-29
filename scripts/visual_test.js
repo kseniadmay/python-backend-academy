@@ -231,7 +231,7 @@ function diffShots(pm, pngjs, currentPath, baselinePath, diffPath) {
 }
 
 // ---------------------------------------------------------------- основной прогон
-(async () => {
+async function runVisualSuite() {
   const { pw, pm, pngjs } = ensureDeps();
   const { chromium } = pw;
   fs.mkdirSync(OUT_DIR, { recursive: true });
@@ -493,4 +493,10 @@ function diffShots(pm, pngjs, currentPath, baselinePath, diffPath) {
   console.log(`\n[visual] Итог: ${passed}/${results.length} PASS, ${failures} FAIL. Отчёт: scripts/visual_report/report.md`);
   if (UPDATE) console.log('[visual] Эталоны обновлены. Закоммитьте scripts/visual_baselines/.');
   process.exit(failures ? 1 : 0);
-})().catch(e => { console.error('[visual] Сбой прогона:', e); process.exit(1); });
+}
+
+if (require.main === module) {
+  runVisualSuite().catch(e => { console.error('[visual] Сбой прогона:', e); process.exit(1); });
+}
+
+module.exports = { DEPS_DIR, resolveDep, ensureDeps, findBrowser, VIEWPORTS, runVisualSuite };

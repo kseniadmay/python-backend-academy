@@ -1,6 +1,6 @@
 from typing import Optional
-from fastapi import APIRouter, Header, HTTPException, Response, status
-from backend.app.core.security import verify_sync_token
+from fastapi import APIRouter, Depends, Response
+from backend.app.core.security import require_sync_auth
 from backend.app.schemas.progress import SyncPullResponse, SyncPushRequest, SyncPushResponse
 from backend.app.services.sync_service import sync_service
 
@@ -9,17 +9,11 @@ router = APIRouter(prefix='/sync', tags=['Sync'])
 
 @router.get('', response_model=SyncPullResponse)
 def pull_progress(
-    authorization: Optional[str] = Header(None)
+    _auth: Optional[str] = Depends(require_sync_auth)
 ) -> SyncPullResponse:
     """
     Получение актуального прогресса пользователя из хранилища.
     """
-    if not verify_sync_token(authorization):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Unauthorized: invalid sync token'
-        )
-
     record = sync_service.read_sync_record()
     if not record:
         return SyncPullResponse(ok=True, updatedAt=0, device=None, bundle=None)
@@ -36,17 +30,11 @@ def pull_progress(
 def push_progress(
     payload: SyncPushRequest,
     response: Response,
-    authorization: Optional[str] = Header(None)
+    _auth: Optional[str] = Depends(require_sync_auth)
 ) -> SyncPushResponse:
     """
     Сохранение прогресса с устройства с защитой от потерянных обновлений.
     """
-    if not verify_sync_token(authorization):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Unauthorized: invalid sync token'
-        )
-
     success, result_data, http_status = sync_service.process_push(payload)
     response.status_code = http_status
 

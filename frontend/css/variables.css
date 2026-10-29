@@ -1,8 +1,9 @@
 /* ==========================================================================
-   Academy Theme Variables: 60/30/10 Light & Evening Obsidian Dark
+   Academy Theme Variables: 60/30/10 Light & Evening Obsidian Dark (DRY)
    ========================================================================== */
 
-:root, :root[data-theme="light"] {
+:root,
+:root[data-theme="light"] {
   --paper: #faf8f5;
   --surface: rgba(255, 255, 255, 0.88);
   --surface-2: rgba(15, 23, 42, 0.045);
@@ -11,91 +12,104 @@
   --ink-muted: #475569;
   --line: rgba(0, 0, 0, 0.07);
   --line-soft: rgba(0, 0, 0, 0.045);
-  --hairline-light: rgba(0, 0, 0, 0.07);
-  
+
   --emerald: #145a46;
   --emerald-soft: rgba(20, 90, 70, 0.10);
   --amber: #d97706;
   --amber-soft: rgba(217, 119, 6, 0.11);
   --bordeaux: #6b1d2f;
   --bordeaux-soft: rgba(107, 29, 47, 0.09);
-  
-  --moss: #145a46;
+
   --moss-deep: #0f4536;
-  --moss-soft: rgba(20, 90, 70, 0.10);
-  --clay: #d97706;
   --clay-deep: #92400e;
-  --clay-soft: rgba(217, 119, 6, 0.11);
-  
+
   --shadow-1: 0 10px 30px -10px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
-  --glass-border: rgba(0, 0, 0, 0.07);
   --orb-burgundy: rgba(107, 29, 47, 0.07);
   --orb-emerald: rgba(20, 90, 70, 0.07);
+
+  /* Семантические алиасы (DRY: ссылаются на базовые токены без дублирования значений) */
+  --hairline-light: var(--line);
+  --glass-border: var(--line);
+  --moss: var(--emerald);
+  --moss-soft: var(--emerald-soft);
+  --clay: var(--amber);
+  --clay-soft: var(--amber-soft);
 
   --font-d: 'Onest', 'Golos Text', sans-serif;
   --font-b: 'Onest', 'Golos Text', sans-serif;
   --font-m: 'JetBrains Mono', monospace;
   --tabbar-h: 68px;
+
+  /* Палитра «Вечерний Обсидиан» (определена однократно как источник для dark-режимов) */
+  --dark-paper: #0d1016;
+  --dark-surface: rgba(22, 27, 36, 0.74);
+  --dark-surface-2: rgba(30, 37, 49, 0.66);
+  --dark-ink: #f8fafc;
+  --dark-ink-soft: #cbd5e1;
+  --dark-ink-muted: #94a3b8;
+  --dark-line: rgba(255, 255, 255, 0.09);
+  --dark-line-soft: rgba(255, 255, 255, 0.05);
+  --dark-emerald: #10b981;
+  --dark-emerald-soft: rgba(16, 185, 129, 0.16);
+  --dark-amber: #f59e0b;
+  --dark-amber-soft: rgba(245, 158, 11, 0.16);
+  --dark-bordeaux: #fb7185;
+  --dark-bordeaux-soft: rgba(190, 18, 60, 0.22);
+  --dark-moss-deep: #6ee7b7;
+  --dark-moss-soft: rgba(16, 185, 129, 0.18);
+  --dark-clay-deep: #fde68a;
+  --dark-shadow-1: 0 16px 40px -12px rgba(0, 0, 0, 0.55);
+  --dark-glass-border: rgba(255, 255, 255, 0.10);
+  --dark-orb-burgundy: rgba(190, 18, 60, 0.24);
+  --dark-orb-emerald: rgba(16, 185, 129, 0.20);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #0d1016;
-    --surface: rgba(22, 27, 36, 0.74);
-    --surface-2: rgba(30, 37, 49, 0.66);
-    --ink: #f8fafc;
-    --ink-soft: #cbd5e1;
-    --ink-muted: #94a3b8;
-    --line: rgba(255, 255, 255, 0.09);
-    --line-soft: rgba(255, 255, 255, 0.05);
-    
-    --emerald: #10b981;
-    --emerald-soft: rgba(16, 185, 129, 0.16);
-    --amber: #f59e0b;
-    --amber-soft: rgba(245, 158, 11, 0.16);
-    --bordeaux: #fb7185;
-    --bordeaux-soft: rgba(190, 18, 60, 0.22);
-    
-    --moss: #10b981;
-    --moss-deep: #6ee7b7;
-    --moss-soft: rgba(16, 185, 129, 0.18);
-    --clay: #f59e0b;
-    --clay-deep: #fde68a;
-    --clay-soft: rgba(245, 158, 11, 0.16);
-    
-    --shadow-1: 0 16px 40px -12px rgba(0, 0, 0, 0.55);
-    --glass-border: rgba(255, 255, 255, 0.10);
-    --orb-burgundy: rgba(190, 18, 60, 0.24);
-    --orb-emerald: rgba(16, 185, 129, 0.20);
+    --paper: var(--dark-paper);
+    --surface: var(--dark-surface);
+    --surface-2: var(--dark-surface-2);
+    --ink: var(--dark-ink);
+    --ink-soft: var(--dark-ink-soft);
+    --ink-muted: var(--dark-ink-muted);
+    --line: var(--dark-line);
+    --line-soft: var(--dark-line-soft);
+    --emerald: var(--dark-emerald);
+    --emerald-soft: var(--dark-emerald-soft);
+    --amber: var(--dark-amber);
+    --amber-soft: var(--dark-amber-soft);
+    --bordeaux: var(--dark-bordeaux);
+    --bordeaux-soft: var(--dark-bordeaux-soft);
+    --moss-deep: var(--dark-moss-deep);
+    --moss-soft: var(--dark-moss-soft);
+    --clay-deep: var(--dark-clay-deep);
+    --shadow-1: var(--dark-shadow-1);
+    --glass-border: var(--dark-glass-border);
+    --orb-burgundy: var(--dark-orb-burgundy);
+    --orb-emerald: var(--dark-orb-emerald);
   }
 }
 
 :root[data-theme="dark"] {
-  --paper: #0d1016;
-  --surface: rgba(22, 27, 36, 0.74);
-  --surface-2: rgba(30, 37, 49, 0.66);
-  --ink: #f8fafc;
-  --ink-soft: #cbd5e1;
-  --ink-muted: #94a3b8;
-  --line: rgba(255, 255, 255, 0.09);
-  --line-soft: rgba(255, 255, 255, 0.05);
-  
-  --emerald: #10b981;
-  --emerald-soft: rgba(16, 185, 129, 0.16);
-  --amber: #f59e0b;
-  --amber-soft: rgba(245, 158, 11, 0.16);
-  --bordeaux: #fb7185;
-  --bordeaux-soft: rgba(190, 18, 60, 0.22);
-  
-  --moss: #10b981;
-  --moss-deep: #6ee7b7;
-  --moss-soft: rgba(16, 185, 129, 0.18);
-  --clay: #f59e0b;
-  --clay-deep: #fde68a;
-  --clay-soft: rgba(245, 158, 11, 0.16);
-  
-  --shadow-1: 0 16px 40px -12px rgba(0, 0, 0, 0.55);
-  --glass-border: rgba(255, 255, 255, 0.10);
-  --orb-burgundy: rgba(190, 18, 60, 0.24);
-  --orb-emerald: rgba(16, 185, 129, 0.20);
+  --paper: var(--dark-paper);
+  --surface: var(--dark-surface);
+  --surface-2: var(--dark-surface-2);
+  --ink: var(--dark-ink);
+  --ink-soft: var(--dark-ink-soft);
+  --ink-muted: var(--dark-ink-muted);
+  --line: var(--dark-line);
+  --line-soft: var(--dark-line-soft);
+  --emerald: var(--dark-emerald);
+  --emerald-soft: var(--dark-emerald-soft);
+  --amber: var(--dark-amber);
+  --amber-soft: var(--dark-amber-soft);
+  --bordeaux: var(--dark-bordeaux);
+  --bordeaux-soft: var(--dark-bordeaux-soft);
+  --moss-deep: var(--dark-moss-deep);
+  --moss-soft: var(--dark-moss-soft);
+  --clay-deep: var(--dark-clay-deep);
+  --shadow-1: var(--dark-shadow-1);
+  --glass-border: var(--dark-glass-border);
+  --orb-burgundy: var(--dark-orb-burgundy);
+  --orb-emerald: var(--dark-orb-emerald);
 }

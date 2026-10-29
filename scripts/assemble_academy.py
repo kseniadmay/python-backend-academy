@@ -16,18 +16,7 @@ _CLOUD_DIR = r'C:\Users\fury6\OneDrive\Python_Backend_Academy'
 _UNPACKED_ROOT = os.path.normpath(os.path.join(_HERE, '..'))
 CANONICAL_STANDARDS_PATH = os.path.join(_UNPACKED_ROOT, 'standards', 'standards.html')
 _IS_UNPACKED_ARCHIVE = os.path.isdir(os.path.join(_UNPACKED_ROOT, 'knowledge_base'))
-if os.path.isfile(IDE_HTML_PATH):
-    from test_all_401_tasks import full_env_code
-else:
-    with open(CANONICAL_STANDARDS_PATH, encoding='utf-8') as f:
-        _existing_academy_html = f.read()
-    _prelude_match = re.search(
-        r'const BRYTHON_PRELUDE = ("(?:\\.|[^"\\])*");',
-        _existing_academy_html,
-    )
-    if not _prelude_match:
-        raise RuntimeError('Could not load the Python runtime from academy.html')
-    full_env_code = json.loads(_prelude_match.group(1))
+from test_all_401_tasks import full_env_code
 
 ORIG_HTML_PATH = os.path.join(_HERE, 'academy.orig.html')
 _TG_DIR = r'C:\Users\fury6\Downloads\Telegram Desktop'
@@ -15470,17 +15459,12 @@ if os.path.exists(SCRATCH_CONTEXT_PATH):
         context_doc = f.read()
     target_paths = [
         SCRATCH_CONTEXT_PATH,
-        SCRATCH_HANDOVER_PATH,
         OUT_PROJECT_CONTEXT_PATH,
-        HANDOVER_MD_PATH,
     ]
     if os.path.isdir(_CLOUD_DIR):
-        target_paths.extend([CLOUD_HANDOVER_PATH, CLOUD_CONTEXT_PATH])
+        target_paths.append(CLOUD_CONTEXT_PATH)
     if _IS_UNPACKED_ARCHIVE:
-        target_paths.extend([
-            os.path.join(_UNPACKED_ROOT, 'HANDOVER_CONTEXT.md'),
-            os.path.join(_UNPACKED_ROOT, 'PROJECT_CONTEXT.md'),
-        ])
+        target_paths.append(os.path.join(_UNPACKED_ROOT, 'PROJECT_CONTEXT.md'))
     for target_path in dict.fromkeys(os.path.abspath(p) for p in target_paths):
         with open(target_path, 'w', encoding='utf-8', newline='\n') as f:
             f.write(context_doc)

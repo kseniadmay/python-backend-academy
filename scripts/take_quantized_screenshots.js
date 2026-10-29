@@ -1,27 +1,17 @@
+'use strict';
 const path = require('path');
 const fs = require('fs');
-const os = require('os');
-
-const DEPS_DIR = path.join(process.env.LOCALAPPDATA || path.join(os.homedir(), '.pba-visual-deps'), 'pba-visual-deps');
-
-function resolveDep(name) {
-  try { return require(name); } catch (e) {}
-  const candidates = [
-    path.join(DEPS_DIR, 'node_modules', name),
-    path.join(os.homedir(), '.pba-visual-deps', 'node_modules', name),
-    path.join(os.homedir(), '.pba-visual-deps', 'pba-visual-deps', 'node_modules', name)
-  ];
-  for (const p of candidates) {
-    if (fs.existsSync(p)) return require(p);
-  }
-  return null;
-}
-
-const { chromium } = resolveDep('playwright-core');
+const { resolveDep, findBrowser, VIEWPORTS } = require('./visual_test');
 
 async function capture() {
+  const pw = resolveDep('playwright-core');
+  if (!pw) {
+    throw new Error('playwright-core is not installed');
+  }
+  const { chromium } = pw;
+
   const browser = await chromium.launch({
-    executablePath: '/Users/fury/Library/Caches/ms-playwright/chromium-1148/chrome-mac/Chromium.app/Contents/MacOS/Chromium',
+    executablePath: findBrowser(),
     headless: true
   });
 
@@ -31,11 +21,7 @@ async function capture() {
   const htmlUrl = 'file://' + path.resolve(__dirname, '..', 'academy.html') + '#/python/skill/1.9.1';
 
   // 1. Mobile viewport (390x844 - iPhone 14)
-  const mobileContext = await browser.newContext({
-    viewport: { width: 390, height: 844 },
-    deviceScaleFactor: 2,
-    isMobile: true
-  });
+  const mobileContext = await browser.newContext(VIEWPORTS.mobile);
   const mobilePage = await mobileContext.newPage();
   await mobilePage.goto(htmlUrl, { waitUntil: 'networkidle' });
   await mobilePage.waitForTimeout(1000);
@@ -45,10 +31,7 @@ async function capture() {
   console.log('Saved mobile screenshot:', mobPath1);
 
   // 2. Desktop viewport (1440x900)
-  const desktopContext = await browser.newContext({
-    viewport: { width: 1440, height: 900 },
-    deviceScaleFactor: 2
-  });
+  const desktopContext = await browser.newContext(VIEWPORTS.desktop);
   const desktopPage = await desktopContext.newPage();
   await desktopPage.goto(htmlUrl, { waitUntil: 'networkidle' });
   await desktopPage.waitForTimeout(1000);
@@ -71,7 +54,11 @@ async function capture() {
   await browser.close();
 }
 
-capture().catch(err => {
-  console.error('Capture error:', err);
-  process.exit(1);
-});
+if (require.main === module) {
+  capture().catch(err => {
+    console.error('Capture error:', err);
+    process.exit(1);
+  });
+}
+
+module.exports = { capture };

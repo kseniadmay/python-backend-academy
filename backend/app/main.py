@@ -1,4 +1,3 @@
-import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import AsyncGenerator
@@ -6,7 +5,6 @@ from typing import AsyncGenerator
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response
-from fastapi.staticfiles import StaticFiles
 
 from backend.app.api.legacy_compat import legacy_router
 from backend.app.api.v1.router import api_v1_router
@@ -51,14 +49,28 @@ NO_STORE_HEADERS = {
     'Surrogate-Control': 'no-store',
 }
 
+STATIC_MEDIA_TYPES = {
+    '.js': 'application/javascript; charset=utf-8',
+    '.css': 'text/css; charset=utf-8',
+    '.json': 'application/json; charset=utf-8',
+    '.svg': 'image/svg+xml',
+    '.html': 'text/html; charset=utf-8',
+}
+
+
+def _serve_spa_entry(root_dir: Path) -> FileResponse:
+    return FileResponse(
+        root_dir / 'academy.html',
+        media_type='text/html; charset=utf-8',
+        headers=NO_STORE_HEADERS
+    )
+
 
 @app.middleware('http')
 async def add_no_store_headers(request: Request, call_next):
     response = await call_next(request)
-    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0'
-    response.headers['Pragma'] = 'no-cache'
-    response.headers['Expires'] = '0'
-    response.headers['Surrogate-Control'] = 'no-store'
+    for key, val in NO_STORE_HEADERS.items():
+        response.headers[key] = val
     return response
 
 
@@ -75,11 +87,7 @@ async def serve_spa_or_static(full_path: str, request: Request) -> Response:
     # Очистка пути от параметров и относительных обходов
     clean_path = full_path.strip().lstrip('/')
     if not clean_path or clean_path in ('index.html', 'academy.html'):
-        return FileResponse(
-            root_dir / 'academy.html',
-            media_type='text/html; charset=utf-8',
-            headers=NO_STORE_HEADERS
-        )
+        return _serve_spa_entry(root_dir)
 
     target_file = root_dir / clean_path
 
@@ -87,34 +95,16 @@ async def serve_spa_or_static(full_path: str, request: Request) -> Response:
     try:
         resolved_file = target_file.resolve()
         if not str(resolved_file).startswith(str(root_dir.resolve())):
-            return FileResponse(root_dir / 'academy.html', media_type='text/html; charset=utf-8', headers=NO_STORE_HEADERS)
+            return _serve_spa_entry(root_dir)
     except Exception:
-        return FileResponse(root_dir / 'academy.html', media_type='text/html; charset=utf-8', headers=NO_STORE_HEADERS)
+        return _serve_spa_entry(root_dir)
 
     if resolved_file.is_file():
-        # Специфические MIME-типы для PWA и ассетов
-        media_type = None
-        suffix = resolved_file.suffix.lower()
-        if suffix == '.js':
-            media_type = 'application/javascript; charset=utf-8'
-        elif suffix == '.css':
-            media_type = 'text/css; charset=utf-8'
-        elif suffix == '.json':
-            media_type = 'application/json; charset=utf-8'
-        elif suffix == '.svg':
-            media_type = 'image/svg+xml'
-        elif suffix == '.html':
-            media_type = 'text/html; charset=utf-8'
-
+        media_type = STATIC_MEDIA_TYPES.get(resolved_file.suffix.lower())
         return FileResponse(
             resolved_file,
             media_type=media_type,
             headers=NO_STORE_HEADERS
         )
 
-    # SPA Fallback для роутов
-    return FileResponse(
-        root_dir / 'academy.html',
-        media_type='text/html; charset=utf-8',
-        headers=NO_STORE_HEADERS
-    )
+    return _serve_spa_entry(root_dir)
