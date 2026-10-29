@@ -15311,7 +15311,7 @@ async function progressSyncRequest(method, payload){
   const response = await fetch(PROGRESS_SYNC_ENDPOINT, {
     method,
     headers: Object.assign(method === 'POST' ? {'Content-Type':'application/json'} : {}, token ? {Authorization:'Bearer ' + token} : {}),
-    cache: 'no-store',
+    cache: 'no-cache',
     body: method === 'POST' ? JSON.stringify(payload) : undefined
   });
   const data = await response.json();

@@ -129,7 +129,7 @@ function sendJson(res, statusCode, payload, extraHeaders = {}) {
     const body = JSON.stringify(payload);
     res.writeHead(statusCode, {
         'Content-Type': 'application/json; charset=utf-8',
-        'Cache-Control': 'no-store',
+        'Cache-Control': 'no-cache, must-revalidate',
         ...extraHeaders
     });
     res.end(body);
@@ -357,18 +357,18 @@ const server = http.createServer((req, res) => {
         const syncFile = path.join(dataDir, 'progress_sync.json');
 
         if (!syncAuthorized(req)) {
-            res.writeHead(401, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
+            res.writeHead(401, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-cache, must-revalidate' });
             res.end(JSON.stringify({ ok: false, error: 'Unauthorized' }));
             return;
         }
 
         if (req.method === 'GET') {
             readSyncRecord(syncFile).then(stored => {
-                res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
+                res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-cache, must-revalidate' });
                 res.end(JSON.stringify({ ok: true, updatedAt: stored ? stored.updatedAt : 0, device: stored ? stored.device : null, bundle: stored ? stored.bundle : null }));
             }).catch(err => {
                 console.error('[Sync] GET failed:', err.message);
-                res.writeHead(503, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
+                res.writeHead(503, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-cache, must-revalidate' });
                 res.end(JSON.stringify({ ok: false, error: 'Sync storage unavailable' }));
             });
             return;
@@ -396,7 +396,7 @@ const server = http.createServer((req, res) => {
                     const storedClientId = stored && String(stored.clientId || stored.device || '');
                     const staleLocalWrite = stored && storedClientId && storedClientId !== clientId && stored.updatedAt > baseUpdatedAt + SYNC_DEVICE_TTL_MS;
                     if (staleLocalWrite) {
-                        res.writeHead(409, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
+                        res.writeHead(409, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-cache, must-revalidate' });
                         res.end(JSON.stringify({ ok: false, conflict: true, updatedAt: stored.updatedAt, device: stored.device, bundle: stored.bundle }));
                         console.log(`[!] [Sync] Конфликт устройств (${payload.device} vs ${stored.device}) — отправлен запрос на повторное слияние`);
                         return;
@@ -430,7 +430,7 @@ const server = http.createServer((req, res) => {
     }
 
     if (reqUrl === '/practice_ide.html') {
-        res.writeHead(302, { Location: '/academy.html#/practice', 'Cache-Control': 'no-store' });
+        res.writeHead(302, { Location: '/academy.html#/practice', 'Cache-Control': 'no-cache, must-revalidate' });
         res.end();
         return;
     }
@@ -461,10 +461,9 @@ const server = http.createServer((req, res) => {
         res.writeHead(200, {
             'Content-Type': contentType,
             'Content-Length': stat.size,
-            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+            'Cache-Control': 'no-cache, must-revalidate, max-age=0',
             'Pragma': 'no-cache',
             'Expires': '0',
-            'Surrogate-Control': 'no-store',
             'Access-Control-Allow-Origin': '*'
         });
 
