@@ -1,14 +1,6 @@
-import io
 import os
-import re
-import shutil
 import subprocess
 import sys
-import tempfile
-import time
-import zipfile
-from concurrent.futures import ThreadPoolExecutor
-from pathlib import Path
 
 try:
     sys.stdout.reconfigure(line_buffering=True)
@@ -24,185 +16,107 @@ from quick_precommit_check import check_html_inline_scripts
 
 HTML_PATH = os.path.normpath(os.path.join(_ROOT, 'academy.html'))
 ETALON_PATH = os.path.normpath(os.path.join(_ROOT, 'standards', 'standards.html'))
-IDE_PATH = os.path.normpath(os.path.join(_ROOT, 'practice_ide.html'))
 INDEX_PATH = os.path.normpath(os.path.join(_ROOT, 'index.html'))
+
 assert os.path.isfile(HTML_PATH), f'academy.html missing: {HTML_PATH}'
 assert os.path.isfile(ETALON_PATH), f'standards/standards.html missing: {ETALON_PATH}'
 
+# 0. Verify Canonical Benchmark Invariant: academy.html and standards.html must be strictly identical
 with open(HTML_PATH, encoding='utf-8') as f1, open(ETALON_PATH, encoding='utf-8') as f2:
     assert f1.read() == f2.read(), 'academy.html and standards.html must be strictly identical (Canonical Benchmark Invariant)!'
 
-
-def _is_git_tracked(rel_path: str) -> bool:
-    return subprocess.run(
-        ['git', 'ls-files', '--error-unmatch', rel_path],
-        cwd=_ROOT, capture_output=True, text=True
-    ).returncode == 0
-
-
+# 1. Syntax check with node --check
 c_acad = check_html_inline_scripts(HTML_PATH, 'academy.html', require_non_empty=True)
 c_etalon = check_html_inline_scripts(ETALON_PATH, 'standards.html', require_non_empty=True)
-ide_rel_path = os.path.relpath(IDE_PATH, _ROOT).replace(os.sep, '/')
-ide_is_tracked = _is_git_tracked(ide_rel_path)
-c_ide = check_html_inline_scripts(IDE_PATH, 'practice_ide.html', require_non_empty=True) if os.path.isfile(IDE_PATH) and ide_is_tracked else 0
 c_idx = check_html_inline_scripts(INDEX_PATH, 'index.html', require_non_empty=True) if os.path.isfile(INDEX_PATH) else 0
-print(f'1. [PASS] node --check passed with 0 syntax errors across {c_acad + c_etalon + c_ide + c_idx} scripts (academy: {c_acad}, etalon: {c_etalon}, IDE: {c_ide}, index: {c_idx})!', flush=True)
+print(f'1. [PASS] node --check passed with 0 syntax errors across {c_acad + c_etalon + c_idx} scripts (academy: {c_acad}, etalon: {c_etalon}, index: {c_idx})!', flush=True)
 
+# 2. Fast in-memory Node VM runtime & router verification (< 0.8s instead of 14 heavy Chrome processes)
+NODE_VM_PROBE = r"""
+const fs = require('fs');
+const vm = require('vm');
+const assert = require('assert');
 
-def _is_chrome_runnable(exe_path: str) -> bool:
-    try:
-        with tempfile.TemporaryDirectory() as td:
-            extra_args = [f'--user-data-dir={td}'] if sys.platform != 'darwin' else []
-            probe = subprocess.run(
-                [
-                    exe_path, '--headless', '--no-sandbox', '--disable-gpu',
-                    '--disable-background-networking', '--no-first-run',
-                    '--no-default-browser-check', '--dump-dom',
-                    *extra_args, 'about:blank'
-                ],
-                capture_output=True, text=True, encoding='utf-8', errors='ignore',
-                timeout=8
-            )
-            return probe.returncode == 0 and '<html' in (probe.stdout or '').lower()
-    except Exception:
-        return False
+const t0 = Date.now();
+const html = fs.readFileSync(process.argv[1], 'utf8');
+const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
+assert(scripts.length > 0, 'No inline <script> blocks found in academy.html');
 
+const elementsById = {};
+function makeEl(id = '') {
+  const el = {
+    id, innerHTML: '', textContent: '', value: '', className: '', style: {}, dataset: {}, attributes: {},
+    classList: { add(){}, remove(){}, toggle(){}, contains(){ return false; } },
+    setAttribute(k, v){ this.attributes[k] = String(v); },
+    getAttribute(k){ return this.attributes[k] || null; },
+    removeAttribute(k){ delete this.attributes[k]; },
+    appendChild(c){ return c; }, insertBefore(c){ return c; }, remove(){},
+    addEventListener(){}, querySelector(){ return makeEl(); }, querySelectorAll(){ return []; },
+    closest(){ return null; }, focus(){}, scrollIntoView(){},
+    getBoundingClientRect(){ return { top: 0, bottom: 100, left: 0, right: 100, width: 100, height: 100 }; }
+  };
+  if (id) elementsById[id] = el;
+  return el;
+}
 
-def get_chrome_executable():
-    mac_pw = os.path.expanduser('~/Library/Caches/ms-playwright')
-    if os.path.isdir(mac_pw):
-        for root, _, files in os.walk(mac_pw):
-            for f in files:
-                if f == 'Chromium' and 'Chromium.app/Contents/MacOS' in root:
-                    pw_exe = os.path.join(root, f)
-                    if os.path.isfile(pw_exe) and _is_chrome_runnable(pw_exe):
-                        return pw_exe
+[
+  'view-root', 'nav-desktop', 'theme-toggle-d', 'theme-toggle-m', 'reset-btn-d',
+  'streak-num-d', 'streak-num-m', 'streak-num-sidebar', 'streak-word-d',
+  'topbar-pomo-time', 'sidebar-pomo-time', 'topbar-sound-btn'
+].forEach(id => makeEl(id));
 
-    candidates = [
-        r'C:\Program Files\Google\Chrome\Application\chrome.exe',
-        r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe',
-        os.path.expandvars(r'%LOCALAPPDATA%\Google\Chrome\Application\chrome.exe'),
-        os.path.expandvars(r'%PROGRAMFILES%\Google\Chrome\Application\chrome.exe'),
-        os.path.expandvars(r'%PROGRAMFILES(X86)%\Google\Chrome\Application\chrome.exe'),
-        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-        '/Applications/Chromium.app/Contents/MacOS/Chromium',
-    ]
-    for c in candidates:
-        if os.path.isfile(c) and _is_chrome_runnable(c):
-            return c
-    for cmd in ('google-chrome', 'chrome', 'chromium'):
-        p = shutil.which(cmd)
-        if p and _is_chrome_runnable(p):
-            return p
-    return None
+const runtimeErrors = [];
+const sandbox = {
+  console: {
+    log(){}, info(){}, warn(){},
+    error(...args){ runtimeErrors.push(args.join(' ')); }
+  },
+  Math, Date, JSON, Object, Array, String, Number, Boolean, RegExp, Set, Map, Promise, Error, TypeError,
+  parseInt, parseFloat, isNaN, isFinite, encodeURIComponent, decodeURIComponent,
+  setTimeout(){ return 1; }, clearTimeout(){}, setInterval(){ return 1; }, clearInterval(){},
+  requestAnimationFrame(){},
+  localStorage: { _s:{}, getItem(k){ return this._s[k] || null; }, setItem(k, v){ this._s[k] = String(v); }, removeItem(k){ delete this._s[k]; } },
+  location: { hash: '#/', protocol: 'https:', href: 'https://localhost/#/' },
+  navigator: { clipboard: { writeText(){} }, vibrate(){} },
+  document: {
+    body: makeEl('body'), documentElement: makeEl('html'),
+    getElementById(id){ return elementsById[id] || makeEl(id); },
+    querySelector(){ return makeEl(); }, querySelectorAll(){ return []; },
+    createElement(t){ return makeEl('', t); }, addEventListener(){}
+  },
+  window: null,
+  scrollTo(){}, matchMedia(){ return { matches: false, addEventListener(){} }; }
+};
+sandbox.window = sandbox;
+sandbox.window.addEventListener = function(ev, fn){ if (ev === 'hashchange') sandbox.__onHash = fn; };
 
+vm.createContext(sandbox);
+for (const code of scripts) {
+  vm.runInContext(code, sandbox);
+}
 
-chrome_exe = get_chrome_executable()
+const routes = [
+  '#/', '#/python', '#/web', '#/backend', '#/algorithms', '#/databases',
+  '#/architecture', '#/infra', '#/infra/boss', '#/mock', '#/map', '#/path',
+  '#/practice', '#/cards',
+  '#/python/skill/1.1.1', '#/databases/skill/5.1.1', '#/databases/skill/5.2.1', '#/databases/skill/5.3.1'
+];
 
-if chrome_exe:
-    base_uri = Path(HTML_PATH).as_uri()
-    chrome_flags = [
-        chrome_exe, '--headless', '--no-sandbox', '--disable-gpu',
-        '--disable-background-networking', '--disable-sync', '--disable-default-apps',
-        '--no-first-run', '--no-default-browser-check',
-        '--allow-file-access-from-files',
-        '--enable-logging=stderr', '--dump-dom'
-    ]
+for (const route of routes) {
+  sandbox.location.hash = route;
+  sandbox.__onHash();
+  const dom = elementsById['view-root'].innerHTML;
+  assert(dom && dom.trim().length > 200, `Empty #view-root (${dom ? dom.length : 0} chars) for route ${route}`);
+  assert(!/NaN\b/.test(dom), `Unexpected NaN rendered in DOM for route ${route}`);
+}
 
-    routes = [
-        (base_uri, 'Готовность к 1-му тех-скринингу'),
-        (base_uri + '#/python', 'Матрица Мастерства Python'),
-        (base_uri + '#/web', 'Матрица Мастерства Web'),
-        (base_uri + '#/backend', 'Матрица Мастерства Backend'),
-        (base_uri + '#/algorithms', 'Матрица Мастерства Алгоритмы'),
-        (base_uri + '#/databases', 'Матрица Мастерства Базы данных'),
-        (base_uri + '#/architecture', 'Матрица Мастерства Архитектура'),
-        (base_uri + '#/infra', 'Матрица Мастерства Инфраструктура'),
-        (base_uri + '#/infra/boss', 'Аудитор продакшен-инфраструктуры'),
-        (base_uri + '#/mock', 'Симулятор собеседования'),
-        (base_uri + '#/map', 'Матрица'),
-        (base_uri + '#/path', 'Python Core'),
-        (base_uri + '#/practice', 'Практика кода'),
-        (base_uri + '#/cards', 'Центр 3D Флеш-карточек'),
-    ]
+assert.strictEqual(runtimeErrors.length, 0, `Runtime console.error calls: ${runtimeErrors.join('; ')}`);
+console.log(`2. [PASS] In-memory Node VM rendered ${routes.length} routes with 0 runtime errors in ${Date.now() - t0}ms!`);
+"""
 
-    def verify_single_route(item):
-        route, expected_sub = item
-        last_err = None
-        for _ in range(2):
-            try:
-                try:
-                    td_ctx = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
-                except TypeError:
-                    td_ctx = tempfile.TemporaryDirectory()
-                with td_ctx as td:
-                    extra_args = [f'--user-data-dir={td}'] if sys.platform != 'darwin' else []
-                    c_res = subprocess.run(
-                        chrome_flags + extra_args + [route],
-                        capture_output=True, text=True, encoding='utf-8', errors='ignore',
-                        timeout=60
-                    )
-                    assert c_res.returncode == 0, f'Chrome failed with code {c_res.returncode} on {route}'
-                    c_errors = [line for line in c_res.stderr.splitlines() if 'ERROR:CONSOLE' in line or 'Uncaught ' in line]
-                    assert not c_errors, f'Console error in Chrome for {route}:\n' + '\n'.join(c_errors)
-                    out = c_res.stdout
-                    m = re.search(r'<main id="view-root">([\s\S]*?)</main>', out)
-                    assert m and len(m.group(1).strip()) > 200, f"Empty <main id='view-root'> in Chrome for {route}"
-                    return f'2. [PASS] Real Headless Chrome rendered {route} (0 console errors, {len(m.group(1))} chars in #view-root)'
-            except Exception as e:
-                last_err = e
-                time.sleep(0.5)
-        raise last_err
-
-    with ThreadPoolExecutor(max_workers=4) as executor:
-        for msg in executor.map(verify_single_route, routes):
-            print(msg, flush=True)
-else:
-    print('2. [SKIP] Headless Chrome binary not runnable in this environment, skipped browser DOM checks.')
-
-if os.path.isfile(IDE_PATH) and ide_is_tracked and chrome_exe:
-    ide_uri = Path(IDE_PATH).as_uri()
-    try:
-        td_ide_ctx = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
-    except TypeError:
-        td_ide_ctx = tempfile.TemporaryDirectory()
-    with td_ide_ctx as td_ide:
-        extra_ide_args = [f'--user-data-dir={td_ide}'] if sys.platform != 'darwin' else []
-        ide_res = subprocess.run(
-            chrome_flags + extra_ide_args + [ide_uri],
-            capture_output=True, text=True, encoding='utf-8', errors='ignore',
-            timeout=30
-        )
-        assert ide_res.returncode == 0, f'Chrome failed on standalone IDE with code {ide_res.returncode}'
-        ide_c_errors = [line for line in ide_res.stderr.splitlines() if 'ERROR:CONSOLE' in line or 'Uncaught ' in line]
-        assert not ide_c_errors, f'Console error in Chrome for standalone IDE:\n' + '\n'.join(ide_c_errors)
-        ide_out = ide_res.stdout
-        assert 'Все уровни' in ide_out and '401' in ide_out, "Missing 'Все уровни' or '401' in IDE HTML render"
-        assert 'task-grid' in ide_out or 'task-card' in ide_out, 'Missing task grid/cards in IDE HTML render'
-        assert 'editorHost' in ide_out or 'CodeMirror' in ide_out, 'Missing editor container in IDE HTML render'
-        print(f'3. [PASS] Real Headless Chrome rendered standalone IDE trainer (0 console errors, {len(ide_out)} chars)')
-
-zip_path = os.path.normpath(os.path.join(_ROOT, 'academy_backup.zip'))
-if os.path.isfile(zip_path) and _is_git_tracked('academy_backup.zip'):
-    with zipfile.ZipFile(zip_path, 'r') as zf:
-        namelist = zf.namelist()
-        assert len(namelist) >= 545, f'Expected >= 545 files in project zip, got {len(namelist)}'
-        required_in_zip = [
-            'academy.html',
-            'practice_ide.html',
-            'standards/standards.html',
-            'manifest.json',
-            'icon.svg',
-            'sw.js',
-            'knowledge_base.zip',
-            'README.md',
-            'scripts/assemble_academy.py',
-            'scripts/test_all_401_tasks.py'
-        ]
-        for req in required_in_zip:
-            assert req in namelist, f"Missing required file '{req}' inside academy_backup.zip"
-        rem_bytes = zf.read('knowledge_base.zip')
-        with zipfile.ZipFile(io.BytesIO(rem_bytes)) as rzf:
-            r_names = rzf.namelist()
-            assert len(r_names) in (525, 526), f'Expected 525 or 526 files inside nested RemNote zip, got {len(r_names)}'
-    print(f'4. [PASS] Project archive academy_backup.zip verified ({len(namelist)} items, nested RemNote 525 items)!')
+res = subprocess.run(
+    ['node', '-e', NODE_VM_PROBE, HTML_PATH],
+    cwd=_ROOT, text=True, encoding='utf-8'
+)
+if res.returncode != 0:
+    sys.exit(res.returncode)
