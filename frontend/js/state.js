@@ -1,11 +1,31 @@
 /**
  * Python Backend Academy — Reactive State Manager
- * Персистентное локальное состояние + синхронизация
+ * Персистентное локальное состояние + синхронизация (включая SRS карточек и конспектов 1/3/7/21/30)
  */
 
 import { api } from './api.js';
 
 const STORAGE_KEY = 'py_backend_academy_v1';
+
+function mergeSrsMaps(baseMap, incomingMap, progressKey) {
+  const a = (baseMap && typeof baseMap === 'object') ? baseMap : {};
+  const b = (incomingMap && typeof incomingMap === 'object') ? incomingMap : {};
+  const merged = Object.assign({}, a, b);
+  Object.keys(a).concat(Object.keys(b)).forEach(key => {
+    const entryA = a[key];
+    const entryB = b[key];
+    if (entryA && entryB && typeof entryA === 'object' && typeof entryB === 'object') {
+      const pickB = String(entryB.lastReview || '') >= String(entryA.lastReview || '') ||
+        Number(entryB[progressKey] || 0) > Number(entryA[progressKey] || 0);
+      merged[key] = Object.assign({}, entryA, pickB ? entryB : entryA);
+    } else if (entryB !== undefined) {
+      merged[key] = entryB;
+    } else {
+      merged[key] = entryA;
+    }
+  });
+  return merged;
+}
 
 export class StateManager {
   constructor() {
@@ -31,6 +51,11 @@ export class StateManager {
       lastActiveDate: new Date().toISOString().split('T')[0],
       completedLessons: [],
       completedTasks: [],
+      readNotes: [],
+      reviewedDecks: [],
+      cardRatings: {},
+      cardSrs: {},
+      noteSrs: {},
       cardsProgress: {},
       readingPositions: {}
     };
@@ -89,14 +114,26 @@ export class StateManager {
     try {
       const pullResult = await api.pullProgress();
       if (pullResult && pullResult.bundle && pullResult.updatedAt > this.lastSyncedAt) {
-        // Серверное состояние новее — объединяем
+        // Серверное состояние новее — объединяем без потери SRS карточек и конспектов
         const serverState = pullResult.bundle.academyState || {};
+        const mergedRatings = Object.assign({}, this.state.cardRatings || {}, serverState.cardRatings || {});
+        Object.keys(this.state.cardRatings || {}).forEach(ck => {
+          if (serverState.cardRatings && serverState.cardRatings[ck] !== undefined) {
+            mergedRatings[ck] = Math.max(Number(this.state.cardRatings[ck]) || 0, Number(serverState.cardRatings[ck]) || 0);
+          }
+        });
         this.state = {
           ...this.state,
           ...serverState,
           xp: Math.max(this.state.xp || 0, serverState.xp || 0),
           completedLessons: Array.from(new Set([...(this.state.completedLessons || []), ...(serverState.completedLessons || [])])),
-          completedTasks: Array.from(new Set([...(this.state.completedTasks || []), ...(serverState.completedTasks || [])]))
+          completedTasks: Array.from(new Set([...(this.state.completedTasks || []), ...(serverState.completedTasks || [])])),
+          readNotes: Array.from(new Set([...(this.state.readNotes || []), ...(serverState.readNotes || [])])),
+          reviewedDecks: Array.from(new Set([...(this.state.reviewedDecks || []), ...(serverState.reviewedDecks || [])])),
+          cardRatings: mergedRatings,
+          cardSrs: mergeSrsMaps(this.state.cardSrs, serverState.cardSrs, 'reps'),
+          noteSrs: mergeSrsMaps(this.state.noteSrs, serverState.noteSrs, 'step'),
+          readingPositions: Object.assign({}, this.state.readingPositions || {}, serverState.readingPositions || {})
         };
         this.lastSyncedAt = pullResult.updatedAt;
         this.save();

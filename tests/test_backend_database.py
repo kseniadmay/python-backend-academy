@@ -27,6 +27,7 @@ from tests.fixtures.fixture_factory import (
     make_corrupted_user_fixture,
 )
 from backend.app.schemas.progress import ProgressBundle
+from backend.app.services.sync_service import merge_academy_states
 
 
 class TestBackendDatabase(unittest.TestCase):
@@ -141,6 +142,50 @@ class TestBackendDatabase(unittest.TestCase):
         self.assertEqual(len(due_cards), 2, 'В суточную очередь должны попасть только просроченные и сегодняшние карточки')
         self.assertEqual(due_cards[0]['deck_id'], 'Ф-001')
         self.assertEqual(due_cards[0]['card_idx'], 0)
+
+    def test_deep_srs_and_notes_monotonic_merge(self) -> None:
+        """
+        Проверка глубокого монотонного слияния расписаний конспектов (noteSrs 1/3/7/21/30)
+        и флеш-карточек (cardSrs FSRS) между двумя устройствами.
+        """
+        stored_state = {
+            'xp': 250,
+            'readNotes': ['К-001', 'К-002'],
+            'reviewedDecks': ['Ф-001'],
+            'cardRatings': {'Ф-001:0': 3, 'Ф-001:1': 2},
+            'noteSrs': {
+                'К-001': {'step': 3, 'intervalDays': 21, 'dueDate': '2026-05-22', 'lastReview': '2026-05-01'},
+                'К-002': {'step': 1, 'intervalDays': 3, 'dueDate': '2026-05-04', 'lastReview': '2026-05-01'},
+            },
+            'cardSrs': {
+                'Ф-001:0': {'reps': 3, 'interval': 9, 'dueDate': '2026-05-10', 'lastReview': '2026-05-01'},
+            },
+        }
+        incoming_state = {
+            'xp': 300,
+            'readNotes': ['К-002', 'К-003'],
+            'reviewedDecks': ['Ф-002'],
+            'cardRatings': {'Ф-001:1': 4, 'Ф-002:0': 3},
+            'noteSrs': {
+                'К-001': {'step': 1, 'intervalDays': 3, 'dueDate': '2026-04-28', 'lastReview': '2026-04-25'},
+                'К-003': {'step': 2, 'intervalDays': 7, 'dueDate': '2026-05-09', 'lastReview': '2026-05-02'},
+            },
+            'cardSrs': {
+                'Ф-002:0': {'reps': 2, 'interval': 4, 'dueDate': '2026-05-06', 'lastReview': '2026-05-02'},
+            },
+        }
+
+        merged = merge_academy_states(stored_state, incoming_state)
+        self.assertEqual(merged['xp'], 300)
+        self.assertEqual(merged['readNotes'], ['К-001', 'К-002', 'К-003'])
+        self.assertEqual(merged['reviewedDecks'], ['Ф-001', 'Ф-002'])
+        self.assertEqual(merged['cardRatings']['Ф-001:0'], 3)
+        self.assertEqual(merged['cardRatings']['Ф-001:1'], 4)
+        self.assertEqual(merged['noteSrs']['К-001']['step'], 3, 'Более свежий этап 3 (21 дн.) не должен затираться устаревшей записью')
+        self.assertEqual(merged['noteSrs']['К-002']['step'], 1)
+        self.assertEqual(merged['noteSrs']['К-003']['step'], 2)
+        self.assertEqual(merged['cardSrs']['Ф-001:0']['reps'], 3)
+        self.assertEqual(merged['cardSrs']['Ф-002:0']['reps'], 2)
 
     def test_acid_transaction_atomic_rollback(self) -> None:
         """Проверка атомарного отката транзакции при возникновении сбоя."""

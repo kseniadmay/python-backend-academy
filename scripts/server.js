@@ -386,9 +386,62 @@ const server = http.createServer((req, res) => {
                     return;
                 }
                 let nextBundle = bundle;
-                if (stored && storedClientId !== clientId) {
+                if (stored && stored.bundle) {
+                    const mergeLists = (a, b) => Array.from(new Set([...(Array.isArray(a) ? a : []), ...(Array.isArray(b) ? b : [])]));
+                    const mergeNumericMaps = (a, b) => {
+                        const ma = (a && typeof a === 'object') ? a : {};
+                        const mb = (b && typeof b === 'object') ? b : {};
+                        const out = Object.assign({}, ma, mb);
+                        Object.keys(ma).forEach(k => {
+                            if (mb[k] !== undefined) {
+                                out[k] = Math.max(Number(ma[k]) || 0, Number(mb[k]) || 0);
+                            }
+                        });
+                        return out;
+                    };
+                    const mergeSrsMaps = (a, b, progKey) => {
+                        const ma = (a && typeof a === 'object') ? a : {};
+                        const mb = (b && typeof b === 'object') ? b : {};
+                        const out = Object.assign({}, ma, mb);
+                        Object.keys(ma).concat(Object.keys(mb)).forEach(k => {
+                            const ea = ma[k];
+                            const eb = mb[k];
+                            if (ea && eb && typeof ea === 'object' && typeof eb === 'object') {
+                                const pickB = String(eb.lastReview || '') >= String(ea.lastReview || '') ||
+                                    Number(eb[progKey] || 0) > Number(ea[progKey] || 0);
+                                out[k] = Object.assign({}, ea, pickB ? eb : ea);
+                            } else if (eb !== undefined) {
+                                out[k] = eb;
+                            } else {
+                                out[k] = ea;
+                            }
+                        });
+                        return out;
+                    };
+                    const sa = stored.bundle.academyState || {};
+                    const sb = bundle.academyState || {};
+                    const mergedState = Object.assign({}, sa, sb);
+                    ['mastered', 'completedLessons', 'completedTasks', 'readNotes', 'reviewedDecks', 'passedUnitTests', 'passedBosses', 'diagnosticGaps'].forEach(key => {
+                        if (sa[key] !== undefined || sb[key] !== undefined) {
+                            mergedState[key] = mergeLists(sa[key], sb[key]);
+                        }
+                    });
+                    ['skillMastery', 'dailyXpByDate', 'cardRatings'].forEach(key => {
+                        if (sa[key] !== undefined || sb[key] !== undefined) {
+                            mergedState[key] = mergeNumericMaps(sa[key], sb[key]);
+                        }
+                    });
+                    if (sa.noteSrs !== undefined || sb.noteSrs !== undefined) {
+                        mergedState.noteSrs = mergeSrsMaps(sa.noteSrs, sb.noteSrs, 'step');
+                    }
+                    if (sa.cardSrs !== undefined || sb.cardSrs !== undefined) {
+                        mergedState.cardSrs = mergeSrsMaps(sa.cardSrs, sb.cardSrs, 'reps');
+                    }
+                    if (sa.readingPositions !== undefined || sb.readingPositions !== undefined) {
+                        mergedState.readingPositions = Object.assign({}, sa.readingPositions || {}, sb.readingPositions || {});
+                    }
                     nextBundle = {
-                        academyState: Object.assign({}, stored.bundle.academyState || {}, bundle.academyState),
+                        academyState: mergedState,
                         ideStatus: Object.assign({}, stored.bundle.ideStatus || {}, bundle.ideStatus || {}),
                         ideDrafts: Object.assign({}, stored.bundle.ideDrafts || {}, bundle.ideDrafts || {})
                     };

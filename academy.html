@@ -10082,39 +10082,49 @@
   }
 
 
-  /* Note SRS 1/3/7/21/30 Spaced Repetition Styles */
+  /* Note SRS 1/3/7/21/30 & Flashcards Spaced Repetition Styles (Zen Glassmorphism) */
   .note-srs-status-badge {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    border-radius: 10px;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 14px;
+    border-radius: 12px;
     font-size: 0.78rem;
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.035);
     border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
     color: var(--ink);
     flex-wrap: wrap;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
   .note-srs-status-badge.note-srs-due {
-    background: rgba(244, 63, 94, 0.12);
-    border-color: rgba(244, 63, 94, 0.35);
+    background: rgba(244, 63, 94, 0.11);
+    border-color: rgba(244, 63, 94, 0.38);
     color: #fda4af;
   }
   .note-srs-status-badge.note-srs-mastered {
-    background: rgba(16, 185, 129, 0.12);
+    background: rgba(16, 185, 129, 0.11);
     border-color: rgba(16, 185, 129, 0.35);
     color: #34d399;
   }
   .note-srs-status-badge.note-srs-scheduled {
-    background: rgba(59, 130, 246, 0.10);
-    border-color: rgba(59, 130, 246, 0.25);
-    color: #93c5fd;
+    background: rgba(6, 182, 212, 0.09);
+    border-color: rgba(6, 182, 212, 0.28);
+    color: #67e8f9;
+  }
+  .note-srs-status-badge.note-srs-fresh {
+    background: rgba(148, 163, 184, 0.07);
+    border-color: rgba(148, 163, 184, 0.18);
+    color: var(--ink-muted);
   }
   .note-srs-ladder {
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    flex-wrap: nowrap;
   }
   .note-srs-step-dot {
     display: inline-flex;
@@ -10122,41 +10132,269 @@
     justify-content: center;
     font-size: 0.68rem;
     font-weight: 700;
-    padding: 2px 6px;
-    border-radius: 5px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 3px 6px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.11);
     color: var(--ink-muted);
     line-height: 1;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .note-srs-step-dot.done {
     background: rgba(16, 185, 129, 0.20);
-    border-color: rgba(16, 185, 129, 0.40);
+    border-color: rgba(16, 185, 129, 0.42);
     color: #34d399;
   }
   .note-srs-step-dot.active {
-    background: rgba(59, 130, 246, 0.25);
-    border-color: rgba(59, 130, 246, 0.50);
-    color: #60a5fa;
-    box-shadow: 0 0 8px rgba(59, 130, 246, 0.35);
+    background: rgba(6, 182, 212, 0.22);
+    border-color: rgba(6, 182, 212, 0.50);
+    color: #67e8f9;
+    box-shadow: 0 0 8px rgba(6, 182, 212, 0.30);
   }
   .note-srs-step-dot.active-due {
     background: rgba(244, 63, 94, 0.25);
     border-color: rgba(244, 63, 94, 0.55);
     color: #fda4af;
-    box-shadow: 0 0 8px rgba(244, 63, 94, 0.40);
+    box-shadow: 0 0 10px rgba(244, 63, 94, 0.40);
   }
   .note-srs-arrow {
     font-size: 0.65rem;
     color: var(--ink-muted);
     opacity: 0.45;
   }
+  .srs-flow-selector {
+    display: flex;
+    gap: 8px;
+    padding: 5px;
+    border-radius: 16px;
+    background: rgba(15, 23, 42, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    margin: 0 auto 16px;
+    max-width: 760px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  [data-theme="light"] .srs-flow-selector {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+  .srs-flow-tab-btn {
+    flex: 1;
+    padding: 9px 12px !important;
+    border-radius: 12px !important;
+    font-size: 0.84rem !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    border: 1px solid transparent !important;
+    transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  }
   .srs-flow-tab-active {
     background: rgba(16, 185, 129, 0.18) !important;
-    border-color: rgba(16, 185, 129, 0.40) !important;
+    border-color: rgba(16, 185, 129, 0.42) !important;
     color: #34d399 !important;
     font-weight: 700 !important;
-    box-shadow: 0 0 12px rgba(16, 185, 129, 0.25) !important;
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+  }
+  [data-theme="light"] .srs-flow-tab-active {
+    background: rgba(5, 150, 105, 0.14) !important;
+    border-color: rgba(5, 150, 105, 0.38) !important;
+    color: #047857 !important;
+  }
+
+  /* Unified Bottom Micro-Stepper (.sub-step-dot & Sliding 7-Dot Window) */
+  .unified-micro-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 12px;
+    margin: 10px 0 8px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-sizing: border-box;
+    flex-wrap: nowrap;
+  }
+  [data-theme="light"] .unified-micro-stepper {
+    background: rgba(15, 23, 42, 0.03);
+    border-color: rgba(15, 23, 42, 0.08);
+  }
+  .sub-step-dots-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    min-width: 68px;
+    flex-shrink: 0;
+  }
+  .sub-step-dot {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    height: 16px;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .sub-step-dot::after {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.22);
+    transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  [data-theme="light"] .sub-step-dot::after {
+    background: rgba(15, 23, 42, 0.22);
+  }
+  .sub-step-dot.done::after {
+    background: #10b981;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.50);
+  }
+  .sub-step-dot.active::after {
+    width: 7px;
+    height: 7px;
+    background: #ffffff;
+    box-shadow: 0 0 8px #34d399, 0 0 14px rgba(52, 211, 153, 0.65);
+    transform: scale(1.15);
+  }
+  [data-theme="light"] .sub-step-dot.active::after {
+    background: #059669;
+  }
+  .sub-step-dot.sub-step-dot--edge::after {
+    opacity: 0.45;
+    transform: scale(0.75);
+  }
+  .unified-stepper-label {
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--ink-muted);
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+    text-align: center;
+    flex: 1;
+  }
+  .unified-stepper-chip {
+    font-size: 0.73rem;
+    font-weight: 700;
+    color: var(--moss);
+    white-space: nowrap;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Active Rescue Scaffold (Algorithmic Memory Trigger) */
+  .active-rescue-box {
+    margin-top: 12px;
+    padding: 12px 16px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.11), rgba(6, 182, 212, 0.08));
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.10);
+    animation: fcAnswerReveal 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .active-rescue-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #fbbf24;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  [data-theme="light"] .active-rescue-head {
+    color: #b45309;
+  }
+  .active-rescue-body {
+    font-size: 0.90rem;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  .rescue-mask-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 10px;
+    margin: 0 2px;
+    border-radius: 8px;
+    font-family: var(--font-m, monospace);
+    font-size: 0.82rem;
+    font-weight: 700;
+    background: rgba(245, 158, 11, 0.22);
+    border: 1px dashed rgba(245, 158, 11, 0.65);
+    color: #fde68a;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .rescue-mask-pill:hover {
+    transform: translateY(-1px);
+    background: rgba(245, 158, 11, 0.32);
+  }
+  .rescue-mask-pill--revealed {
+    background: rgba(16, 185, 129, 0.20);
+    border: 1px solid rgba(16, 185, 129, 0.50);
+    color: #34d399;
+    cursor: default;
+  }
+  [data-theme="light"] .rescue-mask-pill {
+    color: #92400e;
+    background: rgba(245, 158, 11, 0.18);
+  }
+  [data-theme="light"] .rescue-mask-pill--revealed {
+    color: #047857;
+    background: rgba(16, 185, 129, 0.16);
+  }
+
+  /* Baseline-aligned flashcard controls row */
+  .fc-Front-controls-row {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    flex-wrap: nowrap;
+  }
+  .fc-Front-controls-row .btn,
+  .fc-Front-controls-row .btn-sprint-cta {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+  @media (max-width: 600px) {
+    .fc-Front-controls-row {
+      gap: 6px;
+    }
+    .fc-Front-controls-row .btn {
+      padding: 8px 11px !important;
+      font-size: 0.78rem !important;
+      min-height: 40px !important;
+    }
+    .fc-Front-controls-row .btn-sprint-cta {
+      min-height: 40px !important;
+    }
+    .srs-flow-tab-btn {
+      font-size: 0.76rem !important;
+      padding: 8px 8px !important;
+    }
   }
 
 </style>
@@ -16198,23 +16436,9 @@ function viewPythonSkill(sid){
       primaryActionHTML = `<button type="button" class="btn-3d-emerald btn-action-emerald btn-sprint-cta" style="flex:1;max-width:440px;" data-py-finish-note="${activeK}">Закрепить в карточках (+10 XP) ➔</button>`;
     }
 
-    let stepFooterStepperHTML = '';
-    if(steps.length > 1){
-      const microDots = steps.map((st, i) => {
-        let cls = 'step-micro-dot';
-        if(i < stepIdx) cls += ' done';
-        else if(i === stepIdx) cls += ' active';
-        const stTitle = (st && st.title) || ('Шаг ' + (i + 1));
-        return `<button type="button" class="${cls}" title="${escapeHtmlStr(stTitle)}" data-py-jump-step="${i}" aria-label="${escapeHtmlStr(stTitle)}"></button>`;
-      }).join('');
-
-      stepFooterStepperHTML = `
-        <div class="step-footer-stepper" style="display:flex;align-items:center;justify-content:center;width:100%;margin:0 auto 10px;padding:0;">
-          <div class="step-footer-dots" role="tablist" aria-label="Шаги конспекта" style="display:inline-flex;align-items:center;justify-content:center;gap:1px;flex-wrap:wrap;max-width:100%;">
-            ${microDots}
-          </div>
-        </div>`;
-    }
+    const stepFooterStepperHTML = (typeof buildUnifiedMicroStepperHTML === 'function')
+      ? buildUnifiedMicroStepperHTML(stepIdx, steps.length, 'Шаг', 'data-py-jump-step', stepIdx + 1 < steps.length ? '➔ Дальше' : '📇 К карточкам')
+      : '';
 
     const noteSrsBadge = (typeof getNoteSrsBadgeHTML === 'function') ? getNoteSrsBadgeHTML(activeK) : '';
     bodyHTML = `
@@ -16319,13 +16543,24 @@ function viewPythonSkill(sid){
       const qPos = Math.min(pySkillViewState.sessionPos || 0, pySkillViewState.sessionQueue.length - 1);
       const cIdx = pySkillViewState.sessionQueue[qPos] !== undefined ? pySkillViewState.sessionQueue[qPos] : 0;
       const curCard = cards[cIdx] || {q: 'Карточки загружаются', a: ''};
-      const srsPrev = typeof computeRemNoteIntervals === 'function' ? computeRemNoteIntervals(activeF + ':' + cIdx) : {again:{days:1},hard:{days:2},good:{days:3},easy:{days:7}};
+      const curCardKey = activeF + ':' + cIdx;
+      const srsPrev = typeof computeRemNoteIntervals === 'function' ? computeRemNoteIntervals(curCardKey) : {again:{days:1},hard:{days:2},good:{days:3},easy:{days:7}};
 
       const curQTotal = (pySkillViewState.sessionQueue && pySkillViewState.sessionQueue.length) || cards.length;
       const isRepeatPhase = qPos >= cards.length;
       const cardCounterLabel = isRepeatPhase
         ? `Повтор ошибки: ${qPos - cards.length + 1} из ${curQTotal - cards.length}`
         : `Карточка ${qPos + 1} из ${cards.length}`;
+      const showActiveRescue = !pySkillViewState.cardFlipped && (
+        pySkillViewState.rescueCardKey === curCardKey ||
+        (window.__rescuePrimedCards && window.__rescuePrimedCards[curCardKey])
+      );
+      const rescueHTML = (showActiveRescue && typeof buildActiveRescueScaffoldHTML === 'function')
+        ? buildActiveRescueScaffoldHTML(curCard.a, curCard.q, curCardKey)
+        : '';
+      const cardStepperHTML = (typeof buildUnifiedMicroStepperHTML === 'function')
+        ? buildUnifiedMicroStepperHTML(Math.min(cIdx, Math.max(0, cards.length - 1)), cards.length, 'Карточка', '', isRepeatPhase ? '🔁 Закрепление' : '🌱 Первичное усвоение')
+        : '';
 
       bodyHTML = `
         <div class="fc-stage" style="margin-top:0;">
@@ -16340,45 +16575,49 @@ function viewPythonSkill(sid){
                   <div class="topic-badge" style="background:${pySkillViewState.cardFlipped ? 'rgba(16,185,129,0.2)' : 'rgba(59,130,246,0.15)'};color:${pySkillViewState.cardFlipped ? '#34d399' : '#60a5fa'};font-weight:700;">
                     ${pySkillViewState.cardFlipped ? 'Ответ' : 'Вопрос'}
                   </div>
-                  ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(activeF + ':' + cIdx) : ''}
+                  ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
                 </div>
-                <a href="#/docs" class="btn btn-ghost" data-hub-cheatsheet style="padding:3px 9px;font-size:0.75rem;border-radius:10px;color:var(--ink-muted);" title="Открыть инженерный справочник">💡 Шпаргалка</a>
               </div>
               <div class="fc-q">${formatCardQuestionHTML(curCard.q)}</div>
               ${pySkillViewState.cardFlipped ? `<div class="fc-a">${formatRichInlineText(curCard.a)}</div>` : ''}
             </div>
           </div>
+          ${rescueHTML}
+          ${cardStepperHTML}
           ${pySkillViewState.cardFlipped ? `
-            <div class="fc-rate-row" style="margin-top:14px;">
-              <button type="button" class="btn btn-ghost" data-py-rate-card="1" title="Повторить снова через ${srsPrev.again.days} дн (карточка вернётся в очередь)">
-                <span>Снова <span style="font-size:0.72rem;opacity:0.78;font-weight:500;">· в очередь</span> <kbd class="fc-kbd-hint">1</kbd></span>
-                <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.again.days} дн</span>
+            <div class="fc-rate-row" style="margin-top:12px;">
+              <button type="button" class="btn btn-ghost" data-py-rate-card="1" title="Не знаю (С нуля) · карточка вернётся в конец очереди с мнемонической зацепкой (интервал: ${srsPrev.again.days} дн)">
+                <span>Не знаю <kbd class="fc-kbd-hint hide-on-mobile">1</kbd></span>
+                <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">С нуля</span>
               </button>
-              <button type="button" class="btn btn-burgundy" data-py-rate-card="2" title="Повторить через ${srsPrev.hard.days} дн (+2 XP)">
-                <span>Трудно (+2 XP) <kbd class="fc-kbd-hint">2</kbd></span>
-                <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.hard.days} дн</span>
+              <button type="button" class="btn btn-burgundy" data-py-rate-card="2" title="Трудно (С трудом) · повторить через ${srsPrev.hard.days} дн (+2 XP)">
+                <span>Трудно (+2 XP) <kbd class="fc-kbd-hint hide-on-mobile">2</kbd></span>
+                <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">С трудом</span>
               </button>
-              <button type="button" class="btn btn-clay" data-py-rate-card="3" title="Повторить через ${srsPrev.good.days} дн (+5 XP)">
-                <span>Хорошо (+5 XP) <kbd class="fc-kbd-hint">3</kbd></span>
-                <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.good.days} дн</span>
+              <button type="button" class="btn btn-clay" data-py-rate-card="3" title="Хорошо (Уверенно) · повторить через ${srsPrev.good.days} дн (+5 XP)">
+                <span>Хорошо (+5 XP) <kbd class="fc-kbd-hint hide-on-mobile">3</kbd></span>
+                <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">Уверенно</span>
               </button>
-              <button type="button" class="btn btn-primary" data-py-rate-card="4" title="Повторить через ${srsPrev.easy.days} дн (+10 XP)">
-                <span>Легко (+10 XP) <kbd class="fc-kbd-hint">4</kbd></span>
-                <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.easy.days} дн</span>
+              <button type="button" class="btn btn-primary" data-py-rate-card="4" title="Легко (Назубок) · повторить через ${srsPrev.easy.days} дн (+10 XP)">
+                <span>Легко (+10 XP) <kbd class="fc-kbd-hint hide-on-mobile">4</kbd></span>
+                <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">Назубок</span>
               </button>
             </div>
             <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-              <button type="button" class="btn btn-ghost" data-py-prev-card style="padding:8px 16px;border-radius:12px;font-size:0.84rem;">← К вопросу</button>
+              <button type="button" class="btn btn-ghost" data-py-prev-card style="padding:8px 16px;border-radius:12px;font-size:0.84rem;">← Назад</button>
+              <span class="meta" style="font-size:0.74rem;color:var(--ink-muted);">⏱ Интервалы памяти: ${srsPrev.again.days} дн · ${srsPrev.hard.days} дн · ${srsPrev.good.days} дн · ${srsPrev.easy.days} дн</span>
               <div class="fc-swipe-guide" style="display:none;justify-content:center;align-items:center;gap:12px;font-size:0.75rem;color:var(--ink-muted);user-select:none;opacity:0.88;">
-                <span style="display:inline-flex;align-items:center;gap:4px;"><span style="color:#f43f5e;">👈</span> Свайп влево: Снова</span>
+                <span style="display:inline-flex;align-items:center;gap:4px;"><span style="color:#f43f5e;">👈</span> Свайп влево: Не знаю</span>
                 <span style="opacity:0.35;">·</span>
                 <span style="display:inline-flex;align-items:center;gap:4px;">Свайп вправо: Легко <span style="color:#34d399;">👉</span></span>
               </div>
             </div>
           ` : `
-            <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
-              <button type="button" class="btn btn-ghost" data-py-prev-card ${qPos === 0 ? 'disabled' : ''} style="padding:12px 18px;border-radius:14px;">← Назад</button>
-              <button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;padding:12px 20px;border-radius:14px;font-weight:800;" data-py-flip-card title="Перевернуть карточку (Enter или Пробел)">Показать ответ <kbd class="fc-kbd-hint">Space</kbd></button>
+            <div class="fc-Front-controls-row">
+              <button type="button" class="btn btn-ghost" data-py-prev-card ${qPos === 0 ? 'disabled' : ''} style="padding:10px 15px;border-radius:14px;flex-shrink:0;">← Назад</button>
+              <button type="button" class="btn btn-ghost" data-py-rescue-card="${curCardKey}" style="padding:10px 13px;border-radius:14px;flex-shrink:0;" title="Активное спасение (Active Rescue): показать мнемоническую зацепку (клавиша H)">🛟 Зацепка</button>
+              <button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;padding:10px 18px;border-radius:14px;font-weight:800;" data-py-flip-card title="Перевернуть карточку (Enter или Пробел)">Показать ответ <kbd class="fc-kbd-hint hide-on-mobile">Пробел</kbd></button>
+              <a href="#/docs" class="btn btn-ghost" data-hub-cheatsheet style="padding:10px 13px;border-radius:14px;flex-shrink:0;text-decoration:none;" title="Открыть инженерный справочник">💡 Шпаргалка</a>
             </div>
           `}
         </div>`;
@@ -17017,15 +17256,21 @@ const _savedDueQueue = (_isSameDay && Array.isArray(_initCardsPos.dueQueue) && _
     )
   : [];
 let cardsHubState = {
+  hubTab: _initCardsPos.hubTab === 'notes' ? 'notes' : 'cards',
   echelonFilter: _initCardsPos.echelonFilter || 'all',
   unitFilter: _initCardsPos.unitFilter || 'all',
   deckId: (typeof _initCardsPos.deckId === 'string' && ALL_DECKS_COMBINED[_initCardsPos.deckId]) ? _initCardsPos.deckId : 'Ф-001',
   cardIdx: typeof _initCardsPos.cardIdx === 'number' ? _initCardsPos.cardIdx : 0,
   flipped: !!_initCardsPos.flipped,
+  rescueCardKey: null,
   completed: _isSameDay ? !!_initCardsPos.completed : false,
   dueMode: _initCardsPos.dueMode !== false,
   dueQueue: _savedDueQueue,
-  duePos: (_savedDueQueue.length > 0 && !_initCardsPos.completed) ? 0 : (typeof _initCardsPos.duePos === 'number' ? _initCardsPos.duePos : 0)
+  duePos: (_savedDueQueue.length > 0 && !_initCardsPos.completed) ? 0 : (typeof _initCardsPos.duePos === 'number' ? _initCardsPos.duePos : 0),
+  notePos: typeof _initCardsPos.notePos === 'number' ? _initCardsPos.notePos : 0,
+  noteStepIdx: typeof _initCardsPos.noteStepIdx === 'number' ? _initCardsPos.noteStepIdx : 0,
+  noteFullMode: !!_initCardsPos.noteFullMode,
+  forcedNoteId: _initCardsPos.forcedNoteId || null
 };
 window.cardsHubState = cardsHubState;
 function saveCardsHubPosState(){
@@ -17033,6 +17278,7 @@ function saveCardsHubPosState(){
   const today = (typeof dateIsoKey === 'function') ? dateIsoKey() : new Date().toISOString().slice(0, 10);
   const isDone = !!cardsHubState.completed;
   state.cardsHubPos = {
+    hubTab: cardsHubState.hubTab === 'notes' ? 'notes' : 'cards',
     echelonFilter: cardsHubState.echelonFilter || 'all',
     unitFilter: cardsHubState.unitFilter || 'all',
     deckId: cardsHubState.deckId || 'Ф-001',
@@ -17041,10 +17287,13 @@ function saveCardsHubPosState(){
     completed: isDone,
     dueMode: cardsHubState.dueMode !== false,
     duePos: isDone ? 0 : (cardsHubState.duePos || 0),
-    // Фикс залипания: при завершении сессии очередь очищается, не оставляя висячий хвост из 1 карточки
     dueQueue: (isDone || !Array.isArray(cardsHubState.dueQueue))
       ? []
       : cardsHubState.dueQueue.slice(cardsHubState.duePos || 0),
+    notePos: cardsHubState.notePos || 0,
+    noteStepIdx: cardsHubState.noteStepIdx || 0,
+    noteFullMode: !!cardsHubState.noteFullMode,
+    forcedNoteId: cardsHubState.forcedNoteId || null,
     savedDate: today,
     updatedAt: Date.now()
   };
@@ -17078,9 +17327,6 @@ function collectDueCardsQueue(){
     const r = Number(ratings[k]);
     if(r >= 1 && r <= 2 && !seen.has(k)){
       const srsEntry = srsMap[k];
-      // Фикс залипания: если карточка уже поставлена на учёт в SRS (есть srsEntry с dueDate),
-      // она управляется исключительно своим календарным интервалом из блока 1 выше.
-      // Нельзя возвращать её в ежедневную очередь раньше её dueDate!
       if(srsEntry && srsEntry.dueDate) return;
       if(srsEntry && srsEntry.lastReview === today) return;
       const parts = k.split(':');
@@ -17106,14 +17352,38 @@ function collectDueCardsQueue(){
   return queue;
 }
 
+function buildSrsFlowTabsHTML(activeTab, dueCardsCount, dueNotesCount){
+  const isCards = activeTab !== 'notes';
+  const cardsBadge = dueCardsCount > 0
+    ? `<span class="badge" style="background:#f43f5e;color:#fff;padding:2px 7px;border-radius:999px;font-size:0.72rem;font-weight:700;">${dueCardsCount}</span>`
+    : `<span class="badge" style="background:rgba(16,185,129,0.18);color:#34d399;padding:2px 7px;border-radius:999px;font-size:0.72rem;font-weight:700;">✓</span>`;
+  const notesBadge = dueNotesCount > 0
+    ? `<span class="badge" style="background:#f43f5e;color:#fff;padding:2px 7px;border-radius:999px;font-size:0.72rem;font-weight:700;">${dueNotesCount}</span>`
+    : `<span class="badge" style="background:rgba(16,185,129,0.18);color:#34d399;padding:2px 7px;border-radius:999px;font-size:0.72rem;font-weight:700;">✓</span>`;
+  return `
+    <div class="srs-flow-selector" role="tablist" aria-label="Потоки интервального повторения">
+      <button type="button" class="btn btn-ghost srs-flow-tab-btn ${isCards ? 'srs-flow-tab-active' : ''}" data-srs-switch-tab="cards" role="tab" aria-selected="${isCards ? 'true' : 'false'}">
+        <span>📇 Флеш-карточки</span>
+        ${cardsBadge}
+      </button>
+      <button type="button" class="btn btn-ghost srs-flow-tab-btn ${!isCards ? 'srs-flow-tab-active' : ''}" data-srs-switch-tab="notes" role="tab" aria-selected="${!isCards ? 'true' : 'false'}">
+        <span>📖 Конспекты теории (1/3/7/21/30)</span>
+        ${notesBadge}
+      </button>
+    </div>`;
+}
+window.buildSrsFlowTabsHTML = buildSrsFlowTabsHTML;
+
 function viewCardsHub(){
   const noteSrsStats = getNoteSpacedRepetitionStats();
+  const srsGlobalStats = getSpacedRepetitionStats();
   if(cardsHubState.hubTab === 'notes'){
     return viewNotesSrsHub(noteSrsStats);
   }
   if(cardsHubState.dueMode !== false){
     cardsHubState.dueMode = true;
   }
+  const flowTabsHTML = buildSrsFlowTabsHTML('cards', srsGlobalStats.dueTodayCardsCount || 0, noteSrsStats.dueCount || 0);
   if(cardsHubState.dueMode){
     if(!Array.isArray(cardsHubState.dueQueue) || cardsHubState.dueQueue.length === 0){
       cardsHubState.dueQueue = collectDueCardsQueue();
@@ -17122,30 +17392,67 @@ function viewCardsHub(){
     const duePos = Math.min(cardsHubState.duePos || 0, Math.max(0, qLen - 1));
     if(cardsHubState.completed || qLen === 0 || cardsHubState.duePos >= qLen){
       const wasCompletedToday = (cardsHubState.completed || (cardsHubState.duePos >= qLen && qLen > 0));
+      const hasAnyStudiedCards = (
+        (state.reviewedDecks && state.reviewedDecks.length > 0) ||
+        Object.keys(state.cardSrs || {}).length > 0 ||
+        Object.keys(state.cardRatings || {}).some(k => Number(state.cardRatings[k]) > 0)
+      );
+
+      // Инвариант 1.10: Онбординг первого дня (Day-One Onboarding) при 0 изученных колод
+      if(!wasCompletedToday && !hasAnyStudiedCards){
+        return `
+    <div class="container cards-hub-container" style="padding-bottom:84px;max-width:760px;margin:0 auto;">
+      ${flowTabsHTML}
+      <div class="card" style="margin-top:12px;padding:38px 24px;text-align:center;border:1.5px solid rgba(16,185,129,0.35);border-radius:24px;background:radial-gradient(ellipse at top, rgba(16,185,129,0.12), transparent 70%), var(--surface);box-shadow:0 8px 32px rgba(0,0,0,0.25);">
+        <div style="width:64px;height:64px;margin:0 auto 16px;border-radius:50%;background:rgba(16,185,129,0.16);color:#10b981;display:flex;align-items:center;justify-content:center;font-size:30px;border:1.5px solid rgba(16,185,129,0.42);box-shadow:0 0 20px rgba(16,185,129,0.22);">🌱</div>
+        <div style="display:inline-block;padding:4px 12px;border-radius:999px;background:rgba(16,185,129,0.15);color:#34d399;font-size:0.75rem;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.06em;">Интервальное повторение · Старт памяти</div>
+        <h2 style="font-size:1.42rem;font-weight:800;color:var(--ink);margin:0 0 10px;">🌱 Ваша очередь интервального повторения пуста</h2>
+        <p style="font-size:0.92rem;color:var(--ink-muted);max-width:540px;margin:0 auto 24px;line-height:1.6;">
+          Пройдите первый урок на Тропе, и изученные карточки появятся здесь через 24 часа! Алгоритм интервального повторения автоматически построит персональный график удержания знаний в долгосрочной памяти.
+        </p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+          <a href="#/path" class="btn-glass-emerald btn-sprint-cta" style="padding:14px 28px;border-radius:14px;font-weight:800;display:inline-flex;align-items:center;gap:8px;text-decoration:none;">🗺️ Начать обучение ➔</a>
+          <button type="button" class="btn btn-ghost" data-hub-exit-due style="padding:14px 20px;border-radius:14px;font-weight:600;">📚 Обзор тем и колод</button>
+        </div>
+      </div>
+    </div>`;
+      }
+
+      const scheduledEntries = Object.entries(state.cardSrs || {})
+        .filter(([, v]) => v && v.dueDate)
+        .sort((a, b) => (a[1].dueDate < b[1].dueDate ? -1 : 1));
+      const nextDueDateStr = scheduledEntries.length > 0 ? scheduledEntries[0][1].dueDate : 'завтра';
+
       return `
     <div class="container cards-hub-container" style="padding-bottom:84px;max-width:760px;margin:0 auto;">
-      <div class="card" style="margin-top:20px;padding:40px 24px;text-align:center;border:1.5px solid rgba(16,185,129,0.35);border-radius:24px;background:radial-gradient(ellipse at top, rgba(16,185,129,0.12), transparent 70%), var(--surface);box-shadow:0 8px 32px rgba(0,0,0,0.25);">
+      ${flowTabsHTML}
+      <div class="card" style="margin-top:12px;padding:38px 24px;text-align:center;border:1.5px solid rgba(16,185,129,0.35);border-radius:24px;background:radial-gradient(ellipse at top, rgba(16,185,129,0.12), transparent 70%), var(--surface);box-shadow:0 8px 32px rgba(0,0,0,0.25);">
         <div style="width:64px;height:64px;margin:0 auto 16px;border-radius:50%;background:rgba(16,185,129,0.18);color:#10b981;display:flex;align-items:center;justify-content:center;font-size:30px;border:1.5px solid rgba(16,185,129,0.45);box-shadow:0 0 20px rgba(16,185,129,0.25);">✓</div>
         <div style="display:inline-block;padding:4px 12px;border-radius:999px;background:rgba(16,185,129,0.15);color:#34d399;font-size:0.75rem;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.06em;">Интервальное повторение · ${wasCompletedToday ? 'Очередь закрыта' : 'Очередь свободна'}</div>
-        <h2 style="font-size:1.45rem;font-weight:800;color:var(--ink);margin:0 0 10px;">${wasCompletedToday ? '🎉 Все повторения на сегодня успешно выполнены!' : '🎉 Нет карточек, требующих повторения прямо сейчас'}</h2>
+        <h2 style="font-size:1.45rem;font-weight:800;color:var(--ink);margin:0 0 10px;">${wasCompletedToday ? '🎉 Все повторения на сегодня успешно выполнены!' : '🎉 Все карточки на сегодня повторены!'}</h2>
         <p style="font-size:0.92rem;color:var(--ink-muted);max-width:520px;margin:0 auto 24px;line-height:1.6;">
           ${wasCompletedToday
             ? 'Отличная работа! Расписание интервального повторения обновлено. Новые карточки появятся по мере наступления срока кривой забывания.'
-            : 'Все пройденные карточки надёжно закреплены в памяти. Алгоритм вызовет их автоматически, когда подойдёт срок повторения. Продолжай двигаться по Тропе!'}
+            : 'Все пройденные карточки надёжно закреплены в памяти. Алгоритм вызовет их автоматически, когда подойдёт срок повторения.'}
         </p>
         <div style="display:flex;gap:12px;justify-content:center;margin-bottom:24px;flex-wrap:wrap;">
-          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px 18px;">
-            <div style="font-size:0.75rem;color:var(--ink-muted);">Повторено за сегодня</div>
-            <div style="font-size:1.15rem;font-weight:700;color:#10b981;">${qLen} ${typeof pluralizeRu === 'function' ? pluralizeRu(qLen, 'карточка', 'карточки', 'карточек') : 'карточек'}</div>
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px 18px;min-width:130px;">
+            <div style="font-size:0.75rem;color:var(--ink-muted);">В расписании SRS</div>
+            <div style="font-size:1.15rem;font-weight:700;color:#10b981;">${scheduledEntries.length} карт.</div>
           </div>
-          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px 18px;">
-            <div style="font-size:0.75rem;color:var(--ink-muted);">Ударный режим</div>
-            <div style="font-size:1.15rem;font-weight:700;color:var(--gold);">🔥 ${state.streak || 1} ${typeof pluralizeRu === 'function' ? pluralizeRu(state.streak || 1, 'день', 'дня', 'дней') : 'дней'}</div>
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px 18px;min-width:130px;">
+            <div style="font-size:0.75rem;color:var(--ink-muted);">Закреплено (21+ дн)</div>
+            <div style="font-size:1.15rem;font-weight:700;color:#60a5fa;">${srsGlobalStats.masteredCardsCount || 0} карт.</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px 18px;min-width:130px;">
+            <div style="font-size:0.75rem;color:var(--ink-muted);">Следующий сеанс</div>
+            <div style="font-size:1.15rem;font-weight:700;color:var(--gold);">📅 ${escapeHtmlStr(nextDueDateStr)}</div>
           </div>
         </div>
         <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
           <a href="#/" class="btn btn-primary" style="padding:14px 28px;border-radius:14px;font-weight:700;display:inline-flex;align-items:center;gap:8px;text-decoration:none;box-shadow:0 0 20px rgba(16,185,129,0.35);">🗺️ Продолжить изучение на Тропе ➔</a>
-          <button type="button" class="btn btn-ghost" data-hub-exit-due style="padding:14px 20px;border-radius:14px;font-weight:600;">📚 Выбрать тему в каталоге колод</button>
+          ${noteSrsStats.dueCount > 0 ? `<button type="button" class="btn btn-clay" data-srs-switch-tab="notes" style="padding:14px 20px;border-radius:14px;font-weight:700;">📖 Повторить конспекты (${noteSrsStats.dueCount}) ➔</button>` : ''}
+          <button type="button" class="btn btn-ghost" data-hub-exit-due style="padding:14px 20px;border-radius:14px;font-weight:600;">📚 Тренировка по темам</button>
         </div>
       </div>
     </div>`;
@@ -17154,20 +17461,32 @@ function viewCardsHub(){
     const item = cardsHubState.dueQueue[duePos];
     const dObj = ALL_DECKS_COMBINED[item.deckId] || {title: item.deckId, cards: []};
     const cObj = (dObj.cards || [])[item.cardIdx] || {q: '', a: ''};
+    const curCardKey = item.deckId + ':' + item.cardIdx;
     const cleanDeckName = (dObj.title || item.deckId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
+    const showActiveRescue = !cardsHubState.flipped && (
+      cardsHubState.rescueCardKey === curCardKey ||
+      (window.__rescuePrimedCards && window.__rescuePrimedCards[curCardKey])
+    );
+    const rescueHTML = (showActiveRescue && typeof buildActiveRescueScaffoldHTML === 'function')
+      ? buildActiveRescueScaffoldHTML(cObj.a, cObj.q, curCardKey)
+      : '';
+    const dueStepperHTML = (typeof buildUnifiedMicroStepperHTML === 'function')
+      ? buildUnifiedMicroStepperHTML(duePos, qLen, 'Карточка', 'data-hub-goto-due', '🔥 Суточный поток')
+      : '';
 
     return `
     <div class="container cards-hub-container" style="padding-bottom:84px;max-width:760px;margin:0 auto;">
+      ${flowTabsHTML}
       <div class="cards-hub-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
         <div>
-          <h1 style="margin:0;font-size:1.45rem;font-weight:800;">Центр 3D Флеш-карточек</h1>
+          <h1 style="margin:0;font-size:1.45rem;font-weight:800;">Центр интервального повторения</h1>
           <div style="font-size:0.84rem;color:var(--ink-muted);margin-top:2px;">
             Суточный поток · Тема: <span style="color:var(--gold);font-weight:600;">${cleanDeckName}</span>
           </div>
         </div>
         <div class="cards-hub-header-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-          <span class="cocoon-pill" style="font-size:0.80rem;font-weight:600;">${duePos + 1} / ${qLen}</span>
-          <button type="button" class="btn btn-ghost" data-hub-exit-due style="padding:6px 12px;font-size:0.78rem;" title="Перейти к каталогу всех 286 колод">Каталог колод</button>
+          <span class="cocoon-pill" style="font-size:0.80rem;font-weight:600;">Карточка ${duePos + 1} из ${qLen}</span>
+          <button type="button" class="btn btn-ghost" data-hub-exit-due style="padding:6px 12px;font-size:0.78rem;" title="Перейти к тренировке по отдельным темам">По темам</button>
           <a href="#/" class="btn btn-ghost" style="padding:6px 12px;font-size:0.78rem;text-decoration:none;" title="Вернуться к карте обучения">На Тропу ➔</a>
         </div>
       </div>
@@ -17209,6 +17528,7 @@ function viewCardsHub(){
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
                 <div style="display:flex;align-items:center;gap:8px;">
                   <div class="topic-badge" style="background:${cardsHubState.flipped ? 'rgba(16,185,129,0.2)' : 'rgba(59,130,246,0.15)'};color:${cardsHubState.flipped ? '#34d399' : '#60a5fa'};font-weight:700;">${cardsHubState.flipped ? 'Ответ' : 'Вопрос'}</div>
+                  ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
                 </div>
               </div>
               <div class="fc-q">${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(cObj.q) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(cObj.q) : cObj.q)}</div>
@@ -17216,39 +17536,44 @@ function viewCardsHub(){
             </div>
           </div>
         </div>
+        ${rescueHTML}
+        ${dueStepperHTML}
         ${cardsHubState.flipped ? (() => {
-          const srsPrev = typeof computeRemNoteIntervals === 'function' ? computeRemNoteIntervals(item.deckId + ':' + item.cardIdx) : {again:{days:1},hard:{days:2},good:{days:3},easy:{days:7}};
+          const srsPrev = typeof computeRemNoteIntervals === 'function' ? computeRemNoteIntervals(curCardKey) : {again:{days:1},hard:{days:2},good:{days:3},easy:{days:7}};
           return `
-          <div class="fc-rate-row" style="margin-top:14px;">
-            <button type="button" class="btn btn-ghost" data-hub-rate="1" title="Повторить снова через ${srsPrev.again.days} дн (карточка вернётся в конец текущей очереди)">
-              <span>Снова <span style="font-size:0.72rem;opacity:0.78;font-weight:500;">· в очередь</span> <kbd class="fc-kbd-hint">1</kbd></span>
-              <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.again.days} дн</span>
+          <div class="fc-rate-row" style="margin-top:12px;">
+            <button type="button" class="btn btn-ghost" data-hub-rate="1" title="Не знаю (С нуля) · карточка вернётся в конец очереди с мнемонической зацепкой (интервал: ${srsPrev.again.days} дн)">
+              <span>Не знаю <kbd class="fc-kbd-hint hide-on-mobile">1</kbd></span>
+              <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">С нуля</span>
             </button>
-            <button type="button" class="btn btn-burgundy" data-hub-rate="2" title="Повторить через ${srsPrev.hard.days} дн (+2 XP)">
-              <span>Трудно (+2 XP) <kbd class="fc-kbd-hint">2</kbd></span>
-              <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.hard.days} дн</span>
+            <button type="button" class="btn btn-burgundy" data-hub-rate="2" title="Трудно (С трудом) · повторить через ${srsPrev.hard.days} дн (+2 XP)">
+              <span>Трудно (+2 XP) <kbd class="fc-kbd-hint hide-on-mobile">2</kbd></span>
+              <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">С трудом</span>
             </button>
-            <button type="button" class="btn btn-clay" data-hub-rate="3" title="Повторить через ${srsPrev.good.days} дн (+5 XP)">
-              <span>Хорошо (+5 XP) <kbd class="fc-kbd-hint">3</kbd></span>
-              <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.good.days} дн</span>
+            <button type="button" class="btn btn-clay" data-hub-rate="3" title="Хорошо (Уверенно) · повторить через ${srsPrev.good.days} дн (+5 XP)">
+              <span>Хорошо (+5 XP) <kbd class="fc-kbd-hint hide-on-mobile">3</kbd></span>
+              <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">Уверенно</span>
             </button>
-            <button type="button" class="btn btn-primary" data-hub-rate="4" title="Повторить через ${srsPrev.easy.days} дн (+10 XP)">
-              <span>Легко (+10 XP) <kbd class="fc-kbd-hint">4</kbd></span>
-              <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.easy.days} дн</span>
+            <button type="button" class="btn btn-primary" data-hub-rate="4" title="Легко (Назубок) · повторить через ${srsPrev.easy.days} дн (+10 XP)">
+              <span>Легко (+10 XP) <kbd class="fc-kbd-hint hide-on-mobile">4</kbd></span>
+              <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">Назубок</span>
             </button>
           </div>
           <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-            <button type="button" class="btn btn-ghost btn-hub-turn-back" data-hub-prev style="padding:9px 18px;border-radius:12px;font-size:0.84rem;font-weight:600;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);box-shadow:0 2px 6px rgba(0,0,0,0.18);transition:all .18s ease;">← К вопросу</button>
+            <button type="button" class="btn btn-ghost btn-hub-turn-back" data-hub-prev style="padding:9px 18px;border-radius:12px;font-size:0.84rem;font-weight:600;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);box-shadow:0 2px 6px rgba(0,0,0,0.18);transition:all .18s ease;">← Назад</button>
+            <span class="meta" style="font-size:0.74rem;color:var(--ink-muted);">⏱ Интервалы памяти: ${srsPrev.again.days} дн · ${srsPrev.hard.days} дн · ${srsPrev.good.days} дн · ${srsPrev.easy.days} дн</span>
             <div class="fc-swipe-guide" style="display:none;justify-content:center;align-items:center;gap:10px;font-size:0.74rem;color:var(--ink-muted);user-select:none;padding:6px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:999px;">
-              <span style="display:inline-flex;align-items:center;gap:4px;"><span style="color:#f43f5e;">👈</span> Свайп влево: Снова</span>
+              <span style="display:inline-flex;align-items:center;gap:4px;"><span style="color:#f43f5e;">👈</span> Свайп влево: Не знаю</span>
               <span style="opacity:0.35;">·</span>
               <span style="display:inline-flex;align-items:center;gap:4px;">Свайп вправо: Легко <span style="color:#34d399;">👉</span></span>
             </div>
           </div>`;
         })() : `
-          <div style="margin-top:12px;display:flex;gap:10px;align-items:center;width:100%;max-width:100%;box-sizing:border-box;">
-            <button type="button" class="btn btn-ghost" data-hub-prev ${duePos===0?'disabled':''} style="padding:12px 18px;border-radius:14px;white-space:nowrap;flex-shrink:0;">← Назад</button>
-            <button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;min-width:0;padding:12px 20px;border-radius:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" data-hub-flip title="Перевернуть карточку (Enter или Пробел)">Показать ответ <kbd class="fc-kbd-hint">Space</kbd></button>
+          <div class="fc-Front-controls-row">
+            <button type="button" class="btn btn-ghost" data-hub-prev ${duePos===0?'disabled':''} style="padding:10px 15px;border-radius:14px;white-space:nowrap;flex-shrink:0;">← Назад</button>
+            <button type="button" class="btn btn-ghost" data-hub-rescue="${curCardKey}" style="padding:10px 13px;border-radius:14px;white-space:nowrap;flex-shrink:0;" title="Активное спасение (Active Rescue): показать мнемоническую зацепку (клавиша H)">🛟 Зацепка</button>
+            <button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;min-width:0;padding:10px 18px;border-radius:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" data-hub-flip title="Перевернуть карточку (Enter или Пробел)">Показать ответ <kbd class="fc-kbd-hint hide-on-mobile">Пробел</kbd></button>
+            <a href="#/docs" class="btn btn-ghost" data-hub-cheatsheet style="padding:10px 13px;border-radius:14px;white-space:nowrap;flex-shrink:0;text-decoration:none;" title="Открыть инженерный справочник">💡 Шпаргалка</a>
           </div>`}
       </div>
     </div>`;
@@ -17297,7 +17622,7 @@ function viewCardsHub(){
   const cards = deck.cards || [];
   const cIdx = Math.min(cardsHubState.cardIdx, Math.max(0, cards.length - 1));
   const cur = cards[cIdx] || {q:'', a:''};
-  const curDeckTier = getDeckInterviewTier(deck.id);
+  const curCardKey = cardsHubState.deckId + ':' + cIdx;
   const linkedSkills = DECK_TO_SKILLS_MAP[deck.id] || [];
   const primarySkill = linkedSkills[0] || ALL_PY_SKILLS[0];
   const cleanCurDeckTitle = (deck.title || cardsHubState.deckId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
@@ -17318,6 +17643,7 @@ function viewCardsHub(){
     const cleanNextDeckTitle = nextDeck ? (nextDeck.title || nextDeckId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim() : '';
     return `
     <div class="container cards-hub-container" style="padding-bottom:84px;max-width:760px;margin:0 auto;">
+      ${flowTabsHTML}
       <div class="cards-hub-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
         <div>
           <span class="sr-only">Интервальное повторение RemNote · 286 колод · 6 051 карточка</span>
@@ -17357,26 +17683,37 @@ function viewCardsHub(){
     </div>`;
   }
 
+  const showActiveRescue = !cardsHubState.flipped && (
+    cardsHubState.rescueCardKey === curCardKey ||
+    (window.__rescuePrimedCards && window.__rescuePrimedCards[curCardKey])
+  );
+  const rescueHTML = (showActiveRescue && typeof buildActiveRescueScaffoldHTML === 'function')
+    ? buildActiveRescueScaffoldHTML(cur.a, cur.q, curCardKey)
+    : '';
+  const deckStepperHTML = (typeof buildUnifiedMicroStepperHTML === 'function')
+    ? buildUnifiedMicroStepperHTML(cIdx, cards.length, 'Карточка', 'data-hub-goto-card', cardsHubState.isRepeatPhase ? '🔁 Повтор ошибки' : '📇 Колода темы')
+    : '';
+
   return `
     <div class="container cards-hub-container" style="max-width:760px;margin:0 auto;padding-bottom:84px;">
+      ${flowTabsHTML}
       <div class="cards-hub-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
         <div>
           <span class="sr-only">Интервальное повторение RemNote · 286 колод · 6 051 карточка (126 колод Python + 25 колод Web + 43 колоды Backend + 16 колод Алгоритмы + 32 колоды Базы данных + 17 колод Архитектура + 45 колод Инфраструктура)</span>
-          <h1 style="margin:0;font-size:1.45rem;font-weight:800;">Центр 3D Флеш-карточек</h1>
+          <h1 style="margin:0;font-size:1.45rem;font-weight:800;">Центр интервального повторения</h1>
           <div style="font-size:0.84rem;color:var(--ink-muted);margin-top:2px;">
-            Интервальное повторение RemNote · <span style="color:var(--gold);font-weight:600;">${cleanCurDeckTitle}</span>
+            Колода темы · <span style="color:var(--gold);font-weight:600;">${cleanCurDeckTitle}</span>
           </div>
         </div>
         <div class="cards-hub-header-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           ${(() => {
             const srsStats = typeof getSpacedRepetitionStats === 'function' ? getSpacedRepetitionStats() : {dueTodayCardsCount:0, masteredCardsCount:0};
-            const dueBtn = srsStats.dueTodayCardsCount > 0 ? `<button type="button" class="btn btn-burgundy" data-hub-review-due style="padding:6px 12px;font-size:.78rem;font-weight:700;" title="Запустить повторение карточек, запланированных на сегодня">🔥 Повторить на сегодня (<b>${srsStats.dueTodayCardsCount}</b>) ➔</button>` : '';
+            const dueBtn = srsStats.dueTodayCardsCount > 0 ? `<button type="button" class="btn btn-burgundy" data-hub-review-due style="padding:6px 12px;font-size:.78rem;font-weight:700;" title="Запустить повторение карточек, запланированных на сегодня">🔥 Суточная очередь (<b>${srsStats.dueTodayCardsCount}</b>) ➔</button>` : `<button type="button" class="btn btn-ghost" data-hub-review-due style="padding:6px 12px;font-size:.78rem;" title="Переключиться в режим чистого суточного потока">⚡ Суточный поток</button>`;
             const revPill = state.reviewedDecks.length > 0
               ? `<span class="cocoon-pill" style="font-size:0.78rem;">Изучено: <b>${state.reviewedDecks.length} / ${allDeckIds.length}</b></span>`
-              : `<span class="cocoon-pill" style="font-size:0.78rem;">🌱 <b>0 изучено</b> · Старт повторения</span>`;
+              : `<span class="cocoon-pill" style="font-size:0.78rem;">🌱 <b>Старт повторения</b></span>`;
             return `${dueBtn}${revPill}`;
           })()}
-          <a href="#/docs" class="btn btn-ghost" data-hub-cheatsheet style="padding:6px 11px;font-size:.78rem;" title="Открыть инженерный справочник">💡 Шпаргалка</a>
           ${primarySkill ? `<a href="#${primarySkill.routePrefix}/skill/${primarySkill.id}" class="btn btn-ghost" style="padding:6px 11px;font-size:.78rem;">💻 К практике темы ➔</a>` : ''}
           <a href="#/" class="btn btn-ghost" style="padding:6px 11px;font-size:.78rem;text-decoration:none;" title="Вернуться к карте обучения">🗺️ На Тропу</a>
         </div>
@@ -17400,9 +17737,9 @@ function viewCardsHub(){
           <select id="cards-deck-select" class="srs-deck-filter-select" style="min-height:auto;padding:8px 10px;font-size:.85rem;font-weight:600;">${deckOpts}</select>
         </div>
       </details>
-      <div class="fc-stage" style="margin-top:16px;">
+      <div class="fc-stage" style="margin-top:14px;">
         ${buildFcStoriesBarHTML(deck.id, cards.length, cIdx)}
-        <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 6px;font-size:0.82rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0 6px;font-size:0.82rem;">
           <span style="color:var(--ink-muted);font-weight:600;">${cardsHubState.isRepeatPhase ? `Повтор ошибки: карточка ${cards.length ? cIdx + 1 : 0} из ${cards.length}` : `Карточка ${cards.length ? cIdx + 1 : 0} из ${cards.length}`}</span>
           <span style="color:#34d399;font-weight:700;">Интервальное повторение</span>
         </div>
@@ -17411,46 +17748,51 @@ function viewCardsHub(){
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
               <div style="display:flex;align-items:center;gap:8px;">
                 <div class="topic-badge" style="background:${cardsHubState.flipped ? 'rgba(16,185,129,0.2)' : 'rgba(59,130,246,0.15)'};color:${cardsHubState.flipped ? '#34d399' : '#60a5fa'};font-weight:700;">${cardsHubState.flipped ? 'Ответ' : 'Вопрос'}</div>
-                ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(cardsHubState.deckId + ':' + cIdx) : ''}
+                ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
               </div>
             </div>
             <div class="fc-q">${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(cur.q) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(cur.q) : cur.q)}</div>
             ${cardsHubState.flipped ? `<div class="fc-a">${typeof formatRichInlineText === 'function' ? formatRichInlineText(cur.a) : cur.a}</div>` : ''}
           </div>
         </div>
+        ${rescueHTML}
+        ${deckStepperHTML}
         ${cardsHubState.flipped ? (() => {
-          const srsPrev = typeof computeRemNoteIntervals === 'function' ? computeRemNoteIntervals(cardsHubState.deckId + ':' + cIdx) : {again:{days:1},hard:{days:2},good:{days:3},easy:{days:7}};
+          const srsPrev = typeof computeRemNoteIntervals === 'function' ? computeRemNoteIntervals(curCardKey) : {again:{days:1},hard:{days:2},good:{days:3},easy:{days:7}};
           return `
-          <div class="fc-rate-row" style="margin-top:14px;">
-            <button type="button" class="btn btn-ghost" data-hub-rate="1" title="Повторить снова через ${srsPrev.again.days} дн (карточка вернётся в очередь)">
-              <span>Снова <span style="font-size:0.72rem;opacity:0.78;font-weight:500;">· в очередь</span> <kbd class="fc-kbd-hint">1</kbd></span>
-              <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.again.days} дн</span>
+          <div class="fc-rate-row" style="margin-top:12px;">
+            <button type="button" class="btn btn-ghost" data-hub-rate="1" title="Не знаю (С нуля) · карточка вернётся в конец очереди с мнемонической зацепкой (интервал: ${srsPrev.again.days} дн)">
+              <span>Не знаю <kbd class="fc-kbd-hint hide-on-mobile">1</kbd></span>
+              <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">С нуля</span>
             </button>
-            <button type="button" class="btn btn-burgundy" data-hub-rate="2" title="Повторить через ${srsPrev.hard.days} дн (+2 XP)">
-              <span>Трудно (+2 XP) <kbd class="fc-kbd-hint">2</kbd></span>
-              <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.hard.days} дн</span>
+            <button type="button" class="btn btn-burgundy" data-hub-rate="2" title="Трудно (С трудом) · повторить через ${srsPrev.hard.days} дн (+2 XP)">
+              <span>Трудно (+2 XP) <kbd class="fc-kbd-hint hide-on-mobile">2</kbd></span>
+              <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">С трудом</span>
             </button>
-            <button type="button" class="btn btn-clay" data-hub-rate="3" title="Повторить через ${srsPrev.good.days} дн (+5 XP)">
-              <span>Хорошо (+5 XP) <kbd class="fc-kbd-hint">3</kbd></span>
-              <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.good.days} дн</span>
+            <button type="button" class="btn btn-clay" data-hub-rate="3" title="Хорошо (Уверенно) · повторить через ${srsPrev.good.days} дн (+5 XP)">
+              <span>Хорошо (+5 XP) <kbd class="fc-kbd-hint hide-on-mobile">3</kbd></span>
+              <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">Уверенно</span>
             </button>
-            <button type="button" class="btn btn-primary" data-hub-rate="4" title="Повторить через ${srsPrev.easy.days} дн (+10 XP)">
-              <span>Легко (+10 XP) <kbd class="fc-kbd-hint">4</kbd></span>
-              <span class="btn-subtext" style="display:block;font-size:0.75rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.easy.days} дн</span>
+            <button type="button" class="btn btn-primary" data-hub-rate="4" title="Легко (Назубок) · повторить через ${srsPrev.easy.days} дн (+10 XP)">
+              <span>Легко (+10 XP) <kbd class="fc-kbd-hint hide-on-mobile">4</kbd></span>
+              <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">Назубок</span>
             </button>
           </div>
           <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-            <button type="button" class="btn btn-ghost btn-hub-turn-back" data-hub-prev style="padding:9px 18px;border-radius:12px;font-size:0.84rem;font-weight:600;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);box-shadow:0 2px 6px rgba(0,0,0,0.18);transition:all .18s ease;">← К вопросу</button>
+            <button type="button" class="btn btn-ghost btn-hub-turn-back" data-hub-prev style="padding:9px 18px;border-radius:12px;font-size:0.84rem;font-weight:600;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);box-shadow:0 2px 6px rgba(0,0,0,0.18);transition:all .18s ease;">← Назад</button>
+            <span class="meta" style="font-size:0.74rem;color:var(--ink-muted);">⏱ Интервалы памяти: ${srsPrev.again.days} дн · ${srsPrev.hard.days} дн · ${srsPrev.good.days} дн · ${srsPrev.easy.days} дн</span>
             <div class="fc-swipe-guide" style="display:none;justify-content:center;align-items:center;gap:10px;font-size:0.74rem;color:var(--ink-muted);user-select:none;padding:6px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:999px;">
-              <span style="display:inline-flex;align-items:center;gap:4px;"><span style="color:#f43f5e;">👈</span> Свайп влево: Снова</span>
+              <span style="display:inline-flex;align-items:center;gap:4px;"><span style="color:#f43f5e;">👈</span> Свайп влево: Не знаю</span>
               <span style="opacity:0.35;">·</span>
               <span style="display:inline-flex;align-items:center;gap:4px;">Свайп вправо: Легко <span style="color:#34d399;">👉</span></span>
             </div>
           </div>`;
         })() : `
-          <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
-            <button type="button" class="btn btn-ghost" data-hub-prev ${cIdx===0?'disabled':''} style="padding:12px 18px;border-radius:14px;">← Назад</button>
-            <button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;padding:12px 20px;border-radius:14px;font-weight:800;" data-hub-flip title="Перевернуть карточку (Enter или Пробел)">Показать ответ <kbd class="fc-kbd-hint">Space</kbd></button>
+          <div class="fc-Front-controls-row">
+            <button type="button" class="btn btn-ghost" data-hub-prev ${cIdx===0?'disabled':''} style="padding:10px 15px;border-radius:14px;flex-shrink:0;">← Назад</button>
+            <button type="button" class="btn btn-ghost" data-hub-rescue="${curCardKey}" style="padding:10px 13px;border-radius:14px;flex-shrink:0;" title="Активное спасение (Active Rescue): показать мнемоническую зацепку (клавиша H)">🛟 Зацепка</button>
+            <button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;padding:10px 18px;border-radius:14px;font-weight:800;" data-hub-flip title="Перевернуть карточку (Enter или Пробел)">Показать ответ <kbd class="fc-kbd-hint hide-on-mobile">Пробел</kbd></button>
+            <a href="#/docs" class="btn btn-ghost" data-hub-cheatsheet style="padding:10px 13px;border-radius:14px;flex-shrink:0;text-decoration:none;" title="Открыть инженерный справочник">💡 Шпаргалка</a>
           </div>`}
       </div>
     </div>`;
@@ -21060,6 +21402,103 @@ function addDaysToDateKey(baseDateKey, days){
   }
 }
 
+function buildUnifiedMicroStepperHTML(currentIdx, totalCount, itemPrefix, stepClickAttr, rightChipText){
+  const total = Math.max(1, Number(totalCount) || 1);
+  const cur = Math.min(Math.max(0, Number(currentIdx) || 0), total - 1);
+  const prefix = itemPrefix || 'Шаг';
+
+  // Инвариант 1.8: Скользящее 7-точечное окно фокуса при total > 8 (гарантирует ширину <= 68px без переноса строк)
+  let startIdx = 0;
+  let endIdx = total;
+  if(total > 8){
+    startIdx = Math.max(0, Math.min(cur - 3, total - 7));
+    endIdx = startIdx + 7;
+  }
+
+  const dots = [];
+  for(let i = startIdx; i < endIdx; i++){
+    let cls = 'sub-step-dot step-micro-dot';
+    if(i < cur) cls += ' done';
+    else if(i === cur) cls += ' active';
+    if(total > 8 && ((i === startIdx && startIdx > 0) || (i === endIdx - 1 && endIdx < total))){
+      cls += ' sub-step-dot--edge';
+    }
+    const attrPart = stepClickAttr ? `${stepClickAttr}="${i}"` : '';
+    dots.push(`<button type="button" class="${cls}" ${attrPart} title="${escapeHtmlStr(prefix + ' ' + (i + 1) + ' из ' + total)}" aria-label="${escapeHtmlStr(prefix + ' ' + (i + 1) + ' из ' + total)}"></button>`);
+  }
+
+  return `
+    <div class="step-footer-stepper unified-micro-stepper" role="group" aria-label="${escapeHtmlStr(prefix + ' ' + (cur + 1) + ' из ' + total)}">
+      <div class="sub-step-dots-wrap step-footer-dots" role="tablist">
+        ${dots.join('')}
+      </div>
+      <span class="unified-stepper-label">${escapeHtmlStr(prefix)} ${cur + 1} из ${total}</span>
+      ${rightChipText ? `<span class="unified-stepper-chip">${rightChipText}</span>` : `<span class="unified-stepper-chip"></span>`}
+    </div>`;
+}
+window.buildUnifiedMicroStepperHTML = buildUnifiedMicroStepperHTML;
+
+function buildActiveRescueScaffoldHTML(rawAnswer, rawQuestion, cardKey){
+  if(!window.__rescueMaskRevealed) window.__rescueMaskRevealed = {};
+  const isMaskOpen = !!(cardKey && window.__rescueMaskRevealed[cardKey]);
+
+  const plain = String(rawAnswer || '')
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/<pre[\s\S]*?<\/pre>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if(!plain){
+    return '';
+  }
+
+  // Выделяем первое смысловое предложение (до 160 символов)
+  const sentenceMatch = plain.match(/^(.{12,160}?[.!?])(?:\s|$)/);
+  let firstSentence = sentenceMatch ? sentenceMatch[1].trim() : plain.slice(0, 140).trim();
+
+  // Ищем ключевой термин в backticks или самое содержательное слово
+  let targetTerm = '';
+  const codeMatch = String(rawAnswer || '').match(/`([^`\n]{2,36})`/);
+  if(codeMatch && firstSentence.includes(codeMatch[1])){
+    targetTerm = codeMatch[1];
+  } else {
+    const words = firstSentence.split(/\s+/);
+    let bestWord = '';
+    for(let i = 0; i < words.length; i++){
+      const w = words[i].replace(/^[^a-zA-Z0-9_а-яА-ЯёЁ]+|[^a-zA-Z0-9_а-яА-ЯёЁ]+$/g, '');
+      if(w.length >= 5 && !/^(это|когда|который|которая|которые|потому|поэтому|через|между|только|всегда|можно|нужно)$/i.test(w)){
+        bestWord = w;
+        if(/[a-zA-Z_]/.test(w)) break;
+      }
+    }
+    targetTerm = bestWord || (words[words.length - 1] || 'концепт');
+  }
+
+  const safeSentence = escapeHtmlStr(firstSentence);
+  const safeTerm = escapeHtmlStr(targetTerm);
+  const pillHTML = isMaskOpen
+    ? `<span class="rescue-mask-pill rescue-mask-pill--revealed">✓ ${safeTerm}</span>`
+    : `<button type="button" class="rescue-mask-pill" data-reveal-rescue-mask="${escapeHtmlStr(cardKey || '')}" title="Нажмите, чтобы проверить замаскированный ключевой термин">🔒 [ Вспомнить термин ]</button>`;
+
+  let bodyWithMask = safeSentence;
+  if(safeTerm && safeSentence.includes(safeTerm)){
+    bodyWithMask = safeSentence.replace(safeTerm, pillHTML);
+  } else {
+    bodyWithMask = safeSentence + ' — ' + pillHTML;
+  }
+
+  return `
+    <div class="active-rescue-box" role="region" aria-label="Активное спасение памяти">
+      <div class="active-rescue-head">
+        <span>🛟 Мнемоническая зацепка (Active Rescue · 5 сек на припоминание)</span>
+        <span>${isMaskOpen ? 'Термин открыт' : 'Попробуйте вспомнить сами'}</span>
+      </div>
+      <div class="active-rescue-body">${bodyWithMask}</div>
+    </div>`;
+}
+window.buildActiveRescueScaffoldHTML = buildActiveRescueScaffoldHTML;
+
 function computeRemNoteIntervals(cardKey){
   ensureExtendedState();
   const entry = (state.cardSrs && state.cardSrs[cardKey]) || null;
@@ -21068,22 +21507,22 @@ function computeRemNoteIntervals(cardKey){
   const ease = entry ? (Number(entry.ease) || 2.50) : 2.50;
   const lapses = entry ? (Number(entry.lapses) || 0) : 0;
 
-  // Grade 1: Снова (Again) -> интервал 1 день, сброс серии, ease -0.20
+  // Grade 1: Не знаю (С нуля) -> интервал 1 день, сброс серии, ease -0.20
   const againDays = 1;
 
-  // Grade 2: Трудно (Hard) -> рост интервала с коэффициентом 1.2, ease -0.15
+  // Grade 2: Трудно (С трудом) -> рост интервала с коэффициентом 1.2, ease -0.15
   let hardDays;
   if(reps === 0) hardDays = 2;
   else if(reps === 1) hardDays = 2;
   else hardDays = Math.max(curI + 1, Math.round(curI * 1.2));
 
-  // Grade 3: Хорошо (Good) -> стандартная прогрессия SuperMemo-2 / RemNote
+  // Grade 3: Хорошо (Уверенно) -> стандартная прогрессия SuperMemo-2 / FSRS
   let goodDays;
   if(reps === 0) goodDays = 3;
   else if(reps === 1) goodDays = 3;
   else goodDays = Math.max(hardDays + 1, Math.round(curI * ease));
 
-  // Grade 4: Легко (Easy) -> ускоренная прогрессия с бонусом
+  // Grade 4: Легко (Назубок) -> ускоренная прогрессия с бонусом
   let easyDays;
   if(reps === 0) easyDays = 7;
   else if(reps === 1) easyDays = 7;
@@ -21117,6 +21556,13 @@ function applyRemNoteCardRating(cardKey, grade){
     lastGrade: g
   };
 
+  if(!window.__rescuePrimedCards) window.__rescuePrimedCards = {};
+  if(g === 1){
+    window.__rescuePrimedCards[cardKey] = true;
+  } else {
+    delete window.__rescuePrimedCards[cardKey];
+  }
+
   // Поддерживаем совместимость с cardRatings (фиксируем актуальную оценку сессии)
   state.cardRatings[cardKey] = g;
   saveState(state);
@@ -21131,7 +21577,7 @@ function getRemNoteCardStatusBadgeHTML(cardKey){
   const today = dateIsoKey();
   const daysDiff = Math.round((new Date(entry.dueDate + 'T00:00:00') - new Date(today + 'T00:00:00')) / (1000 * 60 * 60 * 24));
   if(daysDiff <= 0){
-    return `<span class="srs-card-status-badge srs-status-due" title="По расписанию RemNote нужно повторить сегодня">🔥 Повторить сегодня</span>`;
+    return `<span class="srs-card-status-badge srs-status-due" title="По расписанию нужно повторить сегодня">🔥 Повторить сегодня</span>`;
   } else if(entry.interval >= 21){
     return `<span class="srs-card-status-badge srs-status-mastered" title="Интервал ${entry.interval} дн. Следующее повторение: ${entry.dueDate}">👑 Закреплено (${entry.interval} дн)</span>`;
   } else {
@@ -21139,28 +21585,59 @@ function getRemNoteCardStatusBadgeHTML(cardKey){
   }
 }
 
-
+function findLinkedSkillAndDeckForNote(noteId){
+  let foundSkill = null;
+  let foundDeckId = null;
+  if(typeof ALL_PY_SKILLS !== 'undefined'){
+    foundSkill = ALL_PY_SKILLS.find(sk => Array.isArray(sk.kIds) && sk.kIds.includes(noteId)) || null;
+  }
+  if(typeof CANONICAL_NOTE_DECKS_MAP !== 'undefined' && CANONICAL_NOTE_DECKS_MAP[noteId] && CANONICAL_NOTE_DECKS_MAP[noteId].length > 0){
+    foundDeckId = CANONICAL_NOTE_DECKS_MAP[noteId][0];
+  } else if(foundSkill && Array.isArray(foundSkill.fIds) && foundSkill.fIds.length > 0){
+    const kIdx = Math.max(0, foundSkill.kIds.indexOf(noteId));
+    foundDeckId = foundSkill.fIds[Math.min(foundSkill.fIds.length - 1, kIdx)];
+  }
+  return { skill: foundSkill, deckId: foundDeckId };
+}
 
 function viewNotesSrsHub(noteSrsStats){
   const stats = noteSrsStats || getNoteSpacedRepetitionStats();
+  const srsGlobalStats = getSpacedRepetitionStats();
   const dueQueue = stats.dueNotes || [];
-  const qLen = dueQueue.length;
+  const forcedId = cardsHubState.forcedNoteId && ALL_NOTES_COMBINED[cardsHubState.forcedNoteId] ? cardsHubState.forcedNoteId : null;
+  const activeQueue = forcedId
+    ? [Object.assign({}, getNoteSrsInfo(forcedId) || { noteId: forcedId, step: 0, interval: 1, nextInterval: 3, jumpInterval: 7, isDue: true }, {
+        title: (ALL_NOTES_COMBINED[forcedId].title || forcedId).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim(),
+        noteObj: ALL_NOTES_COMBINED[forcedId]
+      })]
+    : dueQueue;
+  const qLen = activeQueue.length;
   if(typeof cardsHubState.notePos !== 'number') cardsHubState.notePos = 0;
-  const notePos = Math.min(cardsHubState.notePos, Math.max(0, qLen - 1));
+  const notePos = forcedId ? 0 : Math.min(cardsHubState.notePos, Math.max(0, qLen - 1));
 
-  const flowTabsHTML = `
-    <div class="srs-flow-selector" style="display:flex;gap:8px;margin-bottom:18px;max-width:760px;margin-left:auto;margin-right:auto;">
-      <button type="button" class="btn btn-ghost" data-srs-switch-tab="cards" style="flex:1;padding:10px 14px;border-radius:12px;font-size:0.86rem;display:flex;align-items:center;justify-content:center;gap:6px;">
-        <span>📇 3D Флеш-карточки</span>
-      </button>
-      <button type="button" class="btn btn-primary srs-flow-tab-active" data-srs-switch-tab="notes" style="flex:1;padding:10px 14px;border-radius:12px;font-size:0.86rem;display:flex;align-items:center;justify-content:center;gap:6px;">
-        <span>📖 Конспекты теории (1/3/7/21/30)</span>
-        ${qLen > 0 ? `<span class="badge" style="background:#f43f5e;color:#fff;padding:2px 7px;border-radius:999px;font-size:0.72rem;font-weight:700;">${qLen}</span>` : ''}
-      </button>
-    </div>
-  `;
+  const flowTabsHTML = buildSrsFlowTabsHTML('notes', srsGlobalStats.dueTodayCardsCount || 0, stats.dueCount || 0);
 
   if(qLen === 0 || notePos >= qLen){
+    // Инвариант 1.10: Онбординг первого дня для конспектов при 0 прочитанных конспектов
+    if(stats.totalRead === 0){
+      return `
+    <div class="container cards-hub-container" style="padding-bottom:84px;max-width:760px;margin:0 auto;">
+      ${flowTabsHTML}
+      <div class="card" style="margin-top:10px;padding:38px 24px;text-align:center;border:1.5px solid rgba(16,185,129,0.35);border-radius:24px;background:radial-gradient(ellipse at top, rgba(16,185,129,0.12), transparent 70%), var(--surface);box-shadow:0 8px 32px rgba(0,0,0,0.25);">
+        <div style="width:64px;height:64px;margin:0 auto 16px;border-radius:50%;background:rgba(16,185,129,0.16);color:#10b981;display:flex;align-items:center;justify-content:center;font-size:30px;border:1.5px solid rgba(16,185,129,0.42);box-shadow:0 0 20px rgba(16,185,129,0.22);">🌱</div>
+        <div style="display:inline-block;padding:4px 12px;border-radius:999px;background:rgba(16,185,129,0.15);color:#34d399;font-size:0.75rem;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.06em;">График Эббингауза · 1 ➔ 3 ➔ 7 ➔ 21 ➔ 30 дней</div>
+        <h2 style="font-size:1.42rem;font-weight:800;color:var(--ink);margin:0 0 10px;">🌱 Очередь повторения конспектов пока пуста</h2>
+        <p style="font-size:0.92rem;color:var(--ink-muted);max-width:540px;margin:0 auto 24px;line-height:1.6;">
+          Прочитайте первый конспект на Тропе — и он автоматически встанет на учёт по кривой забывания Эббингауза: <b>1 ➔ 3 ➔ 7 ➔ 21 ➔ 30 дней</b>. Здесь вы сможете освежать теорию по микро-шагам и проверять код в браузере.
+        </p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+          <a href="#/path" class="btn-glass-emerald btn-sprint-cta" style="padding:14px 28px;border-radius:14px;font-weight:800;display:inline-flex;align-items:center;gap:8px;text-decoration:none;">🗺️ Начать первый конспект на Тропе ➔</a>
+        </div>
+      </div>
+    </div>`;
+    }
+
+    const allPlanned = stats.scheduledNotes.concat(stats.masteredNotes);
     return `
     <div class="container cards-hub-container" style="padding-bottom:84px;max-width:760px;margin:0 auto;">
       ${flowTabsHTML}
@@ -21187,39 +21664,88 @@ function viewNotesSrsHub(noteSrsStats){
           </div>
         </div>
 
-        ${stats.scheduledNotes.length > 0 ? `
-          <div style="text-align:left;max-width:580px;margin:0 auto 24px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:16px 20px;">
-            <div style="font-size:0.80rem;font-weight:700;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
-              <span>📅 Ближайшие запланированные повторения:</span>
+        ${allPlanned.length > 0 ? `
+          <div style="text-align:left;max-width:620px;margin:0 auto 24px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px 20px;">
+            <div style="font-size:0.82rem;font-weight:700;color:var(--ink);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
+              <span>📅 График повторений конспектов (1 ➔ 3 ➔ 7 ➔ 21 ➔ 30 дн):</span>
+              <span class="meta" style="font-size:0.74rem;">Можно повторить любой конспект досрочно</span>
             </div>
             <div style="display:flex;flex-direction:column;gap:8px;">
-              ${stats.scheduledNotes.slice(0, 5).map(sn => `
-                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:0.80rem;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);">
-                  <span style="color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtmlStr(sn.title)}</span>
-                  <span style="color:var(--ink-muted);flex-shrink:0;font-size:0.75rem;">Шаг ${sn.step + 1} (${sn.interval} дн) · <b>${sn.dueDate}</b></span>
-                </div>
-              `).join('')}
+              ${allPlanned.slice(0, 8).map(sn => {
+                const miniLadder = NOTE_SRS_SCHEDULE.map((d, idx) =>
+                  `<span class="note-srs-step-dot ${idx < sn.step ? 'done' : (idx === sn.step ? 'active' : '')}">${d}д</span>`
+                ).join('');
+                return `
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:0.81rem;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);flex-wrap:wrap;">
+                  <div style="min-width:0;flex:1 1 200px;">
+                    <div style="color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtmlStr(sn.title)}</div>
+                    <div style="font-size:0.73rem;color:var(--ink-muted);margin-top:2px;">Ступень ${sn.step + 1} из 5 (${sn.interval} дн) · след.: <b>${sn.dueDate}</b></div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                    <div class="note-srs-ladder">${miniLadder}</div>
+                    <button type="button" class="btn btn-ghost" data-srs-force-note="${sn.noteId}" style="padding:5px 10px;font-size:0.75rem;border-radius:8px;font-weight:600;" title="Открыть этот конспект для досрочного повторения">Повторить ➔</button>
+                  </div>
+                </div>`;
+              }).join('')}
             </div>
           </div>
         ` : ''}
 
         <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
           <a href="#/" class="btn btn-primary" style="padding:14px 28px;border-radius:14px;font-weight:700;display:inline-flex;align-items:center;gap:8px;text-decoration:none;box-shadow:0 0 20px rgba(16,185,129,0.35);">🗺️ Продолжить изучение на Тропе ➔</a>
+          ${srsGlobalStats.dueTodayCardsCount > 0 ? `<button type="button" class="btn btn-clay" data-srs-switch-tab="cards" style="padding:14px 20px;border-radius:14px;font-weight:700;">📇 Повторить карточки (${srsGlobalStats.dueTodayCardsCount}) ➔</button>` : ''}
         </div>
       </div>
     </div>`;
   }
 
-  const curItem = dueQueue[notePos];
+  const curItem = activeQueue[notePos];
   const curNote = curItem.noteObj || {};
   const cleanTitle = curItem.title || 'Конспект теории';
-  const steps = curNote.steps || [];
+  const steps = (curNote.steps && curNote.steps.length > 0) ? curNote.steps : [{ title: cleanTitle, html: '<p>Конспект готов к повторению.</p>' }];
+  const sIdx = Math.min(Math.max(0, Number(cardsHubState.noteStepIdx) || 0), steps.length - 1);
+  const curStep = steps[sIdx] || steps[0];
+  const isFullMode = !!cardsHubState.noteFullMode;
+
   const ladderHTML = NOTE_SRS_SCHEDULE.map((days, idx) => {
     let cls = 'note-srs-step-dot';
     if(idx < curItem.step) cls += ' done';
-    else if(idx === curItem.step) cls += ' active-due';
-    return `<span class="${cls}">${days}д</span>`;
+    else if(idx === curItem.step) cls += curItem.isDue ? ' active-due' : ' active';
+    return `<span class="${cls}" title="Ступень ${idx + 1}: интервал ${days} дн">${days}д</span>`;
   }).join('<span class="note-srs-arrow">➔</span>');
+
+  const linkedInfo = findLinkedSkillAndDeckForNote(curItem.noteId);
+  const linkedSkill = linkedInfo.skill;
+  const linkedDeckId = linkedInfo.deckId;
+  const linkedTrack = linkedSkill ? getTrackForSkill(linkedSkill.id) : null;
+
+  const stepOutlineChips = steps.map((st, idx) => {
+    const cleanStTitle = (st.title || ('Шаг ' + (idx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+    const isCur = (!isFullMode && idx === sIdx);
+    return `<button type="button" class="btn btn-ghost" data-srs-note-step="${idx}" style="padding:5px 10px;border-radius:999px;font-size:0.75rem;${isCur ? 'background:rgba(16,185,129,0.18);border-color:rgba(16,185,129,0.45);color:#34d399;font-weight:700;' : 'opacity:0.85;'}">${idx + 1}. ${escapeHtmlStr(cleanStTitle)}</button>`;
+  }).join('');
+
+  const decorateFn = (typeof decorateCodeBlocksWithRunBtn === 'function') ? decorateCodeBlocksWithRunBtn : (h => h);
+  const noteContentHTML = isFullMode
+    ? `<div class="note-review-body" style="margin-bottom:16px;line-height:1.65;font-size:0.93rem;color:var(--ink);">
+        ${steps.map((st, i) => `
+          <div style="margin-bottom:18px;padding-bottom:14px;${i < steps.length - 1 ? 'border-bottom:1px dashed rgba(255,255,255,0.08);' : ''}">
+            ${st.title ? `<h4 style="font-size:1.0rem;font-weight:700;color:var(--moss);margin:0 0 8px;">${st.title.replace(/^К-\d+\s*[:·•\-]\s*/i, '')}</h4>` : ''}
+            <div class="lesson-theory" style="font-size:0.92rem;">${decorateFn(st.html || '')}</div>
+          </div>
+        `).join('')}
+      </div>`
+    : `<div class="note-review-body" style="margin-bottom:12px;line-height:1.65;font-size:0.94rem;color:var(--ink);">
+        ${curStep.title ? `<h4 style="font-size:1.04rem;font-weight:700;color:var(--moss);margin:0 0 10px;">${curStep.title.replace(/^К-\d+\s*[:·•\-]\s*/i, '')}</h4>` : ''}
+        <div class="lesson-theory" style="font-size:0.93rem;">${decorateFn(curStep.html || '')}</div>
+      </div>
+      ${steps.length > 1 ? `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:10px 0;">
+          <button type="button" class="btn btn-ghost" data-srs-note-step="${Math.max(0, sIdx - 1)}" ${sIdx === 0 ? 'disabled' : ''} style="padding:7px 13px;border-radius:10px;font-size:0.80rem;">← Предыдущий шаг</button>
+          <button type="button" class="btn btn-ghost" data-srs-note-step="${Math.min(steps.length - 1, sIdx + 1)}" ${sIdx + 1 >= steps.length ? 'disabled' : ''} style="padding:7px 13px;border-radius:10px;font-size:0.80rem;">Следующий шаг (${Math.min(steps.length, sIdx + 2)}/${steps.length}) ➔</button>
+        </div>
+      ` : ''}
+      ${buildUnifiedMicroStepperHTML(sIdx, steps.length, 'Шаг', 'data-srs-note-step', `Ступень ${curItem.step + 1}/5 (${curItem.interval} дн)`)}`;
 
   return `
   <div class="container cards-hub-container" style="padding-bottom:84px;max-width:760px;margin:0 auto;">
@@ -21232,13 +21758,15 @@ function viewNotesSrsHub(noteSrsStats){
         </div>
       </div>
       <div class="cards-hub-header-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <span class="cocoon-pill" style="font-size:0.80rem;font-weight:600;">${notePos + 1} / ${qLen}</span>
+        <span class="cocoon-pill" style="font-size:0.80rem;font-weight:600;">Конспект ${notePos + 1} из ${qLen}</span>
+        <button type="button" class="btn btn-ghost" data-srs-note-toggle-full style="padding:6px 12px;font-size:0.78rem;" title="Переключить пошаговый режим и полный обзор конспекта">${isFullMode ? '⚡ По шагам' : '📖 Весь конспект'}</button>
+        ${forcedId ? `<button type="button" class="btn btn-ghost" data-srs-exit-force-note style="padding:6px 12px;font-size:0.78rem;">📅 К расписанию</button>` : ''}
         <a href="#/" class="btn btn-ghost" style="padding:6px 12px;font-size:0.78rem;text-decoration:none;">На Тропу ➔</a>
       </div>
     </div>
 
-    <div class="fc-stories-bar" aria-label="Прогресс очереди конспектов дня" style="margin-bottom:16px;">
-      ${dueQueue.map((dq, idx) => {
+    <div class="fc-stories-bar" aria-label="Прогресс очереди конспектов дня" style="margin-bottom:14px;">
+      ${activeQueue.map((dq, idx) => {
         let cls = 'fc-story-seg';
         if(idx === notePos) cls += ' fc-story-seg--active seg--current';
         else if(idx < notePos) cls += ' fc-story-seg--r3 seg--easy';
@@ -21246,10 +21774,10 @@ function viewNotesSrsHub(noteSrsStats){
       }).join('')}
     </div>
 
-    <div class="card" style="border:1.5px solid rgba(16,185,129,0.35);border-radius:20px;padding:24px;background:rgba(16,185,129,0.02);box-shadow:0 8px 32px rgba(0,0,0,0.25);">
+    <div class="card" style="border:1.5px solid rgba(16,185,129,0.35);border-radius:20px;padding:22px;background:rgba(16,185,129,0.02);box-shadow:0 8px 32px rgba(0,0,0,0.25);">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.06);">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span class="topic-badge" style="background:rgba(16,185,129,0.18);color:#34d399;font-weight:700;">Повторение: Шаг ${curItem.step + 1} из 5</span>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span class="topic-badge" style="background:rgba(16,185,129,0.18);color:#34d399;font-weight:700;">Повторение: Ступень ${curItem.step + 1} из 5</span>
           <span style="font-size:0.80rem;color:var(--ink-muted);">Текущий интервал: <b>${curItem.interval} дн</b></span>
         </div>
         <div class="note-srs-ladder" style="background:rgba(255,255,255,0.03);padding:4px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);">
@@ -21257,23 +21785,41 @@ function viewNotesSrsHub(noteSrsStats){
         </div>
       </div>
 
-      <h2 style="font-size:1.30rem;font-weight:800;color:var(--ink);margin:0 0 16px;">${escapeHtmlStr(cleanTitle)}</h2>
+      <h2 style="font-size:1.28rem;font-weight:800;color:var(--ink);margin:0 0 12px;">${escapeHtmlStr(cleanTitle)}</h2>
 
-      <div class="note-review-body" style="max-height:380px;overflow-y:auto;padding-right:8px;margin-bottom:20px;line-height:1.6;font-size:0.92rem;color:var(--ink);">
-        ${steps.map((st, i) => `
-          <div style="margin-bottom:16px;padding-bottom:12px;${i < steps.length - 1 ? 'border-bottom:1px dashed rgba(255,255,255,0.06);' : ''}">
-            ${st.title ? `<h4 style="font-size:0.98rem;font-weight:700;color:var(--moss);margin:0 0 8px;">${st.title.replace(/^К-\d+\s*[:·•\-]\s*/i, '')}</h4>` : ''}
-            <div class="lesson-theory" style="font-size:0.90rem;">${st.html || ''}</div>
+      ${steps.length > 1 ? `
+        <div style="margin-bottom:14px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);">
+          <div style="font-size:0.74rem;font-weight:700;color:var(--ink-muted);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
+            <span>🧭 Структура конспекта (мысленно воспроизведите суть каждого шага):</span>
+            <span>Шагов: ${steps.length}</span>
           </div>
-        `).join('')}
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">${stepOutlineChips}</div>
+        </div>
+      ` : ''}
+
+      ${noteContentHTML}
+
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 0;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);font-size:0.80rem;">
+        <span style="color:var(--ink-muted);font-weight:600;">🔗 Связанные материалы темы:</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          ${linkedDeckId ? `<button type="button" class="btn btn-ghost" data-srs-open-deck="${linkedDeckId}" style="padding:5px 11px;font-size:0.76rem;border-radius:9px;">📇 Карточки этой темы</button>` : ''}
+          ${linkedSkill && linkedTrack ? `<a href="#${linkedTrack.routePrefix}/skill/${linkedSkill.id}" class="btn btn-ghost" style="padding:5px 11px;font-size:0.76rem;border-radius:9px;text-decoration:none;">🗺️ Открыть в уроке ➔</a>` : ''}
+          <a href="#/docs" class="btn btn-ghost" style="padding:5px 11px;font-size:0.76rem;border-radius:9px;text-decoration:none;">💡 Шпаргалка</a>
+        </div>
       </div>
 
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);">
-        <button type="button" class="btn btn-ghost" data-srs-note-reset="${curItem.noteId}" title="Сбросить прогресс повторения конспекта на 1 день" style="padding:11px 16px;border-radius:12px;font-size:0.84rem;">
-          🔄 Снова (через 1 дн)
+      <div class="fc-rate-row" style="grid-template-columns:repeat(3,1fr);margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);">
+        <button type="button" class="btn btn-ghost" data-srs-note-reset="${curItem.noteId}" title="Сбросить интервал конспекта на 1 день (клавиша 1)">
+          <span>Не знаю <kbd class="fc-kbd-hint hide-on-mobile">1</kbd></span>
+          <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">С нуля · 1 дн</span>
         </button>
-        <button type="button" class="btn-glass-emerald btn-sprint-cta" data-srs-note-pass="${curItem.noteId}" style="flex:1;max-width:440px;padding:12px 20px;border-radius:14px;font-weight:800;">
-          ✓ Понятно, закреплено (след.: ${curItem.nextInterval} дн) · +15 XP ➔
+        <button type="button" class="btn-glass-emerald btn-sprint-cta" data-srs-note-pass="${curItem.noteId}" title="Закрепить и перевести на следующую ступень (${curItem.nextInterval} дн, клавиша 2 или Enter)">
+          <span>✓ Понятно (+15 XP) <kbd class="fc-kbd-hint hide-on-mobile">2</kbd></span>
+          <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">Уверенно · ${curItem.nextInterval} дн</span>
+        </button>
+        <button type="button" class="btn btn-primary" data-srs-note-easy="${curItem.noteId}" title="Помню идеально — перешагнуть ступень (${curItem.jumpInterval || curItem.nextInterval} дн, клавиша 3 или 4)">
+          <span>⚡ Назубок (+20 XP) <kbd class="fc-kbd-hint hide-on-mobile">3</kbd></span>
+          <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">Назубок · ${curItem.jumpInterval || curItem.nextInterval} дн</span>
         </button>
       </div>
     </div>
@@ -21295,7 +21841,7 @@ function getNoteSrsInfo(noteId){
         step: 0,
         interval: NOTE_SRS_SCHEDULE[0],
         lastReview: today,
-        dueDate: today,
+        dueDate: addDaysToDateKey(today, NOTE_SRS_SCHEDULE[0]),
         reviewCount: 1,
         mastered: false
       };
@@ -21309,6 +21855,8 @@ function getNoteSrsInfo(noteId){
   const curInterval = entry.interval || NOTE_SRS_SCHEDULE[curStep];
   const nextStep = Math.min(curStep + 1, NOTE_SRS_SCHEDULE.length - 1);
   const nextInterval = NOTE_SRS_SCHEDULE[nextStep];
+  const jumpStep = Math.min(curStep + 2, NOTE_SRS_SCHEDULE.length - 1);
+  const jumpInterval = NOTE_SRS_SCHEDULE[jumpStep];
   const isDue = (entry.dueDate || today) <= today;
   const daysDiff = Math.round((new Date((entry.dueDate || today) + 'T00:00:00') - new Date(today + 'T00:00:00')) / (1000 * 60 * 60 * 24));
 
@@ -21317,6 +21865,7 @@ function getNoteSrsInfo(noteId){
     step: curStep,
     interval: curInterval,
     nextInterval: nextInterval,
+    jumpInterval: jumpInterval,
     lastReview: entry.lastReview || today,
     dueDate: entry.dueDate || today,
     reviewCount: entry.reviewCount || 1,
@@ -21343,34 +21892,50 @@ function registerNoteInitialRead(noteId){
   }
 }
 
-function applyNoteReview(noteId, success, anchorEl){
+function applyNoteReview(noteId, modeOrSuccess, anchorEl){
   ensureExtendedState();
   if(!state.noteSrs) state.noteSrs = {};
   const today = (typeof dateIsoKey === 'function') ? dateIsoKey() : new Date().toISOString().slice(0, 10);
+  const prevEntry = state.noteSrs[noteId] || {};
   const current = getNoteSrsInfo(noteId) || { step: 0, interval: 1, reviewCount: 1 };
   let newStep = current.step;
   let newCount = (current.reviewCount || 1) + 1;
   let isMastered = false;
   let interval = NOTE_SRS_SCHEDULE[0];
+  const alreadyRewardedToday = (prevEntry.lastXpDate === today);
 
-  if(success){
+  if(modeOrSuccess === 'easy'){
+    if(newStep + 2 < NOTE_SRS_SCHEDULE.length){
+      newStep += 2;
+    } else {
+      newStep = NOTE_SRS_SCHEDULE.length - 1;
+      isMastered = true;
+    }
+    interval = NOTE_SRS_SCHEDULE[newStep];
+    if(!alreadyRewardedToday && typeof awardXp === 'function') awardXp(20, anchorEl);
+    try { playSound('complete'); } catch(e){}
+    const daysWord = (typeof pluralizeRu === 'function') ? pluralizeRu(interval, 'день', 'дня', 'дней') : 'дн';
+    if(typeof showToast === 'function'){
+      showToast(`Отлично! Конспект закреплён назубок — следующее повторение через ${interval} ${daysWord}${alreadyRewardedToday ? '' : ' (+20 XP)'}`, 'success');
+    }
+  } else if(modeOrSuccess === true || modeOrSuccess === 'pass'){
     if(newStep < NOTE_SRS_SCHEDULE.length - 1){
       newStep++;
     } else {
       isMastered = true;
     }
     interval = NOTE_SRS_SCHEDULE[newStep];
-    if(typeof awardXp === 'function') awardXp(15, anchorEl);
+    if(!alreadyRewardedToday && typeof awardXp === 'function') awardXp(15, anchorEl);
     try { playSound('tick'); } catch(e){}
     const daysWord = (typeof pluralizeRu === 'function') ? pluralizeRu(interval, 'день', 'дня', 'дней') : 'дн';
     if(typeof showToast === 'function'){
-      showToast(`Конспект закреплён! Следующее повторение по графику через ${interval} ${daysWord} (+15 XP)`, 'success');
+      showToast(`Конспект закреплён! Следующее повторение по графику через ${interval} ${daysWord}${alreadyRewardedToday ? '' : ' (+15 XP)'}`, 'success');
     }
   } else {
     newStep = 0;
     interval = NOTE_SRS_SCHEDULE[0];
     if(typeof showToast === 'function'){
-      showToast('Конспект вернётся на повторение через 1 день', 'info');
+      showToast('Конспект вернётся на повторение через 1 день (С нуля)', 'info');
     }
   }
 
@@ -21379,10 +21944,14 @@ function applyNoteReview(noteId, success, anchorEl){
     step: newStep,
     interval: interval,
     lastReview: today,
+    lastXpDate: (modeOrSuccess === true || modeOrSuccess === 'pass' || modeOrSuccess === 'easy') ? today : (prevEntry.lastXpDate || null),
     dueDate: nextDue,
     reviewCount: newCount,
     mastered: isMastered
   };
+  if(!state.readNotes.includes(noteId)){
+    state.readNotes.push(noteId);
+  }
   saveState(state);
 }
 
@@ -21409,6 +21978,8 @@ function getNoteSpacedRepetitionStats(){
     }
   });
 
+  scheduledNotes.sort((a, b) => (a.dueDate < b.dueDate ? -1 : a.dueDate > b.dueDate ? 1 : 0));
+
   return {
     totalRead: readList.length,
     dueCount: dueNotes.length,
@@ -21422,34 +21993,41 @@ function getNoteSpacedRepetitionStats(){
 
 function getNoteSrsBadgeHTML(noteId){
   const info = getNoteSrsInfo(noteId);
-  if(!info) return '';
+  if(!info){
+    const initialLadder = NOTE_SRS_SCHEDULE.map(days => `<span class="note-srs-step-dot">${days}д</span>`).join('<span class="note-srs-arrow">➔</span>');
+    return `
+      <div class="note-srs-status-badge note-srs-fresh" title="После завершения конспект автоматически встанет на график повторения 1/3/7/21/30 дней">
+        <span style="display:inline-flex;align-items:center;gap:6px;"><span class="note-srs-badge-icon">🌱</span><span class="note-srs-badge-text">График памяти Эббингауза (встанет на учёт после прочтения)</span></span>
+        <div class="note-srs-ladder">${initialLadder}</div>
+      </div>`;
+  }
   const ladderHTML = NOTE_SRS_SCHEDULE.map((days, idx) => {
     let cls = 'note-srs-step-dot';
     if(idx < info.step) cls += ' done';
     else if(idx === info.step) cls += info.isDue ? ' active-due' : ' active';
-    return `<span class="${cls}" title="Шаг ${idx+1}: через ${days} дн">${days}д</span>`;
+    return `<span class="${cls}" title="Ступень ${idx+1}: через ${days} дн">${days}д</span>`;
   }).join('<span class="note-srs-arrow">➔</span>');
 
   if(info.isDue){
     return `
       <div class="note-srs-status-badge note-srs-due" title="По графику 1/3/7/21/30 конспект подошёл к повторению сегодня">
-        <span class="note-srs-badge-icon">🔥</span>
-        <span class="note-srs-badge-text">Повторить сегодня (Шаг ${info.step + 1}: ${info.interval} дн)</span>
-        <div class="note-srs-ladder">${ladderHTML}</div>
+        <span style="display:inline-flex;align-items:center;gap:6px;"><span class="note-srs-badge-icon">🔥</span><span class="note-srs-badge-text">Пора повторить сегодня (Ступень ${info.step + 1}: ${info.interval} дн)</span></span>
+        <div style="display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <div class="note-srs-ladder">${ladderHTML}</div>
+          <button type="button" class="btn btn-clay" data-srs-note-pass="${noteId}" style="padding:3px 10px;font-size:0.72rem;border-radius:8px;font-weight:700;">✓ Закрепить (+15 XP)</button>
+        </div>
       </div>`;
   }
   if(info.mastered){
     return `
       <div class="note-srs-status-badge note-srs-mastered" title="Конспект усвоен на 30+ дней">
-        <span class="note-srs-badge-icon">👑</span>
-        <span class="note-srs-badge-text">Закреплено (${info.interval} дн · след.: ${info.dueDate})</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;"><span class="note-srs-badge-icon">👑</span><span class="note-srs-badge-text">Закреплено в памяти (${info.interval} дн · след.: ${info.dueDate})</span></span>
         <div class="note-srs-ladder">${ladderHTML}</div>
       </div>`;
   }
   return `
     <div class="note-srs-status-badge note-srs-scheduled" title="Следующее повторение: ${info.dueDate}">
-      <span class="note-srs-badge-icon">📅</span>
-      <span class="note-srs-badge-text">Повторение через ${Math.max(1, info.daysDiff)} дн (${info.dueDate})</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;"><span class="note-srs-badge-icon">📅</span><span class="note-srs-badge-text">Повторение через ${Math.max(1, info.daysDiff)} дн (${info.dueDate})</span></span>
       <div class="note-srs-ladder">${ladderHTML}</div>
     </div>`;
 }
@@ -22125,36 +22703,39 @@ viewDashboard = function(){
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--moss)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:2px;flex-shrink:0;"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
                 <span>Интервальное повторение</span>
               </span>
-              ${(typeof getNoteSpacedRepetitionStats === 'function' && getNoteSpacedRepetitionStats().dueCount > 0) ? `<a href="#/cards?tab=notes" class="badge" style="background:rgba(244,63,94,0.18);border:1px solid rgba(244,63,94,0.40);color:#fda4af;padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;text-decoration:none;">${getNoteSpacedRepetitionStats().dueCount} консп. (1/3/7/21/30)</a>` : ''}
+              ${(typeof getNoteSpacedRepetitionStats === 'function' && getNoteSpacedRepetitionStats().dueCount > 0) ? `<a href="#/cards?tab=notes" data-srs-switch-tab="notes" class="badge" style="background:rgba(244,63,94,0.18);border:1px solid rgba(244,63,94,0.40);color:#fda4af;padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;text-decoration:none;">${getNoteSpacedRepetitionStats().dueCount} консп. (1/3/7/21/30)</a>` : ''}
             </div>
             <div class="meta" style="font-size:.78rem;color:var(--ink-muted);">
               ${dueTodayCardsCount > 0
                 ? srsSubtitle
-                : (!hasReviewedAnyCard
-                    ? `<div class="srs-clean-preview" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);cursor:pointer;transition:transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease;" title="Нажмите, чтобы узнать условие открытия колоды" onclick="showToast('Пройдите первые 3 шага теории, чтобы открыть флеш-колоду темы (+10 XP)', 'info');">
-                        <div style="display:flex;align-items:center;gap:7px;min-width:0;flex:1 1 auto;">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;flex-shrink:0;color:var(--ink-muted);"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                          <span style="font-weight:600;color:var(--ink);font-size:0.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                            <span class="srs-deck-title-desk">${escapeHtmlStr(cleanTitle)}</span>
-                            <span class="srs-deck-title-mob">${escapeHtmlStr(srsMobTitle)}</span>
-                          </span>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.03);padding:2px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
-                          <span style="font-size:0.70rem;color:var(--ink-muted);">${theoryDoneCount}/3</span>
-                          <span style="display:inline-flex;gap:4px;align-items:center;">
-                            <span style="width:6px;height:6px;border-radius:50%;background:${theoryDoneCount >= 1 ? '#10b981' : 'rgba(255,255,255,0.18)'};${theoryDoneCount >= 1 ? 'box-shadow:0 0 6px rgba(16,185,129,0.7);' : ''}"></span>
-                            <span style="width:6px;height:6px;border-radius:50%;background:${theoryDoneCount >= 2 ? '#10b981' : 'rgba(255,255,255,0.18)'};${theoryDoneCount >= 2 ? 'box-shadow:0 0 6px rgba(16,185,129,0.7);' : ''}"></span>
-                            <span style="width:6px;height:6px;border-radius:50%;background:${theoryDoneCount >= 3 ? '#10b981' : 'rgba(255,255,255,0.18)'};${theoryDoneCount >= 3 ? 'box-shadow:0 0 6px rgba(16,185,129,0.7);' : ''}"></span>
-                          </span>
-                        </div>
-                      </div>
-                      <div style="display:flex;align-items:center;gap:6px;padding:6px 2px 0;font-size:.74rem;">
-                        <span style="color:var(--ink-muted);font-size:.74rem;display:inline-flex;align-items:center;gap:5px;" title="🌱 ${theoryDoneCount === 0 ? 'Откроется после 3 шагов теории · +10 XP' : `До открытия: ${remainingSteps} ${stepsText} · +10 XP`}">
-                          <span class="srs-act-text-desk">${theoryDoneCount === 0 ? '🌱 Откроется после 3 шагов теории (+10&nbsp;XP)' : `🌱 До открытия: ${remainingSteps}&nbsp;${stepsText} (+10&nbsp;XP)`}</span>
-                          <span class="srs-act-text-mob">${theoryDoneCount === 0 ? '🌱 Откроется после 3 шагов (+10&nbsp;XP)' : `🌱 До открытия: ${remainingSteps}&nbsp;${stepsText} (+10&nbsp;XP)`}</span>
-                        </span>
-                      </div>`
-                    : `<span class="badge" style="background:rgba(16,185,129,0.16);border:1px solid rgba(16,185,129,0.35);color:#34d399;padding:4px 10px;border-radius:8px;font-size:.76rem;font-weight:700;display:inline-block;">✓ Все карточки на сегодня повторены!</span>`
+                : ((typeof getNoteSpacedRepetitionStats === 'function' && getNoteSpacedRepetitionStats().dueCount > 0)
+                    ? `📖 По графику 1/3/7/21/30 к повтору: <b>${getNoteSpacedRepetitionStats().dueCount}&nbsp;консп.</b> (+10&nbsp;XP)`
+                    : (!hasReviewedAnyCard
+                        ? `<div class="srs-clean-preview" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);cursor:pointer;transition:transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease;" title="Нажмите, чтобы узнать условие открытия колоды" onclick="showToast('Пройдите первые 3 шага теории, чтобы открыть флеш-колоду темы (+10 XP)', 'info');">
+                            <div style="display:flex;align-items:center;gap:7px;min-width:0;flex:1 1 auto;">
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;flex-shrink:0;color:var(--ink-muted);"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                              <span style="font-weight:600;color:var(--ink);font-size:0.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                <span class="srs-deck-title-desk">${escapeHtmlStr(cleanTitle)}</span>
+                                <span class="srs-deck-title-mob">${escapeHtmlStr(srsMobTitle)}</span>
+                              </span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.03);padding:2px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
+                              <span style="font-size:0.70rem;color:var(--ink-muted);">${theoryDoneCount}/3</span>
+                              <span style="display:inline-flex;gap:4px;align-items:center;">
+                                <span style="width:6px;height:6px;border-radius:50%;background:${theoryDoneCount >= 1 ? '#10b981' : 'rgba(255,255,255,0.18)'};${theoryDoneCount >= 1 ? 'box-shadow:0 0 6px rgba(16,185,129,0.7);' : ''}"></span>
+                                <span style="width:6px;height:6px;border-radius:50%;background:${theoryDoneCount >= 2 ? '#10b981' : 'rgba(255,255,255,0.18)'};${theoryDoneCount >= 2 ? 'box-shadow:0 0 6px rgba(16,185,129,0.7);' : ''}"></span>
+                                <span style="width:6px;height:6px;border-radius:50%;background:${theoryDoneCount >= 3 ? '#10b981' : 'rgba(255,255,255,0.18)'};${theoryDoneCount >= 3 ? 'box-shadow:0 0 6px rgba(16,185,129,0.7);' : ''}"></span>
+                              </span>
+                            </div>
+                          </div>
+                          <div style="display:flex;align-items:center;gap:6px;padding:6px 2px 0;font-size:.74rem;">
+                            <span style="color:var(--ink-muted);font-size:.74rem;display:inline-flex;align-items:center;gap:5px;" title="🌱 ${theoryDoneCount === 0 ? 'Откроется после 3 шагов теории · +10 XP' : `До открытия: ${remainingSteps} ${stepsText} · +10 XP`}">
+                              <span class="srs-act-text-desk">${theoryDoneCount === 0 ? '🌱 Откроется после 3 шагов теории (+10&nbsp;XP)' : `🌱 До открытия: ${remainingSteps}&nbsp;${stepsText} (+10&nbsp;XP)`}</span>
+                              <span class="srs-act-text-mob">${theoryDoneCount === 0 ? '🌱 Откроется после 3 шагов (+10&nbsp;XP)' : `🌱 До открытия: ${remainingSteps}&nbsp;${stepsText} (+10&nbsp;XP)`}</span>
+                            </span>
+                          </div>`
+                        : `<span class="badge" style="background:rgba(16,185,129,0.16);border:1px solid rgba(16,185,129,0.35);color:#34d399;padding:4px 10px;border-radius:8px;font-size:.76rem;font-weight:700;display:inline-block;">✓ Все карточки на сегодня повторены!</span>`
+                      )
                   )
               }
             </div>
@@ -22162,9 +22743,12 @@ viewDashboard = function(){
           <div style="display:flex;flex-direction:column;gap:8px;margin-top:auto;">
             ${dueTodayCardsCount > 0
               ? `<div style="display:flex;justify-content:flex-end;"><a href="#/cards" ${targetDeckId ? `data-srs-open-deck="${targetDeckId}"` : ''} class="btn-ghost-quiet btn-srs-quiet" style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;font-weight:600;font-size:.80rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:var(--ink-muted);text-decoration:none;transition:all .2s ease;">Повторить ➔</a></div>`
-              : (!hasReviewedAnyCard
-                  ? `<div class="srs-clean-footer meta" style="font-size:.73rem;color:var(--ink-muted);display:flex;align-items:center;gap:6px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.04);margin-top:auto;"><span style="opacity:0.6;">🧠 Память:</span> <span>режим накопления базы</span></div>`
-                  : `<div style="display:flex;justify-content:flex-end;"><a href="#/cards" class="btn-srs-pill link-quiet text-muted">Обзор колод ➔</a></div>`
+              : ((typeof getNoteSpacedRepetitionStats === 'function' && getNoteSpacedRepetitionStats().dueCount > 0)
+                  ? `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><a href="#/cards" class="btn-srs-pill link-quiet text-muted">Колоды</a><a href="#/cards?tab=notes" data-srs-switch-tab="notes" class="btn-ghost-quiet btn-srs-quiet" style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;font-weight:600;font-size:.80rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:var(--ink-muted);text-decoration:none;transition:all .2s ease;">Повторить конспекты ➔</a></div>`
+                  : (!hasReviewedAnyCard
+                      ? `<div class="srs-clean-footer meta" style="font-size:.73rem;color:var(--ink-muted);display:flex;align-items:center;gap:6px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.04);margin-top:auto;"><span style="opacity:0.6;">🧠 Память:</span> <span>режим накопления базы</span></div>`
+                      : `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><a href="#/cards?tab=notes" data-srs-switch-tab="notes" class="btn-srs-pill link-quiet text-muted">Конспекты 1/3/7/21/30</a><a href="#/cards" class="btn-srs-pill link-quiet text-muted">Обзор колод ➔</a></div>`
+                    )
                 )
             }
           </div>
@@ -23256,15 +23840,156 @@ document.addEventListener('click', async function(e){
   if(e.target.closest('[data-diag-confirm]')){ confirmDiagAnswer(); return; }
   if(e.target.closest('[data-diag-prev]')){ prevDiagQuestion(); return; }
 
+  const srsSwitchTabBtn = e.target.closest('[data-srs-switch-tab]');
+  if(srsSwitchTabBtn){
+    const targetTab = srsSwitchTabBtn.getAttribute('data-srs-switch-tab') === 'notes' ? 'notes' : 'cards';
+    cardsHubState.hubTab = targetTab;
+    cardsHubState.rescueCardKey = null;
+    if(targetTab === 'notes'){
+      cardsHubState.notePos = 0;
+      cardsHubState.noteStepIdx = 0;
+    }
+    saveCardsHubPosState();
+    try{ playSound('tick'); }catch(err){}
+    if(location.hash.indexOf('#/cards') !== 0 && location.hash !== '#/notes-review'){
+      location.hash = targetTab === 'notes' ? '#/cards?tab=notes' : '#/cards';
+    }
+    render();
+    return;
+  }
+
+  const srsGotoNoteBtn = e.target.closest('[data-srs-goto-note]');
+  if(srsGotoNoteBtn){
+    cardsHubState.notePos = parseInt(srsGotoNoteBtn.getAttribute('data-srs-goto-note'), 10) || 0;
+    cardsHubState.noteStepIdx = 0;
+    saveCardsHubPosState();
+    render();
+    return;
+  }
+
+  const srsForceNoteBtn = e.target.closest('[data-srs-force-note]');
+  if(srsForceNoteBtn){
+    const fnId = srsForceNoteBtn.getAttribute('data-srs-force-note');
+    if(fnId && ALL_NOTES_COMBINED[fnId]){
+      cardsHubState.hubTab = 'notes';
+      cardsHubState.forcedNoteId = fnId;
+      cardsHubState.noteStepIdx = 0;
+      saveCardsHubPosState();
+      render();
+    }
+    return;
+  }
+
+  if(e.target.closest('[data-srs-exit-force-note]')){
+    cardsHubState.forcedNoteId = null;
+    cardsHubState.noteStepIdx = 0;
+    saveCardsHubPosState();
+    render();
+    return;
+  }
+
+  const srsNoteStepBtn = e.target.closest('[data-srs-note-step]');
+  if(srsNoteStepBtn){
+    cardsHubState.noteStepIdx = Math.max(0, parseInt(srsNoteStepBtn.getAttribute('data-srs-note-step'), 10) || 0);
+    cardsHubState.noteFullMode = false;
+    saveCardsHubPosState();
+    render();
+    return;
+  }
+
+  if(e.target.closest('[data-srs-note-toggle-full]')){
+    cardsHubState.noteFullMode = !cardsHubState.noteFullMode;
+    saveCardsHubPosState();
+    render();
+    return;
+  }
+
+  const srsNotePassBtn = e.target.closest('[data-srs-note-pass]');
+  if(srsNotePassBtn){
+    const nid = srsNotePassBtn.getAttribute('data-srs-note-pass');
+    if(nid){
+      applyNoteReview(nid, 'pass', srsNotePassBtn);
+      cardsHubState.forcedNoteId = null;
+      cardsHubState.noteStepIdx = 0;
+      cardsHubState.notePos = 0;
+      saveCardsHubPosState();
+      render();
+    }
+    return;
+  }
+
+  const srsNoteEasyBtn = e.target.closest('[data-srs-note-easy]');
+  if(srsNoteEasyBtn){
+    const nid = srsNoteEasyBtn.getAttribute('data-srs-note-easy');
+    if(nid){
+      applyNoteReview(nid, 'easy', srsNoteEasyBtn);
+      cardsHubState.forcedNoteId = null;
+      cardsHubState.noteStepIdx = 0;
+      cardsHubState.notePos = 0;
+      saveCardsHubPosState();
+      render();
+    }
+    return;
+  }
+
+  const srsNoteResetBtn = e.target.closest('[data-srs-note-reset]');
+  if(srsNoteResetBtn){
+    const nid = srsNoteResetBtn.getAttribute('data-srs-note-reset');
+    if(nid){
+      applyNoteReview(nid, 'reset', srsNoteResetBtn);
+      cardsHubState.forcedNoteId = null;
+      cardsHubState.noteStepIdx = 0;
+      cardsHubState.notePos = 0;
+      saveCardsHubPosState();
+      render();
+    }
+    return;
+  }
+
+  const revealMaskBtn = e.target.closest('[data-reveal-rescue-mask]');
+  if(revealMaskBtn){
+    e.stopPropagation();
+    const ck = revealMaskBtn.getAttribute('data-reveal-rescue-mask');
+    if(ck){
+      if(!window.__rescueMaskRevealed) window.__rescueMaskRevealed = {};
+      window.__rescueMaskRevealed[ck] = true;
+      try{ playSound('tick'); }catch(err){}
+      render();
+    }
+    return;
+  }
+
+  const pyRescueBtn = e.target.closest('[data-py-rescue-card]');
+  if(pyRescueBtn){
+    e.stopPropagation();
+    const ck = pyRescueBtn.getAttribute('data-py-rescue-card');
+    pySkillViewState.rescueCardKey = (pySkillViewState.rescueCardKey === ck) ? null : ck;
+    try{ playSound('tick'); }catch(err){}
+    render();
+    return;
+  }
+
+  const hubRescueBtn = e.target.closest('[data-hub-rescue]');
+  if(hubRescueBtn){
+    e.stopPropagation();
+    const ck = hubRescueBtn.getAttribute('data-hub-rescue');
+    cardsHubState.rescueCardKey = (cardsHubState.rescueCardKey === ck) ? null : ck;
+    try{ playSound('tick'); }catch(err){}
+    render();
+    return;
+  }
+
   const srsDeckBtn = e.target.closest('[data-srs-open-deck]');
   if(srsDeckBtn){
     const did = srsDeckBtn.getAttribute('data-srs-open-deck');
     if(did && ALL_DECKS_COMBINED[did]){
+      cardsHubState.hubTab = 'cards';
       cardsHubState.deckId = did;
       cardsHubState.cardIdx = 0;
       cardsHubState.dueMode = false;
       cardsHubState.completed = false;
       cardsHubState.flipped = false;
+      cardsHubState.rescueCardKey = null;
       saveCardsHubPosState();
       try{ playSound('flip'); }catch(e){}
       location.hash = '#/cards';
@@ -26380,6 +27105,10 @@ document.addEventListener('keydown', function(e){
     (e.target.closest('[data-direct-unit]') || e.target.closest('[data-gate-track]') || e.target.closest('.hex-challenge-node') || e.target.closest('.hex-3d-node') || e.target.closest('.path-popover-step')).dispatchEvent(clickEv);
     return;
   }
+  if((e.key === 'h' || e.key === 'H' || e.key === 'р' || e.key === 'Р') && !e.ctrlKey && !e.metaKey && !e.altKey){
+    const rescueBtn = document.querySelector('[data-py-rescue-card], [data-hub-rescue]');
+    if(rescueBtn){ e.preventDefault(); rescueBtn.click(); return; }
+  }
   if(e.code === 'Space' || e.key === ' ' || e.key === 'Spacebar'){
     const isFlippedHub = (typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.flipped);
     const isFlippedSkill = (typeof pySkillViewState !== 'undefined' && pySkillViewState && pySkillViewState.tab === 'cards' && pySkillViewState.cardFlipped);
@@ -26417,6 +27146,18 @@ document.addEventListener('keydown', function(e){
     if(nextBtn){ e.preventDefault(); nextBtn.click(); return; }
   }
   if(e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4'){
+    if(typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.hubTab === 'notes' && currentRoute().indexOf('/cards') === 0){
+      if(e.key === '1'){
+        const nr = document.querySelector('[data-srs-note-reset]');
+        if(nr){ e.preventDefault(); nr.click(); return; }
+      } else if(e.key === '2' || e.key === '3'){
+        const np = document.querySelector('[data-srs-note-pass]');
+        if(np){ e.preventDefault(); np.click(); return; }
+      } else if(e.key === '4'){
+        const ne = document.querySelector('[data-srs-note-easy]');
+        if(ne){ e.preventDefault(); ne.click(); return; }
+      }
+    }
     let rateSel = `[data-py-rate-card="${e.key}"], [data-hub-rate="${e.key}"]`;
     if(e.key === '1' || e.key === '2'){
       rateSel += `, [data-py-rate-card="hard"], [data-hub-rate="hard"]`;

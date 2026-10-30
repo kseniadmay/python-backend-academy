@@ -12,7 +12,7 @@ def run_platinum_audit():
         names = []
         for root, _, files in os.walk(project_dir):
             for f in files:
-                if f == '.DS_Store' or f.startswith('._'):
+                if f in ('.DS_Store', 'desktop.ini', 'Thumbs.db', '.gitkeep') or f.startswith('._') or not f.endswith('.md'):
                     continue
                 rel = os.path.relpath(os.path.join(root, f), project_dir).replace('\\', '/')
                 names.append(rel)
