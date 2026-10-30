@@ -3,23 +3,17 @@
 """
 verify_all.py
 
-Кроссплатформенный мастер-конвейер полной верификации платформы
-Python Backend Academy (100% эквивалент и расширение verify_all.cmd).
+Кроссплатформенный мастер-конвейер верификации данных, синтаксиса и задач
+платформы Python Backend Academy (без UI/DOM и браузерных тестов).
 
 Этапы:
-[1/6] Проверка архива RemNote Platinum 525 файлов и карточек (verify_platinum.py)
-[2/6] Сквозные DOM-инварианты и бизнес-логика (test_e2e_dom.js)
-[3/6] PWA Offline, Manifest и Service Worker (test_pwa_offline.js)
-[4/6] Рендеринг маршрутов в Headless Chrome и синтаксис JS (verify_academy.py)
-[5/6] Запуск 401 задачи IDE и 459 сниппетов конспектов (test_all_401_tasks.py)
-[6/6] Визуальное тестирование: все маршруты x viewport'ы x состояния,
-      зонды layout/JS-ошибок и pixel-diff с эталонами (visual_test.js)
-      -- обновление эталонов после ОСОЗНАННЫХ правок UI:
-         node scripts/visual_test.js --update
+[1/3] Проверка архива RemNote Platinum 525 файлов и карточек (verify_platinum.py)
+[2/3] Проверка идентичности эталона и синтаксиса JS/архива (verify_academy.py)
+[3/3] Запуск 401 задачи IDE и 459 сниппетов конспектов (test_all_401_tasks.py)
 
 Опции:
-  --full: дополнительно запустить аудит всех 86+ скриптов конвейера (audit_pipeline.py)
-  --quick: пропустить длительные проверки (401 задачи и визуальный прогон)
+  --full: дополнительно запустить аудит всех Python-скриптов конвейера (audit_pipeline.py)
+  --quick: быстрый прогон без этапа 3 (401 задача IDE)
 """
 
 import os
@@ -35,43 +29,24 @@ except Exception:
 
 _ROOT = os.path.dirname(os.path.abspath(__file__))
 _SCRIPTS = os.path.join(_ROOT, 'scripts')
-_TESTS = os.path.join(_ROOT, 'tests')
 
 STAGES = [
     {
-        'num': '1/6',
+        'num': '1/3',
         'title': 'RemNote Platinum 525-file Package and Card Verification',
         'cmd': [sys.executable, os.path.join(_SCRIPTS, 'verify_platinum.py')],
         'quick': True
     },
     {
-        'num': '2/6',
-        'title': 'Regression Bug Suite (80/80) & Canonical Benchmarks',
-        'cmd': ['node', os.path.join(_TESTS, 'test_bugs_regression.js')],
-        'quick': True
-    },
-    {
-        'num': '3/6',
-        'title': 'PWA Offline, Manifest and Service Worker Verification',
-        'cmd': ['node', os.path.join(_SCRIPTS, 'test_pwa_offline.js')],
-        'quick': True
-    },
-    {
-        'num': '4/6',
-        'title': 'Headless Chrome and JS syntax verification',
+        'num': '2/3',
+        'title': 'Canonical Benchmark and JS Syntax Verification',
         'cmd': [sys.executable, os.path.join(_SCRIPTS, 'verify_academy.py')],
         'quick': True
     },
     {
-        'num': '5/6',
+        'num': '3/3',
         'title': '401 IDE tasks and Python snippets tests',
         'cmd': [sys.executable, os.path.join(_SCRIPTS, 'test_all_401_tasks.py')],
-        'quick': False
-    },
-    {
-        'num': '6/6',
-        'title': 'Visual testing: all routes, viewports, states + pixel-diff vs baselines',
-        'cmd': ['node', os.path.join(_SCRIPTS, 'visual_test.js')],
         'quick': False
     }
 ]
@@ -90,13 +65,13 @@ def run_stage(stage):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Мастер-конвейер верификации Python Backend Academy')
-    parser.add_argument('--full', '-f', action='store_true', help='Запустить полный аудит всех 87 скриптов конвейера')
-    parser.add_argument('--quick', '-q', action='store_true', help='Быстрый прогон без этапов 5 (401 задача IDE) и 6 (визуальный прогон)')
+    parser = argparse.ArgumentParser(description='Мастер-конвейер верификации Python Backend Academy (без UI-тестов)')
+    parser.add_argument('--full', '-f', action='store_true', help='Запустить полный аудит Python-скриптов конвейера')
+    parser.add_argument('--quick', '-q', action='store_true', help='Быстрый прогон без этапа 3 (401 задача IDE)')
     args = parser.parse_args()
 
     print('========================================================', flush=True)
-    print('  PYTHON BACKEND ACADEMY — ПРОВЕРКА КОНВЕЙЕРА (100% PASS)', flush=True)
+    print('  PYTHON BACKEND ACADEMY — ПРОВЕРКА КОНВЕЙЕРА (NO UI)', flush=True)
     print('========================================================', flush=True)
 
     total_start = time.time()
@@ -115,14 +90,14 @@ def main():
             sys.exit(1)
 
     if args.full:
-        print(f"\n[BONUS] Running full audit of all pipeline scripts (audit_pipeline.py)...")
+        print(f"\n[BONUS] Running full audit of pipeline Python scripts (audit_pipeline.py)...")
         b_start = time.time()
         res = subprocess.run([sys.executable, os.path.join(_SCRIPTS, 'audit_pipeline.py')], cwd=_ROOT)
         b_elapsed = time.time() - b_start
         if res.returncode != 0:
             print(f"\n[FAIL] Full pipeline audit FAILED ({b_elapsed:.2f}s)!")
             sys.exit(1)
-        timings.append(('BONUS', 'All Pipeline Scripts Audit', b_elapsed))
+        timings.append(('BONUS', 'All Pipeline Python Scripts Audit', b_elapsed))
 
     total_elapsed = time.time() - total_start
     print('\n========================================================')

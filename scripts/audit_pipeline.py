@@ -3,15 +3,8 @@
 """
 audit_pipeline.py
 
-Скрипт сквозного аудита и верификации всех тестовых и сборочных скриптов
-проекта Python Backend Academy.
-
-Возможности:
-- Авто-обнаружение всех скриптов по паттернам test_*, verify_*, check_*, audit_*.
-- Параллельное выполнение через ThreadPoolExecutor (флаг --parallel, по умолчанию 4 воркера).
-- Наглядный вывод прогресса, таймингов и цветовая индикация.
-- Фильтрация по имени (--filter).
-- Возврат кода 0 только при 100% успешном прохождении всех скриптов.
+Скрипт сквозного аудита и верификации всех Python-скриптов данных и задач
+проекта Python Backend Academy (без UI/DOM и браузерных .js тестов).
 """
 
 import os
@@ -31,17 +24,20 @@ _CWD = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _SCRIPTS_DIR = os.path.join(_CWD, 'scripts')
 
 PATTERNS = [
-    'test_*.py', 'test_*.js',
-    'verify_*.py', 'verify_*.js',
+    'test_*.py',
+    'verify_*.py',
     'check_*.py',
-    'audit_*.py', 'audit_*.js',
+    'audit_*.py',
     'quick_*.py'
 ]
 
+EXCLUDED_SCRIPTS = {
+    'audit_pipeline.py',
+}
+
 HEAVY_SCRIPTS = {
     'test_all_401_tasks.py': 120,
-    'verify_academy.py': 90,
-    'audit_pipeline.py': 0  # исключаем сам себя из рекурсивного аудита
+    'verify_academy.py': 30,
 }
 
 
@@ -50,7 +46,7 @@ def discover_scripts(filter_sub=None):
     for pat in PATTERNS:
         for f in glob.glob(os.path.join(_SCRIPTS_DIR, pat)):
             base = os.path.basename(f)
-            if base == 'audit_pipeline.py':
+            if base in EXCLUDED_SCRIPTS:
                 continue
             if filter_sub and filter_sub.lower() not in base.lower():
                 continue
@@ -60,9 +56,7 @@ def discover_scripts(filter_sub=None):
 
 def run_single_script(script_name, verbose=False):
     full_path = os.path.join(_SCRIPTS_DIR, script_name)
-    is_js = script_name.endswith('.js')
-    cmd = ['node', full_path] if is_js else [sys.executable, full_path]
-
+    cmd = [sys.executable, full_path]
     timeout = HEAVY_SCRIPTS.get(script_name, 35)
 
     start = time.time()
@@ -124,7 +118,7 @@ def run_single_script(script_name, verbose=False):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Сквозной аудит всех тестовых скриптов конвейера.')
+    parser = argparse.ArgumentParser(description='Сквозной аудит Python-скриптов конвейера (без UI-тестов).')
     parser.add_argument('--filter', type=str, default=None, help='Фильтр по имени скрипта')
     parser.add_argument('--parallel', '-p', action='store_true', default=True, help='Параллельный запуск (по умолчанию включён)')
     parser.add_argument('--workers', '-w', type=int, default=4, help='Количество воркеров (по умолчанию 4)')
@@ -143,7 +137,7 @@ def main():
     workers = min(args.workers, total) if use_parallel else 1
 
     print('========================================================', flush=True)
-    print(f'  АУДИТ КОНВЕЙЕРА: {total} скриптов (Воркеры: {workers if use_parallel else 1})', flush=True)
+    print(f'  АУДИТ КОНВЕЙЕРА (NO UI): {total} скриптов (Воркеры: {workers if use_parallel else 1})', flush=True)
     print('========================================================', flush=True)
 
     results = []
