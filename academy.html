@@ -19073,6 +19073,8 @@ function viewCardsHub(){
     const item = cardsHubState.dueQueue[duePos];
     const dObj = ALL_DECKS_COMBINED[item.deckId] || {title: item.deckId, cards: []};
     const cObj = (dObj.cards || [])[item.cardIdx] || {q: '', a: ''};
+    const cur = cObj;
+    const curCard = cObj;
     const curCardKey = item.deckId + ':' + item.cardIdx;
     const cleanDeckName = (dObj.title || item.deckId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
     const showActiveRescue = !cardsHubState.flipped && (
@@ -19172,6 +19174,7 @@ function viewCardsHub(){
   const cards = deck.cards || [];
   const cIdx = Math.min(cardsHubState.cardIdx, Math.max(0, cards.length - 1));
   const cur = cards[cIdx] || {q:'', a:''};
+  const curCard = cur;
   const curCardKey = cardsHubState.deckId + ':' + cIdx;
   const linkedSkills = DECK_TO_SKILLS_MAP[deck.id] || [];
   const primarySkill = linkedSkills[0] || ALL_PY_SKILLS[0];
@@ -28472,6 +28475,7 @@ document.addEventListener('change', function(e){
     cardsHubState.completed = false;
     cardsHubState.repeatQueue = [];
     cardsHubState.isRepeatPhase = false;
+    cardsHubState.dueMode = false;
     saveCardsHubPosState();
     render();
   } else if(e.target.id === 'prac-echelon-filter'){
@@ -28726,6 +28730,8 @@ document.addEventListener('keydown', function(e){
     if(nextBtn){ e.preventDefault(); nextBtn.click(); return; }
   }
   if(e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4'){
+    const isFlippedHub = (typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.flipped);
+    const isFlippedSkill = (typeof pySkillViewState !== 'undefined' && pySkillViewState && pySkillViewState.tab === 'cards' && pySkillViewState.cardFlipped);
     if(typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.hubTab === 'notes' && currentRoute().indexOf('/cards') === 0){
       if(e.key === '1'){
         const nr = document.querySelector('[data-srs-note-reset]');
@@ -28738,16 +28744,21 @@ document.addEventListener('keydown', function(e){
         if(ne){ e.preventDefault(); ne.click(); return; }
       }
     }
-    let rateSel = `[data-py-rate-card="${e.key}"], [data-hub-rate="${e.key}"]`;
-    if(e.key === '1' || e.key === '2'){
-      rateSel += `, [data-py-rate-card="hard"], [data-hub-rate="hard"]`;
-    } else if(e.key === '3'){
-      rateSel += `, [data-py-rate-card="good"], [data-hub-rate="good"]`;
-    } else if(e.key === '4'){
-      rateSel += `, [data-py-rate-card="easy"], [data-hub-rate="easy"]`;
+    if(isFlippedHub || isFlippedSkill){
+      let rateBtn = document.querySelector(`[data-hotkey="${e.key}"]`);
+      if(!rateBtn){
+        let rateSel = `[data-py-rate-card="${e.key}"], [data-hub-rate="${e.key}"]`;
+        if(e.key === '1' || e.key === '2'){
+          rateSel += `, [data-py-rate-card="hard"], [data-hub-rate="hard"]`;
+        } else if(e.key === '3'){
+          rateSel += `, [data-py-rate-card="good"], [data-hub-rate="good"]`;
+        } else if(e.key === '4'){
+          rateSel += `, [data-py-rate-card="easy"], [data-hub-rate="easy"]`;
+        }
+        rateBtn = document.querySelector(rateSel);
+      }
+      if(rateBtn){ e.preventDefault(); rateBtn.click(); return; }
     }
-    const rateBtn = document.querySelector(rateSel);
-    if(rateBtn){ e.preventDefault(); rateBtn.click(); return; }
   }
   if(e.key === 'Enter' && !e.ctrlKey && !e.metaKey){
     const bsNext = document.querySelector('.academy-bottom-sheet [data-lesson-next], .academy-bottom-sheet [data-diag-next], .academy-bottom-sheet [data-py-step-check-next]');
