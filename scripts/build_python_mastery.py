@@ -23,29 +23,12 @@ EXTRA_K_BY_SKILL = {
 }
 
 EXTRA_F_BY_SKILL = {
-    '1.1.1': ['Ф-172', 'Ф-221', 'Ф-229', 'Ф-231'],
-    '1.1.2': ['Ф-227', 'Ф-228', 'Ф-230'],
-    '1.1.3': ['Ф-226'],
-    '1.2.1': ['Ф-232', 'Ф-234'],
-    '1.2.3': ['Ф-233'],
-    '1.3.1': ['Ф-236', 'Ф-238'],
-    '1.3.2': ['Ф-235'],
-    '1.3.3': ['Ф-237'],
-    '1.4.1': ['Ф-240'],
-    '1.4.2': ['Ф-239'],
-    '1.5.1': ['Ф-241', 'Ф-242'],
-    '1.6.1': ['Ф-244', 'Ф-245'],
-    '1.6.2': ['Ф-243'],
-    '1.7.1': ['Ф-247', 'Ф-248'],
-    '1.7.2': ['Ф-246'],
-    '1.8.3': ['Ф-249'],
-    '1.9.1': ['Ф-251', 'Ф-252', 'Ф-253', 'Ф-255'],
-    '1.9.2': ['Ф-254', 'Ф-257'],
-    '1.9.3': ['Ф-194', 'Ф-215', 'Ф-216', 'Ф-250', 'Ф-256'],
+    '1.1.1': ['Ф-079', 'Ф-080', 'Ф-084', 'Ф-085'],
+    '1.9.2': ['Ф-078', 'Ф-257'],
 }
 
 EXPLICIT_DECKS_BY_SKILL = {
-    '1.9.1': ['Ф-082', 'Ф-081', 'Ф-083', 'Ф-255', 'Ф-251'],
+    '1.9.1': ['Ф-081', 'Ф-082', 'Ф-083', 'Ф-252', 'Ф-253', 'Ф-255'],
 }
 
 # Explicit mapping of Python, Web, Backend, Algorithms, Databases, Architecture, and Infrastructure skills to their best matching IDE task IDs from TASKS_381
@@ -176,10 +159,10 @@ SKILL_TASK_IDS = {
     '6.6.2': [100, 123, 138, 160, 214, 384, 390, 391],
 
     # 07 · 🚀 Инфраструктура (21 skills, Units 7.1–7.6)
-    '7.1.1': [210, 296, 366],
-    '7.1.2': [210, 267, 305],
-    '7.1.3': [301, 305, 335],
-    '7.1.4': [49, 192, 377],
+          '7.1.1': [2001, 366],
+      '7.1.2': [2002, 210],
+      '7.1.3': [2003, 305],
+      '7.1.4': [192, 377],
     '7.2.1': [3, 111, 295],
     '7.2.2': [3, 111, 366],
     '7.2.3': [84, 113, 131],
@@ -347,8 +330,7 @@ def parse_module_section(section_md: str, mod_prefix: str):
             if sid in EXPLICIT_DECKS_BY_SKILL:
                 raw_f_ids = list(EXPLICIT_DECKS_BY_SKILL[sid])
             else:
-                _extra_f = set(EXTRA_F_BY_SKILL.get(sid, []))
-                raw_f_ids = [f for f in re.findall(r'/(Ф-\d+)', sbody) if f not in _extra_f]
+                raw_f_ids = re.findall(r'/(Ф-\d+)', sbody) + EXTRA_F_BY_SKILL.get(sid, [])
             f_ids = [f"{fid}@{mod_tag}" if f"{fid}@{mod_tag}" in f_files_map else fid for fid in raw_f_ids]
             k_ids = list(dict.fromkeys(k_ids))
             f_ids = list(dict.fromkeys(f_ids))
@@ -379,8 +361,6 @@ def parse_module_section(section_md: str, mod_prefix: str):
             'desc': f'Навыков: {len(skills)} · Конспектов: {sum(len(s["kIds"]) for s in skills)} · Колод карточек: {sum(len(s["fIds"]) for s in skills)}',
             'skills': skills
         })
-    if mod_prefix == '1':
-        linked_f.update(['Ф-078', 'Ф-079', 'Ф-080', 'Ф-084', 'Ф-085', 'Ф-257'])
     notes_data = {kid: parse_k_note(kid) for kid in sorted(linked_k)}
     decks_data = {fid: parse_f_deck(fid) for fid in sorted(linked_f)}
     return units, notes_data, decks_data
@@ -400,7 +380,4 @@ print(f"Algo    -> Units: {len(ALGO_UNITS)}, Skills: {sum(len(u['skills']) for u
 print(f"DB      -> Units: {len(DB_UNITS)}, Skills: {sum(len(u['skills']) for u in DB_UNITS)}, K: {len(DB_NOTES_DATA)}, F: {len(DB_DECKS_DATA)} ({sum(len(d['cards']) for d in DB_DECKS_DATA.values())} cards)")
 print(f"Arch    -> Units: {len(ARCH_UNITS)}, Skills: {sum(len(u['skills']) for u in ARCH_UNITS)}, K: {len(ARCH_NOTES_DATA)}, F: {len(ARCH_DECKS_DATA)} ({sum(len(d['cards']) for d in ARCH_DECKS_DATA.values())} cards)")
 print(f"Infra   -> Units: {len(INFRA_UNITS)}, Skills: {sum(len(u['skills']) for u in INFRA_UNITS)}, K: {len(INFRA_NOTES_DATA)}, F: {len(INFRA_DECKS_DATA)} ({sum(len(d['cards']) for d in INFRA_DECKS_DATA.values())} cards)")
-
-
-
 
