@@ -103,6 +103,28 @@ A horizontal grid of 4 specialized rating buttons with `14px` border-radius and 
    * Label: `Легко (+10 XP)` | Subtitle: `7 дн · [4]`
    * Color: Electric Cyan (`#06B6D4`) on Dark Cyan background (`rgba(14, 116, 144, 0.28)`)
 
+### 5.1.1. SRS Flashcard Screen Architecture & Flipped State (Canonical Grill-Me Invariants)
+* **Flow Tabs Slim Frame (Верхняя плашка табов)**:
+  - Высота `48–52px`, единая капсула `rgba(0, 0, 0, 0.40)` с `border-radius: 999px`.
+  - Потоки: `🗂 Карточки` (акцентный изумрудный чип) и `📖 Конспекты` (розовый чип).
+  - Суточный прогресс: чип цели `⚡ X / Y · Z% дня` (золотая молния `#F59E0B`), защищён от сжатия и обрезки на мобильных (390px: `padding: 3px 8px; font-size: 0.74rem`).
+* **Bead Necklace Centering (Ожерелье бусин)**:
+  - Ожерелье бусин прогресса выровнено **строго по горизонтальному центру** экрана (`justify-content: center; margin: 0 auto;`).
+  - 7-точечное скользящее окно с плавным затуханием по краям.
+* **Internal Card Counter (Номер карточки внутри карточки)**:
+  - Счётчик (`1 / 19`) помещён **строго внутрь карточки** в верхний ряд `.fc-top-row` как моноширинный бейдж `.fc-card-counter-badge` (`white-space: nowrap !important; flex-shrink: 0 !important;`). Запрещено выносить номер наружу на фон страницы.
+* **Flipped Card Mastery Emerald (Изумрудная перевёрнутая карточка)**:
+  - В фазе ответа (`.fc-card.fc-card--Answer` / `.fc-card--flipped`) карточка приобретает статусное изумрудное свечение:
+    * Тёмная тема: `background: linear-gradient(155deg, rgba(6, 78, 59, 0.48) 0%, rgba(13, 22, 34, 0.90) 50%, rgba(6, 78, 59, 0.32) 100%) !important; border: 1.5px solid rgba(16, 185, 129, 0.75) !important; box-shadow: inset 0 1px 0 rgba(16, 185, 129, 0.40), 0 24px 52px -10px rgba(0, 0, 0, 0.75), 0 0 36px rgba(16, 185, 129, 0.28) !important;`
+    * Светлая тема: чистый мятно-белый градиент с контуром `1.5px solid rgba(16, 185, 129, 0.65)`.
+    * В шапке ответа: изумрудный чип `✓ Ответ` слева, кнопка возврата `← К вопросу` справа.
+* **Two-Phase Action Dock (Двухфазный док действий)**:
+  - Фаза 1 (вопрос): Доминантная кнопка `ПОКАЗАТЬ ОТВЕТ` в стиле **Glass Obsidian Emerald** (`linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(5, 150, 105, 0.22) 100%)`, контур `1.5px solid rgba(16, 185, 129, 0.75)`, ореол `0 8px 24px rgba(16, 185, 129, 0.26)`), идеально гармонирующая с изумрудной оборотной стороной карточки.
+  - Анимация переворота: **True 3D Flip 180°** (`perspective: 1200px`, `animation: cardFlip3DSpring 0.38s cubic-bezier(0.2, 0.85, 0.35, 1.15)` с пружинным овершутом).
+  - Фаза 2 (ответ): на мобильных (`≤640px` / 390px) — **эргономичная сетка 2×2 под большой палец** (2 ряда по 2 кнопки 48px), на десктопе — 1×4.
+* **Mobile Discipline 390px**:
+  - Подсказки `[H]` и `[Esc]` обёрнуты в `.hide-on-mobile` и скрыты на смартфонах. Все бейджи строки метаданных имеют `white-space: nowrap !important; flex-shrink: 0 !important;` без переноса текста в столбик.
+
 ### 5.2. Bead Stepper Ribbon (Micro-Learning Progress)
 Positioned strictly in a single-line card footer:
 * **Left**: Current step indicator (e.g., `Шаг 3 из 12`, 13px Onest Medium).
@@ -123,11 +145,14 @@ When unit tests fail, system tracebacks are replaced by a structured Socratic Di
 
 ### 5.5. Zen Rest Screen (`#/cards` Empty State)
 When daily due cards reach zero (`cardsDueRemaining === 0`):
-* Centered meditative icon `🧘`.
-* Heading: `Очередь повторений чиста` (20px Onest Bold).
-* Subheading: `Все карточки на сегодня закреплены в долговременной памяти. Время для нового материала на Тропе!`.
-* Daily stats pills: Cards reviewed count, XP earned, current streak.
-* Single Dominant CTA: `К СЛЕДУЮЩЕМУ УРОКУ НА ТРОПЕ ➔` (`#/path`).
+* Centered breathing cosmic spark `✨` with emerald drop-shadow (`filter: drop-shadow(0 0 16px rgba(16, 185, 129, 0.45))`).
+* Status pill: `Дзен-пауза · Память в тонусе`.
+* Heading: `Очередь повторений чиста` (24px Onest Bold).
+* Subheading: `Все карточки на сегодня закреплены в долговременной памяти. Время для нового материала на Пути!`.
+* Daily stats pills: Cards reviewed count, current streak.
+* Dual Action Flow:
+  - Primary Dominant CTA: `К СЛЕДУЮЩЕМУ УРОКУ НА ПУТИ ➔` (`#/path`)
+  - Secondary Quiet Link: `📖 К конспектам` (`#/notes-review`).
 
 ### 5.6. Sticky Problem Anchor
 * Top IDE banner displaying task signature (`def solution(...)`).
@@ -151,7 +176,12 @@ When daily due cards reach zero (`cardsDueRemaining === 0`):
 * **Accessibility**: All keyframe animations disabled when `@media (prefers-reduced-motion: reduce)` is set.
 
 ### Sound Micro-Haptics (Web Audio API, 0 KB external files):
-* **Card Flip / Review Grade**: 45ms sine sweep (800Hz $\to$ 400Hz, gentle exponential decay).
+* **Card Flip**: 45ms sine sweep (320Hz $\to$ 480Hz, gentle exponential decay).
+* **SRS Grade Polyphony (Градуированный микро-отклик оценок)**:
+  - 🍷 **Не знаю (Grade 1)**: мягкий глухой спад 260Hz $\to$ 180Hz (60ms) — снятие ощущения штрафа.
+  - 🍯 **Трудно (Grade 2)**: тёплый янтарный подъем 340Hz $\to$ 440Hz (70ms).
+  - 🌿 **Хорошо (Grade 3)**: уверенный изумрудный чистый тон C5 $\to$ E5 (523Hz $\to$ 659Hz, 120ms).
+  - 💎 **Легко (Grade 4)**: кристальный восходящий мажорный аккорд E5–G#5–B5 (659Hz, 830Hz, 987Hz, 120ms) + XP haptic pulse.
 * **Success / Task Solved**: 220ms warm major triad chord (E5–G#5–B5).
 * Mute toggle available in the top bar.
 

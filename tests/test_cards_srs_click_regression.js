@@ -17,6 +17,10 @@ console.log('   TEST CARDS SRS RUNTIME & CLICK REGRESSION SUITE              ');
 console.log('================================================================\n');
 
 // Extract viewCardsHub
+const cbStart = academyHtml.indexOf('function buildSrsDeckContextBarHTML(');
+const cbEnd = academyHtml.indexOf('window.buildSrsDeckContextBarHTML = buildSrsDeckContextBarHTML;', cbStart);
+const buildSrsDeckContextBarCode = (cbStart !== -1 && cbEnd !== -1) ? academyHtml.slice(cbStart, cbEnd) : '';
+
 const startIdx = academyHtml.indexOf('function viewCardsHub(){');
 const endIdx = academyHtml.indexOf('/* ================= 401-TASK CODING TRAINER HUB', startIdx);
 assert(startIdx !== -1 && endIdx !== -1, 'viewCardsHub function boundary found');
@@ -39,6 +43,7 @@ const sandbox = {
   escapeHtmlStr: s => s,
   buildSrsFlowTabsHTML: () => '',
   buildSrsHeaderBarHTML: () => '',
+  buildSrsDailyProgressBarHTML: () => '',
   buildFcProgressHeaderHTML: () => '',
   buildSrsRatingDockHTML: () => '',
   formatCardQuestionHTML: q => q,
@@ -55,6 +60,7 @@ const sandbox = {
 const ctx = vm.createContext(sandbox);
 
 // 1. Тест: Очередь повторения на сегодня (Лицевая сторона)
+if (buildSrsDeckContextBarCode) vm.runInContext(buildSrsDeckContextBarCode, ctx);
 vm.runInContext(viewCardsHubCode, ctx);
 let out1 = vm.runInContext('viewCardsHub();', ctx);
 assert(typeof out1 === 'string' && out1.includes('Question 1'), 'Test 1 Pass: dueMode front renders question');

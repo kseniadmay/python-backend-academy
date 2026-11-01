@@ -380,12 +380,23 @@ function diffShots(pm, pngjs, currentPath, baselinePath, diffPath) {
 
         if (shot.action === 'flip_card') {
           await page.evaluate(() => {
-            if (window.cardsHubState) {
-              window.cardsHubState.flipped = true;
+            const exitDueBtn = document.querySelector('[data-hub-exit-due]');
+            if (exitDueBtn) {
+              exitDueBtn.click();
             }
-            const flipBtn = document.querySelector('[data-action="flip-card"]') || document.querySelector('[data-hub-flip]') || document.querySelector('.btn-cta-dominant') || document.getElementById('srs-active-card');
-            if (flipBtn) flipBtn.click();
-            if (typeof render === 'function') render();
+          }).catch(() => {});
+          await page.waitForTimeout(300);
+          await page.evaluate(() => {
+            const flipBtn = document.querySelector('[data-action="flip-card"]') ||
+                            document.querySelector('[data-hub-flip]') ||
+                            document.querySelector('.btn-cta-dominant') ||
+                            document.getElementById('srs-active-card');
+            if (flipBtn) {
+              flipBtn.click();
+            } else if (window.cardsHubState) {
+              window.cardsHubState.flipped = true;
+              if (typeof render === 'function') render();
+            }
           }).catch(() => {});
           await page.waitForTimeout(800);
         }

@@ -7827,7 +7827,7 @@ function buildPriorityRoadmapWidgetHTML(opts){
         <span class="badge" style="background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.35);color:var(--moss);padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;">🎯 Следующий рубеж</span>
         <span style="font-size:.84rem;color:var(--ink);">Следующий рубеж: завершите Unit 1.1 для перехода к скринингу${openGaps.length > 0 ? ` · Фокус: <b>${openGaps.slice(0,3).join(', ')}</b>` : ''}</span>
       </div>
-      <a href="#/path" class="link-quiet" style="font-size:.8rem;font-weight:600;">К тропе обучения ➔</a>
+      <a href="#/path" class="link-quiet" style="font-size:.8rem;font-weight:600;">К Пути обучения ➔</a>
     </div>`;
 
   return `
@@ -10727,7 +10727,7 @@ function renderPathModeSwitcherHTML(){
   const mode = (state && state.pathViewMode === 'pro') ? 'pro' : 'game';
   return `
     <div class="path-mode-switcher" role="radiogroup" aria-label="Режим плана обучения">
-      <button type="button" class="path-mode-btn ${mode==='game'?'active':''}" data-set-path-mode="game" role="radio" aria-checked="${mode==='game'}" title="Игровой режим с 3D-тропой">🎮 Игровой</button>
+      <button type="button" class="path-mode-btn ${mode==='game'?'active':''}" data-set-path-mode="game" role="radio" aria-checked="${mode==='game'}" title="Игровой режим: Путь курса">🎮 Игровой</button>
       <button type="button" class="path-mode-btn ${mode==='pro'?'active':''}" data-set-path-mode="pro" role="radio" aria-checked="${mode==='pro'}" title="Профессиональный режим со списком глав">💼 Профессиональный</button>
     </div>
   `;
@@ -10841,7 +10841,7 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum)
     </aside>`;
 }
 
-// Набор контурных иконок для узлов тропы (референс: тёмно-серый гекс + светлая иконка вместо замка)
+// Набор контурных иконок для узлов Пути (референс: тёмно-серый гекс + светлая иконка вместо замка)
 const TRAIL_ICON_PATHS = {
   star: '<path d="M12 3l2.7 5.5 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.8 1-6.1L3.2 9.4l6.1-.9z"/>',
   book: '<path d="M6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5v-13A2.5 2.5 0 0 1 6.5 3z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20"/>',
@@ -11479,14 +11479,14 @@ viewMap = function(){
 
   const modeSwitcherHTML = `
     <div class="subtabs subtabs--compact" style="margin-bottom:16px;">
-      <button class="subtab ${mode==='path'?'active':''}" data-map-mode="path">🏔 3D-Тропа курса (Serpentine)</button>
+      <button class="subtab ${mode==='path'?'active':''}" data-map-mode="path">🏔 Путь курса (Serpentine)</button>
       <button class="subtab ${mode==='tree'?'active':''}" data-map-mode="tree">🗺 Дерево и Эшелоны собеседования</button>
     </div>`;
 
   if(mode === 'path'){
     return `
       <div class="container" style="padding-bottom:10px;">
-        <h1 style="margin-bottom:6px;">Карта навыков: Интерактивная 3D-Тропа обучения</h1>
+        <h1 style="margin-bottom:6px;">Карта навыков: Интерактивный Путь обучения</h1>
         <p class="meta" style="margin-bottom:14px;">Математическая извилистая S-трасса соединяет все 45 юнитов курса в единое непрерывное приключение.</p>
         ${modeSwitcherHTML}
       </div>
@@ -12459,7 +12459,7 @@ viewDashboard = function(){
 
 // Update Navigation items cleanly (1-line labels without redundant parenthetical numbers or duplicate emojis)
 NAV_ITEMS.splice(0, NAV_ITEMS.length,
-  {route:'/path', icon:'map', label:'3D-Тропа', shortLabel:'Тропа', mobileTab:true, group:'learn'},
+  {route:'/path', icon:'map', label:'Путь', shortLabel:'Путь', mobileTab:true, group:'learn'},
   {route:'/practice', icon:'code', label:'Практика IDE', shortLabel:'IDE', mobileTab:true, group:'trainer'},
   {route:'/cards', icon:'cards', label:'Карточки', shortLabel:'Карточки', mobileTab:true, group:'trainer'},
   {route:'/mock', icon:'crown', label:'Собеседование', shortLabel:'Интервью', mobileTab:true, group:'trainer'},
@@ -12636,7 +12636,7 @@ function openSettingsModal(){
               <span class="settings-mode-name">Игровой режим</span>
               ${isGame ? '<span class="settings-mode-badge">Активен</span>' : ''}
             </div>
-            <div class="settings-mode-desc">Извилистая тропа с анимированными узлами и карточками юнитов.</div>
+            <div class="settings-mode-desc">Извилистый путь с анимированными узлами и карточками юнитов.</div>
           </button>
 
           <button type="button" class="settings-mode-card ${isPro ? 'active' : ''}" data-set-path-mode="pro">
@@ -12648,7 +12648,7 @@ function openSettingsModal(){
             <div class="settings-mode-desc">Структурированный список уроков по главам с карточкой фокуса.</div>
           </button>
         </div>
-        <div class="path-node-style-picker" role="group" aria-label="Форма узлов игровой тропы" style="margin-top:12px;">
+        <div class="path-node-style-picker" role="group" aria-label="Форма узлов игрового Пути" style="margin-top:12px;">
           <div class="path-node-style-label">Форма узлов</div>
           <button type="button" class="path-node-style-btn ${pathNodeStyle === 'paw' ? 'active' : ''}" data-set-path-node-style="paw" aria-pressed="${pathNodeStyle === 'paw'}">🐾 Лапки</button>
           <button type="button" class="path-node-style-btn ${pathNodeStyle === 'button' ? 'active' : ''}" data-set-path-node-style="button" aria-pressed="${pathNodeStyle === 'button'}">◉ Кнопки</button>
@@ -13085,7 +13085,7 @@ render = function(){
   } else if(route === '/path'){
     root.innerHTML = (state.pathViewMode === 'pro') ? viewProPath() : viewPathSerpentine();
     navRoute = '/path';
-    // V12: активная нода тропы не должна оставаться под таб-баром — мягкий автоскролл к ней
+    // V12: активная нода Пути не должна оставаться под таб-баром — мягкий автоскролл к ней
     setTimeout(function(){
       try{
         const activeNode = document.querySelector('.hex-node--active');
@@ -13261,7 +13261,7 @@ document.addEventListener('click', async function(e){
       }
       render();
       if(typeof showTactileToast === 'function'){
-        showTactileToast(targetMode === 'pro' ? '💼 Включён профессиональный режим' : '🎮 Включён игровой режим 3D-тропы');
+        showTactileToast(targetMode === 'pro' ? '💼 Включён профессиональный режим' : '🎮 Включён игровой режим 3D-пути');
       }
     }
     return;

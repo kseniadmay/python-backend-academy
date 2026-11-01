@@ -55,9 +55,13 @@ server.listen(PORT, async () => {
       deviceScaleFactor: 2
     });
 
+    const ARTIFACT_DIR = path.normalize("C:/Users/fury6/.gemini/antigravity/brain/9476de61-b82f-4118-8a83-496832cde446");
+    const outDir = path.join(__dirname, 'screenshots_output');
+    [ARTIFACT_DIR, outDir].forEach(d => { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); });
+
     const page = await context.newPage();
 
-    await page.goto(`http://localhost:${PORT}/academy.html#/cards`, { waitUntil: 'networkidle' });
+    await page.goto(`http://localhost:${PORT}/academy.html#/cards`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1000);
 
     // Задаем сессию повторения как у пользователя: очередь из 19 карточек колоды Ф-001, позиция 1 (Карточка 2)
@@ -71,12 +75,16 @@ server.listen(PORT, async () => {
     });
     await page.waitForTimeout(600);
 
-    const outDir = path.join(__dirname, 'screenshots_output');
-    if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+    async function saveShot(fileName) {
+      const p1 = path.join(ARTIFACT_DIR, fileName);
+      const p2 = path.join(outDir, fileName);
+      await page.screenshot({ path: p1 });
+      fs.copyFileSync(p1, p2);
+      console.log(`Saved ${fileName}`);
+    }
 
     // 1. Десктоп лицо карточки
-    await page.screenshot({ path: path.join(outDir, 'cards_front_desktop.png') });
-    console.log('Saved cards_front_desktop.png');
+    await saveShot('cards_front_desktop.png');
 
     // 2. Десктоп переворот карточки
     await page.evaluate(() => {
@@ -84,8 +92,7 @@ server.listen(PORT, async () => {
       if (typeof render === 'function') render();
     });
     await page.waitForTimeout(600);
-    await page.screenshot({ path: path.join(outDir, 'cards_back_desktop.png') });
-    console.log('Saved cards_back_desktop.png');
+    await saveShot('cards_back_desktop.png');
 
     // 3. Мобильный экран
     await page.setViewportSize({ width: 390, height: 844 });
@@ -94,8 +101,7 @@ server.listen(PORT, async () => {
       if (typeof render === 'function') render();
     });
     await page.waitForTimeout(600);
-    await page.screenshot({ path: path.join(outDir, 'cards_front_mobile.png') });
-    console.log('Saved cards_front_mobile.png');
+    await saveShot('cards_front_mobile.png');
 
     // 4. Мобильный экран ответ
     await page.evaluate(() => {
@@ -103,8 +109,7 @@ server.listen(PORT, async () => {
       if (typeof render === 'function') render();
     });
     await page.waitForTimeout(600);
-    await page.screenshot({ path: path.join(outDir, 'cards_back_mobile.png') });
-    console.log('Saved cards_back_mobile.png');
+    await saveShot('cards_back_mobile.png');
 
     await browser.close();
   } catch(err) {
