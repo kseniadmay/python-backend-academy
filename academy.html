@@ -24197,21 +24197,45 @@ function viewNotesSrsHub(noteSrsStats){
   }).join('');
 
   const decorateFn = (typeof decorateCodeBlocksWithRunBtn === 'function') ? decorateCodeBlocksWithRunBtn : (h => h);
+  
+  // Устранение дублирования заголовка шага в теле конспекта
+  const cleanStepTitle = (curStep.title || '').replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+  let stepBodyHTML = decorateFn(curStep.html || '');
+  if(cleanStepTitle && stepBodyHTML){
+    stepBodyHTML = stepBodyHTML.replace(/^\s*<h[1-4][^>]*>([\s\S]*?)<\/h[1-4]>/i, (m, inner) => {
+      const plain = inner.replace(/<[^>]+>/g, '').trim().toLowerCase();
+      const c = cleanStepTitle.toLowerCase();
+      if(plain === c || plain.includes(c) || c.includes(plain)) return '';
+      return m;
+    });
+  }
+
   const noteContentHTML = isFullMode
     ? `<div class="note-review-body" style="margin-bottom:16px;line-height:1.65;font-size:0.93rem;color:var(--ink);">
-        ${steps.map((st, i) => `
+        ${steps.map((st, i) => {
+          const sTitle = (st.title || '').replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+          let sHtml = decorateFn(st.html || '');
+          if(sTitle && sHtml){
+            sHtml = sHtml.replace(/^\s*<h[1-4][^>]*>([\s\S]*?)<\/h[1-4]>/i, (m, inner) => {
+              const plain = inner.replace(/<[^>]+>/g, '').trim().toLowerCase();
+              const c = sTitle.toLowerCase();
+              if(plain === c || plain.includes(c) || c.includes(plain)) return '';
+              return m;
+            });
+          }
+          return `
           <div style="margin-bottom:18px;padding-bottom:14px;${i < steps.length - 1 ? 'border-bottom:1px dashed rgba(255,255,255,0.08);' : ''}">
-            ${st.title ? `<h4 style="font-size:1.0rem;font-weight:700;color:var(--moss);margin:0 0 8px;">${st.title.replace(/^К-\d+\s*[:·•\-]\s*/i, '')}</h4>` : ''}
-            <div class="lesson-theory" style="font-size:0.92rem;">${decorateFn(st.html || '')}</div>
-          </div>
-        `).join('')}
+            ${sTitle ? `<h4 style="font-size:1.06rem;font-weight:700;color:#34d399;margin:0 0 10px;display:flex;align-items:center;gap:6px;"><span>✦</span> ${escapeHtmlStr(sTitle)}</h4>` : ''}
+            <div class="lesson-theory" style="font-size:0.92rem;">${sHtml}</div>
+          </div>`;
+        }).join('')}
       </div>`
     : `<div class="note-review-body" style="margin-bottom:12px;line-height:1.65;font-size:0.94rem;color:var(--ink);">
-        ${curStep.title ? `<h4 style="font-size:1.04rem;font-weight:700;color:var(--moss);margin:0 0 10px;">${curStep.title.replace(/^К-\d+\s*[:·•\-]\s*/i, '')}</h4>` : ''}
-        <div class="lesson-theory" style="font-size:0.93rem;">${decorateFn(curStep.html || '')}</div>
+        ${cleanStepTitle ? `<h4 style="font-size:1.08rem;font-weight:700;color:#ffffff;margin:0 0 12px;display:flex;align-items:center;gap:8px;"><span style="color:#34d399;">✦</span> ${escapeHtmlStr(cleanStepTitle)}</h4>` : ''}
+        <div class="lesson-theory" style="font-size:0.93rem;">${stepBodyHTML}</div>
       </div>
       ${steps.length > 1 ? `
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:10px 0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);">
           <button type="button" class="btn btn-ghost" data-srs-note-step="${Math.max(0, sIdx - 1)}" ${sIdx === 0 ? 'disabled' : ''} style="padding:6px 12px;border-radius:10px;font-size:0.78rem;">← Предыдущий шаг</button>
           <span style="font-size:0.78rem;color:var(--ink-muted);font-weight:600;">Шаг ${sIdx + 1} из ${steps.length}</span>
           <button type="button" class="btn btn-ghost" data-srs-note-step="${Math.min(steps.length - 1, sIdx + 1)}" ${sIdx + 1 >= steps.length ? 'disabled' : ''} style="padding:6px 12px;border-radius:10px;font-size:0.78rem;">Следующий шаг ➔</button>
@@ -24224,76 +24248,92 @@ function viewNotesSrsHub(noteSrsStats){
 
     <!-- Уровень 2: Контекст конспекта и ожерелье бусин очереди -->
     <div class="srs-deck-beads-bar" style="margin-bottom:12px;text-align:center;">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;max-width:720px;margin:0 auto 10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;max-width:700px;margin:0 auto 10px;">
         <div style="display:flex;align-items:center;gap:10px;">
-          <span style="font-size:0.82rem;font-weight:700;color:var(--ink-muted);">Конспект ${notePos + 1} из ${qLen}</span>
-          <div class="srs-beads-necklace fc-beads-necklace" style="display:inline-flex;align-items:center;gap:7px;padding:4px 12px;border-radius:999px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
-            ${activeQueue.map((dq, idx) => {
+          <span style="font-size:0.80rem;font-weight:700;color:var(--ink-soft);background:rgba(255,255,255,0.06);padding:3px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.08);white-space:nowrap;">
+            Конспект <b style="color:#6ee7b7;">${notePos + 1}</b> / ${qLen}
+          </span>
+          <div class="srs-beads-necklace fc-beads-necklace" style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
+            ${activeQueue.slice(Math.max(0, notePos - 4), Math.min(qLen, notePos + 5)).map((dq, relIdx) => {
+              const absIdx = Math.max(0, notePos - 4) + relIdx;
               let cls = 'dot-jewel';
-              if(idx === notePos) cls += ' active';
-              else if(idx < notePos) cls += ' done rating-easy';
+              if(absIdx === notePos) cls += ' active';
+              else if(absIdx < notePos) cls += ' done rating-easy';
               else cls += ' future';
-              return `<span class="${cls}" data-srs-goto-note="${idx}" role="button" tabindex="0" title="Конспект ${idx + 1}: ${escapeHtmlStr(dq.title)}"></span>`;
+              return `<span class="${cls}" data-srs-goto-note="${absIdx}" role="button" tabindex="0" title="Конспект ${absIdx + 1}: ${escapeHtmlStr(dq.title)}"></span>`;
             }).join('')}
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
-          <button type="button" class="btn btn-ghost" data-srs-note-toggle-full style="padding:5px 12px;border-radius:10px;font-size:0.78rem;font-weight:600;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);" title="Переключить пошаговый режим и полный обзор конспекта">${isFullMode ? '⚡ По шагам' : '📖 Весь конспект'}</button>
-          ${forcedId ? `<button type="button" class="btn btn-ghost" data-srs-exit-force-note style="padding:5px 12px;border-radius:10px;font-size:0.78rem;font-weight:600;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);">📅 К расписанию</button>` : ''}
+          <button type="button" class="btn btn-ghost" data-srs-note-toggle-full style="padding:4px 12px;border-radius:8px;font-size:0.78rem;font-weight:600;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);" title="Переключить пошаговый режим и полный обзор конспекта">${isFullMode ? '⚡ По шагам' : '📖 Весь конспект'}</button>
+          ${forcedId ? `<button type="button" class="btn btn-ghost" data-srs-exit-force-note style="padding:4px 12px;border-radius:8px;font-size:0.78rem;font-weight:600;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.10);">📅 К расписанию</button>` : ''}
         </div>
       </div>
     </div>
 
     <!-- Уровень 3: Карточка конспекта в стиле Liquid Obsidian Glass -->
-    <main class="srs-card-stage fc-stage" style="margin-top:0;perspective:1200px;margin-bottom:0;">
-      <div class="card fc-card" style="margin:0 auto !important;padding:26px 30px !important;border-radius:24px !important;background:linear-gradient(155deg, rgba(255,255,255,0.04) 0%, rgba(15,23,42,0.90) 50%, rgba(255,255,255,0.02) 100%) !important;border:1.5px solid rgba(255,255,255,0.12) !important;box-shadow:inset 0 1.5px 0 rgba(255,255,255,0.18),0 20px 48px -10px rgba(0,0,0,0.65),0 0 32px -8px rgba(16,185,129,0.20) !important;backdrop-filter:blur(28px) !important;-webkit-backdrop-filter:blur(28px) !important;">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.08);">
+    <main class="srs-card-stage fc-stage" style="margin-top:0;perspective:1200px;margin-bottom:0;width:100%;max-width:700px;margin-left:auto;margin-right:auto;">
+      <div class="card fc-card" style="margin:0 auto !important;padding:22px 24px !important;border-radius:20px !important;background:linear-gradient(165deg, rgba(24, 31, 44, 0.94) 0%, rgba(13, 17, 24, 0.98) 100%) !important;border:1px solid rgba(255, 255, 255, 0.10) !important;box-shadow:inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 20px 48px -10px rgba(0, 0, 0, 0.85) !important;backdrop-filter:blur(24px) !important;-webkit-backdrop-filter:blur(24px) !important;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.06);">
           <div style="display:flex;align-items:center;gap:8px;">
-            <span class="topic-badge" style="background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.35);color:#34d399;font-weight:700;font-size:0.75rem;padding:3px 10px;border-radius:999px;">Ступень ${curItem.step + 1} из 5</span>
-            <span style="font-size:0.80rem;color:var(--ink-muted);">Интервал: <b style="color:#34d399;">${curItem.interval} дн</b></span>
+            <span class="topic-badge" style="background:rgba(16,185,129,0.14);border:1px solid rgba(52,211,153,0.30);color:#6ee7b7;font-weight:700;font-size:0.75rem;padding:3px 10px;border-radius:999px;">Ступень ${curItem.step + 1} из 5</span>
+            <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.28);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#fbbf24;">📅 ${curItem.interval} дн</span>
           </div>
-          <div class="note-srs-ladder" style="background:rgba(255,255,255,0.03);padding:3px 8px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);display:inline-flex;align-items:center;gap:4px;">
+          <div class="note-srs-ladder" style="background:rgba(255,255,255,0.03);padding:3px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.07);display:inline-flex;align-items:center;gap:4px;font-family:var(--font-m);font-size:0.72rem;">
             ${ladderHTML}
           </div>
         </div>
 
-        <h2 style="font-size:1.32rem;font-weight:800;color:var(--ink);margin:0 0 14px;line-height:1.4;">${escapeHtmlStr(cleanTitle)}</h2>
+        <h2 style="font-size:1.28rem;font-weight:800;color:var(--ink);margin:0 0 14px;line-height:1.4;">${escapeHtmlStr(cleanTitle)}</h2>
 
-        ${steps.length > 1 ? `
-          <div style="margin-bottom:14px;padding:8px 12px;border-radius:14px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);">
-            <div style="font-size:0.74rem;font-weight:700;color:var(--ink-muted);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
-              <span>🧭 Шаги конспекта:</span>
-              <span>Шаг ${sIdx + 1} из ${steps.length}</span>
+        ${steps.length > 1 && !isFullMode ? `
+          <div class="note-zen-stepper" style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:6px 12px;margin-bottom:14px;gap:10px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:0.72rem;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.06em;">Шаг:</span>
+              <div style="display:inline-flex;align-items:center;gap:5px;">
+                ${steps.map((st, idx) => {
+                  const isCur = (idx === sIdx);
+                  const cleanStTitle = (st.title || ('Шаг ' + (idx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+                  return `<button type="button" class="btn btn-ghost ${isCur ? 'active' : ''}" data-srs-note-step="${idx}" style="width:26px;height:26px;padding:0;border-radius:6px;font-family:var(--font-m);font-size:0.72rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;${isCur ? 'background:rgba(16,185,129,0.25);border:1px solid rgba(52,211,153,0.60);color:#34d399;box-shadow:0 0 10px rgba(16,185,129,0.3);' : 'background:rgba(255,255,255,0.04);border:1px solid transparent;color:var(--ink-muted);'}" title="${idx + 1}. ${escapeHtmlStr(cleanStTitle)}">${idx + 1}</button>`;
+                }).join('')}
+              </div>
             </div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;">${stepOutlineChips}</div>
+            <span style="font-size:0.76rem;font-weight:600;color:#6ee7b7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px;" title="${escapeHtmlStr(cleanStepTitle)}">
+              ${sIdx + 1}. ${escapeHtmlStr(cleanStepTitle)}
+            </span>
           </div>
         ` : ''}
 
-        <div style="background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.05);border-radius:16px;padding:18px;margin-bottom:14px;">
+        <div style="background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:16px 18px;margin-bottom:14px;">
           ${noteContentHTML}
         </div>
 
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);font-size:0.80rem;margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);font-size:0.78rem;margin-bottom:14px;">
           <span style="color:var(--ink-muted);font-weight:600;">🔗 Связанные материалы темы:</span>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            ${linkedDeckId ? `<button type="button" class="btn btn-ghost" data-srs-open-deck="${linkedDeckId}" style="padding:4px 10px;font-size:0.76rem;border-radius:8px;">📇 Карточки темы</button>` : ''}
-            ${linkedSkill && linkedTrack ? `<a href="#${linkedTrack.routePrefix}/skill/${linkedSkill.id}" class="btn btn-ghost" style="padding:4px 10px;font-size:0.76rem;border-radius:8px;text-decoration:none;">🗺️ Открыть в уроке ➔</a>` : ''}
-            <a href="#/docs" class="btn btn-ghost" style="padding:4px 10px;font-size:0.76rem;border-radius:8px;text-decoration:none;">💡 Шпаргалка</a>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            ${linkedDeckId ? `<button type="button" class="btn btn-ghost" data-srs-open-deck="${linkedDeckId}" style="padding:3px 9px;font-size:0.76rem;border-radius:6px;border:1px solid rgba(255,255,255,0.08);">📇 Карточки темы</button>` : ''}
+            ${linkedSkill && linkedTrack ? `<a href="#${linkedTrack.routePrefix}/skill/${linkedSkill.id}" class="btn btn-ghost" style="padding:3px 9px;font-size:0.76rem;border-radius:6px;border:1px solid rgba(255,255,255,0.08);text-decoration:none;">🗺️ Открыть в уроке ➔</a>` : ''}
+            <a href="#/docs" class="btn btn-ghost" style="padding:3px 9px;font-size:0.76rem;border-radius:6px;border:1px solid rgba(255,255,255,0.08);text-decoration:none;">💡 Шпаргалка</a>
           </div>
         </div>
 
-        <div class="fc-rate-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
-          <button type="button" class="btn btn-rating-reset" data-srs-note-reset="${curItem.noteId}" style="padding:10px 8px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;" title="Сбросить интервал конспекта на 1 день (клавиша 1)">
-            <span style="font-size:0.86rem;font-weight:700;display:flex;align-items:center;gap:4px;">Не знаю <kbd class="fc-kbd-hint hide-on-mobile">1</kbd></span>
-            <span style="display:block;font-size:0.73rem;opacity:0.85;margin-top:2px;">С нуля · 1 дн</span>
+        <div class="fc-rate-row note-rate-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
+          <!-- Кнопка 1: Не знаю (С нуля · 1 дн) -->
+          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-srs-note-reset="${curItem.noteId}" data-hotkey="1" title="Сбросить интервал конспекта на 1 день (клавиша 1)">
+            <span class="srs-btn-title">Не знаю</span>
+            <span class="srs-btn-sub"><span class="srs-days">С нуля · 1 дн</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">1</kbd></span></span>
           </button>
-          <button type="button" class="btn btn-rating-pass" data-srs-note-pass="${curItem.noteId}" style="padding:10px 8px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;" title="Закрепить и перевести на следующую ступень (${curItem.nextInterval} дн, клавиша 2 или Enter)">
-            <span style="font-size:0.86rem;font-weight:800;display:flex;align-items:center;gap:4px;color:#ffffff;">✓ Понятно (+15 XP) <kbd class="fc-kbd-hint hide-on-mobile">2</kbd></span>
-            <span style="display:block;font-size:0.73rem;opacity:0.92;margin-top:2px;color:#a7f3d0;">Уверенно · ${curItem.nextInterval} дн</span>
+
+          <!-- Кнопка 2: Понятно (+15 XP, следующий интервал) -->
+          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-srs-note-pass="${curItem.noteId}" data-hotkey="2" title="Закрепить и перевести на следующую ступень (${curItem.nextInterval} дн, клавиша 2 или Enter)">
+            <span class="srs-btn-title">Понятно</span>
+            <span class="srs-btn-sub"><span class="srs-days">${curItem.nextInterval} дн</span> <span class="srs-xp-badge">+15 XP</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">2</kbd></span></span>
           </button>
-          <button type="button" class="btn btn-rating-easy" data-srs-note-easy="${curItem.noteId}" style="padding:10px 8px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;" title="Помню идеально — перешагнуть ступень (${curItem.jumpInterval || curItem.nextInterval} дн, клавиша 3)">
-            <span style="font-size:0.86rem;font-weight:700;display:flex;align-items:center;gap:4px;color:#ffffff;">⚡ Назубок (+20 XP) <kbd class="fc-kbd-hint hide-on-mobile">3</kbd></span>
-            <span style="display:block;font-size:0.73rem;opacity:0.92;margin-top:2px;color:#bfdbfe;">Назубок · ${curItem.jumpInterval || curItem.nextInterval} дн</span>
+
+          <!-- Кнопка 3: Назубок (+20 XP, перешагнуть интервал) -->
+          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-srs-note-easy="${curItem.noteId}" data-hotkey="3" title="Помню идеально — перешагнуть ступень (${curItem.jumpInterval || curItem.nextInterval} дн, клавиша 3)">
+            <span class="srs-btn-title">Назубок</span>
+            <span class="srs-btn-sub"><span class="srs-days">${curItem.jumpInterval || curItem.nextInterval} дн</span> <span class="srs-xp-badge">+20 XP</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">3</kbd></span></span>
           </button>
         </div>
       </div>
