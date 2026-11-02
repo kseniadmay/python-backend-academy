@@ -11824,6 +11824,14 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     transform: translateY(-2px) rotateY(180deg) !important;
   }
 
+  /* Управление видимостью подсказок горячих клавиш (по умолчанию выключены) */
+  html:not([data-hotkey-hints="on"]) .fc-kbd-hint,
+  html:not([data-hotkey-hints="on"]) .fc-kbd-sep,
+  html:not([data-hotkey-hints="on"]) .fc-hotkey-hint,
+  html:not([data-hotkey-hints="on"]) [data-hotkey-hint] {
+    display: none !important;
+  }
+
   /* Микро-бейдж опыта (+2 XP, +5 XP, +10 XP) в кнопках SRS */
   .srs-xp-badge {
     font-family: var(--font-m, 'JetBrains Mono', monospace);
@@ -14140,7 +14148,7 @@ DELETE /users/42     # удалить пользователя 42</code></pre>
 /* ================= STATE ================= */
 const STORE_KEY = 'academy_state_v1';
 function loadState(){
-  const defaults = {streak:0, lastVisit:null, mastered:[], theme:null, completedLessons:[], dashAccordionOpen: false};
+  const defaults = {streak:0, lastVisit:null, mastered:[], theme:null, completedLessons:[], dashAccordionOpen: false, showHotkeyHints: false};
   try{
     const raw = localStorage.getItem(STORE_KEY);
     if(raw){
@@ -14411,6 +14419,17 @@ if(state.theme) {
   document.documentElement.classList.toggle('theme-light', state.theme === 'light');
   document.documentElement.classList.toggle('theme-dark', state.theme === 'dark');
 }
+
+function applyHotkeyHintsVisibility(){
+  const isEnabled = Boolean(typeof state !== 'undefined' && state && state.showHotkeyHints === true);
+  if(isEnabled){
+    document.documentElement.setAttribute('data-hotkey-hints', 'on');
+  } else {
+    document.documentElement.removeAttribute('data-hotkey-hints');
+  }
+}
+window.applyHotkeyHintsVisibility = applyHotkeyHintsVisibility;
+applyHotkeyHintsVisibility();
 
 // Языковой переключатель RU / EN
 document.addEventListener('click', function(e){
@@ -15283,6 +15302,7 @@ function ensureExtendedState(target){
     if(dk) s.dailyXpByDate[dk] = Math.max(Number(s.dailyXpByDate[dk]) || 0, s.dailyXp);
   }
   if(typeof s.streakFreezes !== 'number') s.streakFreezes = 1;
+  if(typeof s.showHotkeyHints !== 'boolean') s.showHotkeyHints = false;
   if(!s.skillMastery || typeof s.skillMastery !== 'object') s.skillMastery = {}; // sid -> 0 | 50 | 80 | 100
   if(!s.readNotes || !Array.isArray(s.readNotes)) s.readNotes = [];
   if(!s.reviewedDecks || !Array.isArray(s.reviewedDecks)) s.reviewedDecks = [];
@@ -19615,25 +19635,25 @@ function buildSrsRatingDockHTML(srsInfo, isFlipped){
         <!-- Кнопка 1: Не знаю (С нуля · 1, кармин) -->
         <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-hub-rate="1" data-hotkey="1" title="Не знаю (С нуля, клавиша 1)">
           <span class="srs-btn-title">Не знаю</span>
-          <span class="srs-btn-sub"><span class="srs-days">С нуля</span><span class="hide-on-mobile"> · <kbd class="fc-kbd-hint">1</kbd></span></span>
+          <span class="srs-btn-sub"><span class="srs-days">С нуля</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">1</kbd></span></span>
         </button>
 
         <!-- Кнопка 2: Трудно (+2 XP, ${hardDays} дн, клавиша 2, янтарь) -->
         <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--hard fc-rate-btn--hard" data-hub-rate="2" data-hotkey="2" title="Трудно (+2 XP, ${hardDays} дн, клавиша 2)">
           <span class="srs-btn-title">Трудно</span>
-          <span class="srs-btn-sub"><span class="srs-days">${hardDays} дн</span> <span class="srs-xp-badge">+2 XP</span><span class="hide-on-mobile"> · <kbd class="fc-kbd-hint">2</kbd></span></span>
+          <span class="srs-btn-sub"><span class="srs-days">${hardDays} дн</span> <span class="srs-xp-badge">+2 XP</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">2</kbd></span></span>
         </button>
 
         <!-- Кнопка 3: Хорошо (+5 XP, ${goodDays} дн, клавиша 3, изумруд) -->
         <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-hub-rate="3" data-hotkey="3" title="Хорошо (+5 XP, ${goodDays} дн, клавиша 3)">
           <span class="srs-btn-title">Хорошо</span>
-          <span class="srs-btn-sub"><span class="srs-days">${goodDays} дн</span> <span class="srs-xp-badge">+5 XP</span><span class="hide-on-mobile"> · <kbd class="fc-kbd-hint">3</kbd></span></span>
+          <span class="srs-btn-sub"><span class="srs-days">${goodDays} дн</span> <span class="srs-xp-badge">+5 XP</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">3</kbd></span></span>
         </button>
 
         <!-- Кнопка 4: Легко (+10 XP, ${easyDays} дн, клавиша 4, циан) -->
         <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-hub-rate="4" data-hotkey="4" title="Легко (+10 XP, ${easyDays} дн, клавиша 4)">
           <span class="srs-btn-title">Легко</span>
-          <span class="srs-btn-sub"><span class="srs-days">${easyDays} дн</span> <span class="srs-xp-badge">+10 XP</span><span class="hide-on-mobile"> · <kbd class="fc-kbd-hint">4</kbd></span></span>
+          <span class="srs-btn-sub"><span class="srs-days">${easyDays} дн</span> <span class="srs-xp-badge">+10 XP</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">4</kbd></span></span>
         </button>
       </div>
     </footer>
@@ -19997,7 +20017,7 @@ function viewCardsHub(){
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
                   <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.30);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${freeIdx + 1} / ${freeCards.length}</span>
-                  <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
+                  <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><span class="fc-kbd-sep"> </span><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
                 </div>
               </div>
 
@@ -20082,7 +20102,7 @@ function viewCardsHub(){
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
                   <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.30);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${sprintStepNum} / 15</span>
-                  <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
+                  <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><span class="fc-kbd-sep"> </span><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
                 </div>
               </div>
 
@@ -20232,7 +20252,7 @@ function viewCardsHub(){
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
                   <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.30);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${cIdx + 1} / ${cards.length}</span>
-                  <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
+                  <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><span class="fc-kbd-sep"> </span><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
                 </div>
               </div>
 
@@ -25570,7 +25590,11 @@ function openSettingsModal(){
           <button type="button" class="btn btn-ghost" id="settings-sound-toggle" style="flex:1;min-width:140px;">
             ${state.soundEnabled ? '🔊 Звук: Включён' : '🔇 Звук: Выключен'}
           </button>
+          <button type="button" class="btn btn-ghost" id="settings-hotkeys-toggle" data-toggle-hotkey-hints style="flex:1;min-width:170px;" title="Отображать подсказки горячих клавиш на карточках">
+            ${state.showHotkeyHints ? '⌨️ Подсказки клавиш: Вкл' : '⌨️ Подсказки клавиш: Выкл'}
+          </button>
         </div>
+        <p class="meta" style="margin:8px 0 0;font-size:0.78rem;color:var(--ink-muted);">Подсказки горячих клавиш (<kbd>Пробел</kbd>, <kbd>Esc</kbd>, <kbd>1</kbd>–<kbd>4</kbd>) на кнопках карточек. Сами клавиши активны всегда.</p>
       </div>
       <!-- Рубежные тесты: разбор и стартовая модалка -->
       <div class="settings-section" style="margin-top:20px;">
@@ -26526,6 +26550,13 @@ document.addEventListener('click', async function(e){
   if(e.target.closest('#settings-sound-toggle')){
     state.soundEnabled = !state.soundEnabled;
     saveState(state);
+    openSettingsModal();
+    return;
+  }
+  if(e.target.closest('#settings-hotkeys-toggle') || e.target.closest('[data-toggle-hotkey-hints]')){
+    state.showHotkeyHints = !state.showHotkeyHints;
+    saveState(state);
+    applyHotkeyHintsVisibility();
     openSettingsModal();
     return;
   }
