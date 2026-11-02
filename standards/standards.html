@@ -10469,6 +10469,95 @@
 
 
 /* ==========================================================================
+   SRS Beads Pure Floating & Leading Pulse (Вариант 2)
+   ========================================================================== */
+  @keyframes leadingBeadPulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.9), 0 0 20px rgba(16, 185, 129, 0.45);
+      border-color: #34d399;
+    }
+    50% {
+      transform: scale(1.35);
+      box-shadow: 0 0 18px rgba(16, 185, 129, 1), 0 0 32px rgba(16, 185, 129, 0.7);
+      border-color: #6ee7b7;
+    }
+  }
+
+  .srs-deck-beads-bar,
+  .srs-beads-pure-floating,
+  .srs-beads-necklace,
+  .fc-beads-necklace {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .srs-beads-necklace .dot-jewel,
+  .fc-beads-necklace .dot-jewel {
+    border-radius: 999px !important;
+    cursor: pointer !important;
+    transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    flex-shrink: 0 !important;
+  }
+
+  .srs-beads-necklace .dot-jewel.active,
+  .fc-beads-necklace .dot-jewel.active,
+  .bead-active-leading {
+    width: 10px !important;
+    height: 10px !important;
+    background: #ffffff !important;
+    border: 2px solid #10b981 !important;
+    animation: leadingBeadPulse 2.2s infinite ease-in-out !important;
+    position: relative !important;
+    z-index: 2 !important;
+    margin: 0 2px !important;
+  }
+
+  .srs-beads-necklace .dot-jewel.done,
+  .fc-beads-necklace .dot-jewel.done {
+    width: 7.5px !important;
+    height: 7.5px !important;
+    background: #10b981 !important;
+    border: 1px solid rgba(52, 211, 153, 0.6) !important;
+    box-shadow: 0 0 7px rgba(16, 185, 129, 0.55) !important;
+  }
+
+  .srs-beads-necklace .dot-jewel.future,
+  .fc-beads-necklace .dot-jewel.future {
+    width: 7.5px !important;
+    height: 7.5px !important;
+    background: rgba(255, 255, 255, 0.16) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    box-shadow: none !important;
+    opacity: 0.8 !important;
+  }
+
+  .srs-card-topic-chip {
+    font-size: 0.76rem !important;
+    font-weight: 600 !important;
+    color: var(--ink-soft, #cbd5e1) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 260px !important;
+    padding: 2px 8px !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    display: inline-block !important;
+  }
+
+  @media (max-width: 640px) {
+    .srs-card-topic-chip {
+      max-width: 120px !important;
+      font-size: 0.70rem !important;
+      padding: 2px 6px !important;
+    }
+  }
+
+/* ==========================================================================
    SRS Redesign Styles (Fitts's & Hick's Law, Obsidian Glassmorphism)
    ========================================================================== */
 
@@ -19520,15 +19609,15 @@ function buildSrsDeckContextBarHTML(deckTitle, total, currentIdx, getRatingOrIte
 
     let cls = 'dot-jewel';
     if(i === cur){
-      cls += ' active';
+      cls += ' active bead-active-leading';
     } else if(i < cur){
-      cls += ' done';
+      cls += ' done bead-done';
       if(r === 4) cls += ' rating-easy';
       else if(r === 3) cls += ' rating-good';
       else if(r === 2 || r === 1) cls += ' rating-hard';
       else cls += ' rating-viewed';
     } else {
-      cls += ' future';
+      cls += ' future bead-future';
     }
 
     const titleAttr = `Карточка ${i + 1}${previewText ? escapeHtmlStr(previewText) : ''}`;
@@ -19536,13 +19625,11 @@ function buildSrsDeckContextBarHTML(deckTitle, total, currentIdx, getRatingOrIte
     jewels.push(`<span class="${cls}" ${gotoAttr} role="button" tabindex="0" title="${titleAttr}"></span>`);
   }
 
+  // Вариант 2: Чистые центрированные парящие бусины СТРОГО БЕЗ ПОДЛОЖКИ (0 фонов, 0 рамок), ведущая пульсирует
   return `
-    <div class="srs-deck-beads-bar" style="display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 12px;text-align:center;">
-      <div class="srs-context-topic" style="display:inline-flex;align-items:center;justify-content:center;max-width:92%;margin:0 auto 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;font-size:0.80rem;color:var(--ink-muted);letter-spacing:0.03em;text-transform:uppercase;" title="${escapeHtmlStr(deckTitle)}">
-        ${escapeHtmlStr(deckTitle)}
-      </div>
-      <!-- Скользящее ожерелье бусин строго по центру оси экрана -->
-      <div class="srs-beads-necklace fc-beads-necklace" style="display:flex;align-items:center;justify-content:center;gap:6px;margin:0 auto;padding:4px 12px;border-radius:999px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
+    <div class="srs-deck-beads-bar srs-beads-pure-floating" style="display:flex;align-items:center;justify-content:center;margin:0 auto 14px;padding:0;background:transparent;border:none;box-shadow:none;">
+      <!-- Скользящее ожерелье бусин строго по центру оси экрана БЕЗ подложки -->
+      <div class="srs-beads-necklace fc-beads-necklace" style="display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto;padding:2px 0;background:transparent;border:none;box-shadow:none;">
         ${jewels.join('')}
       </div>
       <div style="display:none;">
@@ -19690,13 +19777,16 @@ function viewCardsHub(){
             
             <!-- Лицевая грань: Вопрос (Liquid Obsidian Glass) -->
             <div class="card-face card-front fc-card-front">
-              <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;">
-                <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;">
+              <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
                   <span class="topic-badge fc-type-badge fc-phase-badge fc-phase-badge--question" style="font-size:0.74rem;font-weight:600;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--ink-soft,#cbd5e1);border:1px solid rgba(255,255,255,0.08);letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">Вопрос</span>
+                  ${cleanTitle ? `<span class="srs-card-topic-chip" title="${escapeHtmlStr(cleanTitle)}">${escapeHtmlStr(cleanTitle)}</span>` : ''}
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curKey) : ''}
-                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:var(--ink-muted);letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${freeIdx + 1} / ${freeCards.length}</span>
                 </div>
-                <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curKey}" id="srs-hint-btn" style="padding:3px 10px;border-radius:999px;background:rgba(245,158,11,0.10);color:var(--amber-soft,#fbbf24);font-weight:600;font-size:0.75rem;cursor:pointer;border:1px solid rgba(245,158,11,0.20);" title="💡 Шпаргалка (H)">💡 Шпаргалка <span class="hide-on-mobile"><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.20);border-radius:4px;color:#fff;margin-left:4px;">H</kbd></span></button>
+                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:var(--ink-muted);letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${freeIdx + 1} / ${freeCards.length}</span>
+                  <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curKey}" id="srs-hint-btn" style="padding:3px 10px;border-radius:999px;background:rgba(245,158,11,0.10);color:var(--amber-soft,#fbbf24);font-weight:600;font-size:0.75rem;cursor:pointer;border:1px solid rgba(245,158,11,0.20);" title="💡 Шпаргалка (H)">💡 <span class="hide-on-mobile">Шпаргалка <kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.20);border-radius:4px;color:#fff;margin-left:4px;">H</kbd></span></button>
+                </div>
               </div>
 
               <div class="fc-card-body fc-q" id="srs-card-prompt" style="margin:auto 0;padding:16px 0;font-size:clamp(1.15rem, 2.1vw, 1.35rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
@@ -19710,13 +19800,16 @@ function viewCardsHub(){
 
             <!-- Оборотная грань: Ответ (Mastery Emerald) -->
             <div class="card-face card-back fc-card-back">
-              <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;">
-                <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;">
+              <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
                   <span class="topic-badge fc-type-badge fc-phase-badge fc-phase-badge--answer" style="font-size:0.74rem;font-weight:700;padding:3px 10px;border-radius:999px;background:rgba(16,185,129,0.25);color:#a7f3d0;border:1px solid rgba(52,211,153,0.40);white-space:nowrap;flex-shrink:0;">✓ Ответ</span>
+                  ${cleanTitle ? `<span class="srs-card-topic-chip" style="color:#a7f3d0;opacity:0.9;" title="${escapeHtmlStr(cleanTitle)}">${escapeHtmlStr(cleanTitle)}</span>` : ''}
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curKey) : ''}
-                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.30);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${freeIdx + 1} / ${freeCards.length}</span>
                 </div>
-                <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
+                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.30);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${freeIdx + 1} / ${freeCards.length}</span>
+                  <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
+                </div>
               </div>
 
               <div class="fc-card-body" style="margin:auto 0;padding:12px 0;width:100%;">
@@ -19775,13 +19868,16 @@ function viewCardsHub(){
             
             <!-- Лицевая грань: Вопрос (Liquid Obsidian Glass) -->
             <div class="card-face card-front fc-card-front">
-              <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;">
-                <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;">
+              <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
                   <span class="topic-badge fc-type-badge fc-phase-badge fc-phase-badge--question" style="font-size:0.74rem;font-weight:600;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--ink-soft,#cbd5e1);border:1px solid rgba(255,255,255,0.08);letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">Вопрос</span>
+                  ${cleanDeckName ? `<span class="srs-card-topic-chip" title="${escapeHtmlStr(cleanDeckName)}">${escapeHtmlStr(cleanDeckName)}</span>` : ''}
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
-                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:var(--ink-muted);letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${duePos + 1} / ${qLen}</span>
                 </div>
-                <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curCardKey}" id="srs-hint-btn" style="padding:3px 10px;border-radius:999px;background:rgba(245,158,11,0.10);color:var(--amber-soft,#fbbf24);font-weight:600;font-size:0.75rem;cursor:pointer;border:1px solid rgba(245,158,11,0.20);" title="💡 Шпаргалка (H)">💡 Шпаргалка <span class="hide-on-mobile"><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.20);border-radius:4px;color:#fff;margin-left:4px;">H</kbd></span></button>
+                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:var(--ink-muted);letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${duePos + 1} / ${qLen}</span>
+                  <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curCardKey}" id="srs-hint-btn" style="padding:3px 10px;border-radius:999px;background:rgba(245,158,11,0.10);color:var(--amber-soft,#fbbf24);font-weight:600;font-size:0.75rem;cursor:pointer;border:1px solid rgba(245,158,11,0.20);" title="💡 Шпаргалка (H)">💡 <span class="hide-on-mobile">Шпаргалка <kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.20);border-radius:4px;color:#fff;margin-left:4px;">H</kbd></span></button>
+                </div>
               </div>
 
               <div class="fc-card-body fc-q" id="srs-card-prompt" style="margin:auto 0;padding:16px 0;font-size:clamp(1.15rem, 2.1vw, 1.35rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
@@ -19795,13 +19891,16 @@ function viewCardsHub(){
 
             <!-- Оборотная грань: Ответ (Mastery Emerald) -->
             <div class="card-face card-back fc-card-back">
-              <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;">
-                <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;">
+              <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
                   <span class="topic-badge fc-type-badge fc-phase-badge fc-phase-badge--answer" style="font-size:0.74rem;font-weight:700;padding:3px 10px;border-radius:999px;background:rgba(16,185,129,0.25);color:#a7f3d0;border:1px solid rgba(52,211,153,0.40);white-space:nowrap;flex-shrink:0;">✓ Ответ</span>
+                  ${cleanDeckName ? `<span class="srs-card-topic-chip" style="color:#a7f3d0;opacity:0.9;" title="${escapeHtmlStr(cleanDeckName)}">${escapeHtmlStr(cleanDeckName)}</span>` : ''}
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
-                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.30);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${duePos + 1} / ${qLen}</span>
                 </div>
-                <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
+                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.30);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${duePos + 1} / ${qLen}</span>
+                  <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
+                </div>
               </div>
 
               <div class="fc-card-body" style="margin:auto 0;padding:12px 0;width:100%;">
@@ -19925,13 +20024,16 @@ function viewCardsHub(){
             
             <!-- Лицевая грань: Вопрос (Liquid Obsidian Glass) -->
             <div class="card-face card-front fc-card-front">
-              <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;">
-                <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;">
+              <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
                   <span class="topic-badge fc-type-badge fc-phase-badge fc-phase-badge--question" style="font-size:0.74rem;font-weight:600;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--ink-soft,#cbd5e1);border:1px solid rgba(255,255,255,0.08);letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">Вопрос</span>
+                  ${cleanCurDeckTitle ? `<span class="srs-card-topic-chip" title="${escapeHtmlStr(cleanCurDeckTitle)}">${escapeHtmlStr(cleanCurDeckTitle)}</span>` : ''}
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
-                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:var(--ink-muted);letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${cIdx + 1} / ${cards.length}</span>
                 </div>
-                <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curCardKey}" id="srs-hint-btn" style="padding:3px 10px;border-radius:999px;background:rgba(245,158,11,0.10);color:var(--amber-soft,#fbbf24);font-weight:600;font-size:0.75rem;cursor:pointer;border:1px solid rgba(245,158,11,0.20);" title="💡 Шпаргалка (H)">💡 Шпаргалка <span class="hide-on-mobile"><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.20);border-radius:4px;color:#fff;margin-left:4px;">H</kbd></span></button>
+                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:var(--ink-muted);letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${cIdx + 1} / ${cards.length}</span>
+                  <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curCardKey}" id="srs-hint-btn" style="padding:3px 10px;border-radius:999px;background:rgba(245,158,11,0.10);color:var(--amber-soft,#fbbf24);font-weight:600;font-size:0.75rem;cursor:pointer;border:1px solid rgba(245,158,11,0.20);" title="💡 Шпаргалка (H)">💡 <span class="hide-on-mobile">Шпаргалка <kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.20);border-radius:4px;color:#fff;margin-left:4px;">H</kbd></span></button>
+                </div>
               </div>
 
               <div class="fc-card-body fc-q" id="srs-card-prompt" style="margin:auto 0;padding:16px 0;font-size:clamp(1.15rem, 2.1vw, 1.35rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
@@ -19945,13 +20047,16 @@ function viewCardsHub(){
 
             <!-- Оборотная грань: Ответ (Mastery Emerald) -->
             <div class="card-face card-back fc-card-back">
-              <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;">
-                <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;">
+              <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
                   <span class="topic-badge fc-type-badge fc-phase-badge fc-phase-badge--answer" style="font-size:0.74rem;font-weight:700;padding:3px 10px;border-radius:999px;background:rgba(16,185,129,0.25);color:#a7f3d0;border:1px solid rgba(52,211,153,0.40);white-space:nowrap;flex-shrink:0;">✓ Ответ</span>
+                  ${cleanCurDeckTitle ? `<span class="srs-card-topic-chip" style="color:#a7f3d0;opacity:0.9;" title="${escapeHtmlStr(cleanCurDeckTitle)}">${escapeHtmlStr(cleanCurDeckTitle)}</span>` : ''}
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
-                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.30);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${cIdx + 1} / ${cards.length}</span>
                 </div>
-                <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
+                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.30);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${cIdx + 1} / ${cards.length}</span>
+                  <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
+                </div>
               </div>
 
               <div class="fc-card-body" style="margin:auto 0;padding:12px 0;width:100%;">
