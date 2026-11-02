@@ -2455,14 +2455,11 @@
       width:100% !important;
       max-width:100% !important;
       box-sizing:border-box !important;
-      min-height:clamp(120px, 18vh, 175px) !important;
-      max-height:clamp(180px, 34vh, 275px) !important;
-      padding:12px 14px !important;
-      border-radius:16px !important;
-      overflow-y:auto !important;
-      -webkit-overflow-scrolling:touch !important;
-      scrollbar-width:thin !important;
-      scrollbar-color:rgba(16,185,129,0.35) transparent !important;
+      min-height:240px !important;
+      overflow:visible !important;
+    }
+    .fc-card-face, .card-face{
+      padding:16px 18px !important;
     }
     .fc-stories-bar{gap:2px !important;width:100% !important;max-width:100% !important;min-width:0 !important;box-sizing:border-box !important;overflow:hidden !important;}
     .fc-story-seg{flex:1 1 0 !important;min-width:0 !important;box-sizing:border-box !important;}
@@ -10493,26 +10490,40 @@
 }
 
 /* Одиночная доминантная CTA-кнопка (Закон Хика) */
-.btn-cta-dominant {
+.btn-cta-dominant,
+.btn-style-glass {
   width: 100%;
+  max-width: 440px;
   min-height: 52px;
+  margin: 0 auto;
   border-radius: 16px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(5, 150, 105, 0.22) 100%) !important;
+  color: #ffffff !important;
   font-size: 1.05rem;
   font-weight: 700;
-  border: 1px solid rgba(52, 211, 153, 0.4);
-  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+  border: 1.5px solid rgba(16, 185, 129, 0.75) !important;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-.btn-cta-dominant:active {
-  transform: scale(0.98);
+.btn-cta-dominant:hover,
+.btn-style-glass:hover {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.48) 0%, rgba(5, 150, 105, 0.32) 100%) !important;
+  border-color: rgba(52, 211, 153, 0.95) !important;
+  box-shadow: 0 12px 32px rgba(16, 185, 129, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+  transform: translateY(-1.5px) !important;
+}
+
+.btn-cta-dominant:active,
+.btn-style-glass:active {
+  transform: scale(0.98) !important;
 }
 
 .btn-cta-dominant kbd {
@@ -11500,12 +11511,16 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     opacity: 1 !important;
   }
 
-  /* 3. True 3D Flip (180°) физический контейнер карточки и фиксация канонической ширины 700px */
+  /* 3. True 3D Flip (180°) физический контейнер карточки и канонический 3D-переворот */
   .cards-hub-container {
     width: 100% !important;
     max-width: 700px !important;
     margin: 0 auto !important;
     box-sizing: border-box !important;
+    min-height: calc(100vh - 130px) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
   }
 
   .cards-hub-content {
@@ -11518,8 +11533,10 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     align-items: stretch !important;
   }
 
+  /* 3D Perspective Stage */
   .srs-card-stage,
-  .fc-stage {
+  .fc-stage,
+  .flip-stage {
     perspective: 1200px !important;
     margin: 0 auto !important;
     padding: 0 !important;
@@ -11528,7 +11545,9 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     box-sizing: border-box !important;
   }
 
-  .fc-card {
+  /* Card Shell */
+  .fc-card,
+  .demo-card {
     position: relative !important;
     width: 100% !important;
     max-width: 700px !important;
@@ -11537,7 +11556,6 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     border-radius: 22px !important;
     cursor: pointer !important;
     user-select: none !important;
-    perspective: 1200px !important;
     transform-style: preserve-3d !important;
     -webkit-transform-style: preserve-3d !important;
     transition: transform 380ms cubic-bezier(0.2, 0.85, 0.35, 1.15), box-shadow 0.22s ease, border-color 0.22s ease !important;
@@ -11555,7 +11573,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     transform: rotateY(180deg) !important;
   }
 
-  /* Общие свойства обеих граней карточки */
+  /* Face Common */
   .fc-card-face,
   .card-face {
     position: absolute !important;
@@ -11569,58 +11587,56 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     justify-content: space-between !important;
     backface-visibility: hidden !important;
     -webkit-backface-visibility: hidden !important;
-    transform-style: preserve-3d !important;
-    -webkit-transform-style: preserve-3d !important;
     box-sizing: border-box !important;
-    overflow: hidden !important;
+    overflow: visible !important;
   }
 
-  /* Лицевая грань (Вопрос) — Liquid Obsidian Glass */
+  /* Front Face (Question) — Liquid Obsidian Glass */
   .fc-card-front,
   .card-front {
-    background: linear-gradient(165deg, rgba(26, 33, 44, 0.96) 0%, rgba(13, 17, 24, 0.98) 100%) !important;
+    background: linear-gradient(165deg, rgba(30, 37, 49, 0.85) 0%, rgba(16, 20, 28, 0.95) 100%) !important;
     border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
-    box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.20), 0 20px 48px -10px rgba(0, 0, 0, 0.70), 0 0 36px -8px rgba(16, 185, 129, 0.22) !important;
-    transform: rotateY(0deg) translateZ(1px) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 20px 40px -10px rgba(0, 0, 0, 0.70) !important;
+    transform: rotateY(0deg) !important;
+    z-index: 2 !important;
   }
   .fc-card:not(.is-flipped):not(.fc-card--flipped):hover .fc-card-front,
   .fc-card:not(.is-flipped):not(.fc-card--flipped):hover .card-front {
     border-color: rgba(52, 211, 153, 0.45) !important;
-    box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.25), 0 24px 56px -10px rgba(0, 0, 0, 0.75), 0 0 32px rgba(16, 185, 129, 0.26) !important;
-    transform: translateY(-2px) rotateY(0deg) translateZ(1px) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 24px 50px -10px rgba(0, 0, 0, 0.75), 0 0 32px rgba(16, 185, 129, 0.26) !important;
+    transform: translateY(-2px) rotateY(0deg) !important;
   }
 
-  /* Оборотная грань (Ответ) — Каноническое изумрудное сияние Mastery Emerald */
+  /* Back Face (Answer) — Mastery Emerald */
   .fc-card-back,
   .card-back {
-    background: linear-gradient(155deg, rgba(6, 78, 59, 0.88) 0%, rgba(11, 20, 30, 0.96) 50%, rgba(6, 78, 59, 0.75) 100%) !important;
-    border: 1.5px solid rgba(16, 185, 129, 0.85) !important;
-    box-shadow: inset 0 1.5px 0 rgba(16, 185, 129, 0.50), 0 24px 50px -10px rgba(0, 0, 0, 0.80), 0 0 40px rgba(16, 185, 129, 0.38) !important;
-    transform: rotateY(180deg) translateZ(1px) !important;
+    background: linear-gradient(155deg, rgba(6, 78, 59, 0.55) 0%, rgba(13, 22, 34, 0.92) 50%, rgba(6, 78, 59, 0.38) 100%) !important;
+    border: 1.5px solid rgba(16, 185, 129, 0.75) !important;
+    box-shadow: inset 0 1px 0 rgba(16, 185, 129, 0.45), 0 24px 50px -10px rgba(0, 0, 0, 0.80), 0 0 32px rgba(16, 185, 129, 0.32) !important;
+    transform: rotateY(180deg) !important;
+    z-index: 1 !important;
   }
   .fc-card.is-flipped:hover .fc-card-back,
   .fc-card.fc-card--flipped:hover .fc-card-back,
   .fc-card.is-flipped:hover .card-back,
   .fc-card.fc-card--flipped:hover .card-back {
     border-color: rgba(52, 211, 153, 0.95) !important;
-    box-shadow: inset 0 1.5px 0 rgba(16, 185, 129, 0.55), 0 28px 60px -10px rgba(0, 0, 0, 0.80), 0 0 44px rgba(16, 185, 129, 0.44) !important;
-    transform: translateY(-2px) rotateY(180deg) translateZ(1px) !important;
+    box-shadow: inset 0 1px 0 rgba(16, 185, 129, 0.55), 0 28px 60px -10px rgba(0, 0, 0, 0.85), 0 0 40px rgba(16, 185, 129, 0.42) !important;
+    transform: translateY(-2px) rotateY(180deg) !important;
   }
 
-  /* Железная защита от зеркального просвечивания (State-based visibility + z-index) */
+  /* Защита от зеркального просвечивания (State-based visibility + z-index) */
   .fc-card:not(.is-flipped):not(.fc-card--flipped) .card-front,
   .fc-card:not(.is-flipped):not(.fc-card--flipped) .fc-card-front {
     z-index: 2 !important;
     visibility: visible !important;
     pointer-events: auto !important;
-    transition: visibility 0s 0s !important;
   }
   .fc-card:not(.is-flipped):not(.fc-card--flipped) .card-back,
   .fc-card:not(.is-flipped):not(.fc-card--flipped) .fc-card-back {
     z-index: 1 !important;
     visibility: hidden !important;
     pointer-events: none !important;
-    transition: visibility 0s 190ms !important;
   }
   .fc-card.is-flipped .card-front,
   .fc-card.fc-card--flipped .card-front,
@@ -11661,7 +11677,14 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     line-height: 1.4 !important;
   }
 
-  
+  /* Внутренний контейнер ответа */
+  .fc-card-body {
+    overflow-y: auto !important;
+    max-height: 320px !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(16, 185, 129, 0.35) transparent !important;
+  }
+
   /* Notes SRS Rating Triad (Hick's Law) */
   .btn-rating-reset {
     background: rgba(244, 63, 94, 0.08) !important;
@@ -11678,20 +11701,19 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     transform: scale(0.98) translateY(0) !important;
   }
   .btn-rating-pass {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.65) 0%, rgba(5, 150, 105, 0.50) 50%, rgba(4, 120, 87, 0.60) 100%) !important;
-    border: 1.5px solid rgba(52, 211, 153, 0.85) !important;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(5, 150, 105, 0.22) 100%) !important;
+    border: 1.5px solid rgba(16, 185, 129, 0.75) !important;
     color: #ffffff !important;
-    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.40) !important;
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
     backdrop-filter: blur(14px) !important;
     -webkit-backdrop-filter: blur(14px) !important;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
   .btn-rating-pass:hover {
     transform: translateY(-1.5px) !important;
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.80) 0%, rgba(5, 150, 105, 0.62) 50%, rgba(4, 120, 87, 0.72) 100%) !important;
-    border-color: rgba(110, 231, 183, 0.95) !important;
-    box-shadow: 0 12px 32px rgba(16, 185, 129, 0.50), inset 0 1px 0 rgba(255, 255, 255, 0.55) !important;
-    filter: brightness(1.06) !important;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.48) 0%, rgba(5, 150, 105, 0.32) 100%) !important;
+    border-color: rgba(52, 211, 153, 0.95) !important;
+    box-shadow: 0 12px 32px rgba(16, 185, 129, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
   }
   .btn-rating-pass:active {
     transform: scale(0.98) translateY(0) !important;
@@ -11710,7 +11732,6 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.50) 0%, rgba(37, 99, 235, 0.35) 100%) !important;
     border-color: rgba(147, 197, 253, 0.95) !important;
     box-shadow: 0 12px 30px rgba(59, 130, 246, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
-    filter: brightness(1.06) !important;
   }
   .btn-rating-easy:active {
     transform: scale(0.98) translateY(0) !important;
@@ -11736,19 +11757,21 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     box-sizing: border-box !important;
   }
   .btn-cta-dominant,
-  .btn-glass-emerald {
+  .btn-glass-emerald,
+  .btn-style-glass,
+  #btn-show-answer {
     max-width: 440px !important;
     width: 100% !important;
     margin: 0 auto !important;
     height: 52px !important;
     min-height: 52px !important;
     border-radius: 16px !important;
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.65) 0%, rgba(5, 150, 105, 0.50) 50%, rgba(4, 120, 87, 0.60) 100%) !important;
-    border: 1.5px solid rgba(52, 211, 153, 0.85) !important;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(5, 150, 105, 0.22) 100%) !important;
+    border: 1.5px solid rgba(16, 185, 129, 0.75) !important;
     color: #ffffff !important;
-    box-shadow: 0 8px 28px rgba(16, 185, 129, 0.42), 0 0 24px rgba(16, 185, 129, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
-    backdrop-filter: blur(16px) saturate(160%) !important;
-    -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
     font-size: 1.05rem !important;
     font-weight: 700 !important;
     letter-spacing: 0.01em !important;
@@ -11757,15 +11780,16 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     justify-content: center !important;
     gap: 10px !important;
     cursor: pointer !important;
-    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
   .btn-cta-dominant:hover,
-  .btn-glass-emerald:hover {
+  .btn-glass-emerald:hover,
+  .btn-style-glass:hover,
+  #btn-show-answer:hover {
     transform: translateY(-1.5px) !important;
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.80) 0%, rgba(5, 150, 105, 0.62) 50%, rgba(4, 120, 87, 0.72) 100%) !important;
-    border-color: rgba(110, 231, 183, 0.95) !important;
-    box-shadow: 0 12px 34px rgba(16, 185, 129, 0.52), 0 0 30px rgba(16, 185, 129, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.55) !important;
-    filter: brightness(1.08) !important;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.48) 0%, rgba(5, 150, 105, 0.32) 100%) !important;
+    border-color: rgba(52, 211, 153, 0.95) !important;
+    box-shadow: 0 12px 32px rgba(16, 185, 129, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
   }
   .btn-cta-dominant:active,
   .btn-glass-emerald:active {
@@ -19360,7 +19384,7 @@ function buildSrsRatingDockHTML(srsInfo, isFlipped){
   return `
     <footer class="srs-action-dock" style="margin-top:8px;">
       <!-- Фаза 1: Доминирующая изумрудная кнопка переворота (Показать ответ) во всю ширину -->
-      <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta ${isFlipped ? 'srs-hidden' : ''}" id="btn-show-answer" data-action="flip-card" data-hub-flip style="${isFlipped ? 'display:none !important;' : 'display:flex !important;'}" title="Показать ответ (Enter или Пробел)">
+      <button type="button" class="btn-cta-dominant btn-glass-emerald btn-style-glass btn-sprint-cta ${isFlipped ? 'srs-hidden' : ''}" id="btn-show-answer" data-action="flip-card" data-hub-flip style="${isFlipped ? 'display:none !important;' : 'display:flex !important;'}" title="Показать ответ (Enter или Пробел)">
         <span>Показать ответ</span>
         <kbd class="fc-kbd-hint hide-on-mobile" style="margin-left:8px;">Пробел</kbd>
       </button>
@@ -19714,9 +19738,17 @@ function viewCardsHub(){
     </div>`;
     }
 
-    const item = cardsHubState.dueQueue[duePos];
-    const dObj = ALL_DECKS_COMBINED[item.deckId] || {title: item.deckId, cards: []};
-    const cObj = (dObj.cards || [])[item.cardIdx] || {q: '', a: ''};
+    const item = (cardsHubState.dueQueue && cardsHubState.dueQueue[duePos]) || null;
+    if(!item){
+      cardsHubState.dueQueue = collectDueCardsQueue();
+      if(!cardsHubState.dueQueue || cardsHubState.dueQueue.length === 0){
+        cardsHubState.completed = true;
+        return viewCardsHub();
+      }
+    }
+    const safeItem = item || cardsHubState.dueQueue[0] || {deckId: cardsHubState.deckId || '1.1.1', cardIdx: 0};
+    const dObj = ALL_DECKS_COMBINED[safeItem.deckId] || {title: safeItem.deckId, cards: []};
+    const cObj = (dObj.cards || [])[safeItem.cardIdx] || {q: 'Карточка загружается...', a: 'Ответ загружается...'};
     const cur = cObj;
     const curCard = cObj;
     const curCardKey = item.deckId + ':' + item.cardIdx;
@@ -25829,7 +25861,22 @@ render = function(){
     if(cardsHubState.hubTab !== 'notes' && cardsHubState.dueMode !== false){
       cardsHubState.dueMode = true;
     }
-    root.innerHTML = viewCardsHub();
+    try {
+      root.innerHTML = viewCardsHub();
+    } catch(renderCardsErr){
+      console.error('viewCardsHub render error:', renderCardsErr);
+      cardsHubState.dueMode = true;
+      cardsHubState.dueQueue = collectDueCardsQueue();
+      try {
+        root.innerHTML = viewCardsHub();
+      } catch(secondErr){
+        root.innerHTML = `<div class="container cards-hub-container" style="padding:40px 20px;text-align:center;color:#fff;">
+          <h2 style="font-size:1.4rem;font-weight:700;margin-bottom:12px;">Очередь повторений обновляется</h2>
+          <p style="color:var(--ink-muted);margin-bottom:20px;">Сессия памяти была перезапущена для синхронизации с базой знаний.</p>
+          <a href="#/cards" onclick="location.reload()" class="btn-cta-dominant btn-glass-emerald btn-style-glass" style="padding:12px 24px;text-decoration:none;display:inline-flex;">Обновить экран ➔</a>
+        </div>`;
+      }
+    }
     navRoute = (cardsHubState.hubTab === 'notes') ? '/notes-review' : '/cards';
   } else if(route === '/practice' || route.indexOf('/practice?') === 0){
     const match = route.match(/[?&]task=(\d+)/);
