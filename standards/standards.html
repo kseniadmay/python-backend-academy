@@ -18679,7 +18679,6 @@ function viewPythonSkill(sid){
       const curCard = cards[cIdx] || {q: 'Карточки загружаются', a: ''}; const cur = curCard;
       const curCardKey = activeF + ':' + cIdx;
       const srsPrev = typeof computeRemNoteIntervals === 'function' ? computeRemNoteIntervals(curCardKey) : {again:{days:1},hard:{days:2},good:{days:3},easy:{days:7}};
-    const sprintStepNum = Math.min(15, (Number(cardsHubState.sprintStep) || 0) + 1);
 
       const curQTotal = (pySkillViewState.sessionQueue && pySkillViewState.sessionQueue.length) || cards.length;
       const isRepeatPhase = qPos >= cards.length;
@@ -19738,6 +19737,7 @@ function buildSrsDeckContextBarHTML(deckTitle, total, currentIdx, getRatingOrIte
 window.buildSrsDeckContextBarHTML = buildSrsDeckContextBarHTML;
 
 function viewCardsHub(){
+  const sprintStepNum = Math.min(15, (Number(cardsHubState.sprintStep) || 0) + 1);
   const noteSrsStats = getNoteSpacedRepetitionStats();
   const srsGlobalStats = getSpacedRepetitionStats();
   if(cardsHubState.hubTab === 'notes'){
