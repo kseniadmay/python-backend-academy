@@ -24190,26 +24190,58 @@ function viewNotesSrsHub(noteSrsStats){
   const linkedDeckId = linkedInfo.deckId;
   const linkedTrack = linkedSkill ? getTrackForSkill(linkedSkill.id) : null;
 
-  const stepOutlineChips = steps.map((st, idx) => {
-    const cleanStTitle = (st.title || ('Шаг ' + (idx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-    const isCur = (!isFullMode && idx === sIdx);
-    return `<button type="button" class="btn btn-ghost" data-srs-note-step="${idx}" style="padding:5px 11px;border-radius:999px;font-size:0.75rem;${isCur ? 'background:rgba(16,185,129,0.22);border-color:rgba(52,211,153,0.65);color:#34d399;font-weight:700;' : 'opacity:0.85;'}">${idx + 1}. ${escapeHtmlStr(cleanStTitle)}</button>`;
-  }).join('');
-
   const decorateFn = (typeof decorateCodeBlocksWithRunBtn === 'function') ? decorateCodeBlocksWithRunBtn : (h => h);
-  
-  // Устранение дублирования заголовка шага в теле конспекта
-  const cleanStepTitle = (curStep.title || '').replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-  let stepBodyHTML = decorateFn(curStep.html || '');
-  if(cleanStepTitle && stepBodyHTML){
-    stepBodyHTML = stepBodyHTML.replace(/^\s*<h[1-4][^>]*>([\s\S]*?)<\/h[1-4]>/i, (m, inner) => {
-      const plain = inner.replace(/<[^>]+>/g, '').trim().toLowerCase();
-      const c = cleanStepTitle.toLowerCase();
-      if(plain === c || plain.includes(c) || c.includes(plain)) return '';
-      return m;
-    });
-  }
 
+  // Разбиение текущего шага на кванты (чанки) — как в Coddy и в экране скиллов
+  const cleanStepTitle = (curStep.title || ('Шаг ' + (sIdx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+  const rawChunks = (typeof splitStepHtmlIntoChunks === 'function') ? splitStepHtmlIntoChunks(curStep.html).slice() : [curStep.html || ''];
+  const chunks = rawChunks.length > 0 ? rawChunks : ['<p>Шаг конспекта пуст.</p>'];
+  if(chunks.length > 0 && cleanStepTitle && !/^<h[1-6]/i.test(String(chunks[0] || '').trim())){
+    chunks[0] = `<h4><span style="color:#34d399;margin-right:6px;">✦</span>${escapeHtmlStr(cleanStepTitle)}</h4>\n` + chunks[0];
+  }
+  const totalChunks = chunks.length;
+  const curChunkIdx = Math.min(Math.max(0, Number(cardsHubState.noteChunkIdx) || 0), totalChunks - 1);
+
+  // Статус финиша: все шаги и все кванты пройдены
+  const isLastStep = (sIdx + 1 >= steps.length);
+  const isLastChunk = (curChunkIdx + 1 >= totalChunks);
+  const isCompleted = !!cardsHubState.noteCompleted || (isLastStep && isLastChunk);
+
+  // Пошаговый степпер микро-шагов (как в Coddy: шаги появляются пошагово)
+  const maxReached = Math.max(sIdx, Math.min(steps.length - 1, Number(cardsHubState.noteMaxStep) || sIdx));
+  const revealedSteps = steps.slice(0, maxReached + 1);
+
+  const stepStepperHTML = (steps.length > 1 && !isFullMode) ? `
+    <div class="note-quantum-stepper" style="margin-bottom:14px;padding:12px 14px;border-radius:14px;background:rgba(0,0,0,0.22);border:1px solid rgba(255,255,255,0.06);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:0.78rem;font-weight:700;color:#6ee7b7;display:inline-flex;align-items:center;gap:6px;">
+          ✦ Шаг ${sIdx + 1}: ${escapeHtmlStr(cleanStepTitle)}
+        </span>
+        <span style="font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:var(--ink-soft);background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);padding:2px 8px;border-radius:999px;">
+          Шаг ${sIdx + 1} из ${steps.length}
+        </span>
+      </div>
+      <!-- Сегментированная шкала прогресса микро-шагов -->
+      <div class="step-segmented-track" style="display:flex;gap:4px;width:100%;height:4px;border-radius:999px;overflow:hidden;margin-bottom:10px;background:rgba(255,255,255,0.06);">
+        ${steps.map((_, si) => {
+          const isDone = (si < sIdx);
+          const isCur = (si === sIdx);
+          return `<div class="step-segment" style="flex:1;height:100%;border-radius:999px;background:${isDone ? '#10b981' : (isCur ? '#34d399' : 'rgba(255,255,255,0.08)')};box-shadow:${isCur ? '0 0 8px rgba(52,211,153,0.6)' : 'none'};transition:all .3s ease;"></div>`;
+        }).join('')}
+      </div>
+      <!-- Пошагово появляющиеся пилюли открытых шагов (как в Coddy!) -->
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;">
+        ${revealedSteps.map((st, idx) => {
+          const isCur = (idx === sIdx);
+          const isDone = (idx < sIdx);
+          const cleanStTitle = (st.title || ('Шаг ' + (idx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+          return `<button type="button" class="btn btn-ghost ${isCur ? 'active' : ''}" data-srs-note-step="${idx}" style="padding:4px 11px;border-radius:999px;font-size:0.74rem;line-height:1.35;white-space:nowrap;transition:all .2s ease;cursor:pointer;${isCur ? 'background:linear-gradient(135deg, rgba(16,185,129,0.25) 0%, rgba(6,78,59,0.35) 100%);border:1px solid rgba(52,211,153,0.65);color:#ffffff;font-weight:700;box-shadow:0 2px 10px rgba(16,185,129,0.25);' : (isDone ? 'background:rgba(16,185,129,0.10);border:1px solid rgba(52,211,153,0.25);color:#6ee7b7;font-weight:600;' : 'background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:var(--ink-soft);font-weight:500;')}" title="Перейти к шагу ${idx + 1}: ${escapeHtmlStr(cleanStTitle)}"><span style="color:${isCur ? '#34d399' : (isDone ? '#10b981' : 'var(--ink-muted)')};font-family:var(--font-m);font-weight:700;margin-right:4px;">${idx + 1}.</span>${escapeHtmlStr(cleanStTitle)}</button>`;
+        }).join('')}
+      </div>
+    </div>
+  ` : '';
+
+  // Тело конспекта: лента квантов
   const noteContentHTML = isFullMode
     ? `<div class="note-review-body" style="margin-bottom:16px;line-height:1.65;font-size:0.93rem;color:var(--ink);">
         ${steps.map((st, i) => {
@@ -24230,17 +24262,58 @@ function viewNotesSrsHub(noteSrsStats){
           </div>`;
         }).join('')}
       </div>`
-    : `<div class="note-review-body" style="margin-bottom:12px;line-height:1.65;font-size:0.94rem;color:var(--ink);">
-        ${cleanStepTitle ? `<h4 style="font-size:1.08rem;font-weight:700;color:#ffffff;margin:0 0 12px;display:flex;align-items:center;gap:8px;"><span style="color:#34d399;">✦</span> ${escapeHtmlStr(cleanStepTitle)}</h4>` : ''}
-        <div class="lesson-theory" style="font-size:0.93rem;">${stepBodyHTML}</div>
+    : `<div class="scroll-feed note-review-body" id="srs-note-text" style="margin-bottom:12px;line-height:1.65;font-size:0.94rem;color:var(--ink);">
+        ${chunks.slice(0, curChunkIdx + 1).map((ch, ci) =>
+          `<div class="feed-chunk ${ci < curChunkIdx ? 'feed-chunk-prev' : 'feed-chunk-new'} lesson-theory" data-chunk-idx="${ci}">${decorateFn(ch)}</div>`
+        ).join('')}
+      </div>`;
+
+  // Панель действий: пошаговый Dominant CTA -> в финале открываются кнопки оценки SRS
+  let actionAreaHTML = '';
+  if(isFullMode || isCompleted){
+    actionAreaHTML = `
+      <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin:12px 0 10px;font-size:0.80rem;font-weight:700;color:#6ee7b7;">
+        <span style="color:#34d399;">✓</span> ${isFullMode ? 'Полный обзор конспекта' : 'Все ' + steps.length + ' шагов изучены!'} · Оцените запоминание:
       </div>
-      ${steps.length > 1 ? `
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);">
-          <button type="button" class="btn btn-ghost" data-srs-note-step="${Math.max(0, sIdx - 1)}" ${sIdx === 0 ? 'disabled' : ''} style="padding:6px 12px;border-radius:10px;font-size:0.78rem;">← Предыдущий шаг</button>
-          <span style="font-size:0.78rem;color:var(--ink-muted);font-weight:600;">Шаг ${sIdx + 1} из ${steps.length}</span>
-          <button type="button" class="btn btn-ghost" data-srs-note-step="${Math.min(steps.length - 1, sIdx + 1)}" ${sIdx + 1 >= steps.length ? 'disabled' : ''} style="padding:6px 12px;border-radius:10px;font-size:0.78rem;">Следующий шаг ➔</button>
-        </div>
-      ` : ''}`;
+      <div class="fc-rate-row note-rate-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-top:6px;">
+        <!-- Кнопка 1: Не знаю (С нуля · 1 дн) -->
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-srs-note-reset="${curItem.noteId}" data-hotkey="1" title="Сбросить интервал конспекта на 1 день (клавиша 1)">
+          <span class="srs-btn-title">Не знаю</span>
+          <span class="srs-btn-sub"><span class="srs-days">С нуля · 1 дн</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">1</kbd></span></span>
+        </button>
+
+        <!-- Кнопка 2: Понятно (+15 XP, следующий интервал) -->
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-srs-note-pass="${curItem.noteId}" data-hotkey="2" title="Закрепить и перевести на следующую ступень (${curItem.nextInterval} дн, клавиша 2 или Enter)">
+          <span class="srs-btn-title">Понятно</span>
+          <span class="srs-btn-sub"><span class="srs-days">${curItem.nextInterval} дн</span> <span class="srs-xp-badge">+15 XP</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">2</kbd></span></span>
+        </button>
+
+        <!-- Кнопка 3: Назубок (+20 XP, перешагнуть интервал) -->
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-srs-note-easy="${curItem.noteId}" data-hotkey="3" title="Помню идеально — перешагнуть ступень (${curItem.jumpInterval || curItem.nextInterval} дн, клавиша 3)">
+          <span class="srs-btn-title">Назубок</span>
+          <span class="srs-btn-sub"><span class="srs-days">${curItem.jumpInterval || curItem.nextInterval} дн</span> <span class="srs-xp-badge">+20 XP</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">3</kbd></span></span>
+        </button>
+      </div>
+    `;
+  } else {
+    const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
+    const canGoBack = (curChunkIdx > 0 || sIdx > 0);
+    const backBtnHTML = `<button type="button" class="btn btn-ghost" data-srs-note-chunk-prev="1" style="padding:11px 16px;border-radius:12px;font-size:.84rem;white-space:nowrap;${canGoBack ? 'display:inline-flex;' : 'display:none;'}" ${canGoBack ? '' : 'disabled aria-hidden="true"'}>← Назад</button>`;
+
+    let primaryActionHTML = '';
+    if(hasMoreChunks){
+      primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-srs-note-chunk-more="1">Понятно, дальше (+10 XP) ➔</button>`;
+    } else {
+      primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-srs-note-next-step="${sIdx + 1}">Следующий шаг (${sIdx + 2}/${steps.length}) ➔</button>`;
+    }
+
+    actionAreaHTML = `
+      <div class="srs-actions-bar" style="display:flex;align-items:center;gap:10px;flex-wrap:nowrap;justify-content:center;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);">
+        ${backBtnHTML}
+        ${primaryActionHTML}
+      </div>
+    `;
+  }
 
   return `
   <div class="container cards-hub-container" style="padding-bottom:60px;max-width:700px;margin:0 auto;">
@@ -24286,21 +24359,7 @@ function viewNotesSrsHub(noteSrsStats){
 
         <h2 style="font-size:1.28rem;font-weight:800;color:var(--ink);margin:0 0 14px;line-height:1.4;">${escapeHtmlStr(cleanTitle)}</h2>
 
-        ${steps.length > 1 && !isFullMode ? `
-          <div class="note-quantum-section" style="margin-bottom:14px;padding:10px 14px;border-radius:14px;background:rgba(0,0,0,0.18);border:1px solid rgba(255,255,255,0.06);">
-            <div style="font-size:0.75rem;font-weight:700;color:var(--ink-muted);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
-              <span style="display:inline-flex;align-items:center;gap:6px;">🧭 Кванты конспекта:</span>
-              <span style="font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;background:rgba(16,185,129,0.14);border:1px solid rgba(52,211,153,0.28);padding:1px 8px;border-radius:999px;">Квант ${sIdx + 1} из ${steps.length}</span>
-            </div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              ${steps.map((st, idx) => {
-                const isCur = (idx === sIdx);
-                const cleanStTitle = (st.title || ('Шаг ' + (idx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-                return `<button type="button" class="btn btn-ghost ${isCur ? 'active' : ''}" data-srs-note-step="${idx}" style="padding:5px 12px;border-radius:999px;font-size:0.75rem;line-height:1.35;transition:all .15s ease;cursor:pointer;${isCur ? 'background:linear-gradient(135deg, rgba(16,185,129,0.24) 0%, rgba(6,78,59,0.35) 100%);border:1px solid rgba(52,211,153,0.65);color:#ffffff;font-weight:700;box-shadow:0 2px 10px rgba(16,185,129,0.25);' : 'background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:var(--ink-soft);font-weight:500;'}" title="Перейти к кванту ${idx + 1}: ${escapeHtmlStr(cleanStTitle)}"><span style="color:${isCur ? '#34d399' : 'var(--ink-muted)'};font-family:var(--font-m);font-weight:700;margin-right:4px;">${idx + 1}.</span>${escapeHtmlStr(cleanStTitle)}</button>`;
-              }).join('')}
-            </div>
-          </div>
-        ` : ''}
+        ${stepStepperHTML}
 
         <div style="background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:16px 18px;margin-bottom:14px;">
           ${noteContentHTML}
@@ -24315,25 +24374,7 @@ function viewNotesSrsHub(noteSrsStats){
           </div>
         </div>
 
-        <div class="fc-rate-row note-rate-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
-          <!-- Кнопка 1: Не знаю (С нуля · 1 дн) -->
-          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-srs-note-reset="${curItem.noteId}" data-hotkey="1" title="Сбросить интервал конспекта на 1 день (клавиша 1)">
-            <span class="srs-btn-title">Не знаю</span>
-            <span class="srs-btn-sub"><span class="srs-days">С нуля · 1 дн</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">1</kbd></span></span>
-          </button>
-
-          <!-- Кнопка 2: Понятно (+15 XP, следующий интервал) -->
-          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-srs-note-pass="${curItem.noteId}" data-hotkey="2" title="Закрепить и перевести на следующую ступень (${curItem.nextInterval} дн, клавиша 2 или Enter)">
-            <span class="srs-btn-title">Понятно</span>
-            <span class="srs-btn-sub"><span class="srs-days">${curItem.nextInterval} дн</span> <span class="srs-xp-badge">+15 XP</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">2</kbd></span></span>
-          </button>
-
-          <!-- Кнопка 3: Назубок (+20 XP, перешагнуть интервал) -->
-          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-srs-note-easy="${curItem.noteId}" data-hotkey="3" title="Помню идеально — перешагнуть ступень (${curItem.jumpInterval || curItem.nextInterval} дн, клавиша 3)">
-            <span class="srs-btn-title">Назубок</span>
-            <span class="srs-btn-sub"><span class="srs-days">${curItem.jumpInterval || curItem.nextInterval} дн</span> <span class="srs-xp-badge">+20 XP</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">3</kbd></span></span>
-          </button>
-        </div>
+        ${actionAreaHTML}
       </div>
     </main>
   </div>`;
@@ -26442,6 +26483,9 @@ document.addEventListener('click', async function(e){
   if(srsGotoNoteBtn){
     cardsHubState.notePos = parseInt(srsGotoNoteBtn.getAttribute('data-srs-goto-note'), 10) || 0;
     cardsHubState.noteStepIdx = 0;
+    cardsHubState.noteChunkIdx = 0;
+    cardsHubState.noteMaxStep = 0;
+    cardsHubState.noteCompleted = false;
     saveCardsHubPosState();
     render();
     return;
@@ -26468,9 +26512,134 @@ document.addEventListener('click', async function(e){
     return;
   }
 
+  // Пошаговое раскрытие квантов-шагов конспекта (как в Coddy и в экране скиллов)
+  const srsChunkMoreBtn = e.target.closest('[data-srs-note-chunk-more]');
+  if(srsChunkMoreBtn){
+    const curPos = cardsHubState.notePos || 0;
+    const curQ = (typeof collectDueNotesQueue === 'function') ? collectDueNotesQueue() : [];
+    const curItem = curQ[curPos] || {};
+    const curNote = curItem.noteObj || (ALL_NOTES_COMBINED[curItem.noteId] || {});
+    const steps = (curNote.steps && curNote.steps.length > 0) ? curNote.steps : [];
+    const sIdx = Math.min(Math.max(0, Number(cardsHubState.noteStepIdx) || 0), steps.length - 1);
+    const curStep = steps[sIdx] || { html: '' };
+    const chunks = (typeof splitStepHtmlIntoChunks === 'function') ? splitStepHtmlIntoChunks(curStep.html).slice() : [curStep.html || ''];
+    const nextCIdx = (Number(cardsHubState.noteChunkIdx) || 0) + 1;
+
+    try{ awardXp(10); }catch(err){}
+    try{ playSound('tick'); }catch(err){}
+
+    cardsHubState.noteChunkIdx = nextCIdx;
+    saveCardsHubPosState();
+
+    const feedContainer = document.getElementById('srs-note-text');
+    if(feedContainer && nextCIdx < chunks.length){
+      feedContainer.querySelectorAll('.feed-chunk-new').forEach(function(el){
+        el.classList.remove('feed-chunk-new');
+        el.classList.add('feed-chunk-prev');
+      });
+      const newEl = document.createElement('div');
+      newEl.className = 'feed-chunk feed-chunk-new lesson-theory';
+      newEl.setAttribute('data-chunk-idx', nextCIdx);
+      const decorateFn = (typeof decorateCodeBlocksWithRunBtn === 'function') ? decorateCodeBlocksWithRunBtn : (h => h);
+      newEl.innerHTML = decorateFn(chunks[nextCIdx]);
+      feedContainer.appendChild(newEl);
+
+      const hasMore = (nextCIdx + 1 < chunks.length);
+      if(!hasMore){
+        srsChunkMoreBtn.removeAttribute('data-srs-note-chunk-more');
+        if(sIdx + 1 < steps.length){
+          srsChunkMoreBtn.setAttribute('data-srs-note-next-step', sIdx + 1);
+          srsChunkMoreBtn.textContent = `Следующий шаг (${sIdx + 2}/${steps.length}) ➔`;
+        } else {
+          cardsHubState.noteCompleted = true;
+          render();
+          return;
+        }
+      }
+
+      const cardParent = feedContainer.closest('.fc-card');
+      if(cardParent){
+        const backBtn = cardParent.querySelector('[data-srs-note-chunk-prev]');
+        if(backBtn){
+          backBtn.style.display = 'inline-flex';
+          backBtn.removeAttribute('disabled');
+          backBtn.removeAttribute('aria-hidden');
+        }
+      }
+
+      try{ newEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }catch(err){}
+      return;
+    }
+    render();
+    return;
+  }
+
+  const srsChunkPrevBtn = e.target.closest('[data-srs-note-chunk-prev]');
+  if(srsChunkPrevBtn){
+    const feedContainer = document.getElementById('srs-note-text');
+    if(feedContainer && Number(cardsHubState.noteChunkIdx) > 0){
+      const lastChunkEl = feedContainer.querySelector(`[data-chunk-idx="${cardsHubState.noteChunkIdx}"]`);
+      if(lastChunkEl) lastChunkEl.remove();
+      cardsHubState.noteChunkIdx -= 1;
+      saveCardsHubPosState();
+
+      const curLastChunk = feedContainer.querySelector(`[data-chunk-idx="${cardsHubState.noteChunkIdx}"]`);
+      if(curLastChunk){
+        curLastChunk.classList.remove('feed-chunk-prev');
+        curLastChunk.classList.add('feed-chunk-new');
+      }
+      const cardParent = feedContainer.closest('.fc-card');
+      if(cardParent){
+        if(cardsHubState.noteChunkIdx === 0 && (cardsHubState.noteStepIdx || 0) === 0){
+          srsChunkPrevBtn.style.display = 'none';
+          srsChunkPrevBtn.setAttribute('disabled', '');
+          srsChunkPrevBtn.setAttribute('aria-hidden', 'true');
+        }
+        const actBtn = cardParent.querySelector('[data-srs-note-next-step], [data-srs-note-chunk-more]');
+        if(actBtn){
+          actBtn.removeAttribute('data-srs-note-next-step');
+          actBtn.setAttribute('data-srs-note-chunk-more', '1');
+          actBtn.textContent = 'Понятно, дальше (+10 XP) ➔';
+        }
+      }
+      return;
+    }
+    if(Number(cardsHubState.noteChunkIdx) > 0){
+      cardsHubState.noteChunkIdx -= 1;
+    } else if(Number(cardsHubState.noteStepIdx) > 0){
+      cardsHubState.noteStepIdx -= 1;
+      const curPos = cardsHubState.notePos || 0;
+      const curQ = (typeof collectDueNotesQueue === 'function') ? collectDueNotesQueue() : [];
+      const curItem = curQ[curPos] || {};
+      const curNote = curItem.noteObj || (ALL_NOTES_COMBINED[curItem.noteId] || {});
+      const steps = curNote.steps || [];
+      const prevStep = steps[cardsHubState.noteStepIdx];
+      const prevChunks = prevStep ? splitStepHtmlIntoChunks(prevStep.html) : [];
+      cardsHubState.noteChunkIdx = Math.max(0, prevChunks.length - 1);
+    }
+    saveCardsHubPosState();
+    render();
+    return;
+  }
+
+  const srsNoteNextStepBtn = e.target.closest('[data-srs-note-next-step]');
+  if(srsNoteNextStepBtn){
+    const nextIdx = parseInt(srsNoteNextStepBtn.getAttribute('data-srs-note-next-step'), 10) || 0;
+    try{ awardXp(10); }catch(err){}
+    try{ playSound('tick'); }catch(err){}
+    cardsHubState.noteStepIdx = nextIdx;
+    cardsHubState.noteChunkIdx = 0;
+    cardsHubState.noteMaxStep = Math.max(Number(cardsHubState.noteMaxStep) || 0, nextIdx);
+    saveCardsHubPosState();
+    render();
+    return;
+  }
+
   const srsNoteStepBtn = e.target.closest('[data-srs-note-step]');
   if(srsNoteStepBtn){
     cardsHubState.noteStepIdx = Math.max(0, parseInt(srsNoteStepBtn.getAttribute('data-srs-note-step'), 10) || 0);
+    cardsHubState.noteChunkIdx = 0;
+    cardsHubState.noteMaxStep = Math.max(Number(cardsHubState.noteMaxStep) || 0, cardsHubState.noteStepIdx);
     cardsHubState.noteFullMode = false;
     saveCardsHubPosState();
     render();
@@ -26491,6 +26660,9 @@ document.addEventListener('click', async function(e){
       applyNoteReview(nid, 'pass', srsNotePassBtn);
       cardsHubState.forcedNoteId = null;
       cardsHubState.noteStepIdx = 0;
+      cardsHubState.noteChunkIdx = 0;
+      cardsHubState.noteMaxStep = 0;
+      cardsHubState.noteCompleted = false;
       cardsHubState.notePos = 0;
       saveCardsHubPosState();
       render();
@@ -26505,6 +26677,9 @@ document.addEventListener('click', async function(e){
       applyNoteReview(nid, 'easy', srsNoteEasyBtn);
       cardsHubState.forcedNoteId = null;
       cardsHubState.noteStepIdx = 0;
+      cardsHubState.noteChunkIdx = 0;
+      cardsHubState.noteMaxStep = 0;
+      cardsHubState.noteCompleted = false;
       cardsHubState.notePos = 0;
       saveCardsHubPosState();
       render();
@@ -26519,6 +26694,9 @@ document.addEventListener('click', async function(e){
       applyNoteReview(nid, 'reset', srsNoteResetBtn);
       cardsHubState.forcedNoteId = null;
       cardsHubState.noteStepIdx = 0;
+      cardsHubState.noteChunkIdx = 0;
+      cardsHubState.noteMaxStep = 0;
+      cardsHubState.noteCompleted = false;
       cardsHubState.notePos = 0;
       saveCardsHubPosState();
       render();
@@ -29840,6 +30018,8 @@ document.addEventListener('keydown', function(e){
     }
     const flipBtn = document.querySelector('[data-py-flip-card], [data-hub-flip]');
     if(flipBtn){ e.preventDefault(); flipBtn.click(); return; }
+    const srsNoteCtaBtn = document.querySelector('[data-srs-note-chunk-more], [data-srs-note-next-step]');
+    if(srsNoteCtaBtn){ e.preventDefault(); srsNoteCtaBtn.click(); return; }
     const pyNextBtn = document.querySelector('[data-chunk-more="py"], [data-py-next-step], [data-py-finish-note]');
     if(pyNextBtn){ e.preventDefault(); pyNextBtn.click(); return; }
   }
