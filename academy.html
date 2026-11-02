@@ -24207,43 +24207,41 @@ function viewNotesSrsHub(noteSrsStats){
   const isLastChunk = (curChunkIdx + 1 >= totalChunks);
   const isCompleted = !!cardsHubState.noteCompleted || (isLastStep && isLastChunk);
 
-  // Пошаговый степпер микро-шагов (как в Coddy: шаги появляются пошагово)
-  const maxReached = Math.max(sIdx, Math.min(steps.length - 1, Number(cardsHubState.noteMaxStep) || sIdx));
-  const revealedSteps = steps.slice(0, maxReached + 1);
-
-  const stepStepperHTML = (steps.length > 1 && !isFullMode) ? `
-    <div class="note-quantum-stepper" style="margin-bottom:14px;padding:12px 14px;border-radius:14px;background:rgba(0,0,0,0.22);border:1px solid rgba(255,255,255,0.06);">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <span style="font-size:0.78rem;font-weight:700;color:#6ee7b7;display:inline-flex;align-items:center;gap:6px;">
-          ✦ Шаг ${sIdx + 1}: ${escapeHtmlStr(cleanStepTitle)}
-        </span>
-        <span style="font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:var(--ink-soft);background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);padding:2px 8px;border-radius:999px;">
-          Шаг ${sIdx + 1} из ${steps.length}
-        </span>
-      </div>
-      <!-- Сегментированная шкала прогресса микро-шагов -->
-      <div class="step-segmented-track" style="display:flex;gap:4px;width:100%;height:4px;border-radius:999px;overflow:hidden;margin-bottom:10px;background:rgba(255,255,255,0.06);">
-        ${steps.map((_, si) => {
-          const isDone = (si < sIdx);
-          const isCur = (si === sIdx);
-          return `<div class="step-segment" style="flex:1;height:100%;border-radius:999px;background:${isDone ? '#10b981' : (isCur ? '#34d399' : 'rgba(255,255,255,0.08)')};box-shadow:${isCur ? '0 0 8px rgba(52,211,153,0.6)' : 'none'};transition:all .3s ease;"></div>`;
-        }).join('')}
-      </div>
-      <!-- Пошагово появляющиеся пилюли открытых шагов (как в Coddy!) -->
-      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;">
-        ${revealedSteps.map((st, idx) => {
-          const isCur = (idx === sIdx);
-          const isDone = (idx < sIdx);
-          const cleanStTitle = (st.title || ('Шаг ' + (idx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-          return `<button type="button" class="btn btn-ghost ${isCur ? 'active' : ''}" data-srs-note-step="${idx}" style="padding:4px 11px;border-radius:999px;font-size:0.74rem;line-height:1.35;white-space:nowrap;transition:all .2s ease;cursor:pointer;${isCur ? 'background:linear-gradient(135deg, rgba(16,185,129,0.25) 0%, rgba(6,78,59,0.35) 100%);border:1px solid rgba(52,211,153,0.65);color:#ffffff;font-weight:700;box-shadow:0 2px 10px rgba(16,185,129,0.25);' : (isDone ? 'background:rgba(16,185,129,0.10);border:1px solid rgba(52,211,153,0.25);color:#6ee7b7;font-weight:600;' : 'background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:var(--ink-soft);font-weight:500;')}" title="Перейти к шагу ${idx + 1}: ${escapeHtmlStr(cleanStTitle)}"><span style="color:${isCur ? '#34d399' : (isDone ? '#10b981' : 'var(--ink-muted)')};font-family:var(--font-m);font-weight:700;margin-right:4px;">${idx + 1}.</span>${escapeHtmlStr(cleanStTitle)}</button>`;
-        }).join('')}
-      </div>
+  // Деликатный микро-индикатор шага (без нагромождения степперов и пилюль)
+  const stepHeaderHTML = (steps.length > 1 && !isFullMode) ? `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:0.80rem;color:var(--ink-muted);">
+      <span style="color:#6ee7b7;font-weight:700;">✦ ${sIdx + 1}. ${escapeHtmlStr(cleanStepTitle)}</span>
+      <span style="font-family:var(--font-m);font-size:0.72rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:2px 8px;border-radius:999px;">Шаг ${sIdx + 1} из ${steps.length}</span>
     </div>
   ` : '';
 
-  // Тело конспекта: лента квантов
+  // Тело конспекта: ТОЛЬКО кусочковая подача материала
+  const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
+  const hasMoreSteps = (sIdx + 1 < steps.length);
+  const canGoBack = (curChunkIdx > 0 || sIdx > 0);
+
+  const backBtnHTML = `<button type="button" class="btn btn-ghost" data-srs-note-chunk-prev="1" style="padding:9px 14px;border-radius:10px;font-size:.80rem;white-space:nowrap;${canGoBack ? 'display:inline-flex;' : 'display:none;'}" ${canGoBack ? '' : 'disabled aria-hidden="true"'}>← Назад</button>`;
+
+  let chunkMoreBtnHTML = '';
+  if(!isFullMode){
+    if(hasMoreChunks){
+      chunkMoreBtnHTML = `<button type="button" class="btn btn-ghost" data-srs-note-chunk-more="1" style="flex:1;padding:9px 16px;border-radius:10px;background:rgba(16,185,129,0.16);border:1px solid rgba(52,211,153,0.40);color:#6ee7b7;font-size:0.84rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:all .2s ease;">Понятно, дальше (+10 XP) ➔</button>`;
+    } else if(hasMoreSteps){
+      chunkMoreBtnHTML = `<button type="button" class="btn btn-ghost" data-srs-note-next-step="${sIdx + 1}" style="flex:1;padding:9px 16px;border-radius:10px;background:rgba(16,185,129,0.16);border:1px solid rgba(52,211,153,0.40);color:#6ee7b7;font-size:0.84rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:all .2s ease;">Следующий шаг (${sIdx + 2}/${steps.length}) ➔</button>`;
+    } else if(steps.length > 1){
+      chunkMoreBtnHTML = `<div style="flex:1;text-align:center;font-size:0.80rem;font-weight:700;color:#6ee7b7;padding:6px 12px;background:rgba(16,185,129,0.08);border-radius:8px;border:1px solid rgba(52,211,153,0.20);">✓ Все ${steps.length} шагов конспекта прочитаны</div>`;
+    }
+  }
+
+  const chunkActionRowHTML = (!isFullMode && (hasMoreChunks || hasMoreSteps || steps.length > 1)) ? `
+    <div class="chunk-action-row" style="display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05);">
+      ${backBtnHTML}
+      ${chunkMoreBtnHTML}
+    </div>
+  ` : '';
+
   const noteContentHTML = isFullMode
-    ? `<div class="note-review-body" style="margin-bottom:16px;line-height:1.65;font-size:0.93rem;color:var(--ink);">
+    ? `<div class="note-review-body" style="margin-bottom:14px;line-height:1.65;font-size:0.93rem;color:var(--ink);">
         ${steps.map((st, i) => {
           const sTitle = (st.title || '').replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
           let sHtml = decorateFn(st.html || '');
@@ -24256,64 +24254,18 @@ function viewNotesSrsHub(noteSrsStats){
             });
           }
           return `
-          <div style="margin-bottom:18px;padding-bottom:14px;${i < steps.length - 1 ? 'border-bottom:1px dashed rgba(255,255,255,0.08);' : ''}">
-            ${sTitle ? `<h4 style="font-size:1.06rem;font-weight:700;color:#34d399;margin:0 0 10px;display:flex;align-items:center;gap:6px;"><span>✦</span> ${escapeHtmlStr(sTitle)}</h4>` : ''}
+          <div style="margin-bottom:16px;padding-bottom:12px;${i < steps.length - 1 ? 'border-bottom:1px dashed rgba(255,255,255,0.08);' : ''}">
+            ${sTitle ? `<h4 style="font-size:1.04rem;font-weight:700;color:#34d399;margin:0 0 8px;display:flex;align-items:center;gap:6px;"><span>✦</span> ${escapeHtmlStr(sTitle)}</h4>` : ''}
             <div class="lesson-theory" style="font-size:0.92rem;">${sHtml}</div>
           </div>`;
         }).join('')}
       </div>`
-    : `<div class="scroll-feed note-review-body" id="srs-note-text" style="margin-bottom:12px;line-height:1.65;font-size:0.94rem;color:var(--ink);">
+    : `<div class="scroll-feed note-review-body" id="srs-note-text" style="line-height:1.65;font-size:0.94rem;color:var(--ink);">
         ${chunks.slice(0, curChunkIdx + 1).map((ch, ci) =>
           `<div class="feed-chunk ${ci < curChunkIdx ? 'feed-chunk-prev' : 'feed-chunk-new'} lesson-theory" data-chunk-idx="${ci}">${decorateFn(ch)}</div>`
         ).join('')}
-      </div>`;
-
-  // Панель действий: пошаговый Dominant CTA -> в финале открываются кнопки оценки SRS
-  let actionAreaHTML = '';
-  if(isFullMode || isCompleted){
-    actionAreaHTML = `
-      <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin:12px 0 10px;font-size:0.80rem;font-weight:700;color:#6ee7b7;">
-        <span style="color:#34d399;">✓</span> ${isFullMode ? 'Полный обзор конспекта' : 'Все ' + steps.length + ' шагов изучены!'} · Оцените запоминание:
       </div>
-      <div class="fc-rate-row note-rate-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-top:6px;">
-        <!-- Кнопка 1: Не знаю (С нуля · 1 дн) -->
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-srs-note-reset="${curItem.noteId}" data-hotkey="1" title="Сбросить интервал конспекта на 1 день (клавиша 1)">
-          <span class="srs-btn-title">Не знаю</span>
-          <span class="srs-btn-sub"><span class="srs-days">С нуля · 1 дн</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">1</kbd></span></span>
-        </button>
-
-        <!-- Кнопка 2: Понятно (+15 XP, следующий интервал) -->
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-srs-note-pass="${curItem.noteId}" data-hotkey="2" title="Закрепить и перевести на следующую ступень (${curItem.nextInterval} дн, клавиша 2 или Enter)">
-          <span class="srs-btn-title">Понятно</span>
-          <span class="srs-btn-sub"><span class="srs-days">${curItem.nextInterval} дн</span> <span class="srs-xp-badge">+15 XP</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">2</kbd></span></span>
-        </button>
-
-        <!-- Кнопка 3: Назубок (+20 XP, перешагнуть интервал) -->
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-srs-note-easy="${curItem.noteId}" data-hotkey="3" title="Помню идеально — перешагнуть ступень (${curItem.jumpInterval || curItem.nextInterval} дн, клавиша 3)">
-          <span class="srs-btn-title">Назубок</span>
-          <span class="srs-btn-sub"><span class="srs-days">${curItem.jumpInterval || curItem.nextInterval} дн</span> <span class="srs-xp-badge">+20 XP</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">3</kbd></span></span>
-        </button>
-      </div>
-    `;
-  } else {
-    const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
-    const canGoBack = (curChunkIdx > 0 || sIdx > 0);
-    const backBtnHTML = `<button type="button" class="btn btn-ghost" data-srs-note-chunk-prev="1" style="padding:11px 16px;border-radius:12px;font-size:.84rem;white-space:nowrap;${canGoBack ? 'display:inline-flex;' : 'display:none;'}" ${canGoBack ? '' : 'disabled aria-hidden="true"'}>← Назад</button>`;
-
-    let primaryActionHTML = '';
-    if(hasMoreChunks){
-      primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-srs-note-chunk-more="1">Понятно, дальше (+10 XP) ➔</button>`;
-    } else {
-      primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-srs-note-next-step="${sIdx + 1}">Следующий шаг (${sIdx + 2}/${steps.length}) ➔</button>`;
-    }
-
-    actionAreaHTML = `
-      <div class="srs-actions-bar" style="display:flex;align-items:center;gap:10px;flex-wrap:nowrap;justify-content:center;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);">
-        ${backBtnHTML}
-        ${primaryActionHTML}
-      </div>
-    `;
-  }
+      ${chunkActionRowHTML}`;
 
   return `
   <div class="container cards-hub-container" style="padding-bottom:60px;max-width:700px;margin:0 auto;">
@@ -24359,7 +24311,7 @@ function viewNotesSrsHub(noteSrsStats){
 
         <h2 style="font-size:1.28rem;font-weight:800;color:var(--ink);margin:0 0 14px;line-height:1.4;">${escapeHtmlStr(cleanTitle)}</h2>
 
-        ${stepStepperHTML}
+        ${stepHeaderHTML}
 
         <div style="background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:16px 18px;margin-bottom:14px;">
           ${noteContentHTML}
@@ -24374,7 +24326,26 @@ function viewNotesSrsHub(noteSrsStats){
           </div>
         </div>
 
-        ${actionAreaHTML}
+        <!-- Кнопки интервальной оценки SRS: всегда доступны внизу карточки -->
+        <div class="fc-rate-row note-rate-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
+          <!-- Кнопка 1: Не знаю (С нуля · 1 дн) -->
+          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-srs-note-reset="${curItem.noteId}" data-hotkey="1" title="Сбросить интервал конспекта на 1 день (клавиша 1)">
+            <span class="srs-btn-title">Не знаю</span>
+            <span class="srs-btn-sub"><span class="srs-days">С нуля · 1 дн</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">1</kbd></span></span>
+          </button>
+
+          <!-- Кнопка 2: Понятно (+15 XP, следующий интервал) -->
+          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-srs-note-pass="${curItem.noteId}" data-hotkey="2" title="Закрепить и перевести на следующую ступень (${curItem.nextInterval} дн, клавиша 2 или Enter)">
+            <span class="srs-btn-title">Понятно</span>
+            <span class="srs-btn-sub"><span class="srs-days">${curItem.nextInterval} дн</span> <span class="srs-xp-badge">+15 XP</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">2</kbd></span></span>
+          </button>
+
+          <!-- Кнопка 3: Назубок (+20 XP, перешагнуть интервал) -->
+          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-srs-note-easy="${curItem.noteId}" data-hotkey="3" title="Помню идеально — перешагнуть ступень (${curItem.jumpInterval || curItem.nextInterval} дн, клавиша 3)">
+            <span class="srs-btn-title">Назубок</span>
+            <span class="srs-btn-sub"><span class="srs-days">${curItem.jumpInterval || curItem.nextInterval} дн</span> <span class="srs-xp-badge">+20 XP</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">3</kbd></span></span>
+          </button>
+        </div>
       </div>
     </main>
   </div>`;
