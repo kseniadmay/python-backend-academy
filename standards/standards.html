@@ -11501,7 +11501,24 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     opacity: 1 !important;
   }
 
-  /* 3. True 3D Flip (180°) физический контейнер карточки */
+  /* 3. True 3D Flip (180°) физический контейнер карточки и фиксация канонической ширины 700px */
+  .cards-hub-container {
+    width: 100% !important;
+    max-width: 700px !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+  }
+
+  .cards-hub-content {
+    width: 100% !important;
+    max-width: 700px !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
   .srs-card-stage,
   .fc-stage {
     perspective: 1200px !important;
@@ -11509,6 +11526,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     padding: 0 !important;
     width: 100% !important;
     max-width: 700px !important;
+    box-sizing: border-box !important;
   }
 
   .fc-card {
@@ -11516,7 +11534,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     width: 100% !important;
     max-width: 700px !important;
     margin: 0 auto !important;
-    min-height: 240px !important;
+    min-height: 250px !important;
     border-radius: 22px !important;
     cursor: pointer !important;
     user-select: none !important;
@@ -11527,6 +11545,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
+    box-sizing: border-box !important;
   }
 
   .fc-card.fc-card--flipped,
@@ -11539,6 +11558,8 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   .card-face {
     position: absolute !important;
     inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
     border-radius: 22px !important;
     padding: 22px 26px !important;
     display: flex !important;
@@ -11547,6 +11568,8 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     backface-visibility: hidden !important;
     -webkit-backface-visibility: hidden !important;
     box-sizing: border-box !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
   }
 
   /* Лицевая грань (Вопрос) — Liquid Obsidian Glass */
@@ -19606,9 +19629,9 @@ function viewCardsHub(){
         return { rating: r, preview: rawQ ? ` · ${rawQ.slice(0, 50)}` : '' };
       }, 'data-hub-goto-card', echelonOpts, unitOpts, deckOpts) : '')}
 
-      <div class="cards-hub-content" style="max-width:720px;margin:0 auto;">
-        <main class="srs-card-stage fc-stage" style="margin:0 auto;padding:0;perspective:1200px;">
-          <div class="fc-card demo-card ${isFlipped ? 'is-flipped fc-card--flipped' : ''}" id="srs-active-card" data-flipped="${isFlipped ? 'true' : 'false'}" data-hub-flip data-action="flip-card">
+      <div class="cards-hub-content" style="width:100%;max-width:700px;margin:0 auto;box-sizing:border-box;">
+        <main class="srs-card-stage fc-stage" style="width:100%;max-width:700px;margin:0 auto;padding:0;perspective:1200px;box-sizing:border-box;">
+          <div class="fc-card demo-card ${isFlipped ? 'is-flipped fc-card--flipped' : ''}" id="srs-active-card" data-flipped="${isFlipped ? 'true' : 'false'}" data-hub-flip data-action="flip-card" style="width:100%;max-width:700px;min-height:250px;box-sizing:border-box;">
             
             <!-- Лицевая грань: Вопрос (Liquid Obsidian Glass) -->
             <div class="card-face card-front fc-card-front">
@@ -19683,9 +19706,9 @@ function viewCardsHub(){
       <!-- Уровень 2: Единая строка контекста колоды и прогресса сессии (Deck & Beads Bar) -->
       ${(typeof buildSrsDeckContextBarHTML === 'function' ? buildSrsDeckContextBarHTML(cleanDeckName, qLen, duePos, cardsHubState.dueQueue || [], 'data-hub-goto-due', echelonOpts, unitOpts, deckOpts) : '')}
 
-      <div class="cards-hub-content" style="max-width:720px;margin:0 auto;">
-        <main class="srs-card-stage fc-stage" style="margin:0 auto;padding:0;perspective:1200px;">
-          <div class="fc-card demo-card ${cardsHubState.flipped ? 'is-flipped fc-card--flipped' : ''}" id="srs-active-card" data-flipped="${cardsHubState.flipped ? 'true' : 'false'}" data-hub-flip data-action="flip-card">
+      <div class="cards-hub-content" style="width:100%;max-width:700px;margin:0 auto;box-sizing:border-box;">
+        <main class="srs-card-stage fc-stage" style="width:100%;max-width:700px;margin:0 auto;padding:0;perspective:1200px;box-sizing:border-box;">
+          <div class="fc-card demo-card ${cardsHubState.flipped ? 'is-flipped fc-card--flipped' : ''}" id="srs-active-card" data-flipped="${cardsHubState.flipped ? 'true' : 'false'}" data-hub-flip data-action="flip-card" style="width:100%;max-width:700px;min-height:250px;box-sizing:border-box;">
             
             <!-- Лицевая грань: Вопрос (Liquid Obsidian Glass) -->
             <div class="card-face card-front fc-card-front">
@@ -19833,52 +19856,52 @@ function viewCardsHub(){
         return { rating: r, preview: rawQ ? ` · ${rawQ.slice(0, 50)}` : '' };
       }, 'data-hub-goto-card', echelonOpts, unitOpts, deckOpts) : '')}
 
-      <div class="cards-hub-content" style="max-width:720px;margin:0 auto;">
-        <main class="srs-card-stage fc-stage" style="margin-top:0;perspective:1200px;margin-bottom:0;">
-          <div class="fc-card fc-card--3d ${cardsHubState.flipped ? 'fc-card--flipped fc-card--Answer' : ''}" id="srs-active-card" data-flipped="${cardsHubState.flipped ? 'true' : 'false'}" data-hub-flip data-action="flip-card">
-            <div class="fc-card-inner" style="display:flex;flex-direction:column;height:100%;justify-content:space-between;">
-              ${cardsHubState.flipped ? (() => {
-                return `
-                <!-- Фаза ответа -->
-                <div class="fc-card-face fc-card-back" style="display:flex;flex-direction:column;justify-content:space-between;height:100%;min-height:190px;">
-                  <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;">
-                    <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;">
-                      <span class="topic-badge fc-type-badge fc-phase-badge fc-phase-badge--answer" style="font-size:0.74rem;font-weight:700;padding:3px 10px;border-radius:999px;background:rgba(16,185,129,0.22);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);white-space:nowrap;flex-shrink:0;">✓ Ответ</span>
-                      ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
-                      <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.25);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${cIdx + 1} / ${cards.length}</span>
-                    </div>
-                    <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:transparent;border:none;color:var(--ink-muted);font-size:0.80rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border-radius:8px;transition:color .15s ease;">← К вопросу <span class="hide-on-mobile"><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
-                  </div>
-                  <div class="fc-card-body" style="margin:auto 0;padding:12px 0;width:100%;">
-                    <div class="fc-q" style="font-size:0.98rem;font-weight:600;line-height:1.45;color:var(--ink-soft);margin-bottom:8px;">${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(cur.q) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.q) : curCard.q)}</div>
-                    <div class="fc-divider" style="height:1px;background:linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);margin:8px 0 12px;"></div>
-                    <div class="fc-a" id="srs-card-answer" style="font-size:1.06rem;line-height:1.6;color:var(--ink);animation:fcAnswerReveal 0.22s ease;">${typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.a) : curCard.a}</div>
-                  </div>
-                  <div class="fc-card-footer" style="display:flex;justify-content:center;align-items:center;padding-top:6px;">
-                    <span class="fc-flip-hint hide-on-mobile" style="color:var(--ink-muted);font-size:0.75rem;opacity:0.75;">Оцените сложность [1–4]</span>
-                  </div>
-                </div>`;
-              })() : (() => {
-                return `
-                <!-- Фаза вопроса -->
-                <div class="fc-card-face fc-card-front" style="display:flex;flex-direction:column;justify-content:space-between;height:100%;min-height:190px;">
-                  <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;">
-                    <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;">
-                      <span class="topic-badge fc-type-badge fc-phase-badge fc-phase-badge--question" style="font-size:0.74rem;font-weight:600;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--ink-soft,#cbd5e1);border:1px solid rgba(255,255,255,0.08);letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">Вопрос</span>
-                      ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
-                      <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:var(--ink-muted);letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${cIdx + 1} / ${cards.length}</span>
-                    </div>
-                    <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curCardKey}" id="srs-hint-btn" style="padding:3px 10px;border-radius:999px;background:rgba(245,158,11,0.10);color:var(--amber-soft,#fbbf24);font-weight:600;font-size:0.75rem;cursor:pointer;border:1px solid rgba(245,158,11,0.20);" title="💡 Шпаргалка (H)">💡 Шпаргалка <span class="hide-on-mobile"><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.20);border-radius:4px;color:#fff;margin-left:4px;">H</kbd></span></button>
-                  </div>
-                  <div class="fc-card-body fc-q" id="srs-card-prompt" style="margin:auto 0;padding:18px 0;font-size:clamp(1.18rem, 2.2vw, 1.38rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
-                    ${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(cur.q) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.q) : curCard.q)}
-                  </div>
-                  <div class="fc-card-footer" style="display:flex;justify-content:center;align-items:center;padding-top:6px;">
-                    <span class="fc-flip-hint hide-on-mobile" style="color:var(--ink-muted);font-size:0.75rem;opacity:0.75;">⟳ Пробел для ответа</span>
-                  </div>
-                </div>`;
-              })()}
+      <div class="cards-hub-content" style="width:100%;max-width:700px;margin:0 auto;box-sizing:border-box;">
+        <main class="srs-card-stage fc-stage" style="width:100%;max-width:700px;margin:0 auto;padding:0;perspective:1200px;box-sizing:border-box;">
+          <div class="fc-card demo-card ${cardsHubState.flipped ? 'is-flipped fc-card--flipped' : ''}" id="srs-active-card" data-flipped="${cardsHubState.flipped ? 'true' : 'false'}" data-hub-flip data-action="flip-card" style="width:100%;max-width:700px;min-height:250px;box-sizing:border-box;">
+            
+            <!-- Лицевая грань: Вопрос (Liquid Obsidian Glass) -->
+            <div class="card-face card-front fc-card-front">
+              <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;">
+                <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;">
+                  <span class="topic-badge fc-type-badge fc-phase-badge fc-phase-badge--question" style="font-size:0.74rem;font-weight:600;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--ink-soft,#cbd5e1);border:1px solid rgba(255,255,255,0.08);letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">Вопрос</span>
+                  ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
+                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:var(--ink-muted);letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${cIdx + 1} / ${cards.length}</span>
+                </div>
+                <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curCardKey}" id="srs-hint-btn" style="padding:3px 10px;border-radius:999px;background:rgba(245,158,11,0.10);color:var(--amber-soft,#fbbf24);font-weight:600;font-size:0.75rem;cursor:pointer;border:1px solid rgba(245,158,11,0.20);" title="💡 Шпаргалка (H)">💡 Шпаргалка <span class="hide-on-mobile"><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.20);border-radius:4px;color:#fff;margin-left:4px;">H</kbd></span></button>
+              </div>
+
+              <div class="fc-card-body fc-q" id="srs-card-prompt" style="margin:auto 0;padding:16px 0;font-size:clamp(1.15rem, 2.1vw, 1.35rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
+                ${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(cur.q) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.q) : curCard.q)}
+              </div>
+
+              <div class="fc-card-footer" style="display:flex;justify-content:center;align-items:center;padding-top:4px;">
+                <span class="fc-flip-hint hide-on-mobile" style="color:var(--ink-muted);font-size:0.75rem;opacity:0.75;">⟳ Пробел для ответа</span>
+              </div>
             </div>
+
+            <!-- Оборотная грань: Ответ (Mastery Emerald) -->
+            <div class="card-face card-back fc-card-back">
+              <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;">
+                <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;">
+                  <span class="topic-badge fc-type-badge fc-phase-badge fc-phase-badge--answer" style="font-size:0.74rem;font-weight:700;padding:3px 10px;border-radius:999px;background:rgba(16,185,129,0.25);color:#a7f3d0;border:1px solid rgba(52,211,153,0.40);white-space:nowrap;flex-shrink:0;">✓ Ответ</span>
+                  ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
+                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.30);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${cIdx + 1} / ${cards.length}</span>
+                </div>
+                <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
+              </div>
+
+              <div class="fc-card-body" style="margin:auto 0;padding:12px 0;width:100%;">
+                <div class="fc-q-sub" style="font-size:0.88rem;font-weight:600;line-height:1.4;color:#a7f3d0;opacity:0.85;margin-bottom:6px;">${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(cur.q) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.q) : curCard.q)}</div>
+                <div class="fc-divider" style="height:1px;background:linear-gradient(90deg, transparent, rgba(52,211,153,0.30), transparent);margin:6px 0 10px;"></div>
+                <div class="fc-a-mastery" id="srs-card-answer" style="font-size:1.06rem;line-height:1.6;color:#ffffff;font-weight:500;">${typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.a) : curCard.a}</div>
+              </div>
+
+              <div class="fc-card-footer" style="display:flex;justify-content:center;align-items:center;padding-top:4px;">
+                <span class="fc-flip-hint hide-on-mobile" style="color:#a7f3d0;font-size:0.75rem;opacity:0.8;">Оцените сложность ответа [1–4]</span>
+              </div>
+            </div>
+
           </div>
         </main>
 
