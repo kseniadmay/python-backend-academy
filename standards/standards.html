@@ -1994,7 +1994,7 @@
   .cards-hub-container::before{
     content:"";position:absolute;top:20px;left:50%;transform:translateX(-50%);
     width:min(860px, 94vw);height:540px;
-    background:radial-gradient(ellipse at 50% 25%, rgba(16,185,129,0.09) 0%, rgba(16,185,129,0.02) 45%, transparent 72%);
+    background:radial-gradient(ellipse 60% 50% at 50% 25%, rgba(16,185,129,0.06) 0%, rgba(16,185,129,0.015) 50%, rgba(16,185,129,0) 100%);
     pointer-events:none;z-index:0;
   }
   .cards-hub-header, .cards-hub-content{position:relative;z-index:1;}
@@ -11387,13 +11387,13 @@ html:not([data-theme="dark"]) .fc-card--Answer,
      EPHEMERAL OBSIDIAN 10/10: FLASHCARDS HUB & SIDEBAR REFINEMENT
      ========================================================================== */
 
-  /* 1. Единая компактная верхняя панель (Header Bar, высота до 44px) */
+  /* 1. Единая компактная верхняя панель (Header Bar, высота 30px, идеальная ось) */
   .srs-unified-header-bar {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
-    height: 38px !important;
-    min-height: 38px !important;
+    height: 30px !important;
+    min-height: 30px !important;
     gap: 12px !important;
     margin-bottom: 12px !important;
     padding: 0 2px !important;
@@ -11406,7 +11406,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     box-sizing: border-box !important;
   }
   .srs-flow-selector {
-    height: 32px !important;
+    height: 30px !important;
     padding: 0 !important;
     border-radius: 8px !important;
     background: transparent !important;
@@ -11418,9 +11418,10 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   }
   .srs-flow-tab-btn {
     height: 30px !important;
+    line-height: 28px !important;
     border-radius: 8px !important;
-    padding: 0 12px !important;
-    font-size: 0.82rem !important;
+    padding: 0 10px !important;
+    font-size: 0.80rem !important;
     font-weight: 600 !important;
     white-space: nowrap !important;
     display: inline-flex !important;
@@ -11432,6 +11433,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     border: 1px solid transparent !important;
     transition: all 0.15s ease !important;
     cursor: pointer !important;
+    box-sizing: border-box !important;
   }
   .srs-flow-tab-btn:hover {
     color: var(--ink-soft) !important;
@@ -11443,6 +11445,37 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     border-color: rgba(255, 255, 255, 0.12) !important;
     box-shadow: none !important;
     font-weight: 600 !important;
+  }
+  .srs-header-right-cluster {
+    height: 30px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+  .srs-header-goal-status {
+    height: 30px !important;
+    line-height: 28px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+  }
+  .srs-more-details {
+    height: 30px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .srs-quiet-icon-btn, .srs-header-close-btn {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
   }
   .srs-daily-compact-pill {
     display: inline-flex !important;
@@ -19525,12 +19558,12 @@ function buildSrsFlowTabsHTML(activeTab, dueCardsCount, dueNotesCount){
   const cCount = Number(dueCardsCount) || 0;
   const nCount = Number(dueNotesCount) || 0;
   return `
-    <div class="srs-flow-selector" role="tablist" aria-label="Потоки повторения" style="display:inline-flex;align-items:center;gap:4px;height:32px;background:transparent;border:none;padding:0;">
-      <button type="button" class="srs-flow-tab-btn ${isCards ? 'srs-flow-tab-active' : ''}" data-srs-switch-tab="cards" role="tab" aria-selected="${isCards ? 'true' : 'false'}" style="display:inline-flex;align-items:center;gap:6px;padding:0 12px;height:30px;border-radius:8px;font-size:0.82rem;font-weight:600;color:${isCards ? '#ffffff' : 'var(--ink-muted)'};background:${isCards ? 'rgba(255,255,255,0.08)' : 'transparent'};border:${isCards ? '1px solid rgba(255,255,255,0.12)' : '1px solid transparent'};cursor:pointer;transition:all .15s ease;">
+    <div class="srs-flow-selector" role="tablist" aria-label="Потоки повторения" style="display:inline-flex;align-items:center;gap:4px;height:30px;background:transparent;border:none;padding:0;margin:0;box-sizing:border-box;">
+      <button type="button" class="srs-flow-tab-btn ${isCards ? 'srs-flow-tab-active' : ''}" data-srs-switch-tab="cards" role="tab" aria-selected="${isCards ? 'true' : 'false'}" style="display:inline-flex;align-items:center;gap:6px;padding:0 10px;height:30px;border-radius:8px;font-size:0.80rem;font-weight:600;color:${isCards ? '#ffffff' : 'var(--ink-muted)'};background:${isCards ? 'rgba(255,255,255,0.08)' : 'transparent'};border:${isCards ? '1px solid rgba(255,255,255,0.12)' : '1px solid transparent'};cursor:pointer;transition:all .15s ease;box-sizing:border-box;line-height:1;">
         <span>Карточки</span>
         <span style="font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:${isCards ? '#6ee7b7' : 'var(--ink-muted)'};padding:1px 6px;border-radius:999px;background:${isCards ? 'rgba(16,185,129,0.18)' : 'rgba(255,255,255,0.06)'};">${cCount}</span>
       </button>
-      <button type="button" class="srs-flow-tab-btn ${!isCards ? 'srs-flow-tab-active' : ''}" data-srs-switch-tab="notes" role="tab" aria-selected="${!isCards ? 'true' : 'false'}" style="display:inline-flex;align-items:center;gap:6px;padding:0 12px;height:30px;border-radius:8px;font-size:0.82rem;font-weight:600;color:${!isCards ? '#ffffff' : 'var(--ink-muted)'};background:${!isCards ? 'rgba(255,255,255,0.08)' : 'transparent'};border:${!isCards ? '1px solid rgba(255,255,255,0.12)' : '1px solid transparent'};cursor:pointer;transition:all .15s ease;">
+      <button type="button" class="srs-flow-tab-btn ${!isCards ? 'srs-flow-tab-active' : ''}" data-srs-switch-tab="notes" role="tab" aria-selected="${!isCards ? 'true' : 'false'}" style="display:inline-flex;align-items:center;gap:6px;padding:0 10px;height:30px;border-radius:8px;font-size:0.80rem;font-weight:600;color:${!isCards ? '#ffffff' : 'var(--ink-muted)'};background:${!isCards ? 'rgba(255,255,255,0.08)' : 'transparent'};border:${!isCards ? '1px solid rgba(255,255,255,0.12)' : '1px solid transparent'};cursor:pointer;transition:all .15s ease;box-sizing:border-box;line-height:1;">
         <span>Конспекты</span>
         <span style="font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:${!isCards ? '#fda4af' : 'var(--ink-muted)'};padding:1px 6px;border-radius:999px;background:${!isCards ? 'rgba(244,63,94,0.18)' : 'rgba(255,255,255,0.06)'};">${nCount}</span>
       </button>
@@ -19547,20 +19580,20 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount){
   const finishMode = (typeof state !== 'undefined' && state.srsSprintFinishMode) || 'zen';
 
   return `
-    <header class="srs-unified-header-bar" style="position:relative;display:flex;justify-content:space-between;align-items:center;height:38px;min-height:38px;gap:12px;margin-bottom:14px;padding:0 2px;background:transparent;border:none;box-shadow:none;box-sizing:border-box;">
-      <div style="min-width:0;flex-shrink:0;">
+    <header class="srs-unified-header-bar" style="position:relative;display:flex;justify-content:space-between;align-items:center;height:30px;min-height:30px;gap:12px;margin-bottom:12px;padding:0 2px;background:transparent;border:none;box-shadow:none;box-sizing:border-box;">
+      <div style="min-width:0;flex-shrink:0;display:flex;align-items:center;height:30px;">
         ${flowTabs}
       </div>
 
-      <div class="srs-header-right-cluster" style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-        <div class="srs-header-goal-status" style="display:inline-flex;align-items:center;gap:6px;padding:0 12px;height:30px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);font-size:0.78rem;font-weight:600;color:var(--ink-soft);box-sizing:border-box;">
+      <div class="srs-header-right-cluster" style="display:flex;align-items:center;gap:6px;height:30px;flex-shrink:0;">
+        <div class="srs-header-goal-status" style="display:inline-flex;align-items:center;gap:6px;padding:0 10px;height:30px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);font-size:0.78rem;font-weight:600;color:var(--ink-soft);box-sizing:border-box;line-height:1;">
           <span style="color:#f59e0b;font-size:0.88rem;">⚡</span>
           <b style="color:#fff;font-family:var(--font-m);font-weight:700;">${currentSprintStep} / ${sprintTarget}</b>
           <span class="hide-on-mobile" style="opacity:0.65;font-weight:400;color:var(--ink-muted);">· Спринт ${sprintNum}</span>
         </div>
 
-        <details class="srs-more-details" style="position:relative;display:inline-block;">
-          <summary class="btn btn-ghost srs-quiet-icon-btn srs-more-trigger" style="width:28px;height:28px;min-width:28px;min-height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:7px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--ink-muted);cursor:pointer;list-style:none;font-size:0.95rem;line-height:1;box-sizing:border-box;" title="Настройки и действия">···</summary>
+        <details class="srs-more-details" style="position:relative;display:inline-flex;align-items:center;height:30px;margin:0;padding:0;">
+          <summary class="btn btn-ghost srs-quiet-icon-btn srs-more-trigger" style="width:30px;height:30px;min-width:30px;min-height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--ink-muted);cursor:pointer;list-style:none;font-size:0.95rem;line-height:1;box-sizing:border-box;" title="Настройки и действия">···</summary>
           <div class="srs-more-menu" style="position:absolute;right:0;top:calc(100% + 6px);background:var(--surface,#0f172a);border:1px solid var(--line,rgba(255,255,255,0.10));border-radius:14px;padding:6px;min-width:230px;box-shadow:0 14px 36px rgba(0,0,0,0.55);z-index:100;display:flex;flex-direction:column;gap:4px;backdrop-filter:blur(20px);">
             <div style="padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:2px;">
               <div style="font-size:0.68rem;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Финал 15 карточек</div>
@@ -19575,13 +19608,14 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount){
           </div>
         </details>
 
-        <a href="#/path" class="srs-header-close-btn" style="width:28px;height:28px;min-width:28px;min-height:28px;padding:0;border-radius:7px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;font-size:0.78rem;text-decoration:none;box-sizing:border-box;" title="Закрыть (На Путь)">✕</a>
+        <a href="#/path" class="srs-header-close-btn" style="width:30px;height:30px;min-width:30px;min-height:30px;padding:0;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;font-size:0.78rem;text-decoration:none;box-sizing:border-box;" title="Закрыть (На Путь)">✕</a>
       </div>
 
-      <!-- Лазерная прямая световая нить прогресса спринта (2px) без срезания углами -->
-      <div class="srs-header-progress-thread" style="position:absolute;bottom:-4px;left:0;right:0;height:2px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
+      <!-- Лазерная прямая световая нить прогресса спринта (2px) без паразитной серой границы на фоне -->
+      ${pct > 0 ? `
+      <div class="srs-header-progress-thread" style="position:absolute;bottom:-3px;left:0;right:0;height:2px;background:transparent;border-radius:99px;overflow:hidden;pointer-events:none;">
         <div style="height:100%;width:${pct}%;background:linear-gradient(90deg, #881337 0%, #10b981 100%);box-shadow:0 0 8px rgba(16,185,129,0.5);transition:width .3s ease;border-radius:99px;"></div>
-      </div>
+      </div>` : ''}
     </header>
   `;
 }
