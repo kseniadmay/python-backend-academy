@@ -10471,6 +10471,10 @@
 /* ==========================================================================
    SRS Beads Pure Floating & Leading Pulse (Вариант 2)
    ========================================================================== */
+  @keyframes breathCircle {
+    0%, 100% { transform: scale(1); opacity: 0.5; box-shadow: 0 0 20px rgba(16, 185, 129, 0.3); }
+    50% { transform: scale(1.35); opacity: 0.95; box-shadow: 0 0 50px rgba(16, 185, 129, 0.7); }
+  }
   @keyframes leadingBeadPulse {
     0%, 100% {
       transform: scale(1);
@@ -19514,14 +19518,14 @@ function buildSrsFlowTabsHTML(activeTab, dueCardsCount, dueNotesCount){
   const cCount = Number(dueCardsCount) || 0;
   const nCount = Number(dueNotesCount) || 0;
   return `
-    <div class="srs-flow-selector" role="tablist" aria-label="Потоки повторения" style="display:inline-flex;align-items:center;background:rgba(0,0,0,0.40);padding:2px 3px;border-radius:999px;border:1px solid rgba(255,255,255,0.08);">
-      <button type="button" class="srs-flow-tab-btn ${isCards ? 'srs-flow-tab-active' : ''}" data-srs-switch-tab="cards" role="tab" aria-selected="${isCards ? 'true' : 'false'}" style="display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:999px;font-size:0.79rem;font-weight:${isCards ? '700' : '500'};color:${isCards ? '#ffffff' : 'var(--ink-muted)'};background:${isCards ? 'rgba(255,255,255,0.12)' : 'transparent'};border:${isCards ? '1px solid rgba(255,255,255,0.14)' : '1px solid transparent'};box-shadow:${isCards ? '0 2px 8px rgba(0,0,0,0.3)' : 'none'};cursor:pointer;transition:all .18s ease;">
-        <span>🗂 Карточки</span>
-        <span style="display:inline-block;padding:1px 6px;border-radius:999px;font-family:var(--font-m);font-size:0.70rem;font-weight:700;line-height:1.2;background:${isCards ? 'rgba(16,185,129,0.25)' : 'rgba(255,255,255,0.06)'};color:${isCards ? '#6ee7b7' : 'var(--ink-muted)'};">${cCount}</span>
+    <div class="srs-flow-selector" role="tablist" aria-label="Потоки повторения" style="display:inline-flex;align-items:center;background:rgba(0,0,0,0.50);padding:3px;border-radius:999px;border:1px solid rgba(255,255,255,0.10);">
+      <button type="button" class="srs-flow-tab-btn ${isCards ? 'srs-flow-tab-active' : ''}" data-srs-switch-tab="cards" role="tab" aria-selected="${isCards ? 'true' : 'false'}" style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;font-size:0.79rem;font-weight:700;color:${isCards ? '#6ee7b7' : 'var(--ink-muted)'};background:${isCards ? 'rgba(16,185,129,0.18)' : 'transparent'};border:${isCards ? '1px solid rgba(52,211,153,0.35)' : '1px solid transparent'};box-shadow:${isCards ? '0 0 12px rgba(16,185,129,0.20)' : 'none'};cursor:pointer;transition:all .18s ease;">
+        <span>Карточки</span>
+        <span style="display:inline-block;font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:${isCards ? '#a7f3d0' : 'var(--ink-muted)'};">${cCount}</span>
       </button>
-      <button type="button" class="srs-flow-tab-btn ${!isCards ? 'srs-flow-tab-active' : ''}" data-srs-switch-tab="notes" role="tab" aria-selected="${!isCards ? 'true' : 'false'}" style="display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:999px;font-size:0.79rem;font-weight:${!isCards ? '700' : '500'};color:${!isCards ? '#ffffff' : 'var(--ink-muted)'};background:${!isCards ? 'rgba(255,255,255,0.12)' : 'transparent'};border:${!isCards ? '1px solid rgba(255,255,255,0.14)' : '1px solid transparent'};box-shadow:${!isCards ? '0 2px 8px rgba(0,0,0,0.3)' : 'none'};cursor:pointer;transition:all .18s ease;">
-        <span>📖 Конспекты</span>
-        <span style="display:inline-block;padding:1px 6px;border-radius:999px;font-family:var(--font-m);font-size:0.70rem;font-weight:700;line-height:1.2;background:${!isCards ? 'rgba(244,63,94,0.20)' : 'rgba(255,255,255,0.06)'};color:${!isCards ? '#fda4af' : 'var(--ink-muted)'};">${nCount}</span>
+      <button type="button" class="srs-flow-tab-btn ${!isCards ? 'srs-flow-tab-active' : ''}" data-srs-switch-tab="notes" role="tab" aria-selected="${!isCards ? 'true' : 'false'}" style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;font-size:0.79rem;font-weight:${!isCards ? '700' : '500'};color:${!isCards ? '#fda4af' : 'var(--ink-muted)'};background:${!isCards ? 'rgba(244,63,94,0.18)' : 'transparent'};border:${!isCards ? '1px solid rgba(244,63,94,0.35)' : '1px solid transparent'};box-shadow:${!isCards ? '0 0 12px rgba(244,63,94,0.20)' : 'none'};cursor:pointer;transition:all .18s ease;">
+        <span>Конспекты</span>
+        <span style="display:inline-block;font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:${!isCards ? '#fda4af' : 'var(--ink-muted)'};">${nCount}</span>
       </button>
     </div>`;
 }
@@ -19529,8 +19533,11 @@ window.buildSrsFlowTabsHTML = buildSrsFlowTabsHTML;
 
 function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount){
   const flowTabs = buildSrsFlowTabsHTML(activeTab, dueCardsCount, dueNotesCount);
-  const data = typeof getSrsDailyProgressData === 'function' ? getSrsDailyProgressData() : { totalDoneToday: 0, totalTargetToday: 1, pct: 0 };
-  const pct = Math.max(0, Math.min(100, Number(data.pct) || 0));
+  const currentSprintStep = Math.max(0, Math.min(15, Number(cardsHubState.sprintStep) || 0));
+  const sprintNum = Math.max(1, Number(cardsHubState.sprintNum) || 1);
+  const sprintTarget = 15;
+  const pct = Math.max(0, Math.min(100, Math.round((currentSprintStep / sprintTarget) * 100)));
+  const finishMode = (typeof state !== 'undefined' && state.srsSprintFinishMode) || 'zen';
 
   return `
     <header class="srs-unified-header-bar" style="position:relative;display:flex;justify-content:space-between;align-items:center;height:48px;min-height:48px;gap:12px;margin-bottom:12px;padding:0 14px;border-radius:18px;background:rgba(15,23,42,0.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.10);box-shadow:inset 0 1px 0 rgba(255,255,255,0.12),0 8px 24px rgba(0,0,0,0.35);box-sizing:border-box;overflow:hidden;">
@@ -19539,28 +19546,34 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount){
       </div>
 
       <div class="srs-header-right-cluster" style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
-        <div class="srs-header-goal-status" style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.18);font-size:0.78rem;font-weight:700;color:#6ee7b7;">
+        <div class="srs-header-goal-status" style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.18);font-size:0.78rem;font-weight:700;color:#6ee7b7;">
           <span style="color:#f59e0b;font-size:0.88rem;">⚡</span>
-          <span style="color:var(--ink);">${data.totalDoneToday} / ${data.totalTargetToday}</span>
-          <span class="hide-on-mobile" style="opacity:0.8;font-weight:500;color:var(--ink-muted);">· ${pct}% дня</span>
+          <span style="color:var(--ink);font-family:var(--font-m);font-weight:700;">${currentSprintStep} / ${sprintTarget}</span>
+          <span class="hide-on-mobile" style="opacity:0.8;font-weight:500;color:var(--ink-muted);">· Спринт ${sprintNum}</span>
         </div>
 
-        <details class="srs-more-details hide-on-mobile" style="position:relative;display:inline-block;">
-          <summary class="btn btn-ghost srs-quiet-icon-btn srs-more-trigger" style="width:30px;height:30px;min-width:30px;min-height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--ink-muted);cursor:pointer;list-style:none;font-size:1.05rem;line-height:1;" title="Дополнительные действия">⋯</summary>
-          <div class="srs-more-menu" style="position:absolute;right:0;top:calc(100% + 6px);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px;min-width:210px;box-shadow:0 14px 36px rgba(0,0,0,0.45);z-index:100;display:flex;flex-direction:column;gap:4px;backdrop-filter:blur(20px);">
+        <details class="srs-more-details" style="position:relative;display:inline-block;">
+          <summary class="btn btn-ghost srs-quiet-icon-btn srs-more-trigger" style="width:30px;height:30px;min-width:30px;min-height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--ink-muted);cursor:pointer;list-style:none;font-size:1.05rem;line-height:1;" title="Настройки и действия">···</summary>
+          <div class="srs-more-menu" style="position:absolute;right:0;top:calc(100% + 6px);background:var(--surface,#0f172a);border:1px solid var(--line,rgba(255,255,255,0.10));border-radius:14px;padding:6px;min-width:230px;box-shadow:0 14px 36px rgba(0,0,0,0.55);z-index:100;display:flex;flex-direction:column;gap:4px;backdrop-filter:blur(20px);">
+            <div style="padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:2px;">
+              <div style="font-size:0.68rem;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Финал 15 карточек</div>
+              <button type="button" class="btn btn-ghost" data-action="toggle-srs-finish-mode" style="width:100%;justify-content:space-between;font-size:0.78rem;padding:6px 8px;border-radius:8px;color:var(--ink);background:rgba(255,255,255,0.04);cursor:pointer;">
+                <span>🧘 Дзен-пауза для глаз</span>
+                <span style="color:${finishMode === 'zen' ? '#10b981' : 'var(--ink-muted)'};font-weight:700;">${finishMode === 'zen' ? 'ВКЛ' : 'ВЫКЛ'}</span>
+              </button>
+            </div>
             <a href="#/docs" class="btn btn-ghost" data-hub-cheatsheet style="justify-content:flex-start;font-size:0.82rem;padding:8px 12px;border-radius:8px;text-decoration:none;color:var(--ink);">💡 Шпаргалка</a>
             <button type="button" class="btn btn-ghost" data-srs-switch-tab="notes" style="justify-content:flex-start;font-size:0.82rem;padding:8px 12px;border-radius:8px;color:var(--ink);text-align:left;">📖 К конспектам</button>
             <a href="#/practice" class="btn btn-ghost" style="justify-content:flex-start;font-size:0.82rem;padding:8px 12px;border-radius:8px;text-decoration:none;color:var(--ink);">💻 К тренажёру задач</a>
-            ${cardsHubState.dueMode ? `<button type="button" class="btn btn-ghost" data-hub-exit-due style="justify-content:flex-start;font-size:0.82rem;padding:8px 12px;border-radius:8px;color:var(--ink-muted);text-align:left;">📚 Обзор тем и колод</button>` : `<button type="button" class="btn btn-ghost" data-hub-review-due style="justify-content:flex-start;font-size:0.82rem;padding:8px 12px;border-radius:8px;color:var(--ink-muted);text-align:left;">⚡ Суточная очередь</button>`}
           </div>
         </details>
 
-        <a href="#/" class="btn btn-ghost srs-quiet-icon-btn srs-close-btn hide-on-mobile" style="width:30px;height:30px;min-width:30px;min-height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--ink-muted);text-decoration:none;font-size:0.90rem;line-height:1;" title="Закрыть (На Дашборд)">✕</a>
+        <a href="#/path" class="srs-header-close-btn" style="width:30px;height:30px;min-width:30px;min-height:30px;padding:0;border-radius:999px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;font-size:0.82rem;text-decoration:none;" title="Закрыть (На Путь)">✕</a>
       </div>
 
-      <!-- В основание вплавлена световая нить прогресса: 2.5px, винный бургунди -> благородный изумруд -->
-      <div class="srs-header-light-thread" style="position:absolute;bottom:0;left:0;right:0;height:2.5px;background:rgba(255,255,255,0.06);overflow:hidden;border-bottom-left-radius:18px;border-bottom-right-radius:18px;">
-        <div style="width:${pct}%;height:100%;background:linear-gradient(90deg, #881337 0%, #10b981 100%);box-shadow:0 0 8px rgba(16,185,129,0.45);transition:width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);"></div>
+      <!-- Вплавленная в нижний кант световая нить прогресса спринта (3px) -->
+      <div class="srs-header-progress-thread" style="position:absolute;bottom:0;left:0;right:0;height:2.5px;background:rgba(255,255,255,0.05);overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg, #881337 0%, #10b981 100%);box-shadow:0 0 8px rgba(16,185,129,0.5);transition:width .3s ease;"></div>
       </div>
     </header>
   `;
@@ -19732,6 +19745,56 @@ function viewCardsHub(){
               <a href="#/notes-review" class="btn btn-ghost srs-notes-btn" style="padding:12px 20px;border-radius:14px;font-weight:600;font-size:0.86rem;color:var(--ink-muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .18s ease;">📖 К конспектам</a>
             </div>
           </div>
+        </div>`;
+      }
+
+      // Проверка на финал микро-спринта (15 карточек):
+      if(cardsHubState.sprintFinished){
+        const isZenPhase = (cardsHubState.sprintPhase === 'zen');
+        const sprintNumVal = (Number(cardsHubState.sprintNum) || 2) - 1;
+        const dueRem = Math.max(0, qLen - duePos);
+        return `
+        <div class="container cards-hub-container" style="padding-bottom:60px;max-width:680px;margin:0 auto;">
+          ${buildSrsHeaderBarHTML('cards', dueRem, noteSrsStats.dueCount || 0)}
+          ${isZenPhase ? `
+          <div class="card srs-empty-glow-card srs-zen-rest-screen" style="margin-top:20px;padding:48px 28px;text-align:center;border:1px solid rgba(255,255,255,0.14);border-radius:28px;background:linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(15,23,42,0.85) 50%, rgba(255,255,255,0.02) 100%);box-shadow:inset 0 1.5px 0 rgba(255,255,255,0.22),0 24px 64px -12px rgba(0,0,0,0.7),0 0 40px -10px rgba(16,185,129,0.25);backdrop-filter:blur(36px);position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <div style="position:relative;width:120px;height:120px;margin:12px auto 20px;display:flex;align-items:center;justify-content:center;">
+              <div style="position:absolute;inset:0;border-radius:999px;border:2px solid rgba(16,185,129,0.45);animation:breathCircle 6s infinite ease-in-out;"></div>
+              <div style="width:72px;height:72px;border-radius:999px;background:rgba(16,185,129,0.20);border:1.5px solid #34d399;display:flex;align-items:center;justify-content:center;color:#6ee7b7;font-weight:700;font-size:0.92rem;box-shadow:0 0 24px rgba(16,185,129,0.5);">
+                Вдох
+              </div>
+            </div>
+            <div style="display:inline-block;padding:4px 12px;border-radius:999px;background:rgba(16,185,129,0.15);color:#34d399;font-size:0.75rem;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.06em;">
+              Спринт ${sprintNumVal} пройден · Дзен-пауза
+            </div>
+            <h2 style="font-size:1.45rem;font-weight:800;color:var(--ink);margin:0 0 8px;">Дайте глазам 20 секунд покоя</h2>
+            <p style="font-size:0.92rem;color:var(--ink-muted);max-width:460px;margin:0 auto 24px;line-height:1.6;">
+              Сделайте глубокий вдох и переведите взгляд вдаль. Это восстановит фокусировку перед следующим блоком карточек.
+            </p>
+            <div style="display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;">
+              <button type="button" data-action="skip-srs-zen-pause" class="btn-dominant-cta btn-glass-emerald btn-sprint-cta" style="padding:12px 26px;border-radius:14px;font-weight:700;font-size:0.92rem;cursor:pointer;">Пропустить паузу к результатам ➔</button>
+            </div>
+          </div>
+          ` : `
+          <div class="card srs-empty-glow-card srs-zen-rest-screen" style="margin-top:20px;padding:48px 28px;text-align:center;border:1px solid rgba(255,255,255,0.14);border-radius:28px;background:linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(15,23,42,0.85) 50%, rgba(255,255,255,0.02) 100%);box-shadow:inset 0 1.5px 0 rgba(255,255,255,0.22),0 24px 64px -12px rgba(0,0,0,0.7),0 0 40px -10px rgba(16,185,129,0.25);backdrop-filter:blur(36px);position:relative;overflow:hidden;">
+            <div style="font-size:3.4rem;margin-bottom:12px;animation:pulseGentle 3.6s ease-in-out infinite;display:inline-block;filter:drop-shadow(0 0 16px rgba(16,185,129,0.45));">✨</div>
+            <div style="display:inline-block;padding:4px 12px;border-radius:999px;background:rgba(16,185,129,0.15);color:#34d399;font-size:0.75rem;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.06em;">
+              Спринт ${sprintNumVal} завершён · Память в тонусе
+            </div>
+            <h2 style="font-size:1.45rem;font-weight:800;color:var(--ink);margin:0 0 8px;">15 карточек закреплены!</h2>
+            <p style="font-size:0.92rem;color:var(--ink-muted);max-width:480px;margin:0 auto 20px;line-height:1.6;">
+              Отличный темп микрообучения! Вы заработали <b style="color:#f59e0b;">+25 XP</b> и надежно зафиксировали знания в памяти.
+            </p>
+            <div style="display:flex;gap:10px;justify-content:center;margin-bottom:26px;flex-wrap:wrap;">
+              <span class="cocoon-pill" style="padding:6px 14px;font-size:0.82rem;">⚡ В очереди: <b>${dueRem}</b></span>
+              <span class="cocoon-pill" style="padding:6px 14px;font-size:0.82rem;">🔥 Стрик: <b>${state.streak || 1} дн</b></span>
+            </div>
+            <div style="display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;">
+              <button type="button" data-action="start-next-srs-sprint" class="btn-dominant-cta btn-glass-emerald btn-sprint-cta" style="padding:13px 28px;border-radius:14px;font-weight:700;font-size:0.96rem;display:inline-flex;align-items:center;gap:8px;cursor:pointer;">СЛЕДУЮЩИЙ СПРИНТ (15 КАРТ) ➔</button>
+              <a href="#/path" class="btn btn-ghost srs-notes-btn" style="padding:12px 20px;border-radius:14px;font-weight:600;font-size:0.86rem;color:var(--ink-muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .18s ease;">На Путь к уроку ➔</a>
+            </div>
+          </div>
+          `}
         </div>`;
       }
 
@@ -26157,6 +26220,32 @@ document.addEventListener('click', async function(e){
   if(e.target.closest('[data-diag-confirm]')){ confirmDiagAnswer(); return; }
   if(e.target.closest('[data-diag-prev]')){ prevDiagQuestion(); return; }
 
+  const srsToggleFinishBtn = e.target.closest('[data-action="toggle-srs-finish-mode"]');
+  if(srsToggleFinishBtn){
+    ensureExtendedState();
+    state.srsSprintFinishMode = ((state.srsSprintFinishMode || 'zen') === 'zen') ? 'triumph' : 'zen';
+    saveState();
+    render();
+    return;
+  }
+
+  const srsSkipZenBtn = e.target.closest('[data-action="skip-srs-zen-pause"]');
+  if(srsSkipZenBtn){
+    cardsHubState.sprintPhase = 'triumph';
+    render();
+    return;
+  }
+
+  const srsNextSprintBtn = e.target.closest('[data-action="start-next-srs-sprint"]');
+  if(srsNextSprintBtn){
+    cardsHubState.sprintFinished = false;
+    cardsHubState.sprintPhase = null;
+    cardsHubState.sprintStep = 0;
+    saveCardsHubPosState();
+    render();
+    return;
+  }
+
   const srsSwitchTabBtn = e.target.closest('[data-srs-switch-tab]');
   if(srsSwitchTabBtn){
     const targetTab = srsSwitchTabBtn.getAttribute('data-srs-switch-tab') === 'notes' ? 'notes' : 'cards';
@@ -28510,15 +28599,27 @@ const psk = e.target.closest('[data-py-select-k]');
           cardsHubState.dueQueue.push(curItem);
         }
       }
+      // Микро-спринт по 15 карточек:
+      cardsHubState.sprintStep = (Number(cardsHubState.sprintStep) || 0) + 1;
+      const isSprintFinish = cardsHubState.sprintStep >= 15;
+
       if(cardsHubState.duePos + 1 < (cardsHubState.dueQueue || []).length){
         cardsHubState.duePos++;
         cardsHubState.flipped = false;
+        if(isSprintFinish){
+          cardsHubState.sprintFinished = true;
+          cardsHubState.sprintNum = (Number(cardsHubState.sprintNum) || 1) + 1;
+          cardsHubState.sprintStep = 0;
+          cardsHubState.sprintPhase = ((state && state.srsSprintFinishMode) || 'zen') === 'zen' ? 'zen' : 'triumph';
+          awardXp(25);
+        }
       } else {
         awardXp(25);
         cardsHubState.completed = true;
         cardsHubState.dueQueue = [];
         cardsHubState.duePos = 0;
         cardsHubState.flipped = false;
+        cardsHubState.sprintFinished = false;
       }
       saveCardsHubPosState();
       render();
