@@ -25283,7 +25283,7 @@ function viewNotesSrsHub(noteSrsStats){
   } else {
     const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
     const canGoBack = (curChunkIdx > 0 || sIdx > 0);
-    const backBtnHTML = canGoBack ? `<button type="button" class="btn btn-ghost" data-srs-note-chunk-prev="1" style="height:52px;padding:0 20px;border-radius:16px;font-size:0.88rem;font-weight:600;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);cursor:pointer;flex-shrink:0;" title="Предыдущий квант">← Назад</button>` : '';
+    const backBtnHTML = `<button type="button" class="btn btn-ghost" data-srs-note-chunk-prev="1" style="height:52px;padding:0 20px;border-radius:16px;font-size:0.88rem;font-weight:600;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);cursor:pointer;flex-shrink:0;${canGoBack ? 'display:inline-flex;' : 'display:none;'}" title="Предыдущий квант">← Назад</button>`;
 
     let primaryActionHTML = '';
     if(hasMoreChunks){
@@ -25378,7 +25378,7 @@ function viewNotesSrsHub(noteSrsStats){
           </div>
         ` : ''}
 
-        <!-- Чистый холст текста конспекта: Zen-фокус на одном кванте -->
+        <!-- Чистый холст текста конспекта: пошаговая лента квантов -->
         <div class="note-canvas-body" id="srs-note-text" style="color:var(--ink);font-size:0.94rem;line-height:1.7;">
           ${isFullMode ? `
             <div class="note-review-body" style="line-height:1.7;font-size:0.94rem;color:var(--ink);">
@@ -25393,10 +25393,10 @@ function viewNotesSrsHub(noteSrsStats){
               }).join('')}
             </div>
           ` : `
-            <div class="zen-chunk-container">
-              <div class="feed-chunk feed-chunk-new lesson-theory" data-chunk-idx="${curChunkIdx}" key="chunk-${sIdx}-${curChunkIdx}">
-                ${decorateFn(chunks[curChunkIdx] || '')}
-              </div>
+            <div class="scroll-feed feed-container" id="srs-note-feed">
+              ${chunks.slice(0, curChunkIdx + 1).map((ch, ci) =>
+                `<div class="feed-chunk ${ci < curChunkIdx ? 'feed-chunk-prev' : 'feed-chunk-new'} lesson-theory" data-chunk-idx="${ci}">${decorateFn(ch)}</div>`
+              ).join('')}
             </div>
           `}
         </div>
@@ -27611,6 +27611,41 @@ document.addEventListener('click', async function(e){
     try{ if(typeof playSound === 'function') playSound('tick'); else if(typeof SoundFx !== 'undefined' && SoundFx.playTick) SoundFx.playTick(); }catch(err){}
 
     cardsHubState.noteChunkIdx = nextCIdx;
+    saveCardsHubPosState();
+
+    const feedContainer = document.getElementById('srs-note-feed') || document.getElementById('srs-note-text');
+    if(feedContainer && nextCIdx < chunks.length){
+      feedContainer.querySelectorAll('.feed-chunk-new').forEach(function(el){
+        el.classList.remove('feed-chunk-new');
+        el.classList.add('feed-chunk-prev');
+      });
+      const newEl = document.createElement('div');
+      newEl.className = 'feed-chunk feed-chunk-new lesson-theory';
+      newEl.setAttribute('data-chunk-idx', nextCIdx);
+      const decorateFn = (typeof decorateCodeBlocksWithRunBtn === 'function') ? decorateCodeBlocksWithRunBtn : (h => h);
+      newEl.innerHTML = decorateFn(chunks[nextCIdx]);
+      feedContainer.appendChild(newEl);
+
+      const hasMore = (nextCIdx + 1 < chunks.length);
+      if(!hasMore){
+        srsChunkMoreBtn.removeAttribute('data-srs-note-chunk-more');
+        if(sIdx + 1 < steps.length){
+          srsChunkMoreBtn.setAttribute('data-srs-note-next-step', sIdx + 1);
+          srsChunkMoreBtn.innerHTML = `<span>Следующий шаг (${sIdx + 2}/${steps.length})</span> <span>➔</span>`;
+        } else {
+          cardsHubState.noteCompleted = true;
+          render();
+          return;
+        }
+      }
+
+      const backBtn = document.querySelector('[data-srs-note-chunk-prev]');
+      if(backBtn) backBtn.style.display = 'inline-flex';
+
+      try{ newEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }catch(err){}
+      return;
+    }
+
     if(nextCIdx >= chunks.length){
       if(sIdx + 1 < steps.length){
         cardsHubState.noteStepIdx = sIdx + 1;
@@ -27619,7 +27654,6 @@ document.addEventListener('click', async function(e){
         cardsHubState.noteCompleted = true;
       }
     }
-    saveCardsHubPosState();
     render();
     return;
   }
