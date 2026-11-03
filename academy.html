@@ -12934,6 +12934,140 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     }
   }
 
+  /* Карточка конспекта в стиле Liquid Slate Glass */
+  .srs-note-card {
+    background: linear-gradient(165deg, rgba(30, 41, 59, 0.65) 0%, rgba(15, 23, 42, 0.95) 55%, rgba(10, 15, 26, 0.98) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.22), 0 20px 48px -10px rgba(0, 0, 0, 0.80), 0 0 32px rgba(255, 255, 255, 0.04) !important;
+    border-radius: 20px !important;
+    padding: 22px 26px !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+  }
+
+  /* Центрированные парящие изумрудные бусины шагов конспекта */
+  .note-step-header-row {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    margin-bottom: 16px !important;
+    padding-bottom: 14px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+    text-align: center !important;
+  }
+  .note-step-header-row > div:first-child {
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: #f1f5f9 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+  .note-step-beads-chain {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 2px 0 !important;
+    box-shadow: none !important;
+    margin: 0 auto !important;
+  }
+  .note-step-bead {
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    background: rgba(255, 255, 255, 0.18) !important;
+    border: none !important;
+    transition: all 0.25s ease !important;
+  }
+  .note-step-bead.done {
+    background: #10b981 !important;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.6) !important;
+  }
+  .note-step-bead.active {
+    background: #34d399 !important;
+    box-shadow: 0 0 10px #10b981, 0 0 4px #34d399 !important;
+    animation: srsBeadPulse 2s infinite ease-in-out !important;
+    transform: scale(1.3) !important;
+  }
+
+  /* Унифицированные капсулы верхней панели конспекта (28px / 8px) */
+  .note-queue-pill,
+  .note-top-action-btn {
+    height: 28px !important;
+    min-height: 28px !important;
+    line-height: 26px !important;
+    border-radius: 8px !important;
+    padding: 0 10px !important;
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.09) !important;
+    color: var(--ink-soft, #cbd5e1) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    box-sizing: border-box !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    transition: all 0.2s ease !important;
+  }
+  .note-top-action-btn:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+    color: var(--ink, #ffffff) !important;
+  }
+  .note-queue-beads-necklace {
+    height: 28px !important;
+    min-height: 28px !important;
+    border-radius: 8px !important;
+    padding: 0 8px !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.07) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    box-sizing: border-box !important;
+    white-space: nowrap !important;
+  }
+
+  /* Адаптивность панели конспектов для мобильных экранов */
+  @media (max-width: 600px) {
+    .note-memory-bar {
+      flex-direction: column !important;
+      align-items: center !important;
+      gap: 10px !important;
+    }
+    .note-srs-status-chip,
+    .note-memory-chain {
+      width: auto !important;
+      justify-content: center !important;
+    }
+    .note-step-header-row > div:first-child {
+      white-space: normal !important;
+      text-align: center !important;
+      font-size: 0.98rem !important;
+      line-height: 1.4 !important;
+    }
+    .srs-deck-beads-bar > div {
+      flex-wrap: wrap !important;
+      gap: 8px !important;
+      justify-content: center !important;
+    }
+    .note-queue-pill,
+    .note-top-action-btn {
+      font-size: 0.74rem !important;
+      padding: 0 8px !important;
+    }
+  }
+
   /* Единая архитектура всех капсул карточки (единый радиус 8px, высота 28px, ровная базовая линия) */
   .srs-card-topic-chip,
   .srs-card-status-badge,
@@ -25136,13 +25270,14 @@ function viewNotesSrsHub(noteSrsStats){
     ${headerBarHTML}
 
     <!-- Уровень 2: Контекст конспекта и ожерелье бусин очереди -->
-    <div class="srs-deck-beads-bar" style="margin-bottom:12px;text-align:center;">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;max-width:700px;margin:0 auto 10px;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span style="font-size:0.80rem;font-weight:700;color:var(--ink-soft);background:rgba(255,255,255,0.06);padding:3px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.08);white-space:nowrap;">
+    <div class="srs-deck-beads-bar" style="text-align:center;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;max-width:700px;margin:0 auto;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="note-queue-pill">
             Конспект <b style="color:#6ee7b7;">${notePos + 1}</b> / ${qLen}
           </span>
-          <div class="srs-beads-necklace fc-beads-necklace" style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
+          ${qLen > 1 ? `
+          <div class="note-queue-beads-necklace srs-beads-necklace fc-beads-necklace">
             ${activeQueue.slice(Math.max(0, notePos - 4), Math.min(qLen, notePos + 5)).map((dq, relIdx) => {
               const absIdx = Math.max(0, notePos - 4) + relIdx;
               let cls = 'dot-jewel';
@@ -25151,18 +25286,18 @@ function viewNotesSrsHub(noteSrsStats){
               else cls += ' future';
               return `<span class="${cls}" data-srs-goto-note="${absIdx}" role="button" tabindex="0" title="Конспект ${absIdx + 1}: ${escapeHtmlStr(dq.title)}"></span>`;
             }).join('')}
-          </div>
+          </div>` : ''}
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
-          <button type="button" class="btn btn-ghost" data-srs-note-toggle-full style="padding:4px 12px;border-radius:8px;font-size:0.78rem;font-weight:600;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);" title="Переключить пошаговый режим и полный обзор конспекта">${isFullMode ? '⚡ По квантам' : '📖 Весь конспект'}</button>
-          ${forcedId ? `<button type="button" class="btn btn-ghost" data-srs-exit-force-note style="padding:4px 12px;border-radius:8px;font-size:0.78rem;font-weight:600;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.10);">📅 К расписанию</button>` : ''}
+          <button type="button" class="btn btn-ghost note-top-action-btn" data-srs-note-toggle-full title="Переключить пошаговый режим и полный обзор конспекта">${isFullMode ? '⚡ По квантам' : '📖 Весь конспект'}</button>
+          ${forcedId ? `<button type="button" class="btn btn-ghost note-top-action-btn" data-srs-exit-force-note title="Вернуться к графику повторений">📅 К расписанию</button>` : ''}
         </div>
       </div>
     </div>
 
-    <!-- Уровень 3: Карточка конспекта в стиле Liquid Obsidian Glass -->
+    <!-- Уровень 3: Карточка конспекта в стиле Liquid Slate Glass -->
     <main class="srs-card-stage fc-stage" style="margin-top:0;perspective:1200px;margin-bottom:0;width:100%;max-width:700px;margin-left:auto;margin-right:auto;">
-      <div class="card fc-card" style="margin:0 auto !important;padding:22px 24px !important;border-radius:20px !important;background:linear-gradient(165deg, rgba(24, 31, 44, 0.94) 0%, rgba(13, 17, 24, 0.98) 100%) !important;border:1px solid rgba(255, 255, 255, 0.10) !important;box-shadow:inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 20px 48px -10px rgba(0, 0, 0, 0.85) !important;backdrop-filter:blur(24px) !important;-webkit-backdrop-filter:blur(24px) !important;">
+      <div class="card fc-card srs-note-card">
         
         <!-- Верхняя плашка: ювелирное ожерелье бусин памяти SRS и векторная кривая -->
         <div class="note-memory-bar" style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.06);">
@@ -25183,9 +25318,9 @@ function viewNotesSrsHub(noteSrsStats){
         ${!isFullMode ? `
           <!-- Заголовок шага + бусины 8 шагов в одной строке (без полоски и без дублирования) -->
           <div class="note-step-header-row">
-            <div style="font-size:1.04rem;font-weight:700;color:#6ee7b7;display:flex;align-items:center;gap:8px;min-width:0;">
+            <div style="font-size:1.04rem;font-weight:700;color:#6ee7b7;display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;">
               <span style="color:#34d399;font-size:1rem;flex-shrink:0;">✦</span>
-              <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtmlStr(pureStepTitle || ('Шаг ' + (sIdx + 1)))}</span>
+              <span>${escapeHtmlStr(pureStepTitle || ('Шаг ' + (sIdx + 1)))}</span>
             </div>
             <div class="note-step-beads-chain" title="Шаги конспекта">
               ${steps.map((st, idx) => {
