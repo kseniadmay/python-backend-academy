@@ -10315,6 +10315,50 @@
     border-radius: 999px;
     transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   }
+  .note-step-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .note-step-beads-chain {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    flex-shrink: 0;
+  }
+  .note-step-bead {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    background: rgba(255, 255, 255, 0.14);
+    display: inline-block;
+  }
+  .note-step-bead:hover {
+    transform: scale(1.3);
+    background: rgba(255, 255, 255, 0.35);
+  }
+  .note-step-bead.done {
+    background: #34d399;
+    box-shadow: 0 0 5px rgba(52, 211, 153, 0.5);
+  }
+  .note-step-bead.active {
+    background: #ffffff;
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.95);
+    transform: scale(1.3);
+  }
+  .note-canvas-body .zen-chunk-container {
+    min-height: 140px;
+  }
   /* Pure Floating SRS Flow Tabs (Zero-Shell, 0 backdrop-filter, 0 box-shadow) */
   .srs-flow-selector {
     display: inline-flex !important;
@@ -24414,24 +24458,26 @@ function viewNotesSrsHub(noteSrsStats){
         <h2 style="font-size:1.30rem;font-weight:800;color:#ffffff;letter-spacing:-0.015em;margin:0 0 14px;line-height:1.35;">${escapeHtmlStr(cleanTitle)}</h2>
 
         ${!isFullMode ? `
-          <!-- Плавная непрерывная линия прогресса 3px (Smooth Continuous Line) -->
-          <div class="note-continuous-track" style="width:100%;height:3px;background:rgba(255,255,255,0.08);border-radius:999px;margin-bottom:14px;overflow:hidden;" title="Прогресс: ${progressPct}%">
-            <div class="note-continuous-fill" style="width:${progressPct}%;height:100%;background:linear-gradient(90deg, #10b981, #34d399);box-shadow:0 0 10px rgba(52,211,153,0.6);border-radius:999px;transition:width 0.35s cubic-bezier(0.16,1,0.3,1);"></div>
-          </div>
-
-          <!-- Заголовок кванта и счетчик (без тавтологии номера) -->
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;">
-            <div style="font-size:1.05rem;font-weight:700;color:#6ee7b7;display:flex;align-items:center;gap:8px;min-width:0;">
+          <!-- Заголовок шага + бусины 8 шагов в одной строке (без полоски и без дублирования) -->
+          <div class="note-step-header-row">
+            <div style="font-size:1.04rem;font-weight:700;color:#6ee7b7;display:flex;align-items:center;gap:8px;min-width:0;">
               <span style="color:#34d399;font-size:1rem;flex-shrink:0;">✦</span>
               <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtmlStr(pureStepTitle || ('Шаг ' + (sIdx + 1)))}</span>
             </div>
-            <span style="font-family:var(--font-m, monospace);font-size:0.76rem;color:${isCompleted ? '#6ee7b7' : 'var(--ink-soft)'};background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:3px 9px;border-radius:8px;white-space:nowrap;flex-shrink:0;">
-              ${isCompleted ? '✓ Все шаги изучены' : `Шаг ${sIdx + 1} из ${steps.length}${totalChunks > 1 ? ` · Квант ${curChunkIdx + 1}/${totalChunks}` : ''}`}
-            </span>
+            <div class="note-step-beads-chain" title="Шаги конспекта">
+              ${steps.map((st, idx) => {
+                let cls = 'note-step-bead';
+                if(idx < sIdx) cls += ' done';
+                else if(idx === sIdx) cls += ' active';
+                else cls += ' future';
+                const stTitle = (st.title || ('Шаг ' + (idx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+                return `<span class="${cls}" data-srs-note-step="${idx}" role="button" tabindex="0" title="Шаг ${idx + 1} из ${steps.length}: ${escapeHtmlStr(stTitle)}"></span>`;
+              }).join('')}
+            </div>
           </div>
         ` : ''}
 
-        <!-- Чистый холст текста конспекта с пошаговой анимацией -->
+        <!-- Чистый холст текста конспекта: Zen-фокус на одном кванте -->
         <div class="note-canvas-body" id="srs-note-text" style="color:var(--ink);font-size:0.94rem;line-height:1.7;margin-bottom:18px;">
           ${isFullMode ? `
             <div class="note-review-body" style="line-height:1.7;font-size:0.94rem;color:var(--ink);">
@@ -24446,10 +24492,10 @@ function viewNotesSrsHub(noteSrsStats){
               }).join('')}
             </div>
           ` : `
-            <div class="feed-container">
-              ${chunks.slice(0, curChunkIdx + 1).map((ch, ci) =>
-                `<div class="feed-chunk ${ci < curChunkIdx ? 'feed-chunk-prev' : 'feed-chunk-new'} lesson-theory" data-chunk-idx="${ci}">${decorateFn(ch)}</div>`
-              ).join('')}
+            <div class="zen-chunk-container">
+              <div class="feed-chunk feed-chunk-new lesson-theory" data-chunk-idx="${curChunkIdx}" key="chunk-${sIdx}-${curChunkIdx}">
+                ${decorateFn(chunks[curChunkIdx] || '')}
+              </div>
             </div>
           `}
         </div>
@@ -26612,50 +26658,24 @@ document.addEventListener('click', async function(e){
     try{ if(typeof playSound === 'function') playSound('tick'); else if(typeof SoundFx !== 'undefined' && SoundFx.playTick) SoundFx.playTick(); }catch(err){}
 
     cardsHubState.noteChunkIdx = nextCIdx;
-    saveCardsHubPosState();
-
-    const feedContainer = document.getElementById('srs-note-text');
-    if(feedContainer && nextCIdx < chunks.length){
-      feedContainer.querySelectorAll('.feed-chunk-new').forEach(function(el){
-        el.classList.remove('feed-chunk-new');
-        el.classList.add('feed-chunk-prev');
-      });
-      const newEl = document.createElement('div');
-      newEl.className = 'feed-chunk feed-chunk-new lesson-theory';
-      newEl.setAttribute('data-chunk-idx', nextCIdx);
-      const decorateFn = (typeof decorateCodeBlocksWithRunBtn === 'function') ? decorateCodeBlocksWithRunBtn : (h => h);
-      newEl.innerHTML = decorateFn(chunks[nextCIdx]);
-      feedContainer.appendChild(newEl);
-
-      const hasMore = (nextCIdx + 1 < chunks.length);
-      if(!hasMore){
-        srsChunkMoreBtn.removeAttribute('data-srs-note-chunk-more');
-        if(sIdx + 1 < steps.length){
-          srsChunkMoreBtn.setAttribute('data-srs-note-next-step', sIdx + 1);
-          srsChunkMoreBtn.innerHTML = `<span>Следующий шаг (${sIdx + 2}/${steps.length})</span> <span>➔</span> <kbd class="fc-kbd-hint" style="font-size:0.70rem;padding:2px 6px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.25);border-radius:4px;color:#fff;">Enter</kbd>`;
-        } else {
-          cardsHubState.noteCompleted = true;
-          render();
-          return;
-        }
+    if(nextCIdx >= chunks.length){
+      if(sIdx + 1 < steps.length){
+        cardsHubState.noteStepIdx = sIdx + 1;
+        cardsHubState.noteChunkIdx = 0;
+      } else {
+        cardsHubState.noteCompleted = true;
       }
-
-      const totalSteps = Math.max(1, steps.length);
-      const totalChunks = Math.max(1, chunks.length);
-      const pPct = Math.max(10, Math.min(100, Math.round(((sIdx * totalChunks + nextCIdx + 1) / (totalSteps * totalChunks)) * 100)));
-      const fillEl = document.querySelector('.note-continuous-fill');
-      if(fillEl) fillEl.style.width = pPct + '%';
-
-      try{ newEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }catch(err){}
-      return;
     }
+    saveCardsHubPosState();
     render();
     return;
   }
 
   const srsChunkPrevBtn = e.target.closest('[data-srs-note-chunk-prev]');
   if(srsChunkPrevBtn){
-    if(Number(cardsHubState.noteChunkIdx) > 0){
+    if(cardsHubState.noteCompleted){
+      cardsHubState.noteCompleted = false;
+    } else if(Number(cardsHubState.noteChunkIdx) > 0){
       cardsHubState.noteChunkIdx -= 1;
     } else if(Number(cardsHubState.noteStepIdx) > 0){
       cardsHubState.noteStepIdx -= 1;
