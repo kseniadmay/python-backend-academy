@@ -12789,18 +12789,95 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     z-index: 1 !important;
   }
 
-  /* Дыхание и отступы бусин */
+  /* Пространственный ритм: увеличенный благородный воздух */
+  .srs-unified-header-bar {
+    margin-bottom: 26px !important;
+  }
+  .srs-deck-beads-bar,
   .srs-deck-context-bar {
-    margin: 10px 0 14px !important;
+    margin: 16px auto 26px !important;
     padding: 2px 0 !important;
   }
   .srs-deck-bead.srs-bead-active,
-  .srs-deck-bead.is-current {
+  .srs-deck-bead.is-current,
+  .dot-jewel.active {
     animation: srsBeadPulse 2s infinite ease-in-out !important;
   }
   @keyframes srsBeadPulse {
     0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.25); filter: drop-shadow(0 0 6px #10b981); }
+    50% { transform: scale(1.3); filter: drop-shadow(0 0 8px #10b981); }
+  }
+
+  /* Живой индикатор активной сессии Live Dot */
+  .srs-live-status-dot {
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    background: #10b981 !important;
+    box-shadow: 0 0 8px #10b981, 0 0 2px #34d399 !important;
+    display: inline-block !important;
+    flex-shrink: 0 !important;
+    animation: srsLiveDotPulse 2s infinite ease-in-out !important;
+  }
+  @keyframes srsLiveDotPulse {
+    0%, 100% { opacity: 0.85; transform: scale(1); box-shadow: 0 0 6px #10b981; }
+    50% { opacity: 1; transform: scale(1.35); box-shadow: 0 0 12px #34d399, 0 0 4px #10b981; }
+  }
+
+  /* Оптимизация высоты карточки: компактная посадка, естественный рост при длинном ответе */
+  #srs-active-card {
+    height: auto !important;
+    min-height: 120px !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  #srs-active-card .card-face,
+  .fc-card.demo-card .card-face,
+  .fc-card .card-face {
+    height: auto !important;
+    min-height: 120px !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 18px 24px !important;
+    box-sizing: border-box !important;
+  }
+  .card-face .fc-top-row {
+    margin-bottom: 12px !important;
+  }
+  .card-face .fc-card-body,
+  #srs-active-card #srs-card-prompt {
+    margin: 0 !important;
+    padding: 4px 0 10px !important;
+    font-size: clamp(1.1rem, 2vw, 1.25rem) !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Минималистичная круглая стеклянная иконка подсказки */
+  #srs-hint-btn,
+  .fc-hint-chip {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    min-height: 28px !important;
+    max-height: 28px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.85rem !important;
+    background: rgba(245, 158, 11, 0.12) !important;
+    border: 1px solid rgba(245, 158, 11, 0.25) !important;
+    color: var(--amber-soft, #fbbf24) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease !important;
+  }
+  #srs-hint-btn:hover,
+  .fc-hint-chip:hover {
+    transform: scale(1.08) !important;
+    background: rgba(245, 158, 11, 0.22) !important;
+    border-color: rgba(251, 191, 36, 0.60) !important;
   }
 
   /* Капсула кода (Code Capsule) */
@@ -20237,7 +20314,7 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount){
   return `
     <header class="srs-unified-header-bar" style="position:relative;display:flex;justify-content:space-between;align-items:center;height:30px;min-height:30px;gap:12px;margin-bottom:20px;padding:0 2px;background:transparent;border:none;box-shadow:none;box-sizing:border-box;">
       <div style="min-width:0;flex-shrink:0;display:flex;align-items:center;height:30px;">
-        <span class="srs-header-mode-title" style="font-size:0.76rem;font-weight:700;color:var(--ink-muted);letter-spacing:0.05em;text-transform:uppercase;">${activeTab === 'notes' ? 'Конспекты SRS' : 'Карточки SRS'}</span>
+        <span class="srs-header-mode-title" style="display:inline-flex;align-items:center;gap:7px;font-size:0.76rem;font-weight:700;color:var(--ink-muted);letter-spacing:0.05em;text-transform:uppercase;"><span class="srs-live-status-dot"></span>${activeTab === 'notes' ? 'Конспекты SRS' : 'Карточки SRS'}</span>
       </div>
 
       <div class="srs-header-right-cluster" style="display:flex;align-items:center;gap:6px;height:30px;flex-shrink:0;">
@@ -20534,7 +20611,7 @@ function viewCardsHub(){
 
       <div class="cards-hub-content" style="width:100%;max-width:700px;margin:0 auto;box-sizing:border-box;">
         <main class="srs-card-stage fc-stage" style="width:100%;max-width:700px;margin:0 auto;padding:0;perspective:1200px;box-sizing:border-box;">
-          <div class="fc-card demo-card ${isFlipped ? 'is-flipped fc-card--flipped' : ''}" id="srs-active-card" data-flipped="${isFlipped ? 'true' : 'false'}" data-hub-flip data-action="flip-card" style="width:100%;max-width:700px;min-height:190px;box-sizing:border-box;">
+          <div class="fc-card demo-card ${isFlipped ? 'is-flipped fc-card--flipped' : ''}" id="srs-active-card" data-flipped="${isFlipped ? 'true' : 'false'}" data-hub-flip data-action="flip-card" style="width:100%;max-width:700px;min-height:120px;box-sizing:border-box;">
             
             <!-- Лицевая грань: Вопрос (Liquid Obsidian Glass) -->
             <div class="card-face card-front fc-card-front">
@@ -20544,7 +20621,7 @@ function viewCardsHub(){
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curKey) : ''}
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                  <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curKey}" id="srs-hint-btn" style="padding:3px 10px;border-radius:999px;background:rgba(245,158,11,0.10);color:var(--amber-soft,#fbbf24);font-weight:600;font-size:0.75rem;cursor:pointer;border:1px solid rgba(245,158,11,0.20);" title="💡 Шпаргалка (H)">💡 <span class="hide-on-mobile">Шпаргалка <kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.20);border-radius:4px;color:#fff;margin-left:4px;">H</kbd></span></button>
+                  <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curKey}" id="srs-hint-btn" title="Шпаргалка (H)">💡</button>
                 </div>
               </div>
 
@@ -20621,7 +20698,7 @@ function viewCardsHub(){
 
       <div class="cards-hub-content" style="width:100%;max-width:700px;margin:0 auto;box-sizing:border-box;">
         <main class="srs-card-stage fc-stage" style="width:100%;max-width:700px;margin:0 auto;padding:0;perspective:1200px;box-sizing:border-box;">
-          <div class="fc-card demo-card ${cardsHubState.flipped ? 'is-flipped fc-card--flipped' : ''}" id="srs-active-card" data-flipped="${cardsHubState.flipped ? 'true' : 'false'}" data-hub-flip data-action="flip-card" style="width:100%;max-width:700px;min-height:190px;box-sizing:border-box;">
+          <div class="fc-card demo-card ${cardsHubState.flipped ? 'is-flipped fc-card--flipped' : ''}" id="srs-active-card" data-flipped="${cardsHubState.flipped ? 'true' : 'false'}" data-hub-flip data-action="flip-card" style="width:100%;max-width:700px;min-height:120px;box-sizing:border-box;">
             
             <!-- Лицевая грань: Вопрос (Liquid Obsidian Glass) -->
             <div class="card-face card-front fc-card-front">
@@ -20631,7 +20708,7 @@ function viewCardsHub(){
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                  <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curCardKey}" id="srs-hint-btn" style="padding:3px 10px;border-radius:999px;background:rgba(245,158,11,0.10);color:var(--amber-soft,#fbbf24);font-weight:600;font-size:0.75rem;cursor:pointer;border:1px solid rgba(245,158,11,0.20);" title="💡 Шпаргалка (H)">💡 <span class="hide-on-mobile">Шпаргалка <kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.20);border-radius:4px;color:#fff;margin-left:4px;">H</kbd></span></button>
+                  <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curCardKey}" id="srs-hint-btn" title="Шпаргалка (H)">💡</button>
                 </div>
               </div>
 
@@ -20771,7 +20848,7 @@ function viewCardsHub(){
 
       <div class="cards-hub-content" style="width:100%;max-width:700px;margin:0 auto;box-sizing:border-box;">
         <main class="srs-card-stage fc-stage" style="width:100%;max-width:700px;margin:0 auto;padding:0;perspective:1200px;box-sizing:border-box;">
-          <div class="fc-card demo-card ${cardsHubState.flipped ? 'is-flipped fc-card--flipped' : ''}" id="srs-active-card" data-flipped="${cardsHubState.flipped ? 'true' : 'false'}" data-hub-flip data-action="flip-card" style="width:100%;max-width:700px;min-height:190px;box-sizing:border-box;">
+          <div class="fc-card demo-card ${cardsHubState.flipped ? 'is-flipped fc-card--flipped' : ''}" id="srs-active-card" data-flipped="${cardsHubState.flipped ? 'true' : 'false'}" data-hub-flip data-action="flip-card" style="width:100%;max-width:700px;min-height:120px;box-sizing:border-box;">
             
             <!-- Лицевая грань: Вопрос (Liquid Obsidian Glass) -->
             <div class="card-face card-front fc-card-front">
@@ -20781,7 +20858,7 @@ function viewCardsHub(){
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                  <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curCardKey}" id="srs-hint-btn" style="padding:3px 10px;border-radius:999px;background:rgba(245,158,11,0.10);color:var(--amber-soft,#fbbf24);font-weight:600;font-size:0.75rem;cursor:pointer;border:1px solid rgba(245,158,11,0.20);" title="💡 Шпаргалка (H)">💡 <span class="hide-on-mobile">Шпаргалка <kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.20);border-radius:4px;color:#fff;margin-left:4px;">H</kbd></span></button>
+                  <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curCardKey}" id="srs-hint-btn" title="Шпаргалка (H)">💡</button>
                 </div>
               </div>
 
@@ -24599,12 +24676,12 @@ function getRemNoteCardStatusBadgeHTML(cardKey){
   const entry = state.cardSrs && state.cardSrs[cardKey];
   const svgCurve = `<svg viewBox="0 0 16 16" style="width:12px;height:12px;fill:none;stroke:#34d399;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle;flex-shrink:0;"><path d="M2 13.5h12" stroke-opacity="0.35"/><path d="M2.5 12.5C5 12.5 7 6 13.5 3.5"/><circle cx="13.5" cy="3.5" r="1.5" fill="#34d399"/></svg>`;
   if(!entry || !entry.dueDate){
-    return `<span class="srs-card-status-badge srs-status-new" style="display:inline-flex;align-items:center;gap:5px;" title="Карточка ещё не изучалась"><span style="width:5px;height:5px;border-radius:50%;background:#34d399;box-shadow:0 0 5px rgba(52,211,153,0.8);display:inline-block;"></span><span>Новая</span></span>`;
+    return `<span class="srs-card-status-badge srs-status-new" style="display:inline-flex;align-items:center;gap:5px;" title="Карточка ещё не изучалась"><span>Новая</span></span>`;
   }
   const today = dateIsoKey();
   const daysDiff = Math.round((new Date(entry.dueDate + 'T00:00:00') - new Date(today + 'T00:00:00')) / (1000 * 60 * 60 * 24));
   if(daysDiff <= 0){
-    return `<span class="srs-card-status-badge srs-status-due" style="display:inline-flex;align-items:center;gap:5px;" title="По расписанию нужно повторить сегодня"><span style="width:5px;height:5px;border-radius:50%;background:#f43f5e;box-shadow:0 0 5px rgba(244,63,94,0.8);display:inline-block;"></span><span>Сегодня</span></span>`;
+    return `<span class="srs-card-status-badge srs-status-due" style="display:inline-flex;align-items:center;gap:5px;" title="По расписанию нужно повторить сегодня"><span>Сегодня</span></span>`;
   } else if(entry.interval >= 21){
     return `<span class="srs-card-status-badge srs-status-mastered" style="display:inline-flex;align-items:center;gap:5px;" title="Интервал ${entry.interval} дн. Следующее повторение: ${entry.dueDate}">${svgCurve}<span>${entry.interval} дн</span></span>`;
   } else {
