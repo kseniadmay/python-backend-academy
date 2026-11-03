@@ -20281,7 +20281,9 @@ function viewCardsHub(){
   const curCardKey = cardsHubState.deckId + ':' + cIdx;
   const linkedSkills = DECK_TO_SKILLS_MAP[deck.id] || [];
   const primarySkill = linkedSkills[0] || ALL_PY_SKILLS[0];
-  const cleanCurDeckTitle = (deck.title || cardsHubState.deckId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
+  const cleanCurDeckTitle = (typeof formatDeckTopicTitle === 'function')
+    ? formatDeckTopicTitle(deck.title || cardsHubState.deckId)
+    : (deck.title || cardsHubState.deckId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
 
   deckOpts = filteredDecks.map(fid => {
     const d = ALL_DECKS_COMBINED[fid];
@@ -20357,7 +20359,7 @@ function viewCardsHub(){
       ${buildSrsHeaderBarHTML('cards', srsGlobalStats.dueTodayCardsCount || 0, noteSrsStats.dueCount || 0)}
 
       <!-- Уровень 2: Единая строка контекста колоды и прогресса сессии (Deck & Beads Bar) -->
-      ${(typeof buildSrsDeckContextBarHTML === 'function' ? buildSrsDeckContextBarHTML(cleanCurDeckTitle, cards.length, cIdx, (i) => {
+      ${(typeof buildSrsDeckContextBarHTML === 'function' ? buildSrsDeckContextBarHTML(cleanCurDeckTitle, 15, Math.min(14, sprintStepNum - 1), (i) => {
         const ck = cardsHubState.deckId + ':' + i;
         const r = (state.cardRatings && state.cardRatings[ck]) ? Number(state.cardRatings[ck]) : 0;
         const cO = cards[i];
@@ -20377,7 +20379,7 @@ function viewCardsHub(){
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:var(--ink-muted);letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${cIdx + 1} / ${cards.length}</span>
+                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;" title="Шаг ${sprintStepNum} из 15 в текущем спринте">${sprintStepNum} / 15</span>
                   <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curCardKey}" id="srs-hint-btn" style="padding:3px 10px;border-radius:999px;background:rgba(245,158,11,0.10);color:var(--amber-soft,#fbbf24);font-weight:600;font-size:0.75rem;cursor:pointer;border:1px solid rgba(245,158,11,0.20);" title="💡 Шпаргалка (H)">💡 <span class="hide-on-mobile">Шпаргалка <kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.20);border-radius:4px;color:#fff;margin-left:4px;">H</kbd></span></button>
                 </div>
               </div>
@@ -20397,7 +20399,7 @@ function viewCardsHub(){
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.30);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${cIdx + 1} / ${cards.length}</span>
+                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.30);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${sprintStepNum} / 15</span>
                   <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><span class="fc-kbd-sep"> </span><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
                 </div>
               </div>
