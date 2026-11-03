@@ -10692,7 +10692,7 @@
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    max-width: 260px !important;
+    max-width: 340px !important;
     padding: 2px 8px !important;
     border-radius: 999px !important;
     background: rgba(255, 255, 255, 0.05) !important;
@@ -19859,13 +19859,23 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount){
 }
 window.buildSrsHeaderBarHTML = buildSrsHeaderBarHTML;
 
+function formatDeckTopicTitle(rawTitle){
+  if(!rawTitle) return '';
+  let s = String(rawTitle).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
+  if(/^list comprehension,\s*dict comprehension\s*(?:и|&)?\s*set/i.test(s)){
+    return 'List, Dict & Set Comprehensions';
+  }
+  return s;
+}
+window.formatDeckTopicTitle = formatDeckTopicTitle;
+
 function buildSrsDeckContextBarHTML(deckTitle, total, currentIdx, getRatingOrItems, clickAttr, echelonOpts, unitOpts, deckOpts){
   const count = Math.max(1, Number(total) || 1);
   const cur = Math.max(0, Math.min(count - 1, Number(currentIdx) || 0));
   const attrName = clickAttr || 'data-hub-goto-card';
 
-  // Скользящее ожерелье из круглых бусин (до 7 бусин в фокусе под ширину 390px)
-  const maxVisible = 7;
+  // Ожерелье из 15 круглых бусин спринта (полная синхронизация со спринтом 15 карточек)
+  const maxVisible = 15;
   let startIdx = 0;
   let endIdx = count;
   if(count > maxVisible){
@@ -20088,7 +20098,9 @@ function viewCardsHub(){
       const curKey = freeDeckId + ':' + freeIdx;
       const isFlipped = !!cardsHubState.flipped;
       const srsP = typeof computeRemNoteIntervals === 'function' ? computeRemNoteIntervals(curKey) : {again:{days:1},hard:{days:2},good:{days:3},easy:{days:7}};
-      const cleanTitle = (freeDeck.title || freeDeckId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '');
+      const cleanTitle = (typeof formatDeckTopicTitle === 'function')
+        ? formatDeckTopicTitle(freeDeck.title || freeDeckId)
+        : (freeDeck.title || freeDeckId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '');
 
       return `
     <div class="container cards-hub-container" style="padding-bottom:84px;max-width:700px;margin:0 auto;">
@@ -20106,7 +20118,7 @@ function viewCardsHub(){
       ` : ''}
 
       <!-- Уровень 2: Единая строка контекста колоды и прогресса сессии (Deck & Beads Bar, 32px) -->
-      ${(typeof buildSrsDeckContextBarHTML === 'function' ? buildSrsDeckContextBarHTML(cleanTitle, freeCards.length, freeIdx, (i) => {
+      ${(typeof buildSrsDeckContextBarHTML === 'function' ? buildSrsDeckContextBarHTML(cleanTitle, 15, Math.min(14, sprintStepNum - 1), (i) => {
         const ck = freeDeckId + ':' + i;
         const r = (state.cardRatings && state.cardRatings[ck]) ? Number(state.cardRatings[ck]) : 0;
         const cO = freeCards[i];
@@ -20126,7 +20138,7 @@ function viewCardsHub(){
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curKey) : ''}
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:var(--ink-muted);letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${freeIdx + 1} / ${freeCards.length}</span>
+                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;" title="Шаг ${sprintStepNum} из 15 в текущем спринте">${sprintStepNum} / 15</span>
                   <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curKey}" id="srs-hint-btn" style="padding:3px 10px;border-radius:999px;background:rgba(245,158,11,0.10);color:var(--amber-soft,#fbbf24);font-weight:600;font-size:0.75rem;cursor:pointer;border:1px solid rgba(245,158,11,0.20);" title="💡 Шпаргалка (H)">💡 <span class="hide-on-mobile">Шпаргалка <kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.20);border-radius:4px;color:#fff;margin-left:4px;">H</kbd></span></button>
                 </div>
               </div>
@@ -20146,7 +20158,7 @@ function viewCardsHub(){
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curKey) : ''}
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.30);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${freeIdx + 1} / ${freeCards.length}</span>
+                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.30);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${sprintStepNum} / 15</span>
                   <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><span class="fc-kbd-sep"> </span><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
                 </div>
               </div>
@@ -20182,7 +20194,9 @@ function viewCardsHub(){
     const cur = cObj;
     const curCard = cObj;
     const curCardKey = item.deckId + ':' + item.cardIdx;
-    const cleanDeckName = (dObj.title || item.deckId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
+    const cleanDeckName = (typeof formatDeckTopicTitle === 'function')
+      ? formatDeckTopicTitle(dObj.title || item.deckId)
+      : (dObj.title || item.deckId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
     const showActiveRescue = !cardsHubState.flipped && (
       cardsHubState.rescueCardKey === curCardKey ||
       (window.__rescuePrimedCards && window.__rescuePrimedCards[curCardKey])
@@ -20197,7 +20211,7 @@ function viewCardsHub(){
       ${buildSrsHeaderBarHTML('cards', srsGlobalStats.dueTodayCardsCount || 0, noteSrsStats.dueCount || 0)}
 
       <!-- Уровень 2: Единая строка контекста колоды и прогресса сессии (Deck & Beads Bar) -->
-      ${(typeof buildSrsDeckContextBarHTML === 'function' ? buildSrsDeckContextBarHTML(cleanDeckName, qLen, duePos, cardsHubState.dueQueue || [], 'data-hub-goto-due', echelonOpts, unitOpts, deckOpts) : '')}
+      ${(typeof buildSrsDeckContextBarHTML === 'function' ? buildSrsDeckContextBarHTML(cleanDeckName, 15, Math.min(14, sprintStepNum - 1), cardsHubState.dueQueue || [], 'data-hub-goto-due', echelonOpts, unitOpts, deckOpts) : '')}
 
       <div class="cards-hub-content" style="width:100%;max-width:700px;margin:0 auto;box-sizing:border-box;">
         <main class="srs-card-stage fc-stage" style="width:100%;max-width:700px;margin:0 auto;padding:0;perspective:1200px;box-sizing:border-box;">
@@ -24179,17 +24193,18 @@ function applyRemNoteCardRating(cardKey, grade){
 function getRemNoteCardStatusBadgeHTML(cardKey){
   ensureExtendedState();
   const entry = state.cardSrs && state.cardSrs[cardKey];
+  const svgCurve = `<svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:#34d399;fill:none;" stroke-width="2.5" stroke-linecap="round"><path d="M3 19c3-1 6-7 9-11s6-5 9-5" /></svg>`;
   if(!entry || !entry.dueDate){
-    return `<span class="srs-card-status-badge srs-status-new" title="Карточка ещё не изучалась">🌱 Новая</span>`;
+    return `<span class="srs-card-status-badge srs-status-new" style="display:inline-flex;align-items:center;gap:5px;" title="Карточка ещё не изучалась"><span style="width:5px;height:5px;border-radius:50%;background:#34d399;box-shadow:0 0 5px rgba(52,211,153,0.8);display:inline-block;"></span><span>Новая</span></span>`;
   }
   const today = dateIsoKey();
   const daysDiff = Math.round((new Date(entry.dueDate + 'T00:00:00') - new Date(today + 'T00:00:00')) / (1000 * 60 * 60 * 24));
   if(daysDiff <= 0){
-    return `<span class="srs-card-status-badge srs-status-due" title="По расписанию нужно повторить сегодня">🔥 Сегодня</span>`;
+    return `<span class="srs-card-status-badge srs-status-due" style="display:inline-flex;align-items:center;gap:5px;" title="По расписанию нужно повторить сегодня"><span style="width:5px;height:5px;border-radius:50%;background:#f43f5e;box-shadow:0 0 5px rgba(244,63,94,0.8);display:inline-block;"></span><span>Сегодня</span></span>`;
   } else if(entry.interval >= 21){
-    return `<span class="srs-card-status-badge srs-status-mastered" title="Интервал ${entry.interval} дн. Следующее повторение: ${entry.dueDate}">👑 ${entry.interval} дн</span>`;
+    return `<span class="srs-card-status-badge srs-status-mastered" style="display:inline-flex;align-items:center;gap:5px;" title="Интервал ${entry.interval} дн. Следующее повторение: ${entry.dueDate}">${svgCurve}<span>${entry.interval} дн</span></span>`;
   } else {
-    return `<span class="srs-card-status-badge srs-status-scheduled" title="Следующее повторение: ${entry.dueDate} (${daysDiff} дн)">📅 ${daysDiff} дн</span>`;
+    return `<span class="srs-card-status-badge srs-status-scheduled" style="display:inline-flex;align-items:center;gap:5px;" title="Интервал повторения: ${daysDiff} дн">${svgCurve}<span>${daysDiff} дн</span></span>`;
   }
 }
 
@@ -29079,9 +29094,19 @@ const psk = e.target.closest('[data-py-select-k]');
         cardsHubState.repeatQueue.push(cardsHubState.cardIdx || 0);
       }
     }
+    // Микро-спринт по 15 карточек (Инвариант 15 бусин):
+    cardsHubState.sprintStep = (Number(cardsHubState.sprintStep) || 0) + 1;
+    const isSprintFinish = cardsHubState.sprintStep >= 15;
+
     const d = ALL_DECKS_COMBINED[cardsHubState.deckId] || {cards:[]};
     const totalCards = (d.cards || []).length;
-    if(!cardsHubState.isRepeatPhase && cardsHubState.cardIdx + 1 < totalCards){
+    if(isSprintFinish){
+      cardsHubState.sprintFinished = true;
+      cardsHubState.sprintNum = (Number(cardsHubState.sprintNum) || 1) + 1;
+      cardsHubState.sprintStep = 0;
+      cardsHubState.sprintPhase = ((state && state.srsSprintFinishMode) || 'zen') === 'zen' ? 'zen' : 'triumph';
+      awardXp(25);
+    } else if(!cardsHubState.isRepeatPhase && cardsHubState.cardIdx + 1 < totalCards){
       cardsHubState.cardIdx++;
       cardsHubState.flipped = false;
     } else if(Array.isArray(cardsHubState.repeatQueue) && cardsHubState.repeatQueue.length > 0){
