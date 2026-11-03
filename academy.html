@@ -25255,50 +25255,48 @@ function viewNotesSrsHub(noteSrsStats){
   let actionAreaHTML = '';
   if(isFullMode || isCompleted){
     actionAreaHTML = `
-      <div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:14px;">
-        <div style="font-size:0.80rem;font-weight:700;color:#6ee7b7;text-align:center;margin-bottom:12px;">
-          ✦ ${isFullMode ? 'Полный обзор конспекта' : 'Все ' + steps.length + ' шагов изучены!'} · Оцените запоминание:
-        </div>
-        <div class="fc-rate-row note-rate-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
-          <!-- Кнопка 1: Не вспомнил -->
-          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again note-rate-btn-clean" data-srs-note-reset="${curItem.noteId}" title="Не знаю">
-            <span class="srs-btn-title">Не знаю</span>
-          </button>
+      <div style="font-size:0.80rem;font-weight:700;color:#6ee7b7;text-align:center;margin-bottom:12px;">
+        ✦ ${isFullMode ? 'Полный обзор конспекта' : 'Все ' + steps.length + ' шагов изучены!'} · Оцените запоминание:
+      </div>
+      <div class="fc-rate-row note-rate-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:440px;margin:0 auto;width:100%;">
+        <!-- Кнопка 1: Не вспомнил -->
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again note-rate-btn-clean" data-srs-note-reset="${curItem.noteId}" title="Не знаю">
+          <span class="srs-btn-title">Не знаю</span>
+        </button>
 
-          <!-- Кнопка 2: Вспомнил (+15 XP) -->
-          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent note-rate-btn-clean" data-srs-note-pass="${curItem.noteId}" title="Вспомнил (+15 XP)">
-            <span class="srs-btn-title">Вспомнил</span>
-          </button>
+        <!-- Кнопка 2: Вспомнил (+15 XP) -->
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent note-rate-btn-clean" data-srs-note-pass="${curItem.noteId}" title="Вспомнил (+15 XP)">
+          <span class="srs-btn-title">Вспомнил</span>
+        </button>
 
-          <!-- Кнопка 3: Сходу (+20 XP) -->
-          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy note-rate-btn-clean" data-srs-note-easy="${curItem.noteId}" title="Сходу (+20 XP)">
-            <span class="srs-btn-title">Сходу</span>
-          </button>
-        </div>
+        <!-- Кнопка 3: Сходу (+20 XP) -->
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy note-rate-btn-clean" data-srs-note-easy="${curItem.noteId}" title="Сходу (+20 XP)">
+          <span class="srs-btn-title">Сходу</span>
+        </button>
       </div>
     `;
   } else {
     const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
     const canGoBack = (curChunkIdx > 0 || sIdx > 0);
-    const backBtnHTML = canGoBack ? `<button type="button" class="btn btn-ghost" data-srs-note-chunk-prev="1" style="padding:12px 18px;border-radius:12px;font-size:0.88rem;font-weight:600;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--ink-soft);cursor:pointer;" title="Предыдущий квант">← Назад</button>` : '';
+    const backBtnHTML = canGoBack ? `<button type="button" class="btn btn-ghost" data-srs-note-chunk-prev="1" style="height:52px;padding:0 20px;border-radius:16px;font-size:0.88rem;font-weight:600;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);cursor:pointer;flex-shrink:0;" title="Предыдущий квант">← Назад</button>` : '';
 
     let primaryActionHTML = '';
     if(hasMoreChunks){
       primaryActionHTML = `
-        <button type="button" class="btn-dominant-cta btn-glass-emerald btn-sprint-cta" data-srs-note-chunk-more="1" style="flex:1;padding:13px 20px;border-radius:12px;font-size:0.92rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;">
+        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" data-srs-note-chunk-more="1" style="height:52px;border-radius:16px;font-size:0.94rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:1;max-width:440px;width:100%;">
           <span>Понятно, дальше (+10 XP)</span> <span>➔</span>
         </button>
       `;
     } else {
       primaryActionHTML = `
-        <button type="button" class="btn-dominant-cta btn-glass-emerald btn-sprint-cta" data-srs-note-next-step="${sIdx + 1}" style="flex:1;padding:13px 20px;border-radius:12px;font-size:0.92rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;">
+        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" data-srs-note-next-step="${sIdx + 1}" style="height:52px;border-radius:16px;font-size:0.94rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:1;max-width:440px;width:100%;">
           <span>Следующий шаг (${sIdx + 2}/${steps.length})</span> <span>➔</span>
         </button>
       `;
     }
 
     actionAreaHTML = `
-      <div style="display:flex;align-items:center;gap:10px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);">
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;max-width:440px;margin:0 auto;width:100%;">
         ${backBtnHTML}
         ${primaryActionHTML}
       </div>
@@ -25306,12 +25304,12 @@ function viewNotesSrsHub(noteSrsStats){
   }
 
   return `
-  <div class="container cards-hub-container" style="padding-bottom:60px;max-width:700px;margin:0 auto;">
+  <div class="container cards-hub-container" style="padding-bottom:60px;max-width:680px;margin:0 auto;">
     ${headerBarHTML}
 
     <!-- Уровень 2: Контекст конспекта и ожерелье бусин очереди -->
     <div class="srs-deck-beads-bar" style="text-align:center;">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;max-width:700px;margin:0 auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;max-width:680px;margin:0 auto;">
         <div style="display:flex;align-items:center;gap:8px;">
           <span class="note-queue-pill">
             Конспект <b style="color:#6ee7b7;">${notePos + 1}</b> / ${qLen}
@@ -25336,7 +25334,7 @@ function viewNotesSrsHub(noteSrsStats){
     </div>
 
     <!-- Уровень 3: Карточка конспекта в стиле Liquid Slate Glass -->
-    <main class="srs-card-stage fc-stage" style="margin-top:0;perspective:1200px;margin-bottom:0;width:100%;max-width:700px;margin-left:auto;margin-right:auto;">
+    <main class="srs-card-stage fc-stage" style="margin-top:0;perspective:1200px;margin-bottom:0;width:100%;max-width:680px;margin-left:auto;margin-right:auto;">
       <div class="card fc-card srs-note-card">
         
         <!-- Верхняя плашка: ювелирное ожерелье бусин памяти SRS и векторная кривая -->
@@ -25353,7 +25351,7 @@ function viewNotesSrsHub(noteSrsStats){
         </div>
 
         <!-- Заголовок темы конспекта -->
-        <h2 style="font-size:1.30rem;font-weight:800;color:#ffffff;letter-spacing:-0.015em;margin:0 0 14px;line-height:1.35;">${escapeHtmlStr(cleanTitle)}</h2>
+        <h2 style="font-size:1.35rem;font-weight:800;color:#ffffff;letter-spacing:-0.015em;margin:0 0 16px;line-height:1.35;text-align:center;">${escapeHtmlStr(cleanTitle)}</h2>
 
         ${!isFullMode ? `
           <!-- Заголовок шага + бусины 8 шагов в одной строке (без полоски и без дублирования) -->
@@ -25376,7 +25374,7 @@ function viewNotesSrsHub(noteSrsStats){
         ` : ''}
 
         <!-- Чистый холст текста конспекта: Zen-фокус на одном кванте -->
-        <div class="note-canvas-body" id="srs-note-text" style="color:var(--ink);font-size:0.94rem;line-height:1.7;margin-bottom:18px;">
+        <div class="note-canvas-body" id="srs-note-text" style="color:var(--ink);font-size:0.94rem;line-height:1.7;">
           ${isFullMode ? `
             <div class="note-review-body" style="line-height:1.7;font-size:0.94rem;color:var(--ink);">
               ${steps.map((st, i) => {
@@ -25397,10 +25395,13 @@ function viewNotesSrsHub(noteSrsStats){
             </div>
           `}
         </div>
-
-        ${actionAreaHTML}
       </div>
     </main>
+
+    <!-- Уровень 4: Зона действий (снаружи карточки, наследуется от карточек SRS) -->
+    <footer class="srs-action-dock note-action-dock" style="margin-top:20px;width:100%;max-width:680px;margin-left:auto;margin-right:auto;text-align:center;">
+      ${actionAreaHTML}
+    </footer>
   </div>`;
 }
 
