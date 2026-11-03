@@ -18920,21 +18920,21 @@ function viewPythonSkill(sid){
           ${cardStepperHTML}
           ${pySkillViewState.cardFlipped ? `
             <div class="fc-rate-row" style="margin-top:12px;">
-              <button type="button" class="btn btn-ghost" data-py-rate-card="1" title="Не знаю (С нуля) · карточка вернётся в конец очереди с мнемонической зацепкой (интервал: ${srsPrev.again.days} дн)">
-                <span>Не знаю <kbd class="fc-kbd-hint hide-on-mobile">1</kbd></span>
+              <button type="button" class="btn btn-ghost" data-py-rate-card="1" title="Не вспомнил (С нуля) · карточка вернётся в конец очереди (интервал: ${srsPrev.again.days} дн, клавиша 1)">
+                <span>Не вспомнил <kbd class="fc-kbd-hint hide-on-mobile">1</kbd></span>
                 <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">С нуля · ${srsPrev.again.days} дн</span>
               </button>
-              <button type="button" class="btn btn-burgundy" data-py-rate-card="2" title="Трудно (С трудом) · повторить через ${srsPrev.hard.days} дн (+2 XP)">
-                <span>Трудно (+2 XP) <kbd class="fc-kbd-hint hide-on-mobile">2</kbd></span>
-                <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">С трудом · ${srsPrev.hard.days} дн</span>
+              <button type="button" class="btn btn-burgundy" data-py-rate-card="2" title="С трудом (+2 XP) · повторить через ${srsPrev.hard.days} дн, клавиша 2">
+                <span>С трудом <kbd class="fc-kbd-hint hide-on-mobile">2</kbd></span>
+                <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.hard.days} дн</span>
               </button>
-              <button type="button" class="btn btn-clay" data-py-rate-card="3" title="Хорошо (Уверенно) · повторить через ${srsPrev.good.days} дн (+5 XP)">
-                <span>Хорошо (+5 XP) <kbd class="fc-kbd-hint hide-on-mobile">3</kbd></span>
-                <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">Уверенно · ${srsPrev.good.days} дн</span>
+              <button type="button" class="btn btn-clay" data-py-rate-card="3" title="Вспомнил (+5 XP) · повторить через ${srsPrev.good.days} дн, клавиша 3">
+                <span>Вспомнил <kbd class="fc-kbd-hint hide-on-mobile">3</kbd></span>
+                <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.good.days} дн</span>
               </button>
-              <button type="button" class="btn btn-primary" data-py-rate-card="4" title="Легко (Назубок) · повторить через ${srsPrev.easy.days} дн (+10 XP)">
-                <span>Легко (+10 XP) <kbd class="fc-kbd-hint hide-on-mobile">4</kbd></span>
-                <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">Назубок · ${srsPrev.easy.days} дн</span>
+              <button type="button" class="btn btn-primary" data-py-rate-card="4" title="Сходу (+10 XP) · повторить через ${srsPrev.easy.days} дн, клавиша 4">
+                <span>Сходу <kbd class="fc-kbd-hint hide-on-mobile">4</kbd></span>
+                <span class="btn-subtext" style="display:block;font-size:0.74rem;font-weight:600;opacity:0.92;margin-top:2px;">${srsPrev.easy.days} дн</span>
               </button>
             </div>
             <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
@@ -19764,28 +19764,28 @@ function buildSrsRatingDockHTML(srsInfo, isFlipped){
 
       <!-- Фаза 2: Каноническая 4-кнопочная сетка оценок SRS (Эталон платформы AGENTS.md & DESIGN.md, раскрывается после переворота) -->
       <div class="srs-rating-grid card-rating-grid ${isFlipped ? '' : 'srs-hidden'}" id="srs-rating-panel" style="${isFlipped ? 'display:grid !important;' : 'display:none !important;'}">
-        <!-- Кнопка 1: Не знаю (С нуля · 1, кармин) -->
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-hub-rate="1" data-hotkey="1" title="Не знаю (С нуля, клавиша 1)">
-          <span class="srs-btn-title">Не знаю</span>
+        <!-- Кнопка 1: Не вспомнил (С нуля · 1, кармин) -->
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-hub-rate="1" data-hotkey="1" title="Не вспомнил (С нуля, клавиша 1)">
+          <span class="srs-btn-title">Не вспомнил</span>
           <span class="srs-btn-sub"><span class="srs-days">С нуля</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">1</kbd></span></span>
         </button>
 
-        <!-- Кнопка 2: Трудно (+2 XP, ${hardDays} дн, клавиша 2, янтарь) -->
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--hard fc-rate-btn--hard" data-hub-rate="2" data-hotkey="2" title="Трудно (+2 XP, ${hardDays} дн, клавиша 2)">
-          <span class="srs-btn-title">Трудно</span>
-          <span class="srs-btn-sub"><span class="srs-days">${hardDays} дн</span> <span class="srs-xp-badge">+2 XP</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">2</kbd></span></span>
+        <!-- Кнопка 2: С трудом (+2 XP, ${hardDays} дн, клавиша 2, янтарь) -->
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--hard fc-rate-btn--hard" data-hub-rate="2" data-hotkey="2" title="С трудом (+2 XP при клике, ${hardDays} дн, клавиша 2)">
+          <span class="srs-btn-title">С трудом</span>
+          <span class="srs-btn-sub"><span class="srs-days">${hardDays} дн</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">2</kbd></span></span>
         </button>
 
-        <!-- Кнопка 3: Хорошо (+5 XP, ${goodDays} дн, клавиша 3, изумруд) -->
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-hub-rate="3" data-hotkey="3" title="Хорошо (+5 XP, ${goodDays} дн, клавиша 3)">
-          <span class="srs-btn-title">Хорошо</span>
-          <span class="srs-btn-sub"><span class="srs-days">${goodDays} дн</span> <span class="srs-xp-badge">+5 XP</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">3</kbd></span></span>
+        <!-- Кнопка 3: Вспомнил (+5 XP, ${goodDays} дн, клавиша 3, изумруд) -->
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-hub-rate="3" data-hotkey="3" title="Вспомнил (+5 XP при клике, ${goodDays} дн, клавиша 3)">
+          <span class="srs-btn-title">Вспомнил</span>
+          <span class="srs-btn-sub"><span class="srs-days">${goodDays} дн</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">3</kbd></span></span>
         </button>
 
-        <!-- Кнопка 4: Легко (+10 XP, ${easyDays} дн, клавиша 4, циан) -->
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-hub-rate="4" data-hotkey="4" title="Легко (+10 XP, ${easyDays} дн, клавиша 4)">
-          <span class="srs-btn-title">Легко</span>
-          <span class="srs-btn-sub"><span class="srs-days">${easyDays} дн</span> <span class="srs-xp-badge">+10 XP</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">4</kbd></span></span>
+        <!-- Кнопка 4: Сходу (+10 XP, ${easyDays} дн, клавиша 4, циан) -->
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-hub-rate="4" data-hotkey="4" title="Сходу (+10 XP при клике, ${easyDays} дн, клавиша 4)">
+          <span class="srs-btn-title">Сходу</span>
+          <span class="srs-btn-sub"><span class="srs-days">${easyDays} дн</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">4</kbd></span></span>
         </button>
       </div>
     </footer>
@@ -19829,7 +19829,7 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount){
         <div class="srs-header-goal-status" style="display:inline-flex;align-items:center;gap:6px;padding:0 10px;height:30px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);font-size:0.78rem;font-weight:600;color:var(--ink-soft);box-sizing:border-box;line-height:1;">
           <span style="color:#f59e0b;font-size:0.88rem;">⚡</span>
           <b style="color:#fff;font-family:var(--font-m);font-weight:700;">${currentSprintStep} / ${sprintTarget}</b>
-          <span class="hide-on-mobile" style="opacity:0.65;font-weight:400;color:var(--ink-muted);">· Спринт ${sprintNum}</span>
+          
         </div>
 
         <details class="srs-more-details" style="position:relative;display:inline-flex;align-items:center;height:30px;margin:0;padding:0;">
@@ -20129,7 +20129,6 @@ function viewCardsHub(){
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curKey) : ''}
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;" title="Шаг ${sprintStepNum} из 15 в текущем спринте">${sprintStepNum} / 15</span>
                   <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curKey}" id="srs-hint-btn" style="padding:3px 10px;border-radius:999px;background:rgba(245,158,11,0.10);color:var(--amber-soft,#fbbf24);font-weight:600;font-size:0.75rem;cursor:pointer;border:1px solid rgba(245,158,11,0.20);" title="💡 Шпаргалка (H)">💡 <span class="hide-on-mobile">Шпаргалка <kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.20);border-radius:4px;color:#fff;margin-left:4px;">H</kbd></span></button>
                 </div>
               </div>
@@ -20149,7 +20148,6 @@ function viewCardsHub(){
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curKey) : ''}
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.30);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${sprintStepNum} / 15</span>
                   <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><span class="fc-kbd-sep"> </span><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
                 </div>
               </div>
@@ -20216,7 +20214,6 @@ function viewCardsHub(){
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;" title="Шаг ${sprintStepNum} из 15 в текущем спринте">${sprintStepNum} / 15</span>
                   <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curCardKey}" id="srs-hint-btn" style="padding:3px 10px;border-radius:999px;background:rgba(245,158,11,0.10);color:var(--amber-soft,#fbbf24);font-weight:600;font-size:0.75rem;cursor:pointer;border:1px solid rgba(245,158,11,0.20);" title="💡 Шпаргалка (H)">💡 <span class="hide-on-mobile">Шпаргалка <kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.20);border-radius:4px;color:#fff;margin-left:4px;">H</kbd></span></button>
                 </div>
               </div>
@@ -20236,7 +20233,6 @@ function viewCardsHub(){
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.30);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${sprintStepNum} / 15</span>
                   <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><span class="fc-kbd-sep"> </span><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
                 </div>
               </div>
@@ -20368,7 +20364,6 @@ function viewCardsHub(){
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;" title="Шаг ${sprintStepNum} из 15 в текущем спринте">${sprintStepNum} / 15</span>
                   <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curCardKey}" id="srs-hint-btn" style="padding:3px 10px;border-radius:999px;background:rgba(245,158,11,0.10);color:var(--amber-soft,#fbbf24);font-weight:600;font-size:0.75rem;cursor:pointer;border:1px solid rgba(245,158,11,0.20);" title="💡 Шпаргалка (H)">💡 <span class="hide-on-mobile">Шпаргалка <kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.20);border-radius:4px;color:#fff;margin-left:4px;">H</kbd></span></button>
                 </div>
               </div>
@@ -20388,7 +20383,6 @@ function viewCardsHub(){
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                  <span class="fc-card-counter-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.30);font-family:var(--font-m);font-size:0.72rem;font-weight:700;color:#6ee7b7;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">${sprintStepNum} / 15</span>
                   <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><span class="fc-kbd-sep"> </span><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
                 </div>
               </div>
@@ -24367,22 +24361,22 @@ function viewNotesSrsHub(noteSrsStats){
           ✦ ${isFullMode ? 'Полный обзор конспекта' : 'Все ' + steps.length + ' шагов изучены!'} · Оцените запоминание:
         </div>
         <div class="fc-rate-row note-rate-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
-          <!-- Кнопка 1: Не знаю (С нуля · 1 дн) -->
-          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-srs-note-reset="${curItem.noteId}" data-hotkey="1" title="Сбросить интервал конспекта на 1 день (клавиша 1)">
-            <span class="srs-btn-title">Не знаю</span>
+          <!-- Кнопка 1: Не вспомнил (С нуля · 1 дн) -->
+          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-srs-note-reset="${curItem.noteId}" data-hotkey="1" title="Не вспомнил (Сбросить интервал конспекта на 1 день, клавиша 1)">
+            <span class="srs-btn-title">Не вспомнил</span>
             <span class="srs-btn-sub"><span class="srs-days">С нуля · 1 дн</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">1</kbd></span></span>
           </button>
 
-          <!-- Кнопка 2: Понятно (+15 XP, следующий интервал) -->
-          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-srs-note-pass="${curItem.noteId}" data-hotkey="2" title="Закрепить и перевести на следующую ступень (${curItem.nextInterval} дн, клавиша 2 или Enter)">
-            <span class="srs-btn-title">Понятно</span>
-            <span class="srs-btn-sub"><span class="srs-days">${curItem.nextInterval} дн</span> <span class="srs-xp-badge">+15 XP</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">2</kbd></span></span>
+          <!-- Кнопка 2: Вспомнил (+15 XP, следующий интервал) -->
+          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-srs-note-pass="${curItem.noteId}" data-hotkey="2" title="Вспомнил (+15 XP при клике, перевести на ${curItem.nextInterval} дн, клавиша 2 или Enter)">
+            <span class="srs-btn-title">Вспомнил</span>
+            <span class="srs-btn-sub"><span class="srs-days">${curItem.nextInterval} дн</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">2</kbd></span></span>
           </button>
 
-          <!-- Кнопка 3: Назубок (+20 XP, перешагнуть интервал) -->
-          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-srs-note-easy="${curItem.noteId}" data-hotkey="3" title="Помню идеально — перешагнуть ступень (${curItem.jumpInterval || curItem.nextInterval} дн, клавиша 3)">
-            <span class="srs-btn-title">Назубок</span>
-            <span class="srs-btn-sub"><span class="srs-days">${curItem.jumpInterval || curItem.nextInterval} дн</span> <span class="srs-xp-badge">+20 XP</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">3</kbd></span></span>
+          <!-- Кнопка 3: Сходу (+20 XP, перешагнуть интервал) -->
+          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-srs-note-easy="${curItem.noteId}" data-hotkey="3" title="Сходу (+20 XP при клике, перешагнуть ступень на ${curItem.jumpInterval || curItem.nextInterval} дн, клавиша 3)">
+            <span class="srs-btn-title">Сходу</span>
+            <span class="srs-btn-sub"><span class="srs-days">${curItem.jumpInterval || curItem.nextInterval} дн</span><span class="hide-on-mobile"><span class="fc-kbd-sep"> · </span><kbd class="fc-kbd-hint">3</kbd></span></span>
           </button>
         </div>
       </div>
