@@ -65,7 +65,8 @@
 
   /* ---------- shell / layout ---------- */
   #app{min-height:100vh;display:flex;}
-  .sidebar{width:236px;flex:none;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:22px 18px;position:sticky;top:0;height:100vh;}
+  .sidebar{width:236px;flex:none;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:22px 18px;position:sticky;top:0;height:100vh;max-height:100vh;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;box-sizing:border-box;}
+  .sidebar::-webkit-scrollbar{display:none;}
   .brand{font-family:var(--font-d);font-weight:700;font-size:1.15rem;display:flex;align-items:center;gap:8px;margin-bottom:2px;}
   .brand-sub{font-size:.78rem;color:var(--ink-muted);margin-bottom:26px;}
   .navlink{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:12px;text-decoration:none;color:var(--ink-soft);font-weight:500;font-size:.95rem;margin-bottom:2px;transition:background .15s,color .15s;}
@@ -11809,6 +11810,20 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     flex-shrink: 0 !important;
     transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
   }
+  /* Светящаяся строка прогресса SRS (Glow Beads Progress Bar) */
+  .fc-progress-header .dot-jewel,
+  .fc-beads-necklace .dot-jewel,
+  .srs-beads-necklace .dot-jewel {
+    width: 10px !important;
+    height: 10px !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+    position: relative !important;
+    z-index: 2 !important;
+    box-sizing: border-box !important;
+    transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  }
   .fc-progress-header .dot-jewel.future,
   .fc-progress-header .dot-jewel.rating-viewed,
   .fc-progress-header .dot-jewel:not(.done):not(.active),
@@ -11818,28 +11833,50 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   .srs-beads-necklace .dot-jewel.future,
   .srs-beads-necklace .dot-jewel.rating-viewed,
   .srs-beads-necklace .dot-jewel:not(.done):not(.active) {
-    background: rgba(255, 255, 255, 0.10) !important;
-    border: 1.5px solid rgba(255, 255, 255, 0.18) !important;
-    box-shadow: none !important;
-    opacity: 0.65 !important;
+    background: rgba(16, 185, 129, 0.08) !important;
+    border: 1.5px solid rgba(52, 211, 153, 0.35) !important;
+    box-shadow: inset 0 0 5px rgba(16, 185, 129, 0.20), 0 0 4px rgba(16, 185, 129, 0.15) !important;
+    opacity: 0.9 !important;
+  }
+  .fc-beads-necklace .dot-jewel.future:hover,
+  .srs-beads-necklace .dot-jewel.future:hover {
+    transform: scale(1.35) !important;
+    border-color: rgba(52, 211, 153, 0.85) !important;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.65) !important;
   }
   .fc-progress-header .dot-jewel.active,
   .fc-beads-necklace .dot-jewel.active,
-  .srs-beads-necklace .dot-jewel.active {
-    width: 10px !important;
-    height: 10px !important;
+  .srs-beads-necklace .dot-jewel.active,
+  .bead-active-leading {
+    width: 13px !important;
+    height: 13px !important;
     background: #ffffff !important;
-    border: 2px solid #10b981 !important;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.8) !important;
-    animation: bead-pulse-emerald-light 2.5s infinite ease-in-out !important;
+    border: 2.5px solid #10b981 !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.40), 0 0 14px #34d399, 0 0 28px rgba(16, 185, 129, 0.95), 0 0 40px rgba(52, 211, 153, 0.65) !important;
+    opacity: 1 !important;
+    transform: scale(1.1) !important;
+    animation: jewel-aurora-glow 2.2s infinite ease-in-out !important;
+    z-index: 3 !important;
   }
   .fc-progress-header .dot-jewel.done.rating-easy,
   .fc-beads-necklace .dot-jewel.done.rating-easy,
-  .srs-beads-necklace .dot-jewel.done.rating-easy {
-    background: #10b981 !important;
-    border: 1.5px solid #34d399 !important;
-    box-shadow: 0 0 7px rgba(16, 185, 129, 0.65) !important;
+  .srs-beads-necklace .dot-jewel.done.rating-easy,
+  .fc-beads-necklace .dot-jewel.done,
+  .srs-beads-necklace .dot-jewel.done {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;
+    border: 1.5px solid #a7f3d0 !important;
+    box-shadow: 0 0 10px #10b981, 0 0 20px rgba(52, 211, 153, 0.75), inset 0 1px 2px #ffffff !important;
     opacity: 1 !important;
+  }
+  @keyframes jewel-aurora-glow {
+    0%, 100% {
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.40), 0 0 14px #34d399, 0 0 28px rgba(16, 185, 129, 0.95), 0 0 40px rgba(52, 211, 153, 0.65);
+      transform: scale(1.1);
+    }
+    50% {
+      box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.60), 0 0 20px #6ee7b7, 0 0 34px rgba(16, 185, 129, 1), 0 0 50px rgba(52, 211, 153, 0.90);
+      transform: scale(1.22);
+    }
   }
   .fc-progress-header .dot-jewel.done.rating-good,
   .fc-beads-necklace .dot-jewel.done.rating-good,
@@ -11880,30 +11917,34 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     }
   }
 
-  /* Чистый 3D-шарнир без backdrop-filter для предотвращения сплющивания Chromium */
+  /* Чистый 3D-шарнир с адаптивной авто-высотой под количество строк текста (0 скроллбаров) */
   .fc-card.demo-card,
   .fc-card,
   .demo-card {
+    display: grid !important;
+    grid-template-areas: "cardface" !important;
+    grid-template-columns: 1fr !important;
     position: relative !important;
     width: 100% !important;
     max-width: 700px !important;
     margin: 0 auto !important;
-    min-height: 270px !important;
+    min-height: 140px !important;
+    height: auto !important;
     border-radius: 22px !important;
     cursor: pointer !important;
     user-select: none !important;
     transform-style: preserve-3d !important;
     -webkit-transform-style: preserve-3d !important;
-    transition: transform 0.42s cubic-bezier(0.2, 0.85, 0.35, 1.15) !important;
+    transition: transform 0.38s cubic-bezier(0.2, 0.85, 0.35, 1.15) !important;
     will-change: transform !important;
     padding: 0 !important;
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
     box-sizing: border-box !important;
     overflow: visible !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
   }
 
   .cards-hub-content {
@@ -12643,6 +12684,18 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   .sidebar-settings-btn {
     font-size: 1.05rem !important;
     line-height: 1 !important;
+  }
+
+  body.is-interactive-route,
+  body.is-interactive-route #view-root {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  body.is-interactive-route::-webkit-scrollbar,
+  body.is-interactive-route #view-root::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
   }
 </style>
 <link rel="manifest" href="manifest.json">
