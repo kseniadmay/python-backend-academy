@@ -24190,58 +24190,28 @@ function viewNotesSrsHub(noteSrsStats){
   const linkedDeckId = linkedInfo.deckId;
   const linkedTrack = linkedSkill ? getTrackForSkill(linkedSkill.id) : null;
 
+  const stepOutlineChips = steps.map((st, idx) => {
+    const cleanStTitle = (st.title || ('Шаг ' + (idx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+    const isCur = (!isFullMode && idx === sIdx);
+    return `<button type="button" class="btn btn-ghost" data-srs-note-step="${idx}" style="padding:5px 11px;border-radius:999px;font-size:0.75rem;${isCur ? 'background:rgba(16,185,129,0.22);border-color:rgba(52,211,153,0.65);color:#34d399;font-weight:700;' : 'opacity:0.85;'}">${idx + 1}. ${escapeHtmlStr(cleanStTitle)}</button>`;
+  }).join('');
+
   const decorateFn = (typeof decorateCodeBlocksWithRunBtn === 'function') ? decorateCodeBlocksWithRunBtn : (h => h);
-
-  // Разбиение текущего шага на кванты (чанки) — как в Coddy и в экране скиллов
-  const cleanStepTitle = (curStep.title || ('Шаг ' + (sIdx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-  const rawChunks = (typeof splitStepHtmlIntoChunks === 'function') ? splitStepHtmlIntoChunks(curStep.html).slice() : [curStep.html || ''];
-  const chunks = rawChunks.length > 0 ? rawChunks : ['<p>Шаг конспекта пуст.</p>'];
-  if(chunks.length > 0 && cleanStepTitle && !/^<h[1-6]/i.test(String(chunks[0] || '').trim())){
-    chunks[0] = `<h4><span style="color:#34d399;margin-right:6px;">✦</span>${escapeHtmlStr(cleanStepTitle)}</h4>\n` + chunks[0];
+  
+  // Устранение дублирования заголовка шага в теле конспекта
+  const cleanStepTitle = (curStep.title || '').replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+  let stepBodyHTML = decorateFn(curStep.html || '');
+  if(cleanStepTitle && stepBodyHTML){
+    stepBodyHTML = stepBodyHTML.replace(/^\s*<h[1-4][^>]*>([\s\S]*?)<\/h[1-4]>/i, (m, inner) => {
+      const plain = inner.replace(/<[^>]+>/g, '').trim().toLowerCase();
+      const c = cleanStepTitle.toLowerCase();
+      if(plain === c || plain.includes(c) || c.includes(plain)) return '';
+      return m;
+    });
   }
-  const totalChunks = chunks.length;
-  const curChunkIdx = Math.min(Math.max(0, Number(cardsHubState.noteChunkIdx) || 0), totalChunks - 1);
-
-  // Статус финиша: все шаги и все кванты пройдены
-  const isLastStep = (sIdx + 1 >= steps.length);
-  const isLastChunk = (curChunkIdx + 1 >= totalChunks);
-  const isCompleted = !!cardsHubState.noteCompleted || (isLastStep && isLastChunk);
-
-  // Деликатный микро-индикатор шага (без нагромождения степперов и пилюль)
-  const stepHeaderHTML = (steps.length > 1 && !isFullMode) ? `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:0.80rem;color:var(--ink-muted);">
-      <span style="color:#6ee7b7;font-weight:700;">✦ ${sIdx + 1}. ${escapeHtmlStr(cleanStepTitle)}</span>
-      <span style="font-family:var(--font-m);font-size:0.72rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:2px 8px;border-radius:999px;">Шаг ${sIdx + 1} из ${steps.length}</span>
-    </div>
-  ` : '';
-
-  // Тело конспекта: ТОЛЬКО кусочковая подача материала
-  const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
-  const hasMoreSteps = (sIdx + 1 < steps.length);
-  const canGoBack = (curChunkIdx > 0 || sIdx > 0);
-
-  const backBtnHTML = `<button type="button" class="btn btn-ghost" data-srs-note-chunk-prev="1" style="padding:9px 14px;border-radius:10px;font-size:.80rem;white-space:nowrap;${canGoBack ? 'display:inline-flex;' : 'display:none;'}" ${canGoBack ? '' : 'disabled aria-hidden="true"'}>← Назад</button>`;
-
-  let chunkMoreBtnHTML = '';
-  if(!isFullMode){
-    if(hasMoreChunks){
-      chunkMoreBtnHTML = `<button type="button" class="btn btn-ghost" data-srs-note-chunk-more="1" style="flex:1;padding:9px 16px;border-radius:10px;background:rgba(16,185,129,0.16);border:1px solid rgba(52,211,153,0.40);color:#6ee7b7;font-size:0.84rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:all .2s ease;">Понятно, дальше (+10 XP) ➔</button>`;
-    } else if(hasMoreSteps){
-      chunkMoreBtnHTML = `<button type="button" class="btn btn-ghost" data-srs-note-next-step="${sIdx + 1}" style="flex:1;padding:9px 16px;border-radius:10px;background:rgba(16,185,129,0.16);border:1px solid rgba(52,211,153,0.40);color:#6ee7b7;font-size:0.84rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:all .2s ease;">Следующий шаг (${sIdx + 2}/${steps.length}) ➔</button>`;
-    } else if(steps.length > 1){
-      chunkMoreBtnHTML = `<div style="flex:1;text-align:center;font-size:0.80rem;font-weight:700;color:#6ee7b7;padding:6px 12px;background:rgba(16,185,129,0.08);border-radius:8px;border:1px solid rgba(52,211,153,0.20);">✓ Все ${steps.length} шагов конспекта прочитаны</div>`;
-    }
-  }
-
-  const chunkActionRowHTML = (!isFullMode && (hasMoreChunks || hasMoreSteps || steps.length > 1)) ? `
-    <div class="chunk-action-row" style="display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05);">
-      ${backBtnHTML}
-      ${chunkMoreBtnHTML}
-    </div>
-  ` : '';
 
   const noteContentHTML = isFullMode
-    ? `<div class="note-review-body" style="margin-bottom:14px;line-height:1.65;font-size:0.93rem;color:var(--ink);">
+    ? `<div class="note-review-body" style="margin-bottom:16px;line-height:1.65;font-size:0.93rem;color:var(--ink);">
         ${steps.map((st, i) => {
           const sTitle = (st.title || '').replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
           let sHtml = decorateFn(st.html || '');
@@ -24254,18 +24224,23 @@ function viewNotesSrsHub(noteSrsStats){
             });
           }
           return `
-          <div style="margin-bottom:16px;padding-bottom:12px;${i < steps.length - 1 ? 'border-bottom:1px dashed rgba(255,255,255,0.08);' : ''}">
-            ${sTitle ? `<h4 style="font-size:1.04rem;font-weight:700;color:#34d399;margin:0 0 8px;display:flex;align-items:center;gap:6px;"><span>✦</span> ${escapeHtmlStr(sTitle)}</h4>` : ''}
+          <div style="margin-bottom:18px;padding-bottom:14px;${i < steps.length - 1 ? 'border-bottom:1px dashed rgba(255,255,255,0.08);' : ''}">
+            ${sTitle ? `<h4 style="font-size:1.06rem;font-weight:700;color:#34d399;margin:0 0 10px;display:flex;align-items:center;gap:6px;"><span>✦</span> ${escapeHtmlStr(sTitle)}</h4>` : ''}
             <div class="lesson-theory" style="font-size:0.92rem;">${sHtml}</div>
           </div>`;
         }).join('')}
       </div>`
-    : `<div class="scroll-feed note-review-body" id="srs-note-text" style="line-height:1.65;font-size:0.94rem;color:var(--ink);">
-        ${chunks.slice(0, curChunkIdx + 1).map((ch, ci) =>
-          `<div class="feed-chunk ${ci < curChunkIdx ? 'feed-chunk-prev' : 'feed-chunk-new'} lesson-theory" data-chunk-idx="${ci}">${decorateFn(ch)}</div>`
-        ).join('')}
+    : `<div class="note-review-body" style="margin-bottom:12px;line-height:1.65;font-size:0.94rem;color:var(--ink);">
+        ${cleanStepTitle ? `<h4 style="font-size:1.08rem;font-weight:700;color:#ffffff;margin:0 0 12px;display:flex;align-items:center;gap:8px;"><span style="color:#34d399;">✦</span> ${escapeHtmlStr(cleanStepTitle)}</h4>` : ''}
+        <div class="lesson-theory" style="font-size:0.93rem;">${stepBodyHTML}</div>
       </div>
-      ${chunkActionRowHTML}`;
+      ${steps.length > 1 ? `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);">
+          <button type="button" class="btn btn-ghost" data-srs-note-step="${Math.max(0, sIdx - 1)}" ${sIdx === 0 ? 'disabled' : ''} style="padding:6px 12px;border-radius:10px;font-size:0.78rem;">← Предыдущий шаг</button>
+          <span style="font-size:0.78rem;color:var(--ink-muted);font-weight:600;">Шаг ${sIdx + 1} из ${steps.length}</span>
+          <button type="button" class="btn btn-ghost" data-srs-note-step="${Math.min(steps.length - 1, sIdx + 1)}" ${sIdx + 1 >= steps.length ? 'disabled' : ''} style="padding:6px 12px;border-radius:10px;font-size:0.78rem;">Следующий шаг ➔</button>
+        </div>
+      ` : ''}`;
 
   return `
   <div class="container cards-hub-container" style="padding-bottom:60px;max-width:700px;margin:0 auto;">
@@ -24311,7 +24286,23 @@ function viewNotesSrsHub(noteSrsStats){
 
         <h2 style="font-size:1.28rem;font-weight:800;color:var(--ink);margin:0 0 14px;line-height:1.4;">${escapeHtmlStr(cleanTitle)}</h2>
 
-        ${stepHeaderHTML}
+        ${steps.length > 1 && !isFullMode ? `
+          <div class="note-zen-stepper" style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:6px 12px;margin-bottom:14px;gap:10px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:0.72rem;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.06em;">Шаг:</span>
+              <div style="display:inline-flex;align-items:center;gap:5px;">
+                ${steps.map((st, idx) => {
+                  const isCur = (idx === sIdx);
+                  const cleanStTitle = (st.title || ('Шаг ' + (idx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+                  return `<button type="button" class="btn btn-ghost ${isCur ? 'active' : ''}" data-srs-note-step="${idx}" style="width:26px;height:26px;padding:0;border-radius:6px;font-family:var(--font-m);font-size:0.72rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;${isCur ? 'background:rgba(16,185,129,0.25);border:1px solid rgba(52,211,153,0.60);color:#34d399;box-shadow:0 0 10px rgba(16,185,129,0.3);' : 'background:rgba(255,255,255,0.04);border:1px solid transparent;color:var(--ink-muted);'}" title="${idx + 1}. ${escapeHtmlStr(cleanStTitle)}">${idx + 1}</button>`;
+                }).join('')}
+              </div>
+            </div>
+            <span style="font-size:0.76rem;font-weight:600;color:#6ee7b7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px;" title="${escapeHtmlStr(cleanStepTitle)}">
+              ${sIdx + 1}. ${escapeHtmlStr(cleanStepTitle)}
+            </span>
+          </div>
+        ` : ''}
 
         <div style="background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:16px 18px;margin-bottom:14px;">
           ${noteContentHTML}
@@ -24326,7 +24317,6 @@ function viewNotesSrsHub(noteSrsStats){
           </div>
         </div>
 
-        <!-- Кнопки интервальной оценки SRS: всегда доступны внизу карточки -->
         <div class="fc-rate-row note-rate-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
           <!-- Кнопка 1: Не знаю (С нуля · 1 дн) -->
           <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-srs-note-reset="${curItem.noteId}" data-hotkey="1" title="Сбросить интервал конспекта на 1 день (клавиша 1)">
@@ -26454,9 +26444,6 @@ document.addEventListener('click', async function(e){
   if(srsGotoNoteBtn){
     cardsHubState.notePos = parseInt(srsGotoNoteBtn.getAttribute('data-srs-goto-note'), 10) || 0;
     cardsHubState.noteStepIdx = 0;
-    cardsHubState.noteChunkIdx = 0;
-    cardsHubState.noteMaxStep = 0;
-    cardsHubState.noteCompleted = false;
     saveCardsHubPosState();
     render();
     return;
@@ -26483,134 +26470,9 @@ document.addEventListener('click', async function(e){
     return;
   }
 
-  // Пошаговое раскрытие квантов-шагов конспекта (как в Coddy и в экране скиллов)
-  const srsChunkMoreBtn = e.target.closest('[data-srs-note-chunk-more]');
-  if(srsChunkMoreBtn){
-    const curPos = cardsHubState.notePos || 0;
-    const curQ = (typeof collectDueNotesQueue === 'function') ? collectDueNotesQueue() : [];
-    const curItem = curQ[curPos] || {};
-    const curNote = curItem.noteObj || (ALL_NOTES_COMBINED[curItem.noteId] || {});
-    const steps = (curNote.steps && curNote.steps.length > 0) ? curNote.steps : [];
-    const sIdx = Math.min(Math.max(0, Number(cardsHubState.noteStepIdx) || 0), steps.length - 1);
-    const curStep = steps[sIdx] || { html: '' };
-    const chunks = (typeof splitStepHtmlIntoChunks === 'function') ? splitStepHtmlIntoChunks(curStep.html).slice() : [curStep.html || ''];
-    const nextCIdx = (Number(cardsHubState.noteChunkIdx) || 0) + 1;
-
-    try{ awardXp(10); }catch(err){}
-    try{ playSound('tick'); }catch(err){}
-
-    cardsHubState.noteChunkIdx = nextCIdx;
-    saveCardsHubPosState();
-
-    const feedContainer = document.getElementById('srs-note-text');
-    if(feedContainer && nextCIdx < chunks.length){
-      feedContainer.querySelectorAll('.feed-chunk-new').forEach(function(el){
-        el.classList.remove('feed-chunk-new');
-        el.classList.add('feed-chunk-prev');
-      });
-      const newEl = document.createElement('div');
-      newEl.className = 'feed-chunk feed-chunk-new lesson-theory';
-      newEl.setAttribute('data-chunk-idx', nextCIdx);
-      const decorateFn = (typeof decorateCodeBlocksWithRunBtn === 'function') ? decorateCodeBlocksWithRunBtn : (h => h);
-      newEl.innerHTML = decorateFn(chunks[nextCIdx]);
-      feedContainer.appendChild(newEl);
-
-      const hasMore = (nextCIdx + 1 < chunks.length);
-      if(!hasMore){
-        srsChunkMoreBtn.removeAttribute('data-srs-note-chunk-more');
-        if(sIdx + 1 < steps.length){
-          srsChunkMoreBtn.setAttribute('data-srs-note-next-step', sIdx + 1);
-          srsChunkMoreBtn.textContent = `Следующий шаг (${sIdx + 2}/${steps.length}) ➔`;
-        } else {
-          cardsHubState.noteCompleted = true;
-          render();
-          return;
-        }
-      }
-
-      const cardParent = feedContainer.closest('.fc-card');
-      if(cardParent){
-        const backBtn = cardParent.querySelector('[data-srs-note-chunk-prev]');
-        if(backBtn){
-          backBtn.style.display = 'inline-flex';
-          backBtn.removeAttribute('disabled');
-          backBtn.removeAttribute('aria-hidden');
-        }
-      }
-
-      try{ newEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }catch(err){}
-      return;
-    }
-    render();
-    return;
-  }
-
-  const srsChunkPrevBtn = e.target.closest('[data-srs-note-chunk-prev]');
-  if(srsChunkPrevBtn){
-    const feedContainer = document.getElementById('srs-note-text');
-    if(feedContainer && Number(cardsHubState.noteChunkIdx) > 0){
-      const lastChunkEl = feedContainer.querySelector(`[data-chunk-idx="${cardsHubState.noteChunkIdx}"]`);
-      if(lastChunkEl) lastChunkEl.remove();
-      cardsHubState.noteChunkIdx -= 1;
-      saveCardsHubPosState();
-
-      const curLastChunk = feedContainer.querySelector(`[data-chunk-idx="${cardsHubState.noteChunkIdx}"]`);
-      if(curLastChunk){
-        curLastChunk.classList.remove('feed-chunk-prev');
-        curLastChunk.classList.add('feed-chunk-new');
-      }
-      const cardParent = feedContainer.closest('.fc-card');
-      if(cardParent){
-        if(cardsHubState.noteChunkIdx === 0 && (cardsHubState.noteStepIdx || 0) === 0){
-          srsChunkPrevBtn.style.display = 'none';
-          srsChunkPrevBtn.setAttribute('disabled', '');
-          srsChunkPrevBtn.setAttribute('aria-hidden', 'true');
-        }
-        const actBtn = cardParent.querySelector('[data-srs-note-next-step], [data-srs-note-chunk-more]');
-        if(actBtn){
-          actBtn.removeAttribute('data-srs-note-next-step');
-          actBtn.setAttribute('data-srs-note-chunk-more', '1');
-          actBtn.textContent = 'Понятно, дальше (+10 XP) ➔';
-        }
-      }
-      return;
-    }
-    if(Number(cardsHubState.noteChunkIdx) > 0){
-      cardsHubState.noteChunkIdx -= 1;
-    } else if(Number(cardsHubState.noteStepIdx) > 0){
-      cardsHubState.noteStepIdx -= 1;
-      const curPos = cardsHubState.notePos || 0;
-      const curQ = (typeof collectDueNotesQueue === 'function') ? collectDueNotesQueue() : [];
-      const curItem = curQ[curPos] || {};
-      const curNote = curItem.noteObj || (ALL_NOTES_COMBINED[curItem.noteId] || {});
-      const steps = curNote.steps || [];
-      const prevStep = steps[cardsHubState.noteStepIdx];
-      const prevChunks = prevStep ? splitStepHtmlIntoChunks(prevStep.html) : [];
-      cardsHubState.noteChunkIdx = Math.max(0, prevChunks.length - 1);
-    }
-    saveCardsHubPosState();
-    render();
-    return;
-  }
-
-  const srsNoteNextStepBtn = e.target.closest('[data-srs-note-next-step]');
-  if(srsNoteNextStepBtn){
-    const nextIdx = parseInt(srsNoteNextStepBtn.getAttribute('data-srs-note-next-step'), 10) || 0;
-    try{ awardXp(10); }catch(err){}
-    try{ playSound('tick'); }catch(err){}
-    cardsHubState.noteStepIdx = nextIdx;
-    cardsHubState.noteChunkIdx = 0;
-    cardsHubState.noteMaxStep = Math.max(Number(cardsHubState.noteMaxStep) || 0, nextIdx);
-    saveCardsHubPosState();
-    render();
-    return;
-  }
-
   const srsNoteStepBtn = e.target.closest('[data-srs-note-step]');
   if(srsNoteStepBtn){
     cardsHubState.noteStepIdx = Math.max(0, parseInt(srsNoteStepBtn.getAttribute('data-srs-note-step'), 10) || 0);
-    cardsHubState.noteChunkIdx = 0;
-    cardsHubState.noteMaxStep = Math.max(Number(cardsHubState.noteMaxStep) || 0, cardsHubState.noteStepIdx);
     cardsHubState.noteFullMode = false;
     saveCardsHubPosState();
     render();
@@ -26631,9 +26493,6 @@ document.addEventListener('click', async function(e){
       applyNoteReview(nid, 'pass', srsNotePassBtn);
       cardsHubState.forcedNoteId = null;
       cardsHubState.noteStepIdx = 0;
-      cardsHubState.noteChunkIdx = 0;
-      cardsHubState.noteMaxStep = 0;
-      cardsHubState.noteCompleted = false;
       cardsHubState.notePos = 0;
       saveCardsHubPosState();
       render();
@@ -26648,9 +26507,6 @@ document.addEventListener('click', async function(e){
       applyNoteReview(nid, 'easy', srsNoteEasyBtn);
       cardsHubState.forcedNoteId = null;
       cardsHubState.noteStepIdx = 0;
-      cardsHubState.noteChunkIdx = 0;
-      cardsHubState.noteMaxStep = 0;
-      cardsHubState.noteCompleted = false;
       cardsHubState.notePos = 0;
       saveCardsHubPosState();
       render();
@@ -26665,9 +26521,6 @@ document.addEventListener('click', async function(e){
       applyNoteReview(nid, 'reset', srsNoteResetBtn);
       cardsHubState.forcedNoteId = null;
       cardsHubState.noteStepIdx = 0;
-      cardsHubState.noteChunkIdx = 0;
-      cardsHubState.noteMaxStep = 0;
-      cardsHubState.noteCompleted = false;
       cardsHubState.notePos = 0;
       saveCardsHubPosState();
       render();
@@ -29989,8 +29842,6 @@ document.addEventListener('keydown', function(e){
     }
     const flipBtn = document.querySelector('[data-py-flip-card], [data-hub-flip]');
     if(flipBtn){ e.preventDefault(); flipBtn.click(); return; }
-    const srsNoteCtaBtn = document.querySelector('[data-srs-note-chunk-more], [data-srs-note-next-step]');
-    if(srsNoteCtaBtn){ e.preventDefault(); srsNoteCtaBtn.click(); return; }
     const pyNextBtn = document.querySelector('[data-chunk-more="py"], [data-py-next-step], [data-py-finish-note]');
     if(pyNextBtn){ e.preventDefault(); pyNextBtn.click(); return; }
   }
