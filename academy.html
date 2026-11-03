@@ -20134,6 +20134,7 @@ function viewCardsHub(){
             </div>
             <div style="display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;">
               <a href="#/path" class="btn-dominant-cta btn-glass-emerald btn-sprint-cta" style="padding:13px 28px;border-radius:14px;font-weight:700;font-size:0.96rem;display:inline-flex;align-items:center;gap:8px;text-decoration:none;">К СЛЕДУЮЩЕМУ УРОКУ НА ПУТИ ➔</a>
+              <button type="button" data-action="restart-cards-practice" class="btn btn-ghost srs-notes-btn" style="padding:12px 20px;border-radius:14px;font-weight:600;font-size:0.86rem;color:var(--ink-soft);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .18s ease;">🔄 Повторить ещё раз</button>
               <a href="#/notes-review" class="btn btn-ghost srs-notes-btn" style="padding:12px 20px;border-radius:14px;font-weight:600;font-size:0.86rem;color:var(--ink-muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .18s ease;">📖 К конспектам</a>
             </div>
           </div>
@@ -20269,23 +20270,25 @@ function viewCardsHub(){
     </div>`;
     }
 
-    const item = (cardsHubState.dueQueue && cardsHubState.dueQueue[duePos]) || null;
+    let item = (cardsHubState.dueQueue && cardsHubState.dueQueue[duePos]) || null;
     if(!item){
       cardsHubState.dueQueue = collectDueCardsQueue();
-      if(!cardsHubState.dueQueue || cardsHubState.dueQueue.length === 0){
+      cardsHubState.duePos = 0;
+      item = (cardsHubState.dueQueue && cardsHubState.dueQueue[0]) || null;
+      if(!item){
         cardsHubState.completed = true;
         return viewCardsHub();
       }
     }
-    const safeItem = item || cardsHubState.dueQueue[0] || {deckId: cardsHubState.deckId || '1.1.1', cardIdx: 0};
+    const safeItem = item || {deckId: cardsHubState.deckId || '1.1.1', cardIdx: 0};
     const dObj = ALL_DECKS_COMBINED[safeItem.deckId] || {title: safeItem.deckId, cards: []};
     const cObj = (dObj.cards || [])[safeItem.cardIdx] || {q: 'Карточка загружается...', a: 'Ответ загружается...'};
     const cur = cObj;
     const curCard = cObj;
-    const curCardKey = item.deckId + ':' + item.cardIdx;
+    const curCardKey = safeItem.deckId + ':' + safeItem.cardIdx;
     const cleanDeckName = (typeof formatDeckTopicTitle === 'function')
-      ? formatDeckTopicTitle(dObj.title || item.deckId)
-      : (dObj.title || item.deckId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
+      ? formatDeckTopicTitle(dObj.title || safeItem.deckId)
+      : (dObj.title || safeItem.deckId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
     const showActiveRescue = !cardsHubState.flipped && (
       cardsHubState.rescueCardKey === curCardKey ||
       (window.__rescuePrimedCards && window.__rescuePrimedCards[curCardKey])
@@ -26459,8 +26462,11 @@ render = function(){
     const matchTab = route.match(/[?&]tab=(notes|cards)/);
     if(matchTab){
       cardsHubState.hubTab = matchTab[1];
-    } else if(route === '/notes-review'){
+    } else if(route === '/notes-review' || route.indexOf('/notes-review?') === 0){
       cardsHubState.hubTab = 'notes';
+    } else {
+      // Прямой переход на /cards СТРОГО открывает таб карточек (инвариант нулевого трения)
+      cardsHubState.hubTab = 'cards';
     }
     if(cardsHubState.hubTab !== 'notes' && cardsHubState.dueMode !== false){
       cardsHubState.dueMode = true;
@@ -26646,6 +26652,59 @@ runSandbox = async function(){
 
 /* ================= EXTENDED EVENT HANDLERS ================= */
 document.addEventListener('click', async function(e){
+  // Навигация по боковой панели сайдбара (десктоп .navlink)
+  const navLinkEl = e.target.closest('.navlink');
+  if(navLinkEl){
+    const targetRoute = navLinkEl.getAttribute('data-route') || navLinkEl.getAttribute('href')?.replace(/^#/, '');
+    if(targetRoute){
+      if(targetRoute === '/cards'){
+        if(typeof cardsHubState !== 'undefined' && cardsHubState){
+          cardsHubState.hubTab = 'cards';
+          cardsHubState.flipped = false;
+          // Если очередь была помечена завершенной, сбрасываем завершение для свежей сессии
+          if(cardsHubState.completed){
+            cardsHubState.completed = false;
+            cardsHubState.duePos = 0;
+            cardsHubState.sprintFinished = false;
+            cardsHubState.dueQueue = (typeof collectDueCardsQueue === 'function') ? collectDueCardsQueue() : [];
+          }
+          if(typeof saveCardsHubPosState === 'function') saveCardsHubPosState();
+        }
+      } else if(targetRoute === '/notes-review'){
+        if(typeof cardsHubState !== 'undefined' && cardsHubState){
+          cardsHubState.hubTab = 'notes';
+          if(typeof saveCardsHubPosState === 'function') saveCardsHubPosState();
+        }
+      }
+      try{ if(typeof playSound === 'function') playSound('tick'); }catch(err){}
+      const targetHash = '#' + targetRoute;
+      if(location.hash !== targetHash){
+        location.hash = targetHash;
+      } else {
+        if(typeof render === 'function') render();
+      }
+      e.preventDefault();
+      return;
+    }
+  }
+
+  // Кнопка повторного запуска тренировки карточек
+  const srsRestartBtn = e.target.closest('[data-action="restart-cards-practice"]');
+  if(srsRestartBtn){
+    if(typeof cardsHubState !== 'undefined' && cardsHubState){
+      cardsHubState.completed = false;
+      cardsHubState.duePos = 0;
+      cardsHubState.sprintFinished = false;
+      cardsHubState.sprintStep = 0;
+      cardsHubState.flipped = false;
+      cardsHubState.dueQueue = (typeof collectDueCardsQueue === 'function') ? collectDueCardsQueue() : [];
+      if(typeof saveCardsHubPosState === 'function') saveCardsHubPosState();
+    }
+    try{ if(typeof playSound === 'function') playSound('tick'); }catch(e){}
+    if(typeof render === 'function') render();
+    return;
+  }
+
   const runInl = e.target.closest('[data-run-inline], [data-run-snippet]');
   if(runInl){
     e.stopPropagation();
