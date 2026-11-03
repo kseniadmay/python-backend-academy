@@ -12838,6 +12838,84 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     padding: 2px 0 !important;
   }
 
+  /* Статус-бейдж конспекта (единый калибр 28px / 8px) */
+  .note-srs-status-chip {
+    height: 28px !important;
+    min-height: 28px !important;
+    line-height: 26px !important;
+    border-radius: 8px !important;
+    padding: 0 10px !important;
+    font-size: 0.76rem !important;
+    font-weight: 600 !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: var(--ink-soft, #cbd5e1) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    box-sizing: border-box !important;
+  }
+  .note-srs-status-chip.is-due {
+    background: rgba(244, 63, 94, 0.10) !important;
+    border-color: rgba(244, 63, 94, 0.25) !important;
+    color: #fda4af !important;
+  }
+
+  /* Сегментированный трекер повторений Эббингауза (28px / 8px) */
+  .note-memory-chain {
+    height: 28px !important;
+    min-height: 28px !important;
+    border-radius: 8px !important;
+    padding: 2px 6px !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.09) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 3px !important;
+    box-sizing: border-box !important;
+  }
+  .note-memory-chain .m-bead {
+    height: 22px !important;
+    line-height: 20px !important;
+    padding: 0 7px !important;
+    border-radius: 6px !important;
+    font-size: 0.72rem !important;
+    font-family: var(--font-m, monospace) !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 1px solid transparent !important;
+    transition: all 0.2s ease !important;
+  }
+  .note-memory-chain .m-bead.done {
+    background: rgba(16, 185, 129, 0.16) !important;
+    border-color: rgba(16, 185, 129, 0.32) !important;
+    color: #34d399 !important;
+  }
+  .note-memory-chain .m-bead.current {
+    background: rgba(16, 185, 129, 0.28) !important;
+    border-color: #10b981 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.40) !important;
+    font-weight: 700 !important;
+  }
+  .note-memory-chain .m-bead.active-due {
+    background: rgba(244, 63, 94, 0.28) !important;
+    border-color: #f43f5e !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 8px rgba(244, 63, 94, 0.40) !important;
+  }
+  .note-memory-chain .m-bead:not(.done):not(.current) {
+    background: transparent !important;
+    color: rgba(255, 255, 255, 0.40) !important;
+  }
+  .note-memory-chain .m-bead-arrow {
+    font-size: 0.62rem !important;
+    color: rgba(255, 255, 255, 0.22) !important;
+    margin: 0 -1px !important;
+  }
+
   /* Адаптивный гибрид кнопки «Показать ответ» (440px на десктопе, 100% на мобильных) */
   #btn-show-answer,
   .btn-cta-dominant {
@@ -25088,12 +25166,11 @@ function viewNotesSrsHub(noteSrsStats){
         
         <!-- Верхняя плашка: ювелирное ожерелье бусин памяти SRS и векторная кривая -->
         <div class="note-memory-bar" style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.06);">
-          <div class="memory-badge" style="display:inline-flex;align-items:center;gap:8px;font-size:0.76rem;font-weight:600;color:var(--ink-soft);background:rgba(255,255,255,0.04);padding:4px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.08);">
-            <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:#34d399;fill:none;" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <div class="memory-badge note-srs-status-chip ${curItem.isDue ? 'is-due' : ''}">
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:${curItem.isDue ? '#fda4af' : '#34d399'};fill:none;flex-shrink:0;" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M3 19c3-1 6-7 9-11s6-5 9-5" />
             </svg>
-            <span style="width:6px;height:6px;border-radius:50%;background:${curItem.isDue ? '#f43f5e' : '#34d399'};box-shadow:0 0 6px ${curItem.isDue ? 'rgba(244,63,94,0.8)' : 'rgba(52,211,153,0.8)'};display:inline-block;"></span>
-            <span>${curItem.isDue ? `Повторить: <b style="color:#fda4af;">сегодня (${curItem.interval}д)</b>` : `Интервал: <b>${curItem.interval} дн</b>`}</span>
+            <span>${curItem.isDue ? `Повторить: <b>сегодня (${curItem.interval}д)</b>` : `Интервал: <b>${curItem.interval} дн</b>`}</span>
           </div>
           <div class="note-memory-chain">
             ${ladderHTML}
