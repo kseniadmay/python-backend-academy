@@ -2117,6 +2117,15 @@
   }
 
   /* ---------- Section 9.3: Floating +XP Particle Burst ---------- */
+@keyframes srsEnergyPulse {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.20); box-shadow: 0 0 18px rgba(245, 158, 11, 0.75); border-color: rgba(245, 158, 11, 0.90); }
+  100% { transform: scale(1); box-shadow: none; }
+}
+.srs-energy-pulse {
+  animation: srsEnergyPulse 0.45s cubic-bezier(0.18, 0.89, 0.32, 1.28) !important;
+}
+
   .xp-float-particle{
     position:fixed;right:auto;top:58px;z-index:9999;pointer-events:none;
     width:max-content;max-width:280px;white-space:nowrap;
@@ -16359,16 +16368,21 @@ const SoundFx = {
     try{
       const ctx = this._getCtx();
       if(!ctx) return;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.connect(gain); gain.connect(ctx.destination);
       const now = ctx.currentTime;
-      osc.frequency.setValueAtTime(523.25, now);
-      osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.09);
-      gain.gain.setValueAtTime(0.06, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
-      osc.start(now); osc.stop(now + 0.14);
+      const osc1 = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc1.type = 'sine';
+      osc2.type = 'triangle';
+      osc1.frequency.setValueAtTime(587.33, now); // D5
+      osc1.frequency.exponentialRampToValueAtTime(880.00, now + 0.08); // A5
+      osc2.frequency.setValueAtTime(880.00, now + 0.08);
+      osc2.frequency.setValueAtTime(1174.66, now + 0.16); // D6
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+      osc1.connect(gain); osc2.connect(gain); gain.connect(ctx.destination);
+      osc1.start(now); osc1.stop(now + 0.28);
+      osc2.start(now + 0.08); osc2.stop(now + 0.28);
     }catch(e){}
   },
   playSuccess: function(){
@@ -16522,8 +16536,8 @@ function spawnXpParticle(amount, anchorEl){
   try{
     if(!document || !document.body) return;
     const prev = document.querySelectorAll('.xp-float-particle');
-    if(prev && prev.length > 4){
-      for(let i = 0; i < prev.length - 4; i++){
+    if(prev && prev.length > 5){
+      for(let i = 0; i < prev.length - 5; i++){
         if(prev[i] && prev[i].remove) prev[i].remove();
       }
     }
@@ -16532,20 +16546,55 @@ function spawnXpParticle(amount, anchorEl){
     const icon = amt >= 10 ? '✨' : '⚡';
     el.className = 'xp-float-particle' + (amt >= 10 ? ' xp-particle-epic' : (amt >= 5 ? ' xp-particle-great' : ' xp-particle-good'));
     el.innerHTML = `<span>${icon}</span> <span>+${amt} XP</span>`;
-    let x = Math.round((window.innerWidth || 800) / 2 - 40);
-    let y = Math.round((window.innerHeight || 600) / 2);
+
+    let startX = Math.round((window.innerWidth || 800) / 2 - 40);
+    let startY = Math.round((window.innerHeight || 600) / 2);
     const target = anchorEl || document.activeElement;
     if(target && typeof target.getBoundingClientRect === 'function'){
       const r = target.getBoundingClientRect();
       if(r && (r.width > 0 || r.height > 0)){
-        x = Math.max(16, Math.min((window.innerWidth || 800) - 120, Math.round(r.left + r.width / 2 - 42)));
-        y = Math.max(24, Math.round(r.top - 14));
+        startX = Math.max(16, Math.min((window.innerWidth || 800) - 120, Math.round(r.left + r.width / 2 - 42)));
+        startY = Math.max(24, Math.round(r.top - 14));
       }
     }
-    el.style.left = x + 'px';
-    el.style.top = y + 'px';
+    el.style.left = startX + 'px';
+    el.style.top = startY + 'px';
     document.body.appendChild(el);
-    setTimeout(function(){ try{ el.remove(); }catch(e){} }, 950);
+
+    // Цель полёта — счётчик цели в шапке (⚡ 0 / 15)
+    const goalEl = document.querySelector('.srs-header-goal-status');
+    if(goalEl && typeof el.animate === 'function'){
+      const gr = goalEl.getBoundingClientRect();
+      const targetX = (gr.left + gr.width / 2) - (startX + 40);
+      const targetY = (gr.top + gr.height / 2) - startY;
+
+      const flight = el.animate([
+        { transform: 'translate(0, 0) scale(0.85)', opacity: 0 },
+        { transform: 'translate(0, -20px) scale(1.15)', opacity: 1, offset: 0.20 },
+        { transform: `translate(${targetX * 0.45}px, ${targetY * 0.55 - 35}px) scale(0.95)`, opacity: 0.95, offset: 0.60 },
+        { transform: `translate(${targetX}px, ${targetY}px) scale(0.60)`, opacity: 0.85, offset: 0.90 },
+        { transform: `translate(${targetX}px, ${targetY}px) scale(1.4)`, opacity: 0, offset: 1.0 }
+      ], {
+        duration: 720,
+        easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+        fill: 'forwards'
+      });
+
+      flight.onfinish = () => {
+        try { el.remove(); } catch(_e){}
+        const currentGoal = document.querySelector('.srs-header-goal-status');
+        if(currentGoal){
+          currentGoal.classList.remove('srs-energy-pulse');
+          void currentGoal.offsetWidth; // trigger reflow
+          currentGoal.classList.add('srs-energy-pulse');
+          setTimeout(() => {
+            if(currentGoal) currentGoal.classList.remove('srs-energy-pulse');
+          }, 500);
+        }
+      };
+    } else {
+      setTimeout(function(){ try{ el.remove(); }catch(e){} }, 950);
+    }
   }catch(e){}
 }
 window.spawnXpParticle = spawnXpParticle;
@@ -29070,9 +29119,9 @@ const psk = e.target.closest('[data-py-select-k]');
         } else {
           state.cardRatings[ck] = r || 0;
         }
-        if(!wasStudied){
-          if(r >= 3) awardXp(r === 4 ? 10 : 5, hRate);
-          else if(r === 2) awardXp(2, hRate);
+        const earnedXp = (r === 4 ? 10 : (r === 3 ? 5 : (r === 2 ? 2 : 0)));
+        if(earnedXp > 0){
+          awardXp(earnedXp, hRate);
         }
         if(r === 1){
           cardsHubState.dueQueue.push(curItem);
@@ -29115,9 +29164,9 @@ const psk = e.target.closest('[data-py-select-k]');
         state.cardRatings[ck] = r || 0;
       }
     }
-    if(!wasStudied){
-      if(r >= 3) awardXp(r === 4 ? 10 : 5);
-      else if(r === 2) awardXp(2);
+    const earnedXpFree = (r === 4 ? 10 : (r === 3 ? 5 : (r === 2 ? 2 : 0)));
+    if(earnedXpFree > 0){
+      awardXp(earnedXpFree, hRate);
     }
     if(r === 1){
       if(!Array.isArray(cardsHubState.repeatQueue)) cardsHubState.repeatQueue = [];
