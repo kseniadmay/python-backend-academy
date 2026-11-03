@@ -11997,15 +11997,15 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     transform: rotateY(180deg) !important;
   }
 
-  /* Face Common */
+  /* Face Common: автовысота под весь текст без прокрутки колесиком */
   .fc-card-face,
   .card-face {
-    position: absolute !important;
-    inset: 0 !important;
+    grid-area: cardface !important;
     width: 100% !important;
-    height: 100% !important;
+    height: auto !important;
+    min-height: 140px !important;
     border-radius: 22px !important;
-    padding: 20px 24px !important;
+    padding: 18px 22px !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
@@ -12013,6 +12013,8 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     -webkit-backface-visibility: hidden !important;
     box-sizing: border-box !important;
     overflow: visible !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
   }
 
   /* Front Face (Question) — Liquid Obsidian Glass */
@@ -12137,12 +12139,19 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25) !important;
   }
 
-  /* Внутренний контейнер ответа */
+  /* Внутренний контейнер ответа: 0 прокрутки колесиком, весь текст умещается целиком */
   .fc-card-body {
-    overflow-y: auto !important;
-    max-height: 320px !important;
-    scrollbar-width: thin !important;
-    scrollbar-color: rgba(16, 185, 129, 0.35) transparent !important;
+    overflow: visible !important;
+    overflow-y: visible !important;
+    max-height: none !important;
+    height: auto !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  .fc-card-body::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
   }
 
   /* Notes SRS Rating Triad (Hick's Law) */
@@ -12696,6 +12705,60 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     display: none !important;
     width: 0 !important;
     height: 0 !important;
+  }
+
+  /* ==========================================================================
+     ZERO-SCROLL SRS CARD SYSTEM (Весь текст умещается целиком без прокрутки колёсиком)
+     ========================================================================== */
+  #srs-active-card,
+  .fc-card.demo-card,
+  .fc-card {
+    height: auto !important;
+    min-height: 160px !important;
+    max-height: none !important;
+    overflow: visible !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  #srs-active-card .card-face,
+  .fc-card.demo-card .card-face,
+  .fc-card .card-face {
+    height: auto !important;
+    min-height: 160px !important;
+    max-height: none !important;
+    overflow: visible !important;
+    overflow-y: visible !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  #srs-active-card .fc-card-body,
+  #srs-active-card #srs-card-prompt,
+  #srs-active-card #srs-card-answer,
+  #srs-active-card .fc-a-mastery,
+  .fc-card .fc-card-body,
+  .fc-card .fc-a-mastery {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    overflow-y: visible !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  #srs-active-card .fc-card-body::-webkit-scrollbar,
+  #srs-active-card::-webkit-scrollbar,
+  .fc-card::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  #srs-active-card pre,
+  #srs-active-card code {
+    max-height: none !important;
+    overflow-y: visible !important;
   }
 </style>
 <link rel="manifest" href="manifest.json">
@@ -19973,7 +20036,7 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount){
   const finishMode = (typeof state !== 'undefined' && state.srsSprintFinishMode) || 'zen';
 
   return `
-    <header class="srs-unified-header-bar" style="position:relative;display:flex;justify-content:space-between;align-items:center;height:30px;min-height:30px;gap:12px;margin-bottom:12px;padding:0 2px;background:transparent;border:none;box-shadow:none;box-sizing:border-box;">
+    <header class="srs-unified-header-bar" style="position:relative;display:flex;justify-content:space-between;align-items:center;height:30px;min-height:30px;gap:12px;margin-bottom:18px;padding:0 2px;background:transparent;border:none;box-shadow:none;box-sizing:border-box;">
       <div style="min-width:0;flex-shrink:0;display:flex;align-items:center;height:30px;">
         <span class="srs-header-mode-title" style="font-size:0.76rem;font-weight:700;color:var(--ink-muted);letter-spacing:0.05em;text-transform:uppercase;">${activeTab === 'notes' ? 'Конспекты SRS' : 'Карточки SRS'}</span>
       </div>
@@ -20004,11 +20067,10 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount){
         <a href="#/path" class="srs-header-close-btn" style="width:30px;height:30px;min-width:30px;min-height:30px;padding:0;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;font-size:0.78rem;text-decoration:none;box-sizing:border-box;" title="Закрыть (На Путь)">✕</a>
       </div>
 
-      <!-- Лазерная прямая световая нить прогресса спринта (2px) без паразитной серой границы на фоне -->
-      ${pct > 0 ? `
-      <div class="srs-header-progress-thread" style="position:absolute;bottom:-3px;left:0;right:0;height:2px;background:transparent;border-radius:99px;overflow:hidden;pointer-events:none;">
-        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg, #881337 0%, #10b981 100%);box-shadow:0 0 8px rgba(16,185,129,0.5);transition:width .3s ease;border-radius:99px;"></div>
-      </div>` : ''}
+      <!-- Увеличенная радужная шкала прогресса спринта (бордовый -> рубиновый -> янтарный -> изумрудный, 6px) -->
+      <div class="srs-header-progress-track" style="position:absolute;bottom:-8px;left:0;right:0;height:6px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;pointer-events:none;box-shadow:inset 0 1px 2px rgba(0,0,0,0.45);">
+        <div class="srs-header-progress-fill" style="height:100%;width:${Math.max(6, pct)}%;background:linear-gradient(90deg, #881337 0%, #be123c 22%, #f59e0b 55%, #10b981 85%, #34d399 100%);box-shadow:0 0 14px rgba(16,185,129,0.80), 0 0 6px rgba(225,29,72,0.60);border-radius:99px;transition:width 0.35s cubic-bezier(0.2, 0.8, 0.4, 1);"></div>
+      </div>
     </header>
   `;
 }
