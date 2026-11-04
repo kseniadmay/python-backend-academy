@@ -13735,9 +13735,44 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   .srs-action-dock {
     max-width: 780px !important;
   }
+  .srs-card-stage {
+    perspective: none !important;
+  }
   .srs-note-card {
     padding: 26px 32px !important;
     border-radius: 24px !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    isolation: isolate !important;
+    -webkit-font-smoothing: antialiased !important;
+  }
+
+  /* Устранение нервного тика: стабильные благородные бусины без дергающегося scale и без пульсаций */
+  .cards-hub-container .srs-deck-beads-bar .dot-jewel.active,
+  .cards-hub-container .dot-jewel.bead-active-leading,
+  .cards-hub-container .dot-jewel.active,
+  .dot-jewel.bead-active-leading {
+    animation: none !important;
+    transform: none !important;
+    width: 11px !important;
+    height: 11px !important;
+    background: #ffffff !important;
+    border: 2px solid #10b981 !important;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.75), 0 0 18px rgba(52, 211, 153, 0.40) !important;
+  }
+  .srs-live-status-dot {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+    box-shadow: 0 0 6px #10b981 !important;
+  }
+  .cards-hub-container .btn-sprint-cta::after,
+  .srs-action-dock .btn-sprint-cta::after {
+    display: none !important;
+    animation: none !important;
+  }
+  .note-canvas-body .feed-chunk {
+    transform: none !important;
   }
 
   /* Сохранение сочного изумрудного инлайна без расталкивания скобок и запятых */
@@ -25815,7 +25850,7 @@ function viewNotesSrsHub(noteSrsStats){
   const canGoBackInCard = (!cardsHubState.noteCompleted && (curChunkIdx > 0 || sIdx > 0));
 
   return `
-  <div class="container cards-hub-container" style="padding-bottom:60px;max-width:680px;margin:0 auto;">
+  <div class="container cards-hub-container" style="padding-bottom:60px;max-width:780px;margin:0 auto;">
     ${headerBarHTML}
 
     <!-- Уровень 2: Чистые центрированные парящие бусины шагов конспекта (как в карточках) -->
@@ -25833,15 +25868,14 @@ function viewNotesSrsHub(noteSrsStats){
     </div>
 
     <!-- Уровень 3: Карточка конспекта в стиле Liquid Obsidian & Mastery Glass -->
-    <main class="srs-card-stage" style="margin-top:0;perspective:1200px;margin-bottom:0;width:100%;max-width:680px;margin-left:auto;margin-right:auto;">
+    <main class="srs-card-stage" style="margin-top:0;perspective:none;margin-bottom:0;width:100%;max-width:780px;margin-left:auto;margin-right:auto;">
       <div class="card srs-note-card">
         
         <!-- Верхняя строка карточки: статус интервала слева, график повторений Эббингауза и кнопки [↶]/[📖] справа -->
         <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:0;border-bottom:none;flex-wrap:wrap;">
           <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex-shrink:0;">
-            <span style="font-size:0.76rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#94a3b8;display:inline-flex;align-items:center;gap:6px;">
-              <span style="width:6px;height:6px;border-radius:50%;background:#34d399;box-shadow:0 0 6px #34d399;display:inline-block;"></span>
-              <span>${escapeHtmlStr((cleanTitle.split(/[:·•\-]/)[0] || cleanTitle).trim())}</span>
+            <span style="font-size:0.76rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#94a3b8;display:inline-flex;align-items:center;">
+              ${escapeHtmlStr((cleanTitle.split(/[:·•\-]/)[0] || cleanTitle).trim())}
             </span>
           </div>
 
