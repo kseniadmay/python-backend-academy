@@ -5482,32 +5482,57 @@
 
 
 
-  /* Live Laser Photon Stream */
-
-  @keyframes pathLaserFlow {
-
-    0% { stroke-dashoffset: 0; }
-
-    100% { stroke-dashoffset: -120px; }
-
+  /* Variant 1: Continuous Golden Ribbon with Energy Pulse Wave (Энергетический световой импульс) */
+  .path-energy-ripple-beam {
+    stroke-dasharray: 52 340;
+    animation: pathEnergyRipplePulse 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    pointer-events: none;
+    will-change: stroke-dashoffset, opacity;
+  }
+  @keyframes pathEnergyRipplePulse {
+    0% {
+      stroke-dashoffset: 392;
+      opacity: 0;
+    }
+    15% {
+      opacity: 1;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      stroke-dashoffset: -392;
+      opacity: 0;
+    }
   }
 
-  .path-track-pulse-stream {
-
-    stroke-dasharray: 14 38;
-
-    animation: pathLaserFlow 2.4s linear infinite;
-
-    pointer-events: none;
-
+  /* Synchronized Node Awakening & Triumph Glow */
+  .hex-3d-node.hex-node--active {
+    animation: activeNodeEnergyAwaken 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    transform-box: fill-box;
+    transform-origin: center center;
+  }
+  @keyframes activeNodeEnergyAwaken {
+    0%, 55% {
+      filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.65));
+      transform: scale(1);
+    }
+    75% {
+      filter: drop-shadow(0 0 26px rgba(254, 240, 138, 0.95)) drop-shadow(0 0 16px rgba(52, 211, 153, 0.90));
+      transform: scale(1.05);
+    }
+    100% {
+      filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.65));
+      transform: scale(1);
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
-
-    .path-track-pulse-stream { animation: none !important; }
-
+    .path-energy-ripple-beam,
+    .hex-3d-node.hex-node--active {
+      animation: none !important;
+    }
   }
-
   @media (max-width: 640px) {
 
     .path-serpentine-wrap {
@@ -35762,6 +35787,29 @@ const SoundFx = {
 
   },
 
+  playTriumph: function(){
+    try{
+      const ctx = this._getCtx();
+      if(!ctx) return;
+      const now = ctx.currentTime;
+      const osc1 = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      const osc3 = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc1.type = 'sine'; osc2.type = 'triangle'; osc3.type = 'sine';
+      osc1.frequency.setValueAtTime(523.25, now);
+      osc2.frequency.setValueAtTime(659.25, now + 0.08);
+      osc3.frequency.setValueAtTime(783.99, now + 0.16);
+      osc1.frequency.exponentialRampToValueAtTime(1046.50, now + 0.35);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+      osc1.connect(gain); osc2.connect(gain); osc3.connect(gain); gain.connect(ctx.destination);
+      osc1.start(now); osc1.stop(now + 0.55);
+      osc2.start(now + 0.08); osc2.stop(now + 0.55);
+      osc3.start(now + 0.16); osc3.stop(now + 0.55);
+    }catch(e){}
+  },
+
   playSuccess: function(){
 
     try{
@@ -49650,7 +49698,7 @@ const underTitleFull = cleanUnitTitle(u.id, u.title);
 
 
 
-            <!-- Luminous Ethereal Guide Track with Photon Flow -->
+            <!-- Luminous Ethereal Guide Track with Continuous Liquid Energy Pulse (Variant 1) -->
 
             <path class="path-track-bg" d="${dPath}" fill="none" stroke="rgba(148,163,184,0.12)" stroke-width="2.6" stroke-linecap="round"/>
 
@@ -49658,13 +49706,7 @@ const underTitleFull = cleanUnitTitle(u.id, u.title);
 
               <path class="path-track-progress" d="${dProgress}" fill="none" stroke="url(#pathProgressGrad)" stroke-width="4.8" stroke-linecap="round" style="filter:drop-shadow(0 0 10px rgba(245,158,11,0.75)) drop-shadow(0 0 20px rgba(251,191,36,0.40));"/>
 
-              <path class="path-track-pulse-stream" d="${dProgress}" fill="none" stroke="#fef08a" stroke-width="2.0" stroke-linecap="round" opacity="0.9" style="filter:drop-shadow(0 0 8px #fbbf24);"/>
-
-              ${(activeUnitIndex > 0 && coords[activeUnitIndex] && coords[activeUnitIndex-1]) ? `
-
-                <circle cx="${Math.round(coords[activeUnitIndex].x * 0.75 + coords[activeUnitIndex-1].x * 0.25)}" cy="${Math.round(coords[activeUnitIndex].y * 0.75 + coords[activeUnitIndex-1].y * 0.25)}" r="5.2" fill="#ffffff" filter="drop-shadow(0 0 10px #fbbf24) drop-shadow(0 0 18px rgba(245,158,11,0.8))"/>
-
-              ` : ''}
+              <path class="path-energy-ripple-beam" d="${dProgress}" fill="none" stroke="#ffffff" stroke-width="4.8" stroke-linecap="round" filter="drop-shadow(0 0 8px #fef08a) drop-shadow(0 0 16px #34d399)"/>
 
             ` : ''}
 
