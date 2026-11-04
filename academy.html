@@ -9512,8 +9512,8 @@
   }
   .path-serpentine-svg .path-track-progress {
     stroke: url(#pathProgressGrad) !important;
-    stroke-width: 4.5px !important;
-    filter: drop-shadow(0 0 10px rgba(52, 211, 153, 0.80)) !important;
+    stroke-width: 4.8px !important;
+    filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.75)) drop-shadow(0 0 20px rgba(251, 191, 36, 0.35)) !important;
   }
   .path-serpentine-svg .path-track-future {
     stroke: rgba(148, 163, 184, 0.24) !important;
@@ -24090,9 +24090,12 @@ function trailLockIcon(x, y, color){
     <circle cx="${x}" cy="${y + 1.5}" r="1.3" fill="rgba(10, 14, 20, 0.9)"/>
   </g>`;
 }
-function trailIsometricButton(x, y, fill, stroke, strokeWidth){
-  const shadowY = y + 16;
-  return `<ellipse cx="${x}" cy="${shadowY}" rx="22" ry="7" fill="rgba(0,0,0,0.32)" filter="drop-shadow(0 4px 10px rgba(0,0,0,0.50))"/><g class="path-button-face"><path class="path-button-rim" d="M${x - 24} ${y - 3} A 24 24 0 0 0 ${x + 24} ${y - 3} v 6 a 24 24 0 0 1 -48 0 Z" fill="rgba(10, 14, 20, 0.90)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/><circle class="path-button-top" cx="${x}" cy="${y - 3}" r="24" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}"/><path d="M${x - 15} ${y - 15} A 19 19 0 0 1 ${x + 15} ${y - 15}" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.3" stroke-linecap="round"/></g>`;
+function trailIsometricButton(x, y, fill, stroke, strokeWidth, isCompleted, isActive){
+  const shadowY = y + 15;
+  const glowShadow = isActive
+    ? 'filter="drop-shadow(0 0 18px rgba(245, 158, 11, 0.90)) drop-shadow(0 0 8px rgba(254, 240, 138, 0.70))"'
+    : (isCompleted ? 'filter="drop-shadow(0 0 12px rgba(245, 158, 11, 0.60))"' : '');
+  return `<ellipse cx="${x}" cy="${shadowY}" rx="23" ry="7" fill="rgba(0,0,0,0.45)" filter="drop-shadow(0 4px 10px rgba(0,0,0,0.60))"/><g class="path-button-face" ${glowShadow}><circle class="path-button-top" cx="${x}" cy="${y - 3}" r="25" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}"/><circle cx="${x}" cy="${y - 3}" r="23.2" fill="none" stroke="rgba(254, 240, 138, ${isCompleted ? '0.35' : (isActive ? '0.60' : '0.06')})" stroke-width="1"/></g>`;
 }
 // Тематические иконки по главам (циклятся внутри главы)
 const TRAIL_CHAPTER_ICONS = [
@@ -24230,12 +24233,7 @@ function viewPathSerpentine(options){
       }
 
       const hexBadge = `
-        <rect x="-140" y="-85" width="280" height="170" rx="24" fill="${isLocked ? 'url(#gateAuraLockedGrad)' : 'url(#gateAuraGrad)'}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-        <g class="path-gate-hex-badge" ${hexGlow}>
-          <polygon points="0,-72 16,-63 16,-44 0,-35 -16,-44 -16,-63" fill="${hexFill}" stroke="${hexStroke}" stroke-width="1.8" stroke-linejoin="round"/>
-          <polygon points="0,-68 13,-60 13,-46 0,-38 -13,-46 -13,-60" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1" stroke-linejoin="round"/>
-          ${hexText}
-        </g>`;
+        <rect x="-145" y="-45" width="290" height="98" rx="22" fill="${isLocked ? 'url(#gateAuraLockedGrad)' : 'url(#gateAuraGrad)'}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
 
       const cleanPrevTitle = (prevCb.shortTitle || '').replace(/^[^\wА-Яа-яЁё]+/, '').replace(/Матрица Мастерства\s*/i, '').trim();
       const cleanCurTitle = (cb.shortTitle || '').replace(/^[^\wА-Яа-яЁё]+/, '').replace(/Матрица Мастерства\s*/i, '').trim();
@@ -24296,10 +24294,10 @@ function viewPathSerpentine(options){
     const isCompleted = (status === 'completed');
     const isActive = (status === 'active');
 
-    const topGrad = isCompleted ? 'url(#hexGradCompleted)' : (isActive ? 'url(#hexGradActive)' : 'url(#hexGradLocked)');
-    const buttonGrad = isCompleted ? 'url(#pathButtonCompleted)' : (isActive ? 'url(#pathButtonActive)' : 'url(#pathButtonLocked)');
-    const strokeColor = isCompleted ? 'rgba(255,255,255,0.3)' : (isActive ? '#a7f3d0' : 'rgba(148,163,184,0.40)');
-    const strokeWidth = isActive ? 2 : 1.5;
+    const topGrad = isCompleted ? 'url(#goldNodeDoneGrad)' : (isActive ? 'url(#goldNodeActiveGrad)' : 'url(#hexGradLocked)');
+    const buttonGrad = isCompleted ? 'url(#goldNodeDoneGrad)' : (isActive ? 'url(#goldNodeActiveGrad)' : 'url(#pathButtonLocked)');
+    const strokeColor = isCompleted ? '#fbbf24' : (isActive ? '#fef08a' : 'rgba(148,163,184,0.35)');
+    const strokeWidth = isActive ? 3 : (isCompleted ? 2.4 : 1.5);
 
     let centerIcon = '';
     let pulseHalo = '';
@@ -24337,7 +24335,7 @@ function viewPathSerpentine(options){
       centerIcon = `<text x="${x}" y="${y+(usePawNodes?10:5)}" text-anchor="middle" font-size="${usePawNodes?18:20}" font-weight="900" fill="#fef08a" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.8))">✓</text>`;
     } else if(isActive){
       pulseHalo = `<circle class="hex-pulse-halo" cx="${x}" cy="${y - (usePawNodes ? 0 : 3)}" r="34" fill="none" stroke="rgba(251, 191, 36, 0.85)"/>`;
-      centerIcon = trailIconCenter(x, y - (usePawNodes ? 0 : 3), iconName, usePawNodes ? 20 : 25, '#ffffff');
+      centerIcon = trailIconCenter(x, y - (usePawNodes ? 0 : 3), iconName, usePawNodes ? 20 : 25, '#451a03');
       const unitStarted = (u.skills || []).some(s => (getSkillMP(s.id) || 0) > 0);
       if(unitStarted && unitProgPct > 0 && unitProgPct < 100){
         const circ = 213.6;
@@ -24372,7 +24370,7 @@ function viewPathSerpentine(options){
 
     const nodeShape = usePawNodes
       ? trailPawShape(x, y, topGrad, strokeColor, strokeWidth)
-      : trailIsometricButton(x, y, buttonGrad, isActive ? '#fef08a' : (isCompleted ? 'rgba(254, 240, 138, 0.90)' : 'rgba(203,213,225,0.42)'), isActive ? 2.2 : (isCompleted ? 1.8 : 1.3));
+      : trailIsometricButton(x, y, buttonGrad, isActive ? '#fef08a' : (isCompleted ? '#fbbf24' : 'rgba(148,163,184,0.35)'), strokeWidth, isCompleted, isActive);
 
     const buttonContent = usePawNodes ? centerIcon : `<g class="path-button-icon">${centerIcon}</g>`;
 const underTitleFull = cleanUnitTitle(u.id, u.title);
@@ -24684,9 +24682,19 @@ const underTitleFull = cleanUnitTitle(u.id, u.title);
                 <stop offset="0%" stop-color="rgba(148, 163, 184, 0.08)"/>
                 <stop offset="100%" stop-color="rgba(10, 14, 20, 0.02)"/>
               </linearGradient>
+              <radialGradient id="goldNodeDoneGrad" cx="35%" cy="35%" r="65%">
+                <stop offset="0%" stop-color="#92400e"/>
+                <stop offset="45%" stop-color="#78350f"/>
+                <stop offset="100%" stop-color="#1f0902"/>
+              </radialGradient>
+              <radialGradient id="goldNodeActiveGrad" cx="35%" cy="35%" r="65%">
+                <stop offset="0%" stop-color="#fef08a"/>
+                <stop offset="42%" stop-color="#f59e0b"/>
+                <stop offset="100%" stop-color="#78350f"/>
+              </radialGradient>
               <radialGradient id="biomeEmerald" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#10b981" stop-opacity="0.14"/>
-                <stop offset="65%" stop-color="#059669" stop-opacity="0.04"/>
+                <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.10"/>
+                <stop offset="65%" stop-color="#b45309" stop-opacity="0.03"/>
                 <stop offset="100%" stop-color="#0b0f17" stop-opacity="0"/>
               </radialGradient>
               <radialGradient id="biomeSapphire" cx="50%" cy="50%" r="50%">
@@ -24772,7 +24780,7 @@ const underTitleFull = cleanUnitTitle(u.id, u.title);
         </div>
       </div>
 
-      ${renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum, curEchelon)}
+      <!-- Right rail removed in favor of On-Node Popover for centered Zen focus -->
     </div>`;
 }
 
