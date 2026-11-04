@@ -25450,7 +25450,7 @@ function viewNotesSrsHub(noteSrsStats){
   if(isFullMode || isCompleted){
     actionAreaHTML = `
       <div style="font-size:0.80rem;font-weight:700;color:#6ee7b7;text-align:center;margin-bottom:12px;">
-        ✦ ${isFullMode ? 'Полный обзор конспекта' : 'Все ' + steps.length + ' шагов изучены!'} · Оцените запоминание:
+        ✦ ${isFullMode ? 'Полный обзор конспекта' : 'Все ' + steps.length + ' подтем изучены!'} · Оцените запоминание:
       </div>
       <div class="fc-rate-row note-rate-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:440px;margin:0 auto;width:100%;">
         <!-- Кнопка 1: Не вспомнил -->
@@ -25486,7 +25486,7 @@ function viewNotesSrsHub(noteSrsStats){
     } else if(sIdx + 1 < steps.length){
       primaryActionHTML = `
         <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" data-srs-note-next-step="${sIdx + 1}" style="height:52px;border-radius:16px;font-size:0.94rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:1;max-width:440px;width:100%;">
-          <span>Следующий шаг</span> <span>➔</span>
+          <span>К следующей подтеме</span> <span>➔</span>
         </button>
       `;
     } else {
@@ -25561,22 +25561,42 @@ function viewNotesSrsHub(noteSrsStats){
           </div>
         </div>
 
-        <!-- Заголовок темы конспекта (равнение по левому краю) -->
-        <h2 style="font-size:1.35rem;font-weight:800;color:#ffffff;letter-spacing:-0.015em;margin:0 0 12px;line-height:1.35;text-align:left;">${escapeHtmlStr(cleanTitle)}</h2>
-
-        ${!isFullMode ? `
-          <!-- Заголовок шага (чистый монолитный вид без разделительных линий) -->
-          <div class="note-step-header-row" style="display:block;margin-bottom:14px;padding-bottom:0;border-bottom:none;text-align:left;">
-            <div style="font-size:1.08rem;font-weight:700;color:#6ee7b7;line-height:1.45;letter-spacing:-0.01em;display:flex;align-items:center;gap:8px;">
-              <span style="color:#34d399;font-size:1rem;flex-shrink:0;">✦</span>
-              <span>${escapeHtmlStr(pureStepTitle || ('Шаг ' + (sIdx + 1)))}</span>
-            </div>
+        ${!isFullMode && !isCompleted ? `
+          <!-- Контекстный надзаголовок темы конспекта -->
+          <div class="srs-card-topic-chip" style="font-size:0.80rem;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+            <span style="color:#34d399;font-size:0.85rem;">📚</span>
+            <span>${escapeHtmlStr(cleanTitle)}</span>
           </div>
-        ` : ''}
 
-        <!-- Чистый холст текста конспекта: пошаговая лента квантов -->
+          <!-- Главный доминирующий заголовок экрана: конкретная ПОДТЕМА шага -->
+          <h2 style="font-size:1.32rem;font-weight:800;color:#ffffff;letter-spacing:-0.015em;margin:0 0 16px;line-height:1.35;text-align:left;display:flex;align-items:center;gap:8px;">
+            <span style="color:#34d399;font-size:1.15rem;flex-shrink:0;">✦</span>
+            <span>${escapeHtmlStr(pureStepTitle || cleanTitle)}</span>
+          </h2>
+        ` : isCompleted ? `
+          <!-- Заголовок при успешном завершении всех подтем -->
+          <div class="srs-card-topic-chip" style="font-size:0.80rem;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+            <span style="color:#34d399;font-size:0.85rem;">📚</span>
+            <span>${escapeHtmlStr(cleanTitle)}</span>
+          </div>
+          <h2 style="font-size:1.32rem;font-weight:800;color:#ffffff;letter-spacing:-0.015em;margin:0 0 16px;line-height:1.35;text-align:left;">Все подтемы конспекта пройдены</h2>
+        ` : `
+          <!-- Заголовок темы конспекта в полноэкранном режиме (📖) -->
+          <h2 style="font-size:1.35rem;font-weight:800;color:#ffffff;letter-spacing:-0.015em;margin:0 0 14px;line-height:1.35;text-align:left;">${escapeHtmlStr(cleanTitle)}</h2>
+        `}
+
+        <!-- Чистый холст текста конспекта: пошаговая подача квантов подтемы (Вариант Б: Zen-фокус на 1 кванте) -->
         <div class="note-canvas-body" id="srs-note-text" style="color:var(--ink);font-size:0.94rem;line-height:1.7;">
-          ${isFullMode ? `
+          ${isCompleted ? `
+            <div class="srs-note-completed-box" style="text-align:center;padding:28px 16px;">
+              <div style="font-size:2.8rem;margin-bottom:12px;filter:drop-shadow(0 0 16px rgba(16,185,129,0.5));">✨</div>
+              <div style="display:inline-block;padding:4px 12px;border-radius:999px;background:rgba(16,185,129,0.15);color:#34d399;font-size:0.75rem;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.06em;">Все подтемы пройдены</div>
+              <h3 style="font-size:1.25rem;font-weight:800;color:#ffffff;margin:0 0 8px;">Конспект повторен</h3>
+              <p style="font-size:0.90rem;color:var(--ink-muted);max-width:440px;margin:0 auto;line-height:1.6;">
+                Материал всех ${steps.length} подтем закреплен. Оцените качество запоминания, чтобы алгоритм Эббингауза назначил следующую оптимальную дату повторения.
+              </p>
+            </div>
+          ` : isFullMode ? `
             <div class="note-review-body" style="line-height:1.7;font-size:0.94rem;color:var(--ink);">
               ${steps.map((st, i) => {
                 const sTitle = (st.title || '').replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
@@ -25589,7 +25609,7 @@ function viewNotesSrsHub(noteSrsStats){
               }).join('')}
             </div>
           ` : `
-            <div class="scroll-feed feed-container" id="srs-note-feed">
+            <div class="scroll-feed feed-container" id="srs-note-feed" style="min-height:120px;display:flex;flex-direction:column;justify-content:flex-start;">
               <div class="feed-chunk feed-chunk-new lesson-theory" data-chunk-idx="${curChunkIdx}">${decorateFn(chunks[curChunkIdx] || '')}</div>
             </div>
           `}
@@ -27827,7 +27847,7 @@ document.addEventListener('click', async function(e){
         srsChunkMoreBtn.removeAttribute('data-srs-note-chunk-more');
         if(sIdx + 1 < steps.length){
           srsChunkMoreBtn.setAttribute('data-srs-note-next-step', sIdx + 1);
-          srsChunkMoreBtn.innerHTML = `<span>Следующий шаг</span> <span>➔</span>`;
+          srsChunkMoreBtn.innerHTML = `<span>К следующей подтеме</span> <span>➔</span>`;
         } else {
           srsChunkMoreBtn.setAttribute('data-srs-note-finish', '1');
           srsChunkMoreBtn.innerHTML = `<span>Завершить конспект</span> <span>➔</span>`;
