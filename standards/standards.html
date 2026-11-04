@@ -12934,8 +12934,11 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     }
   }
 
-  /* Карточка конспекта в стиле Mastery Emerald Glass (идентично оборотной стороне карточки с ответом) */
+  /* Карточка конспекта в стиле Mastery Emerald Glass (статичная, без анимации клика) */
   .srs-note-card {
+    position: relative !important;
+    overflow: visible !important;
+    touch-action: pan-y !important;
     background: linear-gradient(165deg, rgba(6, 78, 59, 0.35) 0%, rgba(11, 16, 23, 0.98) 55%, rgba(6, 78, 59, 0.18) 100%) !important;
     border: 1px solid rgba(52, 211, 153, 0.45) !important;
     box-shadow: inset 0 1px 1px rgba(167, 243, 208, 0.22), 0 24px 60px -12px rgba(0, 0, 0, 0.90), 0 0 36px -6px rgba(16, 185, 129, 0.22) !important;
@@ -12943,24 +12946,31 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     padding: 22px 26px !important;
     backdrop-filter: blur(24px) !important;
     -webkit-backdrop-filter: blur(24px) !important;
+    cursor: default !important;
+    transform: none !important;
     transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
+    user-select: text !important;
   }
-  .srs-note-card:hover {
+  .srs-note-card:hover,
+  .srs-note-card:active,
+  .srs-note-card:focus {
     border-color: rgba(52, 211, 153, 0.75) !important;
     box-shadow: inset 0 1px 1px rgba(167, 243, 208, 0.28), 0 28px 64px -10px rgba(0, 0, 0, 0.92), 0 0 42px rgba(16, 185, 129, 0.28) !important;
+    transform: none !important;
+    cursor: default !important;
   }
 
-  /* Центрированные парящие изумрудные бусины шагов конспекта */
+  /* Парящие изумрудные бусины шагов конспекта (равнение по левому краю) */
   .note-step-header-row {
     display: flex !important;
     flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
     gap: 8px !important;
     margin-bottom: 16px !important;
     padding-bottom: 14px !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
-    text-align: center !important;
+    text-align: left !important;
   }
   .note-step-header-row > div:first-child {
     font-size: 1.05rem !important;
@@ -12968,13 +12978,14 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     color: #f1f5f9 !important;
     display: flex !important;
     align-items: center !important;
-    justify-content: center !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
     gap: 8px !important;
   }
   .note-step-beads-chain {
     display: flex !important;
     align-items: center !important;
-    justify-content: center !important;
+    justify-content: flex-start !important;
     gap: 8px !important;
     background: transparent !important;
     border: none !important;
@@ -13100,9 +13111,10 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     }
     .note-step-header-row > div:first-child {
       white-space: normal !important;
-      text-align: center !important;
+      text-align: left !important;
       font-size: 0.98rem !important;
       line-height: 1.4 !important;
+      justify-content: flex-start !important;
     }
     .srs-deck-beads-bar > div {
       flex-wrap: wrap !important;
@@ -17774,6 +17786,8 @@ const ALL_INFRA_SKILLS = [];
 const PY_SKILLS_BY_ID = {};
 const ALL_NOTES_COMBINED = Object.assign({}, PY_MASTERY.notes, WEB_MASTERY.notes, BACKEND_MASTERY.notes, ALGO_MASTERY.notes, DB_MASTERY.notes, ARCH_MASTERY.notes, INFRA_MASTERY.notes);
 const ALL_DECKS_COMBINED = Object.assign({}, PY_MASTERY.decks, WEB_MASTERY.decks, BACKEND_MASTERY.decks, ALGO_MASTERY.decks, DB_MASTERY.decks, ARCH_MASTERY.decks, INFRA_MASTERY.decks);
+window.ALL_NOTES_COMBINED = ALL_NOTES_COMBINED;
+window.ALL_DECKS_COMBINED = ALL_DECKS_COMBINED;
 const ALL_UNIT_TESTS_COMBINED = Object.assign({}, PY_MASTERY.unitTests, WEB_MASTERY.unitTests, BACKEND_MASTERY.unitTests, ALGO_MASTERY.unitTests, DB_MASTERY.unitTests, ARCH_MASTERY.unitTests, INFRA_MASTERY.unitTests);
 const ALL_UNITS_COMBINED = [].concat(PY_MASTERY.units, WEB_MASTERY.units, BACKEND_MASTERY.units, ALGO_MASTERY.units, DB_MASTERY.units, ARCH_MASTERY.units, INFRA_MASTERY.units);
 
@@ -19018,6 +19032,25 @@ function splitStepHtmlIntoChunks(htmlStr){
   return finalChunks.length > 0 ? finalChunks : [s];
 }
 window.splitStepHtmlIntoChunks = splitStepHtmlIntoChunks;
+
+function getStepChunks(curStep, pureStepTitle){
+  if(!curStep) return ['<p>Шаг конспекта пуст.</p>'];
+  const raw = (typeof splitStepHtmlIntoChunks === 'function') ? splitStepHtmlIntoChunks(curStep.html || '').slice() : [curStep.html || ''];
+  const base = raw.length > 0 ? raw : ['<p>Шаг конспекта пуст.</p>'];
+  const pTitle = String(pureStepTitle || '').trim().toLowerCase();
+  const cleaned = base.map((ch, idx) => {
+    if(idx === 0 && pTitle){
+      return ch.replace(/^\s*<h[1-5][^>]*>([\s\S]*?)<\/h[1-5]>/i, (m, inner) => {
+        const plain = inner.replace(/<[^>]+>/g, '').replace(/^\d+[\.\)\s\-·•]+\s*/, '').trim().toLowerCase();
+        if(plain === pTitle || plain.includes(pTitle) || pTitle.includes(plain)) return '';
+        return m;
+      }).trim();
+    }
+    return ch;
+  }).filter(Boolean);
+  return cleaned.length > 0 ? cleaned : base;
+}
+window.getStepChunks = getStepChunks;
 
 function pluralRuTopics(n){
   const abs = Math.abs(n || 0) % 100;
@@ -20549,6 +20582,21 @@ function collectDueCardsQueue(){
 
   return queue;
 }
+
+function collectDueNotesQueue(){
+  if(typeof getNoteSpacedRepetitionStats !== 'function') return [];
+  const stats = getNoteSpacedRepetitionStats();
+  const dueQueue = stats.dueNotes || [];
+  const forcedId = (typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.forcedNoteId && typeof ALL_NOTES_COMBINED !== 'undefined' && ALL_NOTES_COMBINED[cardsHubState.forcedNoteId]) ? cardsHubState.forcedNoteId : null;
+  if(forcedId){
+    return [Object.assign({}, (typeof getNoteSrsInfo === 'function' ? getNoteSrsInfo(forcedId) : null) || { noteId: forcedId, step: 0, interval: 1, nextInterval: 3, jumpInterval: 7, isDue: true }, {
+      title: (ALL_NOTES_COMBINED[forcedId].title || forcedId).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim(),
+      noteObj: ALL_NOTES_COMBINED[forcedId]
+    })];
+  }
+  return dueQueue;
+}
+window.collectDueNotesQueue = collectDueNotesQueue;
 
 // ================= SRS DAILY PROGRESS & RATING DOCK HELPERS =================
 function getSrsDailyProgressData(){
@@ -25236,25 +25284,13 @@ function viewNotesSrsHub(noteSrsStats){
   // Разбиение текущего шага на кванты (чанки) для пошаговой подачи со звуком и анимацией
   const cleanStepTitle = (curStep.title || ('Шаг ' + (sIdx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
   const pureStepTitle = cleanStepTitle.replace(/^\d+[\.\)\s\-·•]+\s*/, '').trim();
-  const rawChunks = (typeof splitStepHtmlIntoChunks === 'function') ? splitStepHtmlIntoChunks(curStep.html).slice() : [curStep.html || ''];
-  const baseChunks = rawChunks.length > 0 ? rawChunks : ['<p>Шаг конспекта пуст.</p>'];
-  const chunks = baseChunks.map((ch, idx) => {
-    if(idx === 0 && pureStepTitle){
-      return ch.replace(/^\s*<h[1-5][^>]*>([\s\S]*?)<\/h[1-5]>/i, (m, inner) => {
-        const plain = inner.replace(/<[^>]+>/g, '').replace(/^\d+[\.\)\s\-·•]+\s*/, '').trim().toLowerCase();
-        const c = pureStepTitle.toLowerCase();
-        if(plain === c || plain.includes(c) || c.includes(plain)) return '';
-        return m;
-      }).trim();
-    }
-    return ch;
-  }).filter(Boolean);
+  const chunks = (typeof getStepChunks === 'function') ? getStepChunks(curStep, pureStepTitle) : (typeof splitStepHtmlIntoChunks === 'function' ? splitStepHtmlIntoChunks(curStep.html) : [curStep.html || '']);
   const totalChunks = Math.max(1, chunks.length);
   const curChunkIdx = Math.min(Math.max(0, Number(cardsHubState.noteChunkIdx) || 0), totalChunks - 1);
 
   const isLastStep = (sIdx + 1 >= steps.length);
   const isLastChunk = (curChunkIdx + 1 >= totalChunks);
-  const isCompleted = !!cardsHubState.noteCompleted || (isLastStep && isLastChunk);
+  const isCompleted = isFullMode ? true : (isLastStep && !!cardsHubState.noteCompleted);
   const progressPct = (isFullMode || isCompleted) ? 100 : Math.max(10, Math.min(100, Math.round(((sIdx * totalChunks + curChunkIdx + 1) / (steps.length * totalChunks)) * 100)));
 
   let actionAreaHTML = '';
@@ -25295,10 +25331,16 @@ function viewNotesSrsHub(noteSrsStats){
           <span>Понятно, дальше</span> <span>➔</span>
         </button>
       `;
-    } else {
+    } else if(sIdx + 1 < steps.length){
       primaryActionHTML = `
         <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" data-srs-note-next-step="${sIdx + 1}" style="height:52px;border-radius:16px;font-size:0.94rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:1;max-width:440px;width:100%;">
           <span>Следующий шаг (${sIdx + 2}/${steps.length})</span> <span>➔</span>
+        </button>
+      `;
+    } else {
+      primaryActionHTML = `
+        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" data-srs-note-finish="1" style="height:52px;border-radius:16px;font-size:0.94rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:1;max-width:440px;width:100%;">
+          <span>Завершить конспект</span> <span>➔</span>
         </button>
       `;
     }
@@ -25315,24 +25357,13 @@ function viewNotesSrsHub(noteSrsStats){
   <div class="container cards-hub-container" style="padding-bottom:60px;max-width:680px;margin:0 auto;">
     ${headerBarHTML}
 
-    <!-- Уровень 2: Контекст конспекта и ожерелье бусин очереди -->
+    <!-- Уровень 2: Контекст конспекта (чистая плашка без повтора бусин) -->
     <div class="srs-deck-beads-bar" style="text-align:center;">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;max-width:680px;margin:0 auto;">
         <div style="display:flex;align-items:center;gap:8px;">
           <span class="note-queue-pill">
             Конспект <b style="color:#6ee7b7;">${notePos + 1}</b> / ${qLen}
           </span>
-          ${qLen > 1 ? `
-          <div class="note-queue-beads-necklace srs-beads-necklace fc-beads-necklace">
-            ${activeQueue.slice(Math.max(0, notePos - 4), Math.min(qLen, notePos + 5)).map((dq, relIdx) => {
-              const absIdx = Math.max(0, notePos - 4) + relIdx;
-              let cls = 'dot-jewel';
-              if(absIdx === notePos) cls += ' active';
-              else if(absIdx < notePos) cls += ' done rating-easy';
-              else cls += ' future';
-              return `<span class="${cls}" data-srs-goto-note="${absIdx}" role="button" tabindex="0" title="Конспект ${absIdx + 1}: ${escapeHtmlStr(dq.title)}"></span>`;
-            }).join('')}
-          </div>` : ''}
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
           <button type="button" class="btn btn-ghost note-top-action-btn" data-srs-note-toggle-full title="Переключить пошаговый режим и полный обзор конспекта">${isFullMode ? '⚡ По квантам' : '📖 Весь конспект'}</button>
@@ -25342,8 +25373,8 @@ function viewNotesSrsHub(noteSrsStats){
     </div>
 
     <!-- Уровень 3: Карточка конспекта в стиле Liquid Slate Glass -->
-    <main class="srs-card-stage fc-stage" style="margin-top:0;perspective:1200px;margin-bottom:0;width:100%;max-width:680px;margin-left:auto;margin-right:auto;">
-      <div class="card fc-card srs-note-card">
+    <main class="srs-card-stage" style="margin-top:0;perspective:1200px;margin-bottom:0;width:100%;max-width:680px;margin-left:auto;margin-right:auto;">
+      <div class="card srs-note-card">
         
         <!-- Верхняя плашка: ювелирное ожерелье бусин памяти SRS и векторная кривая -->
         <div class="note-memory-bar" style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.06);">
@@ -25358,17 +25389,17 @@ function viewNotesSrsHub(noteSrsStats){
           </div>
         </div>
 
-        <!-- Заголовок темы конспекта -->
-        <h2 style="font-size:1.35rem;font-weight:800;color:#ffffff;letter-spacing:-0.015em;margin:0 0 16px;line-height:1.35;text-align:center;">${escapeHtmlStr(cleanTitle)}</h2>
+        <!-- Заголовок темы конспекта (равнение по левому краю) -->
+        <h2 style="font-size:1.35rem;font-weight:800;color:#ffffff;letter-spacing:-0.015em;margin:0 0 16px;line-height:1.35;text-align:left;">${escapeHtmlStr(cleanTitle)}</h2>
 
         ${!isFullMode ? `
-          <!-- Заголовок шага + бусины 8 шагов в одной строке (без полоски и без дублирования) -->
+          <!-- Заголовок шага + бусины 8 шагов (равнение по левому краю) -->
           <div class="note-step-header-row">
-            <div style="font-size:1.04rem;font-weight:700;color:#6ee7b7;display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;">
+            <div style="font-size:1.04rem;font-weight:700;color:#6ee7b7;display:flex;align-items:center;justify-content:flex-start;gap:8px;text-align:left;">
               <span style="color:#34d399;font-size:1rem;flex-shrink:0;">✦</span>
               <span>${escapeHtmlStr(pureStepTitle || ('Шаг ' + (sIdx + 1)))}</span>
             </div>
-            <div class="note-step-beads-chain" title="Шаги конспекта">
+            <div class="note-step-beads-chain" title="Шаги конспекта" style="justify-content:flex-start;">
               ${steps.map((st, idx) => {
                 let cls = 'note-step-bead';
                 if(idx < sIdx) cls += ' done';
@@ -25464,6 +25495,8 @@ function getNoteSrsInfo(noteId){
 
 function registerNoteInitialRead(noteId){
   ensureExtendedState();
+  if(!state.readNotes) state.readNotes = [];
+  if(!state.readNotes.includes(noteId)) state.readNotes.push(noteId);
   if(!state.noteSrs) state.noteSrs = {};
   const today = (typeof dateIsoKey === 'function') ? dateIsoKey() : new Date().toISOString().slice(0, 10);
   if(!state.noteSrs[noteId]){
@@ -27607,7 +27640,9 @@ document.addEventListener('click', async function(e){
     const steps = (curNote.steps && curNote.steps.length > 0) ? curNote.steps : [];
     const sIdx = Math.min(Math.max(0, Number(cardsHubState.noteStepIdx) || 0), steps.length - 1);
     const curStep = steps[sIdx] || { html: '' };
-    const chunks = (typeof splitStepHtmlIntoChunks === 'function') ? splitStepHtmlIntoChunks(curStep.html).slice() : [curStep.html || ''];
+    const cleanStepTitle = (curStep.title || ('Шаг ' + (sIdx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+    const pureStepTitle = cleanStepTitle.replace(/^\d+[\.\)\s\-·•]+\s*/, '').trim();
+    const chunks = (typeof getStepChunks === 'function') ? getStepChunks(curStep, pureStepTitle) : (typeof splitStepHtmlIntoChunks === 'function' ? splitStepHtmlIntoChunks(curStep.html) : [curStep.html || '']);
     const nextCIdx = (Number(cardsHubState.noteChunkIdx) || 0) + 1;
 
     try{ awardXp(10); }catch(err){}
@@ -27636,9 +27671,8 @@ document.addEventListener('click', async function(e){
           srsChunkMoreBtn.setAttribute('data-srs-note-next-step', sIdx + 1);
           srsChunkMoreBtn.innerHTML = `<span>Следующий шаг (${sIdx + 2}/${steps.length})</span> <span>➔</span>`;
         } else {
-          cardsHubState.noteCompleted = true;
-          render();
-          return;
+          srsChunkMoreBtn.setAttribute('data-srs-note-finish', '1');
+          srsChunkMoreBtn.innerHTML = `<span>Завершить конспект</span> <span>➔</span>`;
         }
       }
 
@@ -27653,10 +27687,21 @@ document.addEventListener('click', async function(e){
       if(sIdx + 1 < steps.length){
         cardsHubState.noteStepIdx = sIdx + 1;
         cardsHubState.noteChunkIdx = 0;
+        cardsHubState.noteCompleted = false;
       } else {
         cardsHubState.noteCompleted = true;
       }
     }
+    render();
+    return;
+  }
+
+  const srsNoteFinishBtn = e.target.closest('[data-srs-note-finish]');
+  if(srsNoteFinishBtn){
+    cardsHubState.noteCompleted = true;
+    try{ awardXp(15); }catch(err){}
+    try{ if(typeof playSound === 'function') playSound('fanfare'); else if(typeof SoundFx !== 'undefined' && SoundFx.playSuccess) SoundFx.playSuccess(); }catch(err){}
+    saveCardsHubPosState();
     render();
     return;
   }
@@ -27675,7 +27720,9 @@ document.addEventListener('click', async function(e){
       const curNote = curItem.noteObj || (ALL_NOTES_COMBINED[curItem.noteId] || {});
       const steps = curNote.steps || [];
       const prevStep = steps[cardsHubState.noteStepIdx];
-      const prevChunks = prevStep ? splitStepHtmlIntoChunks(prevStep.html) : [];
+      const prevClean = ((prevStep && prevStep.title) || '').replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+      const prevPure = prevClean.replace(/^\d+[\.\)\s\-·•]+\s*/, '').trim();
+      const prevChunks = prevStep ? ((typeof getStepChunks === 'function') ? getStepChunks(prevStep, prevPure) : splitStepHtmlIntoChunks(prevStep.html)) : [];
       cardsHubState.noteChunkIdx = Math.max(0, prevChunks.length - 1);
     }
     cardsHubState.noteCompleted = false;
@@ -31076,7 +31123,7 @@ document.addEventListener('keydown', function(e){
     if(rescueBtn){ e.preventDefault(); rescueBtn.click(); return; }
   }
   if(e.code === 'Space' || e.key === ' ' || e.key === 'Spacebar'){
-    const srsNoteCta = document.querySelector('[data-srs-note-chunk-more], [data-srs-note-next-step]');
+    const srsNoteCta = document.querySelector('[data-srs-note-chunk-more], [data-srs-note-next-step], [data-srs-note-finish]');
     if(srsNoteCta){ e.preventDefault(); srsNoteCta.click(); return; }
     const isFlippedHub = (typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.flipped);
     const isFlippedSkill = (typeof pySkillViewState !== 'undefined' && pySkillViewState && pySkillViewState.tab === 'cards' && pySkillViewState.cardFlipped);
@@ -31111,7 +31158,7 @@ document.addEventListener('keydown', function(e){
   }
   if(e.key === 'ArrowRight'){
     if(typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.hubTab === 'notes' && currentRoute().indexOf('/cards') === 0){
-      const nextCta = document.querySelector('[data-srs-note-chunk-more], [data-srs-note-next-step]');
+      const nextCta = document.querySelector('[data-srs-note-chunk-more], [data-srs-note-next-step], [data-srs-note-finish]');
       if(nextCta){ e.preventDefault(); nextCta.click(); return; }
     }
     const isFlippedHub = (typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.flipped);
@@ -31157,7 +31204,7 @@ document.addEventListener('keydown', function(e){
   if(e.key === 'Enter' && !e.ctrlKey && !e.metaKey){
     const bsNext = document.querySelector('.academy-bottom-sheet [data-lesson-next], .academy-bottom-sheet [data-diag-next], .academy-bottom-sheet [data-py-step-check-next]');
     if(bsNext){ e.preventDefault(); bsNext.click(); return; }
-    const srsNoteCta = document.querySelector('[data-srs-note-chunk-more], [data-srs-note-next-step]');
+    const srsNoteCta = document.querySelector('[data-srs-note-chunk-more], [data-srs-note-next-step], [data-srs-note-finish]');
     if(srsNoteCta){ e.preventDefault(); srsNoteCta.click(); return; }
     const srsNotePass = document.querySelector('[data-srs-note-pass]');
     if(srsNotePass && typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.hubTab === 'notes'){
@@ -31189,7 +31236,7 @@ document.addEventListener('keydown', function(e){
   let isSwipingCard = false;
 
   document.addEventListener('touchstart', function(e){
-    const card = e.target.closest('.fc-card');
+    const card = e.target.closest('.fc-card:not(.srs-note-card)');
     if(!card) return;
     const touch = e.changedTouches ? e.changedTouches[0] : e;
     touchStartX = touch.clientX;
