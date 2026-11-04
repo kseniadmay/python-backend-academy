@@ -1,4 +1,4 @@
-const CACHE_NAME = 'academy-pwa-v72';
+const CACHE_NAME = 'academy-pwa-v73';
 const ASSETS_TO_CACHE = [
   './',
   'index.html',
@@ -37,35 +37,20 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Не кэшируем API запросы и healthz
+  // Не кэшируем динамические API запросы и healthz
   if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/healthz')) {
     return;
   }
 
-  // Network-First с быстрым адаптивным таймаутом (1200ms) для мобильных сетей
+  // Стратегия Stale-While-Revalidate для мгновенного переключения и загрузки:
+  // 1. Мгновенная отдача из локального кэша (0-5 мс) без ожидания сети
+  // 2. Фоновое обновление кэша из сети (revalidate) без блокировки интерфейса
+  // 3. Fallback на academy.html для навигационных запросов
   event.respondWith(
-    new Promise((resolve) => {
-      let isSettled = false;
-
-      const timer = setTimeout(() => {
-        caches.match(event.request).then((cached) => {
-          if (cached && !isSettled) {
-            isSettled = true;
-            resolve(cached);
-          } else if (event.request.mode === 'navigate' && !isSettled) {
-            caches.match('academy.html').then((acadCached) => {
-              if (acadCached && !isSettled) {
-                isSettled = true;
-                resolve(acadCached);
-              }
-            });
-          }
-        });
-      }, 1200);
-
-      fetch(event.request)
+    caches.match(event.request).then((cachedResponse) => {
+      // Фоновое обновление из сети
+      const networkFetch = fetch(event.request)
         .then((networkResponse) => {
-          clearTimeout(timer);
           if (
             networkResponse &&
             networkResponse.status === 200 &&
@@ -76,26 +61,28 @@ self.addEventListener('fetch', (event) => {
               cache.put(event.request, responseToCache);
             });
           }
-          if (!isSettled) {
-            isSettled = true;
-            resolve(networkResponse);
-          }
+          return networkResponse;
         })
         .catch(() => {
-          clearTimeout(timer);
-          if (!isSettled) {
-            isSettled = true;
-            caches.match(event.request).then((cachedResponse) => {
-              if (cachedResponse) {
-                return resolve(cachedResponse);
-              }
-              if (event.request.mode === 'navigate') {
-                return resolve(caches.match('academy.html'));
-              }
-              resolve(new Response('Offline', { status: 503, statusText: 'Offline' }));
-            });
+          // Сеть недоступна (оффлайн)
+          if (event.request.mode === 'navigate') {
+            return caches.match('academy.html');
           }
         });
+
+      // Если ресурс уже есть в кэше — отдаём его МОЛНИЕНОСНО (0 мс ожидания)
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      // Если в кэше ресурса ещё нет (первое посещение) — ждём сетевого ответа
+      return networkFetch.then((networkResponse) => {
+        if (networkResponse) return networkResponse;
+        if (event.request.mode === 'navigate') {
+          return caches.match('academy.html');
+        }
+        return new Response('Offline', { status: 503, statusText: 'Offline' });
+      });
     })
   );
 });

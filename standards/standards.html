@@ -27870,7 +27870,10 @@ render = function(){
   const route = currentRoute();
   if(route && state.lastRoute !== route){
     state.lastRoute = route;
-    try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
+    if(window._saveRouteTimer) clearTimeout(window._saveRouteTimer);
+    window._saveRouteTimer = setTimeout(function(){
+      try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
+    }, 150);
   }
   const root = document.getElementById('view-root');
   let navRoute = route;

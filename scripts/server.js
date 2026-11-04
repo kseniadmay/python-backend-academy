@@ -490,10 +490,15 @@ const server = http.createServer((req, res) => {
         const etag = `W/"${stat.size.toString(16)}-${Math.floor(stat.mtimeMs).toString(16)}"`;
         const ifNoneMatch = req.headers['if-none-match'];
 
+        const isStaticAsset = ext === '.svg' || ext === '.png' || ext === '.ico' || ext === '.woff2' || ext === '.woff' || ext === '.ttf';
+        const cacheControlHeader = isStaticAsset
+            ? 'public, max-age=86400, stale-while-revalidate=604800'
+            : 'no-cache, stale-while-revalidate=86400';
+
         if (ifNoneMatch && ifNoneMatch === etag) {
             res.writeHead(304, {
                 'ETag': etag,
-                'Cache-Control': 'no-cache, must-revalidate',
+                'Cache-Control': cacheControlHeader,
                 'Access-Control-Allow-Origin': '*'
             });
             res.end();
@@ -523,7 +528,7 @@ const server = http.createServer((req, res) => {
                     'Content-Encoding': 'gzip',
                     'Content-Length': academyGzipCache.buffer.length,
                     'ETag': etag,
-                    'Cache-Control': 'no-cache, must-revalidate',
+                    'Cache-Control': cacheControlHeader,
                     'Vary': 'Accept-Encoding',
                     'Access-Control-Allow-Origin': '*'
                 });
@@ -535,7 +540,7 @@ const server = http.createServer((req, res) => {
                 'Content-Type': contentType,
                 'Content-Encoding': 'gzip',
                 'ETag': etag,
-                'Cache-Control': 'no-cache, must-revalidate',
+                'Cache-Control': cacheControlHeader,
                 'Vary': 'Accept-Encoding',
                 'Access-Control-Allow-Origin': '*'
             });
@@ -547,7 +552,7 @@ const server = http.createServer((req, res) => {
                 'Content-Type': contentType,
                 'Content-Length': stat.size,
                 'ETag': etag,
-                'Cache-Control': 'no-cache, must-revalidate',
+                'Cache-Control': cacheControlHeader,
                 'Vary': 'Accept-Encoding',
                 'Access-Control-Allow-Origin': '*'
             });
