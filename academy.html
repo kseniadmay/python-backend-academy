@@ -12934,15 +12934,15 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     }
   }
 
-  /* Карточка конспекта в стиле Mastery Emerald Glass (статичная, без анимации клика) */
+  /* Карточка конспекта в едином стиле Liquid Obsidian & Mastery Glass (статичная) */
   .srs-note-card {
     position: relative !important;
     overflow: visible !important;
     touch-action: pan-y !important;
-    background: linear-gradient(165deg, rgba(6, 78, 59, 0.35) 0%, rgba(11, 16, 23, 0.98) 55%, rgba(6, 78, 59, 0.18) 100%) !important;
-    border: 1px solid rgba(52, 211, 153, 0.45) !important;
-    box-shadow: inset 0 1px 1px rgba(167, 243, 208, 0.22), 0 24px 60px -12px rgba(0, 0, 0, 0.90), 0 0 36px -6px rgba(16, 185, 129, 0.22) !important;
-    border-radius: 20px !important;
+    background: linear-gradient(165deg, rgba(15, 23, 42, 0.85) 0%, rgba(10, 15, 26, 0.96) 60%, rgba(6, 78, 59, 0.20) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+    box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+    border-radius: 24px !important;
     padding: 22px 26px !important;
     backdrop-filter: blur(24px) !important;
     -webkit-backdrop-filter: blur(24px) !important;
@@ -12954,28 +12954,26 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   .srs-note-card:hover,
   .srs-note-card:active,
   .srs-note-card:focus {
-    border-color: rgba(52, 211, 153, 0.75) !important;
-    box-shadow: inset 0 1px 1px rgba(167, 243, 208, 0.28), 0 28px 64px -10px rgba(0, 0, 0, 0.92), 0 0 42px rgba(16, 185, 129, 0.28) !important;
+    border-color: rgba(52, 211, 153, 0.40) !important;
+    box-shadow: 0 28px 64px -10px rgba(0, 0, 0, 0.85), 0 0 24px rgba(16, 185, 129, 0.18) !important;
     transform: none !important;
     cursor: default !important;
   }
 
-  /* Парящие изумрудные бусины шагов конспекта (равнение по левому краю) */
+  /* Заголовок шага конспекта (чистый монолитный вид без разделительных линий) */
   .note-step-header-row {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    justify-content: flex-start !important;
-    gap: 8px !important;
-    margin-bottom: 16px !important;
-    padding-bottom: 14px !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+    display: block !important;
+    margin-bottom: 14px !important;
+    padding-bottom: 0 !important;
+    border-bottom: none !important;
     text-align: left !important;
   }
   .note-step-header-row > div:first-child {
-    font-size: 1.05rem !important;
+    font-size: 1.15rem !important;
     font-weight: 700 !important;
-    color: #f1f5f9 !important;
+    color: #ffffff !important;
+    line-height: 1.45 !important;
+    letter-spacing: -0.01em !important;
     display: flex !important;
     align-items: center !important;
     justify-content: flex-start !important;
@@ -20761,13 +20759,16 @@ function buildSrsFlowTabsHTML(activeTab, dueCardsCount, dueNotesCount){
 }
 window.buildSrsFlowTabsHTML = buildSrsFlowTabsHTML;
 
-function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount){
+function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProgress){
   const flowTabs = buildSrsFlowTabsHTML(activeTab, dueCardsCount, dueNotesCount);
-  const currentSprintStep = Math.max(0, Math.min(15, Number(cardsHubState.sprintStep) || 0));
-  const sprintNum = Math.max(1, Number(cardsHubState.sprintNum) || 1);
-  const sprintTarget = 15;
+  const isNotes = (activeTab === 'notes');
+  const currentSprintStep = isNotes && noteProgress
+    ? Math.min(noteProgress.total || 1, (noteProgress.current || 0) + 1)
+    : Math.max(0, Math.min(15, Number(cardsHubState.sprintStep) || 0));
+  const sprintTarget = isNotes && noteProgress ? (noteProgress.total || 1) : 15;
   const pct = Math.max(0, Math.min(100, Math.round((currentSprintStep / sprintTarget) * 100)));
   const finishMode = (typeof state !== 'undefined' && state.srsSprintFinishMode) || 'zen';
+  const iconStr = isNotes ? '📖' : '⚡';
 
   return `
     <header class="srs-unified-header-bar" style="position:relative;display:flex;justify-content:space-between;align-items:center;height:30px;min-height:30px;gap:12px;margin-bottom:20px;padding:0 2px;background:transparent;border:none;box-shadow:none;box-sizing:border-box;">
@@ -20776,10 +20777,9 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount){
       </div>
 
       <div class="srs-header-right-cluster" style="display:flex;align-items:center;gap:6px;height:30px;flex-shrink:0;">
-        <div class="srs-header-goal-status" style="display:inline-flex;align-items:center;gap:6px;padding:0 10px;height:30px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);font-size:0.78rem;font-weight:600;color:var(--ink-soft);box-sizing:border-box;line-height:1;">
-          <span style="color:#f59e0b;font-size:0.88rem;">⚡</span>
+        <div class="srs-header-goal-status" style="display:inline-flex;align-items:center;gap:6px;padding:0 10px;height:30px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);font-size:0.78rem;font-weight:600;color:var(--ink-soft);box-sizing:border-box;line-height:1;" title="${isNotes ? `Конспект ${currentSprintStep} из ${sprintTarget}` : `Карточка ${currentSprintStep} из ${sprintTarget}`}">
+          <span style="color:${isNotes ? '#34d399' : '#f59e0b'};font-size:0.88rem;">${iconStr}</span>
           <b style="color:#fff;font-family:var(--font-m);font-weight:700;">${currentSprintStep} / ${sprintTarget}</b>
-          
         </div>
 
         <details class="srs-more-details" style="position:relative;display:inline-flex;align-items:center;height:30px;margin:0;padding:0;">
@@ -25178,7 +25178,7 @@ function viewNotesSrsHub(noteSrsStats){
   const notePos = forcedId ? 0 : Math.min(cardsHubState.notePos, Math.max(0, qLen - 1));
 
   const headerBarHTML = (typeof buildSrsHeaderBarHTML === 'function')
-    ? buildSrsHeaderBarHTML('notes', srsGlobalStats.dueTodayCardsCount || 0, stats.dueCount || 0)
+    ? buildSrsHeaderBarHTML('notes', srsGlobalStats.dueTodayCardsCount || 0, stats.dueCount || 0, { current: notePos, total: qLen })
     : buildSrsFlowTabsHTML('notes', srsGlobalStats.dueTodayCardsCount || 0, stats.dueCount || 0);
 
   if(qLen === 0 || notePos >= qLen){
@@ -25322,7 +25322,6 @@ function viewNotesSrsHub(noteSrsStats){
   } else {
     const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
     const canGoBack = (curChunkIdx > 0 || sIdx > 0);
-    const backBtnHTML = `<button type="button" class="btn btn-ghost" data-srs-note-chunk-prev="1" style="height:52px;padding:0 20px;border-radius:16px;font-size:0.88rem;font-weight:600;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);cursor:pointer;flex-shrink:0;${canGoBack ? 'display:inline-flex;' : 'display:none;'}" title="Предыдущий квант">← Назад</button>`;
 
     let primaryActionHTML = '';
     if(hasMoreChunks){
@@ -25334,7 +25333,7 @@ function viewNotesSrsHub(noteSrsStats){
     } else if(sIdx + 1 < steps.length){
       primaryActionHTML = `
         <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" data-srs-note-next-step="${sIdx + 1}" style="height:52px;border-radius:16px;font-size:0.94rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:1;max-width:440px;width:100%;">
-          <span>Следующий шаг (${sIdx + 2}/${steps.length})</span> <span>➔</span>
+          <span>Следующий шаг</span> <span>➔</span>
         </button>
       `;
     } else {
@@ -25346,68 +25345,73 @@ function viewNotesSrsHub(noteSrsStats){
     }
 
     actionAreaHTML = `
-      <div style="display:flex;align-items:center;justify-content:center;gap:10px;max-width:440px;margin:0 auto;width:100%;">
-        ${backBtnHTML}
+      <div style="display:flex;align-items:center;justify-content:center;max-width:440px;margin:0 auto;width:100%;">
         ${primaryActionHTML}
       </div>
     `;
   }
 
+  const canGoBackInCard = (!cardsHubState.noteCompleted && (curChunkIdx > 0 || sIdx > 0));
+
   return `
   <div class="container cards-hub-container" style="padding-bottom:60px;max-width:680px;margin:0 auto;">
     ${headerBarHTML}
 
-    <!-- Уровень 2: Контекст конспекта (чистая плашка без повтора бусин) -->
-    <div class="srs-deck-beads-bar" style="text-align:center;">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;max-width:680px;margin:0 auto;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span class="note-queue-pill">
-            Конспект <b style="color:#6ee7b7;">${notePos + 1}</b> / ${qLen}
-          </span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <button type="button" class="btn btn-ghost note-top-action-btn" data-srs-note-toggle-full title="Переключить пошаговый режим и полный обзор конспекта">${isFullMode ? '⚡ По квантам' : '📖 Весь конспект'}</button>
-          ${forcedId ? `<button type="button" class="btn btn-ghost note-top-action-btn" data-srs-exit-force-note title="Вернуться к графику повторений">📅 К расписанию</button>` : ''}
-        </div>
+    <!-- Уровень 2: Чистые центрированные парящие бусины шагов конспекта (как в карточках) -->
+    <div class="srs-deck-beads-bar srs-beads-pure-floating" style="display:flex;align-items:center;justify-content:center;margin:18px auto 28px;padding:0;background:transparent;border:none;box-shadow:none;width:100%;">
+      <div class="srs-beads-necklace fc-beads-necklace" style="display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto;padding:2px 0;background:transparent;border:none;box-shadow:none;">
+        ${steps.map((st, idx) => {
+          let cls = 'dot-jewel';
+          if(idx < sIdx) cls += ' done bead-done rating-good';
+          else if(idx === sIdx) cls += ' active bead-active-leading';
+          else cls += ' future bead-future';
+          const stTitle = (st.title || ('Шаг ' + (idx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+          return `<span class="${cls}" data-srs-note-step="${idx}" role="button" tabindex="0" title="${escapeHtmlStr(stTitle)}"></span>`;
+        }).join('')}
       </div>
     </div>
 
-    <!-- Уровень 3: Карточка конспекта в стиле Liquid Slate Glass -->
+    <!-- Уровень 3: Карточка конспекта в стиле Liquid Obsidian & Mastery Glass -->
     <main class="srs-card-stage" style="margin-top:0;perspective:1200px;margin-bottom:0;width:100%;max-width:680px;margin-left:auto;margin-right:auto;">
       <div class="card srs-note-card">
         
-        <!-- Верхняя плашка: ювелирное ожерелье бусин памяти SRS и векторная кривая -->
-        <div class="note-memory-bar" style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.06);">
-          <div class="memory-badge note-srs-status-chip ${curItem.isDue ? 'is-due' : ''}">
-            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:${curItem.isDue ? '#fda4af' : '#34d399'};fill:none;flex-shrink:0;" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 19c3-1 6-7 9-11s6-5 9-5" />
-            </svg>
-            <span>${curItem.isDue ? `Повторить: <b>сегодня (${curItem.interval}д)</b>` : `Интервал: <b>${curItem.interval} дн</b>`}</span>
+        <!-- Верхняя строка карточки: чип темы + статус интервала слева, кнопки [↶] и [📖] справа -->
+        <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:0;border-bottom:none;">
+          <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;flex-wrap:wrap;">
+            <span class="srs-card-topic-chip" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);padding:4px 10px;border-radius:8px;font-size:0.76rem;font-weight:600;letter-spacing:0.01em;" title="${escapeHtmlStr(cleanTitle)}">
+              ${escapeHtmlStr(cleanTitle)}
+            </span>
+            <span class="memory-badge note-srs-status-chip ${curItem.isDue ? 'is-due' : ''}" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:8px;background:${curItem.isDue ? 'rgba(239,68,68,0.12)' : 'rgba(16,185,129,0.12)'};border:1px solid ${curItem.isDue ? 'rgba(239,68,68,0.25)' : 'rgba(16,185,129,0.25)'};font-size:0.72rem;font-weight:600;color:${curItem.isDue ? '#fda4af' : '#34d399'};">
+              <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;flex-shrink:0;" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 19c3-1 6-7 9-11s6-5 9-5" />
+              </svg>
+              <span>${curItem.isDue ? `Повторить: <b>сегодня (${curItem.interval}д)</b>` : `Интервал: <b>${curItem.interval} дн</b>`}</span>
+            </span>
           </div>
-          <div class="note-memory-chain">
-            ${ladderHTML}
+
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+            ${canGoBackInCard ? `
+              <button type="button" class="btn btn-ghost fc-hint-chip" data-srs-note-chunk-prev="1" title="Назад (↶ / ArrowLeft)" style="width:34px;height:34px;min-width:34px;padding:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);font-size:0.95rem;cursor:pointer;transition:all 0.15s ease;">
+                ↶
+              </button>
+            ` : ''}
+            <button type="button" class="btn btn-ghost fc-hint-chip" data-srs-note-toggle-full title="${isFullMode ? 'По квантам' : 'Весь конспект (📖)'}" style="width:34px;height:34px;min-width:34px;padding:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);font-size:0.92rem;cursor:pointer;transition:all 0.15s ease;">
+              📖
+            </button>
+            ${forcedId ? `
+              <button type="button" class="btn btn-ghost fc-hint-chip" data-srs-exit-force-note title="К расписанию" style="width:34px;height:34px;min-width:34px;padding:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);font-size:0.85rem;cursor:pointer;">
+                📅
+              </button>
+            ` : ''}
           </div>
         </div>
 
-        <!-- Заголовок темы конспекта (равнение по левому краю) -->
-        <h2 style="font-size:1.35rem;font-weight:800;color:#ffffff;letter-spacing:-0.015em;margin:0 0 16px;line-height:1.35;text-align:left;">${escapeHtmlStr(cleanTitle)}</h2>
-
         ${!isFullMode ? `
-          <!-- Заголовок шага + бусины 8 шагов (равнение по левому краю) -->
-          <div class="note-step-header-row">
-            <div style="font-size:1.04rem;font-weight:700;color:#6ee7b7;display:flex;align-items:center;justify-content:flex-start;gap:8px;text-align:left;">
-              <span style="color:#34d399;font-size:1rem;flex-shrink:0;">✦</span>
+          <!-- Заголовок шага (чистый монолитный вид без разделительных линий) -->
+          <div class="note-step-header-row" style="display:block;margin-bottom:14px;padding-bottom:0;border-bottom:none;text-align:left;">
+            <div style="font-size:1.15rem;font-weight:700;color:#ffffff;line-height:1.45;letter-spacing:-0.01em;display:flex;align-items:center;gap:8px;">
+              <span style="color:#34d399;font-size:1.05rem;flex-shrink:0;">✦</span>
               <span>${escapeHtmlStr(pureStepTitle || ('Шаг ' + (sIdx + 1)))}</span>
-            </div>
-            <div class="note-step-beads-chain" title="Шаги конспекта" style="justify-content:flex-start;">
-              ${steps.map((st, idx) => {
-                let cls = 'note-step-bead';
-                if(idx < sIdx) cls += ' done';
-                else if(idx === sIdx) cls += ' active';
-                else cls += ' future';
-                const stTitle = (st.title || ('Шаг ' + (idx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-                return `<span class="${cls}" data-srs-note-step="${idx}" role="button" tabindex="0" title="Шаг ${idx + 1} из ${steps.length}: ${escapeHtmlStr(stTitle)}"></span>`;
-              }).join('')}
             </div>
           </div>
         ` : ''}
@@ -25437,8 +25441,8 @@ function viewNotesSrsHub(noteSrsStats){
       </div>
     </main>
 
-    <!-- Уровень 4: Зона действий (снаружи карточки, наследуется от карточек SRS) -->
-    <footer class="srs-action-dock note-action-dock" style="margin-top:20px;width:100%;max-width:680px;margin-left:auto;margin-right:auto;text-align:center;">
+    <!-- Уровень 4: Зона действий (снаружи карточки, строго по центру) -->
+    <footer class="srs-action-dock note-action-dock" style="margin-top:24px;width:100%;max-width:680px;margin-left:auto;margin-right:auto;text-align:center;">
       ${actionAreaHTML}
     </footer>
   </div>`;
@@ -25667,6 +25671,10 @@ window.registerNoteInitialRead = registerNoteInitialRead;
 window.applyNoteReview = applyNoteReview;
 window.getNoteSpacedRepetitionStats = getNoteSpacedRepetitionStats;
 window.getNoteSrsBadgeHTML = getNoteSrsBadgeHTML;
+window.viewNotesSrsHub = viewNotesSrsHub;
+window.viewCardsHub = viewCardsHub;
+window.render = render;
+window.renderApp = render;
 
 // Compute Spaced Repetition Queue (SRS: weak cards rated 1..2 + RemNote calendar schedule due today)
 function getSpacedRepetitionStats(){
@@ -27432,6 +27440,8 @@ render = function(){
   const tsBtn = document.getElementById('topbar-sound-btn');
   if(tsBtn) tsBtn.textContent = state.soundEnabled ? '🔊' : '🔇';
 };
+window.render = render;
+window.renderApp = render;
 
 viewSandbox = function(){
   ensureExtendedState();
@@ -31141,7 +31151,7 @@ document.addEventListener('keydown', function(e){
     if(pyNextBtn){ e.preventDefault(); pyNextBtn.click(); return; }
   }
   if(e.key === 'ArrowLeft'){
-    if(typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.hubTab === 'notes' && currentRoute().indexOf('/cards') === 0){
+    if(typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.hubTab === 'notes' && (currentRoute().indexOf('/cards') === 0 || currentRoute().indexOf('/notes-review') === 0)){
       const prevChunk = document.querySelector('[data-srs-note-chunk-prev]:not([disabled])');
       if(prevChunk){ e.preventDefault(); prevChunk.click(); return; }
       const prevStep = document.querySelector('[data-srs-note-prev-step]:not([disabled])');
@@ -31157,7 +31167,7 @@ document.addEventListener('keydown', function(e){
     if(prevBtn){ e.preventDefault(); prevBtn.click(); return; }
   }
   if(e.key === 'ArrowRight'){
-    if(typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.hubTab === 'notes' && currentRoute().indexOf('/cards') === 0){
+    if(typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.hubTab === 'notes' && (currentRoute().indexOf('/cards') === 0 || currentRoute().indexOf('/notes-review') === 0)){
       const nextCta = document.querySelector('[data-srs-note-chunk-more], [data-srs-note-next-step], [data-srs-note-finish]');
       if(nextCta){ e.preventDefault(); nextCta.click(); return; }
     }
@@ -31173,7 +31183,7 @@ document.addEventListener('keydown', function(e){
   if(e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4'){
     const isFlippedHub = (typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.flipped);
     const isFlippedSkill = (typeof pySkillViewState !== 'undefined' && pySkillViewState && pySkillViewState.tab === 'cards' && pySkillViewState.cardFlipped);
-    if(typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.hubTab === 'notes' && currentRoute().indexOf('/cards') === 0){
+    if(typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.hubTab === 'notes' && (currentRoute().indexOf('/cards') === 0 || currentRoute().indexOf('/notes-review') === 0)){
       if(e.key === '1'){
         const nr = document.querySelector('[data-srs-note-reset]');
         if(nr){ e.preventDefault(); nr.click(); return; }
