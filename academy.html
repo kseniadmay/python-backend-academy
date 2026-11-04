@@ -10001,21 +10001,15 @@
     max-height: 8.5px !important;
     background: #ffffff !important;
     border: 1.5px solid #10b981 !important;
-    animation: bead-pulse-emerald 2s infinite ease-in-out !important;
+    animation: none !important;
     transform: none !important;
     position: relative !important;
     z-index: 5 !important;
   }
   .dot-jewel:not(.milestone).active::after {
-    content: '' !important;
-    display: block !important;
-    position: absolute !important;
-    inset: -2px !important;
-    border-radius: 50% !important;
-    border: 1.5px solid rgba(52, 211, 153, 0.8) !important;
-    pointer-events: none !important;
-    animation: bead-ping-wave 2s cubic-bezier(0.2, 0.8, 0.4, 1) infinite !important;
-    z-index: 1 !important;
+    display: none !important;
+    content: none !important;
+    animation: none !important;
   }
 
   /* Янтарная бусина рубежного зачёта (.milestone) — аккуратный ромб 7.5px */
@@ -10072,21 +10066,15 @@
     max-height: 8.5px !important;
     background: #f59e0b !important;
     border: 1.5px solid #fbbf24 !important;
-    animation: bead-pulse-amber 2s infinite ease-in-out !important;
+    animation: none !important;
     transform: rotate(45deg) !important;
     position: relative !important;
     z-index: 5 !important;
   }
   .dot-jewel.milestone.active::after {
-    content: '' !important;
-    display: block !important;
-    position: absolute !important;
-    inset: -2px !important;
-    border-radius: 2px !important;
-    border: 1.5px solid rgba(251, 191, 36, 0.8) !important;
-    pointer-events: none !important;
-    animation: bead-milestone-ping-wave 2s cubic-bezier(0.2, 0.8, 0.4, 1) infinite !important;
-    z-index: 1 !important;
+    display: none !important;
+    content: none !important;
+    animation: none !important;
   }
   .dot-jewel.milestone.done {
     background: #10b981 !important;
@@ -10309,7 +10297,8 @@
     100% { opacity: 1; transform: translateY(0); }
   }
   .note-canvas-body .feed-chunk.feed-chunk-new {
-    animation: srsAtomReveal 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+    animation: none !important;
+    transform: none !important;
   }
   .note-canvas-body .feed-chunk {
     font-size: 0.94rem !important;
@@ -13745,13 +13734,42 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     backface-visibility: hidden !important;
     isolation: isolate !important;
     -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    text-rendering: geometricPrecision !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: linear-gradient(175deg, #0e1628 0%, #090e1a 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+    box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.12) !important;
+  }
+  .srs-note-card * {
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    text-rendering: geometricPrecision !important;
+  }
+  .srs-note-card .snippet-wrap,
+  .srs-note-card .code-snippet-wrap {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 
-  /* Устранение нервного тика: стабильные благородные бусины без дергающегося scale и без пульсаций */
+  /* Устранение нервного тика: стабильные благородные бусины без дергающегося scale, без пульсаций и без bead-ping-wave */
+  .dot-jewel::after,
+  .dot-jewel::before,
+  .dot-jewel.active::after,
+  .dot-jewel.active::before,
+  .cards-hub-container .dot-jewel::after,
+  .cards-hub-container .dot-jewel::before {
+    display: none !important;
+    animation: none !important;
+    content: none !important;
+  }
+  .dot-jewel,
+  .dot-jewel.active,
+  .dot-jewel.bead-active-leading,
   .cards-hub-container .srs-deck-beads-bar .dot-jewel.active,
   .cards-hub-container .dot-jewel.bead-active-leading,
-  .cards-hub-container .dot-jewel.active,
-  .dot-jewel.bead-active-leading {
+  .cards-hub-container .dot-jewel.active {
     animation: none !important;
     transform: none !important;
     width: 11px !important;
@@ -13771,7 +13789,11 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     display: none !important;
     animation: none !important;
   }
-  .note-canvas-body .feed-chunk {
+  .feed-chunk,
+  .feed-chunk-new,
+  .note-canvas-body .feed-chunk,
+  .note-canvas-body .feed-chunk.feed-chunk-new {
+    animation: none !important;
     transform: none !important;
   }
 
