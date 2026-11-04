@@ -24339,12 +24339,26 @@ function viewPathSerpentine(options){
           </g>`;
       }
 
+      const beamMaxW = 270;
+      const progressFraction = cb.unitsCount > 0 ? Math.min(1, curCompletedCount / cb.unitsCount) : 0;
+      const beamFilledW = Math.round(beamMaxW * progressFraction);
+      const curTierNum = (curEchelon === 'all') ? 1 : (Number(curEchelon) || 1);
+
       markersSVG += `
         <g class="path-section-gate path-chapter-ribbon path-section-gate--${gateStatus}" transform="translate(340, ${cy})">
-          <rect class="path-section-gate-bg" x="-190" y="-26" width="380" height="52" rx="26" fill="${isLocked ? 'url(#gatePillLockedGrad)' : 'url(#gatePillUnlockedGrad)'}" stroke="${isLocked ? 'rgba(190, 18, 60, 0.50)' : 'rgba(16, 185, 129, 0.65)'}" stroke-width="1.5" filter="drop-shadow(0 10px 28px rgba(0,0,0,0.70)) drop-shadow(0 0 24px rgba(16,185,129,0.35))"/>
-          <text x="-165" y="-5" font-family="'Inter', -apple-system, sans-serif" font-size="9" font-weight="800" fill="${isLocked ? '#fda4af' : '#34d399'}" letter-spacing="0.06em">ГЛАВА ${cb.chapterNum} · ${escapeHtmlStr((cb.track || 'BACKEND').toUpperCase())}</text>
+          <rect class="path-section-gate-bg" x="-190" y="-27" width="380" height="54" rx="27" fill="${isLocked ? 'url(#gatePillLockedGrad)' : 'url(#gatePillUnlockedGrad)'}" stroke="${isLocked ? 'rgba(190, 18, 60, 0.50)' : 'rgba(16, 185, 129, 0.65)'}" stroke-width="1.5" filter="drop-shadow(0 10px 28px rgba(0,0,0,0.70)) drop-shadow(0 0 24px rgba(16,185,129,0.35))"/>
+          <text x="-165" y="-6" font-family="'Inter', -apple-system, sans-serif" font-size="9" font-weight="800" fill="${isLocked ? '#fda4af' : '#34d399'}" letter-spacing="0.08em">ГЛАВА ${cb.chapterNum} · ${escapeHtmlStr((cb.track || 'BACKEND').toUpperCase())}</text>
           <text class="path-gate-title" x="-165" y="11" font-family="'Inter', -apple-system, sans-serif" font-size="12.5" font-weight="800" fill="#ffffff">${escapeHtmlStr(curTitleClean)}</text>
-          <text x="115" y="4" text-anchor="end" font-family="'Inter', -apple-system, sans-serif" font-size="11" font-weight="700" fill="${isLocked ? '#fda4af' : '#34d399'}">${curCompletedCount}/${cb.unitsCount} Освоено ✓</text>
+          
+          <!-- Continuous 2px Liquid Glow Beam (Variant 1C) -->
+          <line x1="-165" y1="18" x2="${-165 + beamMaxW}" y2="18" stroke="rgba(148, 163, 184, 0.16)" stroke-width="2" stroke-linecap="round"/>
+          ${(!isLocked && beamFilledW > 0) ? `
+            <line x1="-165" y1="18" x2="${-165 + beamFilledW}" y2="18" stroke="url(#liquidBeamGrad)" stroke-width="2.2" stroke-linecap="round" filter="drop-shadow(0 0 5px rgba(16,185,129,0.75))"/>
+          ` : ''}
+
+          <text x="115" y="-3" text-anchor="end" font-family="'Inter', -apple-system, sans-serif" font-size="11" font-weight="700" fill="${isLocked ? '#fda4af' : '#34d399'}">${curCompletedCount}/${cb.unitsCount} Освоено ✓</text>
+          <text x="115" y="10" text-anchor="end" font-family="'Inter', -apple-system, sans-serif" font-size="8.5" font-weight="700" fill="#64748b">${curEchelon === 'all' ? 'Все темы' : (curTierNum === 1 ? 'Скрининг' : `Эшелон ${curTierNum}`)}</text>
+
           <g class="path-gate-btn ${isLocked ? 'path-gate-btn--locked' : 'path-gate-btn--unlocked'}" data-gate-track="${cb.track}" data-gate-locked="${isLocked?1:0}" transform="translate(150, 0)" role="button" tabindex="0" aria-label="Перейти к главе ${cb.chapterNum}">
             <circle r="17" fill="${isLocked ? 'rgba(148, 163, 184, 0.15)' : 'url(#gateGreenBtnGrad)'}" stroke="${isLocked ? 'rgba(148, 163, 184, 0.3)' : 'rgba(52, 211, 153, 0.8)'}" stroke-width="1.2" filter="${isLocked ? '' : 'drop-shadow(0 0 10px rgba(16,185,129,0.6))'}"/>
             <text y="4" text-anchor="middle" font-family="'Inter', -apple-system, sans-serif" font-size="12" font-weight="900" fill="${isLocked ? '#94a3b8' : '#042f2e'}">${isLocked ? '🔒' : '➔'}</text>
@@ -24663,7 +24677,12 @@ const underTitleFull = cleanUnitTitle(u.id, u.title);
                 <stop offset="50%" stop-color="#fbbf24"/>
                 <stop offset="100%" stop-color="#fef08a"/>
               </linearGradient>
-                            <linearGradient id="gatePillUnlockedGrad" x1="0" y1="0" x2="1" y2="0">
+                                          <linearGradient id="liquidBeamGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#10b981"/>
+                <stop offset="70%" stop-color="#34d399"/>
+                <stop offset="100%" stop-color="#6ee7b7"/>
+              </linearGradient>
+              <linearGradient id="gatePillUnlockedGrad" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0%" stop-color="rgba(15, 23, 42, 0.94)"/>
                 <stop offset="60%" stop-color="rgba(6, 78, 59, 0.65)"/>
                 <stop offset="100%" stop-color="rgba(4, 47, 46, 0.90)"/>
