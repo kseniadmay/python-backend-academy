@@ -10304,18 +10304,22 @@
     font-size: 0.65rem;
     color: rgba(255, 255, 255, 0.25);
   }
-  @keyframes srsChunkFadeSlide {
-    0% { opacity: 0; transform: translateY(8px); }
+  @keyframes srsAtomReveal {
+    0% { opacity: 0; transform: translateY(6px); }
     100% { opacity: 1; transform: translateY(0); }
   }
   .note-canvas-body .feed-chunk.feed-chunk-new {
-    animation: srsChunkFadeSlide 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: srsAtomReveal 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
   }
   .note-canvas-body .feed-chunk {
-    font-size: 0.94rem;
-    line-height: 1.7;
-    color: var(--ink-soft);
-    margin-bottom: 12px;
+    font-size: 0.94rem !important;
+    line-height: 1.7 !important;
+    color: var(--ink-soft) !important;
+    margin-top: 14px !important;
+    margin-bottom: 0 !important;
+  }
+  .note-canvas-body .feed-chunk:first-child {
+    margin-top: 0 !important;
   }
   .note-canvas-body .feed-chunk:last-child {
     margin-bottom: 0;
@@ -19093,7 +19097,7 @@ function decorateCodeBlocksWithRunBtn(htmlStr){
 }
 
 // Split a micro-step's HTML into small progressive chunks (paragraphs, tables, code blocks, Junior vs Senior callouts)
-function splitStepHtmlIntoChunks(htmlStr){
+function splitStepHtmlIntoChunks(htmlStr, stepTitle){
   let cleanIn = String(htmlStr || '').trim();
   while(/^<div\s+class=["']lesson-theory["'][^>]*>/i.test(cleanIn) && /<\/div>\s*$/i.test(cleanIn)){
     cleanIn = cleanIn.replace(/^<div\s+class=["']lesson-theory["'][^>]*>/i, '').replace(/<\/div>\s*$/i, '').trim();
@@ -19101,6 +19105,8 @@ function splitStepHtmlIntoChunks(htmlStr){
   const decorated = (typeof decorateCodeBlocksWithRunBtn === 'function') ? decorateCodeBlocksWithRunBtn(cleanIn) : cleanIn;
   const s = String(decorated || '').trim();
   if(!s) return [''];
+
+  // Шаг 1: Семантическое разбиение на корневые блоки разметки
   const rawBlocks = [];
   const tagRe = /<\/?(div|table|ul|ol|pre|blockquote|p|h[1-6])\b[^>]*>/gi;
   let depth = 0;
@@ -19144,11 +19150,23 @@ function splitStepHtmlIntoChunks(htmlStr){
     if(tail) rawBlocks.push(tail);
   }
 
+  // Очистка дублирующего заголовка шага h1-h5 из первого блока
+  const pTitle = String(stepTitle || '').replace(/^К-\d+\s*[:·•\-]\s*/i, '').replace(/^\d+[\.\)\s\-·•]+\s*/, '').trim().toLowerCase();
+  if(rawBlocks.length > 0 && pTitle){
+    rawBlocks[0] = rawBlocks[0].replace(/^\s*<h[1-5][^>]*>([\s\S]*?)<\/h[1-5]>/i, (match, inner) => {
+      const plain = inner.replace(/<[^>]+>/g, '').replace(/^\d+[\.\)\s\-·•]+\s*/, '').trim().toLowerCase();
+      if(plain === pTitle || plain.includes(pTitle) || pTitle.includes(plain)) return '';
+      return match;
+    }).trim();
+  }
+  const filteredBlocks = rawBlocks.filter(b => b.trim().length > 0);
+
   function isHeadingBlock(b){
     if(/^<h[1-6]\b/i.test(b)) return true;
     const plain = b.replace(/<[^>]+>/g, '').trim();
-    if(/^<p\b/i.test(b) && /^<strong>[\s\S]*<\/strong>$/i.test(b.replace(/^<p\b[^>]*>/i, '').replace(/<\/p>$/i, '').trim())){
-      if(plain.length < 120 && !plain.endsWith('.')) return true;
+    const innerP = b.replace(/^<p\b[^>]*>/i, '').replace(/<\/p>$/i, '').trim();
+    if(/^<p\b/i.test(b) && (/^<strong>[\s\S]*<\/strong>[\.\:\s]*$/i.test(innerP) || (/^[A-ZА-ЯЁ0-9_\s\-\:\.\,\(\)]+$/i.test(plain) && plain.length < 80))){
+      if(plain.length < 140) return true;
     }
     return false;
   }
@@ -19156,62 +19174,44 @@ function splitStepHtmlIntoChunks(htmlStr){
   function isLeadInBlock(b, nextB){
     if(!/^<p\b/i.test(b)) return false;
     const plain = b.replace(/<[^>]+>/g, '').trim();
-    if(/[:—–]\s*$/i.test(plain) && plain.length < 400 && nextB) return true;
+    // Короткий подводящий абзац перед кодом, списком или таблицей
+    if(/[:—–➔→]\s*$/i.test(plain) && plain.length < 240 && nextB) return true;
     return false;
   }
 
-  const merged = [];
+  // Шаг 2: Атомарная группировка (отдельная мысль = отдельный атом)
+  const atomicChunks = [];
   let pending = '';
-  for(let i = 0; i < rawBlocks.length; i++){
-    const b = rawBlocks[i];
-    const nextB = (i + 1 < rawBlocks.length) ? rawBlocks[i + 1] : null;
-    const isH = isHeadingBlock(b);
-    const isLeadIn = isLeadInBlock(b, nextB);
-    if(isH || isLeadIn){
+
+  for(let i = 0; i < filteredBlocks.length; i++){
+    const b = filteredBlocks[i];
+    const nextB = (i + 1 < filteredBlocks.length) ? filteredBlocks[i + 1] : null;
+
+    if(isHeadingBlock(b)){
+      pending = pending ? (pending + '\n' + b) : b;
+    } else if(isLeadInBlock(b, nextB)){
       pending = pending ? (pending + '\n' + b) : b;
     } else if(pending){
-      merged.push(pending + '\n' + b);
+      atomicChunks.push(pending + '\n' + b);
       pending = '';
     } else {
-      merged.push(b);
+      atomicChunks.push(b);
     }
   }
   if(pending){
-    if(merged.length > 0) merged[merged.length - 1] += '\n' + pending;
-    else merged.push(pending);
+    if(atomicChunks.length > 0) atomicChunks[atomicChunks.length - 1] += '\n' + pending;
+    else atomicChunks.push(pending);
   }
 
-  const finalChunks = [];
-  for(let i = 0; i < merged.length; i++){
-    const c = merged[i];
-    const plainLen = c.replace(/<[^>]+>/g, '').trim().length;
-    if(i === 1 && finalChunks.length === 1 && finalChunks[0].replace(/<[^>]+>/g, '').trim().length < 350 && isHeadingBlock(c)){
-      finalChunks[0] += '\n' + c;
-      continue;
-    }
-    const isVisualContrastCard = /class=["'][^"']*(?:theory-contrast-card|visual-contrast|contrast-grid)[^"']*["']/i.test(c);
-    if(finalChunks.length > 0 && isVisualContrastCard && finalChunks[finalChunks.length - 1].replace(/<[^>]+>/g, '').trim().length < 450){
-      finalChunks[finalChunks.length - 1] += '\n' + c;
-      continue;
-    }
-    const isCodeSnippet = /class=["'][^"']*(?:snippet-wrap|code-snippet-wrap)[^"']*["']/i.test(c) || /^<pre\b/i.test(c);
-    if(finalChunks.length > 0 && isCodeSnippet && (finalChunks.length === 1 || finalChunks[finalChunks.length - 1].replace(/<[^>]+>/g, '').trim().length < 900)){
-      finalChunks[finalChunks.length - 1] += '\n' + c;
-      continue;
-    }
-    if(finalChunks.length > 0 && plainLen < 75 && !isHeadingBlock(c) && !isCodeSnippet){
-      finalChunks[finalChunks.length - 1] += '\n' + c;
-    } else {
-      finalChunks.push(c);
-    }
-  }
-  return finalChunks.length > 0 ? finalChunks : [s];
+  return atomicChunks.length > 0 ? atomicChunks : [s];
 }
 window.splitStepHtmlIntoChunks = splitStepHtmlIntoChunks;
 
 function getStepChunks(curStep, pureStepTitle){
   if(!curStep) return ['<p>Шаг конспекта пуст.</p>'];
-  const raw = (typeof splitStepHtmlIntoChunks === 'function') ? splitStepHtmlIntoChunks(curStep.html || '').slice() : [curStep.html || ''];
+  const raw = (typeof splitStepHtmlIntoChunks === 'function')
+    ? splitStepHtmlIntoChunks(curStep.html || '', pureStepTitle || (curStep.title || '')).slice()
+    : [curStep.html || ''];
   const base = raw.length > 0 ? raw : ['<p>Шаг конспекта пуст.</p>'];
   const pTitle = String(pureStepTitle || '').trim().toLowerCase();
   const cleaned = base.map((ch, idx) => {
