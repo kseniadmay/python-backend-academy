@@ -4308,6 +4308,37 @@
   }
 
   /* Desktop 3-column Layout & Coddy Right Rail */
+  
+  .coddy-path-layout {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    padding: 0 16px !important;
+  }
+  .path-serpentine-wrap {
+    width: 100% !important;
+    max-width: 680px !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+  .path-serpentine {
+    width: 100% !important;
+    max-width: 680px !important;
+    position: relative !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+  .path-serpentine-svg {
+    width: 100% !important;
+    max-width: 680px !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
   .coddy-path-layout {
     display: flex;
     justify-content: center;
@@ -24091,11 +24122,11 @@ function trailLockIcon(x, y, color){
   </g>`;
 }
 function trailIsometricButton(x, y, fill, stroke, strokeWidth, isCompleted, isActive){
-  const shadowY = y + 15;
+  const shadowY = y + 16;
   const glowShadow = isActive
-    ? 'filter="drop-shadow(0 0 18px rgba(245, 158, 11, 0.90)) drop-shadow(0 0 8px rgba(254, 240, 138, 0.70))"'
-    : (isCompleted ? 'filter="drop-shadow(0 0 12px rgba(245, 158, 11, 0.60))"' : '');
-  return `<ellipse cx="${x}" cy="${shadowY}" rx="23" ry="7" fill="rgba(0,0,0,0.45)" filter="drop-shadow(0 4px 10px rgba(0,0,0,0.60))"/><g class="path-button-face" ${glowShadow}><circle class="path-button-top" cx="${x}" cy="${y - 3}" r="25" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}"/><circle cx="${x}" cy="${y - 3}" r="23.2" fill="none" stroke="rgba(254, 240, 138, ${isCompleted ? '0.35' : (isActive ? '0.60' : '0.06')})" stroke-width="1"/></g>`;
+    ? 'filter="drop-shadow(0 0 28px rgba(245, 158, 11, 0.95)) drop-shadow(0 0 14px rgba(254, 240, 138, 0.75))"'
+    : (isCompleted ? 'filter="drop-shadow(0 0 16px rgba(245, 158, 11, 0.60))"' : '');
+  return `<ellipse cx="${x}" cy="${shadowY}" rx="24" ry="8" fill="rgba(0,0,0,0.50)" filter="drop-shadow(0 4px 12px rgba(0,0,0,0.70))"/><g class="path-button-face" ${glowShadow}><circle class="path-button-top" cx="${x}" cy="${y}" r="26" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}"/><circle cx="${x}" cy="${y}" r="23.8" fill="none" stroke="rgba(254, 240, 138, ${isCompleted ? '0.38' : (isActive ? '0.65' : '0.06')})" stroke-width="1"/></g>`;
 }
 // Тематические иконки по главам (циклятся внутри главы)
 const TRAIL_CHAPTER_ICONS = [
@@ -24153,7 +24184,7 @@ function viewPathSerpentine(options){
         curY += 280; // Balanced vertical gap (+280px) for non-overlapping milestones
       }
     }
-    const x = Math.round(210 + 94 * Math.sin((i * Math.PI) / 2.2));
+    const x = Math.round(340 + 110 * Math.sin((i * Math.PI) / 2.2));
     return { x, y: curY };
   });
 
@@ -24269,13 +24300,15 @@ function viewPathSerpentine(options){
       }
 
       markersSVG += `
-        <g class="path-section-gate path-chapter-ribbon path-section-gate--${gateStatus}" transform="translate(210, ${cy})">
-          <rect class="path-section-gate-bg" x="-155" y="-42" width="310" height="92" rx="22" fill="${isLocked ? 'rgba(24, 18, 27, 0.88)' : 'linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(6, 78, 59, 0.55))'}" stroke="${isLocked ? 'rgba(190, 18, 60, 0.50)' : 'rgba(16, 185, 129, 0.65)'}" stroke-width="1.5" filter="drop-shadow(0 10px 28px rgba(0,0,0,0.70)) drop-shadow(0 0 24px rgba(16,185,129,0.30))"/>
-          <line x1="-105" y1="-49" x2="105" y2="-49" stroke="rgba(255,255,255,0.18)" stroke-width="0.8" stroke-linecap="round"/>
-          ${hexBadge}
-          <text class="path-gate-title" x="0" y="-14" text-anchor="middle" font-size="${gateTitleFontSize}" font-weight="900" fill="#f8fafc" letter-spacing="0.04em">ГЛАВА ${cb.chapterNum}: ${escapeHtmlStr(curTitleClean.toUpperCase())}</text>
-          ${subText}
-          ${btnContent}
+        <g class="path-section-gate path-chapter-ribbon path-section-gate--${gateStatus}" transform="translate(340, ${cy})">
+          <rect class="path-section-gate-bg" x="-190" y="-26" width="380" height="52" rx="26" fill="${isLocked ? 'rgba(24, 18, 27, 0.90)' : 'linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(6, 78, 59, 0.58) 100%)'}" stroke="${isLocked ? 'rgba(190, 18, 60, 0.50)' : 'rgba(16, 185, 129, 0.65)'}" stroke-width="1.5" filter="drop-shadow(0 10px 28px rgba(0,0,0,0.70)) drop-shadow(0 0 24px rgba(16,185,129,0.35))"/>
+          <text x="-165" y="-5" font-family="'Inter', -apple-system, sans-serif" font-size="9" font-weight="800" fill="${isLocked ? '#fda4af' : '#34d399'}" letter-spacing="0.06em">ГЛАВА ${cb.chapterNum} · ${escapeHtmlStr((cb.track || 'BACKEND').toUpperCase())}</text>
+          <text class="path-gate-title" x="-165" y="11" font-family="'Inter', -apple-system, sans-serif" font-size="12.5" font-weight="800" fill="#ffffff">${escapeHtmlStr(curTitleClean)}</text>
+          <text x="115" y="4" text-anchor="end" font-family="'Inter', -apple-system, sans-serif" font-size="11" font-weight="700" fill="${isLocked ? '#fda4af' : '#34d399'}">${curCompletedCount}/${cb.unitsCount} Освоено ✓</text>
+          <g class="path-gate-btn ${isLocked ? 'path-gate-btn--locked' : 'path-gate-btn--unlocked'}" data-gate-track="${cb.track}" data-gate-locked="${isLocked?1:0}" transform="translate(150, 0)" role="button" tabindex="0" aria-label="Перейти к главе ${cb.chapterNum}">
+            <circle r="17" fill="${isLocked ? 'rgba(148, 163, 184, 0.15)' : 'url(#gateGreenBtnGrad)'}" stroke="${isLocked ? 'rgba(148, 163, 184, 0.3)' : 'rgba(52, 211, 153, 0.8)'}" stroke-width="1.2" filter="${isLocked ? '' : 'drop-shadow(0 0 10px rgba(16,185,129,0.6))'}"/>
+            <text y="4" text-anchor="middle" font-family="'Inter', -apple-system, sans-serif" font-size="12" font-weight="900" fill="${isLocked ? '#94a3b8' : '#042f2e'}">${isLocked ? '🔒' : '➔'}</text>
+          </g>
         </g>`;
     }
   });
@@ -24332,7 +24365,7 @@ function viewPathSerpentine(options){
     if(isCompleted) unitProgPct = 100;
 
     if(isCompleted){
-      centerIcon = `<text x="${x}" y="${y+(usePawNodes?10:5)}" text-anchor="middle" font-size="${usePawNodes?18:20}" font-weight="900" fill="#fef08a" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.8))">✓</text>`;
+      centerIcon = `<text x="${x}" y="${y + 6}" text-anchor="middle" font-family="'Inter', -apple-system, sans-serif" font-size="22" font-weight="900" fill="#fef08a" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.9))">✓</text>`;
     } else if(isActive){
       pulseHalo = `<circle class="hex-pulse-halo" cx="${x}" cy="${y - (usePawNodes ? 0 : 3)}" r="34" fill="none" stroke="rgba(251, 191, 36, 0.85)"/>`;
       centerIcon = trailIconCenter(x, y - (usePawNodes ? 0 : 3), iconName, usePawNodes ? 20 : 25, '#451a03');
@@ -24409,9 +24442,8 @@ const underTitleFull = cleanUnitTitle(u.id, u.title);
     }
     const underLabelX = x;
     const underLabelPill = `
-      <g class="hex-underlabel-pill-wrap" transform="translate(${underLabelX}, ${y + (pillH > 24 ? 47 : 44)})" pointer-events="none">
-        <rect x="${-pillW/2}" y="${pillY}" width="${pillW}" height="${pillH}" rx="${pillH > 24 ? 12 : 11}" fill="rgba(10, 14, 20, 0.88)" stroke="${isActive ? 'rgba(52, 211, 153, 0.45)' : (isCompleted ? 'rgba(167, 243, 208, 0.22)' : 'rgba(255, 255, 255, 0.08)')}" stroke-width="1" filter="drop-shadow(0 4px 12px rgba(0,0,0,0.60))"/>
-        ${labelContentSVG}
+      <g class="hex-underlabel-wrap" transform="translate(${underLabelX}, ${y + 44})" pointer-events="none">
+        <text class="hex-node-underlabel" text-anchor="middle" font-family="'Inter', -apple-system, sans-serif" font-size="12" font-weight="${isActive ? '800' : '700'}" fill="${isActive ? '#fbbf24' : (isCompleted ? '#cbd5e1' : '#64748b')}" style="text-shadow:0 2px 6px rgba(0,0,0,0.95);">${escapeHtmlStr(underTitleFull)}</text>
       </g>`;
     const nodeStateLabel = isCompleted ? 'Пройден' : (isActive ? 'Текущий урок, доступен для продолжения' : 'Заблокирован: сначала пройдите предыдущие уроки');
     const uChap = chapterBreakpoints.find(cb => cb.units.some(x => x.id === u.id)) || curChapter;
@@ -24568,44 +24600,21 @@ const underTitleFull = cleanUnitTitle(u.id, u.title);
         <!-- Mobile compact stats strip -->
         ${renderPathMobileStatsHTML(totalCompletedUnits, streakText, curEchelon, activeChapterNum, completedInChapter, totalInChapter)}
 
-        <!-- Streamlined Single-Row Header Console (Liquid Glassmorphism) -->
-        <div class="path-chapter-banner path-header-console">
-          <div class="path-console-row">
-            <!-- Left: Echelon dropdown trigger -->
-            <button type="button" class="path-console-echelon-pill path-screening-badge echelon-pill--t${curTierNum}" data-open-echelon-modal="1" title="⚡ Готовность к тех-скринингу: ${e1PctTop}% · Нажмите, чтобы сменить целевую программу" aria-label="⚡ Готовность к тех-скринингу: ${e1PctTop}%" aria-haspopup="dialog">
-              <span class="pce-icon">${curEchelon==='all'?'🌐':curEchelonMeta.icon}</span>
-              <span class="pce-label">${curEchelon==='all' ? 'Все темы' : (curTierNum === 1 ? 'Скрининг Junior+' : `Эшелон ${curTierNum}`)}</span>
-              <span class="pce-chevron">▾</span>
-            </button>
-            <span class="path-screening-badge" style="display:none;" aria-hidden="true">⚡ Готовность к тех-скринингу: ${e1PctTop}%</span>
-
-            <!-- Center: Active Lesson Info with Chapter Progress Indicator -->
-            <div class="path-console-focus">
-              <div class="pcf-top-row">
-                <button type="button" class="pcf-chap-btn" id="pcf-chap-dropdown-trigger" title="Нажмите для обзора и перехода к любой главе" aria-haspopup="dialog">
-                  <span class="pcf-chap">ГЛ. ${activeChapterNum}</span>
-                  <span class="pcf-chap-chevron">▾</span>
-                </button>
-                <span class="path-crumb-sep">›</span>
-                <span class="pcf-title">Урок ${activeLessonNumInChap} · ${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</span>
-              </div>
-              <div class="pcf-progress-row" title="Прогресс главы ${activeChapterNum}: ${completedInChapter} из ${totalInChapter} уроков">
-                <div class="pcf-bar-track">
-                  <div class="pcf-bar-fill" style="width: ${Math.round((completedInChapter / (totalInChapter || 1)) * 100)}%;"></div>
-                </div>
-                <span class="pcf-progress-text">${completedInChapter}/${totalInChapter} уроков</span>
-                <span class="pcf-badge">🎯 В ФОКУСЕ</span>
-              </div>
-            </div>
-
-            <!-- Right: Compact Mode Switcher -->
-            <div class="path-console-mode-toggle">
-              <div class="path-mode-switcher path-mode-switcher--mini" role="radiogroup" aria-label="Режим плана обучения">
-                <button type="button" class="path-mode-btn ${state.pathViewMode==='game'?'active':''}" data-set-path-mode="game" title="Игровой режим: Путь курса">🧭 Путь</button>
-                <button type="button" class="path-mode-btn ${state.pathViewMode==='pro'?'active':''}" data-set-path-mode="pro" title="Профессиональный режим со списком глав">📋 Список</button>
-              </div>
-            </div>
+        <!-- Hero Header (Matching Exact Mockup) -->
+        <header class="hero-header" style="width:100%;max-width:680px;margin:24px auto 14px;background:linear-gradient(145deg, rgba(15, 23, 42, 0.92) 0%, rgba(6, 78, 59, 0.42) 100%);border:1.5px solid rgba(16, 185, 129, 0.45);border-radius:20px;padding:18px 24px;box-shadow:0 12px 30px rgba(0,0,0,0.6),0 0 24px rgba(16,185,129,0.2);backdrop-filter:blur(16px);display:flex;justify-content:space-between;align-items:center;">
+          <div class="hero-left" style="display:flex;flex-direction:column;gap:4px;">
+            <div class="hero-badge" style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#34d399;display:flex;align-items:center;gap:6px;">⚡ Программа подготовки · Скрининг Junior+</div>
+            <h1 class="hero-title" style="font-size:18px;font-weight:800;color:#fff;margin:0;">Траектория: Python Backend Engineer</h1>
+            <div class="hero-sub" style="font-size:12px;color:#94a3b8;">Текущий раздел: Глава ${activeChapterNum} · ${escapeHtmlStr(activeChapterShortTitle || 'Web & HTTP')}</div>
           </div>
+          <div class="hero-right" style="display:flex;align-items:center;gap:16px;">
+            <div class="hero-stat-box" style="text-align:right;">
+              <div class="hero-stat-val" style="font-size:16px;font-weight:800;color:#34d399;">${totalCompletedUnits} / ${allUnits.length}</div>
+              <div class="hero-stat-lbl" style="font-size:10px;color:#64748b;">Освоено</div>
+            </div>
+            <button type="button" class="hero-jump-btn" id="path-jump-btn" title="Перейти к текущему уроку" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%);border:none;border-radius:12px;padding:10px 16px;color:#042f2e;font-weight:800;font-size:12px;display:flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(16,185,129,0.45);cursor:pointer;">⚡ К текущему уроку</button>
+          </div>
+        </header>
 
           <!-- Chapter Quick Jump Floating Dropdown -->
           <div class="path-chap-menu" id="path-chap-menu" style="display:none;" role="dialog" aria-modal="false" aria-label="Быстрый переход к главам">
@@ -24636,7 +24645,7 @@ const underTitleFull = cleanUnitTitle(u.id, u.title);
 
         <!-- S-Curve SVG Trail -->
         <div class="path-serpentine" style="position:relative;">
-          <svg class="path-serpentine-svg" viewBox="0 0 420 ${totalH}" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Путь обучения: ${allUnits.length} уроков и челленджи">
+          <svg class="path-serpentine-svg" viewBox="0 0 680 ${totalH}" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Путь обучения: ${allUnits.length} уроков и челленджи">
             <defs>
               <linearGradient id="hexGradCompleted" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="#fef08a"/>
@@ -24711,16 +24720,19 @@ const underTitleFull = cleanUnitTitle(u.id, u.title);
 
             <!-- Ambient Spatial Biomes (Ethereal Depth & Zero Black Void) -->
             <g class="path-ambient-biomes" pointer-events="none">
-              <ellipse cx="210" cy="180" rx="220" ry="170" fill="url(#biomeEmerald)"/>
-              <ellipse cx="210" cy="680" rx="230" ry="180" fill="url(#biomeSapphire)"/>
-              <ellipse cx="210" cy="1180" rx="230" ry="180" fill="url(#biomeAmber)"/>
+              <ellipse cx="340" cy="180" rx="260" ry="170" fill="url(#biomeEmerald)"/>
+              <ellipse cx="340" cy="680" rx="260" ry="180" fill="url(#biomeSapphire)"/>
+              <ellipse cx="340" cy="1180" rx="260" ry="180" fill="url(#biomeAmber)"/>
             </g>
 
             <!-- Luminous Ethereal Guide Track with Photon Flow -->
             <path class="path-track-bg" d="${dPath}" fill="none" stroke="rgba(148,163,184,0.12)" stroke-width="2.6" stroke-linecap="round"/>
             ${dProgress ? `
-              <path class="path-track-progress" d="${dProgress}" fill="none" stroke="url(#pathProgressGrad)" stroke-width="4.5" stroke-linecap="round" style="filter:drop-shadow(0 0 10px rgba(245,158,11,0.65)) drop-shadow(0 0 20px rgba(251,191,36,0.35));"/>
+              <path class="path-track-progress" d="${dProgress}" fill="none" stroke="url(#pathProgressGrad)" stroke-width="4.8" stroke-linecap="round" style="filter:drop-shadow(0 0 10px rgba(245,158,11,0.75)) drop-shadow(0 0 20px rgba(251,191,36,0.40));"/>
               <path class="path-track-pulse-stream" d="${dProgress}" fill="none" stroke="#fef08a" stroke-width="2.0" stroke-linecap="round" opacity="0.9" style="filter:drop-shadow(0 0 8px #fbbf24);"/>
+              ${(activeUnitIndex > 0 && coords[activeUnitIndex] && coords[activeUnitIndex-1]) ? `
+                <circle cx="${Math.round(coords[activeUnitIndex].x * 0.75 + coords[activeUnitIndex-1].x * 0.25)}" cy="${Math.round(coords[activeUnitIndex].y * 0.75 + coords[activeUnitIndex-1].y * 0.25)}" r="5.2" fill="#ffffff" filter="drop-shadow(0 0 10px #fbbf24) drop-shadow(0 0 18px rgba(245,158,11,0.8))"/>
+              ` : ''}
             ` : ''}
             ${dFuture ? `<path class="path-track-future" d="${dFuture}" fill="none" stroke="rgba(245, 158, 11, 0.24)" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="6 6"/>` : ''}
 
