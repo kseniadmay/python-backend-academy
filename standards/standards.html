@@ -24539,8 +24539,9 @@ const underTitleFull = cleanUnitTitle(u.id, u.title);
   let intermediateBeadsSVG = '';
 
   const actCoord = (coords[activeUnitIndex] || coords[0] || { x: 340, y: 70 });
-  const placeBelow = actCoord.y < 190;
-  const initialPopoverTop = placeBelow ? (actCoord.y + 52) : (actCoord.y - 195);
+  const placeBelow = actCoord.y < 240;
+  // Вариант 2: Вертикальный якорь (Elevated Anchor) — карточка поднята на безопасный зазор 70px над узлом
+  const initialPopoverTop = placeBelow ? (actCoord.y + 60) : (actCoord.y - 235);
   const initialPopoverArrow = placeBelow ? 'path-popover-arrow--up' : 'path-popover-arrow--down';
 
   return `
@@ -24898,8 +24899,9 @@ function viewProPath(options){
   }).join('');
 
   const actCoord = (coords[activeUnitIndex] || coords[0] || { x: 340, y: 70 });
-  const placeBelow = actCoord.y < 190;
-  const initialPopoverTop = placeBelow ? (actCoord.y + 52) : (actCoord.y - 195);
+  const placeBelow = actCoord.y < 240;
+  // Вариант 2: Вертикальный якорь (Elevated Anchor) — карточка поднята на безопасный зазор 70px над узлом
+  const initialPopoverTop = placeBelow ? (actCoord.y + 60) : (actCoord.y - 235);
   const initialPopoverArrow = placeBelow ? 'path-popover-arrow--up' : 'path-popover-arrow--down';
 
   return `
@@ -31329,12 +31331,12 @@ const psk = e.target.closest('[data-py-select-k]');
             const arrowX = Math.max(20, Math.min(popoverWidth - 20, popoverHalfWidth + (cx - clampedCx)));
             arrow.style.left = `${Math.round(arrowX)}px`;
           }
-          const popoverH = popover.offsetHeight || 330;
-          if(cy > popoverH + 20){
-            popover.style.top = `${Math.round(cy - popoverH - 14)}px`;
+          const popoverH = popover.offsetHeight || 185;
+          if(cy > popoverH + 80){
+            popover.style.top = `${Math.round(cy - popoverH - 45)}px`;
             if(arrow) arrow.className = 'path-popover-arrow path-popover-arrow--down';
           } else {
-            popover.style.top = `${Math.round((nRect.bottom || (cy + 60)) - pRect.top + 16)}px`;
+            popover.style.top = `${Math.round(cy + 55)}px`;
             if(arrow) arrow.className = 'path-popover-arrow path-popover-arrow--up';
           }
         }
@@ -31343,22 +31345,6 @@ const psk = e.target.closest('[data-py-select-k]');
           backdropEl.style.display = 'block';
         }
         if(openedByKeyboard && typeof popover.focus === 'function') popover.focus();
-        // Clamp to the viewport; disable the scale-in animation while measuring its full size.
-        try{
-          const prevAnim = popover.style.animation;
-          popover.style.animation = 'none';
-          const vh = window.innerHeight || 900;
-          let pr = popover.getBoundingClientRect();
-          if(pr.height > 0){
-            const curTop = parseFloat(popover.style.top) || 0;
-            let delta = 0;
-            if(pr.bottom > vh - 12) delta = -(pr.bottom - (vh - 12));
-            popover.style.top = `${Math.round(curTop + delta)}px`;
-            pr = popover.getBoundingClientRect();
-            if(pr.top < 12) popover.style.top = `${Math.round(parseFloat(popover.style.top) + (12 - pr.top))}px`;
-          }
-          popover.style.animation = prevAnim;
-        }catch(err){}
         return;
       }
     }
