@@ -24227,6 +24227,7 @@ function viewPathSerpentine(options){
   const curActiveUnit = allUnits[activeUnitIndex] || allUnits[0] || ALL_UNITS_COMBINED[0];
   const curChapter = chapterBreakpoints.find(cb => cb.units.some(u => u.id === curActiveUnit.id)) || chapterBreakpoints[0] || { num: 1, chapterNum: 1, shortTitle: 'Python Core', units: allUnits };
   const activeChapterNum = curChapter.chapterNum || curChapter.num || 1;
+  const activeChapterShortTitle = curChapter.shortTitle || (curChapter.title || '').replace(/^Глава\s+\d+:\s*/i, '') || 'Web & HTTP';
   const chapterUnits = curChapter.units || allUnits;
   const totalInChapter = chapterUnits.length;
   const completedInChapter = chapterUnits.filter(isUnitCompleted).length;
@@ -24301,7 +24302,7 @@ function viewPathSerpentine(options){
 
       markersSVG += `
         <g class="path-section-gate path-chapter-ribbon path-section-gate--${gateStatus}" transform="translate(340, ${cy})">
-          <rect class="path-section-gate-bg" x="-190" y="-26" width="380" height="52" rx="26" fill="${isLocked ? 'rgba(24, 18, 27, 0.90)' : 'linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(6, 78, 59, 0.58) 100%)'}" stroke="${isLocked ? 'rgba(190, 18, 60, 0.50)' : 'rgba(16, 185, 129, 0.65)'}" stroke-width="1.5" filter="drop-shadow(0 10px 28px rgba(0,0,0,0.70)) drop-shadow(0 0 24px rgba(16,185,129,0.35))"/>
+          <rect class="path-section-gate-bg" x="-190" y="-26" width="380" height="52" rx="26" fill="${isLocked ? 'url(#gatePillLockedGrad)' : 'url(#gatePillUnlockedGrad)'}" stroke="${isLocked ? 'rgba(190, 18, 60, 0.50)' : 'rgba(16, 185, 129, 0.65)'}" stroke-width="1.5" filter="drop-shadow(0 10px 28px rgba(0,0,0,0.70)) drop-shadow(0 0 24px rgba(16,185,129,0.35))"/>
           <text x="-165" y="-5" font-family="'Inter', -apple-system, sans-serif" font-size="9" font-weight="800" fill="${isLocked ? '#fda4af' : '#34d399'}" letter-spacing="0.06em">ГЛАВА ${cb.chapterNum} · ${escapeHtmlStr((cb.track || 'BACKEND').toUpperCase())}</text>
           <text class="path-gate-title" x="-165" y="11" font-family="'Inter', -apple-system, sans-serif" font-size="12.5" font-weight="800" fill="#ffffff">${escapeHtmlStr(curTitleClean)}</text>
           <text x="115" y="4" text-anchor="end" font-family="'Inter', -apple-system, sans-serif" font-size="11" font-weight="700" fill="${isLocked ? '#fda4af' : '#34d399'}">${curCompletedCount}/${cb.unitsCount} Освоено ✓</text>
@@ -24375,21 +24376,8 @@ function viewPathSerpentine(options){
         const dashOffset = (circ * (1 - unitProgPct / 100)).toFixed(1);
         radialProgressRing = `<circle class="hex-progress-ring" cx="${x}" cy="${y - (usePawNodes ? 0 : 3)}" r="34" fill="none" stroke="#fbbf24" stroke-width="3" stroke-dasharray="${circ}" stroke-dashoffset="${dashOffset}" stroke-linecap="round" transform="rotate(-90 ${x} ${y - (usePawNodes ? 0 : 3)})" filter="drop-shadow(0 0 10px rgba(245,158,11,0.85))"/>`;
       }
-      const bubbleActionTxt = unitStarted ? 'ПРОДОЛЖИТЬ ➔' : 'НАЧАТЬ ➔';
-      const bubbleSubTxt = unitStarted && unitSkillsMastered > 0
-        ? `Освоено ${unitSkillsMastered}/${unitTotalSkills} тем`
-        : '⚡ 2 МИН · БЕЗ КОДА';
-      const bubbleW = 152;
-      const bubbleY = y - 50;
-      activeBubble = `
-        <g class="hex-active-tooltip hex-active-tooltip--direct" data-direct-unit="${u.id}" transform="translate(${x}, ${bubbleY})" role="button" tabindex="0" aria-label="${bubbleActionTxt}: ${bubbleSubTxt}" title="Нажмите, чтобы сразу перейти к обучению">
-          <g class="hex-active-tooltip__inner">
-            <rect x="${-bubbleW/2}" y="-28" width="${bubbleW}" height="28" rx="14" fill="url(#pathBubbleGrad)" stroke="rgba(255,255,255,0.36)" stroke-width="1.2" filter="drop-shadow(0 6px 22px rgba(16,185,129,0.55))"/>
-            <polygon points="-5,0 5,0 0,6" fill="#047857" stroke="rgba(255,255,255,0.25)" stroke-width="0.8"/>
-            <text x="0" y="-16.5" text-anchor="middle" font-family="'Onest', var(--font-b, sans-serif)" font-size="8" font-weight="700" fill="#a7f3d0" letter-spacing="0.05em">${bubbleSubTxt}</text>
-            <text x="0" y="-5.5" text-anchor="middle" font-family="var(--font-d, 'Unbounded', sans-serif)" font-size="9.5" font-weight="900" fill="#ffffff" letter-spacing="0.05em">${bubbleActionTxt}</text>
-          </g>
-        </g>`;
+      // Tiny yellow bubble replaced by the elegant On-Node Glass Popover card anchored to active node
+      activeBubble = '';
     } else {
       const semIcon = trailIconCenter(x, y - (usePawNodes ? 0 : 3), iconName, usePawNodes ? 20 : 22, 'rgba(148, 163, 184, 0.45)');
       const miniLock = `
@@ -24478,7 +24466,7 @@ const underTitleFull = cleanUnitTitle(u.id, u.title);
     const chUnlocked = endIdx <= activeUnitIndex;
     const chStatus = chDone ? 'done' : (chUnlocked ? 'open' : 'locked');
     // Perfectly centered milestone culmination at bx = 210, between chapter end and next chapter gate
-    const bx = 210;
+    const bx = 340;
     const by = y + 110;
     const chGrad = chDone ? 'url(#hexGradCompleted)' : (chStatus === 'open' ? 'url(#hexGradChallenge)' : 'url(#hexGradLocked)');
     const chButtonGrad = chDone ? 'url(#pathButtonCompleted)' : (chStatus === 'open' ? 'url(#pathButtonChallenge)' : 'url(#pathButtonLocked)');
@@ -24547,52 +24535,13 @@ const underTitleFull = cleanUnitTitle(u.id, u.title);
     screeningShort = echPct > 0 ? `👑 ${echPct}% к офферу` : '👑 Оффер';
   }
 
-  // Intermediate Micro-Step Beads (Continuous Atomic Dots Necklace)
+  // Intermediate Micro-Step Beads: Ribbon is clean continuous gold beam
   let intermediateBeadsSVG = '';
-  for(let i = 0; i < coords.length - 1; i++){
-    if(chapterStartSet.has(i + 1)){
-      continue;
-    }
-    const p1 = coords[i];
-    const p2 = coords[i+1];
-    const midY = (p1.y + p2.y) / 2;
-    const tValues = [0.28, 0.50, 0.72];
 
-    tValues.forEach((t, bIdx) => {
-      const u = 1 - t;
-      const bx = Math.round(u*u*u * p1.x + 3*u*u*t * p1.x + 3*u*t*t * p2.x + t*t*t * p2.x);
-      const by = Math.round(u*u*u * p1.y + 3*u*u*t * midY + 3*u*t*t * midY + t*t*t * p2.y);
-
-      let beadStatus = 'locked';
-      if(i < activeUnitIndex){
-        beadStatus = 'done';
-      } else if(i === activeUnitIndex){
-        beadStatus = (bIdx === 0) ? 'active' : 'upcoming';
-      }
-
-      let beadFill = 'rgba(148, 163, 184, 0.20)';
-      let beadStroke = 'rgba(148, 163, 184, 0.35)';
-      let beadR = 3.5;
-      let beadGlow = '';
-
-      if(beadStatus === 'done'){
-        beadFill = '#10b981';
-        beadStroke = '#34d399';
-        beadR = 4;
-        beadGlow = 'filter="drop-shadow(0 0 5px rgba(52,211,153,0.7))"';
-      } else if(beadStatus === 'active'){
-        beadFill = '#059669';
-        beadStroke = '#a7f3d0';
-        beadR = 4.5;
-        beadGlow = 'class="hex-bead-pulse" filter="drop-shadow(0 0 8px rgba(52,211,153,0.9))"';
-      }
-
-      intermediateBeadsSVG += `
-        <g class="hex-bead-group" transform="translate(${bx}, ${by})">
-          <circle cx="0" cy="0" r="${beadR}" fill="${beadFill}" stroke="${beadStroke}" stroke-width="1.2" ${beadGlow}/>
-        </g>`;
-    });
-  }
+  const actCoord = (coords[activeUnitIndex] || coords[0] || { x: 340, y: 70 });
+  const placeBelow = actCoord.y < 190;
+  const initialPopoverTop = placeBelow ? (actCoord.y + 52) : (actCoord.y - 195);
+  const initialPopoverArrow = placeBelow ? 'path-popover-arrow--up' : 'path-popover-arrow--down';
 
   return `
     <div class="coddy-path-layout">
@@ -24641,7 +24590,6 @@ const underTitleFull = cleanUnitTitle(u.id, u.title);
               }).join('')}
             </div>
           </div>
-        </div>
 
         <!-- S-Curve SVG Trail -->
         <div class="path-serpentine" style="position:relative;">
@@ -24674,6 +24622,15 @@ const underTitleFull = cleanUnitTitle(u.id, u.title);
                 <stop offset="0%" stop-color="#f59e0b"/>
                 <stop offset="50%" stop-color="#fbbf24"/>
                 <stop offset="100%" stop-color="#fef08a"/>
+              </linearGradient>
+                            <linearGradient id="gatePillUnlockedGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="rgba(15, 23, 42, 0.94)"/>
+                <stop offset="60%" stop-color="rgba(6, 78, 59, 0.65)"/>
+                <stop offset="100%" stop-color="rgba(4, 47, 46, 0.90)"/>
+              </linearGradient>
+              <linearGradient id="gatePillLockedGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="rgba(24, 18, 27, 0.92)"/>
+                <stop offset="100%" stop-color="rgba(15, 23, 42, 0.88)"/>
               </linearGradient>
               <linearGradient id="gateGreenBtnGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="#34d399"/>
@@ -24749,21 +24706,22 @@ const underTitleFull = cleanUnitTitle(u.id, u.title);
             ${branchesSVG}
           </svg>
 
-          <!-- Anchored Popover Modal & Backdrop -->
+          <!-- Anchored On-Node Glass Popover (Centered over active node by default as in reference) -->
           <div id="path-popover-backdrop" class="path-popover-backdrop" style="display:none;" aria-hidden="true"></div>
-          <div id="path-anchored-popover" class="path-popover" style="display:none;" role="dialog" tabindex="-1" aria-labelledby="popover-title" aria-describedby="popover-status">
+          <div id="path-anchored-popover" class="path-popover" data-return-focus-unit="${curActiveUnit ? curActiveUnit.id : ''}" style="display:block;top:${initialPopoverTop}px;left:${actCoord.x}px;" role="dialog" tabindex="-1" aria-labelledby="popover-title" aria-describedby="popover-status">
             <div class="path-popover-drag-handle" aria-hidden="true"></div>
-            <div class="path-popover-arrow path-popover-arrow--down" id="popover-arrow"></div>
+            <div class="path-popover-arrow ${initialPopoverArrow}" id="popover-arrow"></div>
             <div class="path-popover-content">
               <div class="path-popover-header">
-                <div class="path-popover-badge" id="popover-badge">🎯 Модуль 1 · Python</div>
-                <button type="button" class="path-popover-close" id="popover-close-btn" aria-label="Закрыть">✕</button>
+                <div class="path-popover-badge" id="popover-badge">В ФОКУСЕ · УРОК ${activeLessonNumInChap}</div>
+                <div style="font-size:11px;font-weight:700;color:#94a3b8;display:flex;align-items:center;gap:4px;"><span style="color:#fbbf24;">⚡</span> ~2 мин</div>
+                <button type="button" class="path-popover-close" id="popover-close-btn" aria-label="Закрыть" style="margin-left:auto;">✕</button>
               </div>
-              <h3 class="path-popover-title" id="popover-title">Переменные и память</h3>
-              <div class="path-popover-status" id="popover-status">В процессе изучения</div>
+              <h3 class="path-popover-title" id="popover-title" style="margin:6px 0 4px;font-size:15px;font-weight:800;color:#ffffff;line-height:1.25;">${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</h3>
+              <div class="path-popover-status" id="popover-status" style="margin-bottom:12px;font-size:11.5px;color:#94a3b8;line-height:1.4;">${escapeHtmlStr(curActiveUnit.desc || 'Флеш-карточки интервального повторения и практические задачи.')}</div>
               <div class="path-popover-skills" id="popover-skills"></div>
               <div class="path-popover-actions">
-                <button type="button" class="path-popover-cta path-popover-cta--active" id="popover-cta-btn">НАЧАТЬ ➔</button>
+                <button type="button" class="path-popover-cta path-popover-cta--active" id="popover-cta-btn" data-target-unit="${curActiveUnit ? curActiveUnit.id : ''}">НАЧАТЬ УРОК (2 МИН) ➔</button>
               </div>
             </div>
           </div>
@@ -24938,6 +24896,11 @@ function viewProPath(options){
       </div>
     `;
   }).join('');
+
+  const actCoord = (coords[activeUnitIndex] || coords[0] || { x: 340, y: 70 });
+  const placeBelow = actCoord.y < 190;
+  const initialPopoverTop = placeBelow ? (actCoord.y + 52) : (actCoord.y - 195);
+  const initialPopoverArrow = placeBelow ? 'path-popover-arrow--up' : 'path-popover-arrow--down';
 
   return `
     <div class="coddy-path-layout">
