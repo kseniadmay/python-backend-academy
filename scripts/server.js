@@ -1,4 +1,5 @@
 const http = require('http');
+const zlib = require('zlib');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
@@ -14,6 +15,7 @@ const SYNC_DEVICE_TTL_MS = 60 * 1000;
 const SYNC_TOKEN = process.env.SYNC_TOKEN || '';
 const DATABASE_URL = process.env.DATABASE_URL || '';
 const CONTENT_CACHE = new Map();
+const academyGzipCache = { mtimeMs: 0, buffer: null, etag: '' };
 
 if (process.env.NODE_ENV === 'production' && (!DATABASE_URL || !SYNC_TOKEN)) {
     throw new Error('Production requires DATABASE_URL and SYNC_TOKEN');
@@ -188,10 +190,6 @@ const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    res.setHeader('Surrogate-Control', 'no-store');
 
     if (req.method === 'OPTIONS') {
         res.writeHead(204);
@@ -489,17 +487,73 @@ const server = http.createServer((req, res) => {
 
     try {
         const stat = fs.statSync(filePath);
-        res.writeHead(200, {
-            'Content-Type': contentType,
-            'Content-Length': stat.size,
-            'Cache-Control': 'no-cache, must-revalidate, max-age=0',
-            'Pragma': 'no-cache',
-            'Expires': '0',
-            'Access-Control-Allow-Origin': '*'
-        });
+        const etag = `W/"${stat.size.toString(16)}-${Math.floor(stat.mtimeMs).toString(16)}"`;
+        const ifNoneMatch = req.headers['if-none-match'];
 
-        const stream = fs.createReadStream(filePath);
-        stream.pipe(res);
+        if (ifNoneMatch && ifNoneMatch === etag) {
+            res.writeHead(304, {
+                'ETag': etag,
+                'Cache-Control': 'no-cache, must-revalidate',
+                'Access-Control-Allow-Origin': '*'
+            });
+            res.end();
+            return;
+        }
+
+        const acceptEncoding = req.headers['accept-encoding'] || '';
+        const canGzip = /\bgzip\b/.test(acceptEncoding) && (
+            contentType.startsWith('text/') ||
+            contentType.startsWith('application/javascript') ||
+            contentType.startsWith('application/json') ||
+            contentType === 'image/svg+xml'
+        );
+
+        const isAcademy = path.basename(filePath) === 'academy.html';
+
+        if (canGzip) {
+            if (isAcademy) {
+                if (!academyGzipCache.buffer || academyGzipCache.mtimeMs !== stat.mtimeMs) {
+                    const raw = fs.readFileSync(filePath);
+                    academyGzipCache.buffer = zlib.gzipSync(raw, { level: 6 });
+                    academyGzipCache.mtimeMs = stat.mtimeMs;
+                    academyGzipCache.etag = etag;
+                }
+                res.writeHead(200, {
+                    'Content-Type': contentType,
+                    'Content-Encoding': 'gzip',
+                    'Content-Length': academyGzipCache.buffer.length,
+                    'ETag': etag,
+                    'Cache-Control': 'no-cache, must-revalidate',
+                    'Vary': 'Accept-Encoding',
+                    'Access-Control-Allow-Origin': '*'
+                });
+                res.end(academyGzipCache.buffer);
+                return;
+            }
+
+            res.writeHead(200, {
+                'Content-Type': contentType,
+                'Content-Encoding': 'gzip',
+                'ETag': etag,
+                'Cache-Control': 'no-cache, must-revalidate',
+                'Vary': 'Accept-Encoding',
+                'Access-Control-Allow-Origin': '*'
+            });
+            const rawStream = fs.createReadStream(filePath);
+            const gzipStream = zlib.createGzip({ level: 6 });
+            rawStream.pipe(gzipStream).pipe(res);
+        } else {
+            res.writeHead(200, {
+                'Content-Type': contentType,
+                'Content-Length': stat.size,
+                'ETag': etag,
+                'Cache-Control': 'no-cache, must-revalidate',
+                'Vary': 'Accept-Encoding',
+                'Access-Control-Allow-Origin': '*'
+            });
+            const stream = fs.createReadStream(filePath);
+            stream.pipe(res);
+        }
     } catch (e) {
         res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
         res.end('Server Error: ' + e.message);

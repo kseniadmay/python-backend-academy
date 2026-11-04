@@ -15136,8 +15136,8 @@ pwa_meta = """<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#faf8f5" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0d1016">
 <link rel="apple-touch-icon" href="icon.svg">"""
-brython_scripts = """<script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.13.0/brython.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.13.0/brython_stdlib.js"></script>"""
+brython_scripts = """<script defer src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.13.0/brython.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.13.0/brython_stdlib.js"></script>"""
 html_out = html_out.replace('</style>\n</head>', EXTRA_CSS + '\n</style>\n' + pwa_meta + '\n' + brython_scripts + '\n</head>', 1)
 
 # 1b. Wrap desktop sidebar streak word for Russian pluralization (avoid "1 дней подряд")

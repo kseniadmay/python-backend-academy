@@ -4,6 +4,7 @@ from typing import AsyncGenerator
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, Response
 
 from backend.app.api.legacy_compat import legacy_router
@@ -41,6 +42,7 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
+app.add_middleware(GZipMiddleware, minimum_size=1024)
 
 NO_STORE_HEADERS = {
     'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
@@ -58,19 +60,35 @@ STATIC_MEDIA_TYPES = {
 }
 
 
-def _serve_spa_entry(root_dir: Path) -> FileResponse:
-    return FileResponse(
-        root_dir / 'academy.html',
-        media_type='text/html; charset=utf-8',
-        headers=NO_STORE_HEADERS
-    )
+def _serve_file_with_etag(file_path: Path, media_type: str, request: Request) -> Response:
+    try:
+        st = file_path.stat()
+        etag = f'W/"{st.st_size:x}-{int(st.st_mtime):x}"'
+        if request.headers.get('if-none-match') == etag:
+            return Response(status_code=304, headers={'ETag': etag, 'Cache-Control': 'no-cache, must-revalidate'})
+        return FileResponse(
+            file_path,
+            media_type=media_type,
+            headers={
+                'ETag': etag,
+                'Cache-Control': 'no-cache, must-revalidate',
+                'Access-Control-Allow-Origin': '*'
+            }
+        )
+    except Exception:
+        return FileResponse(file_path, media_type=media_type)
+
+def _serve_spa_entry(root_dir: Path, request: Request) -> Response:
+    return _serve_file_with_etag(root_dir / 'academy.html', 'text/html; charset=utf-8', request)
 
 
 @app.middleware('http')
 async def add_no_store_headers(request: Request, call_next):
     response = await call_next(request)
-    for key, val in NO_STORE_HEADERS.items():
-        response.headers[key] = val
+    path = request.url.path
+    if path.startswith('/api/') or path.startswith('/healthz'):
+        for key, val in NO_STORE_HEADERS.items():
+            response.headers[key] = val
     return response
 
 
@@ -87,7 +105,7 @@ async def serve_spa_or_static(full_path: str, request: Request) -> Response:
     # Очистка пути от параметров и относительных обходов
     clean_path = full_path.strip().lstrip('/')
     if not clean_path or clean_path in ('index.html', 'academy.html'):
-        return _serve_spa_entry(root_dir)
+        return _serve_spa_entry(root_dir, request)
 
     target_file = root_dir / clean_path
 
@@ -95,16 +113,12 @@ async def serve_spa_or_static(full_path: str, request: Request) -> Response:
     try:
         resolved_file = target_file.resolve()
         if not str(resolved_file).startswith(str(root_dir.resolve())):
-            return _serve_spa_entry(root_dir)
+            return _serve_spa_entry(root_dir, request)
     except Exception:
-        return _serve_spa_entry(root_dir)
+        return _serve_spa_entry(root_dir, request)
 
     if resolved_file.is_file():
-        media_type = STATIC_MEDIA_TYPES.get(resolved_file.suffix.lower())
-        return FileResponse(
-            resolved_file,
-            media_type=media_type,
-            headers=NO_STORE_HEADERS
-        )
+        media_type = STATIC_MEDIA_TYPES.get(resolved_file.suffix.lower()) or 'application/octet-stream'
+        return _serve_file_with_etag(resolved_file, media_type, request)
 
-    return _serve_spa_entry(root_dir)
+    return _serve_spa_entry(root_dir, request)

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'academy-pwa-v71';
+const CACHE_NAME = 'academy-pwa-v72';
 const ASSETS_TO_CACHE = [
   './',
   'index.html',
@@ -42,31 +42,60 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Network-First стратегия с бесшовным Cache-Fallback для оффлайна
+  // Network-First с быстрым адаптивным таймаутом (1200ms) для мобильных сетей
   event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        if (
-          networkResponse &&
-          networkResponse.status === 200 &&
-          networkResponse.type === 'basic'
-        ) {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-        }
-        return networkResponse;
-      })
-      .catch(() => {
-        return caches.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          if (event.request.mode === 'navigate') {
-            return caches.match('academy.html');
+    new Promise((resolve) => {
+      let isSettled = false;
+
+      const timer = setTimeout(() => {
+        caches.match(event.request).then((cached) => {
+          if (cached && !isSettled) {
+            isSettled = true;
+            resolve(cached);
+          } else if (event.request.mode === 'navigate' && !isSettled) {
+            caches.match('academy.html').then((acadCached) => {
+              if (acadCached && !isSettled) {
+                isSettled = true;
+                resolve(acadCached);
+              }
+            });
           }
         });
-      })
+      }, 1200);
+
+      fetch(event.request)
+        .then((networkResponse) => {
+          clearTimeout(timer);
+          if (
+            networkResponse &&
+            networkResponse.status === 200 &&
+            networkResponse.type === 'basic'
+          ) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+          }
+          if (!isSettled) {
+            isSettled = true;
+            resolve(networkResponse);
+          }
+        })
+        .catch(() => {
+          clearTimeout(timer);
+          if (!isSettled) {
+            isSettled = true;
+            caches.match(event.request).then((cachedResponse) => {
+              if (cachedResponse) {
+                return resolve(cachedResponse);
+              }
+              if (event.request.mode === 'navigate') {
+                return resolve(caches.match('academy.html'));
+              }
+              resolve(new Response('Offline', { status: 503, statusText: 'Offline' }));
+            });
+          }
+        });
+    })
   );
 });
