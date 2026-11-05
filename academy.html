@@ -5304,7 +5304,7 @@
   /* Neo-Glass HUD Header for Path Screen (Variant 1) */
   .hero-header {
     width: 100%;
-    max-width: 680px;
+    max-width: 720px;
     margin: 20px auto 14px;
     background: linear-gradient(145deg, rgba(15, 23, 42, 0.92) 0%, rgba(6, 78, 59, 0.42) 100%);
     border: 1.5px solid rgba(16, 185, 129, 0.45);
@@ -5362,6 +5362,84 @@
     align-items: center;
     gap: 14px;
     flex-shrink: 0;
+  }
+  .hero-gamify-badges {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(30, 41, 59, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    font-size: 12px;
+    font-weight: 800;
+    color: #f8fafc;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    cursor: default;
+    user-select: none;
+  }
+  .hero-pill:hover {
+    transform: translateY(-1px);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+  .hero-pill--streak {
+    border-color: rgba(245, 158, 11, 0.38);
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.12);
+  }
+  .hero-pill--streak:hover {
+    border-color: rgba(245, 158, 11, 0.65);
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.25);
+  }
+  .hero-pill--xp {
+    border-color: rgba(16, 185, 129, 0.38);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.12);
+  }
+  .hero-pill--xp:hover {
+    border-color: rgba(16, 185, 129, 0.65);
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.25);
+  }
+  .hero-flame-icon {
+    font-size: 13.5px;
+    display: inline-block;
+    animation: heroFlameBreath 2.4s infinite ease-in-out;
+  }
+  @keyframes heroFlameBreath {
+    0%, 100% {
+      transform: scale(1);
+      filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.5));
+    }
+    50% {
+      transform: scale(1.12);
+      filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.85));
+    }
+  }
+  .hero-star-icon {
+    font-size: 13.5px;
+    display: inline-block;
+    animation: heroStarShimmer 2.6s infinite ease-in-out;
+  }
+  @keyframes heroStarShimmer {
+    0%, 100% {
+      transform: rotate(0deg) scale(1);
+      filter: drop-shadow(0 0 4px rgba(254, 240, 138, 0.5));
+    }
+    50% {
+      transform: rotate(8deg) scale(1.12);
+      filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.85));
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-flame-icon, .hero-star-icon {
+      animation: none !important;
+    }
   }
   .hero-stat-box {
     text-align: right;
@@ -5429,6 +5507,9 @@
     }
     .hero-right {
       gap: 10px;
+    }
+    .hero-gamify-badges {
+      display: none !important;
     }
     .hero-jump-btn {
       padding: 7px 11px;
@@ -49322,6 +49403,12 @@ const underTitleFull = cleanUnitTitle(u.id, u.title);
 
   const streakText = (typeof pluralizeRu === 'function') ? pluralizeRu(state.streak || 0, 'день', 'дня', 'дней') : 'дн.';
 
+  const streakCount = Math.max(1, Number(state.streak) || 1);
+
+  const xpCount = Number(state.xp) || 0;
+
+  const formattedXp = xpCount >= 1000 ? (xpCount.toLocaleString('ru-RU') + ' XP') : (xpCount + ' XP');
+
 
 
   // Echelon metadata
@@ -49418,6 +49505,16 @@ const underTitleFull = cleanUnitTitle(u.id, u.title);
               <div class="hero-sub">Текущий раздел: Глава ${activeChapterNum} · ${escapeHtmlStr(activeChapterShortTitle || 'Web & HTTP')}</div>
             </div>
             <div class="hero-right">
+              <div class="hero-gamify-badges">
+                <div class="hero-pill hero-pill--streak" title="Текущая серия ударных дней обучения" aria-label="Стрик ${streakCount} дн.">
+                  <span class="hero-pill-icon hero-flame-icon">🔥</span>
+                  <span class="hero-pill-val">${streakCount} дн.</span>
+                </div>
+                <div class="hero-pill hero-pill--xp" title="Накопленные баллы опыта" aria-label="Опыт ${formattedXp}">
+                  <span class="hero-pill-icon hero-star-icon">⭐</span>
+                  <span class="hero-pill-val">${formattedXp}</span>
+                </div>
+              </div>
               <div class="hero-stat-box">
                 <div class="hero-stat-val">${totalCompletedUnits} / ${allUnits.length}</div>
                 <div class="hero-stat-lbl">Освоено</div>
