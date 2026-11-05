@@ -41269,13 +41269,13 @@ function viewPythonSkill(sid){
 
   const curStep = steps[stepIdx] || {title: noteObj.title, html: ''};
 
-  const chunks = splitStepHtmlIntoChunks(curStep.html).slice();
+  const cleanStepTitle = (curStep.title || ('Шаг ' + (stepIdx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
 
-  if(chunks.length > 0 && curStep.title && !/^<h[1-6]\b/i.test(String(chunks[0] || '').trim())){
+  const pureStepTitle = cleanStepTitle.replace(/^\d+[\.\)\s\-·•]+\s*/, '').trim();
 
-    chunks[0] = `<h4>${curStep.title}</h4>\n` + chunks[0];
-
-  }
+  const chunks = (typeof getStepChunks === 'function')
+    ? getStepChunks(curStep, pureStepTitle)
+    : (typeof splitStepHtmlIntoChunks === 'function' ? splitStepHtmlIntoChunks(curStep.html, pureStepTitle) : [curStep.html || '']);
 
   const totalChunks = chunks.length;
 
@@ -41622,7 +41622,6 @@ function viewPythonSkill(sid){
       : '';
 
     const cleanNoteTitle = (noteObj && noteObj.title ? noteObj.title : activeK).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-    const cleanStepTitle = (curStep.title || ('Шаг ' + (stepIdx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
 
     bodyHTML = `
       <!-- Уровень 2: Чистые центрированные парящие бусины шагов конспекта (как в тренажёре конспектов) -->
@@ -59262,13 +59261,13 @@ document.addEventListener('click', async function(e){
 
       const curStep = steps[curSIdx] || {title:'', html:''};
 
-      const chunks = (typeof splitStepHtmlIntoChunks === 'function') ? splitStepHtmlIntoChunks(curStep.html).slice() : [];
+      const cleanStepTitle = (curStep.title || ('Шаг ' + (curSIdx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
 
-      if(chunks.length > 0 && curStep.title && !/^<h[1-6]\b/i.test(String(chunks[0] || '').trim())){
+      const pureStepTitle = cleanStepTitle.replace(/^\d+[\.\)\s\-·•]+\s*/, '').trim();
 
-        chunks[0] = `<h4>${curStep.title}</h4>\n` + chunks[0];
-
-      }
+      const chunks = (typeof getStepChunks === 'function')
+        ? getStepChunks(curStep, pureStepTitle)
+        : (typeof splitStepHtmlIntoChunks === 'function' ? splitStepHtmlIntoChunks(curStep.html, pureStepTitle) : [curStep.html || '']);
 
 
 
@@ -59620,7 +59619,7 @@ document.addEventListener('click', async function(e){
 
         const prevStep = noteObj && noteObj.steps && noteObj.steps[pySkillViewState.stepIdx];
 
-        const prevChunks = prevStep ? splitStepHtmlIntoChunks(prevStep.html) : [];
+        const prevChunks = prevStep ? ((typeof getStepChunks === 'function') ? getStepChunks(prevStep) : splitStepHtmlIntoChunks(prevStep.html)) : [];
 
         pySkillViewState.chunkIdx = Math.max(0, prevChunks.length - 1);
 
@@ -60420,13 +60419,13 @@ const psk = e.target.closest('[data-py-select-k]');
 
     const curStep = steps[nextStepIdx] || {title:'', html:''};
 
-    const chunks = (typeof splitStepHtmlIntoChunks === 'function') ? splitStepHtmlIntoChunks(curStep.html).slice() : [];
+    const cleanStepTitle = (curStep.title || ('Шаг ' + (nextStepIdx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
 
-    if(chunks.length > 0 && curStep.title && !/^<h[1-6]\b/i.test(String(chunks[0] || '').trim())){
+    const pureStepTitle = cleanStepTitle.replace(/^\d+[\.\)\s\-·•]+\s*/, '').trim();
 
-      chunks[0] = `<h4>${curStep.title}</h4>\n` + chunks[0];
-
-    }
+    const chunks = (typeof getStepChunks === 'function')
+      ? getStepChunks(curStep, pureStepTitle)
+      : (typeof splitStepHtmlIntoChunks === 'function' ? splitStepHtmlIntoChunks(curStep.html, pureStepTitle) : [curStep.html || '']);
 
 
 
