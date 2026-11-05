@@ -5684,7 +5684,158 @@
 
   }
 
-  /* Variant 1: Magnetic Glow & Micro-Levitation for Nodes (Hover & Focus Dynamics) */
+    /* ================= FLOATING CHAPTER COMPASS RAIL (Variant 1: Academic Glass Compass) ================= */
+  .path-floating-chapter-rail {
+    position: fixed;
+    right: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 95;
+    pointer-events: auto;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .pfc-rail-inner {
+    background: rgba(15, 23, 42, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 28px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 18px rgba(0, 0, 0, 0.35);
+    padding: 10px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .pfc-rail-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(30, 41, 59, 0.6);
+    color: #94a3b8;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    outline: none;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .pfc-rail-btn:hover,
+  .pfc-rail-btn:focus-visible {
+    transform: scale(1.15) translateX(-2px);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.35);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Statuses */
+  .pfc-rail-btn--completed {
+    background: rgba(202, 138, 4, 0.18);
+    border-color: rgba(250, 204, 21, 0.45);
+    color: #fef08a;
+  }
+  .pfc-rail-btn--completed:hover {
+    border-color: #fef08a;
+    box-shadow: 0 0 18px rgba(250, 204, 21, 0.6);
+  }
+
+  .pfc-rail-btn--active {
+    background: rgba(16, 185, 129, 0.25);
+    border-color: rgba(52, 211, 153, 0.85);
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(52, 211, 153, 0.65), inset 0 0 8px rgba(52, 211, 153, 0.4);
+    animation: pfcPulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pfcPulse {
+    0%, 100% { box-shadow: 0 0 14px rgba(52, 211, 153, 0.5); }
+    50% { box-shadow: 0 0 24px rgba(52, 211, 153, 0.95), 0 0 8px #ffffff; }
+  }
+
+  .pfc-rail-btn.is-scroll-active {
+    border-color: rgba(52, 211, 153, 0.95) !important;
+    box-shadow: 0 0 18px rgba(52, 211, 153, 0.8) !important;
+    transform: scale(1.12);
+  }
+
+  .pfc-rail-btn--locked {
+    background: rgba(15, 23, 42, 0.5);
+    border-color: rgba(71, 85, 105, 0.3);
+    color: #475569;
+  }
+  .pfc-rail-btn--locked:hover {
+    border-color: rgba(71, 85, 105, 0.55);
+    color: #64748b;
+  }
+
+  .pfc-rail-tooltip {
+    position: absolute;
+    right: 44px;
+    top: 50%;
+    transform: translateY(-50%) translateX(8px);
+    background: rgba(15, 23, 42, 0.94);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-radius: 10px;
+    padding: 6px 12px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: left;
+    z-index: 100;
+  }
+
+  .pfc-rail-tooltip::after {
+    content: '';
+    position: absolute;
+    right: -5px;
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+    width: 8px;
+    height: 8px;
+    background: rgba(15, 23, 42, 0.94);
+    border-right: 1px solid rgba(255, 255, 255, 0.16);
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+  }
+
+  .pfc-rail-btn:hover .pfc-rail-tooltip,
+  .pfc-rail-btn:focus-visible .pfc-rail-tooltip {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+
+  .pfc-tooltip-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #f8fafc;
+  }
+  .pfc-tooltip-sub {
+    font-size: 10px;
+    color: #94a3b8;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  @media (max-width: 1024px) {
+    .path-floating-chapter-rail {
+      display: none !important;
+    }
+  }
+
+/* Variant 1: Magnetic Glow & Micro-Levitation for Nodes (Hover & Focus Dynamics) */
   .hex-3d-node {
     cursor: pointer;
     outline: none;
@@ -35872,6 +36023,25 @@ const SoundFx = {
 
   },
 
+  playNav: function(){
+    try{
+      const ctx = this._getCtx();
+      if(!ctx) return;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, now); // D5
+      osc.frequency.exponentialRampToValueAtTime(880.00, now + 0.10); // A5
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.32);
+    }catch(e){}
+  },
+
   playXp: function(){
 
     try{
@@ -48697,6 +48867,43 @@ function getSemanticTrailIcon(u, i, isChapterLast){
 
 
 
+function renderFloatingChapterRailHTML(chapterBreakpoints, activeChapterNum) {
+  if (!chapterBreakpoints || !chapterBreakpoints.length) return '';
+  const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
+  
+  const buttonsHTML = chapterBreakpoints.map((cb, cIdx) => {
+    const isChapDone = cb.units.length > 0 && cb.units.every(isUnitCompleted);
+    const isChapActive = (cb.chapterNum === activeChapterNum);
+    const doneCount = cb.units.filter(isUnitCompleted).length;
+    const totalCount = cb.units.length;
+    const pct = Math.round(doneCount / (totalCount || 1) * 100);
+    const roman = romanNumerals[cIdx] || (cIdx + 1);
+    const statusClass = isChapDone ? 'completed' : (isChapActive ? 'active' : 'locked');
+    const statusText = isChapDone ? 'Освоено 100%' : (isChapActive ? `Текущая · ${doneCount}/${totalCount} (${pct}%)` : `Заблокировано · 0/${totalCount}`);
+
+    return `
+      <button type="button" class="pfc-rail-btn pfc-rail-btn--${statusClass} ${isChapActive ? 'is-active is-scroll-active' : ''}" 
+              data-jump-chapter="${cb.startIdx}"
+              data-chapter-num="${cb.chapterNum}"
+              aria-label="Глава ${cb.chapterNum}: ${escapeHtmlStr(cb.shortTitle || '')}">
+        <span class="pfc-rail-roman">${roman}</span>
+        <div class="pfc-rail-tooltip" role="tooltip">
+          <span class="pfc-tooltip-title">Гл. ${cb.chapterNum}: ${escapeHtmlStr(cb.shortTitle || '')}</span>
+          <span class="pfc-tooltip-sub">${statusText}</span>
+        </div>
+      </button>
+    `;
+  }).join('');
+
+  return `
+    <nav class="path-floating-chapter-rail" id="path-chapter-rail" aria-label="Быстрая навигация по главам">
+      <div class="pfc-rail-inner">
+        ${buttonsHTML}
+      </div>
+    </nav>
+  `;
+}
+
 function viewPathSerpentine(options){
 
   options = options || {};
@@ -49993,7 +50200,7 @@ const underTitleFull = cleanUnitTitle(u.id, u.title);
 
 
 
-      <!-- Right rail removed in favor of On-Node Popover for centered Zen focus -->
+      ${renderFloatingChapterRailHTML(chapterBreakpoints, activeChapterNum)}
 
     </div>`;
 
@@ -56636,15 +56843,41 @@ render = function(){
 
           };
 
+                    const updateRailActive = function() {
+            const railBtns = document.querySelectorAll('.pfc-rail-btn');
+            if(!railBtns.length) return;
+            const viewMid = window.innerHeight / 2;
+            let currentActiveChap = 1;
+            railBtns.forEach(btn => {
+              const startIdx = parseInt(btn.getAttribute('data-jump-chapter'), 10);
+              const node = document.querySelector(`.hex-3d-node[data-node-idx="${startIdx}"]`);
+              if(node) {
+                const rect = node.getBoundingClientRect();
+                if(rect.top <= viewMid + 150) {
+                  currentActiveChap = parseInt(btn.getAttribute('data-chapter-num'), 10);
+                }
+              }
+            });
+            railBtns.forEach(btn => {
+              const chapNum = parseInt(btn.getAttribute('data-chapter-num'), 10);
+              if(chapNum === currentActiveChap) {
+                btn.classList.add('is-scroll-active');
+              } else {
+                btn.classList.remove('is-scroll-active');
+              }
+            });
+          };
+
           if(!window._pathJumpScrollBound){
 
             window._pathJumpScrollBound = true;
 
-            window.addEventListener('scroll', updateJumpBtn, { passive: true });
+            window.addEventListener('scroll', () => { updateJumpBtn(); updateRailActive(); }, { passive: true });
 
           }
 
           updateJumpBtn();
+          updateRailActive();
 
         }
 
@@ -62805,6 +63038,19 @@ const psk = e.target.closest('[data-py-select-k]');
 
     }
 
+  }
+
+    const railBtn = e.target.closest('.pfc-rail-btn');
+  if(railBtn){
+    if(typeof SoundFx !== 'undefined' && SoundFx.playNav) SoundFx.playNav();
+    const startIdx = parseInt(railBtn.getAttribute('data-jump-chapter'), 10);
+    const targetNode = document.querySelector(`.hex-3d-node[data-node-idx="${startIdx}"]`);
+    if(targetNode){
+      targetNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetNode.classList.add('hex-node--prereq-target');
+      setTimeout(() => targetNode.classList.remove('hex-node--prereq-target'), 1800);
+    }
+    return;
   }
 
   const chapItem = e.target.closest('.path-chap-menu-item');
