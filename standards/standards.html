@@ -11852,6 +11852,55 @@
 
   }
 
+  /* Variant 1: Chapter Gate Breakthrough & Ethereal Beacon FX */
+  .path-section-gate.gate-beacon-flash .path-section-gate-bg {
+    animation: gateBeaconSurge 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes gateBeaconSurge {
+    0% {
+      filter: drop-shadow(0 10px 28px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 24px rgba(16, 185, 129, 0.35));
+      stroke: rgba(16, 185, 129, 0.65);
+    }
+    35% {
+      filter: drop-shadow(0 10px 32px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 45px rgba(52, 211, 153, 0.95)) drop-shadow(0 0 20px rgba(254, 240, 138, 0.85));
+      stroke: #fef08a;
+      stroke-width: 2.5px;
+    }
+    100% {
+      filter: drop-shadow(0 10px 28px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 24px rgba(16, 185, 129, 0.35));
+      stroke: rgba(16, 185, 129, 0.65);
+      stroke-width: 1.5px;
+    }
+  }
+
+  /* Target lesson shedding Fog of Mastery */
+  .hex-3d-node.gate-breakthrough-target {
+    opacity: 1 !important;
+    filter: none !important;
+    animation: gateTargetAwaken 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes gateTargetAwaken {
+    0% {
+      transform: scale(0.95);
+      filter: blur(4px) drop-shadow(0 0 0 transparent);
+    }
+    40% {
+      transform: scale(1.15);
+      filter: blur(0px) drop-shadow(0 0 35px rgba(52, 211, 153, 0.95)) drop-shadow(0 0 20px rgba(254, 240, 138, 0.9));
+    }
+    100% {
+      transform: scale(1);
+      filter: drop-shadow(0 0 16px rgba(16, 185, 129, 0.7));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .path-section-gate.gate-beacon-flash .path-section-gate-bg,
+    .hex-3d-node.gate-breakthrough-target {
+      animation: none !important;
+    }
+  }
+
   .path-section-gate-bg {
 
     transition: filter 0.22s ease, stroke 0.22s ease, fill 0.22s ease;
@@ -35891,6 +35940,28 @@ const SoundFx = {
     }catch(e){}
   },
 
+  playBeacon: function(){
+    try{
+      const ctx = this._getCtx();
+      if(!ctx) return;
+      const now = ctx.currentTime;
+      const osc1 = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc1.type = 'sine';
+      osc2.type = 'triangle';
+      osc1.frequency.setValueAtTime(261.63, now);
+      osc1.frequency.exponentialRampToValueAtTime(523.25, now + 0.35);
+      osc2.frequency.setValueAtTime(329.63, now);
+      osc2.frequency.exponentialRampToValueAtTime(659.25, now + 0.35);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.75);
+      osc1.connect(gain); osc2.connect(gain); gain.connect(ctx.destination);
+      osc1.start(now); osc1.stop(now + 0.75);
+      osc2.start(now); osc2.stop(now + 0.75);
+    }catch(e){}
+  },
+
   playSuccess: function(){
 
     try{
@@ -48931,7 +49002,7 @@ function viewPathSerpentine(options){
 
       markersSVG += `
 
-        <g class="path-section-gate path-chapter-ribbon path-section-gate--${gateStatus}" transform="translate(340, ${cy})">
+        <g class="path-section-gate path-chapter-ribbon path-section-gate--${gateStatus}" data-gate-track="${cb.track}" data-gate-start-idx="${cb.startIdx}" data-gate-chap-num="${cb.chapterNum}" data-gate-chap-title="${escapeHtmlStr(cleanCurTitle)}" data-gate-locked="${isLocked?1:0}" transform="translate(340, ${cy})">
 
           <rect class="path-section-gate-bg" x="-190" y="-27" width="380" height="54" rx="27" fill="${isLocked ? 'url(#gatePillLockedGrad)' : 'url(#gatePillUnlockedGrad)'}" stroke="${isLocked ? 'rgba(190, 18, 60, 0.50)' : 'rgba(16, 185, 129, 0.65)'}" stroke-width="1.5" filter="drop-shadow(0 10px 28px rgba(0,0,0,0.70)) drop-shadow(0 0 24px rgba(16,185,129,0.35))"/>
 
@@ -48959,7 +49030,7 @@ function viewPathSerpentine(options){
 
 
 
-          <g class="path-gate-btn ${isLocked ? 'path-gate-btn--locked' : 'path-gate-btn--unlocked'}" data-gate-track="${cb.track}" data-gate-locked="${isLocked?1:0}" transform="translate(150, 0)" role="button" tabindex="0" aria-label="Перейти к главе ${cb.chapterNum}">
+          <g class="path-gate-btn ${isLocked ? 'path-gate-btn--locked' : 'path-gate-btn--unlocked'}" data-gate-track="${cb.track}" data-gate-start-idx="${cb.startIdx}" data-gate-chap-num="${cb.chapterNum}" data-gate-chap-title="${escapeHtmlStr(cleanCurTitle)}" data-gate-locked="${isLocked?1:0}" transform="translate(150, 0)" role="button" tabindex="0" aria-label="Перейти к главе ${cb.chapterNum}">
 
             <circle r="17" fill="${isLocked ? 'rgba(148, 163, 184, 0.15)' : 'url(#gateGreenBtnGrad)'}" stroke="${isLocked ? 'rgba(148, 163, 184, 0.3)' : 'rgba(52, 211, 153, 0.8)'}" stroke-width="1.2" filter="${isLocked ? '' : 'drop-shadow(0 0 10px rgba(16,185,129,0.6))'}"/>
 
@@ -62564,6 +62635,12 @@ const psk = e.target.closest('[data-py-select-k]');
 
     const prevTitle = gateBtn.getAttribute('data-gate-prev-title') || 'предыдущей главы';
 
+    const startIdx = gateBtn.getAttribute('data-gate-start-idx');
+
+    const chapNum = gateBtn.getAttribute('data-gate-chap-num') || '';
+
+    const chapTitle = gateBtn.getAttribute('data-gate-chap-title') || '';
+
     if(typeof navigator !== 'undefined' && navigator.vibrate){
 
       try{ navigator.vibrate(10); }catch(v){}
@@ -62592,6 +62669,31 @@ const psk = e.target.closest('[data-py-select-k]');
 
       return;
 
+    }
+
+    // Unlocked Breakthrough Flow (Variant 1: Ethereal Beacon & Fog Lift)
+    if(typeof SoundFx !== 'undefined' && SoundFx.playBeacon){
+      SoundFx.playBeacon();
+    }
+    const gateRibbon = gateBtn.closest('.path-section-gate');
+    if(gateRibbon){
+      gateRibbon.classList.add('gate-beacon-flash');
+      setTimeout(() => gateRibbon.classList.remove('gate-beacon-flash'), 1600);
+    }
+    if(typeof showTactileToast === 'function' && chapNum){
+      showTactileToast(`✨ Глава ${chapNum}: «${chapTitle}» открыта!`);
+    }
+    if(startIdx !== null && startIdx !== undefined && startIdx !== ''){
+      const targetNode = document.querySelector(`.hex-3d-node[data-node-idx="${startIdx}"]`);
+      if(targetNode){
+        targetNode.classList.add('gate-breakthrough-target');
+        targetNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => {
+          targetNode.classList.remove('gate-breakthrough-target');
+          targetNode.click();
+        }, 550);
+        return;
+      }
     }
 
     if(track) location.hash = `#/${track}`;
