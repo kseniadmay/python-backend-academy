@@ -5684,30 +5684,37 @@
 
   }
 
+  /* Variant 1: Magnetic Glow & Micro-Levitation for Nodes (Hover & Focus Dynamics) */
   .hex-3d-node {
-
     cursor: pointer;
-
     outline: none;
-
     transform-box: fill-box;
-
-    transform-origin: center;
-
-    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.20s ease;
-
+    transform-origin: center center;
+    transition: transform 0.26s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.24s ease;
   }
-
-  .hex-3d-node:hover {
-
-    transform: scale(1.045);
-
+  .hex-3d-node:hover,
+  .hex-3d-node:focus-visible {
+    transform: translateY(-5px) scale(1.08);
   }
-
   .hex-3d-node:active {
+    transform: translateY(1px) scale(0.95);
+    transition-duration: 0.08s;
+  }
 
-    transform: scale(0.93) translateY(2px);
-
+  /* Specific Glowing Halos per status */
+  .hex-3d-node.hex-node--completed:hover,
+  .hex-3d-node.hex-node--completed:focus-visible {
+    filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 26px rgba(254, 240, 138, 0.95)) drop-shadow(0 0 16px rgba(52, 211, 153, 0.85));
+  }
+  .hex-3d-node.hex-node--active:hover,
+  .hex-3d-node.hex-node--active:focus-visible {
+    transform: translateY(-5px) scale(1.10) !important;
+    filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 35px rgba(254, 240, 138, 1)) drop-shadow(0 0 20px rgba(52, 211, 153, 0.9)) !important;
+  }
+  .hex-3d-node.hex-node--locked:hover,
+  .hex-3d-node.hex-node--locked:focus-visible {
+    transform: translateY(-2px) scale(1.03);
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 10px rgba(148, 163, 184, 0.35));
   }
 
   .hex-active-tooltip {
@@ -5948,32 +5955,22 @@
 
   }
 
-  /* «Челлендж мастерства» — боковые ветви-гексагоны (по референсу Coddy) */
-
+  /* «Челлендж мастерства» — боковые ветви-гексагоны (Magnetic Glow & Levitation) */
   .hex-challenge-node {
-
     cursor: pointer;
-
     outline: none;
-
     transform-box: fill-box;
-
-    transform-origin: center;
-
-    transition: transform 0.24s ease;
-
+    transform-origin: center center;
+    transition: transform 0.26s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.24s ease;
   }
-
-  .hex-challenge-node:hover {
-
-    transform: scale(1.035);
-
+  .hex-challenge-node:hover,
+  .hex-challenge-node:focus-visible {
+    transform: translateY(-5px) scale(1.08);
+    filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 28px rgba(244, 63, 94, 0.95)) drop-shadow(0 0 16px rgba(254, 240, 138, 0.7));
   }
-
   .hex-challenge-node:active {
-
-    transform: scale(0.985);
-
+    transform: translateY(1px) scale(0.95);
+    transition-duration: 0.08s;
   }
 
   .hex-challenge-node--locked {
