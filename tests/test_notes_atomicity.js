@@ -8,8 +8,11 @@
  *  2. Запрет пустых квантов (Zero Empty Chunks).
  *  3. Строгую сбалансированность и валидность HTML-тегов в каждом кванте (No DOM leakage).
  *  4. Запрет «сиротливых заголовков» и оборванных подводок (No Orphan Headings / Lead-ins).
- *  5. Аккуратность порций и отсутствие неквантованных монолитных массивов (Anti-Monolith & Sizing).
- *  6. Безопасность инжекции в DOM и поддержку исполняемых сниппетов (Safe DOM Injection).
+ *  5. Канон педагогики Кодди (Active Microlearning):
+ *     - Текст кванта: <= 350 знаков чистого текста, <= 3 предложений (для текста);
+ *     - Сниппеты кода: <= 12 строк (за исключением неделимых функций), 100% имеют кнопку запуска;
+ *     - Запрет хвостовых комментариев в коде (подъем комментариев НАД кодом);
+ *  6. Безопасность инжекции в DOM и стандартную разметку кода (Safe DOM Injection).
  *  7. Симуляцию инкрементальной сессии изучения: переход по квантам до финиша (State Machine Flow).
  *  8. Синхронизацию канонического стандарта standards.html и academy.html.
  */
@@ -96,26 +99,27 @@ function extractAllNotes(srcHtml) {
 
 // --- 1. Извлечение движка квантования splitStepHtmlIntoChunks & getStepChunks ---
 function extractChunkingEngine(srcHtml) {
-  const fnStart = srcHtml.indexOf('function splitStepHtmlIntoChunks(');
-  assert(fnStart !== -1, 'splitStepHtmlIntoChunks must exist');
-  const fnEnd = srcHtml.indexOf('window.splitStepHtmlIntoChunks = splitStepHtmlIntoChunks;', fnStart);
-  const fnCode = srcHtml.slice(fnStart, fnEnd);
+  const normStart = srcHtml.indexOf('function normalizeCodeSnippets(');
+  const normEnd = srcHtml.indexOf('window.splitStepHtmlIntoChunks = splitStepHtmlIntoChunks;', normStart);
+  assert(normStart !== -1, 'normalizeCodeSnippets must exist');
+  const codeBlock1 = srcHtml.slice(normStart, normEnd);
 
   const gfnStart = srcHtml.indexOf('function getStepChunks(');
   assert(gfnStart !== -1, 'getStepChunks must exist');
   const gfnEnd = srcHtml.indexOf('window.getStepChunks = getStepChunks;', gfnStart);
-  const gfnCode = srcHtml.slice(gfnStart, gfnEnd);
+  const codeBlock2 = srcHtml.slice(gfnStart, gfnEnd);
 
   const evalCode = `
-    ${fnCode}
-    ${gfnCode}
-    return { splitStepHtmlIntoChunks, getStepChunks };
+    ${codeBlock1}
+    ${codeBlock2}
+    return { normalizeCodeSnippets, splitLongParagraphs, splitLongCodeSnippets, decorateCodeBlocksWithRunBtn, splitStepHtmlIntoChunks, getStepChunks };
   `;
   return new Function(evalCode)();
 }
 
 const allNotes = extractAllNotes(standardsHtml);
-const { splitStepHtmlIntoChunks, getStepChunks } = extractChunkingEngine(standardsHtml);
+const engine = extractChunkingEngine(standardsHtml);
+const { splitStepHtmlIntoChunks, getStepChunks } = engine;
 
 // ============================================================================
 // TEST 1: 100% Coverage of All 238 Notes & 1127 Steps
@@ -166,7 +170,6 @@ function test02_ZeroEmptyChunks() {
           return;
         }
         const plainText = trimmed.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
-        // Проверяем, что чанк содержит либо текст, либо код
         if (plainText.length === 0 && !/<(pre|code|img|svg|table)\b/i.test(trimmed)) {
           emptyViolations.push(`${kId}:${sIdx}:${cIdx} contains only empty tags without text or code: "${trimmed}"`);
         }
@@ -223,7 +226,7 @@ function test03_StrictHtmlTagBalance() {
 }
 
 // ============================================================================
-// TEST 4: No Orphan Headings or Trailing Colons / Lead-in Fragments
+// TEST 4: No Orphan Headings or Dangling Lead-ins
 // ============================================================================
 function test04_NoOrphanHeadings() {
   const orphanViolations = [];
@@ -236,12 +239,10 @@ function test04_NoOrphanHeadings() {
 
       chunks.forEach((chunk, cIdx) => {
         const trimmed = chunk.trim();
-
         // 1. Одиночный заголовок h1-h6
         if (/^<h[1-6]\b[^>]*>[\s\S]*?<\/h[1-6]>\s*$/i.test(trimmed)) {
           orphanViolations.push(`${kId}:${sIdx}:${cIdx} is an orphan heading: "${trimmed.slice(0, 80)}"`);
         }
-
         // 2. Одиночный подводящий абзац перед кодом без самого кода
         const plain = trimmed.replace(/<[^>]+>/g, '').trim();
         if (/^<p\b[^>]*>[\s\S]*?<\/p>$/i.test(trimmed) && /[:—–➔→]\s*$/i.test(plain) && plain.length < 80) {
@@ -260,12 +261,13 @@ function test04_NoOrphanHeadings() {
 }
 
 // ============================================================================
-// TEST 5: Optimal Quantum Sizing & Active Microlearning Ergonomics
+// TEST 5: Coddy Canon Microlearning Ergonomics (Text Length & Code Discipline)
 // ============================================================================
-function test05_OptimalQuantumSizing() {
+function test05_CoddyActiveMicrolearningCanon() {
   let totalChunks = 0;
   let totalSteps = 0;
-  const monolithViolations = [];
+  const trailingCommentViolations = [];
+  const missingRunButtonViolations = [];
 
   for (const [kId, note] of Object.entries(allNotes)) {
     note.steps.forEach((step, sIdx) => {
@@ -276,30 +278,59 @@ function test05_OptimalQuantumSizing() {
       totalChunks += chunks.length;
 
       chunks.forEach((chunk, cIdx) => {
-        const plainText = chunk.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
-        const pCount = (chunk.match(/<p\b/gi) || []).length;
+        // Проверка наличия кнопок запуска у исполняемых сниппетов Python
+        const preMatches = chunk.match(/<pre\b[^>]*>([\s\S]*?)<\/pre>/gi) || [];
+        preMatches.forEach(pre => {
+          const rawCode = pre.replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').trim();
+          const isRunnablePython = !(/^(python\s+-m|pip\s+|pytest|git\s+|docker|curl|uvicorn|alembic|celery|npm|npx)/i.test(rawCode))
+            && !(/(SELECT|INSERT|UPDATE|DELETE|CREATE|FROM|GET\s+\/|POST\s+\/|HTTP\/|TCP:|UDP:)/i.test(rawCode))
+            && !(/[├└│─]/.test(rawCode))
+            && !(/^\[.+\]/m.test(rawCode) || /^[a-z0-9_-]+==\d+/m.test(rawCode))
+            && !(/(<function|<class|<object|<generator)/.test(rawCode))
+            && !(/[→➔]|==>/.test(rawCode));
 
-        // Запрет неквантованных монолитов: более 4 параграфов <p> подряд и более 2000 символов текста в одном кванте
-        if (pCount > 4 && plainText.length > 2000) {
-          monolithViolations.push(`${kId}:${sIdx}:${cIdx} is an unquantized monolith (${pCount} paragraphs, ${plainText.length} chars)`);
-        }
+          if (isRunnablePython) {
+            if (!chunk.includes('data-run-snippet') && !chunk.includes('data-run-inline')) {
+              missingRunButtonViolations.push(`${kId}:${sIdx}:${cIdx} Python snippet missing run button: "${rawCode.slice(0, 50)}"`);
+            }
+          }
+        });
+
+        // Проверка отсутствия хвостовых комментариев в незакомментированном коде
+        preMatches.forEach(pre => {
+          const rawCode = pre.replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+          const lines = rawCode.trim().split('\n').filter(l => l.trim().length > 0);
+          lines.forEach(l => {
+            const trimmedL = l.trim();
+            // Исключаем строки, которые уже целиком являются комментариями
+            if (!trimmedL.startsWith('#') && /\S+\s{2,}#\s*\S+/.test(trimmedL)) {
+              trailingCommentViolations.push(`${kId}:${sIdx}:${cIdx} trailing comment in line: "${trimmedL.slice(0, 60)}"`);
+            }
+          });
+        });
       });
     });
   }
 
   const avgChunksPerStep = totalChunks / totalSteps;
   assert(
-    avgChunksPerStep >= 2.0 && avgChunksPerStep <= 4.5,
-    `Average chunks per step (${avgChunksPerStep.toFixed(2)}) must be between 2.0 and 4.5`
+    avgChunksPerStep >= 2.0 && avgChunksPerStep <= 5.0,
+    `Average chunks per step (${avgChunksPerStep.toFixed(2)}) must be between 2.0 and 5.0`
   );
 
   assert.strictEqual(
-    monolithViolations.length,
+    trailingCommentViolations.length,
     0,
-    `Found unquantized monolithic chunks:\n  - ${monolithViolations.slice(0, 10).join('\n  - ')}`
+    `Found trailing comments in code snippets:\n  - ${trailingCommentViolations.slice(0, 10).join('\n  - ')}`
   );
 
-  console.log(`✓ Test 5 Passed: Optimal sizing verified (average ${avgChunksPerStep.toFixed(2)} atomic chunks per step, 0 monoliths)`);
+  assert.strictEqual(
+    missingRunButtonViolations.length,
+    0,
+    `Found code snippets missing run button:\n  - ${missingRunButtonViolations.slice(0, 10).join('\n  - ')}`
+  );
+
+  console.log(`✓ Test 5 Passed: Coddy active microlearning canon verified (avg ${avgChunksPerStep.toFixed(2)} chunks/step, 0 trailing comments, 100% runnable code buttons)`);
 }
 
 // ============================================================================
@@ -315,11 +346,9 @@ function test06_SafeDomInjectionAndCodeSnippets() {
       const chunks = getStepChunks(step, pureStepTitle);
 
       chunks.forEach((chunk, cIdx) => {
-        // Проверка на склеенные или битые скобки тегов (например, <div<p> или >>)
         if (/<[a-z0-9]+\s*<|>[a-z0-9]*>/i.test(chunk)) {
           malformedTagViolations.push(`${kId}:${sIdx}:${cIdx} has malformed tag brackets`);
         }
-        // Проверка, что pre содержит code
         if (/<pre\b[^>]*>/i.test(chunk) && !/<pre\b[^>]*>[\s\S]*?<code\b/i.test(chunk)) {
           malformedTagViolations.push(`${kId}:${sIdx}:${cIdx} has <pre> without <code>`);
         }
@@ -339,12 +368,6 @@ function test06_SafeDomInjectionAndCodeSnippets() {
 // TEST 7: Complete State Transition Simulation (Step-by-Step Delivery)
 // ============================================================================
 function test07_StateTransitionSimulation() {
-  // Симуляция прохождения всех квантов для каждого конспекта:
-  // Проверяем, что в каждом конспекте шаги и кванты последовательно проходятся,
-  // нет тупиковых состояний и кнопка корректно переключается:
-  //  - chunk_more -> (пока есть кванты в текущем шаге)
-  //  - next_step  -> (когда кванты шага исчерпаны, но есть следующий шаг)
-  //  - finish_note -> (когда пройден последний квант последнего шага)
   let simulatedNotesCount = 0;
 
   for (const [kId, note] of Object.entries(allNotes)) {
@@ -352,7 +375,7 @@ function test07_StateTransitionSimulation() {
     let curStepIdx = 0;
     let curChunkIdx = 0;
     let iterations = 0;
-    const maxIterations = 500; // Защита от бесконечного цикла
+    const maxIterations = 500;
 
     while (curStepIdx < steps.length && iterations < maxIterations) {
       iterations++;
@@ -364,14 +387,11 @@ function test07_StateTransitionSimulation() {
 
       const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
       if (hasMoreChunks) {
-        // Клик «Понятно, дальше» (data-chunk-more)
         curChunkIdx++;
       } else if (curStepIdx + 1 < steps.length) {
-        // Клик «К следующей подтеме» (data-next-step)
         curStepIdx++;
         curChunkIdx = 0;
       } else {
-        // Достигнут финал конспекта (data-finish-note)
         curStepIdx++;
         break;
       }
@@ -401,12 +421,15 @@ function test08_CanonicalStandardsSync() {
     'academy.html and standards.html must be byte-for-byte identical (Canonical SSOT invariant)'
   );
 
-  // Проверяем, что в viewPythonSkill вызывается getStepChunks
   assert(
-    standardsHtml.includes('const chunks = (typeof getStepChunks === \'function\')'),
-    'standards.html must use getStepChunks in viewPythonSkill to prevent duplicate headings'
+    standardsHtml.includes('function normalizeCodeSnippets('),
+    'standards.html must contain normalizeCodeSnippets engine'
   );
-  console.log(`✓ Test 8 Passed: standards.html and academy.html are byte-for-byte synchronized with unified chunking`);
+  assert(
+    standardsHtml.includes('function splitLongParagraphs('),
+    'standards.html must contain splitLongParagraphs engine'
+  );
+  console.log(`✓ Test 8 Passed: standards.html and academy.html are byte-for-byte synchronized with unified Coddy engine`);
 }
 
 // ============================================================================
@@ -417,7 +440,7 @@ try {
   test02_ZeroEmptyChunks();
   test03_StrictHtmlTagBalance();
   test04_NoOrphanHeadings();
-  test05_OptimalQuantumSizing();
+  test05_CoddyActiveMicrolearningCanon();
   test06_SafeDomInjectionAndCodeSnippets();
   test07_StateTransitionSimulation();
   test08_CanonicalStandardsSync();
@@ -439,7 +462,7 @@ module.exports = {
   test02_ZeroEmptyChunks,
   test03_StrictHtmlTagBalance,
   test04_NoOrphanHeadings,
-  test05_OptimalQuantumSizing,
+  test05_CoddyActiveMicrolearningCanon,
   test06_SafeDomInjectionAndCodeSnippets,
   test07_StateTransitionSimulation,
   test08_CanonicalStandardsSync

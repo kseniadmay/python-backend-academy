@@ -40081,36 +40081,189 @@ function highlightPythonTokens(codeInner){
 
 
 
+// Нормализация сниппетов кода: перенос хвостовых комментариев НАД строкой кода
+function normalizeCodeSnippets(codeText) {
+  const lines = String(codeText || '').split('\n');
+  const result = [];
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    // Защищаем HTML-сущности кавычек &#x27; и &quot;
+    const safe = line.replace(/&#x27;/g, '__SQ__').replace(/&quot;/g, '__DQ__').replace(/&apos;/g, '__SQ__');
+    const match = safe.match(/^(\s*)([^\r\n#]+?)\s+#\s*(.+)$/);
+    if (match) {
+      const indent = match[1];
+      const codePart = match[2].trimEnd().replace(/__SQ__/g, '&#x27;').replace(/__DQ__/g, '&quot;');
+      const commentPart = match[3].trim().replace(/__SQ__/g, '&#x27;').replace(/__DQ__/g, '&quot;');
+      const singleQuotes = (codePart.match(/'|&#x27;|&apos;/g) || []).length;
+      const doubleQuotes = (codePart.match(/"|&quot;/g) || []).length;
+      if (singleQuotes % 2 === 0 && doubleQuotes % 2 === 0) {
+        result.push(`${indent}# ${commentPart}`);
+        result.push(`${indent}${codePart.trimStart()}`);
+        continue;
+      }
+    }
+    result.push(line);
+  }
+  return result.join('\n');
+}
+
+// Авто-разрезание составных блоков кода >12 строк по маркерам независимых примеров
+function splitLongCodeSnippets(rawCode) {
+  const lines = String(rawCode || '').trim().split('\n');
+  if (lines.length <= 12) return [rawCode];
+
+  const exampleMarkers = [];
+  lines.forEach((line, idx) => {
+    if (/^\s*#\s*(\d+[\.\)]|Пример\s*\d+|Вариант\s*\d+|Шаг\s*\d+)/i.test(line)) {
+      exampleMarkers.push(idx);
+    }
+  });
+
+  if (exampleMarkers.length > 1) {
+    const parts = [];
+    for (let i = 0; i < exampleMarkers.length; i++) {
+      const start = exampleMarkers[i];
+      const end = (i + 1 < exampleMarkers.length) ? exampleMarkers[i + 1] : lines.length;
+      const partLines = lines.slice(start, end).join('\n').trim();
+      if (partLines) parts.push(partLines);
+    }
+    if (exampleMarkers[0] > 0) {
+      const header = lines.slice(0, exampleMarkers[0]).join('\n').trim();
+      if (header && parts.length > 0) {
+        parts[0] = header + '\n\n' + parts[0];
+      }
+    }
+    return parts;
+  }
+
+  const emptyLineIdxs = [];
+  lines.forEach((line, idx) => {
+    if (line.trim() === '' && idx > 3 && idx < lines.length - 4) {
+      emptyLineIdxs.push(idx);
+    }
+  });
+
+  if (emptyLineIdxs.length > 0) {
+    const mid = lines.length / 2;
+    emptyLineIdxs.sort((a, b) => Math.abs(a - mid) - Math.abs(b - mid));
+    const splitIdx = emptyLineIdxs[0];
+    const part1 = lines.slice(0, splitIdx).join('\n').trim();
+    const part2 = lines.slice(splitIdx + 1).join('\n').trim();
+    if (part1 && part2) {
+      return [part1, part2];
+    }
+  }
+
+  return [rawCode];
+}
+
+// Квантование длинных абзацев (>350 знаков / >3 предложений) на аккуратные микро-порции
+function splitLongParagraphs(pInnerHtml) {
+  const plain = String(pInnerHtml || '').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
+  if (plain.length <= 350) return [pInnerHtml];
+
+  const placeholders = [];
+  let masked = String(pInnerHtml || '').replace(/<code\b[^>]*>[\s\S]*?<\/code>/gi, m => {
+    placeholders.push(m);
+    return `___PLH_${placeholders.length - 1}___`;
+  });
+  masked = masked.replace(/<strong\b[^>]*>[\s\S]*?<\/strong>/gi, m => {
+    placeholders.push(m);
+    return `___PLH_${placeholders.length - 1}___`;
+  });
+  masked = masked.replace(/<em\b[^>]*>[\s\S]*?<\/em>/gi, m => {
+    placeholders.push(m);
+    return `___PLH_${placeholders.length - 1}___`;
+  });
+  masked = masked.replace(/\b(т\.е|т\.д|и др|e\.g|i\.e)\./gi, m => {
+    placeholders.push(m);
+    return `___PLH_${placeholders.length - 1}___`;
+  });
+  masked = masked.replace(/\b\d+\.\d+\b/g, m => {
+    placeholders.push(m);
+    return `___PLH_${placeholders.length - 1}___`;
+  });
+
+  const parts = [];
+  let lastIdx = 0;
+  const sentenceRe = /([.!?])\s+(?=[A-ZА-ЯЁ]|___PLH_)/g;
+  let m;
+
+  let currentChunk = '';
+  while ((m = sentenceRe.exec(masked)) !== null) {
+    const endPos = m.index + m[1].length;
+    const sent = masked.slice(lastIdx, endPos).trim();
+    lastIdx = m.index + m[0].length;
+
+    if (!currentChunk) {
+      currentChunk = sent;
+    } else {
+      const combined = currentChunk + ' ' + sent;
+      if (combined.length > 200) {
+        parts.push(currentChunk);
+        currentChunk = sent;
+      } else {
+        currentChunk = combined;
+      }
+    }
+  }
+
+  const tail = masked.slice(lastIdx).trim();
+  if (tail) {
+    if (currentChunk && (currentChunk + ' ' + tail).length <= 350) {
+      parts.push(currentChunk + ' ' + tail);
+    } else {
+      if (currentChunk) parts.push(currentChunk);
+      parts.push(tail);
+    }
+  } else if (currentChunk) {
+    parts.push(currentChunk);
+  }
+
+  if (parts.length === 0) return [pInnerHtml];
+
+  return parts.map(part => {
+    let unmasked = part;
+    for (let i = placeholders.length - 1; i >= 0; i--) {
+      unmasked = unmasked.replace(`___PLH_${i}___`, placeholders[i]);
+    }
+    return unmasked;
+  });
+}
+
 // Helper to decorate <pre><code> blocks with inline "▶ Запустить в Python" button (skips already-decorated RemNote K-note blocks)
-
 function decorateCodeBlocksWithRunBtn(htmlStr){
-
   let s = String(htmlStr || '');
 
-  s = s.replace(/<pre><code>([\s\S]*?)<\/code><\/pre>/g, function(full, codeInner){
-
-    const looksLikePython = !(/^(SELECT|INSERT|UPDATE|DELETE|CREATE|FROM|docker|git|GET|POST|PATCH|PUT|paths:)/i.test(codeInner.trim()));
-
-    const highlighted = (looksLikePython && typeof highlightPythonTokens === 'function') ? highlightPythonTokens(codeInner) : codeInner;
-
+  // 1. Нормализация кода во всех сниппетах (перенос хвостовых комментариев НАД строкой)
+  s = s.replace(/<pre\b[^>]*><code\b[^>]*>([\s\S]*?)<\/code><\/pre>/gi, function(full, codeInner){
+    const normalized = normalizeCodeSnippets(codeInner);
+    const looksLikePython = !(/^(SELECT|INSERT|UPDATE|DELETE|CREATE|FROM|docker|git|GET|POST|PATCH|PUT|paths:)/i.test(normalized.trim()));
+    const highlighted = (looksLikePython && typeof highlightPythonTokens === 'function') ? highlightPythonTokens(normalized) : normalized;
     return `<pre><code>${highlighted}</code></pre>`;
-
   });
+
+  // 2. Если перед <pre> есть code-run-bar без кнопки запуска — добавляем кнопку запуска
+  s = s.replace(/<div\s+class=["']code-run-bar["']>([\s\S]*?)<\/div>(\s*<pre\b[^>]*><code\b[^>]*>[\s\S]*?<\/code><\/pre>)/gi, function(full, barInner, prePart){
+    if(barInner.includes('data-run-snippet') || barInner.includes('data-run-inline')) return full;
+    return `<div class="code-run-bar"><button type="button" class="btn-inline-run" data-run-snippet="1">▶ Запустить код</button></div>${prePart}`;
+  });
+
+  // Если snippet-wrap не имел code-run-bar вовсе — добавляем его перед <pre>
+  s = s.replace(/(<div\s+class=["']snippet-wrap["'][^>]*>)(\s*<pre\b[^>]*><code\b[^>]*>)/gi, '$1<div class="code-run-bar"><button type="button" class="btn-inline-run" data-run-snippet="1">▶ Запустить код</button></div>$2');
 
   if(s.indexOf('snippet-wrap') !== -1 || s.indexOf('code-snippet-wrap') !== -1) return s;
 
+  // 3. Для сырых блоков <pre><code> оборачиваем в snippet-wrap
   return s.replace(/<pre><code>([\s\S]*?)<\/code><\/pre>/g, function(full, codeInner){
-
     const looksLikePython = !(/^(SELECT|INSERT|UPDATE|DELETE|CREATE|FROM|docker|git|GET|POST|PATCH|PUT|paths:)/i.test(codeInner.trim()));
-
-    const highlighted = looksLikePython ? highlightPythonTokens(codeInner) : codeInner;
-
-    if(!looksLikePython) return `<pre><code>${highlighted}</code></pre>`;
-
-    return `<div class="code-snippet-wrap"><button type="button" class="run-inline-btn" data-run-inline>▶ Запустить код</button><pre><code>${highlighted}</code></pre></div>`;
-
+    const subParts = splitLongCodeSnippets(codeInner);
+    return subParts.map(sp => {
+      const highlighted = looksLikePython ? highlightPythonTokens(sp) : sp;
+      if(!looksLikePython) return `<pre><code>${highlighted}</code></pre>`;
+      return `<div class="snippet-wrap"><div class="code-run-bar"><button type="button" class="btn-inline-run" data-run-snippet="1">▶ Запустить код</button></div><pre><code>${highlighted}</code></pre><div class="snippet-out hidden"></div></div>`;
+    }).join('\n');
   });
-
 }
 
 
@@ -40257,90 +40410,66 @@ function splitStepHtmlIntoChunks(htmlStr, stepTitle){
 
   }
 
-  const filteredBlocks = rawBlocks.filter(b => b.trim().length > 0);
+  const rawFilteredBlocks = rawBlocks.filter(b => b.trim().length > 0);
 
-
+  // Педагогика Кодди: авто-сплит длинных монолитных параграфов <p> (>350 знаков / >3 предложений)
+  const filteredBlocks = [];
+  for(const blk of rawFilteredBlocks){
+    const pMatch = blk.match(/^<p\b[^>]*>([\s\S]*?)<\/p>$/i);
+    if(pMatch && typeof splitLongParagraphs === 'function'){
+      const innerP = pMatch[1];
+      const plain = innerP.replace(/<[^>]+>/g, '').trim();
+      if(plain.length > 350){
+        const subP = splitLongParagraphs(innerP);
+        subP.forEach(sp => filteredBlocks.push(`<p>${sp}</p>`));
+        continue;
+      }
+    }
+    filteredBlocks.push(blk);
+  }
 
   function isHeadingBlock(b){
-
     if(/^<h[1-6]\b/i.test(b)) return true;
-
     const plain = b.replace(/<[^>]+>/g, '').trim();
-
     const innerP = b.replace(/^<p\b[^>]*>/i, '').replace(/<\/p>$/i, '').trim();
-
     if(/^<p\b/i.test(b) && (/^<strong>[\s\S]*<\/strong>[\.\:\s]*$/i.test(innerP) || (/^[A-ZА-ЯЁ0-9_\s\-\:\.\,\(\)]+$/i.test(plain) && plain.length < 80))){
-
       if(plain.length < 140) return true;
-
     }
-
     return false;
-
   }
-
-
 
   function isLeadInBlock(b, nextB){
-
     if(!/^<p\b/i.test(b)) return false;
-
     const plain = b.replace(/<[^>]+>/g, '').trim();
-
     // Короткий подводящий абзац перед кодом или списком
-
     if(/[:—–➔→]\s*$/i.test(plain) && plain.length < 180 && nextB) return true;
-
     return false;
-
   }
 
-
-
   // Сверх-атомарная подача: 1 мысль = 1 квант (Duolingo / Coddy / Active Microlearning)
-
   const atomicChunks = [];
-
   let pending = '';
 
-
-
   for(let i = 0; i < filteredBlocks.length; i++){
-
     const b = filteredBlocks[i];
-
     const nextB = (i + 1 < filteredBlocks.length) ? filteredBlocks[i + 1] : null;
 
-
-
     if(isHeadingBlock(b)){
-
       pending = pending ? (pending + '\n' + b) : b;
-
     } else if(isLeadInBlock(b, nextB)){
-
       pending = pending ? (pending + '\n' + b) : b;
-
     } else if(pending){
-
+      // Заголовок или подводка (pending) ОБЯЗАНЫ идти вместе со следующим содержательным блоком (никаких сирот!)
       atomicChunks.push(pending + '\n' + b);
-
       pending = '';
-
     } else {
-
       atomicChunks.push(b);
-
     }
-
   }
 
   if(pending){
-
     if(atomicChunks.length > 0) atomicChunks[atomicChunks.length - 1] += '\n' + pending;
-
     else atomicChunks.push(pending);
-
   }
 
 

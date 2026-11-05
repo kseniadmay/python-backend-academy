@@ -101,6 +101,20 @@ def main() -> int:
                 print(f'[HOOK ERROR] Ошибка в HTML {f}:\n{e}')
                 return 1
 
+    # Защита педагогики Кодди: если менялись стандарты, академия или тесты — валидируем атомарность конспектов
+    html_or_notes_changed = any(
+        f.endswith('standards.html') or f.endswith('academy.html') or 'test_notes_atomicity' in f
+        for f in files
+    )
+    if html_or_notes_changed and has_node:
+        test_path = os.path.join(_ROOT, 'tests', 'test_notes_atomicity.js')
+        if os.path.isfile(test_path):
+            c = subprocess.run(['node', test_path], capture_output=True, text=True)
+            if c.returncode != 0:
+                print(f'[HOOK ERROR] Сбой теста атомарности конспектов (Active Microlearning):\n{c.stderr or c.stdout}')
+                return 1
+            print('✓ [Pre-Commit] Тест атомарности конспектов (Active Microlearning) пройден со 100% успехом.')
+
     print('✓ [Pre-Commit] Синтаксическая проверка пройдена (JS, Python, JSON, HTML inline в норме).')
     return 0
 
