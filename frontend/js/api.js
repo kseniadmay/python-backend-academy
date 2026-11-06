@@ -68,6 +68,130 @@ export class AcademyApi {
     return await this._request(`/api/v1/content/search?q=${encodeURIComponent(query)}`);
   }
 
+
+  // --- SRS & FSRS Spaced Repetition API ---
+
+  async fetchSrsDue(echelon = null, deckId = null, limit = 50) {
+    const params = new URLSearchParams();
+    if (echelon) params.append('echelon', echelon);
+    if (deckId) params.append('deck_id', deckId);
+    if (limit) params.append('limit', limit);
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return await this._request(`/api/v1/srs/due${query}`);
+  }
+
+  async rateSrsCard(cardId, deckId, rating, durationMs = null) {
+    return await this._request('/api/v1/srs/rate', {
+      method: 'POST',
+      body: JSON.stringify({
+        card_id: cardId,
+        deck_id: deckId,
+        rating: Number(rating),
+        duration_ms: durationMs
+      })
+    });
+  }
+
+  async fetchSrsStats() {
+    return await this._request('/api/v1/srs/stats');
+  }
+
+  async fetchSrsCardState(cardId) {
+    return await this._request(`/api/v1/srs/card/${encodeURIComponent(cardId)}`);
+  }
+
+
+  // --- Navigation & App Shell API ---
+
+  async fetchNavigationMeta() {
+    return await this._request('/api/v1/navigation/meta');
+  }
+
+
+  // --- Practice & Task Execution API ---
+
+  async runTaskCode(taskId, code) {
+    return await this._request('/api/v1/practice/run', {
+      method: 'POST',
+      body: JSON.stringify({
+        task_id: Number(taskId),
+        code
+      })
+    });
+  }
+
+  async fetchTaskHints(taskId, level = 1) {
+    return await this._request(`/api/v1/practice/hint/${encodeURIComponent(taskId)}?level=${level}`);
+  }
+
+  async saveTaskDraft(taskId, draftCode) {
+    return await this._request('/api/v1/practice/draft', {
+      method: 'POST',
+      body: JSON.stringify({
+        task_id: Number(taskId),
+        draft_code: draftCode
+      })
+    });
+  }
+
+  async fetchTaskDraft(taskId) {
+    return await this._request(`/api/v1/practice/draft/${encodeURIComponent(taskId)}`);
+  }
+
+
+  // --- Path & Trail Progression API ---
+
+  async fetchPathOverview() {
+    return await this._request('/api/v1/path/overview');
+  }
+
+  async fetchEchelonPath(echelonId) {
+    return await this._request(`/api/v1/path/echelon/${encodeURIComponent(echelonId)}`);
+  }
+
+
+  // --- Atomic Notes & Reader API ---
+
+  async fetchNoteDetail(noteId) {
+    return await this._request(`/api/v1/notes/${encodeURIComponent(noteId)}`);
+  }
+
+  async saveNoteProgress(noteId, stepIndex, isCompleted = false) {
+    return await this._request('/api/v1/notes/progress', {
+      method: 'POST',
+      body: JSON.stringify({
+        note_id: noteId,
+        step_index: Number(stepIndex),
+        is_completed: Boolean(isCompleted)
+      })
+    });
+  }
+
+  async fetchDueNotes() {
+    return await this._request('/api/v1/notes/due');
+  }
+
+
+  // --- Mock Technical Interview API ---
+
+  async fetchMockSession(echelon = 1, taskId = null) {
+    const params = new URLSearchParams({ echelon });
+    if (taskId) params.append('task_id', taskId);
+    return await this._request(`/api/v1/mock/session?${params.toString()}`);
+  }
+
+  async evaluateMockTask(sessionId, taskId, code, hintsUsed = 0) {
+    return await this._request('/api/v1/mock/evaluate', {
+      method: 'POST',
+      body: JSON.stringify({
+        session_id: sessionId,
+        task_id: Number(taskId),
+        code,
+        hints_used: Number(hintsUsed)
+      })
+    });
+  }
+
   // --- Sync API ---
 
   async pullProgress() {

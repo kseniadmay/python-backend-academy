@@ -33548,13 +33548,21 @@ function toggleTheme(){ setTheme(effectiveDark() ? 'light' : 'dark'); }
 /* ================= NAV LABELS ================= */
 
 const NAV_ITEMS = [
-
-  {route:'/', icon:'home', label:'Дашборд'},
-
-  {route:'/map', icon:'map', label:'Карта навыков'},
-
-  {route:'/sandbox', icon:'terminal', label:'Песочница'}
-
+  {route:'/', icon:'home', label:'Дашборд', shortLabel:'Дашборд', mobileTab:true, group:'main'},
+  {route:'/path', icon:'path', label:'Путь к офферу', shortLabel:'Путь', mobileTab:true, group:'main'},
+  {route:'/cards', icon:'cards', label:'Интервалка', shortLabel:'Интервалка', mobileTab:true, group:'main', hasDueDot:true},
+  {route:'/practice', icon:'code', label:'Zen IDE', shortLabel:'IDE', mobileTab:true, group:'main'},
+  {route:'/notes-review', icon:'book', label:'Конспекты', shortLabel:'Конспекты', group:'trainer'},
+  {route:'/mock', icon:'mock', label:'Собеседование', shortLabel:'Интервью', group:'trainer'},
+  {route:'/python', icon:'python', label:'Python Core', shortLabel:'Python', group:'module'},
+  {route:'/web', icon:'globe', label:'Web и HTTP', shortLabel:'Web', group:'module'},
+  {route:'/backend', icon:'server', label:'Backend', shortLabel:'Backend', group:'module'},
+  {route:'/algorithms', icon:'bolt', label:'Алгоритмы', shortLabel:'Алгоритмы', group:'module'},
+  {route:'/databases', icon:'database', label:'Базы данных', shortLabel:'БД', group:'module'},
+  {route:'/architecture', icon:'arch', label:'Архитектура', shortLabel:'Архит.', group:'module'},
+  {route:'/infra', icon:'rocket', label:'Инфраструктура', shortLabel:'Инфра', group:'module'},
+  {route:'/docs', icon:'book', label:'Справочник', shortLabel:'Справочник', group:'tool'},
+  {route:'/sandbox', icon:'terminal', label:'Песочница', shortLabel:'Песочница', group:'tool'}
 ];
 
 function renderNav(){
@@ -42774,14 +42782,14 @@ function viewPythonSkill(sid){
 
           <div class="srs-rating-grid card-rating-grid ${pySkillViewState.cardFlipped ? '' : 'srs-hidden'}" style="${pySkillViewState.cardFlipped ? 'display:grid !important;' : 'display:none !important;'}">
             <!-- Кнопка 1: Не знаю -->
-            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-py-rate-card="1" title="Не знаю (Повтор сегодня · интервал ${srsPrev.again.days} дн)">
-              <span class="srs-btn-title">Не знаю</span>
+            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-py-rate-card="1" title="Не вспомнил (Повтор сегодня · интервал ${srsPrev.again.days} дн)">
+              <span class="srs-btn-title">Не вспомнил</span>
               <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-again">0 XP</span></span>
             </button>
 
             <!-- Кнопка 2: Частично -->
-            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--hard fc-rate-btn--hard" data-py-rate-card="2" title="Частично (+2 XP · интервал ${srsPrev.hard.days} дн)">
-              <span class="srs-btn-title">Частично</span>
+            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--hard fc-rate-btn--hard" data-py-rate-card="2" title="Со скрипом (+2 XP · интервал ${srsPrev.hard.days} дн)">
+              <span class="srs-btn-title">Со скрипом</span>
               <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-amber">⚡+2</span></span>
             </button>
 
@@ -42792,8 +42800,8 @@ function viewPythonSkill(sid){
             </button>
 
             <!-- Кнопка 4: Сходу -->
-            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-py-rate-card="4" title="Сходу (+10 XP · интервал ${srsPrev.easy.days} дн)">
-              <span class="srs-btn-title">Сходу</span>
+            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-py-rate-card="4" title="На автомате (+10 XP · интервал ${srsPrev.easy.days} дн)">
+              <span class="srs-btn-title">На автомате</span>
               <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-cyan">✨+10</span></span>
             </button>
           </div>
@@ -44386,9 +44394,9 @@ function buildSrsRatingDockHTML(srsInfo, isFlipped){
 
         <!-- Кнопка 1: Не знаю (Повтор сегодня, кармин) -->
 
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-hub-rate="1" title="Не знаю (Повтор сегодня · интервал 1 дн)">
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-hub-rate="1" title="Не вспомнил (Повтор сегодня · интервал 1 дн)">
 
-          <span class="srs-btn-title">Не знаю</span>
+          <span class="srs-btn-title">Не вспомнил</span>
 
           <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-again">0 XP</span></span>
 
@@ -44398,9 +44406,9 @@ function buildSrsRatingDockHTML(srsInfo, isFlipped){
 
         <!-- Кнопка 2: Частично (+2 XP, янтарь) -->
 
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--hard fc-rate-btn--hard" data-hub-rate="2" title="Частично (+2 XP · интервал ${hardDays} дн)">
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--hard fc-rate-btn--hard" data-hub-rate="2" title="Со скрипом (+2 XP · интервал ${hardDays} дн)">
 
-          <span class="srs-btn-title">Частично</span>
+          <span class="srs-btn-title">Со скрипом</span>
 
           <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-amber">⚡+2</span></span>
 
@@ -44422,9 +44430,9 @@ function buildSrsRatingDockHTML(srsInfo, isFlipped){
 
         <!-- Кнопка 4: Сходу (+10 XP, циан) -->
 
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-hub-rate="4" title="Сходу (+10 XP · интервал ${easyDays} дн)">
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-hub-rate="4" title="На автомате (+10 XP · интервал ${easyDays} дн)">
 
-          <span class="srs-btn-title">Сходу</span>
+          <span class="srs-btn-title">На автомате</span>
 
           <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-cyan">✨+10</span></span>
 
@@ -52753,7 +52761,7 @@ function viewNotesSrsHub(noteSrsStats){
 
         <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-srs-note-reset="${curItem.noteId}" title="Не знаю">
 
-          <span class="srs-btn-title">Не знаю</span>
+          <span class="srs-btn-title">Не вспомнил</span>
 
           <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-again">0 XP</span></span>
 
@@ -52775,9 +52783,9 @@ function viewNotesSrsHub(noteSrsStats){
 
         <!-- Кнопка 3: Сходу (+20 XP) -->
 
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-srs-note-easy="${curItem.noteId}" title="Сходу (+20 XP)">
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-srs-note-easy="${curItem.noteId}" title="На автомате (+20 XP)">
 
-          <span class="srs-btn-title">Сходу</span>
+          <span class="srs-btn-title">На автомате</span>
 
           <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-cyan">✨+20</span></span>
 
@@ -54330,26 +54338,6 @@ viewDashboard = function(){
     </div>
   `;
 };
-NAV_ITEMS.splice(0, NAV_ITEMS.length,
-  {route:'/', icon:'home', label:'Дашборд', shortLabel:'Дашборд', mobileTab:true, group:'main'},
-  {route:'/path', icon:'path', label:'Путь к офферу', shortLabel:'Путь', mobileTab:true, group:'main'},
-  {route:'/cards', icon:'cards', label:'Интервалка', shortLabel:'Интервалка', mobileTab:true, group:'main', hasDueDot:true},
-  {route:'/practice', icon:'code', label:'Zen IDE', shortLabel:'IDE', mobileTab:true, group:'main'},
-  {route:'/notes-review', icon:'book', label:'Конспекты', shortLabel:'Конспекты', group:'trainer'},
-  {route:'/mock', icon:'mock', label:'Собеседование', shortLabel:'Интервью', group:'trainer'},
-  {route:'/python', icon:'python', label:'Python Core', shortLabel:'Python', group:'module'},
-  {route:'/web', icon:'globe', label:'Web и HTTP', shortLabel:'Web', group:'module'},
-  {route:'/backend', icon:'server', label:'Backend', shortLabel:'Backend', group:'module'},
-  {route:'/algorithms', icon:'bolt', label:'Алгоритмы', shortLabel:'Алгоритмы', group:'module'},
-  {route:'/databases', icon:'database', label:'Базы данных', shortLabel:'БД', group:'module'},
-  {route:'/architecture', icon:'arch', label:'Архитектура', shortLabel:'Архит.', group:'module'},
-  {route:'/infra', icon:'rocket', label:'Инфраструктура', shortLabel:'Инфра', group:'module'},
-  {route:'/docs', icon:'book', label:'Справочник', shortLabel:'Справочник', group:'tool'},
-  {route:'/sandbox', icon:'terminal', label:'Песочница', shortLabel:'Песочница', group:'tool'}
-);
-
-
-
 renderNav = function(){
   const desk = document.getElementById('nav-desktop');
   if(desk){
@@ -54595,34 +54583,38 @@ function openMobileDrawer(){
         <button class="btn btn-ghost" style="padding:4px 8px;font-size:1.2rem;border-radius:10px;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;" data-close-drawer aria-label="Закрыть">✕</button>
       </div>
 
-      <!-- Секция Главное -->
+      <!-- Секция Главное (DRY Single Source of Truth из NAV_ITEMS) -->
       <div class="drawer-nav-section-title">Главное</div>
-      <a href="#/" class="drawer-nav-link" onclick="closeMobileDrawer();">📊 <span>Дашборд</span></a>
-      <a href="#/path" class="drawer-nav-link" onclick="closeMobileDrawer();">🗺️ <span>Путь</span></a>
-      <a href="#/cards" class="drawer-nav-link" onclick="closeMobileDrawer();">⚡ <span>Интервалка</span></a>
-      <a href="#/practice" class="drawer-nav-link" onclick="closeMobileDrawer();">💻 <span>IDE</span></a>
+      ${NAV_ITEMS.filter(it => it.group === 'main').map(it => `
+        <a href="#${it.route}" class="drawer-nav-link" onclick="closeMobileDrawer();">
+          <span style="display:inline-flex;align-items:center;margin-right:8px;vertical-align:middle;">${ICONS[it.icon] || ''}</span>
+          <span>${it.label}</span>
+          ${it.route === '/cards' && (typeof getSpacedRepetitionStats === 'function' && getSpacedRepetitionStats().dueTodayCardsCount > 0) ? `<span class="badge" style="margin-left:auto;font-size:0.72rem;background:rgba(16,185,129,0.18);color:#34d399;padding:1px 6px;border-radius:6px;">${getSpacedRepetitionStats().dueTodayCardsCount}</span>` : ''}
+        </a>
+      `).join('')}
 
       <!-- Секция Тренажёры и практика -->
-      <div class="drawer-nav-section-title">Тренажёры и практика</div>
-      <a href="#/mock" class="drawer-nav-link" onclick="closeMobileDrawer();">💼 <span>Собеседование</span></a>
-      <a href="#/notes-review" class="drawer-nav-link" onclick="closeMobileDrawer();">📖 <span>Конспекты</span></a>
-      <a href="#/docs" class="drawer-nav-link" onclick="closeMobileDrawer();">📚 <span>Справочник</span></a>
-      <a href="#/sandbox" class="drawer-nav-link" onclick="closeMobileDrawer();">🧪 <span>Песочница</span></a>
+      <div class="drawer-nav-section-title" style="margin-top:10px;">Тренажёры и практика</div>
+      ${NAV_ITEMS.filter(it => it.group === 'trainer' || it.group === 'tool').map(it => `
+        <a href="#${it.route}" class="drawer-nav-link" onclick="closeMobileDrawer();">
+          <span style="display:inline-flex;align-items:center;margin-right:8px;vertical-align:middle;">${ICONS[it.icon] || ''}</span>
+          <span>${it.label}</span>
+        </a>
+      `).join('')}
 
-      <!-- Секция Модули программы -->
-      <div class="drawer-nav-section-title">Модули курса</div>
+      <!-- Секция Модули курса -->
+      <div class="drawer-nav-section-title" style="margin-top:10px;">Модули курса</div>
       <details style="margin-bottom:12px;">
         <summary style="cursor:pointer;padding:8px 10px;font-size:0.82rem;font-weight:700;color:var(--ink-muted);border-radius:8px;background:var(--surface-2);border:1px solid var(--line);">
           <span>Показать 7 модулей</span>
         </summary>
         <div style="padding-top:6px;display:flex;flex-direction:column;gap:4px;">
-          <a href="#/python" class="drawer-nav-link" onclick="closeMobileDrawer();" style="font-size:0.80rem;padding:7px 10px;">🐍 Python Core</a>
-          <a href="#/web" class="drawer-nav-link" onclick="closeMobileDrawer();" style="font-size:0.80rem;padding:7px 10px;">🌐 Web и HTTP</a>
-          <a href="#/backend" class="drawer-nav-link" onclick="closeMobileDrawer();" style="font-size:0.80rem;padding:7px 10px;">⚙️ Backend</a>
-          <a href="#/algorithms" class="drawer-nav-link" onclick="closeMobileDrawer();" style="font-size:0.80rem;padding:7px 10px;">⚡ Алгоритмы</a>
-          <a href="#/databases" class="drawer-nav-link" onclick="closeMobileDrawer();" style="font-size:0.80rem;padding:7px 10px;">🗄️ Базы данных</a>
-          <a href="#/architecture" class="drawer-nav-link" onclick="closeMobileDrawer();" style="font-size:0.80rem;padding:7px 10px;">🏛️ Архитектура</a>
-          <a href="#/infra" class="drawer-nav-link" onclick="closeMobileDrawer();" style="font-size:0.80rem;padding:7px 10px;">🚀 Инфраструктура</a>
+          ${NAV_ITEMS.filter(it => it.group === 'module').map(it => `
+            <a href="#${it.route}" class="drawer-nav-link" onclick="closeMobileDrawer();" style="font-size:0.80rem;padding:7px 10px;">
+              <span style="display:inline-flex;align-items:center;margin-right:8px;vertical-align:middle;">${ICONS[it.icon] || ''}</span>
+              <span>${it.label}</span>
+            </a>
+          `).join('')}
         </div>
       </details>
 
