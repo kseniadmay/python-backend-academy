@@ -9,6 +9,7 @@
 | Файл / Каталог | Описание |
 |---|---|
 | [`test_helpers.js`](test_helpers.js) | **Единый DRY-модуль тестового контекста**: централизованные пути, однократное кэшированное чтение `academy.html` / `standards.html` / `PROJECT_CONTEXT.md` / `AGENTS.md`, парсинг `PY_MASTERY` и проверка `Invariant 0`. |
+| [`test_zen_ide_dry_consistency.js`](test_zen_ide_dry_consistency.js) | **Архитектурный DRY-тест экрана Zen IDE**: валидация единого вызова `buildUnifiedZenIdeHTML` (спринт + банк задач), 0% дублирования разметки, VS Code Mini-Drawer, аккордеоны, баннер триумфа и побайтовая синхронизация. |
 | [`test_descriptor_suite.js`](test_descriptor_suite.js) | **Сьют Строгого Дескриптора (17 инвариантов)**: побайтовое соответствие эталонов, Clean Human UI, Active Rescue, Non-Destructive Peeking, Execution Watchdog 2000ms, iOS Zoom Guard 16px, Single Dominant CTA, запрет 3D/Coddy, фикстуры и DDL схемы. |
 | [`test_backend_database.py`](test_backend_database.py) | **Тестовый комплекс реляционной базы данных (SQLite)**: валидация схемы 9 таблиц, ACID-транзакции, откат при сбоях, внешние ключи, индексация, алгоритм SRS и сохранение черновиков IDE. |
 | [`test_backend_concurrency.py`](test_backend_concurrency.py) | **Стресс-тесты конкурентности и отказоустойчивости**: многопоточная запись в SQLite (режим WAL, 10 потоков без блокировок), миграция схем v1/v2 ➔ v3, краш-рекавери на диске и лимиты полезной нагрузки. |
