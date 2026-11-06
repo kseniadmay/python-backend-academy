@@ -4334,73 +4334,10 @@
 
 
 
-  .xp-float-particle{
+  /* Анимация летающей плашки XP (.xp-float-particle) удалена; вместо нее искры разлетаются при нажатии */
+  .srs-sparks-burst-container{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:99999;overflow:hidden;}
 
-    position:fixed;right:auto;top:58px;z-index:9999;pointer-events:none;
-
-    width:max-content;max-width:280px;white-space:nowrap;
-
-    padding:6px 14px;border-radius:999px;color:#fff;
-
-    font-family:var(--font-d);font-weight:800;font-size:.88rem;
-
-    animation:float-up-fade .95s cubic-bezier(0.22,1,0.36,1) forwards;
-
-    will-change:transform, opacity;
-
-    transform:translateZ(0);
-
-    display:inline-flex;align-items:center;gap:5px;
-
-  }
-
-  .xp-particle-good {
-
-    background: linear-gradient(135deg, #b45309 0%, #f59e0b 100%);
-
-    box-shadow: 0 8px 24px rgba(245,158,11,0.45);
-
-    border: 1px solid rgba(255,255,255,0.25);
-
-  }
-
-  .xp-particle-great {
-
-    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-
-    box-shadow: 0 8px 24px rgba(16,185,129,0.45);
-
-    border: 1px solid rgba(255,255,255,0.30);
-
-  }
-
-  .xp-particle-epic {
-
-    background: linear-gradient(135deg, #059669 0%, #06b6d4 100%);
-
-    box-shadow: 0 8px 30px rgba(6,182,212,0.55);
-
-    border: 1.5px solid rgba(255,255,255,0.40);
-
-    text-shadow: 0 0 8px rgba(255,255,255,0.60);
-
-    font-size: 0.94rem;
-
-  }
-
-  @keyframes float-up-fade{
-
-    0%{opacity:0;transform:translateY(10px) scale(0.9);}
-
-    25%{opacity:1;transform:translateY(0) scale(1.05);}
-
-    100%{opacity:0;transform:translateY(-28px) scale(0.95);}
-
-  }
-
-
-
-  /* Activity Heatmap & Daily Ring & Pomodoro */
+/* Activity Heatmap & Daily Ring & Pomodoro */
 
   .anti-proc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:20px;}
 
@@ -37358,325 +37295,184 @@ if(typeof window.showTactileToast !== 'function'){
 
 
 function spawnXpParticle(amount, anchorEl){
-
+  // Летающая через экран плашка XP удалена: вызываем радиальный разлет искр
   try{
-
-    if(!document || !document.body) return;
-
-    const prev = document.querySelectorAll('.xp-float-particle');
-
-    if(prev && prev.length > 5){
-
-      for(let i = 0; i < prev.length - 5; i++){
-
-        if(prev[i] && prev[i].remove) prev[i].remove();
-
-      }
-
+    if(typeof triggerSparksBurst === 'function'){
+      triggerSparksBurst(anchorEl, amount);
     }
-
-    const el = document.createElement('div');
-
-    const amt = Number(amount) || 0;
-
-    const icon = amt >= 10 ? '✨' : '⚡';
-
-    el.className = 'xp-float-particle' + (amt >= 10 ? ' xp-particle-epic' : (amt >= 5 ? ' xp-particle-great' : ' xp-particle-good'));
-
-    el.innerHTML = `<span>${icon}</span> <span>+${amt} XP</span>`;
-
-
-
-    let startX = Math.round((window.innerWidth || 800) / 2 - 40);
-
-    let startY = Math.round((window.innerHeight || 600) / 2);
-
-    const target = anchorEl || document.activeElement;
-
-    if(target && typeof target.getBoundingClientRect === 'function'){
-
-      const r = target.getBoundingClientRect();
-
-      if(r && (r.width > 0 || r.height > 0)){
-
-        startX = Math.max(16, Math.min((window.innerWidth || 800) - 120, Math.round(r.left + r.width / 2 - 42)));
-
-        startY = Math.max(24, Math.round(r.top - 14));
-
-      }
-
-    }
-
-    el.style.left = startX + 'px';
-
-    el.style.top = startY + 'px';
-
-    document.body.appendChild(el);
-
-
-
-    // Цель полёта — счётчик цели в шапке (⚡ 0 / 15)
-
-    const goalEl = document.querySelector('.srs-header-goal-status');
-
-    if(goalEl && typeof el.animate === 'function'){
-
-      const gr = goalEl.getBoundingClientRect();
-
-      const targetX = (gr.left + gr.width / 2) - (startX + 40);
-
-      const targetY = (gr.top + gr.height / 2) - startY;
-
-
-
-      const flight = el.animate([
-
-        { transform: 'translate(0, 0) scale(0.85)', opacity: 0 },
-
-        { transform: 'translate(0, -20px) scale(1.15)', opacity: 1, offset: 0.20 },
-
-        { transform: `translate(${targetX * 0.45}px, ${targetY * 0.55 - 35}px) scale(0.95)`, opacity: 0.95, offset: 0.60 },
-
-        { transform: `translate(${targetX}px, ${targetY}px) scale(0.60)`, opacity: 0.85, offset: 0.90 },
-
-        { transform: `translate(${targetX}px, ${targetY}px) scale(1.4)`, opacity: 0, offset: 1.0 }
-
-      ], {
-
-        duration: 720,
-
-        easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
-
-        fill: 'forwards'
-
-      });
-
-
-
-      flight.onfinish = () => {
-
-        try { el.remove(); } catch(_e){}
-
-        const currentGoal = document.querySelector('.srs-header-goal-status');
-
-        if(currentGoal){
-
-          currentGoal.classList.remove('srs-energy-pulse');
-
-          void currentGoal.offsetWidth; // trigger reflow
-
-          currentGoal.classList.add('srs-energy-pulse');
-
-          setTimeout(() => {
-
-            if(currentGoal) currentGoal.classList.remove('srs-energy-pulse');
-
-          }, 500);
-
-        }
-
-      };
-
-    } else {
-
-      setTimeout(function(){ try{ el.remove(); }catch(e){} }, 950);
-
-    }
-
-  }catch(e){}
-
+  }catch(_e){}
 }
-
 window.spawnXpParticle = spawnXpParticle;
 
-
-
 function dateIsoKey(d){
-
   const dt = d || new Date();
-
   return dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
-
 }
 
-function triggerSparksBurst(anchorEl){
-
+function triggerSparksBurst(anchorOrEvent, gradeOrAmount, maybeEvent){
   try{
-
     if(!document || !document.body) return;
 
     let originX = window.innerWidth / 2;
-
     let originY = window.innerHeight / 2;
+    let anchorEl = null;
+    let evt = null;
 
-    if(anchorEl && typeof anchorEl.getBoundingClientRect === 'function'){
-
-      const r = anchorEl.getBoundingClientRect();
-
-      if(r && (r.width > 0 || r.height > 0)){
-
-        originX = r.left + r.width / 2;
-
-        originY = r.top + r.height / 2;
-
-      }
-
+    if(anchorOrEvent && anchorOrEvent.target && anchorOrEvent.clientX !== undefined){
+      evt = anchorOrEvent;
+      anchorEl = anchorOrEvent.target;
+    } else if(anchorOrEvent && typeof anchorOrEvent.getBoundingClientRect === 'function'){
+      anchorEl = anchorOrEvent;
+    } else if(anchorOrEvent && anchorOrEvent.clientX !== undefined && anchorOrEvent.clientY !== undefined){
+      originX = anchorOrEvent.clientX;
+      originY = anchorOrEvent.clientY;
     }
 
+    if(maybeEvent && maybeEvent.clientX !== undefined){
+      evt = maybeEvent;
+    }
 
+    // При клике мышью или тапе пальцем искры разлетаются точно из точки нажатия
+    if(evt && typeof evt.clientX === 'number' && typeof evt.clientY === 'number' && (evt.clientX > 0 || evt.clientY > 0)){
+      originX = evt.clientX;
+      originY = evt.clientY;
+    } else if(anchorEl && typeof anchorEl.getBoundingClientRect === 'function'){
+      const r = anchorEl.getBoundingClientRect();
+      if(r && (r.width > 0 || r.height > 0)){
+        originX = Math.round(r.left + r.width / 2);
+        originY = Math.round(r.top + r.height / 2);
+      }
+    }
+
+    // Защита от дублирования салюта на том же элементе за короткий промежуток
+    if(anchorEl){
+      if(anchorEl._sparksTriggered) return;
+      anchorEl._sparksTriggered = true;
+      setTimeout(() => { try { delete anchorEl._sparksTriggered; } catch(_e){} }, 350);
+    }
+
+    // Подбор цветовой палитры под оценку SRS (1..4) или начисление опыта
+    let grade = gradeOrAmount;
+    if(typeof grade === 'string'){
+      const parsed = parseInt(grade, 10);
+      if(!isNaN(parsed)) grade = parsed;
+      else if(grade === 'again' || grade === 'reset') grade = 1;
+      else if(grade === 'hard') grade = 2;
+      else if(grade === 'good' || grade === 'pass') grade = 3;
+      else if(grade === 'easy') grade = 4;
+    }
+
+    let colors = ['#fbbf24', '#f59e0b', '#34d399', '#10b981', '#38bdf8', '#ffffff', '#fde68a'];
+    let sparkCount = 24;
+    let minDistance = 55;
+    let maxDistance = 95;
+
+    if(grade === 4){
+      // «Сходу» / Easy — яркий изумрудно-бирюзовый триумф с золотыми звёздами
+      colors = ['#38bdf8', '#06b6d4', '#34d399', '#10b981', '#fbbf24', '#ffffff', '#a7f3d0'];
+      sparkCount = 30;
+      minDistance = 70;
+      maxDistance = 115;
+    } else if(grade === 3){
+      // «Вспомнил» / Good — сочный мятно-изумрудный всплеск с золотом
+      colors = ['#34d399', '#10b981', '#059669', '#6ee7b7', '#fbbf24', '#ffffff'];
+      sparkCount = 24;
+      minDistance = 60;
+      maxDistance = 95;
+    } else if(grade === 2){
+      // «Частично» / Hard — тёплый солнечный янтарно-цитриновый блеск
+      colors = ['#fbbf24', '#f59e0b', '#d97706', '#fde68a', '#ffffff'];
+      sparkCount = 20;
+      minDistance = 50;
+      maxDistance = 85;
+    } else if(grade === 1){
+      // «Не знаю» / Again — ободряющие кораллово-розовые и золотые искорки
+      colors = ['#fb7185', '#f43f5e', '#fda4af', '#f59e0b', '#fbbf24', '#ffffff'];
+      sparkCount = 18;
+      minDistance = 45;
+      maxDistance = 75;
+    } else if(typeof grade === 'number' && grade >= 10){
+      // Бонусные очки опыта
+      colors = ['#fbbf24', '#f59e0b', '#34d399', '#38bdf8', '#ffffff'];
+      sparkCount = 26;
+      minDistance = 65;
+      maxDistance = 105;
+    }
 
     const container = document.createElement('div');
-
     container.className = 'srs-sparks-burst-container';
-
     container.style.cssText = 'position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:99999;overflow:hidden;';
-
     document.body.appendChild(container);
 
-
-
-    // Палитра искр: золотистый янтарь, сияющий изумруд, бриллиантовый циан и звёздный белый
-
-    const colors = ['#fbbf24', '#f59e0b', '#34d399', '#10b981', '#38bdf8', '#ffffff', '#fde68a'];
-
-    const sparkCount = 28;
-
-
-
     for(let i = 0; i < sparkCount; i++){
-
       const spark = document.createElement('div');
-
       const isStar = (i % 4 === 0);
-
       const color = colors[i % colors.length];
-
       const size = isStar ? 12 : (3 + Math.random() * 4);
 
-
-
       spark.style.cssText = `
-
         position:absolute;
-
         left:${originX}px;
-
         top:${originY}px;
-
         width:${size}px;
-
         height:${size}px;
-
         border-radius:${isStar ? '0' : '50%'};
-
         background:${isStar ? 'transparent' : color};
-
         box-shadow:${isStar ? 'none' : '0 0 6px ' + color};
-
         pointer-events:none;
-
         will-change:transform, opacity;
-
       `;
 
-
-
       if(isStar){
-
-        spark.innerHTML = `<span style="display:block;font-size:11px;line-height:1;color:${color};text-shadow:0 0 8px ${color};">✦</span>`;
-
+        spark.innerHTML = `<span style="display:block;font-size:11px;line-height:1;color:${color};text-shadow:0 0 8px ${color};user-select:none;">✦</span>`;
       }
-
-
 
       container.appendChild(spark);
 
-
-
-      // Радиальный разлёт искр во все 360 градусов
-
-      const angle = (i / sparkCount) * 2 * Math.PI + (Math.random() - 0.5) * 0.4;
-
-      const distance = 70 + Math.random() * 95;
-
+      // Радиальный разлёт искр во все 360 градусов с лёгким дрейфом
+      const angle = (i / sparkCount) * 2 * Math.PI + (Math.random() - 0.5) * 0.45;
+      const distance = minDistance + Math.random() * (maxDistance - minDistance);
       const destX = Math.cos(angle) * distance;
-
-      const destY = Math.sin(angle) * distance + (Math.random() * 20);
-
+      const destY = Math.sin(angle) * distance + (Math.random() * 22);
       const rotation = (Math.random() - 0.5) * 720;
 
-
-
       if(typeof spark.animate === 'function'){
-
         spark.animate([
-
           { transform: 'translate(-50%, -50%) scale(0.6) rotate(0deg)', opacity: 1 },
-
           { transform: `translate(calc(-50% + ${destX * 0.45}px), calc(-50% + ${destY * 0.45}px)) scale(1.3) rotate(${rotation * 0.45}deg)`, opacity: 1, offset: 0.35 },
-
           { transform: `translate(calc(-50% + ${destX}px), calc(-50% + ${destY}px)) scale(0) rotate(${rotation}deg)`, opacity: 0, offset: 1.0 }
-
         ], {
-
-          duration: 420 + Math.random() * 260,
-
+          duration: 420 + Math.random() * 240,
           easing: 'cubic-bezier(0.12, 0.85, 0.32, 1)',
-
           fill: 'forwards'
-
         });
-
       }
-
     }
 
-
-
     setTimeout(() => {
-
       try{ container.remove(); }catch(_e){}
-
-    }, 750);
-
+    }, 720);
   }catch(_err){}
-
 }
-
 window.triggerSparksBurst = triggerSparksBurst;
 
-
-
 function awardXp(amount, anchorEl){
-
   ensureExtendedState();
-
   state.xp += amount;
-
   const k = dateIsoKey();
-
   state.dailyXpByDate[k] = (state.dailyXpByDate[k] || 0) + amount;
-
   saveState(state);
-
   playSound('xp');
-
-  // Отключена летающая через экран плашка spawnXpParticle для мгновенной реакции UI
-
+  if(anchorEl && typeof triggerSparksBurst === 'function'){
+    try { triggerSparksBurst(anchorEl, amount); } catch(_e){}
+  }
   try {
-
     const dayVal = (typeof todayXp === 'function') ? todayXp() : (state.dailyXpByDate[k] || 0);
-
     document.querySelectorAll('.sprint-xp-pill').forEach(function(el){
-
       el.innerHTML = `⚡ +${dayVal} XP<span class="sprint-xp-subtext"> за сутки</span>`;
-
       el.title = `Заработано за сутки: ${dayVal} XP`;
-
     });
-
   } catch(e){}
-
 }
 
 function todayXp(){
@@ -57289,7 +57085,7 @@ document.addEventListener('click', async function(e){
     const nid = srsNotePassBtn.getAttribute('data-srs-note-pass');
 
     if(nid){
-
+      try { triggerSparksBurst(srsNotePassBtn, 3, e); } catch(_e){}
       applyNoteReview(nid, 'pass', srsNotePassBtn);
 
       cardsHubState.forcedNoteId = null;
@@ -57321,9 +57117,7 @@ document.addEventListener('click', async function(e){
     const nid = srsNoteEasyBtn.getAttribute('data-srs-note-easy');
 
     if(nid){
-
-      try { triggerSparksBurst(srsNoteEasyBtn); } catch(_e){}
-
+      try { triggerSparksBurst(srsNoteEasyBtn, 4, e); } catch(_e){}
       applyNoteReview(nid, 'easy', srsNoteEasyBtn);
 
       cardsHubState.forcedNoteId = null;
@@ -57355,7 +57149,7 @@ document.addEventListener('click', async function(e){
     const nid = srsNoteResetBtn.getAttribute('data-srs-note-reset');
 
     if(nid){
-
+      try { triggerSparksBurst(srsNoteResetBtn, 1, e); } catch(_e){}
       applyNoteReview(nid, 'reset', srsNoteResetBtn);
 
       cardsHubState.forcedNoteId = null;
@@ -60374,11 +60168,8 @@ const psk = e.target.closest('[data-py-select-k]');
 
     // Искры летят в разные стороны только при нажатии кнопки Сходу (4)
 
-    if(rating === 4 || rawRate === 'easy'){
-
-      try { triggerSparksBurst(prc); } catch(_e){}
-
-    }
+    // Радиальный разлет искр при нажатии любой оценки с палитрой под тип ответа
+    try { triggerSparksBurst(prc, rating, e); } catch(_e){}
 
     const fid = pySkillViewState.fId;
 
@@ -61842,13 +61633,8 @@ const psk = e.target.closest('[data-py-select-k]');
 
     }
 
-    // Искры летят в разные стороны только при нажатии кнопки Сходу (4)
-
-    if(rSound === 4 || rawRate === 'easy'){
-
-      try { triggerSparksBurst(hRate); } catch(_e){}
-
-    }
+    // Радиальный разлет искр при нажатии любой оценки с палитрой под тип ответа
+    try { triggerSparksBurst(hRate, rSound, e); } catch(_e){}
 
     try { playSound('rate', rSound); } catch(_e){}
 
