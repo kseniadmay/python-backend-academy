@@ -133,13 +133,13 @@ def main() -> int:
                 return 1
             print('✓ [Pre-Commit] Тест консистентности инлайн-кода и карточек SRS пройден со 100% успехом.')
         # Архитектурная защита DRY: единый канонический экран решения задач Zen IDE
-        dry_test_path = os.path.join(_ROOT, 'tests', 'test_zen_ide_dry_consistency.js')
+        dry_test_path = os.path.join(_ROOT, 'tests', 'test_dry_architecture.js')
         if os.path.isfile(dry_test_path):
             c_dry = subprocess.run(['node', dry_test_path], capture_output=True, text=True)
             if c_dry.returncode != 0:
-                print(f'[HOOK ERROR] Сбой архитектурного DRY-теста Zen IDE:\n{c_dry.stderr or c_dry.stdout}')
+                print(f'[HOOK ERROR] Сбой глобального архитектурного DRY-теста:\n{c_dry.stderr or c_dry.stdout}')
                 return 1
-            print('✓ [Pre-Commit] Архитектурный DRY-тест Zen IDE пройден со 100% успехом.')
+            print('✓ [Pre-Commit] Глобальный архитектурный DRY-тест (SSOT) пройден со 100% успехом.')
 
     print('✓ [Pre-Commit] Синтаксическая проверка пройдена (JS, Python, JSON, HTML inline в норме).')
     return 0
