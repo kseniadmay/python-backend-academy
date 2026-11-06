@@ -132,7 +132,7 @@
 
   #app{min-height:100vh;display:flex;}
 
-  .sidebar{width:236px;flex:none;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:22px 18px;position:sticky;top:0;height:100vh;max-height:100vh;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;box-sizing:border-box;}
+  .sidebar{width:256px;flex:none;background:var(--surface);border-right:1px solid var(--line);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);display:flex;flex-direction:column;padding:18px 14px;position:sticky;top:0;height:100vh;max-height:100vh;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;box-sizing:border-box;transition:transform 0.25s cubic-bezier(0.16,1,0.3,1),width 0.25s cubic-bezier(0.16,1,0.3,1);}
 
   .sidebar::-webkit-scrollbar{display:none;}
 
@@ -140,11 +140,33 @@
 
   .brand-sub{font-size:.78rem;color:var(--ink-muted);margin-bottom:26px;}
 
-  .navlink{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:12px;text-decoration:none;color:var(--ink-soft);font-weight:500;font-size:.95rem;margin-bottom:2px;transition:background .15s,color .15s;}
+  .brand-box-unified{padding:0 2px 12px;margin-bottom:10px;border-bottom:1px solid var(--line-soft);}
+  .brand-row-unified{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;}
+  .brand-left{display:flex;align-items:center;gap:9px;}
+  .brand-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg, var(--moss), var(--emerald, #10b981));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:0.95rem;box-shadow:0 2px 8px rgba(16,185,129,0.25);flex-shrink:0;}
+  .brand-icon .icon{width:16px;height:16px;stroke:#fff;}
+  .brand-title{font-family:var(--font-d);font-weight:800;font-size:1.05rem;letter-spacing:-0.02em;line-height:1.15;color:var(--ink);}
+  .level-tag-unified{font-size:0.68rem;font-weight:800;padding:3px 8px;border-radius:7px;background:var(--emerald-soft, rgba(16,185,129,0.15));color:var(--emerald, #10b981);border:1px solid rgba(16,185,129,0.25);font-family:var(--font-m);letter-spacing:0.02em;flex-shrink:0;}
+  .quick-search-btn{width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:6px 10px;display:flex;align-items:center;gap:8px;color:var(--ink-muted);font-size:0.78rem;cursor:pointer;transition:background .15s, border-color .15s, color .15s;font-family:var(--font-d);}
+  .quick-search-btn:hover{border-color:var(--moss);color:var(--ink);background:var(--surface-hover, rgba(255,255,255,0.06));}
+  .search-kbd{margin-left:auto;font-family:var(--font-m);font-size:0.66rem;padding:2px 5px;border-radius:5px;background:var(--surface);border:1px solid var(--line);color:var(--ink-soft);font-weight:700;}
 
-  .navlink:hover{background:var(--surface-2);color:var(--ink);}
+  /* Quick Search Command Palette Modal */
+  .search-modal-backdrop{position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;background:rgba(0,0,0,0.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:flex-start;justify-content:center;padding:12vh 20px 20px;opacity:0;pointer-events:none;transition:opacity .18s ease;}
+  .search-modal-backdrop.is-open{opacity:1;pointer-events:auto;}
+  .search-modal-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 20px 48px rgba(0,0,0,0.45);width:100%;max-width:540px;overflow:hidden;display:flex;flex-direction:column;transform:translateY(-8px) scale(0.98);transition:transform .18s cubic-bezier(0.16,1,0.3,1);}
+  .search-modal-backdrop.is-open .search-modal-card{transform:translateY(0) scale(1);}
+  .search-modal-input-row{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line-soft);}
+  .search-modal-input{flex:1;background:transparent;border:none;outline:none;font-family:var(--font-d);font-size:1rem;color:var(--ink);}
+  .search-modal-results{max-height:360px;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:2px;}
+  .search-result-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:10px;text-decoration:none;color:var(--ink);cursor:pointer;transition:background .12s;font-size:0.9rem;}
+  .search-result-item:hover, .search-result-item.selected{background:var(--surface-2);color:var(--emerald, #10b981);}
 
-  .navlink.active{background:var(--moss-soft);color:var(--moss-deep);}
+  .navlink{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:11px;text-decoration:none;color:var(--ink-soft);font-weight:500;font-size:.88rem;margin-bottom:2px;border:1px solid transparent;transition:background .15s, border-color .15s, color .15s;}
+
+  .navlink:hover{background:var(--surface-hover, rgba(255,255,255,0.05));color:var(--ink);}
+
+  .navlink.active{background:var(--surface-2);border-color:var(--line);color:var(--ink);font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,0.06);}
 
   .sidebar-foot{margin-top:auto;display:flex;flex-direction:column;gap:10px;}
 
@@ -726,7 +748,12 @@
 
   #nav-desktop .navlink{
 
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:7px 10px;font-size:.86rem;border-radius:10px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:8px 11px;font-size:.88rem;font-weight:500;border-radius:11px;border:1px solid transparent;display:flex;align-items:center;gap:10px;
+  }
+
+  .nav-group-label{font-size:.67rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-muted);padding:8px 8px 3px;margin-top:8px;display:flex;align-items:center;justify-content:space-between;}
+  .nav-group-label:first-child{margin-top:0;padding-top:2px;}
+  .navlink__badge-emerald{background:var(--emerald-soft, rgba(16,185,129,0.15)) !important;color:var(--emerald, #10b981) !important;border:1px solid rgba(16,185,129,0.3) !important;}
 
   }
 
@@ -29361,9 +29388,25 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
   <aside class="sidebar">
 
-    <div class="brand"><svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M7.8 7.6 10.5 16M16.2 7.6 13.5 16M8.3 6h7.4"/></svg>Academy</div>
+    <div class="brand-box-unified">
+      <div class="brand-row-unified">
+        <div class="brand-left">
+          <div class="brand-icon"><svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M7.8 7.6 10.5 16M16.2 7.6 13.5 16M8.3 6h7.4"/></svg></div>
+          <div>
+            <div class="brand-title">Academy</div>
+            <div class="brand-sub" style="margin-bottom:0;">Python Backend</div>
+          </div>
+        </div>
+        <span class="level-tag-unified" id="sidebar-level-badge">Junior 1</span>
+      </div>
+      <button class="quick-search-btn" id="sidebar-quick-search-btn" type="button" aria-label="Быстрый поиск по темам" title="Быстрый поиск (Ctrl+K)">
+        <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span>Поиск по темам...</span>
+        <span class="search-kbd">Ctrl K</span>
+      </button>
+    </div>
 
-    <div class="brand-sub">Python Backend</div>
+
 
     <nav id="nav-desktop">
 
@@ -54190,9 +54233,9 @@ viewDashboard = function(){
 };
 NAV_ITEMS.splice(0, NAV_ITEMS.length,
   {route:'/', icon:'home', label:'Дашборд', shortLabel:'Дашборд', mobileTab:true, group:'main'},
-  {route:'/path', icon:'path', label:'Путь', shortLabel:'Путь', mobileTab:true, group:'main'},
+  {route:'/path', icon:'path', label:'Путь к офферу', shortLabel:'Путь', mobileTab:true, group:'main'},
   {route:'/cards', icon:'cards', label:'Интервалка', shortLabel:'Интервалка', mobileTab:true, group:'main', hasDueDot:true},
-  {route:'/practice', icon:'code', label:'IDE', shortLabel:'IDE', mobileTab:true, group:'main'},
+  {route:'/practice', icon:'code', label:'Zen IDE', shortLabel:'IDE', mobileTab:true, group:'main'},
   {route:'/notes-review', icon:'book', label:'Конспекты', shortLabel:'Конспекты', group:'trainer'},
   {route:'/mock', icon:'mock', label:'Собеседование', shortLabel:'Интервью', group:'trainer'},
   {route:'/python', icon:'python', label:'Python Core', shortLabel:'Python', group:'module'},
@@ -54231,9 +54274,9 @@ renderNav = function(){
       const pVal = modPctMap[it.route];
       let badgeHtml = '';
       if(it.route === '/notes-review'){
-        badgeHtml = `<span class="navlink__pct navlink__badge-due">${notesDueCount || 0}</span>`;
+        badgeHtml = (notesDueCount > 0) ? `<span class="navlink__pct navlink__badge-due">${notesDueCount}</span>` : '';
       } else if(it.route === '/cards'){
-        badgeHtml = `<span class="navlink__pct navlink__badge-due">${cardsDueCount || 0}</span>`;
+        badgeHtml = (cardsDueCount > 0) ? `<span class="navlink__pct navlink__badge-due">${cardsDueCount}</span>` : ''; } else if(it.route === '/path'){ const mCount = (typeof state !== 'undefined' && state && Array.isArray(state.mastered)) ? state.mastered.length : 0; badgeHtml = `<span class="navlink__pct navlink__badge-emerald">Шаг ${mCount + 1}</span>`;
       } else if(pVal !== undefined && pVal > 0){
         badgeHtml = `<span class="navlink__pct">${pVal}%</span>`;
       }
@@ -54247,23 +54290,14 @@ renderNav = function(){
     const modulesPctBadge = overallPct > 0 ? `<span class="navlink__pct">${overallPct}%</span>` : '';
 
     desk.innerHTML = `
-      <div class="nav-group-label">Главное</div>
+      <div class="nav-group-label">Обучение и практика</div>
       ${mainLinks}
-      <details class="nav-modules-accordion" style="margin-top:6px;">
-        <summary class="nav-modules-summary">
-          <div class="nav-modules-summary-row" style="display:flex;justify-content:space-between;align-items:center;white-space:nowrap;width:100%;">
-            <span>🗺️ Модули программы</span>
-            ${modulesPctBadge}
-          </div>
-          <div class="nav-modules-bar" style="height:3px;margin-top:4px;border-radius:99px;background:var(--line);overflow:hidden;"><div class="nav-modules-bar-fill" style="height:100%;border-radius:99px;width:${overallPct}%;background:linear-gradient(90deg, var(--emerald), var(--amber));transition:width .35s ease;"></div></div>
-        </summary>
-        <div class="nav-modules-list">${modLinks}</div>
-      </details>
-      <div class="nav-group-label" style="margin-top:14px;">Тренажёры и практика</div>
+      <div class="nav-group-label" style="margin-top:14px;">Собеседование и ретеншн</div>
       ${trainerLinks}
-      <div class="nav-group-label" style="margin-top:14px;">Инструменты</div>
+      <div class="nav-group-label" style="margin-top:14px;">База знаний и лаборатория</div>
       ${toolLinks}
     `;
+    if(typeof updateSidebarLevelBadge === 'function') updateSidebarLevelBadge();
   }
 
   const mobItems = NAV_ITEMS.filter(it => it.mobileTab);
@@ -55028,9 +55062,153 @@ window.openSettingsModal = openSettingsModal;
 
 window.closeSettingsModal = closeSettingsModal;
 
+/* ================= SIDEBAR LEVEL BADGE & QUICK SEARCH ================= */
 
+function updateSidebarLevelBadge(){
+  const badge = document.getElementById('sidebar-level-badge');
+  if(!badge) return;
+  const count = (typeof state !== 'undefined' && state && Array.isArray(state.mastered)) ? state.mastered.length : 0;
+  let level = 'Старт';
+  if(count >= 80){
+    level = 'Middle';
+  } else if(count >= 50){
+    level = 'Junior+';
+  } else if(count >= 20){
+    level = 'Junior 2';
+  } else if(count >= 3){
+    level = 'Junior 1';
+  }
+  badge.textContent = level;
+}
+window.updateSidebarLevelBadge = updateSidebarLevelBadge;
 
+function ensureQuickSearchModal(){
+  let modal = document.getElementById('sidebar-search-modal');
+  if(modal) return modal;
+  modal = document.createElement('div');
+  modal.id = 'sidebar-search-modal';
+  modal.className = 'search-modal-backdrop';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-label', 'Быстрый поиск по курсу');
+  modal.innerHTML = `
+    <div class="search-modal-card">
+      <div class="search-modal-input-row">
+        <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--ink-muted);flex-shrink:0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-modal-input" id="sidebar-search-input" placeholder="Поиск тем, навыков и модулей..." autocomplete="off" />
+        <span class="search-kbd" style="font-size:0.68rem;cursor:pointer;" id="sidebar-search-esc-btn">ESC</span>
+      </div>
+      <div class="search-modal-results" id="sidebar-search-results"></div>
+    </div>
+  `;
+  document.body.appendChild(modal);
 
+  modal.addEventListener('click', function(e){
+    if(e.target === modal || e.target.closest('#sidebar-search-esc-btn')){
+      closeQuickSearchModal();
+    }
+  });
+
+  const inp = modal.querySelector('#sidebar-search-input');
+  const res = modal.querySelector('#sidebar-search-results');
+
+  const renderResults = function(query){
+    if(typeof NODES === 'undefined' || !Array.isArray(NODES)){
+      res.innerHTML = '<div style="padding:14px;color:var(--ink-muted);font-size:0.85rem;text-align:center;">Темы загружаются...</div>';
+      return;
+    }
+    const q = (query || '').trim().toLowerCase();
+    let matches = [];
+    if(!q){
+      matches = NODES.slice(0, 7);
+    } else {
+      matches = NODES.filter(function(n){
+        return (n.title && n.title.toLowerCase().indexOf(q) !== -1) ||
+               (n.summary && n.summary.toLowerCase().indexOf(q) !== -1) ||
+               (Array.isArray(n.outline) && n.outline.some(function(o){
+                 const t = typeof o === 'string' ? o : (o && o.title);
+                 return t && t.toLowerCase().indexOf(q) !== -1;
+               }));
+      }).slice(0, 10);
+    }
+
+    if(matches.length === 0){
+      const safeQuery = typeof escapeHtml === 'function' ? escapeHtml(q) : q;
+      res.innerHTML = '<div style="padding:18px;color:var(--ink-muted);font-size:0.85rem;text-align:center;">Ничего не найдено по запросу «' + safeQuery + '»</div>';
+      return;
+    }
+
+    res.innerHTML = matches.map(function(n, idx){
+      const stageLabel = n.stage !== undefined ? ('Модуль ' + n.stage) : 'Курс';
+      const safeTitle = typeof escapeHtml === 'function' ? escapeHtml(n.title || '') : (n.title || '');
+      const safeSummary = typeof escapeHtml === 'function' ? escapeHtml(n.summary || '') : (n.summary || '');
+      return '<a href="#/topic/' + encodeURIComponent(n.id) + '" class="search-result-item" data-search-idx="' + idx + '">' +
+        '<div style="display:flex;flex-direction:column;gap:3px;overflow:hidden;">' +
+          '<strong style="font-size:0.9rem;color:var(--ink);">' + safeTitle + '</strong>' +
+          '<span style="font-size:0.75rem;color:var(--ink-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + safeSummary + '</span>' +
+        '</div>' +
+        '<span style="font-size:0.7rem;color:var(--ink-soft);font-family:var(--font-m);flex-shrink:0;margin-left:12px;">' + stageLabel + '</span>' +
+      '</a>';
+    }).join('');
+
+    res.querySelectorAll('.search-result-item').forEach(function(item){
+      item.addEventListener('click', function(){
+        closeQuickSearchModal();
+      });
+    });
+  };
+
+  inp.addEventListener('input', function(){
+    renderResults(inp.value);
+  });
+
+  return modal;
+}
+
+function openQuickSearchModal(){
+  const modal = ensureQuickSearchModal();
+  modal.classList.add('is-open');
+  const inp = modal.querySelector('#sidebar-search-input');
+  if(inp){
+    inp.value = '';
+    inp.dispatchEvent(new Event('input'));
+    setTimeout(function(){ inp.focus(); }, 50);
+  }
+}
+window.openQuickSearchModal = openQuickSearchModal;
+
+function closeQuickSearchModal(){
+  const modal = document.getElementById('sidebar-search-modal');
+  if(modal){
+    modal.classList.remove('is-open');
+  }
+}
+window.closeQuickSearchModal = closeQuickSearchModal;
+
+// Quick search trigger buttons and keyboard shortcut Ctrl+K / Cmd+K
+document.addEventListener('click', function(e){
+  const btn = e.target.closest('#sidebar-quick-search-btn');
+  if(btn){
+    e.preventDefault();
+    openQuickSearchModal();
+  }
+});
+
+document.addEventListener('keydown', function(e){
+  if((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K' || e.keyCode === 75)){
+    e.preventDefault();
+    const modal = document.getElementById('sidebar-search-modal');
+    if(modal && modal.classList.contains('is-open')){
+      closeQuickSearchModal();
+    } else {
+      openQuickSearchModal();
+    }
+    return;
+  }
+  if(e.key === 'Escape'){
+    closeQuickSearchModal();
+  }
+});
 
 // Inject Ambient Background Orbs (.ambient-orb--burgundy & .ambient-orb--emerald), Onest Font, Bug Logger FAB, Global Pomodoro Pill & Sidebar Footer Quick Start
 

@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Стенд перестройки сайдбара — Шаг 7: Поведение в маршрутах и Zen IDE — Python Backend Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #0d1117;
+      --bg-subtle: #161b22;
+      --paper: #14160F;
+      --surface: #1B1E15;
+      --surface-2: #21241A;
+      --surface-hover: rgba(255, 255, 255, 0.05);
+      --ink: #ECEDE2;
+      --ink-soft: #B6B8A9;
+      --ink-muted: #7D806F;
+      --line: #33362A;
+      --line-soft: #282B20;
+      --moss: #74AC82;
+      --moss-deep: #CDE8D2;
+      --moss-soft: #223028;
+      --emerald: #10B981;
+      --emerald-soft: rgba(16, 185, 129, 0.15);
+      --amber: #F59E0B;
+      --amber-soft: rgba(245, 158, 11, 0.15);
+      --clay: #DA9C63;
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --font-d: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+      --font-title: 'Unbounded', sans-serif;
+      --spring-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    [data-theme="light"] {
+      --bg-canvas: #f6f8fa;
+      --bg-subtle: #ffffff;
+      --paper: #F1F2EC;
+      --surface: #FBFBF7;
+      --surface-2: #F4F5EE;
+      --surface-hover: rgba(0, 0, 0, 0.04);
+      --ink: #1C201A;
+      --ink-soft: #565A4E;
+      --ink-muted: #8B8D80;
+      --line: #DCDBCD;
+      --line-soft: #E7E6DA;
+      --moss: #3F6B4A;
+      --moss-deep: #274A32;
+      --moss-soft: #E3ECE3;
+      --emerald: #059669;
+      --emerald-soft: rgba(5, 150, 105, 0.12);
+      --amber: #D97706;
+      --amber-soft: rgba(217, 119, 6, 0.12);
+      --clay: #B8703B;
+      --border-glass: rgba(0, 0, 0, 0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-canvas);
+      color: var(--ink);
+      font-family: var(--font-d);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    .ambient-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.18;
+    }
+    .orb-1 { width: 450px; height: 450px; background: #10B981; top: -100px; left: -100px; }
+    .orb-2 { width: 500px; height: 500px; background: #F59E0B; bottom: -120px; right: -80px; }
+
+    /* Top Control Bar */
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .top-bar__title {
+      font-family: var(--font-title);
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.02em;
+    }
+    .top-bar__badge {
+      font-family: var(--font-m);
+      font-size: 0.68rem;
+      background: var(--emerald-soft);
+      color: var(--emerald);
+      border: 1px solid var(--emerald);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+    .variant-selector {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface-2);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+    }
+    .variant-btn {
+      background: transparent;
+      border: none;
+      color: var(--ink-soft);
+      font-family: var(--font-d);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s var(--spring-smooth);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .variant-btn:hover { color: var(--ink); background: var(--surface-hover); }
+    .variant-btn.active {
+      background: var(--moss);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    }
+    .theme-toggle-btn {
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      padding: 7px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+
+    .showcase-container {
+      display: flex;
+      flex: 1;
+      position: relative;
+      z-index: 1;
+      height: calc(100vh - 61px);
+      overflow: hidden;
+    }
+
+    /* Common Approved Sidebar Structure (256px) */
+    .sb-base {
+      width: 256px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--line);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      display: flex;
+      flex-direction: column;
+      padding: 18px 14px;
+      height: 100%;
+      overflow-y: auto;
+      scrollbar-width: none;
+      transition: all 0.3s var(--spring-smooth);
+    }
+    .sb-base::-webkit-scrollbar { display: none; }
+
+    /* Unified Approved Header (1+2+4 Synthesis: Editorial + Junior 2 Badge + Ctrl K) */
+    .brand-box-unified {
+      padding: 0 4px 12px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .brand-row-unified {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .brand-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--moss), var(--emerald));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.95rem;
+    }
+    .brand-title {
+      font-family: var(--font-title);
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+    .level-tag-unified {
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 7px;
+      background: var(--emerald-soft);
+      color: var(--emerald);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      font-family: var(--font-m);
+    }
+    .quick-search-btn {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--ink-muted);
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .quick-search-btn:hover {
+      border-color: var(--moss);
+      color: var(--ink);
+      background: var(--surface-hover);
+    }
+    .search-kbd {
+      margin-left: auto;
+      font-family: var(--font-m);
+      font-size: 0.66rem;
+      padding: 2px 5px;
+      border-radius: 5px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      color: var(--ink-soft);
+    }
+
+    /* Approved Nav Links (Scandinavian Glass Capsule) */
+    .sb-nav-group { margin-bottom: 16px; }
+    .sb-group-label {
+      font-size: 0.67rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+      padding: 6px 10px 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sb-glass-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 11px;
+      border-radius: 11px;
+      color: var(--ink-soft);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      margin-bottom: 2px;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+    }
+    .sb-glass-link:hover {
+      background: var(--surface-hover);
+      color: var(--ink);
+    }
+    .sb-glass-link.active {
+      background: var(--surface-2);
+      border-color: var(--border-glass);
+      color: var(--ink);
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .sb-link__badge {
+      margin-left: auto;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--ink-muted);
+      font-family: var(--font-m);
+    }
+    .sb-link__badge.badge-amber {
+      background: var(--amber-soft);
+      color: var(--amber);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .sb-link__badge.badge-emerald {
+      background: var(--emerald-soft);
+      color: var(--emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    /* Approved Balanced Footer */
+    .sb-footer {
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--line-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .sb-action-pill {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.14), rgba(245, 158, 11, 0.1));
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 0.86rem;
+      padding: 8px 12px;
+      border-radius: 11px;
+      cursor: pointer;
+    }
+    .sb-hud-row { display: flex; align-items: center; gap: 8px; }
+    .sb-pomo-btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      padding: 7px 10px;
+      border-radius: 10px;
+      font-family: var(--font-m);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .sb-streak-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--amber-soft);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: var(--amber);
+      padding: 7px 11px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 0.84rem;
+      cursor: pointer;
+    }
+    .sb-sys-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+    .sb-lang-pill { display: flex; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+    .sb-lang-btn { background: transparent; border: none; padding: 4px 8px; font-size: 0.72rem; font-weight: 700; color: var(--ink-muted); cursor: pointer; }
+    .sb-lang-btn.active { background: var(--surface-hover); color: var(--ink); }
+    .sb-icon-btn { background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 9px; cursor: pointer; color: var(--ink-soft); display: flex; align-items: center; justify-content: center; }
+    .sb-quiet-link { background: none; border: none; font-size: 0.74rem; color: var(--ink-muted); cursor: pointer; text-align: center; text-decoration: underline; }
+
+    /* Step 7 Specific Visualizations */
+    /* V7.1: Smart Collapse / Zen Toggle Button in IDE */
+    .zen-mock-banner {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .zen-toggle-pill {
+      background: var(--emerald);
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.80rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* V7.3: Peek Handle */
+    .peek-handle {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 6px;
+      height: 60px;
+      border-radius: 0 4px 4px 0;
+      background: var(--moss);
+      cursor: pointer;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+    }
+
+    /* Canvas Info */
+    .preview-canvas { flex: 1; padding: 32px 40px; overflow-y: auto; }
+    .preview-header {
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line-soft);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .preview-header h2 { font-family: var(--font-title); font-size: 1.35rem; font-weight: 700; letter-spacing: -0.02em; }
+    .preview-header p { font-size: 0.88rem; color: var(--ink-muted); margin-top: 4px; }
+    .feature-tags { display: flex; gap: 8px; }
+    .feature-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      color: var(--ink-soft);
+    }
+    .canvas-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .comp-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+    .comp-table th, .comp-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--line-soft); }
+    .comp-table th { background: var(--surface-2); font-weight: 700; font-size: 0.76rem; text-transform: uppercase; color: var(--ink-muted); }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-orb orb-1"></div>
+  <div class="ambient-orb orb-2"></div>
+
+  <!-- Header -->
+  <header class="top-bar">
+    <div class="top-bar__title">
+      <svg class="icon" viewBox="0 0 24 24" style="color:var(--emerald);width:20px;height:20px;"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><path d="M7.8 7.6 10.5 16M16.2 7.6 13.5 16M8.3 6h7.4" stroke="currentColor" stroke-width="2"/></svg>
+      <span>Стенд перестройки сайдбара</span>
+      <span class="top-bar__badge">Шаг 7: Поведение в Zen IDE и навигации</span>
+    </div>
+
+    <!-- Variant Tabs for Step 7 -->
+    <div class="variant-selector" role="tablist">
+      <button class="variant-btn active" data-target="v7-1" onclick="switchStep7Variant('v7-1')">
+        <span>⭐ 1. Умный контекстный Zen</span>
+      </button>
+      <button class="variant-btn" data-target="v7-2" onclick="switchStep7Variant('v7-2')">
+        <span>📌 2. Всегда закреплён (Pinned)</span>
+      </button>
+      <button class="variant-btn" data-target="v7-3" onclick="switchStep7Variant('v7-3')">
+        <span>🪟 3. Выплывающий Float & Peek</span>
+      </button>
+      <button class="variant-btn" data-target="v7-4" onclick="switchStep7Variant('v7-4')">
+        <span>🔄 4. Динамический футер-экшен</span>
+      </button>
+    </div>
+
+    <button class="theme-toggle-btn" onclick="toggleTheme()">
+      <span id="theme-icon">🌙</span> <span id="theme-text">Тёмная тема</span>
+    </button>
+  </header>
+
+  <div class="showcase-container">
+
+    <!-- ==================== APPROVED UNIFIED SIDEBAR MOCKUP ==================== -->
+    <aside id="main-sidebar" class="sb-base">
+      <!-- Unified Header (Synthesis 1+2+4) -->
+      <div class="brand-box-unified">
+        <div class="brand-row-unified">
+          <div class="brand-left">
+            <div class="brand-icon">A</div>
+            <div>
+              <div class="brand-title">Academy</div>
+            </div>
+          </div>
+          <span class="level-tag-unified">Junior 2</span>
+        </div>
+        <button class="quick-search-btn" onclick="alert('Открытие палитры поиска Ctrl+K!')">
+          <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>Поиск по темам...</span>
+          <span class="search-kbd">Ctrl K</span>
+        </button>
+      </div>
+
+      <!-- Group 1: Обучение и практика -->
+      <div class="sb-nav-group">
+        <div class="sb-group-label">Обучение и практика</div>
+        <a href="#/path" class="sb-glass-link active">
+          <svg class="icon" viewBox="0 0 24 24"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+          <span>Путь к офферу</span>
+          <span class="sb-link__badge badge-emerald">Шаг 14</span>
+        </a>
+        <a href="#/cards" class="sb-glass-link">
+          <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>Интервалка</span>
+          <span class="sb-link__badge badge-amber">8 долгов</span>
+        </a>
+        <a href="#/practice" class="sb-glass-link">
+          <svg class="icon" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <span>Zen IDE</span>
+        </a>
+        <a href="#/" class="sb-glass-link">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5M6 10v9h5v-5h2v5h5v-9"/></svg>
+          <span>Дашборд</span>
+        </a>
+      </div>
+
+      <!-- Group 2: Собеседование и ретеншн -->
+      <div class="sb-nav-group">
+        <div class="sb-group-label">Собеседование и ретеншн</div>
+        <a href="#/mock" class="sb-glass-link">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+          <span>Мок-собеседование</span>
+        </a>
+        <a href="#/notes-review" class="sb-glass-link">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span>Конспекты</span>
+          <span class="sb-link__badge badge-amber">3</span>
+        </a>
+      </div>
+
+      <!-- Group 3: База знаний и лаборатория -->
+      <div class="sb-nav-group">
+        <div class="sb-group-label">База знаний и лаборатория</div>
+        <a href="#/docs" class="sb-glass-link">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          <span>Справочник</span>
+        </a>
+        <a href="#/sandbox" class="sb-glass-link">
+          <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 9l3 3-3 3M13 15h4"/></svg>
+          <span>Песочница</span>
+        </a>
+      </div>
+
+      <!-- Approved Balanced Footer -->
+      <div class="sb-footer">
+        <button id="quick-step-btn" class="sb-action-pill">
+          <span>⚡ Быстрый микро-шаг</span>
+        </button>
+
+        <div class="sb-hud-row">
+          <button class="sb-pomo-btn" title="Запустить фокус">
+            <span>⏱ 15:00</span>
+            <span style="color:var(--emerald);">▶</span>
+          </button>
+          <div class="sb-streak-badge" title="Стрик дней">
+            <span>🔥 4</span>
+          </div>
+        </div>
+
+        <div class="sb-sys-row">
+          <div class="sb-lang-pill">
+            <button class="sb-lang-btn active">RU</button>
+            <button class="sb-lang-btn">EN</button>
+          </div>
+          <button class="sb-icon-btn" title="Сменить тему">🌙</button>
+          <button class="sb-icon-btn" title="Настройки">⚙️</button>
+        </div>
+
+        <button class="sb-quiet-link">🐞 Журнал замечаний</button>
+      </div>
+    </aside>
+
+    <!-- Canvas Info -->
+    <main class="preview-canvas">
+      <!-- Interactive Zen Simulation -->
+      <div class="zen-mock-banner">
+        <div>
+          <div style="font-weight:700;font-size:0.92rem;">Симуляция рабочей области: Zen IDE & Путь к офферу</div>
+          <div style="font-size:0.78rem;color:var(--ink-muted);margin-top:2px;">Проверьте, как сайдбар адаптируется при входе в режим глубокой фокусировки на коде.</div>
+        </div>
+        <button class="zen-toggle-pill" onclick="simulateZenToggle()">
+          <span>🧘 Включить Zen Focus</span>
+        </button>
+      </div>
+
+      <div class="preview-header">
+        <div>
+          <h2 id="step7-variant-title">1. Умный контекстный Zen Focus (Smart Route Context)</h2>
+          <p id="step7-variant-desc">При входе в Zen IDE или нажатии Zen-Mode сайдбар плавно скрывается, отдавая 100% ширины экрану кода. На страницах пути кнопка микро-шага скрывается по DRY.</p>
+        </div>
+        <div class="feature-tags" id="step7-variant-tags">
+          <span class="feature-tag">100% фокус на коде</span>
+          <span class="feature-tag">Контекстный микро-шаг</span>
+          <span class="feature-tag">Плавный transition</span>
+        </div>
+      </div>
+
+      <div class="canvas-card">
+        <h3>
+          <svg class="icon" viewBox="0 0 24 24" style="color:var(--emerald);"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+          <span>Сравнение поведения сайдбара в рабочих режимах</span>
+        </h3>
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th>Поведение</th>
+              <th>В редакторе кода (Zen IDE)</th>
+              <th>На страницах контента (/path, /cards)</th>
+              <th>Рекомендация</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="background:rgba(16, 185, 129, 0.05);">
+              <td><strong>1. Умный контекстный Zen</strong></td>
+              <td>Сайдбар скрывается по шорткату или кнопке Zen, освобождая место терминалу и коду</td>
+              <td>Сайдбар статичен; кнопка микро-шага в футере скрыта на Пути (нет дублирования), но активна в Справочнике</td>
+              <td><span style="color:var(--emerald);font-weight:700;">Рекомендуется</span></td>
+            </tr>
+            <tr>
+              <td><strong>2. Всегда закреплён (Pinned)</strong></td>
+              <td>Сайдбар никогда не прячется автоматически, только при явном клике</td>
+              <td>Все элементы футера статичны без адаптации</td>
+              <td>Может быть тесно для IDE на экранах 1366px</td>
+            </tr>
+            <tr>
+              <td><strong>3. Float & Peek (Всплывающий)</strong></td>
+              <td>Сайдбар сдвигается за край, оставляя тонкую полоску-триггер; при наведении курсора всплывает поверх редактора</td>
+              <td>Обычный вид</td>
+              <td>Требует привыкания к hover-триггеру</td>
+            </tr>
+            <tr>
+              <td><strong>4. Динамический футер-экшен</strong></td>
+              <td>Кнопка действия меняется: в IDE — «Запустить код», в карточках — «Учить карточки», в конспектах — «Тест»</td>
+              <td>Кнопка футера всегда динамически контекстна</td>
+              <td>Усложняет логику состояний</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    const step7Data = {
+      'v7-1': {
+        title: '1. Умный контекстный Zen Focus (Smart Route Context)',
+        desc: 'При входе в Zen IDE или нажатии Zen-Mode сайдбар плавно скрывается, отдавая 100% ширины экрану кода. На страницах пути кнопка микро-шага скрывается по DRY.',
+        tags: ['100% фокус на коде', 'Контекстный микро-шаг', 'Плавный transition']
+      },
+      'v7-2': {
+        title: '2. Всегда закреплён (Pinned Monolith)',
+        desc: 'Сайдбар жестко зафиксирован на всех страницах и никогда не скрывается без ручной команды пользователя.',
+        tags: ['Постоянная фиксация', 'Статичность', 'Классический layout']
+      },
+      'v7-3': {
+        title: '3. Выплывающий Float & Peek при наведении в IDE',
+        desc: 'В Zen IDE сайдбар прячется за левый край экрана, но при подведении мыши к левой границе выезжает поверх экрана.',
+        tags: ['Всплывающий оверлей', 'Максимум места для кода', 'Hover-триггер']
+      },
+      'v7-4': {
+        title: '4. Динамический футер-экшен (Context Action Button)',
+        desc: 'Главная кнопка в футере меняет своё действие в зависимости от текущей страницы (в IDE — «Запуск», на картах — «Повторить»).',
+        tags: ['Динамический экшен', 'Контекстные кнопки', 'Геймификация']
+      }
+    };
+
+    function switchStep7Variant(vId) {
+      document.querySelectorAll('.variant-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.target === vId);
+      });
+
+      const d = step7Data[vId];
+      if (d) {
+        document.getElementById('step7-variant-title').textContent = d.title;
+        document.getElementById('step7-variant-desc').textContent = d.desc;
+        const tags = document.getElementById('step7-variant-tags');
+        tags.innerHTML = d.tags.map(t => `<span class="feature-tag">${t}</span>`).join('');
+      }
+
+      const qBtn = document.getElementById('quick-step-btn');
+      if (vId === 'v7-4' && qBtn) {
+        qBtn.innerHTML = '<span>⚡ Запустить код (IDE)</span>';
+      } else if (qBtn) {
+        qBtn.innerHTML = '<span>⚡ Быстрый микро-шаг</span>';
+      }
+    }
+
+    let isZen = false;
+    function simulateZenToggle() {
+      const sb = document.getElementById('main-sidebar');
+      isZen = !isZen;
+      if (isZen) {
+        sb.style.transform = 'translateX(-100%)';
+        sb.style.width = '0';
+        sb.style.padding = '0';
+        sb.style.border = 'none';
+      } else {
+        sb.style.transform = 'translateX(0)';
+        sb.style.width = '256px';
+        sb.style.padding = '18px 14px';
+        sb.style.borderRight = '1px solid var(--line)';
+      }
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.getAttribute('data-theme') !== 'light';
+      html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      document.getElementById('theme-icon').textContent = isDark ? '☀️' : '🌙';
+      document.getElementById('theme-text').textContent = isDark ? 'Светлая тема' : 'Тёмная тема';
+    }
+  </script>
+</body>
+</html>
