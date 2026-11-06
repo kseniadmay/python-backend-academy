@@ -5843,13 +5843,29 @@
     transform-origin: center center;
     transition: transform 0.26s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.24s ease;
   }
-  .hex-3d-node:hover,
-  .hex-3d-node:focus-visible {
-    transform: translateY(-5px) scale(1.08);
+  /* Silky Tactile Nodes (0 Twitching, Isolated Hit-target) */
+  .hex-3d-node, .path-node {
+    cursor: pointer;
+    outline: none;
   }
-  .hex-3d-node:active {
-    transform: translateY(1px) scale(0.95);
-    transition-duration: 0.08s;
+  .hex-3d-node .hit-target, .path-node .hit-target {
+    fill: transparent;
+    pointer-events: all;
+  }
+  .hex-3d-node *, .path-node * {
+    pointer-events: none;
+  }
+  .hex-3d-node .bead-group, .path-node .bead-group {
+    transition: filter 0.18s ease;
+  }
+  .hex-3d-node:hover .bead-group, .path-node:hover .bead-group {
+    filter: drop-shadow(0 0 16px rgba(16, 185, 129, 0.9)) brightness(1.15);
+  }
+  .hex-3d-node.hex-node--active:hover .bead-group, .path-node.active:hover .bead-group {
+    filter: drop-shadow(0 0 22px rgba(245, 158, 11, 0.95)) brightness(1.15);
+  }
+  .hex-3d-node:active .bead-group, .path-node:active .bead-group {
+    transform: translateY(2.5px);
   }
 
   /* Specific Glowing Halos per status */
@@ -28869,6 +28885,507 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 }
 .finale-modal-close:hover { background: rgba(255,255,255,0.18); color: #fff; }
 
+
+  /* ================= SILK BOTTOM SHEET & ZEN TRAIL (MASTERPIECE INTEGRATION) ================= */
+  .silk-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.24s ease;
+    z-index: 1090;
+  }
+  .silk-backdrop.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .silk-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(105%);
+    width: 100%;
+    max-width: 440px;
+    background: linear-gradient(180deg, rgba(17, 24, 39, 0.98) 0%, rgba(10, 14, 22, 0.99) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-bottom: none;
+    border-radius: 22px 22px 0 0;
+    padding: 16px 18px max(20px, env(safe-area-inset-bottom, 20px));
+    box-shadow: 0 -12px 40px rgba(0,0,0,0.7), 0 0 32px rgba(16, 185, 129, 0.15);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    z-index: 1100;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .silk-sheet.open {
+    transform: translateX(-50%) translateY(0);
+  }
+  .silk-sheet .sheet-handle {
+    width: 36px;
+    height: 4px;
+    background: rgba(255,255,255,0.22);
+    border-radius: 2px;
+    margin: 0 auto 12px;
+  }
+  .silk-sheet .sheet-close-btn {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: rgba(255,255,255,0.06);
+    border: none;
+    color: #94a3b8;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.18s ease;
+  }
+  .silk-sheet .sheet-close-btn:hover {
+    background: rgba(255,255,255,0.14);
+    color: #ffffff;
+  }
+  .silk-sheet .sheet-tag {
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .silk-sheet .sheet-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+  .silk-sheet .sheet-desc {
+    font-size: 12px;
+    color: #94a3b8;
+    line-height: 1.45;
+    margin-bottom: 14px;
+  }
+  .silk-sheet .sheet-action-btn {
+    width: 100%;
+    height: 44px;
+    border-radius: 12px;
+    font-family: 'Onest', -apple-system, sans-serif;
+    font-size: 13.5px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    letter-spacing: 0.02em;
+    transition: all 0.2s ease;
+  }
+  .silk-sheet .sheet-action-btn--primary {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+  }
+  .silk-sheet .sheet-action-btn--primary:hover {
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.55);
+    transform: translateY(-1px);
+  }
+  .silk-sheet .sheet-action-btn--secondary {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #cbd5e1;
+  }
+  /* Chapter Milestone Pill (0 Transforms on hover) */
+  .chapter-milestone-pill {
+    cursor: pointer;
+  }
+  .chapter-milestone-pill .milestone-hit {
+    fill: transparent;
+    pointer-events: all;
+  }
+  .chapter-milestone-pill * {
+    pointer-events: none;
+  }
+  .chapter-milestone-pill .milestone-rect {
+    transition: filter 0.22s ease, stroke 0.22s ease, fill 0.22s ease;
+  }
+  .chapter-milestone-pill:hover .milestone-rect {
+    filter: drop-shadow(0 0 16px rgba(16, 185, 129, 0.65)) drop-shadow(0 4px 12px rgba(0,0,0,0.6));
+    stroke: rgba(52, 211, 153, 0.95);
+    fill: rgba(15, 23, 42, 0.98);
+  }
+  /* Exam Challenge Node (Noble Gold Mastery) */
+  .hex-challenge-node {
+    cursor: pointer;
+  }
+  .hex-challenge-node .hit-target {
+    fill: transparent;
+    pointer-events: all;
+  }
+  .hex-challenge-node * {
+    pointer-events: none;
+  }
+  .hex-challenge-node .bead-group {
+    transition: filter 0.18s ease;
+  }
+  .hex-challenge-node:hover .bead-group {
+    filter: drop-shadow(0 0 18px rgba(245, 158, 11, 0.9)) brightness(1.15);
+  }
+  .hex-challenge-node:active .bead-group {
+    transform: translateY(2.5px);
+  }
+  /* Floating Smart Horizon Beacon */
+  .horizon-beacon-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.95) 0%, rgba(217, 119, 6, 0.95) 100%);
+    border: 1px solid rgba(254, 240, 138, 0.6);
+    border-radius: 999px;
+    padding: 10px 18px;
+    color: #1f0902;
+    font-family: 'Onest', -apple-system, sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.5), 0 0 20px rgba(245, 158, 11, 0.3);
+    backdrop-filter: blur(16px);
+    z-index: 150;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .horizon-beacon-btn:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 12px 28px rgba(245, 158, 11, 0.65);
+  }
+  /* Finale Stargate Pedestal */
+  .path-stargate-finale {
+    width: 100%;
+    max-width: 440px;
+    margin: 28px auto 60px;
+    background: linear-gradient(155deg, rgba(16, 185, 129, 0.08) 0%, rgba(15, 23, 42, 0.85) 60%, rgba(245, 158, 11, 0.06) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 24px;
+    padding: 24px 20px;
+    text-align: center;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+  .path-stargate-finale .stargate-icon {
+    font-size: 36px;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 0 16px rgba(245,158,11,0.5));
+  }
+  .path-stargate-finale .stargate-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .path-stargate-finale .stargate-sub {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 14px;
+  }
+  .path-stargate-finale .stargate-badges {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #cbd5e1;
+  }
+  .path-stargate-finale .stargate-pill {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 999px;
+    padding: 4px 12px;
+  }
+
+
+
+  /* ========================================================
+     LINEAR DEVELOPER DASHBOARD AESTHETICS
+     ======================================================== */
+  .linear-hero-card {
+    background: linear-gradient(165deg, rgba(16, 185, 129, 0.09) 0%, rgba(15, 23, 42, 0.78) 45%, rgba(10, 14, 23, 0.95) 100%), var(--surface);
+    border: 1.5px solid rgba(52, 211, 153, 0.38);
+    border-radius: 24px;
+    padding: 24px 26px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 14px;
+    box-sizing: border-box;
+  }
+  @media (max-width: 560px) {
+    .linear-hero-card { padding: 16px 16px; border-radius: 18px; }
+  }
+
+  .linear-eyebrow-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .linear-eyebrow-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font-m);
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(52, 211, 153, 0.32);
+    padding: 4px 10px;
+    border-radius: 8px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .linear-pulse-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #34d399;
+    box-shadow: 0 0 8px #34d399;
+    animation: pulse-ring 2s infinite ease-in-out;
+  }
+
+  .linear-title {
+    font-family: var(--font-d);
+    font-size: clamp(1.18rem, 1.08rem + 0.85vw, 1.55rem);
+    font-weight: 800;
+    line-height: 1.25;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .linear-subtitle {
+    font-size: 0.84rem;
+    color: var(--ink-soft);
+    margin-bottom: 18px;
+    line-height: 1.45;
+  }
+
+  /* 4 Macro Milestones Stepper */
+  .linear-stepper-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin: 18px 0 22px;
+  }
+  @media (max-width: 560px) {
+    .linear-stepper-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  }
+  .linear-step-card {
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 14px;
+    padding: 11px 13px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-decoration: none;
+    color: inherit;
+    box-sizing: border-box;
+  }
+  .linear-step-card:hover {
+    border-color: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-1px);
+  }
+  .linear-step-card.done {
+    background: rgba(16, 185, 129, 0.06);
+    border-color: rgba(16, 185, 129, 0.35);
+  }
+  .linear-step-card.active {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.16), rgba(6, 78, 59, 0.25));
+    border: 1.5px solid #34d399;
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.22);
+  }
+  .linear-step-card.milestone.active {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(124, 74, 34, 0.25));
+    border: 1.5px solid #fbbf24;
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.22);
+  }
+  .linear-step-num {
+    font-family: var(--font-m);
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--ink-muted);
+    letter-spacing: 0.04em;
+  }
+  .linear-step-card.done .linear-step-num { color: #34d399; }
+  .linear-step-card.active .linear-step-num { color: #a7f3d0; }
+  .linear-step-title {
+    font-weight: 700;
+    font-size: 0.84rem;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .linear-step-status {
+    font-size: 0.72rem;
+    color: var(--ink-muted);
+  }
+  .linear-step-card.done .linear-step-status { color: #34d399; font-weight: 600; }
+  .linear-step-card.active .linear-step-status { color: #34d399; font-weight: 700; }
+
+  /* Single Dominant CTA */
+  .linear-cta-btn {
+    width: 100%;
+    padding: 15px 22px;
+    border-radius: 16px;
+    font-family: var(--font-b);
+    font-weight: 700;
+    font-size: 0.98rem;
+    color: #ffffff;
+    background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow: 0 10px 28px rgba(16, 185, 129, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.32);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    box-sizing: border-box;
+  }
+  .linear-cta-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%; width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.32), transparent);
+    transform: skewX(-22deg);
+    animation: shimmerSweep 3.2s infinite ease-in-out;
+  }
+  .linear-cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 34px rgba(16, 185, 129, 0.58), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  }
+  .linear-cta-badge {
+    font-family: var(--font-m);
+    font-size: 0.78rem;
+    font-weight: 800;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    padding: 3px 9px;
+    border-radius: 999px;
+    color: #fde68a;
+  }
+
+  /* Telemetry Dock Bar */
+  .linear-telemetry-dock {
+    background: rgba(18, 24, 38, 0.68);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow-1);
+    box-sizing: border-box;
+  }
+  @media (max-width: 640px) {
+    .linear-telemetry-dock {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 14px;
+      padding: 14px 16px;
+    }
+  }
+  .linear-dock-col {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+  }
+  .linear-dock-sep {
+    width: 1px;
+    height: 42px;
+    background: rgba(255, 255, 255, 0.08);
+  }
+  @media (max-width: 640px) {
+    .linear-dock-sep { display: none; }
+  }
+
+  /* Linear Module Spoiler & Table */
+  .linear-spoiler {
+    background: rgba(18, 24, 38, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 16px;
+    padding: 12px 18px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-1);
+    box-sizing: border-box;
+  }
+  .linear-spoiler-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+  }
+  .linear-table {
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 14px;
+    background: rgba(12, 16, 26, 0.65);
+    overflow: hidden;
+    margin-top: 10px;
+  }
+  .linear-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-decoration: none;
+    color: inherit;
+    box-sizing: border-box;
+  }
+  .linear-row:last-child { border-bottom: none; }
+  .linear-row:hover { background: rgba(255, 255, 255, 0.04); }
+  .linear-row.active {
+    background: rgba(16, 185, 129, 0.08);
+  }
+  .linear-path-link {
+    font-size: 0.74rem;
+    color: #34d399;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(16, 185, 129, 0.1);
+    transition: background 0.18s ease;
+  }
+  .linear-path-link:hover {
+    background: rgba(16, 185, 129, 0.2);
+  }
+
 </style>
 
 <link rel="manifest" href="manifest.json">
@@ -49465,1306 +49982,286 @@ function renderPathGrandFinaleHTML(allUnits, chapterBreakpoints){
 }
 
 function viewPathSerpentine(options){
-
   options = options || {};
-
   ensureExtendedState();
 
-  const curEchelon = (options.echelon !== undefined) ? options.echelon : ((state && state.selectedEchelon) || 1);
-
+  const curEchelon = (options.echelon !== undefined) ? options.echelon : ((state && state.selectedEchelon) || 'all');
   const { units: allUnits, chapters: chapterBreakpoints } = getEchelonUnitsAndChapters(curEchelon, ALL_UNITS_COMBINED);
 
-  const usePawNodes = state.pathNodeStyle === 'paw';
-
-  
-
-  // Find which units are completed vs active vs locked
-
+  // Find active unit index
   let activeUnitIndex = -1;
-
   allUnits.forEach((u, idx) => {
-
     const isUnitTestPassed = (state.passedUnitTests || []).includes(u.id);
-
-    const allSkillsMastered = (u.skills && u.skills.length > 0) && u.skills.every(s => getSkillMP(s.id) >= 80);
-
+    const allSkillsMastered = (u.skills && u.skills.length > 0) && u.skills.every(s => (typeof getSkillMP === 'function' ? getSkillMP(s.id) : 0) >= 80);
     const isCompleted = isUnitTestPassed || allSkillsMastered;
-
     if(!isCompleted && activeUnitIndex === -1){
-
       activeUnitIndex = idx;
-
     }
-
   });
-
   if(activeUnitIndex === -1) activeUnitIndex = Math.max(0, allUnits.length - 1);
 
-
-
-  // Track coordinates for each node in this echelon with harmonic amplitude
-
+  // Harmonic serpentine wave coordinates (±110px amplitude in 680px viewBox -> ±65px on 393px mobile)
   const chapterStartSet = new Set(chapterBreakpoints.slice(1).map(cb => cb.startIdx));
-
-  let curY = 88;
-
+  let curY = 70;
   const coords = allUnits.map((u, i) => {
-
     if(i > 0){
-
-      curY += 130;
-
+      curY += 120;
       if(chapterStartSet.has(i)){
-
-        curY += 280; // Balanced vertical gap (+280px) for non-overlapping milestones
-
+        curY += 160; // Slender vertical gap for milestone pill
       }
-
     }
-
     const x = Math.round(340 + 110 * Math.sin((i * Math.PI) / 2.2));
-
     return { x, y: curY };
-
   });
 
-
-
-  const totalH = coords.length ? (coords[coords.length - 1].y + 300) : 520;
-
-
+  const totalH = coords.length ? (coords[coords.length - 1].y + 190) : 600;
 
   // Build smooth Bezier path
-
   let dPath = coords.length ? `M ${coords[0].x} ${coords[0].y}` : '';
-
   for(let i = 0; i < coords.length - 1; i++){
-
     const p1 = coords[i];
-
     const p2 = coords[i+1];
-
     const midY = (p1.y + p2.y) / 2;
-
     dPath += ` C ${p1.x} ${midY}, ${p2.x} ${midY}, ${p2.x} ${p2.y}`;
-
   }
-
-
 
   // Build progress sub-path up to active unit
-
   let dProgress = '';
-
   if(activeUnitIndex > 0 && coords.length > 0){
-
     dProgress = `M ${coords[0].x} ${coords[0].y}`;
-
     for(let i = 0; i < Math.min(activeUnitIndex, coords.length - 1); i++){
-
       const p1 = coords[i];
-
       const p2 = coords[i+1];
-
       const midY = (p1.y + p2.y) / 2;
-
       dProgress += ` C ${p1.x} ${midY}, ${p2.x} ${midY}, ${p2.x} ${p2.y}`;
-
     }
-
   }
 
-
-
-  // Dotted "path ahead" overlay from active unit to end
-
+  // Dotted future track
   let dFuture = '';
-
   if(activeUnitIndex < coords.length - 1 && coords.length > 0){
-
     dFuture = `M ${coords[activeUnitIndex].x} ${coords[activeUnitIndex].y}`;
-
     for(let i = activeUnitIndex; i < coords.length - 1; i++){
-
       const p1 = coords[i];
-
       const p2 = coords[i+1];
-
       const midY = (p1.y + p2.y) / 2;
-
       dFuture += ` C ${p1.x} ${midY}, ${p2.x} ${midY}, ${p2.x} ${p2.y}`;
-
     }
-
   }
 
-
-
-  // Active unit metadata for top chapter banner
-
-  const curActiveUnit = allUnits[activeUnitIndex] || allUnits[0] || ALL_UNITS_COMBINED[0];
-
-  const curChapter = chapterBreakpoints.find(cb => cb.units.some(u => u.id === curActiveUnit.id)) || chapterBreakpoints[0] || { num: 1, chapterNum: 1, shortTitle: 'Python Core', units: allUnits };
-
-  const activeChapterNum = curChapter.chapterNum || curChapter.num || 1;
-
-  const activeChapterShortTitle = curChapter.shortTitle || (curChapter.title || '').replace(/^Глава\s+\d+:\s*/i, '') || 'Web & HTTP';
-
-  const chapterUnits = curChapter.units || allUnits;
-
-  const totalInChapter = chapterUnits.length;
-
-  const completedInChapter = chapterUnits.filter(isUnitCompleted).length;
-
-  const activeLessonNumInChap = Math.max(1, chapterUnits.findIndex(u => u.id === curActiveUnit.id) + 1);
-
-
-
-  // Chapter gate cards between chapters in this echelon
-
+  // Chapter milestones (slender glass pills on centerline)
   let markersSVG = '';
-
   chapterBreakpoints.forEach((cb, ci) => {
-
     if(ci > 0 && coords[cb.startIdx]){
-
       const prevCb = chapterBreakpoints[ci - 1];
-
       const isPrevChapterDone = prevCb.units.length > 0 && prevCb.units.every(isUnitCompleted);
-
       const curCompletedCount = cb.units.filter(isUnitCompleted).length;
-
       const isCurChapterDone = cb.units.length > 0 && curCompletedCount === cb.units.length;
-
       const gateStatus = !isPrevChapterDone ? 'locked' : (isCurChapterDone ? 'completed' : 'active');
-
       const isLocked = (gateStatus === 'locked');
 
-
-
       const prevY = coords[cb.startIdx - 1].y;
-
-      const cy = prevY + 260;
-
-
-
-      let hexFill = 'url(#pathButtonActive)';
-
-      let hexStroke = 'rgba(52, 211, 153, 0.90)';
-
-      let hexGlow = 'filter="drop-shadow(0 0 12px rgba(16, 185, 129, 0.55))"';
-
-      let hexText = `<text x="0" y="-48" text-anchor="middle" font-size="14" font-weight="900" fill="#ffffff">${cb.chapterNum}</text>`;
-
-
-
-      if(isLocked){
-
-        hexFill = 'url(#pathButtonLocked)';
-
-        hexStroke = 'rgba(190, 18, 60, 0.60)';
-
-        hexGlow = '';
-
-        hexText = `<text x="0" y="-49" text-anchor="middle" font-size="12" font-weight="900" fill="#fda4af">🔒</text>`;
-
-      } else if(isCurChapterDone){
-
-        hexFill = 'url(#pathButtonCompleted)';
-
-        hexStroke = 'rgba(52, 211, 153, 0.85)';
-
-        hexGlow = 'filter="drop-shadow(0 0 10px rgba(16, 185, 129, 0.55))"';
-
-        hexText = `<text x="0" y="-48" text-anchor="middle" font-size="15" font-weight="900" fill="#ffffff">✓</text>`;
-
-      }
-
-
-
-      const hexBadge = `
-
-        <rect x="-145" y="-45" width="290" height="98" rx="22" fill="${isLocked ? 'url(#gateAuraLockedGrad)' : 'url(#gateAuraGrad)'}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
-
-
-
-      const cleanPrevTitle = (prevCb.shortTitle || '').replace(/^[^\wА-Яа-яЁё]+/, '').replace(/Матрица Мастерства\s*/i, '').trim();
-
-      const cleanCurTitle = (cb.shortTitle || '').replace(/^[^\wА-Яа-яЁё]+/, '').replace(/Матрица Мастерства\s*/i, '').trim();
-
-
-
-      const curTitleClean = (cleanCurTitle.length > 34) ? (cleanCurTitle.slice(0, 32).trim() + '…') : cleanCurTitle;
-
-      const prevTitleClean = (cleanPrevTitle.length > 28) ? (cleanPrevTitle.slice(0, 26).trim() + '…') : cleanPrevTitle;
-
-      const gateTitleFontSize = curTitleClean.length > 22 ? 10.5 : 11.5;
-
-
-
-      let subText = '';
-
-      if(isLocked){
-
-        subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10" font-weight="600" fill="#fda4af">${cb.unitsCount} ${pluralizeRu(cb.unitsCount, 'урок', 'урока', 'уроков')} · После «${escapeHtmlStr(prevTitleClean)}»</text>`;
-
-      } else if(isCurChapterDone){
-
-        subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10" font-weight="600" fill="#6ee7b7">✓ Все ${cb.unitsCount} из ${cb.unitsCount} уроков сданы · 100%</text>`;
-
-      } else {
-
-        const pct = Math.round(curCompletedCount / cb.unitsCount * 100);
-
-        subText = `<text class="path-gate-sub" x="0" y="5" text-anchor="middle" font-size="10" font-weight="600" fill="#9be7c4">${curCompletedCount} из ${cb.unitsCount} ${pluralizeRu(cb.unitsCount, 'урок', 'урока', 'уроков')} сдано · ${pct}%</text>`;
-
-      }
-
-
-
-      let btnContent = '';
-
-      if(isLocked){
-
-        btnContent = `
-
-          <g class="path-gate-btn path-gate-btn--locked" data-gate-track="${cb.track}" data-gate-locked="1" data-gate-prev-title="${escapeHtmlStr(cleanPrevTitle)}" role="button" tabindex="0" aria-label="Глава ${cb.chapterNum} заблокирована. Завершите темы «${escapeHtmlStr(cleanPrevTitle)}»." aria-disabled="true">
-
-            <rect x="-105" y="16" width="210" height="32" rx="16" fill="rgba(148, 163, 184, 0.08)" stroke="rgba(148, 163, 184, 0.22)" stroke-width="1.1"/>
-
-            <text x="0" y="36.5" text-anchor="middle" font-size="10" font-weight="700" fill="#94a3b8" letter-spacing="0.06em">🔒 ДОСТУПНО ПОСЛЕ ГЛАВЫ ${cb.chapterNum - 1}</text>
-
-          </g>`;
-
-      } else {
-
-        const btnLabel = isCurChapterDone ? 'ОБЗОР ГЛАВЫ ➔' : 'ПЕРЕЙТИ К ГЛАВЕ ➔';
-
-        btnContent = `
-
-          <g class="path-gate-btn path-gate-btn--unlocked" data-gate-track="${cb.track}" data-gate-locked="0" role="button" tabindex="0" aria-label="Перейти к главе ${cb.chapterNum}: ${escapeHtmlStr(cleanCurTitle)}" aria-keyshortcuts="Enter Space">
-
-            <rect class="path-gate-btn-rect" x="-110" y="10" width="220" height="32" rx="16" fill="url(#gateGreenBtnGrad)" stroke="rgba(52, 211, 153, 0.80)" stroke-width="1.3" filter="drop-shadow(0 4px 14px rgba(16,185,129,0.55))"/>
-
-            <text x="0" y="37" text-anchor="middle" font-size="10.5" font-weight="900" fill="#ffffff" letter-spacing="0.06em">${btnLabel}</text>
-
-          </g>`;
-
-      }
-
-
-
-      const beamMaxW = 270;
-
-      const progressFraction = cb.unitsCount > 0 ? Math.min(1, curCompletedCount / cb.unitsCount) : 0;
-
-      const beamFilledW = Math.round(beamMaxW * progressFraction);
-
-      const curTierNum = (curEchelon === 'all') ? 1 : (Number(curEchelon) || 1);
-
-
+      const cy = Math.round((prevY + coords[cb.startIdx].y) / 2);
+      const cleanCurTitle = (cb.shortTitle || cb.title || '').replace(/^[^\wА-Яа-яЁё]+/, '').replace(/Матрица Мастерства\s*/i, '').trim();
 
       markersSVG += `
-
-        <g class="path-section-gate path-chapter-ribbon path-section-gate--${gateStatus}" data-gate-track="${cb.track}" data-gate-start-idx="${cb.startIdx}" data-gate-chap-num="${cb.chapterNum}" data-gate-chap-title="${escapeHtmlStr(cleanCurTitle)}" data-gate-locked="${isLocked?1:0}" transform="translate(340, ${cy})">
-
-          <rect class="path-section-gate-bg" x="-190" y="-27" width="380" height="54" rx="27" fill="${isLocked ? 'url(#gatePillLockedGrad)' : 'url(#gatePillUnlockedGrad)'}" stroke="${isLocked ? 'rgba(190, 18, 60, 0.50)' : 'rgba(16, 185, 129, 0.65)'}" stroke-width="1.5" filter="drop-shadow(0 10px 28px rgba(0,0,0,0.70)) drop-shadow(0 0 24px rgba(16,185,129,0.35))"/>
-
-          <text x="-165" y="-6" font-family="'Inter', -apple-system, sans-serif" font-size="9" font-weight="800" fill="${isLocked ? '#fda4af' : '#34d399'}" letter-spacing="0.08em">ГЛАВА ${cb.chapterNum} · ${escapeHtmlStr((cb.track || 'BACKEND').toUpperCase())}</text>
-
-          <text class="path-gate-title" x="-165" y="11" font-family="'Inter', -apple-system, sans-serif" font-size="12.5" font-weight="800" fill="#ffffff">${escapeHtmlStr(curTitleClean)}</text>
-
-          
-
-          <!-- Continuous 2px Liquid Glow Beam (Variant 1C) -->
-
-          <line x1="-165" y1="18" x2="${-165 + beamMaxW}" y2="18" stroke="rgba(148, 163, 184, 0.16)" stroke-width="2" stroke-linecap="round"/>
-
-          ${(!isLocked && beamFilledW > 0) ? `
-
-            <line x1="-165" y1="18" x2="${-165 + beamFilledW}" y2="18" stroke="url(#liquidBeamGrad)" stroke-width="2.2" stroke-linecap="round" filter="drop-shadow(0 0 5px rgba(16,185,129,0.75))"/>
-
-          ` : ''}
-
-
-
-          <text x="115" y="-3" text-anchor="end" font-family="'Inter', -apple-system, sans-serif" font-size="11" font-weight="700" fill="${isLocked ? '#fda4af' : '#34d399'}">${curCompletedCount}/${cb.unitsCount} Освоено ✓</text>
-
-          <text x="115" y="10" text-anchor="end" font-family="'Inter', -apple-system, sans-serif" font-size="8.5" font-weight="700" fill="#64748b">${curEchelon === 'all' ? 'Все темы' : (curTierNum === 1 ? 'Скрининг' : `Эшелон ${curTierNum}`)}</text>
-
-
-
-          <g class="path-gate-btn ${isLocked ? 'path-gate-btn--locked' : 'path-gate-btn--unlocked'}" data-gate-track="${cb.track}" data-gate-start-idx="${cb.startIdx}" data-gate-chap-num="${cb.chapterNum}" data-gate-chap-title="${escapeHtmlStr(cleanCurTitle)}" data-gate-locked="${isLocked?1:0}" transform="translate(150, 0)" role="button" tabindex="0" aria-label="Перейти к главе ${cb.chapterNum}">
-
-            <circle r="17" fill="${isLocked ? 'rgba(148, 163, 184, 0.15)' : 'url(#gateGreenBtnGrad)'}" stroke="${isLocked ? 'rgba(148, 163, 184, 0.3)' : 'rgba(52, 211, 153, 0.8)'}" stroke-width="1.2" filter="${isLocked ? '' : 'drop-shadow(0 0 10px rgba(16,185,129,0.6))'}"/>
-
-            <text y="4" text-anchor="middle" font-family="'Inter', -apple-system, sans-serif" font-size="12" font-weight="900" fill="${isLocked ? '#94a3b8' : '#042f2e'}">${isLocked ? '🔒' : '➔'}</text>
-
-          </g>
-
+        <g class="chapter-milestone-pill" id="chapter-${cb.chapterNum}-pill" data-chapter-num="${cb.chapterNum}" data-chapter-title="${escapeHtmlStr(cleanCurTitle)}" data-done-count="${curCompletedCount}" data-total-count="${cb.unitsCount}" data-chapter-status="${gateStatus}" transform="translate(340, ${cy})">
+          <rect class="milestone-hit" x="-140" y="-18" width="280" height="36" rx="18" fill="transparent" pointer-events="all"/>
+          <rect class="milestone-rect" x="-130" y="-13" width="260" height="26" rx="13" fill="rgba(15, 23, 42, 0.92)" stroke="${isCurChapterDone ? 'rgba(52, 211, 153, 0.7)' : (isLocked ? 'rgba(148, 163, 184, 0.25)' : 'rgba(52, 211, 153, 0.45)')}" stroke-width="1.2" filter="drop-shadow(0 4px 12px rgba(0,0,0,0.5))"/>
+          <circle cx="-108" cy="0" r="3.5" fill="${isCurChapterDone ? '#10b981' : (isLocked ? '#64748b' : '#34d399')}"/>
+          <text x="-96" y="3.5" font-family="'Onest', sans-serif" font-size="10.5" font-weight="800" fill="${isCurChapterDone ? '#a7f3d0' : (isLocked ? '#94a3b8' : '#e2e8f0')}" letter-spacing="0.04em">ГЛАВА ${cb.chapterNum}: ${escapeHtmlStr(cleanCurTitle.toUpperCase())}</text>
+          <text x="108" y="3.5" text-anchor="end" font-family="'Onest', sans-serif" font-size="10" font-weight="700" fill="${isCurChapterDone ? '#34d399' : (isLocked ? '#64748b' : '#34d399')}">${curCompletedCount}/${cb.unitsCount} ✓</text>
         </g>`;
-
     }
-
   });
 
-
-
-  // Flat-topped hexagon SVG points calculation
-
+  // Nodes SVG
   let nodesSVG = '';
-
   allUnits.forEach((u, i) => {
-
     const { x, y } = coords[i];
-
     let status = 'locked';
-
     if(i < activeUnitIndex || isUnitCompleted(u)){
-
       status = 'completed';
-
     } else if(i === activeUnitIndex){
-
       status = 'active';
-
     }
-
-
-
     const isCompleted = (status === 'completed');
-
     const isActive = (status === 'active');
+    const isLocked = (status === 'locked');
 
+    // Icon based on track
+    const trk = (typeof getTrackForUnit === 'function') ? getTrackForUnit(u.id) : { key: 'python' };
+    let iconChar = '</>';
+    if(trk.key === 'web') iconChar = '🌐';
+    else if(trk.key === 'backend' || trk.key === 'architecture') iconChar = '⚡';
+    else if(trk.key === 'databases') iconChar = '🗄️';
+    else if(trk.key === 'infra') iconChar = '⚙️';
+    else if(trk.key === 'algorithms') iconChar = '</>';
 
+    const underTitle = (typeof cleanUnitTitle === 'function') ? cleanUnitTitle(u.id, u.title) : (u.title || '');
 
-    const topGrad = isCompleted ? 'url(#goldNodeDoneGrad)' : (isActive ? 'url(#goldNodeActiveGrad)' : 'url(#hexGradLocked)');
-
-    const buttonGrad = isCompleted ? 'url(#goldNodeDoneGrad)' : (isActive ? 'url(#goldNodeActiveGrad)' : 'url(#pathButtonLocked)');
-
-    const strokeColor = isCompleted ? '#fbbf24' : (isActive ? '#fef08a' : 'rgba(148,163,184,0.35)');
-
-    const strokeWidth = isActive ? 3 : (isCompleted ? 2.4 : 1.5);
-
-
-
-    let centerIcon = '';
-
-    let pulseHalo = '';
-
-    let activeBubble = '';
-
-    let radialProgressRing = '';
-
-    let triadOrbit = '';
-
-
-
-    // Fog of Mastery: progressive depth for distant locked lessons (Enchanted Glass Teaser)
-
-    let fogStyle = '';
-
-    if(status === 'locked'){
-
-      const dist = i - activeUnitIndex;
-
-      if(dist === 1) fogStyle = 'opacity:0.92;';
-
-      else if(dist === 2) fogStyle = 'opacity:0.82;';
-
-      else if(dist === 3) fogStyle = 'opacity:0.72;';
-
-      else fogStyle = 'opacity:0.60;';
-
-    }
-
-
-
+    let innerContent = '';
     if(isCompleted){
-
-      triadOrbit = `<circle cx="${x}" cy="${y - (usePawNodes ? 0 : 3)}" r="29" fill="none" stroke="rgba(251, 191, 36, 0.55)" stroke-width="1.3" stroke-dasharray="16 4 16 4 16 4" stroke-linecap="round" pointer-events="none"/>`;
-
+      innerContent = `
+        <circle r="21" fill="#10b981" stroke="#6ee7b7" stroke-width="2"/>
+        <text y="4" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="800" fill="#ffffff">${iconChar}</text>
+        <circle cx="14" cy="-14" r="7" fill="#042f2e" stroke="#34d399" stroke-width="1.2"/>
+        <text x="14" y="-11.5" text-anchor="middle" font-size="8.5" font-weight="900" fill="#34d399">✓</text>`;
     } else if(isActive){
-
-      triadOrbit = `<circle cx="${x}" cy="${y - (usePawNodes ? 0 : 3)}" r="29" fill="none" stroke="rgba(254, 240, 138, 0.75)" stroke-width="1.6" stroke-dasharray="16 4 16 4 16 4" stroke-linecap="round" pointer-events="none"/>`;
-
-    }
-
-    const iconName = getSemanticTrailIcon(u, i, false);
-
-
-
-    let unitProgPct = 0;
-
-    let unitSkillsMastered = 0;
-
-    const unitTotalSkills = (u.skills && u.skills.length > 0) ? u.skills.length : 1;
-
-    if(u.skills && u.skills.length > 0){
-
-      unitSkillsMastered = u.skills.filter(s => getSkillMP(s.id) >= 80).length;
-
-      unitProgPct = Math.round((unitSkillsMastered / unitTotalSkills) * 100);
-
-    }
-
-    if(isCompleted) unitProgPct = 100;
-
-
-
-    if(isCompleted){
-
-      centerIcon = `<text x="${x}" y="${y + 6}" text-anchor="middle" font-family="'Inter', -apple-system, sans-serif" font-size="22" font-weight="900" fill="#fef08a" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.9))">✓</text>`;
-
-    } else if(isActive){
-
-      pulseHalo = `<circle class="hex-pulse-halo" cx="${x}" cy="${y - (usePawNodes ? 0 : 3)}" r="34" fill="none" stroke="rgba(251, 191, 36, 0.85)"/>`;
-
-      centerIcon = trailIconCenter(x, y - (usePawNodes ? 0 : 3), iconName, usePawNodes ? 20 : 25, '#451a03');
-
-      const unitStarted = (u.skills || []).some(s => (getSkillMP(s.id) || 0) > 0);
-
-      if(unitStarted && unitProgPct > 0 && unitProgPct < 100){
-
-        const circ = 213.6;
-
-        const dashOffset = (circ * (1 - unitProgPct / 100)).toFixed(1);
-
-        radialProgressRing = `<circle class="hex-progress-ring" cx="${x}" cy="${y - (usePawNodes ? 0 : 3)}" r="34" fill="none" stroke="#fbbf24" stroke-width="3" stroke-dasharray="${circ}" stroke-dashoffset="${dashOffset}" stroke-linecap="round" transform="rotate(-90 ${x} ${y - (usePawNodes ? 0 : 3)})" filter="drop-shadow(0 0 10px rgba(245,158,11,0.85))"/>`;
-
-      }
-
-      // Tiny yellow bubble replaced by the elegant On-Node Glass Popover card anchored to active node
-
-      activeBubble = '';
-
+      innerContent = `
+        <circle class="hex-pulse-halo" r="32" fill="none" stroke="rgba(245, 158, 11, 0.85)" stroke-width="1.8"/>
+        <circle r="23" fill="#f59e0b" stroke="#fef08a" stroke-width="2.5" filter="drop-shadow(0 0 18px rgba(245,158,11,0.9))"/>
+        <text y="5" text-anchor="middle" font-size="12" fill="#1f0902">${iconChar}</text>`;
     } else {
-
-      const semIcon = trailIconCenter(x, y - (usePawNodes ? 0 : 3), iconName, usePawNodes ? 20 : 22, 'rgba(148, 163, 184, 0.45)');
-
-      const miniLock = `
-
-        <g class="path-node-minilock" transform="translate(${x + 15}, ${y + 11})">
-
-          <circle cx="0" cy="0" r="7.5" fill="#0b0f17" stroke="rgba(148, 163, 184, 0.45)" stroke-width="1"/>
-
-          <path d="M-2.5 -0.5 h5 v4.5 h-5 z" fill="#94a3b8"/>
-
-          <path d="M-1.8 -0.5 v-2 a1.8 1.8 0 0 1 3.6 0 v2" fill="none" stroke="#94a3b8" stroke-width="1" stroke-linecap="round"/>
-
-        </g>`;
-
-      centerIcon = `<g class="path-node-locked-inner">${semIcon}${miniLock}</g>`;
-
+      innerContent = `
+        <circle r="19" fill="#1e293b" stroke="rgba(255,255,255,0.08)" stroke-width="1.2"/>
+        <text y="4" text-anchor="middle" font-size="11" fill="#64748b">${iconChar}</text>
+        <circle cx="13" cy="-13" r="6" fill="#0f172a" stroke="#64748b" stroke-width="1"/>
+        <text x="13" y="-10.5" text-anchor="middle" font-size="7" fill="#64748b">🔒</text>`;
     }
-
-
-
-    const nodeShape = usePawNodes
-
-      ? trailPawShape(x, y, topGrad, strokeColor, strokeWidth)
-
-      : trailIsometricButton(x, y, buttonGrad, isActive ? '#fef08a' : (isCompleted ? '#fbbf24' : 'rgba(148,163,184,0.35)'), strokeWidth, isCompleted, isActive);
-
-
-
-    const buttonContent = usePawNodes ? centerIcon : `<g class="path-button-icon">${centerIcon}</g>`;
-
-const underTitleFull = cleanUnitTitle(u.id, u.title);
-
-    let labelContentSVG = '';
-
-    let pillW = 110;
-
-    let pillH = 22;
-
-    let pillY = -12;
-
-    if(underTitleFull.length <= 18){
-
-      pillW = Math.max(90, Math.min(180, Math.round(underTitleFull.length * 7.2 + 22)));
-
-      labelContentSVG = `<text class="hex-node-underlabel hex-node-underlabel--${status}" x="0" y="3.5" text-anchor="middle">${escapeHtmlStr(underTitleFull)}</text>`;
-
-    } else {
-
-      const words = underTitleFull.split(' ');
-
-      let line1 = '';
-
-      let line2 = '';
-
-      if(words.length === 1){
-
-        line1 = words[0];
-
-      } else {
-
-        const mid = Math.ceil(words.length / 2);
-
-        line1 = words.slice(0, mid).join(' ');
-
-        line2 = words.slice(mid).join(' ');
-
-      }
-
-      if(!line2){
-
-        pillW = Math.max(96, Math.min(190, Math.round(line1.length * 7.0 + 20)));
-
-        labelContentSVG = `<text class="hex-node-underlabel hex-node-underlabel--${status}" x="0" y="3.5" text-anchor="middle">${escapeHtmlStr(line1)}</text>`;
-
-      } else {
-
-        pillH = 34;
-
-        pillY = -17;
-
-        const maxLen = Math.max(line1.length, line2.length);
-
-        pillW = Math.max(96, Math.min(184, Math.round(maxLen * 7.0 + 20)));
-
-        labelContentSVG = `
-
-          <text class="hex-node-underlabel hex-node-underlabel--${status} hex-node-underlabel--multiline" x="0" y="-3.5" text-anchor="middle">
-
-            <tspan x="0" dy="0">${escapeHtmlStr(line1)}</tspan>
-
-            <tspan x="0" dy="13.5">${escapeHtmlStr(line2)}</tspan>
-
-          </text>`;
-
-      }
-
-    }
-
-    const underLabelX = x;
-
-    const underLabelPill = `
-
-      <g class="hex-underlabel-wrap" transform="translate(${underLabelX}, ${y + 44})" pointer-events="none">
-
-        <text class="hex-node-underlabel" text-anchor="middle" font-family="'Inter', -apple-system, sans-serif" font-size="12" font-weight="${isActive ? '800' : '700'}" fill="${isActive ? '#fbbf24' : (isCompleted ? '#cbd5e1' : '#64748b')}" style="text-shadow:0 2px 6px rgba(0,0,0,0.95);">${escapeHtmlStr(underTitleFull)}</text>
-
-      </g>`;
-
-    const nodeStateLabel = isCompleted ? 'Пройден' : (isActive ? 'Текущий урок, доступен для продолжения' : 'Заблокирован: сначала пройдите предыдущие уроки');
-
-    const uChap = chapterBreakpoints.find(cb => cb.units.some(x => x.id === u.id)) || curChapter;
-
-    const lessonNumInChap = (uChap.units.findIndex(x => x.id === u.id) >= 0) ? (uChap.units.findIndex(x => x.id === u.id) + 1) : (i + 1);
-
-    const nodeAccessibleLabel = `Урок ${lessonNumInChap}: ${cleanUnitTitle(u.id, u.title)}. ${nodeStateLabel}. Нажмите Enter или пробел, чтобы открыть.`;
-
-
-
-    let lockedTeaser = '';
-
-
 
     nodesSVG += `
-
-      <g class="hex-3d-node hex-node--${status}" data-unit-id="${u.id}" data-node-idx="${i}" data-cx="${x}" data-cy="${y}" style="${fogStyle}" role="button" tabindex="0" aria-label="${escapeHtmlStr(nodeAccessibleLabel)}" aria-keyshortcuts="Enter Space ArrowUp ArrowDown Home End" title="${escapeHtmlStr(nodeAccessibleLabel)}">
-
-        ${pulseHalo}
-
-        ${radialProgressRing}
-
-        ${triadOrbit}
-
-        <circle cx="${x}" cy="${y - 3}" r="32" fill="transparent" pointer-events="all"/>
-
-        ${nodeShape}
-
-        ${buttonContent}
-
-        ${underLabelPill}
-
-        ${lockedTeaser}
-
-        ${activeBubble}
-
+      <g class="hex-3d-node path-node hex-node--${status} ${isActive ? 'hex-node--active active' : ''}" ${isActive ? 'id="active-target-lesson"' : ''} data-unit-id="${u.id}" data-node-idx="${i}" data-title="${escapeHtmlStr(underTitle)}" data-status="${status}" data-desc="${escapeHtmlStr(u.desc || 'Флеш-карточки интервального повторения и практические задачи.')}" transform="translate(${x}, ${y})" role="button" tabindex="0">
+        <circle class="hit-target" r="34"/>
+        <g class="bead-group" pointer-events="none">
+          ${innerContent}
+        </g>
+        <text y="38" text-anchor="middle" font-family="'Onest', sans-serif" font-size="11.5" font-weight="${isActive ? '800' : '600'}" fill="${isActive ? '#fbbf24' : (isCompleted ? '#cbd5e1' : '#64748b')}" style="text-shadow:0 2px 6px rgba(0,0,0,0.95);">${escapeHtmlStr(underTitle)}</text>
       </g>`;
-
   });
 
-
-
-  // «Челлендж мастерства» side branches for each chapter in this echelon
-
+  // Chapter Exam Branches (Noble Golden Mastery Beads)
   let branchesSVG = '';
-
   chapterBreakpoints.forEach((cb, cIdx) => {
-
     const endIdx = (cIdx < chapterBreakpoints.length - 1) ? (chapterBreakpoints[cIdx + 1].startIdx - 1) : (allUnits.length - 1);
-
     const u = allUnits[endIdx];
-
     if(!u || !coords[endIdx]) return;
-
     const { x, y } = coords[endIdx];
-
-    const track = getTrackForUnit(u.id);
-
+    const track = (typeof getTrackForUnit === 'function') ? getTrackForUnit(u.id) : { routePrefix: 'python' };
     const chDone = (state.passedUnitTests || []).includes(u.id);
-
     const chUnlocked = endIdx <= activeUnitIndex;
-
     const chStatus = chDone ? 'done' : (chUnlocked ? 'open' : 'locked');
-
     const bx = 340;
-
-    const by = y + 110;
-
-
-
-    let examVisual = '';
-
-    let examPill = '';
-
-    let connectorStroke = 'rgba(148, 163, 184, 0.35)';
-
-
-
-    if(chDone){
-
-      connectorStroke = 'rgba(52, 211, 153, 0.80)';
-
-      examVisual = `
-
-        <ellipse cx="${bx}" cy="${by + 22}" rx="28" ry="8" fill="rgba(0,0,0,0.60)" filter="blur(4px)"/>
-
-        <g class="path-challenge-face">
-
-          <circle cx="${bx}" cy="${by}" r="27" fill="url(#hexGradCompleted)" stroke="#fef08a" stroke-width="1.8" filter="drop-shadow(0 4px 14px rgba(0,0,0,0.6))"/>
-
-          <circle cx="${bx}" cy="${by}" r="24.5" fill="none" stroke="rgba(254, 240, 138, 0.40)" stroke-width="1"/>
-
-          <text x="${bx}" y="${by + 7}" text-anchor="middle" font-size="20" font-weight="900" fill="#ffffff" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.8))">✓</text>
-
-        </g>`;
-
-      examPill = `
-
-        <rect x="${bx - 54}" y="${by + 33}" width="108" height="24" rx="12" fill="rgba(15, 23, 42, 0.94)" stroke="rgba(52, 211, 153, 0.55)" stroke-width="1.2" filter="drop-shadow(0 4px 12px rgba(0,0,0,0.6))"/>
-
-        <text class="hex-branch-label" x="${bx}" y="${by + 49}" text-anchor="middle" font-family="'Onest', sans-serif" font-size="10" font-weight="800" fill="#34d399" letter-spacing="0.06em">✓ СДАНО</text>`;
-
-    } else if(chStatus === 'open'){
-
-      connectorStroke = 'rgba(244, 63, 94, 0.75)';
-
-      examVisual = `
-
-        <circle class="hex-challenge-pulse" cx="${bx}" cy="${by}" r="36" fill="none" stroke="rgba(225, 29, 72, 0.55)" stroke-width="1.5" filter="drop-shadow(0 0 16px rgba(225,29,72,0.8))"/>
-
-        <ellipse cx="${bx}" cy="${by + 22}" rx="28" ry="8" fill="rgba(0,0,0,0.60)" filter="blur(4px)"/>
-
-        <g class="path-challenge-face">
-
-          <circle cx="${bx}" cy="${by}" r="27" fill="url(#examRubyGrad)" stroke="#fda4af" stroke-width="1.8" filter="drop-shadow(0 4px 16px rgba(225,29,72,0.65)) drop-shadow(0 4px 12px rgba(0,0,0,0.6))"/>
-
-          <circle cx="${bx}" cy="${by}" r="24.5" fill="none" stroke="rgba(255, 255, 255, 0.45)" stroke-width="1"/>
-
-          <text x="${bx}" y="${by + 7}" text-anchor="middle" font-size="20" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.8))">🏆</text>
-
-        </g>`;
-
-      examPill = `
-
-        <rect x="${bx - 60}" y="${by + 33}" width="120" height="24" rx="12" fill="rgba(15, 23, 42, 0.94)" stroke="rgba(225, 29, 72, 0.60)" stroke-width="1.2" filter="drop-shadow(0 4px 12px rgba(0,0,0,0.6)) drop-shadow(0 0 12px rgba(225,29,72,0.30))"/>
-
-        <text class="hex-branch-label" x="${bx}" y="${by + 49}" text-anchor="middle" font-family="'Onest', sans-serif" font-size="10" font-weight="800" fill="#fecdd3" letter-spacing="0.06em">АТТЕСТАЦИЯ</text>`;
-
-    } else {
-
-      connectorStroke = 'rgba(148, 163, 184, 0.35)';
-
-      examVisual = `
-
-        <ellipse cx="${bx}" cy="${by + 22}" rx="26" ry="7" fill="rgba(0,0,0,0.40)" filter="blur(3px)"/>
-
-        <g class="path-challenge-face">
-
-          <circle cx="${bx}" cy="${by}" r="27" fill="url(#examLockedGrad)" stroke="rgba(148, 163, 184, 0.28)" stroke-width="1.4"/>
-
-          <circle cx="${bx}" cy="${by}" r="24.5" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1"/>
-
-          <text x="${bx}" y="${by + 7}" text-anchor="middle" font-size="18" fill="#64748b" opacity="0.60">🏆</text>
-
-        </g>`;
-
-      examPill = `
-
-        <rect x="${bx - 60}" y="${by + 33}" width="120" height="24" rx="12" fill="rgba(15, 23, 42, 0.90)" stroke="rgba(148, 163, 184, 0.22)" stroke-width="1"/>
-
-        <text class="hex-branch-label" x="${bx}" y="${by + 49}" text-anchor="middle" font-family="'Onest', sans-serif" font-size="10" font-weight="700" fill="#64748b" letter-spacing="0.05em">🔒 АТТЕСТАЦИЯ</text>`;
-
-    }
-
-
+    const by = y + 70;
 
     branchesSVG += `
-
-      <g class="hex-challenge-branch">
-
-        <path d="M ${x},${y + 56} Q ${(x + bx) / 2},${(y + 56 + by - 27) / 2} ${bx},${by - 27}" fill="none" stroke="${connectorStroke}" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3 4"/>
-
-        <g class="hex-challenge-node hex-challenge-node--${chStatus}" data-challenge-route="#${track.routePrefix}/unittest/${u.id}" data-challenge-status="${chStatus}" data-cx="${bx}" data-cy="${by}" role="button" tabindex="0" aria-label="Челлендж мастерства, проверка темы «${cleanUnitTitle(u.id, u.title)}». ${chDone ? 'Пройдено' : (chUnlocked ? 'Доступно' : 'Заблокировано до завершения уроков главы')}." aria-keyshortcuts="Enter Space" aria-disabled="${chStatus === 'locked' ? 'true' : 'false'}">
-
-          <circle cx="${bx}" cy="${by}" r="28" fill="transparent" pointer-events="all"/>
-
-          ${examVisual}
-
-          <g class="hex-branch-pill" pointer-events="none">
-
-            ${examPill}
-
-          </g>
-
+      <g class="hex-challenge-node hex-challenge-node--${chStatus}" data-challenge-route="#${track.routePrefix}/unittest/${u.id}" data-challenge-status="${chStatus}" data-challenge-title="Аттестация: ${escapeHtmlStr(cb.shortTitle || cb.title)}" transform="translate(${bx}, ${by})" role="button" tabindex="0">
+        <circle class="hit-target" r="34"/>
+        <g class="bead-group" pointer-events="none">
+          <circle r="21" fill="${chDone ? '#059669' : (chUnlocked ? '#d97706' : '#1e293b')}" stroke="${chDone ? '#34d399' : (chUnlocked ? '#fef08a' : 'rgba(245, 158, 11, 0.45)')}" stroke-width="1.8" filter="${chUnlocked ? 'drop-shadow(0 0 16px rgba(245,158,11,0.85))' : ''}"/>
+          <text y="5" text-anchor="middle" font-size="13">🏆</text>
         </g>
-
-        <!-- Seamless flow link from Exam to Chapter Gate -->
-
-        <line x1="${bx}" y1="${by + 59}" x2="${bx}" y2="${by + 86}" stroke="rgba(148, 163, 184, 0.35)" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 4"/>
-
+        <text y="36" text-anchor="middle" font-family="'Onest', sans-serif" font-size="11" font-weight="700" fill="${chUnlocked ? '#fcd34d' : (chDone ? '#34d399' : '#64748b')}" style="text-shadow:0 2px 6px rgba(0,0,0,0.9);">${chDone ? '✓ Аттестация сдана' : (chUnlocked ? 'Аттестация Главы' : '🔒 Аттестация')}</text>
       </g>`;
-
   });
 
-
-
-  const totalCompletedUnits = ALL_UNITS_COMBINED.filter(isUnitCompleted).length;
-
+  const curActiveUnit = allUnits[activeUnitIndex] || allUnits[0] || ALL_UNITS_COMBINED[0];
+  const curChapter = chapterBreakpoints.find(cb => cb.units.some(u => u.id === curActiveUnit.id)) || chapterBreakpoints[0] || { num: 1, chapterNum: 1, shortTitle: 'Python Core', units: allUnits };
+  const activeChapterNum = curChapter.chapterNum || curChapter.num || 1;
+  const activeChapterShortTitle = curChapter.shortTitle || (curChapter.title || '').replace(/^Глава\s+\d+:\s*/i, '') || 'Python Core';
+  const completedTotalCount = allUnits.filter(isUnitCompleted).length;
   const streakText = (typeof pluralizeRu === 'function') ? pluralizeRu(state.streak || 0, 'день', 'дня', 'дней') : 'дн.';
-
   const streakCount = Math.max(1, Number(state.streak) || 1);
-
   const xpCount = Number(state.xp) || 0;
-
   const formattedXp = xpCount >= 1000 ? (xpCount.toLocaleString('ru-RU') + ' XP') : (xpCount + ' XP');
 
-
-
-  // Echelon metadata
-
-  const curTierNum = (curEchelon === 'all') ? (curActiveUnit.tier || 1) : (Number(curEchelon) || 1);
-
-  const curEchelonMeta = (typeof INTERVIEW_ECHELONS !== 'undefined' && INTERVIEW_ECHELONS[curTierNum]) ? INTERVIEW_ECHELONS[curTierNum] : { shortLabel: `Эшелон ${curTierNum}`, icon: '🛡️', targetLabel: 'к скринингу' };
-
-  const e1Top = (typeof getEchelonProgress === 'function') ? getEchelonProgress(1) : null;
-
-  const e1PctTop = e1Top ? e1Top.pct : 0;
-
-  const echProg = (typeof getEchelonProgress === 'function') ? getEchelonProgress(curTierNum) : null;
-
-  const echPct = echProg ? echProg.pct : 0;
-
-
-
-  const echelonFull = (curEchelon === 'all') ? '🌐 Все эшелоны' : `${curEchelonMeta.icon} Эшелон ${curTierNum}`;
-
-  const echelonShort = (curEchelon === 'all') ? '🌐 Все' : `${curEchelonMeta.icon} Эш. ${curTierNum}`;
-
-
-
-  let screeningFull = '';
-
-  let screeningShort = '';
-
-  if(curTierNum === 1 || curEchelon === 'all'){
-
-    screeningFull = e1PctTop > 0 ? `⚡ Скрининг: ${e1PctTop}%` : '⚡ Базовый скрининг';
-
-    screeningShort = e1PctTop > 0 ? `⚡ ${e1PctTop}% к скринингу` : '⚡ База';
-
-  } else if(curTierNum === 2){
-
-    screeningFull = echPct > 0 ? `🎯 Стек и БД: ${echPct}%` : '🎯 Стек и БД';
-
-    screeningShort = echPct > 0 ? `🎯 ${echPct}% к интервью` : '🎯 Стек';
-
-  } else if(curTierNum === 3){
-
-    screeningFull = echPct > 0 ? `⚡ Сервисы: ${echPct}%` : '⚡ Сервисы';
-
-    screeningShort = echPct > 0 ? `⚡ ${echPct}% к лайвкодингу` : '⚡ Сервисы';
-
-  } else {
-
-    screeningFull = echPct > 0 ? `👑 Архитектура: ${echPct}%` : '👑 Архитектура';
-
-    screeningShort = echPct > 0 ? `👑 ${echPct}% к офферу` : '👑 Оффер';
-
-  }
-
-
-
-  // Intermediate Micro-Step Beads: Ribbon is clean continuous gold beam
-
-  let intermediateBeadsSVG = '';
-
-
-
-  const actCoord = (coords[activeUnitIndex] || coords[0] || { x: 340, y: 70 });
-
-  const placeBelow = actCoord.y < 240;
-
-  // Вариант 2: Вертикальный якорь (Elevated Anchor) — карточка поднята на безопасный зазор 70px над узлом
-
-  const initialPopoverTop = placeBelow ? (actCoord.y + 60) : (actCoord.y - 235);
-
-  const initialPopoverArrow = placeBelow ? 'path-popover-arrow--up' : 'path-popover-arrow--down';
-
-
-
   return `
-
     <div class="coddy-path-layout">
-
       <div class="container path-serpentine-wrap">
 
-        <!-- Mobile compact stats strip -->
+        <!-- Ambient Spatial Orbs -->
+        <div style="position:fixed; border-radius:50%; filter:blur(90px); pointer-events:none; z-index:0; opacity:0.25; width:440px; height:440px; background:radial-gradient(circle, #10b981 0%, transparent 70%); top:-120px; left:-100px;"></div>
+        <div style="position:fixed; border-radius:50%; filter:blur(90px); pointer-events:none; z-index:0; opacity:0.25; width:480px; height:480px; background:radial-gradient(circle, #f59e0b 0%, transparent 70%); bottom:-150px; right:-120px;"></div>
 
-        ${renderPathMobileStatsHTML(totalCompletedUnits, streakText, curEchelon, activeChapterNum, completedInChapter, totalInChapter)}
-
-
-
-        <!-- Hero Header (Matching Exact Mockup) -->
-
-        <header class="hero-header">
-          <div class="hero-header-row">
-            <div class="hero-left">
-              <span class="hero-badge">⚡ Программа подготовки · Скрининг Junior+</span>
-              <h1 class="hero-title">Траектория: Python Backend Engineer</h1>
-              <div class="hero-sub">Текущий раздел: Глава ${activeChapterNum} · ${escapeHtmlStr(activeChapterShortTitle || 'Web & HTTP')}</div>
-            </div>
-            <div class="hero-right">
-              <div class="hero-gamify-badges">
-                <div class="hero-pill hero-pill--streak" title="Текущая серия ударных дней обучения" aria-label="Стрик ${streakCount} дн.">
-                  <span class="hero-pill-icon hero-flame-icon">🔥</span>
-                  <span class="hero-pill-val">${streakCount} дн.</span>
-                </div>
-                <div class="hero-pill hero-pill--xp" title="Накопленные баллы опыта" aria-label="Опыт ${formattedXp}">
-                  <span class="hero-pill-icon hero-star-icon">⭐</span>
-                  <span class="hero-pill-val">${formattedXp}</span>
-                </div>
-              </div>
-              <div class="hero-stat-box">
-                <div class="hero-stat-val">${totalCompletedUnits} / ${allUnits.length}</div>
-                <div class="hero-stat-lbl">Освоено</div>
-              </div>
-              <button type="button" class="hero-jump-btn" id="path-jump-btn" title="Перейти к текущему уроку">⚡ К текущему уроку</button>
-            </div>
+        <!-- Hero Header -->
+        <header class="trail-hero" style="width:100%; max-width:480px; margin: 0 auto 24px; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-radius: 20px; padding: 16px 18px; box-shadow: 0 16px 36px rgba(0,0,0,0.45);">
+          <div style="font-size: 11px; font-weight: 700; color: #10b981; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+            ⚡ Сквозная траектория · Junior → Middle
           </div>
-          <div class="hero-progress-track">
-            <div class="hero-progress-fill" style="width:${Math.round(totalCompletedUnits / (allUnits.length || 1) * 100)}%;"></div>
+          <h1 style="font-size: 18px; font-weight: 800; color: #fff; line-height: 1.25; margin-bottom: 4px;">
+            Траектория: Python Backend Engineer
+          </h1>
+          <div style="font-size: 12.5px; color: #94a3b8; margin-bottom: 12px;">
+            Текущий раздел: Глава ${activeChapterNum} · ${escapeHtmlStr(activeChapterShortTitle)}
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 12px; font-weight: 700; color: #cbd5e1;">
+            <div>🔥 ${streakCount} ${streakText}</div>
+            <div>⭐ ${formattedXp}</div>
+            <div style="color: #10b981;">${completedTotalCount} / ${allUnits.length} освоено</div>
+          </div>
+          <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; margin-top: 10px;">
+            <div style="height: 100%; width: ${Math.round((completedTotalCount / (allUnits.length || 1)) * 100)}%; background: linear-gradient(90deg, #10b981, #34d399); box-shadow: 0 0 10px rgba(16, 185, 129, 0.7);"></div>
           </div>
         </header>
 
+        <!-- SVG ENDLESS HARMONIC SERPENTINE -->
+        <svg class="path-serpentine-svg trail-svg-canvas" viewBox="0 0 680 ${totalH}" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:680px; display:block; margin: 0 auto; overflow:visible;">
+          <defs>
+            <linearGradient id="zenPathProgressGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#10b981"/>
+              <stop offset="100%" stop-color="#f59e0b"/>
+            </linearGradient>
+            <radialGradient id="biomeEmerald" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#10b981" stop-opacity="0.10"/>
+              <stop offset="100%" stop-color="#0b0f17" stop-opacity="0"/>
+            </radialGradient>
+            <radialGradient id="biomeAmber" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.12"/>
+              <stop offset="100%" stop-color="#0b0f17" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
 
+          <!-- Ambient Spatial Biomes -->
+          <g pointer-events="none">
+            <ellipse cx="340" cy="180" rx="260" ry="170" fill="url(#biomeEmerald)"/>
+            <ellipse cx="340" cy="780" rx="260" ry="180" fill="url(#biomeAmber)"/>
+          </g>
 
-          <!-- Chapter Quick Jump Floating Dropdown -->
+          <!-- Guide Tracks -->
+          <path d="${dPath}" fill="none" stroke="rgba(148,163,184,0.12)" stroke-width="2.6" stroke-linecap="round"/>
+          ${dProgress ? `<path d="${dProgress}" fill="none" stroke="url(#zenPathProgressGrad)" stroke-width="4.8" stroke-linecap="round" style="filter:drop-shadow(0 0 10px rgba(16,185,129,0.75));"/>` : ''}
+          ${dFuture ? `<path d="${dFuture}" fill="none" stroke="rgba(245, 158, 11, 0.28)" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="6 6"/>` : ''}
 
-          <div class="path-chap-menu" id="path-chap-menu" style="display:none;" role="dialog" aria-modal="false" aria-label="Быстрый переход к главам">
+          <!-- Milestones, Nodes, Exams -->
+          ${markersSVG}
+          ${nodesSVG}
+          ${branchesSVG}
+        </svg>
 
-            <div class="path-chap-menu-head">
-
-              <span class="path-chap-menu-title">Главы программы (${chapterBreakpoints.length})</span>
-
-              <button type="button" class="path-chap-menu-close" id="path-chap-menu-close" aria-label="Закрыть">✕</button>
-
-            </div>
-
-            <div class="path-chap-menu-list">
-
-              ${chapterBreakpoints.map((cb, cIdx) => {
-
-                const isChapDone = cb.units.length > 0 && cb.units.every(isUnitCompleted);
-
-                const isChapActive = (cb.chapterNum === activeChapterNum);
-
-                const doneCount = cb.units.filter(isUnitCompleted).length;
-
-                const badgeIcon = isChapDone ? '✓' : (isChapActive ? '🎯' : '🔒');
-
-                const badgeClass = isChapDone ? 'pcm-badge--done' : (isChapActive ? 'pcm-badge--active' : 'pcm-badge--locked');
-
-                return `
-
-                  <button type="button" class="path-chap-menu-item ${isChapActive ? 'active' : ''}" data-jump-chapter="${cb.startIdx}">
-
-                    <span class="pcm-badge ${badgeClass}">${badgeIcon}</span>
-
-                    <div class="pcm-info">
-
-                      <span class="pcm-name">Глава ${cb.chapterNum}: ${escapeHtmlStr(cb.shortTitle || '')}</span>
-
-                      <span class="pcm-meta">${doneCount}/${cb.units.length} уроков (${Math.round(doneCount / (cb.units.length || 1) * 100)}%)</span>
-
-                    </div>
-
-                    <span class="pcm-arrow">➔</span>
-
-                  </button>`;
-
-              }).join('')}
-
-            </div>
-
+        <!-- Stargate Finale -->
+        <div class="path-stargate-finale" id="finale-section">
+          <div class="stargate-icon">🎓</div>
+          <h3 class="stargate-title">Выпускник Академии: Python Backend Engineer</h3>
+          <p class="stargate-sub">Полное освоение всей программы подготовки Junior / Middle</p>
+          <div class="stargate-badges">
+            <div class="stargate-pill">🔒 7 глав программы</div>
+            <div class="stargate-pill">⚡ ${formattedXp}</div>
           </div>
-
-
-
-        <!-- S-Curve SVG Trail -->
-
-        <div class="path-serpentine" style="position:relative;">
-
-          <svg class="path-serpentine-svg" viewBox="0 0 680 ${totalH}" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Путь обучения: ${allUnits.length} уроков и челленджи">
-
-            <defs>
-
-              <linearGradient id="hexGradCompleted" x1="0" y1="0" x2="0" y2="1">
-
-                <stop offset="0%" stop-color="#fef08a"/>
-
-                <stop offset="50%" stop-color="#fbbf24"/>
-
-                <stop offset="100%" stop-color="#b45309"/>
-
-              </linearGradient>
-
-              <linearGradient id="hexGradActive" x1="0" y1="0" x2="0" y2="1">
-
-                <stop offset="0%" stop-color="#fef08a"/>
-
-                <stop offset="40%" stop-color="#fbbf24"/>
-
-                <stop offset="100%" stop-color="#d97706"/>
-
-              </linearGradient>
-
-              <linearGradient id="hexGradLocked" x1="0" y1="0" x2="0" y2="1">
-
-                <stop offset="0%" stop-color="#2a3342"/>
-
-                <stop offset="100%" stop-color="#111620"/>
-
-              </linearGradient>
-
-              <linearGradient id="hexGradChallenge" x1="0" y1="0" x2="0" y2="1">
-
-                <stop offset="0%" stop-color="#d47b9a"/>
-
-                <stop offset="100%" stop-color="#711b3c"/>
-
-              </linearGradient>
-
-              <linearGradient id="pathButtonActive" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffffff"/><stop offset="0.48" stop-color="#fef08a"/><stop offset="1" stop-color="#d97706"/></linearGradient>
-
-              <linearGradient id="pathButtonCompleted" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fef08a"/><stop offset="0.50" stop-color="#f59e0b"/><stop offset="1" stop-color="#78350f"/></linearGradient>
-
-              <linearGradient id="pathButtonLocked" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#3d495c"/><stop offset="0.55" stop-color="#242d3a"/><stop offset="1" stop-color="#111620"/></linearGradient>
-
-              <linearGradient id="pathButtonSide" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#1b222d"/><stop offset="1" stop-color="#0a0e14"/></linearGradient>
-
-              <linearGradient id="pathButtonChallenge" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e7a0b8"/><stop offset="0.55" stop-color="#9f315d"/><stop offset="1" stop-color="#641833"/></linearGradient>
-
-              <radialGradient id="examRubyGrad" cx="35%" cy="30%" r="70%">
-
-                <stop offset="0%" stop-color="#fda4af"/>
-
-                <stop offset="35%" stop-color="#e11d48"/>
-
-                <stop offset="70%" stop-color="#9f1239"/>
-
-                <stop offset="100%" stop-color="#4c0519"/>
-
-              </radialGradient>
-
-              <radialGradient id="examLockedGrad" cx="35%" cy="30%" r="70%">
-
-                <stop offset="0%" stop-color="#334155"/>
-
-                <stop offset="45%" stop-color="#1e293b"/>
-
-                <stop offset="100%" stop-color="#0b0f19"/>
-
-              </radialGradient>
-
-              <linearGradient id="pathProgressGrad" x1="0" y1="0" x2="0" y2="1">
-
-                <stop offset="0%" stop-color="#f59e0b"/>
-
-                <stop offset="50%" stop-color="#fbbf24"/>
-
-                <stop offset="100%" stop-color="#fef08a"/>
-
-              </linearGradient>
-
-                                          <linearGradient id="liquidBeamGrad" x1="0" y1="0" x2="1" y2="0">
-
-                <stop offset="0%" stop-color="#10b981"/>
-
-                <stop offset="70%" stop-color="#34d399"/>
-
-                <stop offset="100%" stop-color="#6ee7b7"/>
-
-              </linearGradient>
-
-              <linearGradient id="gatePillUnlockedGrad" x1="0" y1="0" x2="1" y2="0">
-
-                <stop offset="0%" stop-color="rgba(15, 23, 42, 0.94)"/>
-
-                <stop offset="60%" stop-color="rgba(6, 78, 59, 0.65)"/>
-
-                <stop offset="100%" stop-color="rgba(4, 47, 46, 0.90)"/>
-
-              </linearGradient>
-
-              <linearGradient id="gatePillLockedGrad" x1="0" y1="0" x2="1" y2="0">
-
-                <stop offset="0%" stop-color="rgba(24, 18, 27, 0.92)"/>
-
-                <stop offset="100%" stop-color="rgba(15, 23, 42, 0.88)"/>
-
-              </linearGradient>
-
-              <linearGradient id="gateGreenBtnGrad" x1="0" y1="0" x2="0" y2="1">
-
-                <stop offset="0%" stop-color="#34d399"/>
-
-                <stop offset="100%" stop-color="#059669"/>
-
-              </linearGradient>
-
-              <linearGradient id="pathBubbleGrad" x1="0" y1="0" x2="0" y2="1">
-
-                <stop offset="0%" stop-color="#fef08a"/>
-
-                <stop offset="100%" stop-color="#d97706"/>
-
-              </linearGradient>
-
-              <linearGradient id="gateAuraGrad" x1="0" y1="0" x2="0" y2="1">
-
-                <stop offset="0%" stop-color="rgba(16, 185, 129, 0.12)"/>
-
-                <stop offset="100%" stop-color="rgba(10, 14, 20, 0.02)"/>
-
-              </linearGradient>
-
-              <linearGradient id="gateAuraLockedGrad" x1="0" y1="0" x2="0" y2="1">
-
-                <stop offset="0%" stop-color="rgba(148, 163, 184, 0.08)"/>
-
-                <stop offset="100%" stop-color="rgba(10, 14, 20, 0.02)"/>
-
-              </linearGradient>
-
-              <radialGradient id="goldNodeDoneGrad" cx="35%" cy="35%" r="65%">
-
-                <stop offset="0%" stop-color="#92400e"/>
-
-                <stop offset="45%" stop-color="#78350f"/>
-
-                <stop offset="100%" stop-color="#1f0902"/>
-
-              </radialGradient>
-
-              <radialGradient id="goldNodeActiveGrad" cx="35%" cy="35%" r="65%">
-
-                <stop offset="0%" stop-color="#fef08a"/>
-
-                <stop offset="42%" stop-color="#f59e0b"/>
-
-                <stop offset="100%" stop-color="#78350f"/>
-
-              </radialGradient>
-
-              <radialGradient id="biomeEmerald" cx="50%" cy="50%" r="50%">
-
-                <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.10"/>
-
-                <stop offset="65%" stop-color="#b45309" stop-opacity="0.03"/>
-
-                <stop offset="100%" stop-color="#0b0f17" stop-opacity="0"/>
-
-              </radialGradient>
-
-              <radialGradient id="biomeSapphire" cx="50%" cy="50%" r="50%">
-
-                <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.12"/>
-
-                <stop offset="65%" stop-color="#1d4ed8" stop-opacity="0.03"/>
-
-                <stop offset="100%" stop-color="#0b0f17" stop-opacity="0"/>
-
-              </radialGradient>
-
-              <radialGradient id="biomeAmber" cx="50%" cy="50%" r="50%">
-
-                <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.14"/>
-
-                <stop offset="65%" stop-color="#b45309" stop-opacity="0.03"/>
-
-                <stop offset="100%" stop-color="#0b0f17" stop-opacity="0"/>
-
-              </radialGradient>
-
-            </defs>
-
-
-
-            <!-- Ambient Spatial Biomes (Ethereal Depth & Zero Black Void) -->
-
-            <g class="path-ambient-biomes" pointer-events="none">
-
-              <ellipse cx="340" cy="180" rx="260" ry="170" fill="url(#biomeEmerald)"/>
-
-              <ellipse cx="340" cy="680" rx="260" ry="180" fill="url(#biomeSapphire)"/>
-
-              <ellipse cx="340" cy="1180" rx="260" ry="180" fill="url(#biomeAmber)"/>
-
-            </g>
-
-
-
-            <!-- Luminous Ethereal Guide Track with Continuous Liquid Energy Pulse (Variant 1) -->
-
-            <path class="path-track-bg" d="${dPath}" fill="none" stroke="rgba(148,163,184,0.12)" stroke-width="2.6" stroke-linecap="round"/>
-
-            ${dProgress ? `
-
-              <path class="path-track-progress" d="${dProgress}" fill="none" stroke="url(#pathProgressGrad)" stroke-width="4.8" stroke-linecap="round" style="filter:drop-shadow(0 0 10px rgba(245,158,11,0.75)) drop-shadow(0 0 20px rgba(251,191,36,0.40));"/>
-
-              <path class="path-energy-ripple-beam" d="${dProgress}" fill="none" stroke="#ffffff" stroke-width="4.8" stroke-linecap="round" filter="drop-shadow(0 0 8px #fef08a) drop-shadow(0 0 16px #34d399)"/>
-
-            ` : ''}
-
-            ${dFuture ? `<path class="path-track-future" d="${dFuture}" fill="none" stroke="rgba(245, 158, 11, 0.24)" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="6 6"/>` : ''}
-
-
-
-            <!-- Chapter ribbons -->
-
-            ${markersSVG}
-
-
-
-            <!-- Intermediate Micro-Step Beads (Continuous Atomic Dots Necklace) -->
-
-            ${intermediateBeadsSVG}
-
-
-
-            <!-- 3D Hexagonal Nodes -->
-
-            ${nodesSVG}
-
-
-
-            <!-- «Челлендж мастерства» side branches -->
-
-            ${branchesSVG}
-
-          </svg>
-
-
-
-          <!-- Anchored On-Node Glass Popover (Centered over active node by default as in reference) -->
-
-          <div id="path-popover-backdrop" class="path-popover-backdrop" style="display:none;" aria-hidden="true"></div>
-
-          <div id="path-anchored-popover" class="path-popover" data-return-focus-unit="${curActiveUnit ? curActiveUnit.id : ''}" style="display:block;top:${initialPopoverTop}px;left:${actCoord.x}px;" role="dialog" tabindex="-1" aria-labelledby="popover-title" aria-describedby="popover-status">
-
-            <div class="path-popover-drag-handle" aria-hidden="true"></div>
-
-            <div class="path-popover-arrow ${initialPopoverArrow}" id="popover-arrow"></div>
-
-            <div class="path-popover-content">
-
-              <div class="path-popover-header">
-
-                <div class="path-popover-badge" id="popover-badge">В ФОКУСЕ · УРОК ${activeLessonNumInChap}</div>
-
-                <div style="font-size:11px;font-weight:700;color:#94a3b8;display:flex;align-items:center;gap:4px;"><span style="color:#fbbf24;">⚡</span> ~2 мин</div>
-
-                <button type="button" class="path-popover-close" id="popover-close-btn" aria-label="Закрыть" style="margin-left:auto;">✕</button>
-
-              </div>
-
-              <h3 class="path-popover-title" id="popover-title" style="margin:6px 0 4px;font-size:15px;font-weight:800;color:#ffffff;line-height:1.25;">${escapeHtmlStr(cleanUnitTitle(curActiveUnit.id, curActiveUnit.title))}</h3>
-
-              <div class="path-popover-status" id="popover-status" style="margin-bottom:12px;font-size:11.5px;color:#94a3b8;line-height:1.4;">${escapeHtmlStr(curActiveUnit.desc || 'Флеш-карточки интервального повторения и практические задачи.')}</div>
-
-              <div class="path-popover-skills" id="popover-skills"></div>
-
-              <div class="path-popover-actions">
-
-                <button type="button" class="path-popover-cta path-popover-cta--active" id="popover-cta-btn" data-target-unit="${curActiveUnit ? curActiveUnit.id : ''}">НАЧАТЬ УРОК (2 МИН) ➔</button>
-
-              </div>
-
-            </div>
-
-          </div>
-
         </div>
 
-        <!-- Grand Track Finale: Hybrid Pedestal & Quantum Stargate Orbit -->
-        ${renderPathGrandFinaleHTML(allUnits, chapterBreakpoints)}
-
-        <!-- Floating Horizon HUD Beacon (Smart Spring Compass) -->
-
-        <button type="button" class="path-jump-btn" id="path-jump-btn" title="Перейти к текущему уроку" aria-label="Перейти к текущему уроку">
-
-          <svg class="path-hud-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
-
-          <span class="path-hud-label">⚡ К текущему уроку</span>
-
+        <!-- Floating Smart Horizon Beacon -->
+        <button type="button" class="horizon-beacon-btn" id="horizonBeacon" style="display:none;" title="К текущему уроку">
+          <span class="beacon-arrow" id="beaconArrow">↑</span>
+          <span>⚡ К текущему уроку</span>
         </button>
 
-
-
-        <!-- Echelon / Program Selector Bottom Sheet & Modal -->
-
-        <div id="path-echelon-modal-backdrop" class="path-echelon-modal-backdrop" style="display:none;" aria-hidden="true"></div>
-
-        <div id="path-echelon-modal" class="path-echelon-modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="path-echelon-modal-title">
-
-          <div class="path-echelon-modal-handle"></div>
-
-          <div class="path-echelon-modal-head">
-
-            <div>
-
-              <h3 class="path-echelon-modal-title" id="path-echelon-modal-title">Программы подготовки к собеседованию</h3>
-
-              <p class="path-echelon-modal-sub">Выберите целевой эшелон. Маршрут обучения перестроится под выбранную программу.</p>
-
-            </div>
-
-            <button type="button" class="path-echelon-modal-close" data-close-echelon-modal="1" aria-label="Закрыть">✕</button>
-
-          </div>
-
-          <div class="path-echelon-cards-list">
-
-            ${renderEchelonCardsModalHTML(curEchelon)}
-
-          </div>
-
+        <!-- Silk Bottom Sheet & Backdrop -->
+        <div class="silk-backdrop" id="silkBackdrop"></div>
+        <div class="silk-sheet" id="silkSheet">
+          <div class="sheet-handle"></div>
+          <button type="button" class="sheet-close-btn" id="silkCloseBtn" aria-label="Закрыть">✕</button>
+          <div class="sheet-tag" id="sheetTag">В ФОКУСЕ</div>
+          <h3 class="sheet-title" id="sheetTitle">Название урока</h3>
+          <p class="sheet-desc" id="sheetDesc">Краткое описание дидактического шага.</p>
+          <button type="button" class="sheet-action-btn sheet-action-btn--primary" id="silkBtn">
+            НАЧАТЬ УРОК (2 МИН) ➔
+          </button>
         </div>
 
       </div>
 
-
-
       ${renderFloatingChapterRailHTML(chapterBreakpoints, activeChapterNum)}
-
     </div>`;
-
 }
 
 
@@ -54270,1191 +53767,351 @@ window.renderQuizModal = renderQuizModal;
 // Рефакторинг экрана Дашборда в соответствии с инвариантами активного микрообучения (Active Micro-learning) и дизайн-системой «Вечерний Обсидиан»
 
 viewDashboard = function(){
-
   const tXp = todayXp();
-
   const dailyGoal = state.dailyGoal || 50;
-
   const goalPct = Math.min(100, Math.round(tXp / dailyGoal * 100));
-
   const isZeroXp = tXp === 0;
-
   const currentStreakVal = Number(state.streak || 0);
 
-  const streakDayText = currentStreakVal > 0 ? (isZeroXp ? `🔥 ${currentStreakVal} дн.` : `День ${currentStreakVal + 1} серии`) : 'День 1';
-
-
-
   const e1 = getEchelonProgress(1);
-
   const e2 = getEchelonProgress(2);
-
   const e3 = getEchelonProgress(3);
-
   const e4 = getEchelonProgress(4);
-
   const e1CurMp = e1.skills.reduce((sum, s) => sum + getSkillMP(s.id), 0);
-
   const e1MaxMp = Math.max(1, e1.skills.length * 100);
-
   const e1Pct = Math.min(100, Math.round(e1CurMp / e1MaxMp * 100));
 
-
-
-  // Определение фокусного навыка для карточки быстрого спринта
-
+  // Определение фокусного навыка для карточки спринта
   const openGaps = (state.diagnosticGaps || []).filter(sid => PY_SKILLS_BY_ID[sid] && getSkillMP(sid) < 100);
-
   const activeTierNum = e1.pct < 100 ? 1 : (e2.pct < 100 ? 2 : (e3.pct < 100 ? 3 : 4));
-
   const focusSk = openGaps.length > 0
-
     ? PY_SKILLS_BY_ID[openGaps[0]]
-
     : (getFirstUnmasteredSkillInEchelon(activeTierNum) || ALL_PY_SKILLS[0]);
-
-  const focusKId = (focusSk && focusSk.kIds && focusSk.kIds.find(k => !state.readNotes.includes(k))) || (focusSk && focusSk.kIds && focusSk.kIds[0]) || 'К-001';
-
   const focusSid = focusSk ? focusSk.id : '1.1.1';
 
-
-
   // Звание и статус готовности к интервью
+  let readinessRank = 'Стажёр (Junior <span class="rank-sprout-emoji">🌱</span>)';
+  if(e1Pct >= 100){ readinessRank = 'Готов к тех-скринингу (Junior 1)'; }
+  if(e2.pct >= 100){ readinessRank = 'Стек-разработчик (Junior 2)'; }
+  if(e3.pct >= 100){ readinessRank = 'Прод-разработчик (Junior+)'; }
+  if(e4.pct >= 100){ readinessRank = 'Готов к офферу (Middle)'; }
 
-  let readinessRank = 'Стажёр (Junior <span class="rank-sprout-emoji" style="background:none !important;-webkit-background-clip:initial !important;-webkit-text-fill-color:initial !important;color:initial !important;display:inline-block;vertical-align:0;">🌱</span>)';
-
-  let rankIcon = '🌱';
-
-  if(e1Pct >= 100){ readinessRank = 'Готов к тех-скринингу (Junior 1)'; rankIcon = '🛡️'; }
-
-  if(e2.pct >= 100){ readinessRank = 'Стек-разработчик (Junior 2)'; rankIcon = '⚔️'; }
-
-  if(e3.pct >= 100){ readinessRank = 'Прод-разработчик (Junior+)'; rankIcon = '⚡'; }
-
-  if(e4.pct >= 100){ readinessRank = 'Готов к офферу (Middle)'; rankIcon = '👑'; }
-
-
-
-  // Интервальное повторение (SRS) — единый канонический источник правды
-
-  const srs = getSpacedRepetitionStats();
-
-  const allDecksList = Object.values(ALL_DECKS_COMBINED || {});
-
+  // Интервальное повторение (SRS)
   const dueQueueCards = (typeof collectDueCardsQueue === 'function') ? collectDueCardsQueue() : [];
-
   const dueTodayCardsCount = dueQueueCards.length;
-
-  let hasReviewedAnyCard = false;
-
-  allDecksList.forEach(d => {
-
-    (d.cards || []).forEach((c, cIdx) => {
-
-      const ck = d.id + ':' + cIdx;
-
-      if((state.cardRatings && state.cardRatings[ck] > 0) || (state.cardSrs && state.cardSrs[ck])) hasReviewedAnyCard = true;
-
-    });
-
-  });
-
-  const isSrsAllDone = dueTodayCardsCount === 0;
-
-
-
-  const dueDecks = allDecksList.filter(d => {
-
-    return dueQueueCards.some(item => item.deckId === d.id);
-
-  });
-
+  const allDecksList = Object.values(ALL_DECKS_COMBINED || {});
+  const dueDecks = allDecksList.filter(d => dueQueueCards.some(item => item.deckId === d.id));
   const focusDeckObj = (focusSk && focusSk.deckIds && ALL_DECKS_COMBINED[focusSk.deckIds[0]]) || null;
-
   const targetDeckId = (dueDecks.length > 0 && dueDecks[0].id) || (focusDeckObj && focusDeckObj.id) || (allDecksList[0] && allDecksList[0].id) || '';
 
-
-
-  // Локальный прогресс активного юнита и эшелона
-
+  // Активный юнит
   const activeUnitId = (focusSk && focusSk.unitId) || '1.1';
-
   const activeUnit = (typeof ALL_UNITS_COMBINED !== 'undefined' ? ALL_UNITS_COMBINED.find(u => u.id === activeUnitId) : null) || (PY_MASTERY.units && PY_MASTERY.units[0]);
-
   const curUnitSkills = (activeUnit && activeUnit.skills) || [];
-
+  const curUnitTotal = curUnitSkills.length || 5;
   const curUnitDone = curUnitSkills.filter(s => getSkillMP(s.id) >= 100).length;
 
-  const curUnitTotal = curUnitSkills.length || 5;
-
-  const curUnitMp = curUnitSkills.reduce((sum, s) => sum + getSkillMP(s.id), 0);
-
-  const curUnitMaxMp = Math.max(1, curUnitTotal * 100);
-
-  const curUnitMpPct = Math.round(curUnitMp / curUnitMaxMp * 100);
-
-
-
-  // Название активного юнита без технического префикса «Юнит X.X ·»
-
   const rawUnitTitle = (activeUnit && activeUnit.title) || 'Базовый синтаксис';
-
   const cleanUnitTitle = rawUnitTitle.replace(/^(?:Юнит|Урок|Модуль)\s+[\d.]+\s*[:·•\-–—]?\s*/i, '').replace(/^[·•\-–—]\s*/, '').trim();
 
-
-
-  // Чистое название фокусной темы без технических префиксов и скобок параметров
-
   const cleanTitle = (focusSk && focusSk.title)
-
     ? String(focusSk.title).replace(/^[\d.]+\s*[:·•\-]\s*/i, '').replace(/^[·•\-]\s*/, '').replace(/\s*\([^)]*\)\s*$/, '').trim()
-
     : 'Базовые коллекции и срезы';
 
-
-
-  // Вспомогательная функция для оборачивания синтаксических терминов в моноширинные чипсы (макс. 3-4 ключевых тега)
-
   const formatSkillTitleWithChips = (title, maxTokens = 3) => {
-
     const cleanT = String(title || '').replace(/^[\d.]+\s*[:·•\-]\s*/i, '').replace(/^[·•\-]\s*/, '').trim();
-
     const ftMatch = cleanT.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
-
     if(ftMatch){
-
       const rawTokens = ftMatch[2].split(',').map(tok => tok.trim()).filter(Boolean);
-
-      const conceptTokens = rawTokens.slice(0, maxTokens);
-
-      const conceptChips = conceptTokens.map(cleanTok => {
-
-        return `<span class="focus-code-chip">${escapeHtmlStr(cleanTok)}</span>`;
-
-      }).join(' ');
-
+      const conceptChips = rawTokens.slice(0, maxTokens).map(tok => `<span class="focus-code-chip">${escapeHtmlStr(tok)}</span>`).join(' ');
       return `<span class="dash-theme-title-text">${escapeHtmlStr(ftMatch[1])}</span> <span class="focus-chips-wrap">${conceptChips}</span>`;
-
     }
-
     return `<span class="dash-theme-title-text">${escapeHtmlStr(cleanT)}</span>`;
-
   };
 
+  const focusTitleFormatted = focusSk ? formatSkillTitleWithChips(focusSk.title) : 'Базовые коллекции и срезы';
 
-
-  // 1. Темы текущего активного модуля: статусные индикаторы вместо жестких номеров
-
-  const currentUnitThemesHTML = curUnitSkills.map((s, idx) => {
-
-    const mp = getSkillMP(s.id);
-
-    const isFocusThis = s.id === focusSid;
-
-    const isDoneTheme = mp >= 100;
-
-    const isLockedTheme = mp === 0 && !isFocusThis;
-
-    const formattedTitle = formatSkillTitleWithChips(s.title, 3);
-
-    const stepNumStr = String(idx + 1);
-
-
-
-    let stepStatusIndicator = '';
-
-    let linkAttrs = `href="#/python/skill/${s.id}" class="link-quiet dash-theme-link" style="text-decoration:none;color:inherit;font-weight:600;min-width:0;line-height:1.35;"`;
-
-
-
-    if(isFocusThis){
-
-      stepStatusIndicator = `<span class="dash-theme-status-icon dash-theme-focus-node" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(16,185,129,0.22);border:1px solid rgba(16,185,129,0.45);font-size:.70rem;font-weight:700;color:#34d399;box-shadow:0 0 8px rgba(16,185,129,0.3);flex-shrink:0;" title="Тема в фокусе">${stepNumStr}</span>`;
-
-    } else if(isDoneTheme){
-
-      stepStatusIndicator = `<span class="dash-theme-status-icon" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);font-size:.72rem;font-weight:700;color:#34d399;flex-shrink:0;" title="Тема освоена">✓</span>`;
-
-    } else if(isLockedTheme){
-
-      stepStatusIndicator = `<span class="dash-theme-status-icon" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);font-family:var(--font-m);font-size:.68rem;font-weight:600;color:var(--ink-muted);opacity:0.45;flex-shrink:0;" title="Тема ${idx+1}">${stepNumStr}</span>`;
-
-      linkAttrs = `class="link-quiet dash-theme-link dash-theme-link--locked" style="text-decoration:none;color:inherit;font-weight:600;min-width:0;line-height:1.35;cursor: pointer;" title="Откроется последовательно после завершения предыдущего шага" data-locked-clean-title="${escapeHtmlStr(cleanTitle)}" onclick="showToast('Сначала завершите текущую тему: ' + ${JSON.stringify(cleanTitle).replace(/"/g, '&quot;')}, 'info'); return false;"`;
-
-    } else {
-
-      stepStatusIndicator = `<span class="dash-theme-status-icon" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);font-family:var(--font-m);font-size:.68rem;font-weight:600;color:var(--ink-muted);opacity:0.45;flex-shrink:0;" title="Тема ${idx+1}">${stepNumStr}</span>`;
-
-    }
-
-
-
-    const isLastTheme = idx === curUnitSkills.length - 1;
-
-    const borderBtm = isLastTheme ? '' : 'border-bottom:1px solid rgba(255,255,255,0.04);';
-
-    const rowLockedAttr = isLockedTheme
-
-      ? `data-locked-clean-title="${escapeHtmlStr(cleanTitle)}" style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:8px 12px;${borderBtm}font-size:.82rem;cursor:pointer;border-radius:10px;box-sizing:border-box;"`
-
-      : `style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:8px 12px;${borderBtm}font-size:.82rem;border-radius:10px;box-sizing:border-box;"`;
-
-
-
-    return `
-
-      <div class="dash-accordion-theme-row ${isLockedTheme ? 'dash-accordion-theme-row--locked' : ''} ${isFocusThis ? 'dash-accordion-theme-row--active-focus' : ''}" ${rowLockedAttr}>
-
-        <div class="dash-theme-title-col" style="display:flex;align-items:flex-start;gap:9px;min-width:0;flex:1 1 auto;">
-
-          ${stepStatusIndicator}
-
-          <div class="dash-theme-text-wrap" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;min-width:0;flex:1 1 auto;">
-
-            <a ${linkAttrs}>${formattedTitle}</a>
-
-          </div>
-
-        </div>
-
-        <div class="dash-theme-badge-col" style="display:flex;align-items:flex-start;gap:6px;flex-shrink:0;margin-left:auto;">
-
-          ${isFocusThis
-
-            ? `<span class="badge" style="background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.45);color:var(--moss);padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;white-space:nowrap;box-shadow:0 0 10px rgba(16,185,129,0.25);">В фокусе</span>`
-
-            : (mp === 100
-
-                ? `<span class="state-tag state-tag--mastered" style="font-size:.70rem;margin:0;white-space:nowrap;">✓ 100 MP</span>`
-
-                : (mp === 0
-
-                    ? `<span class="meta dash-step-locked-badge" style="font-size:.72rem;padding:2px 7px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#cbd5e1;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;" title="Откроется последовательно после завершения предыдущего шага"><span class="dash-step-locked-badge-desk">🔒 Закрыто</span><span class="dash-step-locked-badge-mob">🔒</span></span>`
-
-                    : `<span class="meta" style="font-size:.72rem;white-space:nowrap;">${mp} MP</span>`
-
-                  )
-
-              )
-
-          }
-
-        </div>
-
-      </div>
-
-    `;
-
-  }).join('');
-
-
-
-  // Заголовок карточки фокуса: чистое название без технического префикса `${focusSk.id} ·`
-
-  let focusTitleFormatted = '';
-
-  if(focusSk){
-
-    focusTitleFormatted = formatSkillTitleWithChips(focusSk.title);
-
-  } else {
-
-    focusTitleFormatted = 'Базовые коллекции и срезы';
-
-  }
-
-
-
-  // Индекс активной темы в текущем модуле для надзаголовка
-
-  const curSkillIndex = curUnitSkills.findIndex(s => s.id === focusSid);
-
-  const curSkillNum = curSkillIndex >= 0 ? curSkillIndex + 1 : 1;
-
-  const curSkillTotal = curUnitSkills.length || 3;
-
-  const focusEyebrowText = `● ${cleanUnitTitle.toUpperCase()}`;
-
-
-
-  // Ювелирная цепочка микро-шагов: строго 13 бусин (3 теории + 3 карточек + 6 практики + 1 зачёт)
-
+  // 4 Макро-этапа темы: 3 теории + 3 карточек + 6 практики + 1 зачёт
   const allKIds = (focusSk && focusSk.kIds && focusSk.kIds.length) ? [...focusSk.kIds] : ['К-001', 'К-002', 'К-003'];
-
-  while(allKIds.length < 3){
-
-    allKIds.push(`К-${String(allKIds.length + 1).padStart(3, '0')}`);
-
-  }
-
-  const focusKIds = allKIds.slice(0, 3); // Ровно 3 бусины Теории
-
-
-
-  // Формирование списка карточек темы (ровно 3 бусины Карточек динамически без хардкода)
+  while(allKIds.length < 3) allKIds.push(`К-${String(allKIds.length + 1).padStart(3, '0')}`);
+  const focusKIds = allKIds.slice(0, 3);
 
   const rawFIds = (focusSk && focusSk.fIds && focusSk.fIds.length)
-
     ? [...focusSk.fIds]
-
     : ((focusSk && focusSk.deckIds && focusSk.deckIds.length) ? [...focusSk.deckIds] : ['Ф-001', 'Ф-002', 'Ф-003']);
-
-  while(rawFIds.length < 3){
-
-    rawFIds.push(`Ф-${String(rawFIds.length + 1).padStart(3, '0')}`);
-
-  }
-
+  while(rawFIds.length < 3) rawFIds.push(`Ф-${String(rawFIds.length + 1).padStart(3, '0')}`);
   const curFList = rawFIds.slice(0, 3);
 
-  const cardList = curFList.map(fId => {
-
-    const d = (typeof ALL_DECKS_COMBINED !== 'undefined' && ALL_DECKS_COMBINED[fId]) || {};
-
-    const t = (d.title || fId).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
-
-    return { id: fId, title: `Карточки: ${t}` };
-
-  });
-
-  const focusFIds = cardList.map(c => c.id);
-
-
-
-  // Формирование списка задач практики (ровно 6 ключевых задач практики: 3 + 3 + 6 + 1 = 13 бусин)
-
   const defaultTrackTasks = [20, 19, 39, 255, 258, 259];
-
   const allTIds = (focusSk && focusSk.taskIds && focusSk.taskIds.length) ? [...focusSk.taskIds] : defaultTrackTasks;
-
   const firstUnsolvedTIdx = allTIds.findIndex(t => !(state.taskCodeHistory && state.taskCodeHistory[t]));
-
   const startT = firstUnsolvedTIdx === -1 ? Math.max(0, allTIds.length - 6) : Math.min(Math.max(0, firstUnsolvedTIdx), Math.max(0, allTIds.length - 6));
-
   let focusTIds = allTIds.length >= 6 ? allTIds.slice(startT, startT + 6) : [...allTIds];
-
-  if(focusTIds.length < 6){
-
-    for(const dt of defaultTrackTasks){
-
-      if(!focusTIds.includes(dt)){
-
-        focusTIds.push(dt);
-
-        if(focusTIds.length === 6) break;
-
-      }
-
-    }
-
-    let fallbackId = 1;
-
-    while(focusTIds.length < 6){
-
-      if(!focusTIds.includes(fallbackId)) focusTIds.push(fallbackId);
-
-      fallbackId++;
-
-    }
-
-  }
-
-
+  while(focusTIds.length < 6) focusTIds.push(defaultTrackTasks[focusTIds.length] || 1);
 
   const isUnitExamPassed = Boolean(state.unitTests && state.unitTests[activeUnitId]);
-
-
-
-  // Определение активных элементов по фазам
-
   const firstUnreadK = focusKIds.find(k => !state.readNotes.includes(k));
-
-  const firstUnreviewedF = !firstUnreadK ? (cardList.find(c => !state.reviewedDecks.includes(c.id))?.id || null) : null;
-
+  const firstUnreviewedF = !firstUnreadK ? (curFList.find(c => !state.reviewedDecks.includes(c)) || null) : null;
   const firstUnsolvedT = (!firstUnreadK && !firstUnreviewedF) ? focusTIds.find(t => !(state.taskCodeHistory && state.taskCodeHistory[t])) : null;
 
-  const isAllPreExamDone = !firstUnreadK && !firstUnreviewedF && !firstUnsolvedT;
+  // Расчет прогресса для 4 макро-этапов
+  const doneTheoryCount = focusKIds.filter(k => state.readNotes.includes(k)).length;
+  const isTheoryDone = isUnitExamPassed || (!firstUnreadK && doneTheoryCount >= 3);
+  const isTheoryActive = Boolean(firstUnreadK);
 
+  const doneCardsCount = curFList.filter(f => state.reviewedDecks.includes(f)).length;
+  const isCardsDone = isUnitExamPassed || (!firstUnreadK && !firstUnreviewedF);
+  const isCardsActive = Boolean(!firstUnreadK && firstUnreviewedF);
 
+  const donePracticeCount = focusTIds.filter(t => state.taskCodeHistory && state.taskCodeHistory[t]).length;
+  const isPracticeDone = isUnitExamPassed || (!firstUnreadK && !firstUnreviewedF && !firstUnsolvedT);
+  const isPracticeActive = Boolean(!firstUnreadK && !firstUnreviewedF && firstUnsolvedT);
 
-  const theoryDoneCount = focusKIds.filter(k => state.readNotes.includes(k)).length;
-
-  const remainingSteps = Math.max(1, 3 - theoryDoneCount);
-
-  const stepsText = remainingSteps === 1 ? 'микро-шаг' : 'микро-шага';
-
-
-
-  const curKIdx = firstUnreadK ? focusKIds.indexOf(firstUnreadK) : focusKIds.length;
-
-  const curFIdx = firstUnreviewedF ? cardList.findIndex(c => c.id === firstUnreviewedF) : cardList.length;
-
-  const curTIdx = firstUnsolvedT ? focusTIds.indexOf(firstUnsolvedT) : focusTIds.length;
-
-
-
-  // Определение единого глобального индекса активного шага:
-
-  // [0 .. focusKIds.length - 1] -> теория
-
-  // [focusKIds.length .. focusKIds.length + cardList.length - 1] -> карточки
-
-  // [focusKIds.length + cardList.length .. + focusTIds.length - 1] -> практика
-
-  // [последний индекс] -> зачёт
-
-  let activeGlobalStepIdx = -1;
-
-  if(firstUnreadK){
-
-    activeGlobalStepIdx = curKIdx;
-
-  } else if(firstUnreviewedF){
-
-    activeGlobalStepIdx = focusKIds.length + curFIdx;
-
-  } else if(firstUnsolvedT){
-
-    activeGlobalStepIdx = focusKIds.length + cardList.length + curTIdx;
-
-  } else if(!isUnitExamPassed){
-
-    activeGlobalStepIdx = focusKIds.length + cardList.length + focusTIds.length;
-
-  } else {
-
-    activeGlobalStepIdx = 9999; // Все выполнено
-
-  }
-
-
+  const isExamActive = Boolean(!firstUnreadK && !firstUnreviewedF && !firstUnsolvedT && !isUnitExamPassed);
 
   const focusTr = focusSk ? getTrackForSkill(focusSk.id) : null;
-
   const focusTrackKey = (focusTr && focusTr.key) || 'python';
 
+  // Определение активного шага темы (1 из 4)
+  const currentStageNum = isTheoryActive ? 1 : (isCardsActive ? 2 : (isPracticeActive ? 3 : 4));
 
-
-  // Гармоничные векторные SVG-иконки для фаз карточки фокуса
-
-  const phaseTheorySvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:5px;flex-shrink:0;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>`;
-
-  const phaseCardsSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:5px;flex-shrink:0;"><rect x="3" y="6" width="14" height="15" rx="2"></rect><path d="M7 2h12a2 2 0 0 1 2 2v13"></path></svg>`;
-
-  const phasePracticeSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:5px;flex-shrink:0;"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>`;
-
-  const phaseQuizSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:5px;flex-shrink:0;"><path d="M10 2v7.31L4.1 19.46A2 2 0 0 0 5.8 22h12.4a2 2 0 0 0 1.7-2.54L14 9.31V2"></path><path d="M8.5 2h7"></path><path d="M7 16h10"></path></svg>`;
-
-
-
-  let focusContextText = '';
-
-  let focusCtaHTML = '';
+  // Single Dominant CTA конфигурация
+  let ctaLabel = 'Продолжить';
+  let ctaBadge = '+15 XP ⚡';
+  let ctaAttrs = '';
+  let activeStageSubtext = '';
 
   if(firstUnreadK){
-
-    const savedReading = (state.readingPositions && state.readingPositions[focusSid]) || {};
-
-    const hasAnyRead = (state.readNotes && state.readNotes.length > 0 && state.readNotes.some(k => focusKIds.includes(k)));
-
-    const isStarted = Boolean(hasAnyRead || curKIdx > 0 || (savedReading.stepIdx && savedReading.stepIdx > 0) || (savedReading.chunkIdx && savedReading.chunkIdx > 0));
-
-    const ctaLabel = 'Продолжить';
-
-    let stepPhaseName = 'Интуиция и основы';
-
-    if(curKIdx === 1){
-
-      stepPhaseName = 'Ключевые нюансы';
-
-    } else if(curKIdx >= 2){
-
-      stepPhaseName = 'Закрепление темы';
-
-    }
-
-    const currentStepNum = curKIdx + 1;
-
-    focusContextText = `Шаг ${currentStepNum} из 13 · ${stepPhaseName}`;
-
-    focusCtaHTML = `<div class="focus-cta-wrap"><button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta cocoon-focus-cta" data-quick-microstep="${focusSid}" data-quick-kid="${firstUnreadK}"><span class="cocoon-focus-cta-label">${ctaLabel}</span><span class="cocoon-focus-cta-right"><span class="btn-reward-badge">+15&nbsp;XP ⚡</span><span class="btn-cta-arrow">➔</span></span></button></div>`;
-
+    ctaLabel = `Продолжить: Теория — Шаг ${doneTheoryCount + 1}`;
+    ctaBadge = '+15 XP ⚡';
+    ctaAttrs = `class="linear-cta-btn cocoon-focus-cta" data-quick-microstep="${focusSid}" data-quick-kid="${firstUnreadK}"`;
+    activeStageSubtext = `Интуиция синтаксиса · микро-шаг ${doneTheoryCount + 1} из 3`;
   } else if(firstUnreviewedF){
-
-    const cardStepNum = focusKIds.length + curFIdx + 1;
-
-    focusContextText = `Шаг ${cardStepNum} из 13 · Закрепление в карточках`;
-
-    focusCtaHTML = `<div class="focus-cta-wrap"><a href="#/cards" data-srs-open-deck="${firstUnreviewedF}" class="btn-glass-emerald btn-sprint-cta btn-dominant-cta cocoon-focus-cta"><span class="cocoon-focus-cta-label">Повторить карточки</span><span class="cocoon-focus-cta-right"><span class="btn-reward-badge">+10&nbsp;XP ⚡</span><span class="btn-cta-arrow">➔</span></span></a></div>`;
-
+    ctaLabel = `Продолжить: Флеш-карточки темы`;
+    ctaBadge = '+10 XP ⚡';
+    ctaAttrs = `href="#/cards" data-srs-open-deck="${firstUnreviewedF}" class="linear-cta-btn cocoon-focus-cta"`;
+    activeStageSubtext = `Интервальное закрепление понятий в карточках`;
   } else if(firstUnsolvedT){
-
-    const practiceStepNum = focusKIds.length + cardList.length + curTIdx + 1;
-
-    focusContextText = `Шаг ${practiceStepNum} из 13 · Задачи в IDE`;
-
-    focusCtaHTML = `<div class="focus-cta-wrap"><a href="#/practice?task=${firstUnsolvedT}" class="btn-glass-emerald btn-sprint-cta btn-dominant-cta cocoon-focus-cta"><span class="cocoon-focus-cta-label">Решить задачу в IDE</span><span class="cocoon-focus-cta-right"><span class="btn-reward-badge">+15&nbsp;XP ⚡</span><span class="btn-cta-arrow">➔</span></span></a></div>`;
-
+    ctaLabel = `Решить задачу в Zen IDE (Задача ${donePracticeCount + 1}/6)`;
+    ctaBadge = '+15 XP ⚡';
+    ctaAttrs = `href="#/practice?task=${firstUnsolvedT}" class="linear-cta-btn cocoon-focus-cta"`;
+    activeStageSubtext = `Практическое решение на чистом Python в Zen IDE`;
+  } else if(!isUnitExamPassed){
+    ctaLabel = `Сдать рубежный тест юнита`;
+    ctaBadge = '+50 XP ⚡';
+    ctaAttrs = `class="linear-cta-btn cocoon-focus-cta" data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}"`;
+    activeStageSubtext = `Рубежная проверка mastery-освоения темы`;
   } else {
-
-    focusContextText = `Шаг 13 из 13 · Рубежный тест`;
-
-    focusCtaHTML = `<div class="focus-cta-wrap"><button class="btn-glass-emerald btn-sprint-cta btn-dominant-cta cocoon-focus-cta" data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}"><span class="cocoon-focus-cta-label">Начать рубежный тест</span><span class="cocoon-focus-cta-right"><span class="btn-reward-badge">+50&nbsp;XP ⚡</span><span class="btn-cta-arrow">➔</span></span></button></div>`;
-
+    ctaLabel = `Продолжить на Тропе обучения`;
+    ctaBadge = '+20 XP ⚡';
+    ctaAttrs = `href="#/path" class="linear-cta-btn cocoon-focus-cta"`;
+    activeStageSubtext = `Все этапы темы закрыты на 100%!`;
   }
 
-
-
-  // 1. Точки Кластера «Теория»
-
-  const theoryDots = [];
-
-  focusKIds.forEach((kId, idx) => {
-
-    const globalIdx = idx;
-
-    const isDone = isUnitExamPassed || (globalIdx < activeGlobalStepIdx);
-
-    const isActive = (globalIdx === activeGlobalStepIdx);
-
-    const cls = isDone ? 'done' : (isActive ? 'active' : '');
-
-    const n = (typeof ALL_NOTES_COMBINED !== 'undefined' && ALL_NOTES_COMBINED[kId]) || { title: kId };
-
-    const title = (n.title || kId).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-
-    theoryDots.push(`<span class="dot-jewel ${cls}" title="Теория: ${escapeHtmlStr(title)}" data-quick-microstep="${focusSid}" data-quick-kid="${kId}"></span>`);
-
-  });
-
-
-
-  // 2. Точки Кластера «Карточки»
-
-  const cardDots = [];
-
-  cardList.forEach((s, idx) => {
-
-    const isActive = Boolean(!firstUnreadK && firstUnreviewedF === s.id);
-
-    const globalIdx = focusKIds.length + idx;
-
-    const isDone = isUnitExamPassed || (globalIdx < activeGlobalStepIdx);
-
-    const cls = isDone ? 'done' : (isActive ? 'active' : '');
-
-    cardDots.push(`<span class="dot-jewel ${cls}" title="${escapeHtmlStr(s.title)}" data-srs-open-deck="${s.id}"></span>`);
-
-  });
-
-
-
-  // 3. Точки Кластера «Практика»
-
-  const taskShortTitles = {
-
-    20: 'Срезы списков',
-
-    19: 'Диагональный срез матрицы',
-
-    39: 'Отрицательные индексы',
-
-    255: 'Комбинированные срезы',
-
-    258: 'Сравнение list и tuple',
-
-    259: 'Генераторы списков'
-
-  };
-
-  const practiceDots = [];
-
-  focusTIds.forEach((tId, idx) => {
-
-    const globalIdx = focusKIds.length + cardList.length + idx;
-
-    const isDone = isUnitExamPassed || (globalIdx < activeGlobalStepIdx);
-
-    const isActive = (globalIdx === activeGlobalStepIdx);
-
-    const cls = isDone ? 'done' : (isActive ? 'active' : '');
-
-    const shortT = taskShortTitles[tId] || (typeof IDE_TASKS_BY_ID !== 'undefined' && IDE_TASKS_BY_ID[tId] && IDE_TASKS_BY_ID[tId].title) || 'Практическое задание';
-
-    const extraStyle = '';
-
-    practiceDots.push(`<span class="dot-jewel ${cls}" ${extraStyle} title="Практика: ${escapeHtmlStr(shortT)}" data-open-practice-task="${tId}"></span>`);
-
-  });
-
-
-
-  // 4. Точка Кластера «Зачёт»
-
-  const examGlobalIdx = focusKIds.length + cardList.length + focusTIds.length;
-
-  const isExamDone = isUnitExamPassed || (examGlobalIdx < activeGlobalStepIdx);
-
-  const isExamActive = (examGlobalIdx === activeGlobalStepIdx);
-
-  const examCls = isExamDone ? 'done' : (isExamActive ? 'active' : '');
-
-  const examDot = `<span class="dot-jewel milestone ${examCls}" title="Итоговый зачёт темы" data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}"></span>`;
-
-
-
-  // Кластерная структура трекера со сверхкомпактными иконками и полноэкранной адаптацией
-
-  const focusMiniTrackHTML = `
-
-    <div class="dots-necklace-container" style="margin: 12px 0 16px;">
-
-      <div class="tracker-clusters-wrap">
-
-        <div class="tracker-cluster" data-quick-microstep="${focusSid}" data-quick-kid="${firstUnreadK || focusKIds[0]}" style="cursor:pointer;">
-
-          <span class="tracker-cluster-label" data-quick-microstep="${focusSid}" data-quick-kid="${firstUnreadK || focusKIds[0]}" style="cursor:pointer;" title="Теория">
-
-            <span class="cluster-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:2px;">
-
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-
-              </svg>
-
-            </span>
-
-            <span class="cluster-label-text">Теория</span>
-
-          </span>
-
-          <div class="tracker-cluster-dots">
-
-            ${theoryDots.join('')}
-
-          </div>
-
-        </div>
-
-
-
-        <span class="dots-phase-divider"></span>
-
-
-
-        <div class="tracker-cluster" data-srs-open-deck="${firstUnreviewedF || focusFIds[0]}" style="cursor:pointer;">
-
-          <span class="tracker-cluster-label" data-srs-open-deck="${firstUnreviewedF || focusFIds[0]}" style="cursor:pointer;" title="Карточки">
-
-            <span class="cluster-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:2px;">
-
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-
-                <rect x="3" y="6" width="14" height="15" rx="2"></rect>
-
-                <path d="M7 2h12a2 2 0 0 1 2 2v13"></path>
-
-              </svg>
-
-            </span>
-
-            <span class="cluster-label-text">Карточки</span>
-
-          </span>
-
-          <div class="tracker-cluster-dots">
-
-            ${cardDots.join('')}
-
-          </div>
-
-        </div>
-
-
-
-        <span class="dots-phase-divider"></span>
-
-
-
-        <div class="tracker-cluster" data-open-practice-task="${firstUnsolvedT || focusTIds[0]}" style="cursor:pointer;">
-
-          <span class="tracker-cluster-label" data-open-practice-task="${firstUnsolvedT || focusTIds[0]}" style="cursor:pointer;" title="Практика">
-
-            <span class="cluster-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:2px;">
-
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-
-                <polyline points="4 17 10 11 4 5"></polyline>
-
-                <line x1="12" y1="19" x2="20" y2="19"></line>
-
-              </svg>
-
-            </span>
-
-            <span class="cluster-label-text">Практика</span>
-
-          </span>
-
-          <div class="tracker-cluster-dots">
-
-            ${practiceDots.join('')}
-
-          </div>
-
-        </div>
-
-
-
-        <span class="dots-phase-divider"></span>
-
-
-
-        <div class="tracker-cluster" data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}" style="cursor:pointer;">
-
-          <span class="tracker-cluster-label" data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}" style="cursor:pointer;" title="Зачёт">
-
-            <span class="cluster-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:2px;">
-
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-
-                <path d="M10 2v7.31L4.1 19.46A2 2 0 0 0 5.8 22h12.4a2 2 0 0 0 1.7-2.54L14 9.31V2"></path>
-
-                <path d="M8.5 2h7"></path>
-
-                <path d="M7 16h10"></path>
-
-              </svg>
-
-            </span>
-
-            <span class="cluster-label-text">Зачёт</span>
-
-          </span>
-
-          <div class="tracker-cluster-dots">
-
-            ${examDot}
-
-          </div>
-
-        </div>
-
+  // Linear Stepper HTML (4 благородных макро-этапа)
+  const linearStepperHTML = `
+    <div class="linear-stepper-grid">
+      <!-- 01: Теория -->
+      <div class="linear-step-card ${isTheoryDone ? 'done' : (isTheoryActive ? 'active' : '')}"
+           data-quick-microstep="${focusSid}" data-quick-kid="${firstUnreadK || focusKIds[0]}"
+           title="Теория: 3 микро-конспекта">
+        <div class="linear-step-num">01 ТЕОРИЯ</div>
+        <div class="linear-step-title"><span>📖</span> <span>Конспекты</span></div>
+        <div class="linear-step-status">${isTheoryDone ? '3/3 закрыто ✓' : (isTheoryActive ? `${doneTheoryCount}/3 в фокусе ➔` : `${doneTheoryCount}/3 готово`)}</div>
       </div>
 
-    </div>
+      <!-- 02: Карточки -->
+      <a href="#/cards" ${targetDeckId ? `data-srs-open-deck="${targetDeckId}"` : ''}
+         class="linear-step-card ${isCardsDone ? 'done' : (isCardsActive ? 'active' : '')}"
+         title="Флеш-карточки темы">
+        <div class="linear-step-num">02 КАРТОЧКИ</div>
+        <div class="linear-step-title"><span>🗂️</span> <span>Карточки</span></div>
+        <div class="linear-step-status">${isCardsDone ? '3/3 закрыто ✓' : (isCardsActive ? `${doneCardsCount}/3 в фокусе ➔` : `${doneCardsCount}/3 готово`)}</div>
+      </a>
 
+      <!-- 03: Практика -->
+      <a href="#/practice?task=${firstUnsolvedT || focusTIds[0]}"
+         class="linear-step-card ${isPracticeDone ? 'done' : (isPracticeActive ? 'active' : '')}"
+         title="Практика в Zen IDE: 6 задач">
+        <div class="linear-step-num">03 ПРАКТИКА</div>
+        <div class="linear-step-title"><span>💻</span> <span>Zen IDE</span></div>
+        <div class="linear-step-status">${isPracticeDone ? '6/6 решено ✓' : (isPracticeActive ? `${donePracticeCount}/6 в фокусе ➔` : `${donePracticeCount}/6 задач`)}</div>
+      </a>
+
+      <!-- 04: Зачёт -->
+      <div class="linear-step-card milestone ${isUnitExamPassed ? 'done' : (isExamActive ? 'active' : '')}"
+           data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}"
+           title="Рубежный тест юнита">
+        <div class="linear-step-num">04 ЗАЧЁТ</div>
+        <div class="linear-step-title"><span>⚡</span> <span>Экзамен</span></div>
+        <div class="linear-step-status">${isUnitExamPassed ? 'Сдан ✓' : (isExamActive ? 'Готов к сдаче ➔' : 'Рубежный тест')}</div>
+      </div>
+    </div>
   `;
 
-
-
-  // Порционный микро-шаг SRS: не пугать десятками/сотнями карточек, предлагать порцию в 5 карточек
-
-  const srsExpressCount = Math.min(5, dueTodayCardsCount);
-
-  const srsSubtitle = dueTodayCardsCount > 0
-
-    ? `Экспресс-повтор: ${srsExpressCount} карточек · ${escapeHtmlStr(cleanTitle)}`
-
-    : 'Все карточки на сегодня повторены!';
-
-
-
-  // Контекстная подсказка до дневной нормы
-
+  // Подсказка до дневной нормы XP
   const remainingGoalXp = Math.max(0, dailyGoal - tXp);
-
   const remainingGoalSteps = Math.ceil(remainingGoalXp / 15);
-
   const stepsWord = (remainingGoalSteps === 1) ? 'шаг' : (remainingGoalSteps >= 2 && remainingGoalSteps <= 4 ? 'шага' : 'шагов');
-
   const goalMicroHintText = remainingGoalSteps > 0
-
     ? (tXp === 0
-
-        ? (currentStreakVal > 0 ? `Первый шаг продлит серию до 🔥 <b>${currentStreakVal + 1} дн.</b>` : `Сделайте первый шаг дня ⚡`)
-
+        ? (currentStreakVal > 0 ? `🔥 <b>${currentStreakVal} дн.</b> подряд · сделайте шаг дня` : `Сделайте первый шаг дня ⚡`)
         : `⚡ 1 шаг = +15 XP · До цели: <b>${remainingGoalSteps}&nbsp;${stepsWord}</b>`)
+    : `⚡ Дневная норма выполнена!`;
 
-    : `⚡ Дневная цель выполнена! Отличный темп`;
+  // Список тем текущего модуля для таблицы спойлера
+  const linearThemeRowsHTML = curUnitSkills.map((s, idx) => {
+    const mp = getSkillMP(s.id);
+    const isFocusThis = s.id === focusSid;
+    const isDoneTheme = mp >= 100;
+    const isLockedTheme = mp === 0 && !isFocusThis;
+    const cleanT = String(s.title || '').replace(/^[\d.]+\s*[:·•\-]\s*/i, '').replace(/^[·•\-]\s*/, '').trim();
 
-
-
-  // Активный статус в аккордеоне тем без технического префикса «Юнит X.X»
-
-  const curUnitDoneCount = curUnitSkills.filter(s => getSkillMP(s.id) >= 100).length;
-
-  const lockedCount = Math.max(0, curUnitTotal - (curUnitDoneCount > 0 ? curUnitDoneCount : 1));
-
-  const accordionStatusText = curUnitDoneCount > 0
-
-    ? `${curUnitDoneCount} из ${curUnitTotal} тем освоено`
-
-    : `1 в фокусе · ${lockedCount} закрыты`;
-
-  const accordionMobStatusText = curUnitDoneCount > 0
-
-    ? `${curUnitDoneCount}/${curUnitTotal} освоено`
-
-    : `1 в фокусе · ${lockedCount} закрыты`;
-
-  const srsMobTitle = cleanTitle.includes(' и ') ? cleanTitle.split(' и ')[0].trim() : (cleanTitle.length > 22 ? cleanTitle.slice(0, 20).trim() + '…' : cleanTitle);
-
-
+    return `
+      <div class="linear-row ${isFocusThis ? 'active' : ''}"
+           ${isLockedTheme ? `onclick="showToast('Сначала завершите текущую тему: ' + ${JSON.stringify(cleanTitle).replace(/"/g, '&quot;')}, 'info');"` : `onclick="location.hash='#/python/skill/${s.id}';"`}>
+        <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+          <span style="font-family:var(--font-m);font-size:0.72rem;color:${isDoneTheme ? '#34d399' : (isFocusThis ? '#34d399' : 'var(--ink-muted)')};flex-shrink:0;">
+            ${isDoneTheme ? '✓' : (isFocusThis ? '●' : String(idx + 1).padStart(2, '0'))}
+          </span>
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:${isFocusThis ? '700' : '500'};color:${isFocusThis ? '#34d399' : (isLockedTheme ? 'var(--ink-muted)' : 'var(--ink)')};">
+            ${escapeHtmlStr(cleanT)}
+          </span>
+        </div>
+        <div style="flex-shrink:0;margin-left:10px;">
+          ${isFocusThis
+            ? `<span style="font-family:var(--font-m);font-size:0.70rem;background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.4);padding:2px 7px;border-radius:6px;color:#34d399;font-weight:700;">В фокусе</span>`
+            : (isDoneTheme
+                ? `<span style="font-family:var(--font-m);font-size:0.70rem;color:#34d399;font-weight:600;">100 MP</span>`
+                : `<span style="font-family:var(--font-m);font-size:0.70rem;color:var(--ink-muted);">🔒</span>`
+              )
+          }
+        </div>
+      </div>
+    `;
+  }).join('');
 
   return `
-
     <div class="container dashboard-container">
 
-      <!-- Зона 1: Шапка Эшелона (.echelon-topbar-clean) -->
-
-      <div class="echelon-topbar-clean" style="padding:14px 18px;border-radius:18px;margin-bottom:14px;display:flex;flex-direction:column;gap:10px;background:rgba(18, 22, 31, 0.65);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255, 255, 255, 0.08);box-shadow:var(--shadow-1);">
-
-        <!-- Ряд 1: Звание и эшелон слева, аудио-компаньон справа -->
-
-        <div class="echelon-topbar-row-top" style="display:flex;justify-content:space-between;align-items:center;width:100%;gap:10px;">
-
-          <div class="echelon-title-group" style="display:flex;align-items:baseline;gap:10px;min-width:0;flex-wrap:wrap;">
-
-            <h1 class="rank-title-glow echelon-bordeaux-title" style="margin:0;font-size:1.24rem;">${readinessRank}</h1>
-
-            <span class="meta echelon-tier-tag" style="font-size:.74rem;color:var(--ink-muted);white-space:nowrap;">Эшелон 1 · Фундамент</span>
-
-          </div>
-
-          <div class="echelon-topbar-actions" style="display:inline-flex;align-items:center;gap:8px;flex-shrink:0;">
-
-            <button class="topbar-audio-btn btn btn-ghost-quiet" id="dashAudioCompanionBtn" title="Голосовой брифинг Сократа" aria-label="Голосовой наставник Сократ" style="padding:5px 10px;border-radius:10px;font-size:.80rem;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(12px);color:var(--ink-muted);cursor:pointer;transition:all .2s ease;">
-
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;flex-shrink:0;">
-
-                <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
-
-                <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
-
-              </svg>
-
-              <span class="topbar-audio-text">Брифинг</span>
-
-            </button>
-
-          </div>
-
+      <!-- Топбар Эшелона Linear -->
+      <div class="echelon-topbar-clean" style="padding:12px 18px;border-radius:18px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;background:rgba(18,22,31,0.65);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.08);box-shadow:var(--shadow-1);">
+        <div style="display:flex;align-items:center;gap:12px;min-width:0;flex-wrap:wrap;">
+          <h1 class="rank-title-glow echelon-bordeaux-title" style="margin:0;font-size:1.18rem;">${readinessRank}</h1>
+          <span class="meta" style="font-size:0.76rem;color:var(--ink-muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:3px 9px;border-radius:8px;">
+            Эшелон 1 · Готовность: <b style="color:#34d399;">${e1Pct}%</b>
+          </span>
         </div>
-
-
-
-        <!-- Прогресс эшелона: лаконичный трек с чистым заголовком -->
-
-        <div class="echelon-clean-wrap" style="width:100%;" title="Готовность к 1-му тех-скринингу">
-
-          <div class="echelon-clean-meta" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:nowrap;margin-bottom:6px;">
-
-            ${e1CurMp === 0
-
-              ? `<span class="echelon-readiness-emerald" style="font-weight:700;font-size:.82rem;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-
-                  <span class="echelon-label-full">Готовность к тех-скринингу</span>
-
-                  <span class="echelon-label-mobile">Тех-скрининг</span>
-
-                </span>
-
-                <span class="meta echelon-mp-counter" style="font-size:.74rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:2px 7px;border-radius:6px;white-space:nowrap;flex-shrink:0;">Тема 1 из ${curUnitTotal}</span>`
-
-              : `<span class="echelon-readiness-emerald" style="font-weight:700;font-size:.82rem;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-
-                  <span class="echelon-label-full">Готовность к тех-скринингу: ${e1Pct}%</span>
-
-                  <span class="echelon-label-mobile">Тех-скрининг: ${e1Pct}%</span>
-
-                </span>
-
-                <span class="meta echelon-mp-counter" style="font-size:.74rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:2px 7px;border-radius:6px;white-space:nowrap;flex-shrink:0;">${curUnitDone === 0 ? `Тема 1 из ${curUnitTotal}` : `${curUnitDone} из ${curUnitTotal} тем`}</span>`
-
-            }
-
-          </div>
-
-          <div class="echelon-clean-track ${e1CurMp === 0 ? 'is-zero' : ''}" style="height:6px;border-radius:999px;position:relative;box-shadow:inset 0 1px 2px rgba(0,0,0,0.4);${e1CurMp === 0 ? 'background:rgba(255, 255, 255, 0.06);' : 'background:rgba(255,255,255,0.08);'}">
-
-            ${e1CurMp === 0
-
-              ? `<div class="echelon-clean-fill" style="width:0%;"></div>`
-
-              : `<div class="echelon-clean-fill" style="width:${e1Pct}%;height:100%;border-radius:999px;background:linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%);box-shadow:0 0 12px rgba(16,185,129,0.5);transition:width .35s ease;"></div>`
-
-            }
-
-          </div>
-
-        </div>
-
+        <button class="topbar-audio-btn btn btn-ghost-quiet" id="dashAudioCompanionBtn" title="Голосовой брифинг Сократа" aria-label="Голосовой наставник Сократ" style="padding:6px 12px;border-radius:10px;font-size:0.78rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:var(--ink-muted);cursor:pointer;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+            <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+          </svg>
+          <span>Брифинг</span>
+        </button>
       </div>
 
-
-
-      <!-- Зона 2: Главная карточка Фокуса (Single Dominant Hero Card) -->
-
-      <div class="cocoon-focus-card">
-
-        <div class="cocoon-focus-eyebrow" style="display:inline-flex;width:fit-content;max-width:100%;align-items:center;gap:7px;font-size:.74rem;font-weight:800;letter-spacing:0.06em;color:#34d399;text-transform:uppercase;margin-bottom:8px;padding:4px 12px;border-radius:999px;">
-
-          <span class="pulse-ring-dot"></span> ${focusEyebrowText.replace(/^●\s*/, '')}
-
+      <!-- Главная Hero-карточка Фокуса (Linear Developer Style) -->
+      <div class="linear-hero-card cocoon-focus-card">
+        <div class="linear-eyebrow-row">
+          <span class="linear-eyebrow-chip">
+            <span class="linear-pulse-dot"></span> МОДУЛЬ · ${cleanUnitTitle.toUpperCase()}
+          </span>
+          <span style="font-family:var(--font-m);font-size:0.74rem;color:var(--ink-muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);padding:3px 9px;border-radius:8px;">
+            Этап ${currentStageNum} из 4
+          </span>
         </div>
 
-        <div class="cocoon-focus-title">
-
+        <h2 class="linear-title cocoon-focus-title">
           ${focusTitleFormatted}
-
+        </h2>
+        <div class="linear-subtitle meta">
+          ${activeStageSubtext}
         </div>
 
-        <div class="meta" style="font-size:.82rem;color:var(--ink-muted);margin-bottom:8px;text-wrap:balance;line-height:1.4;">
-
-          ${focusContextText}
-
-        </div>
-
-        ${focusMiniTrackHTML}
-
-        ${focusCtaHTML}
-
-      </div>
-
-
-
-      <!-- Зона 3: Компактный суточный пульс (Rhythm & SRS Grid — 2 колонки) -->
-
-      <div class="dash-pulse-grid">
-
-        <!-- Левая колонка: Дневная цель + ритм недели -->
-
-        <div class="dash-pulse-card">
-
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;flex-wrap:wrap;min-width:0;">
-
-            ${tXp === 0
-
-              ? `<span style="font-weight:700;font-size:.88rem;color:var(--ink);display:inline-flex;align-items:center;gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;flex-shrink:0;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg> Цель дня: ${dailyGoal} XP</span>
-
-                 <span class="badge" data-quick-microstep="${focusSid}" data-quick-kid="${firstUnreadK}" style="font-weight:600;font-size:.72rem;color:#fbbf24;background:rgba(245,158,11,0.10);border:1px dashed rgba(245,158,11,0.45);padding:2px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;" title="${currentStreakVal > 0 ? `Завершите 1 шаг сегодня, чтобы продлить серию до ${currentStreakVal + 1} дн.` : 'Начать первый шаг дня'}">${currentStreakVal > 0 ? `🔥 ${currentStreakVal} дн.` : 'День 1'}</span>`
-
-              : `<span style="font-weight:700;font-size:.88rem;color:var(--ink);display:inline-flex;align-items:center;gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;flex-shrink:0;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg> Цель дня: ${tXp} / ${dailyGoal} XP</span>
-
-                 <span style="font-weight:800;font-size:.82rem;color:var(--moss);">${goalPct}%</span>`
-
-            }
-
-          </div>
-
-          <div class="mp-progress-track" style="margin:0 0 12px;height:6px;border-radius:999px;background:rgba(255,255,255,0.06);overflow:hidden;">
-
-            ${isZeroXp
-
-              ? `<div class="mp-progress-fill empty-goal-pulse" style="width:0%;height:100%;"></div>`
-
-              : `<div class="mp-progress-fill" style="width:${goalPct}%;height:100%;background:linear-gradient(90deg,var(--emerald),#34d399);border-radius:999px;transition:width .3s ease;"></div>`
-
-            }
-
-          </div>
-
-          ${buildSevenDayHeatmapHTML()}
-
-          <div class="goal-micro-hint" style="font-size:.76rem;color:var(--ink-muted);margin-top:8px;line-height:1.45;white-space:normal;">
-
-            ${goalMicroHintText}
-
-          </div>
-
-        </div>
-
-
-
-        <!-- Правая колонка: Интервальное повторение SRS -->
-
-        <div class="dash-pulse-card" style="display:flex;flex-direction:column;justify-content:space-between;gap:12px;">
-
-          <div>
-
-            <div style="font-weight:700;font-size:.88rem;color:var(--ink);display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px;">
-
-              <span style="display:inline-flex;align-items:center;gap:6px;">
-
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--moss)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:2px;flex-shrink:0;"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
-
-                <span>Интервальное повторение</span>
-
-              </span>
-
-              ${(typeof getNoteSpacedRepetitionStats === 'function' && getNoteSpacedRepetitionStats().dueCount > 0) ? `<a href="#/cards?tab=notes" data-srs-switch-tab="notes" class="badge" style="background:rgba(244,63,94,0.18);border:1px solid rgba(244,63,94,0.40);color:#fda4af;padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;text-decoration:none;">${getNoteSpacedRepetitionStats().dueCount} консп. (1/3/7/21/30)</a>` : ''}
-
-            </div>
-
-            <div class="meta" style="font-size:.78rem;color:var(--ink-muted);">
-
-              ${dueTodayCardsCount > 0
-
-                ? srsSubtitle
-
-                : ((typeof getNoteSpacedRepetitionStats === 'function' && getNoteSpacedRepetitionStats().dueCount > 0)
-
-                    ? `📖 По графику 1/3/7/21/30 к повтору: <b>${getNoteSpacedRepetitionStats().dueCount}&nbsp;консп.</b> (+10&nbsp;XP)`
-
-                    : (!hasReviewedAnyCard
-
-                        ? `<div class="srs-clean-preview" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);cursor:pointer;transition:transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease;" title="Нажмите, чтобы узнать условие открытия колоды" onclick="showToast('Пройдите первые 3 шага теории, чтобы открыть флеш-колоду темы (+10 XP)', 'info');">
-
-                            <div style="display:flex;align-items:center;gap:7px;min-width:0;flex:1 1 auto;">
-
-                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;flex-shrink:0;color:var(--ink-muted);"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-
-                              <span style="font-weight:600;color:var(--ink);font-size:0.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-
-                                <span class="srs-deck-title-desk">${escapeHtmlStr(cleanTitle)}</span>
-
-                                <span class="srs-deck-title-mob">${escapeHtmlStr(srsMobTitle)}</span>
-
-                              </span>
-
-                            </div>
-
-                            <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.03);padding:2px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
-
-                              <span style="font-size:0.70rem;color:var(--ink-muted);">${theoryDoneCount}/3</span>
-
-                              <span style="display:inline-flex;gap:4px;align-items:center;">
-
-                                <span style="width:6px;height:6px;border-radius:50%;background:${theoryDoneCount >= 1 ? '#10b981' : 'rgba(255,255,255,0.18)'};${theoryDoneCount >= 1 ? 'box-shadow:0 0 6px rgba(16,185,129,0.7);' : ''}"></span>
-
-                                <span style="width:6px;height:6px;border-radius:50%;background:${theoryDoneCount >= 2 ? '#10b981' : 'rgba(255,255,255,0.18)'};${theoryDoneCount >= 2 ? 'box-shadow:0 0 6px rgba(16,185,129,0.7);' : ''}"></span>
-
-                                <span style="width:6px;height:6px;border-radius:50%;background:${theoryDoneCount >= 3 ? '#10b981' : 'rgba(255,255,255,0.18)'};${theoryDoneCount >= 3 ? 'box-shadow:0 0 6px rgba(16,185,129,0.7);' : ''}"></span>
-
-                              </span>
-
-                            </div>
-
-                          </div>
-
-                          <div style="display:flex;align-items:center;gap:6px;padding:6px 2px 0;font-size:.74rem;">
-
-                            <span style="color:var(--ink-muted);font-size:.74rem;display:inline-flex;align-items:center;gap:5px;" title="🌱 ${theoryDoneCount === 0 ? 'Откроется после 3 шагов теории · +10 XP' : `До открытия: ${remainingSteps} ${stepsText} · +10 XP`}">
-
-                              <span class="srs-act-text-desk">${theoryDoneCount === 0 ? '🌱 Откроется после 3 шагов теории (+10&nbsp;XP)' : `🌱 До открытия: ${remainingSteps}&nbsp;${stepsText} (+10&nbsp;XP)`}</span>
-
-                              <span class="srs-act-text-mob">${theoryDoneCount === 0 ? '🌱 Откроется после 3 шагов (+10&nbsp;XP)' : `🌱 До открытия: ${remainingSteps}&nbsp;${stepsText} (+10&nbsp;XP)`}</span>
-
-                            </span>
-
-                          </div>`
-
-                        : `<span class="badge" style="background:rgba(16,185,129,0.16);border:1px solid rgba(16,185,129,0.35);color:#34d399;padding:4px 10px;border-radius:8px;font-size:.76rem;font-weight:700;display:inline-block;">✓ Все карточки на сегодня повторены!</span>`
-
-                      )
-
-                  )
-
-              }
-
-            </div>
-
-          </div>
-
-          <div style="display:flex;flex-direction:column;gap:8px;margin-top:auto;">
-
-            ${dueTodayCardsCount > 0
-
-              ? `<div style="display:flex;justify-content:flex-end;"><a href="#/cards" ${targetDeckId ? `data-srs-open-deck="${targetDeckId}"` : ''} class="btn-ghost-quiet btn-srs-quiet" style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;font-weight:600;font-size:.80rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:var(--ink-muted);text-decoration:none;transition:all .2s ease;">Повторить ➔</a></div>`
-
-              : ((typeof getNoteSpacedRepetitionStats === 'function' && getNoteSpacedRepetitionStats().dueCount > 0)
-
-                  ? `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><a href="#/cards" class="btn-srs-pill link-quiet text-muted">Колоды</a><a href="#/cards?tab=notes" data-srs-switch-tab="notes" class="btn-ghost-quiet btn-srs-quiet" style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;font-weight:600;font-size:.80rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:var(--ink-muted);text-decoration:none;transition:all .2s ease;">Повторить конспекты ➔</a></div>`
-
-                  : (!hasReviewedAnyCard
-
-                      ? `<div class="srs-clean-footer meta" style="font-size:.73rem;color:var(--ink-muted);display:flex;align-items:center;gap:6px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.04);margin-top:auto;"><span style="opacity:0.6;">🧠 Память:</span> <span>режим накопления базы</span></div>`
-
-                      : `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><a href="#/cards?tab=notes" data-srs-switch-tab="notes" class="btn-srs-pill link-quiet text-muted">Конспекты 1/3/7/21/30</a><a href="#/cards" class="btn-srs-pill link-quiet text-muted">Обзор колод ➔</a></div>`
-
-                    )
-
-                )
-
-            }
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-
-      <!-- Зона 4: Вторичная (под аккуратным свернутым аккордеоном) -->
-
-      <details class="dash-accordion" ${state.dashAccordionOpen ? 'open' : ''} style="margin-top:14px;margin-bottom:16px;border-radius:16px;padding:12px 16px;">
-
-        <summary class="dash-accordion-summary" role="button" aria-expanded="${state.dashAccordionOpen ? 'true' : 'false'}">
-
-          <div class="dash-accordion-summary-inner">
-
-            <div class="dash-accordion-title-wrap" style="min-width:0;flex:1 1 auto;overflow:hidden;display:inline-flex;align-items:center;gap:8px;">
-
-              <svg class="chevron-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--moss);transition:transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);display:inline-block;flex-shrink:0;"><polyline points="6 9 12 15 18 9"></polyline></svg>
-
-              <span class="dash-accordion-title" style="min-width:0;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;">
-
-                <span class="dash-accordion-title-desk">Темы: ${escapeHtmlStr(cleanUnitTitle)}</span>
-
-                <span class="dash-accordion-title-mob">Темы: ${escapeHtmlStr(cleanUnitTitle)}</span>
-
-              </span>
-
-            </div>
-
-            <span class="meta dash-accordion-status" style="font-size:.76rem;font-weight:500;flex-shrink:0;white-space:nowrap;">
-
-              <span class="dash-accordion-status-desk">${accordionStatusText}</span>
-
-              <span class="dash-accordion-status-mob">${accordionMobStatusText}</span>
-
+        <!-- 4 Благородных Макро-этапа -->
+        ${linearStepperHTML}
+
+        <!-- Доминантный Single Dominant CTA -->
+        <div class="focus-cta-wrap" style="margin-top:4px;">
+          <${firstUnreadK || !isPracticeActive && !isCardsActive ? 'button' : 'a'} ${ctaAttrs}>
+            <span style="display:inline-flex;align-items:center;gap:8px;">
+              <span>${ctaLabel}</span>
             </span>
+            <div style="display:inline-flex;align-items:center;gap:8px;flex-shrink:0;">
+              <span class="linear-cta-badge">${ctaBadge}</span>
+              <span style="font-size:1.1rem;line-height:1;">➔</span>
+            </div>
+          </${firstUnreadK || !isPracticeActive && !isCardsActive ? 'button' : 'a'}>
+        </div>
+      </div>
 
+      <!-- Статус-Док Телеметрии дня (Linear Telemetry Dock) -->
+      <div class="linear-telemetry-dock">
+        <!-- Левая колонка: Суточная цель + Стрик -->
+        <div class="linear-dock-col" style="cursor:pointer;" onclick="location.hash='#/practice';">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <span style="font-size:0.84rem;font-weight:700;display:inline-flex;align-items:center;gap:6px;color:var(--ink);">
+              <span>🎯</span>
+              <span>Цель дня: ${tXp} / ${dailyGoal} XP</span>
+            </span>
+            <span style="font-size:0.76rem;font-weight:800;color:#34d399;font-family:var(--font-m);">${goalPct}%</span>
           </div>
+          <div style="height:5px;border-radius:999px;background:rgba(255,255,255,0.06);overflow:hidden;margin:2px 0;">
+            <div style="height:100%;width:${goalPct}%;border-radius:999px;background:linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%);box-shadow:0 0 10px rgba(16,185,129,0.5);transition:width .35s ease;"></div>
+          </div>
+          <div style="font-size:0.73rem;color:var(--ink-muted);">
+            ${goalMicroHintText}
+          </div>
+        </div>
 
+        <div class="linear-dock-sep"></div>
+
+        <!-- Правая колонка: Интервальная память SRS -->
+        <div class="linear-dock-col">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <span style="font-size:0.84rem;font-weight:700;display:inline-flex;align-items:center;gap:6px;color:var(--ink);">
+              <span>🔄</span>
+              <span>Интервальная память SRS</span>
+            </span>
+            ${dueTodayCardsCount > 0
+              ? `<span style="font-size:0.72rem;font-weight:700;color:#fbbf24;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);padding:2px 7px;border-radius:6px;font-family:var(--font-m);">${dueTodayCardsCount} к повтору</span>`
+              : `<span style="font-size:0.72rem;font-weight:700;color:#34d399;background:rgba(16,185,129,0.12);padding:2px 7px;border-radius:6px;">✓ Закрыто</span>`
+            }
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:0.73rem;color:var(--ink-muted);">
+            <span>${dueTodayCardsCount > 0 ? 'Экспресс-повтор по кривой Эббингауза' : 'Все карточки на сегодня повторены!'}</span>
+            ${dueTodayCardsCount > 0
+              ? `<a href="#/cards" ${targetDeckId ? `data-srs-open-deck="${targetDeckId}"` : ''} class="linear-path-link" style="flex-shrink:0;">Повторить ➔</a>`
+              : `<a href="#/cards" class="linear-path-link" style="flex-shrink:0;">Обзор колод ➔</a>`
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Модульный Спойлер Тем (Linear Module Spoiler) -->
+      <details class="linear-spoiler dash-accordion" ${state.dashAccordionOpen ? 'open' : ''}>
+        <summary class="linear-spoiler-header dash-accordion-summary" style="list-style:none;" role="button">
+          <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+            <svg class="chevron-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:#34d399;transition:transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);flex-shrink:0;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            <span style="font-size:0.84rem;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+              Темы модуля: ${escapeHtmlStr(cleanUnitTitle)}
+            </span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
+            <span style="font-size:0.74rem;color:var(--ink-muted);">${curUnitDone} из ${curUnitTotal} освоено</span>
+            <a href="#/path" class="linear-path-link" onclick="event.stopPropagation();">Тропа ➔</a>
+          </div>
         </summary>
 
-        <div class="dash-accordion-content" style="margin-top:10px;padding-top:4px;">
-
-          ${currentUnitThemesHTML}
-
-          <div style="text-align:center;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05);margin-bottom:0;">
-
-            <a href="#/map" class="link-quiet dash-map-link" style="font-size:.80rem;display:flex;width:100%;justify-content:center;align-items:center;gap:6px;text-decoration:none;opacity:0.75;transition:opacity .2s ease, color .2s ease;margin-bottom:0;padding:8px 12px;box-sizing:border-box;">
-
-              <span style="display:inline-flex;align-items:center;gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;flex-shrink:0;"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></svg>Карта навыков ➔</span>
-
-            </a>
-
-          </div>
-
-
-
+        <div class="linear-table">
+          ${linearThemeRowsHTML}
         </div>
-
       </details>
 
-
-
-    </div>`;
-
+    </div>
+  `;
 };
-
 NAV_ITEMS.splice(0, NAV_ITEMS.length,
 
   {route:'/path', icon:'path', label:'Путь', shortLabel:'Путь', mobileTab:true, group:'learn'},
@@ -63495,29 +62152,7 @@ const psk = e.target.closest('[data-py-select-k]');
 
 
 
-  // «Челлендж мастерства» branch node click (navigate to the unit test route)
 
-  const challengeNode = e.target.closest('.hex-challenge-node');
-
-  if(challengeNode){
-
-    const chStatus = challengeNode.getAttribute('data-challenge-status');
-
-    const chRoute = challengeNode.getAttribute('data-challenge-route');
-
-    if(chStatus === 'locked'){
-
-      if(typeof showTactileToast === 'function') showTactileToast('🔒 Челлендж откроется после прохождения предыдущих уроков');
-
-      return;
-
-    }
-
-    if(chRoute) location.hash = chRoute;
-
-    return;
-
-  }
 
 
 
@@ -63642,553 +62277,68 @@ const psk = e.target.closest('[data-py-select-k]');
 
 
 
-  // 3D Serpentine Path node click (Open anchored popover)
-
-  const hexNode = e.target.closest('.hex-3d-node');
-
-  if(hexNode && hexNode.classList.contains('hex-node--locked')){
-
-    hexNode.classList.add('hex-node--shaking');
-
-    setTimeout(() => hexNode.classList.remove('hex-node--shaking'), 340);
-
-  }
-
+  // Zen Silk Serpentine: Node click -> Silk Bottom Sheet
+  const hexNode = e.target.closest('.hex-3d-node, .path-node');
   if(hexNode){
-
-    document.querySelectorAll('.hex-node--prereq-target').forEach(el => el.classList.remove('hex-node--prereq-target'));
-
-    if(typeof navigator !== 'undefined' && navigator.vibrate){
-
-      try{ navigator.vibrate(10); }catch(vErr){}
-
-    }
-
-    const openedByKeyboard = e.detail === 0;
-
     const uid = hexNode.getAttribute('data-unit-id');
-
-
-
-    // One-Tap Direct Launch для активного урока
-
-    if(uid && typeof ALL_UNITS_COMBINED !== 'undefined'){
-
-      const curEchelon = (state && state.selectedEchelon) || 1;
-
-      const { units: echUnits } = (typeof getEchelonUnitsAndChapters === 'function')
-
-        ? getEchelonUnitsAndChapters(curEchelon, ALL_UNITS_COMBINED)
-
-        : { units: ALL_UNITS_COMBINED };
-
-      let actIdx = echUnits.findIndex(x => {
-
-        const pass = (state.passedUnitTests || []).includes(x.id) || ((x.skills||[]).length > 0 && (x.skills||[]).every(sk => getSkillMP(sk.id) >= 80));
-
-        return !pass;
-
-      });
-
-      if(actIdx === -1) actIdx = Math.max(0, echUnits.length - 1);
-
-      const clickedIdx = echUnits.findIndex(x => x.id === uid);
-
-      if(clickedIdx === actIdx){
-
-        const unitObj = ALL_UNITS_COMBINED.find(x => x.id === uid);
-
-        if(unitObj){
-
-          const trk = getTrackForUnit(uid);
-
-          const actSk = (unitObj.skills || []).find(sk => (getSkillMP(sk.id) || 0) < 80) || (unitObj.skills && unitObj.skills[0]);
-
-          const targetSkId = actSk ? actSk.id : '';
-
-          const popover = document.getElementById('path-anchored-popover');
-
-          const backdrop = document.getElementById('path-popover-backdrop');
-
-          if(backdrop) backdrop.style.display = 'none';
-
-          if(popover) popover.style.display = 'none';
-
-          location.hash = targetSkId ? `#${trk.routePrefix}/skill/${targetSkId}` : `#${trk.routePrefix}`;
-
-          return;
-
-        }
-
-      }
-
+    const title = hexNode.getAttribute('data-title') || '';
+    const desc = hexNode.getAttribute('data-desc') || '';
+    const status = hexNode.getAttribute('data-status') || 'locked';
+    if(typeof window.openSilkSheet === 'function'){
+      window.openSilkSheet(uid, title, desc, status);
     }
-
-    const popover = document.getElementById('path-anchored-popover');
-
-    if(popover && uid && typeof ALL_UNITS_COMBINED !== 'undefined'){
-
-      popover.setAttribute('data-return-focus-unit', uid);
-
-      const u = ALL_UNITS_COMBINED.find(x => x.id === uid);
-
-      if(u){
-
-        const track = getTrackForUnit(uid);
-
-        const pBadge = document.getElementById('popover-badge');
-
-        const pTitle = document.getElementById('popover-title');
-
-        const pStatus = document.getElementById('popover-status');
-
-        const pSkills = document.getElementById('popover-skills');
-
-        const pCta = document.getElementById('popover-cta-btn');
-
-
-
-        const curEchelon = (state && state.selectedEchelon) || 1;
-
-        const { units: echUnits, chapters: echChapters } = (typeof getEchelonUnitsAndChapters === 'function')
-
-          ? getEchelonUnitsAndChapters(curEchelon, ALL_UNITS_COMBINED)
-
-          : { units: ALL_UNITS_COMBINED, chapters: [] };
-
-        const uChap = echChapters.find(cb => cb.units.some(x => x.id === uid));
-
-        const chapterUnits = uChap ? uChap.units : ALL_UNITS_COMBINED.filter(x => getTrackForUnit(x.id).routePrefix === track.routePrefix);
-
-        const uIdx = (echUnits.findIndex(x => x.id === uid) >= 0) ? echUnits.findIndex(x => x.id === uid) : ALL_UNITS_COMBINED.findIndex(x => x.id === uid);
-
-        const lessonNumInChap = (chapterUnits.findIndex(x => x.id === u.id) >= 0) ? (chapterUnits.findIndex(x => x.id === u.id) + 1) : (uIdx + 1);
-
-
-
-        const trackTitleClean = track.title.split('Матрица Мастерства').pop().trim() || track.title;
-
-        if(pBadge) pBadge.textContent = `Глава · ${trackTitleClean}`;
-
-        if(pTitle) pTitle.textContent = `Урок ${lessonNumInChap} · ${cleanUnitTitle(u.id, u.title)}`;
-
-
-
-        const isPassed = (state.passedUnitTests || []).includes(u.id) || ((u.skills||[]).length > 0 && (u.skills||[]).every(s => getSkillMP(s.id) >= 80));
-
-        let activeIdx = echUnits.findIndex(x => {
-
-          const pass = (state.passedUnitTests || []).includes(x.id) || ((x.skills||[]).length > 0 && (x.skills||[]).every(s => getSkillMP(s.id) >= 80));
-
-          return !pass;
-
-        });
-
-        if(activeIdx === -1) activeIdx = Math.max(0, echUnits.length - 1);
-
-        const isActive = (uIdx === activeIdx);
-
-        const isLocked = (uIdx > activeIdx && !isPassed);
-
-
-
-        const activeUnitObj = echUnits[activeIdx] || u;
-
-        if(pStatus){
-
-          if(isPassed) pStatus.textContent = '✅ Урок освоен на 100%';
-
-          else if(isActive) pStatus.textContent = '🎯 Текущий урок';
-
-          else if(isLocked) {
-
-            pStatus.innerHTML = '🔒 Откроется после предыдущих уроков (текущий: <span style="color:var(--amber);font-weight:700;">' + escapeHtmlStr(cleanUnitTitle(activeUnitObj.id, activeUnitObj.title)) + '</span>)';
-
-            const activeNodeEl = document.querySelector('.hex-3d-node[data-unit-id="' + activeUnitObj.id + '"]');
-
-            if(activeNodeEl) activeNodeEl.classList.add('hex-node--prereq-target');
-
-          }
-
-          else pStatus.textContent = '📖 Доступен для изучения';
-
-        }
-
-
-
-        if(pSkills){
-
-          const skillsList = u.skills || [];
-
-          const noteCount = skillsList.reduce((acc, s) => acc + (s.kIds ? s.kIds.length : 1), 0);
-
-          const skillCount = skillsList.length;
-
-          const passedCount = skillsList.filter(s => (typeof getSkillMP === 'function' ? getSkillMP(s.id) : 0) >= 80).length;
-
-          
-
-          let activeSkillIndex = skillsList.findIndex(s => (getSkillMP(s.id) || 0) < 80);
-
-          if(activeSkillIndex === -1 && skillsList.length > 0) activeSkillIndex = skillsList.length - 1;
-
-
-
-          const stepsHtml = skillsList.map((s, sIdx) => {
-
-            const sMp = (typeof getSkillMP === 'function') ? Math.round(getSkillMP(s.id) || 0) : 0;
-
-            const isStepPassed = sMp >= 80;
-
-            const isStepActive = !isLocked && !isStepPassed && (sIdx === activeSkillIndex || (activeSkillIndex === -1 && sIdx === 0));
-
-            const isStepLocked = isLocked || (!isStepPassed && !isStepActive && sIdx > activeSkillIndex);
-
-            
-
-            let statusClass = 'locked';
-
-            let statusIcon = '🔒';
-
-            let statusText = 'Закрыто';
-
-            if(isStepPassed){
-
-              statusClass = 'completed';
-
-              statusIcon = '✓';
-
-              statusText = 'Сдано';
-
-            } else if(isStepActive){
-
-              statusClass = 'active';
-
-              statusIcon = '▶';
-
-              statusText = 'Текущий шаг';
-
-            }
-
-
-
-            const cleanSkillTitle = s.title.replace(/\s*\([^)]*\)$/, '');
-
-
-
-            return `
-
-              <div class="path-popover-step path-popover-step--${statusClass}" data-target-route="#${track.routePrefix}/skill/${s.id}" role="button" tabindex="${isStepLocked ? '-1' : '0'}" title="${escapeHtmlStr(s.title)} (${statusText})">
-
-                <div class="pps-left">
-
-                  <span class="pps-marker pps-marker--${statusClass}">${statusIcon}</span>
-
-                  <div class="pps-text-wrap">
-
-                    <span class="pps-title">${sIdx + 1}. ${escapeHtmlStr(cleanSkillTitle)}</span>
-
-                  </div>
-
-                </div>
-
-                <span class="pps-action-icon">${isStepPassed ? '✓' : (isStepActive ? '➔' : (isStepLocked ? '🔒' : '➔'))}</span>
-
-              </div>`;
-
-          }).join('');
-
-
-
-          pSkills.innerHTML = `
-
-            <div class="path-popover-meta-row" style="font-size:0.73rem;color:var(--ink-muted);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
-
-              <span class="path-popover-skills-label" style="font-weight:700;color:var(--ink-soft);margin-bottom:0;">Ключевые темы урока:</span>
-
-              <span style="font-weight:700;color:${passedCount === skillCount ? 'var(--emerald)' : 'var(--amber)'};">${passedCount}/${skillCount} сдано</span>
-
-            </div>
-
-            <div class="path-popover-skills-list path-popover-steps-list">
-
-              ${stepsHtml}
-
-            </div>`;
-
-        }
-
-
-
-        if(pCta){
-
-          const unitStarted = (u.skills || []).some(s => (getSkillMP(s.id) || 0) > 0);
-
-          pCta.className = isPassed ? 'path-popover-cta path-popover-cta--passed' : (isLocked ? 'path-popover-cta path-popover-cta--locked' : 'path-popover-cta path-popover-cta--active');
-
-          pCta.disabled = isLocked;
-
-          const activeSkill = (u.skills || []).find(s => (getSkillMP(s.id) || 0) < 80) || (u.skills && u.skills[0]);
-
-          const targetSkillId = activeSkill ? activeSkill.id : '';
-
-          pCta.setAttribute('data-target-route', `#${track.routePrefix}/skill/${targetSkillId}`);
-
-
-
-          pCta.removeAttribute('data-target-unit');
-
-          if(isPassed){
-
-            pCta.textContent = 'ОБЗОР УРОКА ➔';
-
-          } else if(isLocked){
-
-            pCta.disabled = false;
-
-            pCta.className = 'path-popover-cta path-popover-cta--jump-active';
-
-            pCta.setAttribute('data-target-unit', activeUnitObj.id);
-
-            pCta.textContent = 'ПЕРЕЙТИ К ТЕКУЩЕМУ ШАГУ ➔';
-
-          } else if(unitStarted){
-
-            const activeIdxInUnit = (u.skills || []).findIndex(s => s.id === targetSkillId);
-
-            pCta.textContent = `ПРОДОЛЖИТЬ ТЕМУ ${activeIdxInUnit + 1} ➔`;
-
-          } else {
-
-            pCta.textContent = 'НАЧАТЬ УРОК ➔';
-
-          }
-
-        }
-
-
-
-        popover.style.display = 'block';
-
-        const parent = popover.offsetParent || popover.parentElement;
-
-        if(parent){
-
-          const pRect = (parent.getBoundingClientRect && parent.getBoundingClientRect()) || { left: 0, top: 0, width: 420 };
-
-          const nRect = (hexNode.getBoundingClientRect && hexNode.getBoundingClientRect()) || { left: 210, right: 210, top: 100, bottom: 160 };
-
-          const pWidth = pRect.width || 420;
-
-          let cx = (nRect.left + nRect.right) / 2 - pRect.left;
-
-          let cy = nRect.top - pRect.top;
-
-          if(!cx || isNaN(cx)){
-
-            cx = parseFloat(hexNode.getAttribute('data-cx')) || 210;
-
-            cy = parseFloat(hexNode.getAttribute('data-cy')) || 100;
-
-          }
-
-          const popoverWidth = parseFloat(window.getComputedStyle(popover).width) || 340;
-
-          const popoverHalfWidth = popoverWidth / 2;
-
-          const clampedCx = Math.max(popoverHalfWidth + 8, Math.min(pWidth - popoverHalfWidth - 8, cx));
-
-          popover.style.left = `${Math.round(clampedCx)}px`;
-
-          const arrow = document.getElementById('popover-arrow');
-
-          if(arrow){
-
-            const arrowX = Math.max(20, Math.min(popoverWidth - 20, popoverHalfWidth + (cx - clampedCx)));
-
-            arrow.style.left = `${Math.round(arrowX)}px`;
-
-          }
-
-          const popoverH = popover.offsetHeight || 185;
-
-          if(cy > popoverH + 80){
-
-            popover.style.top = `${Math.round(cy - popoverH - 45)}px`;
-
-            if(arrow) arrow.className = 'path-popover-arrow path-popover-arrow--down';
-
-          } else {
-
-            popover.style.top = `${Math.round(cy + 55)}px`;
-
-            if(arrow) arrow.className = 'path-popover-arrow path-popover-arrow--up';
-
-          }
-
-        }
-
-        const backdropEl = document.getElementById('path-popover-backdrop');
-        if(backdropEl){
-          backdropEl.style.display = 'none';
-        }
-        if(window.innerWidth <= 640){
-          try {
-            popover.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          } catch(scrErr) {}
-        }
-
-        if(openedByKeyboard && typeof popover.focus === 'function') popover.focus();
-
-        return;
-
-      }
-
-    }
-
-  }
-
-
-
-  // Popover backdrop tap closes mobile sheet
-
-  if(e.target.closest('#path-popover-backdrop')){
-
-    document.querySelectorAll('.hex-node--prereq-target').forEach(el => el.classList.remove('hex-node--prereq-target'));
-
-    const popover = document.getElementById('path-anchored-popover');
-
-    const backdrop = document.getElementById('path-popover-backdrop');
-
-    if(popover) popover.style.display = 'none';
-
-    if(backdrop) backdrop.style.display = 'none';
-
     return;
-
   }
 
-
-
-  // Popover close and CTA button
-
-  if(e.target.closest('#popover-close-btn')){
-
-    document.querySelectorAll('.hex-node--prereq-target').forEach(el => el.classList.remove('hex-node--prereq-target'));
-
-    const popover = document.getElementById('path-anchored-popover');
-
-    const backdrop = document.getElementById('path-popover-backdrop');
-
-    if(backdrop) backdrop.style.display = 'none';
-
-    if(popover){
-
-      popover.style.display = 'none';
-
-      const returnId = popover.getAttribute('data-return-focus-unit');
-
-      const returnNode = Array.from(document.querySelectorAll('.hex-3d-node')).find(node => node.getAttribute('data-unit-id') === returnId);
-
-      if(returnNode && typeof returnNode.focus === 'function') returnNode.focus();
-
+  // Zen Silk Serpentine: Milestone pill click -> Chapter Bottom Sheet
+  const milestonePill = e.target.closest('.chapter-milestone-pill');
+  if(milestonePill){
+    const chapNum = milestonePill.getAttribute('data-chapter-num');
+    const chapTitle = milestonePill.getAttribute('data-chapter-title') || '';
+    const doneCount = milestonePill.getAttribute('data-done-count') || 0;
+    const totalCount = milestonePill.getAttribute('data-total-count') || 0;
+    const chapStatus = milestonePill.getAttribute('data-chapter-status') || 'locked';
+    if(typeof window.openChapterSheet === 'function'){
+      window.openChapterSheet(chapNum, chapTitle, doneCount, totalCount, chapStatus);
     }
-
     return;
-
   }
 
-  const popCta = e.target.closest('#popover-cta-btn');
-
-  if(popCta){
-
-    document.querySelectorAll('.hex-node--prereq-target').forEach(el => el.classList.remove('hex-node--prereq-target'));
-
-    const targetUnitId = popCta.getAttribute('data-target-unit');
-
-    const tr = popCta.getAttribute('data-target-route');
-
-    const popover = document.getElementById('path-anchored-popover');
-
-    const backdrop = document.getElementById('path-popover-backdrop');
-
-    if(backdrop) backdrop.style.display = 'none';
-
-    if(popover) popover.style.display = 'none';
-
-    if(targetUnitId){
-
-      const targetNode = document.querySelector('.hex-3d-node[data-unit-id="' + targetUnitId + '"]');
-
-      if(targetNode){
-
-        try { targetNode.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(err){}
-
-        setTimeout(() => { try { targetNode.dispatchEvent(new MouseEvent('click', { bubbles: true })); } catch(e){} }, 260);
-
-      }
-
-      return;
-
+  // Zen Silk Serpentine: Challenge / Exam node click -> Silk Bottom Sheet
+  const challengeNode = e.target.closest('.hex-challenge-node');
+  if(challengeNode){
+    const chStatus = challengeNode.getAttribute('data-challenge-status');
+    const chRoute = challengeNode.getAttribute('data-challenge-route');
+    const chTitle = challengeNode.getAttribute('data-challenge-title') || 'Аттестация Главы';
+    if(typeof window.openSilkSheet === 'function'){
+      window.openSilkSheet(null, chTitle, 'Рубежная аттестация по темам главы. 8 контрольных вопросов для закрепления мастерства.', chStatus === 'done' ? 'completed' : (chStatus === 'locked' ? 'locked' : 'exam'), chRoute);
     }
-
-    if(tr && !popCta.disabled){
-
-      location.hash = tr;
-
-    }
-
     return;
-
   }
 
-  const popStep = e.target.closest('.path-popover-step');
-
-  if(popStep && !popStep.classList.contains('path-popover-step--locked')){
-
-    if(typeof navigator !== 'undefined' && navigator.vibrate){
-
-      try{ navigator.vibrate(10); }catch(vErr){}
-
-    }
-
-    const tr = popStep.getAttribute('data-target-route');
-
-    const popover = document.getElementById('path-anchored-popover');
-
-    const backdrop = document.getElementById('path-popover-backdrop');
-
-    if(backdrop) backdrop.style.display = 'none';
-
-    if(popover) popover.style.display = 'none';
-
-    if(tr){
-
-      location.hash = tr;
-
-    }
-
+  // Silk sheet close button or backdrop click
+  if(e.target.closest('#silkCloseBtn') || e.target.closest('#silkBackdrop')){
+    if(typeof window.closeSilkSheet === 'function') window.closeSilkSheet();
     return;
-
   }
 
-  if(!e.target.closest('#path-anchored-popover') && !e.target.closest('.hex-3d-node') && !e.target.closest('#path-popover-backdrop')){
-
-    const popover = document.getElementById('path-anchored-popover');
-
-    const backdrop = document.getElementById('path-popover-backdrop');
-
-    if(popover && popover.style && popover.style.display !== 'none'){
-
-      popover.style.display = 'none';
-
-      if(backdrop) backdrop.style.display = 'none';
-
+  // Silk sheet action button click
+  const silkActionBtn = e.target.closest('#silkBtn');
+  if(silkActionBtn){
+    if(typeof window.handleSilkActionClick === 'function'){
+      window.handleSilkActionClick();
     }
-
+    return;
   }
 
-
+  // Horizon Beacon click
+  if(e.target.closest('#horizonBeacon')){
+    const act = document.getElementById('active-target-lesson') || document.querySelector('.hex-node--active');
+    if(act) {
+      act.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return;
+  }
 
   // Jump to active unit button (with haptics and smooth scroll)
 
@@ -65485,6 +63635,203 @@ render();
 
 
 })();
+
+
+
+// ==================== ZEN SILK SERPENTINE CONTROLLERS ====================
+let _currentSilkData = null;
+
+window.openSilkSheet = function(uid, title, desc, status, customRoute){
+  _currentSilkData = { uid, title, desc, status, customRoute };
+  const sheet = document.getElementById('silkSheet');
+  const backdrop = document.getElementById('silkBackdrop');
+  if(!sheet || !backdrop) return;
+
+  const titleEl = document.getElementById('sheetTitle');
+  const tagEl = document.getElementById('sheetTag');
+  const descEl = document.getElementById('sheetDesc');
+  const btn = document.getElementById('silkBtn');
+
+  if(titleEl) titleEl.textContent = title;
+  if(descEl) descEl.textContent = desc;
+
+  if (status === 'completed') {
+    if(tagEl) {
+      tagEl.textContent = '✓ ПРОЙДЕНО · 100%';
+      tagEl.style.color = '#34d399';
+    }
+    if(btn) {
+      btn.className = 'sheet-action-btn sheet-action-btn--primary';
+      btn.textContent = '📖 ПОВТОРИТЬ КОНСПЕКТ ➔';
+      btn.style.background = 'linear-gradient(135deg, rgba(16,185,129,0.35), rgba(5,150,105,0.22))';
+      btn.style.border = '1px solid rgba(16,185,129,0.6)';
+    }
+  } else if (status === 'active') {
+    if(tagEl) {
+      tagEl.textContent = '⚡ В ФОКУСЕ · ТЕКУЩИЙ УРОК (~2 МИН)';
+      tagEl.style.color = '#fbbf24';
+    }
+    if(btn) {
+      btn.className = 'sheet-action-btn sheet-action-btn--primary';
+      btn.textContent = 'НАЧАТЬ УРОК (2 МИН) ➔';
+      btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+      btn.style.border = '1px solid rgba(255,255,255,0.25)';
+    }
+  } else if (status === 'exam') {
+    if(tagEl) {
+      tagEl.textContent = '🏆 РУБЕЖНЫЙ ЗАЧЁТ · АТТЕСТАЦИЯ';
+      tagEl.style.color = '#fcd34d';
+    }
+    if(btn) {
+      btn.className = 'sheet-action-btn sheet-action-btn--primary';
+      btn.textContent = 'НАЧАТЬ АТТЕСТАЦИЮ ➔';
+      btn.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+      btn.style.border = '1px solid rgba(255,255,255,0.25)';
+    }
+  } else {
+    if(tagEl) {
+      tagEl.textContent = '🔒 ЗАБЛОКИРОВАНО';
+      tagEl.style.color = '#94a3b8';
+    }
+    if(btn) {
+      btn.className = 'sheet-action-btn sheet-action-btn--secondary';
+      btn.textContent = '🔒 ПЕРЕЙТИ К ТЕКУЩЕМУ УРОКУ ➔';
+      btn.style.background = 'rgba(255,255,255,0.06)';
+      btn.style.border = '1px solid rgba(255,255,255,0.12)';
+    }
+  }
+
+  backdrop.classList.add('open');
+  sheet.classList.add('open');
+};
+
+window.openChapterSheet = function(chapNum, chapTitle, doneCount, totalCount, chapStatus){
+  _currentSilkData = { type: 'chapter', chapNum, chapTitle, doneCount, totalCount, chapStatus };
+  const sheet = document.getElementById('silkSheet');
+  const backdrop = document.getElementById('silkBackdrop');
+  if(!sheet || !backdrop) return;
+
+  const titleEl = document.getElementById('sheetTitle');
+  const tagEl = document.getElementById('sheetTag');
+  const descEl = document.getElementById('sheetDesc');
+  const btn = document.getElementById('silkBtn');
+
+  if(titleEl) titleEl.textContent = `Глава ${chapNum}: ${chapTitle}`;
+  if(descEl) descEl.textContent = `Освоено ${doneCount} из ${totalCount} уроков модуля. Завершите все темы для открытия рубежной аттестации.`;
+
+  if(chapStatus === 'completed'){
+    if(tagEl) {
+      tagEl.textContent = '✓ ВСЕ УРОКИ ОСВОЕНЫ · 100%';
+      tagEl.style.color = '#34d399';
+    }
+    if(btn) {
+      btn.className = 'sheet-action-btn sheet-action-btn--primary';
+      btn.textContent = `✓ ОБЗОР ГЛАВЫ (${doneCount}/${totalCount}) ➔`;
+      btn.style.background = 'linear-gradient(135deg, rgba(16,185,129,0.35), rgba(5,150,105,0.22))';
+      btn.style.border = '1px solid rgba(16,185,129,0.6)';
+    }
+  } else if(chapStatus === 'active'){
+    if(tagEl) {
+      tagEl.textContent = `⚡ ТЕКУЩАЯ ГЛАВА · ${doneCount}/${totalCount} СДАНО`;
+      tagEl.style.color = '#fbbf24';
+    }
+    if(btn) {
+      btn.className = 'sheet-action-btn sheet-action-btn--primary';
+      btn.textContent = 'ПРОДОЛЖИТЬ ОБУЧЕНИЕ ➔';
+      btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+      btn.style.border = '1px solid rgba(255,255,255,0.25)';
+    }
+  } else {
+    if(tagEl) {
+      tagEl.textContent = '🔒 ГЛАВА ЗАБЛОКИРОВАНА';
+      tagEl.style.color = '#94a3b8';
+    }
+    if(btn) {
+      btn.className = 'sheet-action-btn sheet-action-btn--secondary';
+      btn.textContent = '🔒 ДОСТУПНО ПОСЛЕ ПРЕДЫДУЩИХ ГЛАВ';
+      btn.style.background = 'rgba(255,255,255,0.06)';
+      btn.style.border = '1px solid rgba(255,255,255,0.12)';
+    }
+  }
+
+  backdrop.classList.add('open');
+  sheet.classList.add('open');
+};
+
+window.closeSilkSheet = function(){
+  const sheet = document.getElementById('silkSheet');
+  const backdrop = document.getElementById('silkBackdrop');
+  if(sheet) sheet.classList.remove('open');
+  if(backdrop) backdrop.classList.remove('open');
+  _currentSilkData = null;
+};
+
+window.handleSilkActionClick = function(){
+  if(!_currentSilkData) return;
+  const d = _currentSilkData;
+  window.closeSilkSheet();
+
+  if(d.type === 'chapter'){
+    const pill = document.getElementById(`chapter-${d.chapNum}-pill`);
+    if(pill) pill.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  if(d.customRoute){
+    location.hash = d.customRoute;
+    return;
+  }
+
+  if(d.status === 'locked'){
+    const act = document.getElementById('active-target-lesson') || document.querySelector('.hex-node--active');
+    if(act) act.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  if(d.uid && typeof ALL_UNITS_COMBINED !== 'undefined'){
+    const unitObj = ALL_UNITS_COMBINED.find(x => x.id === d.uid);
+    if(unitObj){
+      const trk = (typeof getTrackForUnit === 'function') ? getTrackForUnit(d.uid) : { routePrefix: 'python' };
+      const actSk = (unitObj.skills || []).find(sk => (typeof getSkillMP === 'function' ? getSkillMP(sk.id) : 0) < 80) || (unitObj.skills && unitObj.skills[0]);
+      const targetSkId = actSk ? actSk.id : '';
+      location.hash = targetSkId ? `#${trk.routePrefix}/skill/${targetSkId}` : `#${trk.routePrefix}`;
+    }
+  }
+};
+
+window.checkHorizonBeacon = function(){
+  const beacon = document.getElementById('horizonBeacon');
+  const beaconArrow = document.getElementById('beaconArrow');
+  const activeTarget = document.getElementById('active-target-lesson') || document.querySelector('.hex-node--active');
+  if (!beacon || !activeTarget) {
+    if(beacon) beacon.style.display = 'none';
+    return;
+  }
+  const rect = activeTarget.getBoundingClientRect();
+  const vh = window.innerHeight || 800;
+  const inView = (rect.top >= 60 && rect.bottom <= vh - 60);
+
+  if (inView) {
+    beacon.style.display = 'none';
+  } else {
+    beacon.style.display = 'flex';
+    if (beaconArrow) {
+      beaconArrow.textContent = (rect.top < 60) ? '↑' : '↓';
+    }
+  }
+};
+
+if (!window._zenBeaconBound) {
+  window._zenBeaconBound = true;
+  window.addEventListener('scroll', function() {
+    if (window.checkHorizonBeacon) window.checkHorizonBeacon();
+  }, { passive: true });
+  window.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && window.closeSilkSheet) {
+      window.closeSilkSheet();
+    }
+  });
+}
 
 </script>
 
