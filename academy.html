@@ -3009,6 +3009,162 @@
 
   }
 
+  
+  /* =========================================================================
+     ZEN IDE MASTER STANDARD (Canonical Task Solving Screen & Drawer)
+     ========================================================================= */
+  .zen-accordion {
+    background: rgba(12, 16, 24, 0.7);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-top: 10px;
+    transition: all 0.2s ease;
+  }
+  .zen-accordion-header {
+    padding: 11px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--ink-dim);
+    transition: background 0.15s;
+  }
+  .zen-accordion-header:hover {
+    background: rgba(255, 255, 255, 0.03);
+    color: #fff;
+  }
+  .zen-accordion .acc-icon {
+    font-size: 0.72rem;
+    transition: transform 0.2s ease;
+    color: var(--ink-muted);
+  }
+  .zen-accordion.is-open .acc-icon {
+    transform: rotate(180deg);
+  }
+  .zen-accordion-content {
+    padding: 0 14px 14px 14px;
+    display: none;
+    animation: stepFadeIn 0.2s ease;
+  }
+  .zen-accordion.is-open .zen-accordion-content {
+    display: block;
+  }
+
+  .vscode-mini-drawer {
+    background: #080b11;
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    margin-top: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .vscode-mini-drawer .drawer-nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid var(--glass-border);
+    padding-right: 12px;
+  }
+  .vscode-mini-drawer .drawer-tabs-group {
+    display: flex;
+  }
+  .vscode-mini-drawer .drawer-tab-btn {
+    padding: 7px 14px;
+    font-size: 0.75rem;
+    font-family: var(--font-m, monospace);
+    color: var(--ink-muted);
+    cursor: pointer;
+    border-right: 1px solid var(--glass-border);
+    background: transparent;
+    border-top: none;
+    border-left: none;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .vscode-mini-drawer .drawer-tab-btn.is-active {
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.08);
+    border-bottom-color: var(--emerald);
+  }
+  .vscode-mini-drawer .drawer-toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--ink-muted);
+    cursor: pointer;
+    font-size: 0.74rem;
+  }
+  .vscode-mini-drawer .drawer-toggle-btn:hover { color: #fff; }
+  .vscode-mini-drawer .drawer-body-panel {
+    padding: 12px 16px;
+    font-family: var(--font-m, monospace);
+    font-size: 0.8rem;
+    color: #cbd5e1;
+    max-height: 140px;
+    overflow-y: auto;
+    line-height: 1.5;
+  }
+  .vscode-mini-drawer.is-collapsed .drawer-body-panel {
+    display: none !important;
+  }
+
+  .triumph-celebration-banner {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.22) 0%, rgba(13, 22, 34, 0.95) 100%);
+    border: 1.5px solid var(--emerald);
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-top: 10px;
+    animation: triumphPop 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25);
+  }
+  .triumph-celebration-banner.is-active {
+    display: flex !important;
+  }
+  .triumph-text-title {
+    font-size: 0.96rem;
+    font-weight: 800;
+    color: #34d399;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-triumph-next {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: 1px solid rgba(16, 185, 129, 0.8);
+    color: #fff;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 0.86rem;
+    padding: 10px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+    white-space: nowrap;
+    transition: all 0.2s ease;
+  }
+  .btn-triumph-next:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.55);
+  }
+  @keyframes triumphPop {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .py-editor-shell--clean .py-accessory-bar {
+    display: none !important;
+  }
+
+
   @media (max-width:640px){
 
     .hide-on-mobile,
@@ -37516,7 +37672,7 @@ function todayXp(){
 
 // Helper: Build Code Editor with synchronized Line-Numbers Gutter and Sticky Python Accessory Bar
 
-function buildCodeEditorWithGutterHTML(editorId, codeStr, minHeightPx, customTokens){
+function buildCodeEditorWithGutterHTML(editorId, codeStr, minHeightPx, customTokens, hideAccessoryBar){
 
   const raw = String(codeStr || '');
 
@@ -37592,11 +37748,13 @@ function buildCodeEditorWithGutterHTML(editorId, codeStr, minHeightPx, customTok
 
   ).join('');
 
+  const barHTML = hideAccessoryBar ? '' : `<div class="py-accessory-bar" role="toolbar" aria-label="Быстрый ввод символов Python">${barBtns}</div>`;
+
   return `
 
-    <div class="py-editor-shell" data-editor-shell="${editorId}">
+    <div class="py-editor-shell ${hideAccessoryBar ? 'py-editor-shell--clean' : ''}" data-editor-shell="${editorId}">
 
-      <div class="py-accessory-bar" role="toolbar" aria-label="Быстрый ввод символов Python">${barBtns}</div>
+      ${barHTML}
 
       <div class="editor-with-gutter code-editor-shell">
 
@@ -41298,7 +41456,7 @@ function buildTaskSpecDetails(tObj){
 
   const cleanTokens = Array.from(new Set(tokens)).slice(0, 5);
 
-  return { ioCard, quickTokens: cleanTokens };
+  return { ioCard, quickTokens: cleanTokens, sliceVisual };
 
 }
 
@@ -41776,6 +41934,237 @@ const CANONICAL_NOTE_DECKS_MAP = {
 
 };
 
+
+
+
+/* =========================================================================
+   CANONICAL UNIFIED ZEN IDE COMPONENT (DRY Single Source of Truth)
+   ========================================================================= */
+
+function buildSocraticDiffHTML(rawOutput){
+  if(!rawOutput) return '';
+  const str = String(rawOutput);
+  const assertMatch = str.match(/assert\s+(.+?)\s*==\s*([^\n,]+)/);
+  if(assertMatch){
+    const userVal = assertMatch[1].trim();
+    const expVal = assertMatch[2].trim();
+    return `
+      <div class="mini-diff-box" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;font-size:0.78rem;">
+        <div class="m-diff-user" style="background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.3);padding:8px 10px;border-radius:8px;color:#fca5a5;">
+          <div style="font-size:0.68rem;opacity:0.8;margin-bottom:2px;font-weight:700;">− ВАШ ВЫВОД:</div>
+          <code style="word-break:break-all;">${escapeHtmlStr(userVal)}</code>
+        </div>
+        <div class="m-diff-expected" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);padding:8px 10px;border-radius:8px;color:#6ee7b7;">
+          <div style="font-size:0.68rem;opacity:0.8;margin-bottom:2px;font-weight:700;">+ ОЖИДАЛОСЬ:</div>
+          <code style="word-break:break-all;">${escapeHtmlStr(expVal)}</code>
+        </div>
+      </div>
+    `;
+  }
+  return `<pre style="margin-top:6px;font-size:0.78rem;white-space:pre-wrap;color:#fca5a5;background:rgba(244,63,94,0.08);padding:8px 10px;border-radius:8px;">${escapeHtmlStr(str)}</pre>`;
+}
+
+function buildUnifiedZenIdeHTML(params){
+  const tObj = params.task || {};
+  const tid = tObj.id;
+  const editorId = params.editorId || 'py-skill-editor';
+  const codeDraft = params.codeDraft || '';
+  const socraticHints = params.socraticHints || [];
+  const hintLevel = params.hintLevel || 0;
+  const runStatus = params.runStatus;
+  const runOutput = params.runOutput || '';
+  const isSolved = !!params.isSolved;
+  const mobTab = params.mobTab === 'code' ? 'code' : 'spec';
+  const context = params.context || 'sprint';
+  const nextBtnLabel = params.nextBtnLabel || 'Следующая задача ➔';
+  const nextBtnAttr = params.nextBtnAttr || `data-py-next-task-btn="${tid}"`;
+  const runBtnAttr = params.runBtnAttr || `data-py-run-task="${tid}"`;
+  const resetBtnAttr = params.resetBtnAttr || `data-py-reset-task="${tid}"`;
+  const hintBtnAttr = params.hintBtnAttr || `data-py-task-hint`;
+  const mobTabAttr = params.mobTabAttr || `data-py-practice-tab`;
+  const swiperHTML = params.swiperHTML || '';
+  const backBtnHTML = params.backBtnHTML || '';
+  const drawerTab = params.drawerTab || 'tests';
+  const drawerCollapsed = !!params.drawerCollapsed;
+  const accSliceOpen = !!params.accSliceOpen;
+  const accSocratesOpen = !!params.accSocratesOpen;
+
+  const spec = buildTaskSpecDetails(tObj);
+
+  let cleanDesc = String(tObj.desc || '');
+  cleanDesc = cleanDesc.replace(/^<p>\s*<strong>\s*Задание\s*[:.-]?\s*<\/strong>\s*/i, '<p>');
+  cleanDesc = cleanDesc.replace(/^<p>\s*Задание\s*[:.-]?\s*/i, '<p>');
+  cleanDesc = cleanDesc.replace(/^<strong>\s*Задание\s*[:.-]?\s*<\/strong>\s*/i, '');
+  cleanDesc = cleanDesc.replace(/^Задание\s*[:.-]?\s*/i, '').trim();
+  cleanDesc = cleanDesc.replace(/^<p>/i, '').replace(/<\/p>$/i, '').trim();
+
+  const shownHints = socraticHints.slice(0, hintLevel).map((h, i) =>
+    `<div class="socratic-hint socratic-bubble" style="margin:8px 0;padding:8px 12px;border-radius:10px;background:rgba(217,119,6,0.08);border-left:3px solid var(--amber);font-size:0.82rem;line-height:1.45;color:#fef3c7;"><strong>💡 Наводка ${i+1}:</strong> ${h}</div>`
+  ).join('');
+
+  const mobileTabBarHTML = `
+    <div class="practice-mobile-tab-bar" style="display:none;margin-bottom:14px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:14px;padding:4px;gap:6px;">
+      <button type="button" class="btn btn-ghost ${mobTab === 'spec' ? 'is-active active' : ''}" ${mobTabAttr}="spec" style="flex:1;padding:8px 12px;font-size:0.82rem;font-weight:700;border-radius:10px;justify-content:center;${mobTab === 'spec' ? 'background:rgba(16,185,129,0.18);color:#34d399;border:1px solid rgba(16,185,129,0.35);' : ''}">📋 Условие &amp; Схемы</button>
+      <button type="button" class="btn btn-ghost ${mobTab === 'code' ? 'is-active active' : ''}" ${mobTabAttr}="code" style="flex:1;padding:8px 12px;font-size:0.82rem;font-weight:700;border-radius:10px;justify-content:center;${mobTab === 'code' ? 'background:rgba(16,185,129,0.18);color:#34d399;border:1px solid rgba(16,185,129,0.35);' : ''}">💻 Редактор кода</button>
+    </div>`;
+
+  const metaHeaderHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+      <div style="display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;font-weight:700;">
+        ${backBtnHTML}
+        <span style="color:var(--ink-muted);">${context === 'sprint' ? 'Практика' : 'Банк задач'}</span>
+        <span class="badge" style="background:rgba(217,119,6,0.18);color:var(--amber);padding:2px 8px;border-radius:8px;font-weight:700;white-space:nowrap;">${escapeHtmlStr(tObj.tier || 'Уровень 1')}</span>
+        ${tObj.id ? `<span style="color:var(--ink-muted);font-size:0.75rem;">#${tObj.id}</span>` : ''}
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        ${swiperHTML}
+        ${isSolved ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
+      </div>
+    </div>
+  `;
+
+  const conditionHTML = `
+    <div class="lesson-theory" style="font-size:0.89rem;color:var(--ink-soft);line-height:1.55;margin-bottom:12px;">
+      <h3 style="font-size:1.05rem;font-weight:700;color:var(--ink);margin:0 0 6px 0;">${escapeHtmlStr(tObj.title || 'Задание')}</h3>
+      ${cleanDesc ? `<div>${cleanDesc}</div>` : ''}
+    </div>
+    ${spec.ioCard || ''}
+  `;
+
+  let sliceAccordionHTML = '';
+  if(spec.sliceVisual){
+    sliceAccordionHTML = `
+      <div class="zen-accordion ${accSliceOpen ? 'is-open' : ''}" data-zen-accordion="slice">
+        <div class="zen-accordion-header" data-zen-toggle-acc="slice">
+          <span>📐 Анатомия среза [start:stop:step]</span>
+          <span class="acc-icon">${accSliceOpen ? '▲' : '▼'}</span>
+        </div>
+        <div class="zen-accordion-content" style="${accSliceOpen ? 'display:block;' : 'display:none;'}">
+          ${spec.sliceVisual}
+        </div>
+      </div>
+    `;
+  }
+
+  const socratesAccordionHTML = `
+    <div class="zen-accordion ${accSocratesOpen ? 'is-open' : ''}" data-zen-accordion="socrates">
+      <div class="zen-accordion-header" data-zen-toggle-acc="socrates">
+        <span style="color:var(--amber);">💡 Наставник Сократ (Наводки: <strong>${hintLevel} / ${socraticHints.length}</strong>)</span>
+        <span class="acc-icon">${accSocratesOpen ? '▲' : '▼'}</span>
+      </div>
+      <div class="zen-accordion-content" style="${accSocratesOpen ? 'display:block;' : 'display:none;'}">
+        <button type="button" class="btn btn-ghost" ${hintBtnAttr} style="width:100%;justify-content:center;font-size:0.82rem;padding:9px 12px;border-radius:12px;border:1px dashed rgba(217,119,6,0.35);background:rgba(217,119,6,0.06);color:#fcd34d;font-weight:600;" ${hintLevel >= socraticHints.length ? 'disabled' : ''}>
+          ${hintLevel >= socraticHints.length ? '✓ Все наводки раскрыты' : 'Получить наводку без готового кода ➔'}
+        </button>
+        <div class="socrates-hints-stack" style="margin-top:8px;">
+          ${shownHints}
+        </div>
+      </div>
+    </div>
+  `;
+
+  let drawerTabContent = '';
+  if(drawerTab === 'stdout'){
+    drawerTabContent = `<pre style="margin:0;font-family:var(--font-m, monospace);font-size:0.78rem;white-space:pre-wrap;color:#cbd5e1;">${escapeHtmlStr(runOutput || '[Python 3.12 Sandboxed Session]\n>>> Готов к запуску кода.')}</pre>`;
+  } else if(drawerTab === 'socrates'){
+    drawerTabContent = shownHints ? `<div>${shownHints}</div>` : `<div style="color:var(--ink-muted);font-size:0.8rem;">Наставник Сократ готов помочь. Нажмите кнопку «Получить наводку» в левой панели.</div>`;
+  } else {
+    if(runStatus === 'running'){
+      drawerTabContent = `<div class="test-running-shimmer" style="color:var(--amber);font-size:0.82rem;">⚡ Выполняю pytest-проверки в браузере…</div>`;
+    } else if(runStatus === 'pass'){
+      drawerTabContent = `
+        <div style="color:#34d399;font-weight:700;">✓ Все тесты пройдены чисто! (+15 XP)</div>
+        <div style="font-size:0.75rem;opacity:0.85;margin-top:2px;">Задание успешно решено и закреплено.</div>
+      `;
+    } else if(runStatus === 'fail'){
+      drawerTabContent = `
+        <div style="color:#fb7185;font-weight:700;margin-bottom:4px;">✗ Ошибка выполнения или неверный результат:</div>
+        ${buildSocraticDiffHTML(runOutput)}
+        <div style="margin-top:6px;font-size:0.74rem;color:var(--amber);">💡 Раскройте аккордеон Наставника Сократа слева для наводки.</div>
+      `;
+    } else {
+      drawerTabContent = `<div style="color:var(--ink-muted);font-size:0.8rem;">Редактор готов к проверке. Нажмите «▷ Проверить решение».</div>`;
+    }
+  }
+
+  const testsTabTitle = runStatus === 'pass'
+    ? '✓ Тесты пройдены'
+    : (runStatus === 'fail' ? '✗ Тесты не прошли' : (runStatus === 'running' ? '⚡ Проверка…' : 'Тесты (готов)'));
+  const testsTabColor = runStatus === 'pass' ? '#34d399' : (runStatus === 'fail' ? '#fb7185' : 'inherit');
+
+  const miniDrawerHTML = `
+    <div class="vscode-mini-drawer ${drawerCollapsed ? 'is-collapsed' : ''}" data-zen-drawer="${editorId}">
+      <div class="drawer-nav-bar">
+        <div class="drawer-tabs-group">
+          <button type="button" class="drawer-tab-btn ${drawerTab === 'tests' ? 'is-active' : ''}" data-zen-drawer-tab="tests" style="color:${testsTabColor};">
+            ${testsTabTitle}
+          </button>
+          <button type="button" class="drawer-tab-btn ${drawerTab === 'stdout' ? 'is-active' : ''}" data-zen-drawer-tab="stdout">Терминал (stdout)</button>
+          <button type="button" class="drawer-tab-btn ${drawerTab === 'socrates' ? 'is-active' : ''}" data-zen-drawer-tab="socrates">Наставник Сократ (${hintLevel}/${socraticHints.length})</button>
+        </div>
+        <button type="button" class="drawer-toggle-btn" data-zen-toggle-drawer title="Свернуть / Развернуть консоль">${drawerCollapsed ? 'Развернуть ▴' : 'Свернуть ▾'}</button>
+      </div>
+      <div class="drawer-body-panel" style="${drawerCollapsed ? 'display:none;' : ''}">
+        ${drawerTabContent}
+      </div>
+    </div>
+  `;
+
+  const triumphBannerHTML = `
+    <div class="triumph-celebration-banner ${runStatus === 'pass' ? 'is-active' : ''}">
+      <div>
+        <div class="triumph-text-title">🏆 Задача решена чисто!</div>
+        <div style="font-size:0.78rem;color:var(--ink-muted);margin-top:2px;">+15 XP зачислено на баланс эшелона</div>
+      </div>
+      <button type="button" class="btn-triumph-next" ${nextBtnAttr}>${nextBtnLabel}</button>
+    </div>
+  `;
+
+  const actionButtonRowHTML = `
+    <div class="action-button-row" style="${runStatus === 'pass' ? 'display:none !important;' : 'display:flex;gap:10px;align-items:center;'}">
+      <button type="button" class="btn-reset-code btn btn-ghost" ${resetBtnAttr} style="padding:12px 14px;border-radius:14px;flex:none;opacity:0.8;" title="Сбросить код к исходному шаблону">↺</button>
+      <button type="button" class="btn-check-solution" ${runBtnAttr}>
+        <span>${ICONS.play || '▷'} Проверить решение</span>
+        <span class="xp-tag">+15 XP</span>
+        <span class="hide-on-mobile" style="font-size:0.75rem;opacity:0.85;font-weight:500;">(Ctrl+Enter)</span>
+      </button>
+    </div>
+  `;
+
+  return `
+    <div class="card" style="margin-top:0;">
+      ${mobileTabBarHTML}
+      <div class="practice-layout practice-atomic-split ${mobTab === 'code' ? 'show-code' : 'show-spec'}">
+        <div class="practice-left-pane practice-spec-pane" style="display:flex;flex-direction:column;justify-content:space-between;gap:12px;">
+          <div>
+            ${metaHeaderHTML}
+            ${conditionHTML}
+            ${sliceAccordionHTML}
+            ${socratesAccordionHTML}
+          </div>
+          <div style="margin-top:auto;">
+            <button type="button" class="btn-glass-emerald practice-mobile-cta" ${mobTabAttr}="code" style="display:none;width:100%;justify-content:center;margin-top:14px;padding:12px 16px;border-radius:12px;font-size:0.88rem;font-weight:700;">Перейти к коду ➔</button>
+          </div>
+        </div>
+        <div class="practice-right-pane" style="display:flex;flex-direction:column;justify-content:space-between;">
+          <div>
+            ${buildCodeEditorWithGutterHTML(editorId, codeDraft, 240, null, true)}
+            <div class="practice-kbd-dock hide-on-mobile" style="display:flex;align-items:center;gap:14px;padding:6px 14px;background:rgba(0,0,0,0.25);border-radius:0 0 10px 10px;font-size:0.72rem;color:var(--ink-muted);margin-top:-2px;">
+              <span><kbd>Ctrl</kbd>+<kbd>Enter</kbd> Запустить проверку</span>
+              <span><kbd>Tab</kbd> Отступ 4 пробела</span>
+            </div>
+          </div>
+          <div style="margin-top:10px;">
+            ${miniDrawerHTML}
+            <div style="margin-top:10px;">
+              ${triumphBannerHTML}
+              ${actionButtonRowHTML}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
 
 
 function viewPythonSkill(sid){
@@ -42422,16 +42811,6 @@ function viewPythonSkill(sid){
 
     const socraticHints = buildSocraticHintsForTask(tObj);
 
-    const shownHints = socraticHints.slice(0, pySkillViewState.hintLevel).map((h, i) =>
-
-      `<div class="socratic-hint" style="margin:8px 0;padding:10px 14px;border-radius:12px;background:rgba(217,119,6,0.08);border-left:3px solid var(--amber);font-size:0.86rem;line-height:1.45;"><strong>💡 Наводка ${i+1}:</strong> ${h}</div>`
-
-    ).join('');
-
-
-
-    const spec = buildTaskSpecDetails(tObj);
-
     const taskIdx = tIds.indexOf(activeTid);
 
     const isLastTask = (taskIdx >= tIds.length - 1);
@@ -42440,173 +42819,49 @@ function viewPythonSkill(sid){
 
 
 
-    let runFeedback = '';
+    bodyHTML = buildUnifiedZenIdeHTML({
 
-    if(pySkillViewState.runStatus === 'pass') runFeedback = `
+      task: tObj,
 
-      <div class="result-feedback result-feedback--pass" style="margin-top:12px;padding:12px 16px;border-radius:14px;background:rgba(16,185,129,0.12);border:1px solid #10b981;color:#10b981;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      editorId: 'py-skill-editor',
 
-        <div>
+      codeDraft: pySkillViewState.codeDraft,
 
-          <div style="font-weight:700;">✓ Все тесты пройдены! (+15 MP)</div>
+      runStatus: pySkillViewState.runStatus,
 
-          <div style="font-size:0.78rem;opacity:0.85;margin-top:2px;">Задание успешно решено и закреплено.</div>
+      runOutput: pySkillViewState.runOutput,
 
-        </div>
+      socraticHints: socraticHints,
 
-        <button type="button" class="btn-glass-emerald" style="padding:8px 16px;border-radius:10px;font-size:0.84rem;white-space:nowrap;" data-py-next-task-btn="${tObj.id}">${nextBtnLabel}</button>
+      hintLevel: pySkillViewState.hintLevel || 0,
 
-      </div>`;
+      isSolved: solvedMap[tObj.id] === 'solved',
 
-    else if(pySkillViewState.runStatus === 'fail') runFeedback = `
+      mobTab: pySkillViewState.mobPracticeTab,
 
-      <div class="result-feedback result-feedback--fail" style="margin-top:12px;padding:12px;border-radius:12px;background:rgba(239,68,68,0.12);border:1px solid #ef4444;color:#ef4444;">
+      context: 'sprint',
 
-        <div style="font-weight:700;">✗ Ошибка выполнения или неверный результат</div>
+      nextBtnLabel: nextBtnLabel,
 
-        <pre style="margin-top:6px;font-size:0.80rem;white-space:pre-wrap;">${escapeHtmlStr(pySkillViewState.runOutput)}</pre>
+      nextBtnAttr: `data-py-next-task-btn="${tObj.id}"`,
 
-      </div>`;
+      runBtnAttr: `data-py-run-task="${tObj.id}"`,
 
+      resetBtnAttr: `data-py-reset-task="${tObj.id}"`,
 
+      hintBtnAttr: `data-py-task-hint`,
 
-    let cleanDesc = String(tObj.desc || '');
+      mobTabAttr: `data-py-practice-tab`,
 
-    cleanDesc = cleanDesc.replace(/^<p>\s*<strong>\s*Задание\s*[:.-]?\s*<\/strong>\s*/i, '<p>');
+      drawerTab: pySkillViewState.drawerTab || 'tests',
 
-    cleanDesc = cleanDesc.replace(/^<p>\s*Задание\s*[:.-]?\s*/i, '<p>');
+      drawerCollapsed: !!pySkillViewState.drawerCollapsed,
 
-    cleanDesc = cleanDesc.replace(/^<strong>\s*Задание\s*[:.-]?\s*<\/strong>\s*/i, '');
+      accSliceOpen: !!pySkillViewState.accSliceOpen,
 
-    cleanDesc = cleanDesc.replace(/^Задание\s*[:.-]?\s*/i, '').trim();
+      accSocratesOpen: !!pySkillViewState.accSocratesOpen
 
-    cleanDesc = cleanDesc.replace(/^<p>/i, '').replace(/<\/p>$/i, '').trim();
-
-
-
-    const mobTab = (pySkillViewState.mobPracticeTab === 'code') ? 'code' : 'spec';
-
-    const mobileTabBarHTML = `
-
-      <div class="practice-mobile-tab-bar" style="display:none;margin-bottom:14px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:14px;padding:4px;gap:6px;">
-
-        <button type="button" class="btn btn-ghost ${mobTab === 'spec' ? 'is-active active' : ''}" data-py-practice-tab="spec" style="flex:1;padding:8px 12px;font-size:0.82rem;font-weight:700;border-radius:10px;justify-content:center;${mobTab === 'spec' ? 'background:rgba(16,185,129,0.18);color:#34d399;border:1px solid rgba(16,185,129,0.35);' : ''}">📋 Условие &amp; Схемы</button>
-
-        <button type="button" class="btn btn-ghost ${mobTab === 'code' ? 'is-active active' : ''}" data-py-practice-tab="code" style="flex:1;padding:8px 12px;font-size:0.82rem;font-weight:700;border-radius:10px;justify-content:center;${mobTab === 'code' ? 'background:rgba(16,185,129,0.18);color:#34d399;border:1px solid rgba(16,185,129,0.35);' : ''}">💻 Редактор кода</button>
-
-      </div>`;
-
-
-
-    bodyHTML = `
-
-      <div class="card" style="margin-top:0;">
-
-        ${mobileTabBarHTML}
-
-        <div class="practice-layout practice-atomic-split ${mobTab === 'code' ? 'show-code' : 'show-spec'}">
-
-          <div class="practice-left-pane practice-spec-pane">
-
-            <div>
-
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;">
-
-                <div style="display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;font-weight:700;">
-
-                  <span style="color:var(--ink-muted);">Практика</span>
-
-                  <span class="badge" style="background:rgba(217,119,6,0.18);color:var(--amber);padding:2px 8px;border-radius:8px;font-weight:700;white-space:nowrap;">${tObj.tier}</span>
-
-                </div>
-
-                <div style="display:flex;gap:8px;align-items:center;">
-
-                  <span style="font-size:0.78rem;color:var(--ink-muted);font-weight:600;">Задание ${taskIdx >= 0 ? taskIdx + 1 : 1} из ${tIds.length}</span>
-
-                  ${solvedMap[tObj.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
-
-                </div>
-
-              </div>
-
-              <div class="lesson-theory" style="font-size:0.89rem;color:var(--ink-soft);line-height:1.55;margin-bottom:12px;">
-
-                <strong>Задание:</strong> ${cleanDesc}
-
-              </div>
-
-              ${spec.ioCard}
-
-            </div>
-
-            <div style="margin-top:auto;padding-top:12px;border-top:1px solid var(--glass-border);">
-
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-
-                <span style="font-size:0.75rem;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:0.04em;">💡 Наставник Сократ</span>
-
-                <span style="font-size:0.72rem;color:var(--ink-muted);">Уровень скаффолдинга: <strong>${pySkillViewState.hintLevel} / ${socraticHints.length}</strong></span>
-
-              </div>
-
-              <button type="button" class="btn btn-ghost" data-py-task-hint style="width:100%;justify-content:center;font-size:0.82rem;padding:9px 12px;border-radius:12px;border:1px dashed rgba(217,119,6,0.35);background:rgba(217,119,6,0.04);" ${pySkillViewState.hintLevel>=socraticHints.length?'disabled':''}>
-
-                ${pySkillViewState.hintLevel>=socraticHints.length ? '✓ Все наводки раскрыты' : 'Получить наводку без готового кода ➔'}
-
-              </button>
-
-              ${shownHints}
-
-              <button type="button" class="btn-glass-emerald practice-mobile-cta" data-py-practice-tab="code" style="display:none;width:100%;justify-content:center;margin-top:14px;padding:12px 16px;border-radius:12px;font-size:0.88rem;font-weight:700;">Перейти к коду ➔</button>
-
-            </div>
-
-          </div>
-
-          <div class="practice-right-pane" style="display:flex;flex-direction:column;justify-content:space-between;">
-
-            <div>
-
-              ${buildCodeEditorWithGutterHTML('py-skill-editor', pySkillViewState.codeDraft, 220, spec.quickTokens)}
-
-              <div class="practice-kbd-dock hide-on-mobile">
-
-                <span><kbd>Ctrl</kbd>+<kbd>Enter</kbd> Запустить тесты</span>
-
-                <span><kbd>Tab</kbd> Отступ</span>
-
-              </div>
-
-            </div>
-
-            <div style="margin-top:10px;">
-
-              <div style="display:flex;gap:10px;align-items:center;">
-
-                <button type="button" class="btn btn-ghost" data-py-reset-task="${tObj.id}" style="padding:12px 14px;border-radius:14px;flex:none;opacity:0.8;" title="Сбросить код к исходному шаблону">↺</button>
-
-                <button type="button" class="btn-check-solution" data-py-run-task="${tObj.id}">
-
-                  <span>${ICONS.play} Проверить решение</span>
-
-                  <span class="xp-tag">+15 XP</span>
-
-                  <span class="hide-on-mobile" style="font-size:0.75rem;opacity:0.85;font-weight:500;">(Ctrl+Enter)</span>
-
-                </button>
-
-              </div>
-
-              ${runFeedback}
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>`;
+    });
 
   }
 
@@ -45641,6 +45896,8 @@ function viewPracticeHub(){
 
   const totalSolved = countSolvedIdeTasks(solvedMap);
 
+
+
   if(!practiceHubState.codeDraft && IDE_TASKS_BY_ID[practiceHubState.taskId]){
 
     practiceHubState.codeDraft = getIdeDraft(practiceHubState.taskId, IDE_TASKS_BY_ID[practiceHubState.taskId].initialCode);
@@ -45723,51 +45980,117 @@ function viewPracticeHub(){
 
   }
 
-  const curFilteredIdx = filtered.length > 0 ? Math.max(0, filtered.findIndex(t => t.id === curTask.id)) : 0;
 
-  const curTaskEchelon = getTaskInterviewTier(curTask.id);
 
-  const socraticHints = buildSocraticHintsForTask(curTask);
+  // --- РЕЖИМ 1: ЕДИНЫЙ ZEN IDE (ПРИ РЕШЕНИИ КОНКРЕТНОЙ ЗАДАЧИ) ---
 
-  const socraticLabels = [
+  if(practiceHubState.viewMode === 'ide'){
 
-    'Уровень 0 (Zero Hint — Граничные условия)',
+    const curFilteredIdx = filtered.length > 0 ? Math.max(0, filtered.findIndex(t => t.id === curTask.id)) : 0;
 
-    'Уровень 1 (Conceptual Hint — Концепция)',
-
-    'Уровень 2 (Structural Hint — Декомпозиция)',
-
-    'Уровень 3 (Tactical Hint — Сигнатура и контракт)'
-
-  ];
-
-  const shownHints = socraticHints.slice(0, practiceHubState.hintLevel).map((h, idx) =>
-
-    `<div class="hint-box"><strong>${socraticLabels[idx] || ('Уровень опоры ' + idx)}:</strong> ${h}</div>`
-
-  ).join('');
+    const socraticHints = buildSocraticHintsForTask(curTask);
 
 
 
-  let runFeedback = '';
+    const swiperHTML = `
 
-  if(practiceHubState.runStatus === 'running') runFeedback = `<div class="test-running-shimmer" style="margin-top:10px;">⚡ Выполняю pytest-проверки в браузере…</div>`;
+      <div style="display:inline-flex;gap:4px;align-items:center;" class="prac-inline-swiper">
 
-  else if(practiceHubState.runStatus === 'pass') runFeedback = `<div class="result-box--pass correct-pulse-anim">${ICONS.check} Задача #${curTask.id} решена верно! (+25 XP)\n${practiceHubState.runOutput||''}</div>`;
+        <button type="button" class="btn btn-ghost" style="padding:3px 8px;font-size:.74rem;" data-prac-step="-1" ${filtered.length<=1?'disabled':''} title="Предыдущая задача">‹</button>
 
-  else if(practiceHubState.runStatus === 'fail') runFeedback = `
+        <span style="font-size:.75rem;font-weight:700;color:var(--ink-muted);">${filtered.length>0 ? `${curFilteredIdx + 1}/${filtered.length}` : '0/0'}</span>
 
-    <div class="result-box--fail">Тесты не прошли:\n${practiceHubState.runOutput||''}</div>
+        <button type="button" class="btn btn-ghost" style="padding:3px 8px;font-size:.74rem;" data-prac-step="1" ${filtered.length<=1?'disabled':''} title="Следующая задача">›</button>
 
-    <div style="margin-top:8px;"><button class="btn btn-ghost" style="padding:6px 12px;font-size:.78rem;" data-prac-hint>💡 Разобрать ошибку с Сократовским интервьюером (${practiceHubState.hintLevel}/${socraticHints.length})</button></div>`;
-
-
-
-  // V7 (Coddy-ref): один механизм навигации по задачам — инлайн-свайпер в шапке задачи (‹ N/M ›);
-
-  // селект-список и дубль «Пред/След» из дравера фильтров сняты, поиск остался
+      </div>`;
 
 
+
+    const backBtnHTML = `
+
+      <button type="button" class="btn btn-ghost" data-prac-back-catalog style="padding:4px 10px;font-size:0.76rem;margin-right:4px;" title="Вернуться к каталогу задач">← К каталогу</button>
+
+    `;
+
+
+
+    const zenIdeHTML = buildUnifiedZenIdeHTML({
+
+      task: curTask,
+
+      editorId: 'prac-code-editor',
+
+      codeDraft: practiceHubState.codeDraft,
+
+      runStatus: practiceHubState.runStatus,
+
+      runOutput: practiceHubState.runOutput,
+
+      socraticHints: socraticHints,
+
+      hintLevel: practiceHubState.hintLevel || 0,
+
+      isSolved: solvedMap[curTask.id] === 'solved',
+
+      mobTab: (practiceHubState.mobileTab === 'code' ? 'code' : 'spec'),
+
+      context: 'hub',
+
+      nextBtnLabel: (curFilteredIdx + 1 < filtered.length ? 'Следующая задача ➔' : 'К каталогу задач ➔'),
+
+      nextBtnAttr: `data-prac-next-task="${curTask.id}"`,
+
+      runBtnAttr: `data-prac-run="${curTask.id}"`,
+
+      resetBtnAttr: `data-prac-reset="${curTask.id}"`,
+
+      hintBtnAttr: `data-prac-hint`,
+
+      mobTabAttr: `data-prac-mob-tab`,
+
+      swiperHTML: swiperHTML,
+
+      backBtnHTML: backBtnHTML,
+
+      drawerTab: practiceHubState.drawerTab || 'tests',
+
+      drawerCollapsed: !!practiceHubState.drawerCollapsed,
+
+      accSliceOpen: !!practiceHubState.accSliceOpen,
+
+      accSocratesOpen: !!practiceHubState.accSocratesOpen
+
+    });
+
+
+
+    return `
+
+      <div class="container" style="max-width:980px;">
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+
+          <div style="display:flex;align-items:center;gap:10px;">
+
+            <button type="button" class="btn btn-ghost" data-prac-back-catalog style="padding:6px 12px;font-size:0.82rem;font-weight:700;">← Каталог задач (${totalSolved} / ${IDE_TASKS.length} решено)</button>
+
+            <span style="font-size:0.82rem;color:var(--ink-muted);">Zen IDE тренажёр</span>
+
+          </div>
+
+          <a href="practice_ide.html" target="_blank" class="btn btn-ghost" style="padding:6px 12px;font-size:0.78rem;">Открыть полноэкранный тренажёр ↗</a>
+
+        </div>
+
+        ${zenIdeHTML}
+
+      </div>`;
+
+  }
+
+
+
+  // --- РЕЖИМ 2: MASTER-DETAIL ВИТРИНА КАТАЛОГА 401 ЗАДАЧИ ---
 
   let echelonLabel = '🎯 Все эшелоны';
 
@@ -45907,283 +46230,45 @@ function viewPracticeHub(){
 
 
 
-  practiceHubState.mobileTab = practiceHubState.mobileTab || 'task';
+  const catalogCardsHTML = filtered.map(t => {
 
-  const curMobTab = practiceHubState.mobileTab;
+    const solved = solvedMap[t.id] === 'solved';
 
-  const mobileTabsHTML = `
+    const ech = getTaskInterviewTier(t.id);
 
-    <div class="prac-mobile-tabs" role="tablist">
+    return `
 
-      <button type="button" class="prac-mob-tab ${curMobTab==='docs'?'active':''}" data-prac-mob-tab="docs" role="tab">📖 Справка</button>
+      <div class="panel prac-task-card ${solved ? 'is-solved' : ''}" data-open-prac-task="${t.id}" style="padding:16px;border-radius:14px;cursor:pointer;transition:all 0.2s;background:var(--bg-card);border:1px solid ${solved ? 'rgba(16,185,129,0.4)' : 'var(--line)'};display:flex;flex-direction:column;justify-content:space-between;gap:10px;">
 
-      <button type="button" class="prac-mob-tab ${curMobTab==='task'?'active':''}" data-prac-mob-tab="task" role="tab">🎯 Задача</button>
+        <div>
 
-      <button type="button" class="prac-mob-tab ${curMobTab==='code'?'active':''}" data-prac-mob-tab="code" role="tab">💻 Код</button>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
 
-      <button type="button" class="prac-mob-tab ${curMobTab==='solution'?'active':''}" data-prac-mob-tab="solution" role="tab">💡 Решение</button>
+            <span class="badge" style="background:rgba(217,119,6,0.15);color:var(--amber);font-size:0.72rem;padding:2px 7px;border-radius:6px;font-weight:700;">${escapeHtmlStr(t.tier)}</span>
 
-    </div>`;
-
-
-
-  let sigCode = 'def solution():';
-
-  const sigMatch = (curTask.initialCode || '').match(/def\s+[a-zA-Z0-9_]+\s*\([^)]*\)(?:\s*->\s*[^:]+)?:/);
-
-  if(sigMatch) sigCode = sigMatch[0];
-
-  const signatureBoxHTML = `<div class="prac-signature-box"><div class="sig-badge">Сигнатура функции:</div><code>${escapeHtmlStr(sigCode)}</code></div>`;
-
-
-
-  const plainExplainBtnHTML = `
-
-    <div style="margin:8px 0 10px;">
-
-      <button type="button" class="btn btn-ghost" style="padding:6px 12px;font-size:.78rem;" data-prac-toggle-explain>
-
-        🤖 ${practiceHubState.showPlainExplain ? 'Скрыть пояснение' : 'Объяснить задание'}
-
-      </button>
-
-    </div>`;
-
-  const plainExplainBoxHTML = practiceHubState.showPlainExplain ? `
-
-    <div class="panel" style="padding:12px 14px;margin-bottom:12px;border-left:3px solid var(--amber);">
-
-      <div style="font-size:0.8rem;font-weight:700;color:var(--amber);margin-bottom:4px;">Суть задания простыми словами:</div>
-
-      <p style="font-size:0.86rem;line-height:1.5;margin:0;">${escapeHtmlStr(curTask.hint || curTask.title)}</p>
-
-    </div>` : '';
-
-
-
-  let testCasesRowsHTML = '';
-
-  if(curTask.tests && curTask.tests.includes('assert ')){
-
-    const assertLines = curTask.tests.split('\n').filter(l => l.trim().startsWith('assert ')).slice(0, 4);
-
-    testCasesRowsHTML = assertLines.map((al, idx) => {
-
-      let clean = al.trim().replace(/^assert\s+/, '');
-
-      let parts = clean.split('==');
-
-      let inp = parts[0] ? parts[0].trim() : `Тест #${idx+1}`;
-
-      let exp = parts[1] ? parts[1].split(',')[0].trim() : 'True';
-
-      const clip = (v, n) => v.length > n ? v.slice(0, n) + '…' : v;
-
-      return `<tr><td><code title="${escapeHtmlStr(inp)}">${escapeHtmlStr(clip(inp, 36))}</code></td><td><code title="${escapeHtmlStr(exp)}">${escapeHtmlStr(clip(exp, 24))}</code></td><td><span style="color:var(--ink-muted);">Ожидает</span></td></tr>`;
-
-    }).join('');
-
-  }
-
-  if(!testCasesRowsHTML){
-
-    testCasesRowsHTML = `
-
-      <tr><td><code>solution(sample_input)</code></td><td><code>expected_result</code></td><td><span style="color:var(--ink-muted);">Ожидает</span></td></tr>
-
-      <tr><td><code>solution(edge_case)</code></td><td><code>expected_edge</code></td><td><span style="color:var(--ink-muted);">Ожидает</span></td></tr>`;
-
-  }
-
-  const testCasesTableHTML = `
-
-    <div class="prac-testcases-wrapper" style="margin-bottom:12px;">
-
-      <div style="font-size:0.76rem;font-weight:700;color:var(--ink-soft);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">Тестовые случаи:</div>
-
-      <table class="prac-testcases-table">
-
-        <thead><tr><th>Входные данные</th><th>Ожидаемый результат</th><th>Статус</th></tr></thead>
-
-        <tbody>${testCasesRowsHTML}</tbody>
-
-      </table>
-
-    </div>`;
-
-
-
-  const isSolved = (solvedMap[curTask.id] === 'solved') || !!practiceHubState.solutionUnlocked;
-
-  const solutionPaneHTML = isSolved ? `
-
-    <div class="prac-solution-pane">
-
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-
-        <span class="state-tag state-tag--mastered">✓ Эталонное авторское решение</span>
-
-        <span class="topic-badge" style="margin:0;">Сложность: O(n) / O(1)</span>
-
-      </div>
-
-      <h3 style="margin-bottom:8px;">Код решения:</h3>
-
-      <div class="theory-code-block" style="margin-bottom:12px;white-space:pre-wrap;font-family:var(--font-m);font-size:0.84rem;">${escapeHtmlStr(curTask.solution || '# Эталонное решение принято!')}</div>
-
-      <p class="meta"><strong>Разбор инварианта:</strong> ${escapeHtmlStr(curTask.hint || 'Решение оптимизировано под технический скрининг.')}</p>
-
-    </div>` : `
-
-    <div class="prac-solution-locked">
-
-      <div class="lock-orb">🔒</div>
-
-      <h3>Эталонное решение защищено</h3>
-
-      <p>По Сократовскому регламенту решение открывается после успешной сдачи тестов. Если вы застряли — используйте подсказки во вкладке «Задача».</p>
-
-      <button type="button" class="btn btn-ghost" data-prac-unlock-solution>🔓 Всё равно открыть эталонное решение</button>
-
-    </div>`;
-
-
-
-  const docsSearchVal = (practiceHubState.docsSearch || '').toLowerCase();
-
-  const docsCards = [
-
-    { title: 'Функции & Сигнатуры', code: 'def func(arg, *args, default=0, **kwargs) -> int:\n    return default + arg', desc: 'Позиционные и именованные аргументы, дефолтные параметры.' },
-
-    { title: 'Словари dict (O(1))', code: 'val = d.get(key, "default")\nfor k, v in d.items(): pass', desc: 'Хеш-таблица. Поиск, вставка, удаление в среднем O(1).' },
-
-    { title: 'Списки list & Срезы', code: 'rev = lst[::-1]  # разворот срезом\nlst.append(x)    # O(1) амортизированно\nlst.pop()        # O(1) с конца', desc: 'Динамический массив. Вставка в начало O(n).' },
-
-    { title: 'Множества set (O(1))', code: 'union = s1 | s2      # объединение\nintersect = s1 & s2  # пересечение', desc: 'Уникальные неизменяемые элементы. Проверка in за O(1).' },
-
-    { title: 'Очередь collections.deque', code: 'from collections import deque\nq = deque([1, 2, 3])\nq.appendleft(0)  # O(1)', desc: 'Двусвязный список блоков, O(1) с обоих концов.' },
-
-    { title: 'Исключения try..except', code: 'try:\n    risky_operation()\nexcept ValueError as err:\n    pass', desc: 'Перехват конкретных подклассов Exception, raise from.' },
-
-    { title: 'Контекстный менеджер with', code: 'with open("file.txt") as f:\n    content = f.read()', desc: 'Гарантированное освобождение ресурсов.' },
-
-    { title: 'Датаклассы dataclass', code: 'from dataclasses import dataclass\n\n@dataclass\nclass Item:\n    id: int; title: str', desc: 'Автогенерация __init__, __repr__, __eq__.' }
-
-  ].filter(c => !docsSearchVal || c.title.toLowerCase().includes(docsSearchVal) || c.desc.toLowerCase().includes(docsSearchVal) || c.code.toLowerCase().includes(docsSearchVal));
-
-
-
-  const docsPaneHTML = `
-
-    <div class="prac-docs-pane">
-
-      <div style="margin-bottom:12px;">
-
-        <input id="prac-docs-search-input" type="text" class="code-editor" style="min-height:auto;padding:8px 12px;font-size:0.84rem;width:100%;" placeholder="Поиск по синтаксису (def, dict, list, deque, with)…" value="${escapeHtmlStr(practiceHubState.docsSearch || '')}">
-
-      </div>
-
-      <div style="display:flex;flex-direction:column;gap:10px;">
-
-        ${docsCards.map(c => `
-
-          <div class="panel" style="padding:12px 14px;">
-
-            <div style="font-weight:700;font-size:0.88rem;margin-bottom:4px;color:var(--emerald);">${escapeHtmlStr(c.title)}</div>
-
-            <p style="font-size:0.78rem;color:var(--ink-soft);margin-bottom:6px;">${escapeHtmlStr(c.desc)}</p>
-
-            <pre class="theory-code-block" style="padding:8px 10px;font-size:0.78rem;margin:0;"><code>${escapeHtmlStr(c.code)}</code></pre>
+            ${solved ? '<span class="state-tag state-tag--mastered" style="margin:0;font-size:0.72rem;">✓ Решено</span>' : `<span style="font-size:0.72rem;color:var(--ink-muted);">Эшелон ${ech}</span>`}
 
           </div>
 
-        `).join('')}
+          <div style="font-weight:700;font-size:0.92rem;color:var(--ink);line-height:1.35;">#${t.id} ${escapeHtmlStr(t.title)}</div>
+
+          <div style="font-size:0.78rem;color:var(--ink-muted);margin-top:4px;">${escapeHtmlStr(t.topic || '')}</div>
+
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.75rem;padding-top:8px;border-top:1px solid rgba(255,255,255,0.05);">
+
+          <span style="color:var(--emerald);font-weight:700;">+25 XP</span>
+
+          <span style="color:var(--accent);font-weight:600;">Решать в Zen IDE ➔</span>
+
+        </div>
 
       </div>
 
-    </div>`;
+    `;
 
-
-
-  const cleanDescText = (curTask.desc || '')
-
-    .replace(/<[^>]+>/g, ' ')
-
-    .replace(/^[\s\r\n]*(?:Задание|Задача)\s*[:·\-–—]?\s*/i, '')
-
-    .trim()
-
-    .replace(/\s+/g, ' ');
-
-  const cleanTitleText = (curTask.title || '').trim().replace(/\s+/g, ' ');
-
-  const isDescRedundant = !cleanDescText || cleanDescText === cleanTitleText || cleanDescText === (cleanTitleText + '.');
-
-
-
-  const taskConditionHTML = `
-
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-
-      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-
-        <span class="topic-badge" style="margin:0;">Задача #${curTask.id} · ${curTask.tier} · ${curTask.topic}</span>
-
-        ${renderEchelonBadge(curTaskEchelon)}
-
-        ${solvedMap[curTask.id]==='solved' ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
-
-      </div>
-
-      <div style="display:inline-flex;gap:4px;align-items:center;" class="prac-inline-swiper">
-
-        <button type="button" class="btn btn-ghost" style="padding:3px 8px;font-size:.74rem;" data-prac-step="-1" ${filtered.length<=1?'disabled':''} title="Предыдущая задача">‹</button>
-
-        <span style="font-size:.75rem;font-weight:700;color:var(--ink-muted);">${filtered.length>0 ? `${curFilteredIdx + 1}/${filtered.length}` : '0/0'}</span>
-
-        <button type="button" class="btn btn-ghost" style="padding:3px 8px;font-size:.74rem;" data-prac-step="1" ${filtered.length<=1?'disabled':''} title="Следующая задача">›</button>
-
-      </div>
-
-    </div>
-
-    <h2 class="prac-task-title">${escapeHtmlStr(curTask.title)}</h2>
-
-    ${signatureBoxHTML}
-
-    ${(!isDescRedundant && curTask.desc) ? `<div class="lesson-theory" style="margin-bottom:10px;">${curTask.desc}</div>` : ''}
-
-    ${plainExplainBtnHTML}
-
-    ${plainExplainBoxHTML}
-
-    <div style="margin-top:10px;">
-
-      <button class="btn btn-ghost" style="padding:6px 12px;font-size:.78rem;" data-prac-hint ${practiceHubState.hintLevel>=socraticHints.length?'disabled':''}>💡 Сократовская подсказка (${practiceHubState.hintLevel}/${socraticHints.length})</button>
-
-    </div>
-
-    ${shownHints}`;
-
-
-
-  const codePaneHTML = `
-
-    ${testCasesTableHTML}
-
-    ${buildCodeEditorWithGutterHTML('prac-code-editor', practiceHubState.codeDraft, 240)}
-
-    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-
-      <button class="btn btn-3d-orange btn-primary prac-run-btn" data-prac-run="${curTask.id}">▶ Запустить код</button>
-
-      <button class="btn btn-ghost" data-prac-ask-ai>🤖 Спросить ИИ</button>
-
-      <button class="btn btn-ghost" data-prac-reset="${curTask.id}">Сбросить</button>
-
-    </div>
-
-    ${runFeedback}`;
+  }).join('');
 
 
 
@@ -46197,7 +46282,7 @@ function viewPracticeHub(){
 
           <div class="topic-badge">Интегрированный тренажёр с IDE · 401 задача · 7 уровней (🥚 → 👑)</div>
 
-          <h1>💻 Практика кода (${totalSolved} / 401 решено)</h1>
+          <h1>💻 Банк задач (${totalSolved} / ${IDE_TASKS.length} решено)</h1>
 
         </div>
 
@@ -46213,35 +46298,15 @@ function viewPracticeHub(){
 
 
 
-      <div class="microstep-card">
+      <div class="prac-catalog-grid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:14px;margin-top:16px;">
 
-        ${mobileTabsHTML}
-
-        <!-- Practice IDE Grid: 4-Tab on Mobile (<768px), 2-Column Split on Desktop (>=769px) -->
-
-        <div class="practice-desktop-grid">
-
-          <div class="practice-left-pane ${curMobTab === 'code' ? 'prac-pane--hidden-mobile' : ''}">
-
-            ${curMobTab === 'docs' ? docsPaneHTML : (curMobTab === 'solution' ? solutionPaneHTML : taskConditionHTML)}
-
-          </div>
-
-          <div class="practice-right-pane ${curMobTab !== 'code' ? 'prac-pane--hidden-mobile' : ''}">
-
-            ${codePaneHTML}
-
-          </div>
-
-        </div>
+        ${catalogCardsHTML || '<div class="panel" style="padding:32px;text-align:center;grid-column:1/-1;color:var(--ink-muted);">Задачи по заданным фильтрам не найдены.</div>'}
 
       </div>
 
     </div>`;
 
 }
-
-
 
 /* ================= 7 MODULE BOSS CHALLENGES (#/<track>/boss) ================= */
 
@@ -60414,6 +60479,117 @@ const psk = e.target.closest('[data-py-select-k]');
 
     return;
 
+  }
+
+    // Zen IDE Accordion toggler
+  const zAcc = e.target.closest('[data-zen-toggle-acc]');
+  if(zAcc){
+    const which = zAcc.getAttribute('data-zen-toggle-acc');
+    const isSprint = (pySkillViewState && pySkillViewState.tab === 'code');
+    const targetState = isSprint ? pySkillViewState : practiceHubState;
+    if(which === 'slice'){
+      targetState.accSliceOpen = !targetState.accSliceOpen;
+    } else if(which === 'socrates'){
+      targetState.accSocratesOpen = !targetState.accSocratesOpen;
+    }
+    render();
+    return;
+  }
+
+  // Zen IDE Drawer tabs
+  const zTab = e.target.closest('[data-zen-drawer-tab]');
+  if(zTab){
+    const tabName = zTab.getAttribute('data-zen-drawer-tab');
+    const isSprint = (pySkillViewState && pySkillViewState.tab === 'code');
+    const targetState = isSprint ? pySkillViewState : practiceHubState;
+    targetState.drawerTab = tabName;
+    targetState.drawerCollapsed = false;
+    render();
+    return;
+  }
+
+  // Zen IDE Drawer toggle
+  const zTog = e.target.closest('[data-zen-toggle-drawer]');
+  if(zTog){
+    const isSprint = (pySkillViewState && pySkillViewState.tab === 'code');
+    const targetState = isSprint ? pySkillViewState : practiceHubState;
+    targetState.drawerCollapsed = !targetState.drawerCollapsed;
+    render();
+    return;
+  }
+
+  // Open Task in Zen IDE from Catalog
+  const zOpenTask = e.target.closest('[data-open-prac-task]');
+  if(zOpenTask){
+    const tid = parseInt(zOpenTask.getAttribute('data-open-prac-task'), 10);
+    const curTask = IDE_TASKS_BY_ID[tid];
+    if(curTask){
+      practiceHubState.taskId = tid;
+      practiceHubState.codeDraft = getIdeDraft(tid, curTask.initialCode);
+      practiceHubState.hintLevel = 0;
+      practiceHubState.runStatus = null;
+      practiceHubState.runOutput = '';
+      practiceHubState.viewMode = 'ide';
+      savePracticeHubPosState();
+      render();
+    }
+    return;
+  }
+
+  // Back to Catalog from Zen IDE
+  const zBackCat = e.target.closest('[data-prac-back-catalog]');
+  if(zBackCat){
+    practiceHubState.viewMode = 'catalog';
+    savePracticeHubPosState();
+    render();
+    return;
+  }
+
+  // Practice Hub Next Task
+  const zPracNext = e.target.closest('[data-prac-next-task]');
+  if(zPracNext){
+    const solvedMap = getIdeSolvedMap();
+    const gapTaskIds = new Set();
+    (state.diagnosticGaps || []).forEach(sid => {
+      const sk = PY_SKILLS_BY_ID[sid];
+      if(sk) (sk.taskIds || []).forEach(tid => gapTaskIds.add(tid));
+    });
+    const tiers = ['🥚 Уровень 1','🐣 Уровень 2','🐢 Уровень 3','🦊 Уровень 4','🦅 Уровень 5','🦁 Уровень 6','👑 Уровень 7'];
+    const filtered = IDE_TASKS.filter(t => {
+      if(practiceHubState.echelonFilter === 'gaps'){
+        if(gapTaskIds.size > 0 && !gapTaskIds.has(t.id)) return false;
+        if(gapTaskIds.size === 0 && getTaskInterviewTier(t.id) !== 1) return false;
+      } else if(practiceHubState.echelonFilter !== 'all'){
+        if(getTaskInterviewTier(t.id) !== parseInt(practiceHubState.echelonFilter, 10)) return false;
+      }
+      if(practiceHubState.tierFilter !== 'all' && t.tier !== practiceHubState.tierFilter) return false;
+      const isPyCore = (t.id >= 240 && t.id <= 381) || String(t.topic).includes('Python Core');
+      if(practiceHubState.catFilter === 'python' && !isPyCore) return false;
+      if(practiceHubState.catFilter === 'backend' && isPyCore) return false;
+      if(practiceHubState.statusFilter === 'solved' && solvedMap[t.id] !== 'solved') return false;
+      if(practiceHubState.statusFilter === 'unsolved' && solvedMap[t.id] === 'solved') return false;
+      if(practiceHubState.search){
+        const q = practiceHubState.search.toLowerCase();
+        if(!String(t.id).includes(q) && !t.title.toLowerCase().includes(q) && !t.topic.toLowerCase().includes(q)) return false;
+      }
+      return true;
+    });
+    const curIdx = filtered.findIndex(t => t.id === practiceHubState.taskId);
+    if(curIdx >= 0 && curIdx + 1 < filtered.length){
+      const nextTask = filtered[curIdx + 1];
+      practiceHubState.taskId = nextTask.id;
+      practiceHubState.codeDraft = getIdeDraft(nextTask.id, nextTask.initialCode);
+      practiceHubState.hintLevel = 0;
+      practiceHubState.runStatus = null;
+      practiceHubState.runOutput = '';
+      savePracticeHubPosState();
+      render();
+    } else {
+      practiceHubState.viewMode = 'catalog';
+      savePracticeHubPosState();
+      render();
+    }
+    return;
   }
 
   const pntask = e.target.closest('[data-py-next-task-btn]');
