@@ -43908,7 +43908,15 @@ let cardsHubState = {
 
   noteFullMode: !!_initCardsPos.noteFullMode,
 
-  forcedNoteId: _initCardsPos.forcedNoteId || null
+  forcedNoteId: _initCardsPos.forcedNoteId || null,
+
+  sprintNum: (_isSameDay && typeof _initCardsPos.sprintNum === 'number') ? _initCardsPos.sprintNum : 1,
+
+  sprintStep: (_isSameDay && typeof _initCardsPos.sprintStep === 'number') ? _initCardsPos.sprintStep : 0,
+
+  sprintFinished: (_isSameDay && !!_initCardsPos.sprintFinished),
+
+  sprintPhase: (_isSameDay && typeof _initCardsPos.sprintPhase === 'string') ? _initCardsPos.sprintPhase : null
 
 };
 
@@ -43955,6 +43963,14 @@ function saveCardsHubPosState(){
     noteFullMode: !!cardsHubState.noteFullMode,
 
     forcedNoteId: cardsHubState.forcedNoteId || null,
+
+    sprintNum: cardsHubState.sprintNum || 1,
+
+    sprintStep: cardsHubState.sprintStep || 0,
+
+    sprintFinished: !!cardsHubState.sprintFinished,
+
+    sprintPhase: cardsHubState.sprintPhase || null,
 
     savedDate: today,
 
@@ -44434,19 +44450,171 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
   const isNotes = (activeTab === 'notes');
 
-  const currentSprintStep = isNotes && noteProgress
-
-    ? Math.min(noteProgress.total || 1, (noteProgress.current || 0) + 1)
-
-    : Math.max(0, Math.min(15, Number(cardsHubState.sprintStep) || 0));
-
-  const sprintTarget = isNotes && noteProgress ? (noteProgress.total || 1) : 15;
-
-  const pct = Math.max(0, Math.min(100, Math.round((currentSprintStep / sprintTarget) * 100)));
-
   const finishMode = (typeof state !== 'undefined' && state.srsSprintFinishMode) || 'zen';
 
-  const iconStr = isNotes ? '📖' : '⚡';
+  const daily = (typeof getSrsDailyProgressData === 'function') ? getSrsDailyProgressData() : null;
+
+
+
+  let iconStr = '⚡';
+
+  let goalLabel = '';
+
+  let goalTitle = '';
+
+  let dailyDebtPct = 0;
+
+
+
+  if(isNotes){
+
+    iconStr = '📖';
+
+    const notesDoneToday = daily ? daily.notesDoneToday : 0;
+
+    const notesDueRemaining = (typeof dueNotesCount === 'number') ? dueNotesCount : (daily ? daily.notesDueRemaining : 0);
+
+    const totalNotesToday = notesDoneToday + notesDueRemaining;
+
+
+
+    const noteStep = noteProgress ? Math.min(noteProgress.total || 1, (noteProgress.current || 0) + 1) : 1;
+
+    const noteTotal = noteProgress ? (noteProgress.total || 1) : Math.max(1, totalNotesToday);
+
+
+
+    goalLabel = `${noteStep} / ${noteTotal}`;
+
+    goalTitle = `Конспект ${noteStep} из ${noteTotal}`;
+
+
+
+    if(totalNotesToday > 0){
+
+      dailyDebtPct = Math.max(0, Math.min(100, Math.round((notesDoneToday / totalNotesToday) * 100)));
+
+    } else {
+
+      dailyDebtPct = 100;
+
+    }
+
+  } else {
+
+    // Карточки SRS: знак молнии считает количество спринтов-сессий
+
+    iconStr = '⚡';
+
+    const cardsDoneToday = daily ? daily.cardsDoneToday : 0;
+
+    const cardsDueRemaining = (typeof dueCardsCount === 'number') ? dueCardsCount : (daily ? daily.cardsDueRemaining : 0);
+
+    const totalDebtCardsToday = cardsDoneToday + cardsDueRemaining;
+
+
+
+    // Считаем общее количество спринтов-сессий на день (по 15 карточек на спринт)
+
+    const totalSprintsTarget = Math.max(1, Math.ceil(totalDebtCardsToday / 15));
+
+    const completedSprintsToday = Math.floor(cardsDoneToday / 15);
+
+
+
+    // Номер текущего спринта-сессии
+
+    let curSprint = 1;
+
+    if(typeof cardsHubState !== 'undefined' && typeof cardsHubState.sprintNum === 'number' && cardsHubState.sprintNum > 0){
+
+      curSprint = cardsHubState.sprintNum;
+
+    } else {
+
+      curSprint = Math.max(1, completedSprintsToday + 1);
+
+      if(typeof cardsHubState !== 'undefined'){
+
+        cardsHubState.sprintNum = curSprint;
+
+      }
+
+    }
+
+
+
+    // Если прямо сейчас фаза завершения спринта (Дзен-пауза / Триумф), показываем номер завершённого спринта
+
+    const isSprintJustFinished = (typeof cardsHubState !== 'undefined' && cardsHubState.sprintFinished);
+
+    const displaySprintNum = isSprintJustFinished ? Math.max(1, curSprint - 1) : curSprint;
+
+
+
+    // Формируем счетчик количества спринтов-сессий
+
+    if(typeof cardsHubState !== 'undefined' && cardsHubState.completed){
+
+      const doneSprintsCount = Math.max(1, completedSprintsToday);
+
+      const sprintPlural = (typeof pluralizeRu === 'function')
+
+        ? pluralizeRu(doneSprintsCount, 'спринт', 'спринта', 'спринтов')
+
+        : (doneSprintsCount === 1 ? 'спринт' : 'спринта');
+
+      goalLabel = `${doneSprintsCount} ${sprintPlural}`;
+
+      goalTitle = `Все спринты на сегодня выполнены (${doneSprintsCount} ${sprintPlural})`;
+
+    } else if(totalSprintsTarget > 1){
+
+      goalLabel = `Спринт ${displaySprintNum} / ${totalSprintsTarget}`;
+
+      goalTitle = `Спринт-сессия ${displaySprintNum} из ${totalSprintsTarget} на сегодня (по 15 карточек) · Сдано за день: ${cardsDoneToday} из ${totalDebtCardsToday} карточек`;
+
+    } else {
+
+      goalLabel = `Спринт ${displaySprintNum}`;
+
+      goalTitle = `Спринт-сессия ${displaySprintNum} (по 15 карточек) · Сдано за день: ${cardsDoneToday} из ${totalDebtCardsToday} карточек`;
+
+    }
+
+
+
+    // Радужная шкала прогресса: общий прогресс сдачи долга за день
+
+    if(typeof cardsHubState !== 'undefined' && cardsHubState.completed){
+
+      dailyDebtPct = 100;
+
+    } else if(cardsDueRemaining === 0 && cardsDoneToday > 0){
+
+      dailyDebtPct = 100;
+
+    } else if(totalDebtCardsToday > 0){
+
+      dailyDebtPct = Math.max(0, Math.min(100, Math.round((cardsDoneToday / totalDebtCardsToday) * 100)));
+
+    } else {
+
+      dailyDebtPct = 100;
+
+    }
+
+  }
+
+
+
+  const progressFillWidth = (dailyDebtPct === 0) ? 0 : Math.max(6, dailyDebtPct);
+
+  const progressFillTitle = isNotes
+
+    ? `Общий прогресс сдачи долга по конспектам за день: ${dailyDebtPct}%`
+
+    : `Общий прогресс сдачи долга по карточкам за день: ${dailyDebtPct}% (${daily ? daily.cardsDoneToday : 0} из ${daily ? (daily.cardsDoneToday + (typeof dueCardsCount === 'number' ? dueCardsCount : daily.cardsDueRemaining)) : 0} карточек)`;
 
 
 
@@ -44464,11 +44632,11 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
       <div class="srs-header-right-cluster" style="display:flex;align-items:center;gap:6px;height:30px;flex-shrink:0;">
 
-        <div class="srs-header-goal-status" style="display:inline-flex;align-items:center;gap:6px;padding:0 10px;height:30px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);font-size:0.78rem;font-weight:600;color:var(--ink-soft);box-sizing:border-box;line-height:1;" title="${isNotes ? `Конспект ${currentSprintStep} из ${sprintTarget}` : `Карточка ${currentSprintStep} из ${sprintTarget}`}">
+        <div class="srs-header-goal-status" style="display:inline-flex;align-items:center;gap:6px;padding:0 10px;height:30px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);font-size:0.78rem;font-weight:600;color:var(--ink-soft);box-sizing:border-box;line-height:1;" title="${goalTitle}">
 
           <span style="color:${isNotes ? '#34d399' : '#f59e0b'};font-size:0.88rem;">${iconStr}</span>
 
-          <b style="color:#fff;font-family:var(--font-m);font-weight:700;">${currentSprintStep} / ${sprintTarget}</b>
+          <b style="color:#fff;font-family:var(--font-m);font-weight:700;">${goalLabel}</b>
 
         </div>
 
@@ -44516,7 +44684,7 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
       <div class="srs-header-progress-track" style="position:absolute;bottom:-16px;left:0;right:0;height:4px;background:transparent;border:none;border-radius:99px;overflow:visible;pointer-events:none;box-shadow:none;">
 
-        <div class="srs-header-progress-fill" style="height:100%;width:${Math.max(6, pct)}%;background:linear-gradient(90deg, #881337 0%, #be123c 22%, #f59e0b 55%, #10b981 85%, #34d399 100%);box-shadow:0 0 7px rgba(16,185,129,0.40), 0 0 14px rgba(16,185,129,0.18), 0 0 4px rgba(245,158,11,0.30);border-radius:99px;transition:width 0.35s cubic-bezier(0.2, 0.8, 0.4, 1);"></div>
+        <div class="srs-header-progress-fill" style="height:100%;width:${progressFillWidth}%;background:linear-gradient(90deg, #881337 0%, #be123c 22%, #f59e0b 55%, #10b981 85%, #34d399 100%);box-shadow:0 0 7px rgba(16,185,129,0.40), 0 0 14px rgba(16,185,129,0.18), 0 0 4px rgba(245,158,11,0.30);border-radius:99px;transition:width 0.35s cubic-bezier(0.2, 0.8, 0.4, 1);" title="${progressFillTitle}"></div>
 
       </div>
 
@@ -44525,7 +44693,6 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
   `;
 
 }
-
 window.buildSrsHeaderBarHTML = buildSrsHeaderBarHTML;
 
 
