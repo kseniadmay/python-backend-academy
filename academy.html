@@ -29559,6 +29559,49 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     display: none !important;
   }
 
+
+/* ================= KHAN ACADEMY MASTERY MATRIX STYLES ================= */
+.km-card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:var(--shadow-1);}
+.km-two-col{display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start;}
+@media (max-width:960px){
+  .km-two-col{grid-template-columns:1fr;}
+  .km-left-rail{position:static !important;}
+}
+.km-left-rail{position:sticky;top:20px;}
+.km-nav-btn{width:100%;text-align:left;padding:12px 14px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink);display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;transition:all .15s ease;margin-bottom:8px;}
+.km-nav-btn:hover{border-color:var(--moss);background:var(--surface);}
+.km-nav-btn.is-active{background:rgba(16,185,129,0.12);border-color:var(--emerald);color:var(--ink);box-shadow:0 0 12px rgba(16,185,129,0.18);}
+.km-bar-segmented{height:12px;background:var(--surface-2);border-radius:999px;overflow:hidden;display:flex;padding:2px;border:1px solid var(--line);gap:2px;}
+.km-bar-seg{height:100%;transition:width .4s ease;border-radius:999px;}
+.km-bar-seg--m{background:var(--emerald);}
+.km-bar-seg--p{background:#0d9488;}
+.km-bar-seg--f{background:var(--amber);}
+.km-bar-seg--n{background:var(--line);}
+
+.km-circle-badge{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;flex:none;}
+.km-circle-badge--m{background:rgba(16,185,129,0.2);border:1.5px solid var(--emerald);color:var(--emerald);}
+.km-circle-badge--p{background:rgba(13,148,136,0.2);border:1.5px solid #0d9488;color:#2dd4bf;}
+.km-circle-badge--f{background:rgba(245,158,11,0.2);border:1.5px solid var(--amber);color:var(--amber);}
+.km-circle-badge--n{background:var(--surface-2);border:1.5px solid var(--line);color:var(--ink-muted);}
+
+.km-skill-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-radius:12px;border:1px solid var(--line-soft);background:var(--surface);margin-bottom:6px;transition:all .15s ease;cursor:pointer;}
+.km-skill-row:hover{border-color:var(--moss);transform:translateX(2px);}
+.km-skill-row__main{display:flex;align-items:center;gap:10px;min-width:0;flex:1;}
+.km-skill-row__title{font-size:.88rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+.km-challenge-banner{background:linear-gradient(135deg, rgba(16,185,129,0.18) 0%, var(--surface) 60%, rgba(13,148,136,0.12) 100%);border:1px solid rgba(16,185,129,0.35);border-radius:18px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;box-shadow:var(--shadow-1);margin-bottom:16px;}
+
+.km-supergrid{display:grid;grid-template-columns:repeat(auto-fill, minmax(70px, 1fr));gap:6px;padding-top:10px;}
+.km-tile{height:54px;border-radius:10px;border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px;cursor:pointer;transition:transform .12s, border-color .12s;text-align:center;}
+.km-tile:hover{transform:scale(1.07);z-index:2;}
+.km-tile--m{background:rgba(16,185,129,0.25);border-color:var(--emerald);color:var(--ink);}
+.km-tile--p{background:rgba(13,148,136,0.25);border-color:#0d9488;color:var(--ink);}
+.km-tile--f{background:rgba(245,158,11,0.25);border-color:var(--amber);color:var(--ink);}
+.km-tile--n{background:var(--surface-2);border-color:var(--line);color:var(--ink-muted);}
+
+.km-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;}
+.km-modal-card{background:var(--surface);border:1px solid var(--line);border-radius:20px;max-width:540px;width:100%;padding:24px;box-shadow:0 12px 40px rgba(0,0,0,0.6);position:relative;animation:kmModalIn .18s ease-out;}
+@keyframes kmModalIn{from{opacity:0;transform:scale(0.95);}to{opacity:1;transform:scale(1);}}
 </style>
 
 <link rel="manifest" href="manifest.json">
@@ -33625,6 +33668,634 @@ function firstOpenNode(){
 
 
 
+/* ================= KHAN ACADEMY MASTERY MATRIX LOGIC ================= */
+
+let kmActiveTrack = 'all';
+let kmCurrentView = 'units'; // 'units' | 'grid'
+let kmCurrentFilter = 'all'; // 'all' | 'mastered' | 'proficient' | 'familiar' | 'notstarted' | 'gap'
+let kmSearchQuery = '';
+
+function getAllTrackSkills(){
+  const res = [];
+  Object.values(MASTERY_TRACKS).forEach(tr => {
+    (tr.skills || []).forEach(s => res.push(s));
+  });
+  return res;
+}
+
+function getKhanTrackSkills(trackKey){
+  if(trackKey === 'all') return getAllTrackSkills();
+  const tr = MASTERY_TRACKS[trackKey] || MASTERY_TRACKS.python;
+  return tr.skills || [];
+}
+
+function calculateKhanMastery(trackKey = 'all'){
+  const skills = getKhanTrackSkills(trackKey);
+  const total = skills.length || 1;
+  let m = 0, p = 0, f = 0, n = 0, sumMp = 0;
+  skills.forEach(s => {
+    const mp = getSkillMP(s.id);
+    sumMp += mp;
+    if(mp >= 100) m++;
+    else if(mp >= 80) p++;
+    else if(mp >= 50) f++;
+    else n++;
+  });
+  const maxMp = total * 100;
+  const pct = Math.round((sumMp / maxMp) * 100);
+  return { total, m, p, f, n, sumMp, maxMp, pct };
+}
+
+// Виджет для Дашборда (Вариант 3: ультра-лаконичный и вдохновляющий)
+function renderDashboardMasteryWidgetHTML(){
+  const stat = calculateKhanMastery('all');
+  const allSkills = getAllTrackSkills();
+  
+  // Ищем 2 рекомендуемые темы для прокачки (с MP 50 или 80 или пробел диагностики)
+  const gaps = state.diagnosticGaps || [];
+  const candidates = allSkills.filter(s => {
+    const mp = getSkillMP(s.id);
+    return gaps.includes(s.id) || (mp >= 50 && mp < 100);
+  });
+  const recs = candidates.slice(0, 2);
+
+  const recsHTML = recs.length > 0 ? recs.map(s => {
+    const mp = getSkillMP(s.id);
+    const badge = mp >= 80 ? '80%' : (mp >= 50 ? '50%' : '🎯 Пробел');
+    const badgeClass = mp >= 80 ? 'km-circle-badge--p' : (mp >= 50 ? 'km-circle-badge--f' : 'km-circle-badge--f');
+    const actionLabel = mp >= 80 ? 'До 👑 100%' : 'Практика →';
+    return `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;background:var(--surface-2);border:1px solid var(--line-soft);border-radius:10px;margin-bottom:6px;">
+        <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
+          <span class="km-circle-badge ${badgeClass}" style="width:22px;height:22px;font-size:.65rem;">${badge}</span>
+          <span style="font-size:.84rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.id} · ${s.title}</span>
+        </div>
+        <button onclick="window.openKhanSkillModal('${s.id}')" class="btn btn-ghost" style="padding:4px 9px;font-size:.76rem;color:var(--emerald);font-weight:700;">${actionLabel}</button>
+      </div>`;
+  }).join('') : `
+    <div style="padding:10px;text-align:center;font-size:.82rem;color:var(--ink-muted);">Все активные темы освоены! Перейдите к новым разделам на карте.</div>
+  `;
+
+  return `
+    <div class="km-card" style="margin-top:20px;border-color:rgba(16,185,129,0.3);">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+        <div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:1.1rem;">📊</span>
+            <h2 style="font-size:1.05rem;font-weight:700;margin:0;">Матрица компетенций (Khan Academy)</h2>
+          </div>
+          <p class="meta" style="font-size:.78rem;margin:2px 0 0 0;">Подтверждённый уровень навыков по всей бэкенд-программе</p>
+        </div>
+        <div style="font-size:1.35rem;font-weight:800;color:var(--emerald);font-family:var(--font-m);">${stat.pct}%</div>
+      </div>
+
+      <!-- Segmented Bar -->
+      <div class="km-bar-segmented" style="margin-bottom:14px;">
+        <div class="km-bar-seg km-bar-seg--m" style="width:${(stat.m/stat.total)*100}%;" title="Освоено: ${stat.m}"></div>
+        <div class="km-bar-seg km-bar-seg--p" style="width:${(stat.p/stat.total)*100}%;" title="Уверенно: ${stat.p}"></div>
+        <div class="km-bar-seg km-bar-seg--f" style="width:${(stat.f/stat.total)*100}%;" title="В процессе: ${stat.f}"></div>
+        <div class="km-bar-seg km-bar-seg--n" style="width:${(stat.n/stat.total)*100}%;" title="Не начато: ${stat.n}"></div>
+      </div>
+
+      <!-- 4 Status Chips -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(110px, 1fr));gap:8px;margin-bottom:14px;">
+        <div style="padding:8px 10px;border-radius:12px;background:var(--surface-2);border:1px solid rgba(16,185,129,0.3);text-align:center;">
+          <div style="font-size:1.05rem;font-weight:800;color:var(--emerald);font-family:var(--font-m);">${stat.m}</div>
+          <div style="font-size:.72rem;font-weight:600;color:var(--ink-soft);">👑 Освоено</div>
+        </div>
+        <div style="padding:8px 10px;border-radius:12px;background:var(--surface-2);border:1px solid rgba(13,148,136,0.3);text-align:center;">
+          <div style="font-size:1.05rem;font-weight:800;color:#2dd4bf;font-family:var(--font-m);">${stat.p}</div>
+          <div style="font-size:.72rem;font-weight:600;color:var(--ink-soft);">⚡ Уверенно</div>
+        </div>
+        <div style="padding:8px 10px;border-radius:12px;background:var(--surface-2);border:1px solid rgba(245,158,11,0.3);text-align:center;">
+          <div style="font-size:1.05rem;font-weight:800;color:var(--amber);font-family:var(--font-m);">${stat.f}</div>
+          <div style="font-size:.72rem;font-weight:600;color:var(--ink-soft);">📖 В процессе</div>
+        </div>
+        <div style="padding:8px 10px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);text-align:center;">
+          <div style="font-size:1.05rem;font-weight:800;color:var(--ink-muted);font-family:var(--font-m);">${stat.n}</div>
+          <div style="font-size:.72rem;font-weight:600;color:var(--ink-muted);">⚪ Не начато</div>
+        </div>
+      </div>
+
+      <!-- Next skills recommendation -->
+      <div style="margin-bottom:14px;">
+        <div style="font-size:.78rem;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;margin-bottom:6px;">
+          🎯 Рекомендуется закрепить:
+        </div>
+        ${recsHTML}
+      </div>
+
+      <!-- CTA to Full Map -->
+      <a href="#/map" class="btn btn-primary" style="width:100%;text-align:center;justify-content:center;padding:11px 16px;border-radius:12px;font-size:.88rem;font-weight:700;">
+        🗺️ Открыть полную матрицу компетенций (${stat.total} навыков) →
+      </a>
+    </div>
+  `;
+}
+
+// Полная страница Матрицы навыков (#/map) в стиле Khan Academy
+function viewMap(){
+  ensureExtendedState();
+  const stat = calculateKhanMastery(kmActiveTrack);
+  const globalStat = calculateKhanMastery('all');
+  const allSkills = getKhanTrackSkills(kmActiveTrack);
+
+  // Фильтрация
+  const filteredSkills = allSkills.filter(s => {
+    if(kmSearchQuery){
+      const q = kmSearchQuery.toLowerCase();
+      if(!s.title.toLowerCase().includes(q) && !s.id.toLowerCase().includes(q) && !(s.practiceDesc||'').toLowerCase().includes(q)) return false;
+    }
+    const mp = getSkillMP(s.id);
+    const isGap = (state.diagnosticGaps || []).includes(s.id);
+    if(kmCurrentFilter === 'mastered') return mp >= 100;
+    if(kmCurrentFilter === 'proficient') return mp === 80;
+    if(kmCurrentFilter === 'familiar') return mp === 50;
+    if(kmCurrentFilter === 'notstarted') return mp === 0;
+    if(kmCurrentFilter === 'gap') return isGap;
+    return true;
+  });
+
+  // Левая колонка со списком модулей
+  const trackEntries = [
+    { key: 'all', title: 'Все модули курса', icon: '🌐', count: globalStat.total, pct: globalStat.pct },
+    { key: 'python', title: 'Python Core', icon: '🐍', count: MASTERY_TRACKS.python.skills.length, pct: calculateKhanMastery('python').pct },
+    { key: 'web', title: 'Web, HTTP & REST', icon: '🌐', count: MASTERY_TRACKS.web.skills.length, pct: calculateKhanMastery('web').pct },
+    { key: 'backend', title: 'FastAPI & Backend', icon: '⚙️', count: MASTERY_TRACKS.backend.skills.length, pct: calculateKhanMastery('backend').pct },
+    { key: 'databases', title: 'Базы данных & SQL', icon: '🗄️', count: MASTERY_TRACKS.databases.skills.length, pct: calculateKhanMastery('databases').pct },
+    { key: 'algorithms', title: 'Алгоритмы', icon: '⚡', count: MASTERY_TRACKS.algorithms.skills.length, pct: calculateKhanMastery('algorithms').pct },
+    { key: 'architecture', title: 'Архитектура сервисов', icon: '🏛️', count: MASTERY_TRACKS.architecture.skills.length, pct: calculateKhanMastery('architecture').pct },
+    { key: 'infra', title: 'Docker & Инфра', icon: '🚀', count: MASTERY_TRACKS.infra.skills.length, pct: calculateKhanMastery('infra').pct }
+  ];
+
+  const leftRailHTML = `
+    <div class="km-left-rail">
+      <div style="font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-muted);margin-bottom:8px;padding:0 4px;">
+        Разделы программы:
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        ${trackEntries.map(t => `
+          <button onclick="window.selectKhanTrack('${t.key}')" class="km-nav-btn ${kmActiveTrack===t.key?'is-active':''}">
+            <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
+              <span style="font-size:1.05rem;">${t.icon}</span>
+              <div style="min-width:0;text-align:left;">
+                <div style="font-size:.84rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.title}</div>
+                <div style="font-size:.7rem;color:var(--ink-muted);">${t.count} навыков</div>
+              </div>
+            </div>
+            <span style="font-size:.78rem;font-weight:800;font-family:var(--font-m);color:${t.pct>=80?'var(--emerald)':(t.pct>=40?'var(--amber)':'var(--ink-muted)')};">${t.pct}%</span>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  // Сборка юнитов для правой колонки
+  let rightContentHTML = '';
+
+  if(kmCurrentView === 'grid'){
+    // Супер-сетка Heatmap
+    rightContentHTML = `
+      <div class="km-card" style="padding:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+          <h3 style="font-size:.92rem;margin:0;">Компактная карта компетенций (Heatmap)</h3>
+          <div style="display:flex;align-items:center;gap:10px;font-size:.72rem;color:var(--ink-muted);">
+            <span><span class="m-sq m-sq--0" style="display:inline-flex;width:12px;height:12px;border-radius:2px;vertical-align:middle;"></span> 0%</span>
+            <span><span class="m-sq m-sq--50" style="display:inline-flex;width:12px;height:12px;border-radius:2px;vertical-align:middle;"></span> 50%</span>
+            <span><span class="m-sq m-sq--80" style="display:inline-flex;width:12px;height:12px;border-radius:2px;vertical-align:middle;"></span> 80%</span>
+            <span><span class="m-sq m-sq--100" style="display:inline-flex;width:12px;height:12px;border-radius:2px;vertical-align:middle;"></span> 👑 100%</span>
+          </div>
+        </div>
+        <div class="km-supergrid">
+          ${filteredSkills.map(s => {
+            const mp = getSkillMP(s.id);
+            let cls = 'km-tile--n';
+            let iconText = s.id;
+            if(mp >= 100){ cls = 'km-tile--m'; iconText = '👑 ' + s.id; }
+            else if(mp >= 80){ cls = 'km-tile--p'; iconText = '⚡ ' + s.id; }
+            else if(mp >= 50){ cls = 'km-tile--f'; iconText = s.id; }
+            return `
+              <button onclick="window.openKhanSkillModal('${s.id}')" class="km-tile ${cls}" title="${s.id}: ${s.title} (${mpLabel(mp)})">
+                <span style="font-size:.68rem;font-weight:800;font-family:var(--font-m);line-height:1;">${iconText}</span>
+                <span style="font-size:.62rem;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;margin-top:2px;">${s.title}</span>
+              </button>`;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  } else {
+    // Режим "По модулям" (Khan Academy Authentic Unit Rows)
+    const unitsMap = {};
+    filteredSkills.forEach(s => {
+      const uId = s.unitId || '1.1';
+      if(!unitsMap[uId]){
+        const uObj = ALL_UNITS_COMBINED.find(x => x.id === uId) || { id: uId, title: s.unitTitle || ('Урок ' + uId) };
+        unitsMap[uId] = { info: uObj, skills: [] };
+      }
+      unitsMap[uId].skills.push(s);
+    });
+
+    const unitsList = Object.values(unitsMap);
+
+    if(unitsList.length === 0){
+      rightContentHTML = `<div class="km-card" style="text-align:center;padding:32px;color:var(--ink-muted);">По выбранным критериям темы не найдены.</div>`;
+    } else {
+      rightContentHTML = unitsList.map(u => {
+        const uTotal = u.skills.length;
+        const uMastered = u.skills.filter(s => getSkillMP(s.id) >= 100).length;
+        const uMp = u.skills.reduce((acc, s) => acc + getSkillMP(s.id), 0);
+        const uPct = Math.round((uMp / ((uTotal * 100) || 1)) * 100);
+        const utPassed = state.passedUnitTests.includes(u.info.id);
+
+        const skillsRows = u.skills.map(s => {
+          const mp = getSkillMP(s.id);
+          const isGap = (state.diagnosticGaps || []).includes(s.id);
+          let badgeCls = 'km-circle-badge--n', badgeText = '○', actionText = 'Начать →', btnCls = 'btn-ghost';
+          if(mp >= 100){ badgeCls = 'km-circle-badge--m'; badgeText = '👑'; actionText = 'Освоено ✓'; btnCls = 'btn-ghost'; }
+          else if(mp >= 80){ badgeCls = 'km-circle-badge--p'; badgeText = '80%'; actionText = 'Закрепить →'; btnCls = 'btn-ghost'; }
+          else if(mp >= 50){ badgeCls = 'km-circle-badge--f'; badgeText = '50%'; actionText = 'Практика →'; btnCls = 'btn-primary'; }
+
+          return `
+            <div onclick="window.openKhanSkillModal('${s.id}')" class="km-skill-row">
+              <div class="km-skill-row__main">
+                <span class="km-circle-badge ${badgeCls}">${badgeText}</span>
+                <span style="font-size:.76rem;font-family:var(--font-m);font-weight:700;color:var(--ink-muted);">${s.id}</span>
+                <span class="km-skill-row__title">${s.title}</span>
+                ${isGap ? `<span class="echelon-badge echelon-badge--gap" style="font-size:.65rem;padding:2px 6px;">🎯 Пробел</span>` : ''}
+              </div>
+              <button class="btn ${btnCls}" style="padding:4px 10px;font-size:.76rem;white-space:nowrap;font-weight:600;">${actionText}</button>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="km-card" style="margin-bottom:14px;padding:16px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;border-bottom:1px solid var(--line-soft);padding-bottom:10px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="topic-badge" style="margin:0;font-family:var(--font-m);font-weight:700;">Урок ${u.info.id}</span>
+                <h3 style="font-size:.95rem;margin:0;">${u.info.title || ''}</h3>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:.76rem;color:var(--ink-soft);font-weight:600;">${uMastered}/${uTotal} освоено · <b style="color:var(--emerald);">${uPct}%</b></span>
+                <a href="#${s_routePrefix(u.info.id)}/unittest/${u.info.id}" class="btn ${utPassed?'btn-primary':'btn-clay'}" style="padding:4px 9px;font-size:.74rem;white-space:nowrap;">
+                  ${utPassed ? '👑 Зачёт сдан' : '⚡ Рубежный зачёт'}
+                </a>
+              </div>
+            </div>
+            <div>${skillsRows}</div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  function s_routePrefix(uid){
+    const u = ALL_UNITS_COMBINED.find(x => x.id === uid);
+    return (u && u.trackKey) ? ('/' + u.trackKey) : '/python';
+  }
+
+  return `
+    <div class="container" style="max-width:1120px;">
+      
+      <!-- Top Header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+        <div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--emerald);">
+            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--emerald);"></span>
+            Khan Academy Mastery Learning Framework
+          </div>
+          <h1 style="font-size:1.6rem;margin-top:2px;">Матрица компетенций Python Backend</h1>
+        </div>
+
+        <!-- Mode Switcher -->
+        <div style="display:inline-flex;padding:3px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);">
+          <button onclick="window.switchKhanView('units')" class="btn ${kmCurrentView==='units'?'btn-primary':'btn-ghost'}" style="padding:6px 12px;font-size:.8rem;border-radius:9px;">
+            📚 По модулям
+          </button>
+          <button onclick="window.switchKhanView('grid')" class="btn ${kmCurrentView==='grid'?'btn-primary':'btn-ghost'}" style="padding:6px 12px;font-size:.8rem;border-radius:9px;">
+            🗺️ Супер-сетка
+          </button>
+        </div>
+      </div>
+
+      <!-- Khan Academy Summary Mastery Banner -->
+      <div class="km-card" style="margin-bottom:18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+          <div style="flex:1;min-width:240px;max-width:420px;">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;">
+              <span style="font-size:.76rem;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;">Общий уровень мастерства</span>
+              <span style="font-size:1.4rem;font-weight:800;color:var(--emerald);font-family:var(--font-m);">${stat.pct}%</span>
+            </div>
+            <div class="km-bar-segmented" style="height:12px;">
+              <div class="km-bar-seg km-bar-seg--m" style="width:${(stat.m/stat.total)*100}%;"></div>
+              <div class="km-bar-seg km-bar-seg--p" style="width:${(stat.p/stat.total)*100}%;"></div>
+              <div class="km-bar-seg km-bar-seg--f" style="width:${(stat.f/stat.total)*100}%;"></div>
+              <div class="km-bar-seg km-bar-seg--n" style="width:${(stat.n/stat.total)*100}%;"></div>
+            </div>
+          </div>
+
+          <!-- 4 Filter Chips -->
+          <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:8px;flex:2;min-width:280px;">
+            <button onclick="window.setKhanFilter('mastered')" style="padding:8px 10px;border-radius:12px;background:var(--surface-2);border:1.5px solid ${kmCurrentFilter==='mastered'?'var(--emerald)':'rgba(16,185,129,0.3)'};text-align:left;cursor:pointer;">
+              <div style="font-size:.92rem;font-weight:800;color:var(--emerald);font-family:var(--font-m);">${stat.m}</div>
+              <div style="font-size:.68rem;font-weight:700;color:var(--ink-soft);">👑 Освоено</div>
+            </button>
+            <button onclick="window.setKhanFilter('proficient')" style="padding:8px 10px;border-radius:12px;background:var(--surface-2);border:1.5px solid ${kmCurrentFilter==='proficient'?'#0d9488':'rgba(13,148,136,0.3)'};text-align:left;cursor:pointer;">
+              <div style="font-size:.92rem;font-weight:800;color:#2dd4bf;font-family:var(--font-m);">${stat.p}</div>
+              <div style="font-size:.68rem;font-weight:700;color:var(--ink-soft);">⚡ Уверенно</div>
+            </button>
+            <button onclick="window.setKhanFilter('familiar')" style="padding:8px 10px;border-radius:12px;background:var(--surface-2);border:1.5px solid ${kmCurrentFilter==='familiar'?'var(--amber)':'rgba(245,158,11,0.3)'};text-align:left;cursor:pointer;">
+              <div style="font-size:.92rem;font-weight:800;color:var(--amber);font-family:var(--font-m);">${stat.f}</div>
+              <div style="font-size:.68rem;font-weight:700;color:var(--ink-soft);">📖 В процессе</div>
+            </button>
+            <button onclick="window.setKhanFilter('notstarted')" style="padding:8px 10px;border-radius:12px;background:var(--surface-2);border:1.5px solid ${kmCurrentFilter==='notstarted'?'var(--ink-muted)':'var(--line)'};text-align:left;cursor:pointer;">
+              <div style="font-size:.92rem;font-weight:800;color:var(--ink-muted);font-family:var(--font-m);">${stat.n}</div>
+              <div style="font-size:.68rem;font-weight:700;color:var(--ink-muted);">⚪ Не начато</div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two-Column Layout -->
+      <div class="km-two-col">
+        <!-- Left Rail -->
+        ${leftRailHTML}
+
+        <!-- Right Column -->
+        <div>
+          <!-- Mastery Challenge Banner -->
+          <div class="km-challenge-banner">
+            <div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+                <span style="font-size:.74rem;font-weight:800;color:var(--emerald);text-transform:uppercase;letter-spacing:.04em;">⚡ Mastery Challenge</span>
+                <span class="topic-badge" style="margin:0;font-size:.68rem;padding:2px 6px;">+100 MP</span>
+              </div>
+              <div style="font-size:.92rem;font-weight:700;color:var(--ink);">Экспресс-прокачка тем до «👑 Освоено»</div>
+              <div style="font-size:.76rem;color:var(--ink-soft);margin-top:2px;">3 случайных вопроса по недавно пройденным темам</div>
+            </div>
+            <button onclick="window.startKhanMasteryChallenge()" class="btn btn-primary" style="padding:8px 14px;font-size:.82rem;font-weight:700;white-space:nowrap;">
+              Начать квиз (3 мин) →
+            </button>
+          </div>
+
+          <!-- Toolbar (Filter & Search) -->
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px;background:var(--surface-2);padding:8px 12px;border-radius:14px;border:1px solid var(--line);">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+              <button onclick="window.setKhanFilter('all')" class="btn ${kmCurrentFilter==='all'?'btn-primary':'btn-ghost'}" style="padding:4px 9px;font-size:.74rem;">Все (${allSkills.length})</button>
+              <button onclick="window.setKhanFilter('mastered')" class="btn ${kmCurrentFilter==='mastered'?'btn-primary':'btn-ghost'}" style="padding:4px 9px;font-size:.74rem;color:var(--emerald);">👑 Освоено</button>
+              <button onclick="window.setKhanFilter('familiar')" class="btn ${kmCurrentFilter==='familiar'?'btn-primary':'btn-ghost'}" style="padding:4px 9px;font-size:.74rem;color:var(--amber);">📖 Практика</button>
+              <button onclick="window.setKhanFilter('notstarted')" class="btn ${kmCurrentFilter==='notstarted'?'btn-primary':'btn-ghost'}" style="padding:4px 9px;font-size:.74rem;color:var(--ink-muted);">⚪ Не начато</button>
+              <button onclick="window.setKhanFilter('gap')" class="btn ${kmCurrentFilter==='gap'?'btn-primary':'btn-ghost'}" style="padding:4px 9px;font-size:.74rem;color:var(--danger);">🎯 Пробелы</button>
+            </div>
+            <input type="text" oninput="window.searchKhanSkills(this.value)" value="${escapeHtmlStr(kmSearchQuery)}" placeholder="Поиск темы..." style="background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:.78rem;color:var(--ink);width:160px;font-family:inherit;">
+          </div>
+
+          <!-- Content: Units or Grid -->
+          ${rightContentHTML}
+        </div>
+      </div>
+
+    </div>
+  `;
+}
+
+// Window actions
+window.switchKhanView = function(view){
+  kmCurrentView = view;
+  if(window.renderApp) window.renderApp();
+};
+
+window.selectKhanTrack = function(trackKey){
+  kmActiveTrack = trackKey;
+  if(window.renderApp) window.renderApp();
+};
+
+window.setKhanFilter = function(flt){
+  kmCurrentFilter = flt;
+  if(window.renderApp) window.renderApp();
+};
+
+window.searchKhanSkills = function(q){
+  kmSearchQuery = q;
+  if(window.renderApp) window.renderApp();
+};
+
+// Skill Modal Detail
+window.openKhanSkillModal = function(sid){
+  const s = PY_SKILLS_BY_ID[sid];
+  if(!s) return;
+  const mp = getSkillMP(sid);
+  const existing = document.getElementById('km-modal-root');
+  if(existing) existing.remove();
+
+  const modalEl = document.createElement('div');
+  modalEl.id = 'km-modal-root';
+  modalEl.className = 'km-modal-overlay';
+  modalEl.onclick = function(e){ if(e.target === modalEl) window.closeKhanSkillModal(); };
+
+  modalEl.innerHTML = `
+    <div class="km-modal-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;border-bottom:1px solid var(--line);padding-bottom:10px;">
+        <div>
+          <span class="topic-badge" style="font-family:var(--font-m);font-size:.72rem;">Тема ${s.id}</span>
+          <h3 style="font-size:1.1rem;margin-top:4px;">${s.title}</h3>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:1.15rem;font-weight:800;color:var(--emerald);font-family:var(--font-m);">${mp} MP</div>
+          <div style="font-size:.7rem;color:var(--ink-soft);">${mpLabel(mp)}</div>
+        </div>
+      </div>
+
+      <div style="font-size:.85rem;color:var(--ink-soft);margin-bottom:16px;">
+        <div style="font-weight:700;color:var(--ink);margin-bottom:4px;">Зачем это нужно на практике:</div>
+        <div style="background:var(--surface-2);border:1px solid var(--line-soft);border-radius:10px;padding:10px 12px;line-height:1.45;">
+          ${s.practiceDesc || 'Уверенное владение синтаксисом и внутренним устройством, проверяемое на технических собеседованиях.'}
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding-top:12px;border-top:1px solid var(--line);">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <a href="#/sandbox" onclick="window.closeKhanSkillModal()" class="btn btn-primary" style="padding:7px 12px;font-size:.8rem;font-weight:700;">💻 В Zen IDE</a>
+          <a href="#/cards" onclick="window.closeKhanSkillModal()" class="btn btn-ghost" style="padding:7px 12px;font-size:.8rem;">🗂️ Карточки SRS</a>
+          <a href="#${s.routePrefix||'/python'}/skill/${s.id}" onclick="window.closeKhanSkillModal()" class="btn btn-ghost" style="padding:7px 12px;font-size:.8rem;">📖 Конспект</a>
+        </div>
+        <button onclick="window.toggleKhanSkillMastery('${s.id}')" class="btn btn-ghost" style="font-size:.76rem;color:var(--ink-muted);">
+          ${mp>=100 ? 'Сбросить в 0 MP' : '👑 Сделать 100 MP'}
+        </button>
+      </div>
+      <button onclick="window.closeKhanSkillModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:var(--ink-muted);font-size:1.2rem;cursor:pointer;">✕</button>
+    </div>
+  `;
+  document.body.appendChild(modalEl);
+};
+
+window.closeKhanSkillModal = function(){
+  const m = document.getElementById('km-modal-root');
+  if(m) m.remove();
+};
+
+window.toggleKhanSkillMastery = function(sid){
+  const cur = getSkillMP(sid);
+  setSkillMP(sid, cur >= 100 ? 0 : 100);
+  window.closeKhanSkillModal();
+  if(window.renderApp) window.renderApp();
+};
+
+// Mastery Challenge Quiz Flow
+let kmChallengeState = {
+  questions: [],
+  currentIndex: 0,
+  score: 0
+};
+
+window.startKhanMasteryChallenge = function(){
+  const all = getAllTrackSkills();
+  // Выбираем темы со статусом 50 или 80 или пробелы
+  const pool = all.filter(s => {
+    const mp = getSkillMP(s.id);
+    return mp === 50 || mp === 80 || (state.diagnosticGaps||[]).includes(s.id);
+  });
+  const chosenSkills = (pool.length >= 3 ? pool : all).sort(() => 0.5 - Math.random()).slice(0, 3);
+  
+  // Собираем вопросы
+  const questions = [];
+  chosenSkills.forEach(s => {
+    const unit = ALL_UNITS_COMBINED.find(u => u.id === s.unitId);
+    let q = null;
+    if(unit && unit.questions && unit.questions.length > 0){
+      q = unit.questions[Math.floor(Math.random() * unit.questions.length)];
+    }
+    if(!q){
+      q = {
+        q: `Как наиболее эффективно применять навык «${s.title}» в production?`,
+        options: [
+          `Использовать стандартные идиомы Python с учётом временной сложности $O(1)$`,
+          `Избегать использования из-за накладных расходов`,
+          `Заменять низкоуровневым кодом на C`
+        ],
+        correct: 0,
+        explain: s.practiceDesc || 'Следование стандартам чистого кода и оптимальной алгоритмической сложности.'
+      };
+    }
+    questions.push({ skill: s, ...q });
+  });
+
+  kmChallengeState = { questions, currentIndex: 0, score: 0 };
+  renderKhanChallengeModal();
+};
+
+function renderKhanChallengeModal(){
+  const existing = document.getElementById('km-challenge-root');
+  if(existing) existing.remove();
+
+  const modalEl = document.createElement('div');
+  modalEl.id = 'km-challenge-root';
+  modalEl.className = 'km-modal-overlay';
+
+  const q = kmChallengeState.questions[kmChallengeState.currentIndex];
+  if(!q){
+    // Завершение квиза
+    modalEl.innerHTML = `
+      <div class="km-modal-card" style="text-align:center;padding:32px 24px;">
+        <div style="font-size:2.8rem;margin-bottom:8px;">👑</div>
+        <h2 style="font-size:1.3rem;margin-bottom:6px;">Mastery Challenge завершён!</h2>
+        <p style="font-size:.88rem;color:var(--ink-soft);margin-bottom:16px;">
+          Вы успешно подтвердили владение темами! Навыки повышены до уровня <b>«Освоено 👑 (100 MP)»</b>.
+        </p>
+        <button onclick="window.closeKhanChallengeModal()" class="btn btn-primary" style="padding:10px 24px;font-size:.9rem;font-weight:700;">
+          Отлично, к матрице!
+        </button>
+      </div>
+    `;
+    document.body.appendChild(modalEl);
+    playSound('mastery');
+    return;
+  }
+
+  const idx = kmChallengeState.currentIndex + 1;
+  const total = kmChallengeState.questions.length;
+
+  modalEl.innerHTML = `
+    <div class="km-modal-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <span class="topic-badge" style="margin:0;font-size:.72rem;">Вопрос ${idx} из ${total} · Тема ${q.skill.id}</span>
+        <button onclick="window.closeKhanChallengeModal()" style="background:none;border:none;color:var(--ink-muted);font-size:1.1rem;cursor:pointer;">✕</button>
+      </div>
+
+      <h3 style="font-size:1.02rem;margin-bottom:14px;line-height:1.35;">${q.q}</h3>
+
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;" id="km-options-box">
+        ${q.options.map((opt, i) => `
+          <button onclick="window.answerKhanChallenge(${i})" class="btn btn-ghost" style="text-align:left;padding:10px 14px;font-size:.84rem;justify-content:flex-start;border-radius:12px;white-space:normal;line-height:1.35;">
+            ${opt}
+          </button>
+        `).join('')}
+      </div>
+
+      <div id="km-explain-box" style="display:none;background:var(--surface-2);border-radius:10px;padding:12px;margin-bottom:14px;font-size:.82rem;line-height:1.4;"></div>
+
+      <div id="km-next-btn-box" style="display:none;text-align:right;">
+        <button onclick="window.nextKhanChallengeQuestion()" class="btn btn-primary" style="padding:8px 18px;font-size:.84rem;font-weight:700;">
+          Дальше →
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modalEl);
+}
+
+window.answerKhanChallenge = function(chosenIdx){
+  const q = kmChallengeState.questions[kmChallengeState.currentIndex];
+  if(!q) return;
+  const isCorrect = (chosenIdx === q.correct);
+  if(isCorrect){
+    kmChallengeState.score++;
+    setSkillMP(q.skill.id, 100);
+    playSound('success');
+  } else {
+    playSound('error');
+  }
+
+  const optBox = document.getElementById('km-options-box');
+  if(optBox){
+    const buttons = optBox.querySelectorAll('button');
+    buttons.forEach((btn, i) => {
+      btn.disabled = true;
+      if(i === q.correct){
+        btn.style.background = 'rgba(16,185,129,0.2)';
+        btn.style.borderColor = 'var(--emerald)';
+        btn.style.color = 'var(--emerald)';
+        btn.innerHTML = '✓ ' + btn.innerHTML;
+      } else if(i === chosenIdx){
+        btn.style.background = 'rgba(239,68,68,0.2)';
+        btn.style.borderColor = 'var(--danger)';
+        btn.style.color = 'var(--danger)';
+        btn.innerHTML = '✕ ' + btn.innerHTML;
+      }
+    });
+  }
+
+  const expBox = document.getElementById('km-explain-box');
+  if(expBox){
+    expBox.style.display = 'block';
+    expBox.innerHTML = `<b>${isCorrect ? 'Верно!' : 'Почти:'}</b> ${q.explain || ''}`;
+  }
+
+  const nextBox = document.getElementById('km-next-btn-box');
+  if(nextBox) nextBox.style.display = 'block';
+};
+
+window.nextKhanChallengeQuestion = function(){
+  kmChallengeState.currentIndex++;
+  renderKhanChallengeModal();
+};
+
+window.closeKhanChallengeModal = function(){
+  const m = document.getElementById('km-challenge-root');
+  if(m) m.remove();
+  if(window.renderApp) window.renderApp();
+};
+
 function viewDashboard(){
 
   const p = stageProgress();
@@ -33669,6 +34340,8 @@ function viewDashboard(){
 
       </div>
 
+      ${renderDashboardMasteryWidgetHTML()}
+
     </div>`;
 
 }
@@ -33707,7 +34380,7 @@ function nodeCardHTML(n){
 
 
 
-function viewMap(){
+function viewOldStagesMap(){
 
   const stagesHTML = STAGES.map((s,i)=>{
 
