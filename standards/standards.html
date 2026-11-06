@@ -29386,6 +29386,95 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     background: rgba(16, 185, 129, 0.2);
   }
 
+
+
+  /* ========================================================
+     LINEAR COMMAND BAR (FOUR PILLARS: ECHELONS, GAPS, TRACKS, SRS)
+     ======================================================== */
+  .linear-command-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .linear-command-bar::-webkit-scrollbar { display: none; }
+
+  .linear-command-chip {
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 7px 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
+    flex-shrink: 0;
+    text-decoration: none;
+    box-sizing: border-box;
+  }
+  .linear-command-chip:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.18);
+    color: var(--ink);
+    transform: translateY(-1px);
+  }
+  .linear-command-chip.active {
+    background: rgba(16, 185, 129, 0.14) !important;
+    border-color: #34d399 !important;
+    color: #34d399 !important;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.22);
+  }
+  .linear-command-chip.cmd-chip--warn {
+    border-color: rgba(244, 63, 94, 0.4);
+    color: #fda4af;
+    background: rgba(244, 63, 94, 0.08);
+  }
+  .linear-command-chip.cmd-chip--warn:hover {
+    background: rgba(244, 63, 94, 0.15);
+    border-color: #f43f5e;
+  }
+  .linear-command-chip.cmd-chip--due {
+    border-color: rgba(245, 158, 11, 0.4);
+    color: #fde68a;
+    background: rgba(245, 158, 11, 0.08);
+  }
+  .cmd-chip-icon {
+    font-size: 0.88rem;
+    line-height: 1;
+  }
+  .cmd-chip-title {
+    font-family: var(--font-m);
+    font-size: 0.74rem;
+  }
+
+  /* Linear Command Detail Drawer Panel */
+  .linear-cmd-detail {
+    background: rgba(15, 20, 31, 0.82);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    animation: fadeInSlide 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+  }
+  @keyframes fadeInSlide {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
 </style>
 
 <link rel="manifest" href="manifest.json">
@@ -53783,8 +53872,9 @@ viewDashboard = function(){
 
   // Определение фокусного навыка для карточки спринта
   const openGaps = (state.diagnosticGaps || []).filter(sid => PY_SKILLS_BY_ID[sid] && getSkillMP(sid) < 100);
+  const openGapsCount = openGaps.length;
   const activeTierNum = e1.pct < 100 ? 1 : (e2.pct < 100 ? 2 : (e3.pct < 100 ? 3 : 4));
-  const focusSk = openGaps.length > 0
+  const focusSk = openGapsCount > 0
     ? PY_SKILLS_BY_ID[openGaps[0]]
     : (getFirstUnmasteredSkillInEchelon(activeTierNum) || ALL_PY_SKILLS[0]);
   const focusSid = focusSk ? focusSk.id : '1.1.1';
@@ -53872,7 +53962,6 @@ viewDashboard = function(){
   const focusTr = focusSk ? getTrackForSkill(focusSk.id) : null;
   const focusTrackKey = (focusTr && focusTr.key) || 'python';
 
-  // Определение активного шага темы (1 из 4)
   const currentStageNum = isTheoryActive ? 1 : (isCardsActive ? 2 : (isPracticeActive ? 3 : 4));
 
   // Single Dominant CTA конфигурация
@@ -53908,7 +53997,7 @@ viewDashboard = function(){
     activeStageSubtext = `Все этапы темы закрыты на 100%!`;
   }
 
-  // Linear Stepper HTML (4 благородных макро-этапа)
+  // 4 Благородных Макро-этапа
   const linearStepperHTML = `
     <div class="linear-stepper-grid">
       <!-- 01: Теория -->
@@ -53991,11 +54080,138 @@ viewDashboard = function(){
     `;
   }).join('');
 
+  // Интерактивный обработчик для переключения вкладок детальной шторки Командного Среза
+  window.toggleLinearCommandSheet = function(type) {
+    const detailEl = document.getElementById('linearCmdDetail');
+    const contentEl = document.getElementById('linearCmdDetailContent');
+    if(!detailEl || !contentEl) return;
+
+    const currentActive = detailEl.getAttribute('data-active-sheet');
+    if(detailEl.style.display !== 'none' && currentActive === type) {
+      detailEl.style.display = 'none';
+      detailEl.removeAttribute('data-active-sheet');
+      document.querySelectorAll('.linear-command-chip').forEach(c => c.classList.remove('active'));
+      return;
+    }
+
+    document.querySelectorAll('.linear-command-chip').forEach(c => {
+      c.classList.toggle('active', c.getAttribute('data-cmd') === type);
+    });
+
+    detailEl.setAttribute('data-active-sheet', type);
+    detailEl.style.display = 'block';
+
+    if(type === 'echelon') {
+      contentEl.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <span style="font-family:var(--font-d);font-size:0.95rem;font-weight:800;color:var(--ink);">🏛️ 4 Эшелона до Middle</span>
+          <span style="font-size:0.74rem;color:#34d399;font-weight:700;font-family:var(--font-m);">Текущий: Эшелон 1 (${e1Pct}%)</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;">
+          <div style="background:rgba(255,255,255,0.03);padding:10px 12px;border-radius:12px;border:1px solid ${e1Pct >= 100 ? '#10b981' : 'rgba(52,211,153,0.4)'};">
+            <div style="display:flex;justify-content:space-between;font-size:0.78rem;font-weight:700;margin-bottom:4px;">
+              <span>Эшелон 1: Фундамент</span><span style="color:#34d399;">${e1Pct}%</span>
+            </div>
+            <div style="height:4px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;margin-bottom:6px;">
+              <div style="height:100%;width:${e1Pct}%;background:linear-gradient(90deg, #059669, #34d399);"></div>
+            </div>
+            <div style="font-size:0.70rem;color:var(--ink-muted);">Рубеж: Допуск к 1-му тех-скринингу Junior</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02);padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);">
+            <div style="display:flex;justify-content:space-between;font-size:0.78rem;font-weight:700;margin-bottom:4px;color:var(--ink-muted);">
+              <span>Эшелон 2: Стек разработчика</span><span>${e2.pct}%</span>
+            </div>
+            <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;margin-bottom:6px;">
+              <div style="height:100%;width:${e2.pct}%;background:#64748b;"></div>
+            </div>
+            <div style="font-size:0.70rem;color:var(--ink-muted);">Web, HTTP, ORM, Базы данных SQL</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02);padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);">
+            <div style="display:flex;justify-content:space-between;font-size:0.78rem;font-weight:700;margin-bottom:4px;color:var(--ink-muted);">
+              <span>Эшелон 3: Прод-разработка</span><span>${e3.pct}%</span>
+            </div>
+            <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;margin-bottom:6px;">
+              <div style="height:100%;width:${e3.pct}%;background:#64748b;"></div>
+            </div>
+            <div style="font-size:0.70rem;color:var(--ink-muted);">Asyncio, Redis, Celery, Docker, CI/CD</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02);padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);">
+            <div style="display:flex;justify-content:space-between;font-size:0.78rem;font-weight:700;margin-bottom:4px;color:var(--ink-muted);">
+              <span>Эшелон 4: Оффер Middle</span><span>${e4.pct}%</span>
+            </div>
+            <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;margin-bottom:6px;">
+              <div style="height:100%;width:${e4.pct}%;background:#64748b;"></div>
+            </div>
+            <div style="font-size:0.70rem;color:var(--ink-muted);">Архитектура, шардинг, репликация, оффер</div>
+          </div>
+        </div>
+      `;
+    } else if(type === 'gaps') {
+      const gapCardsHTML = openGapsCount > 0
+        ? openGaps.slice(0, 4).map(sid => {
+            const sk = PY_SKILLS_BY_ID[sid] || { title: sid, id: sid };
+            const cleanT = String(sk.title || '').replace(/^[\d.]+\s*[:·•\-]\s*/i, '').replace(/^[·•\-]\s*/, '').trim();
+            return `
+              <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.3);padding:9px 12px;border-radius:10px;gap:8px;">
+                <div style="min-width:0;">
+                  <div style="font-size:0.80rem;font-weight:700;color:#fda4af;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">⚠️ ${escapeHtmlStr(cleanT)}</div>
+                  <div style="font-size:0.70rem;color:var(--ink-muted);">Рекомендовано повторение для защиты mastery-балла</div>
+                </div>
+                <a href="#/python/skill/${sk.id}" class="linear-path-link" style="color:#fda4af;background:rgba(244,63,94,0.18);border:1px solid rgba(244,63,94,0.35);flex-shrink:0;">Закрыть ➔</a>
+              </div>
+            `;
+          }).join('')
+        : `<div style="text-align:center;padding:12px 8px;font-size:0.82rem;color:#34d399;font-weight:600;">🛡️ Отличная работа! Критических пробелов не обнаружено. Все изученные темы закреплены.</div>`;
+
+      contentEl.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-family:var(--font-d);font-size:0.95rem;font-weight:800;color:var(--ink);">⚠️ Охотник за пробелами (Diagnostic Gaps)</span>
+          <span style="font-size:0.74rem;color:${openGapsCount > 0 ? '#fda4af' : '#34d399'};font-weight:700;font-family:var(--font-m);">${openGapsCount} к устранению</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          ${gapCardsHTML}
+        </div>
+      `;
+    } else if(type === 'tracks') {
+      const allTracksData = [
+        { key: 'python', label: '1. Python Core', pct: e1Pct },
+        { key: 'web', label: '2. Web & HTTP API', pct: e2.pct },
+        { key: 'db', label: '3. Базы данных SQL', pct: 0 },
+        { key: 'algorithms', label: '4. Алгоритмы & O(N)', pct: 0 },
+        { key: 'async', label: '5. Асинхронность & Очереди', pct: 0 },
+        { key: 'architecture', label: '6. Архитектура & Паттерны', pct: 0 },
+        { key: 'devops', label: '7. DevOps, Docker, CI/CD', pct: 0 }
+      ];
+
+      const tracksGridHTML = allTracksData.map(tr => `
+        <div style="background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);padding:8px 12px;border-radius:10px;">
+          <div style="display:flex;justify-content:space-between;font-size:0.76rem;margin-bottom:4px;">
+            <span style="font-weight:600;color:${tr.pct > 0 ? 'var(--ink)' : 'var(--ink-muted)'};">${tr.label}</span>
+            <b style="color:${tr.pct > 0 ? '#34d399' : 'var(--ink-muted)'};font-family:var(--font-m);">${tr.pct}%</b>
+          </div>
+          <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
+            <div style="height:100%;width:${tr.pct}%;background:${tr.pct > 0 ? '#10b981' : 'transparent'};"></div>
+          </div>
+        </div>
+      `).join('');
+
+      contentEl.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-family:var(--font-d);font-size:0.95rem;font-weight:800;color:var(--ink);">🧭 Матрица 7 направлений бэкенда</span>
+          <a href="#/map" class="linear-path-link">Карта навыков ➔</a>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));gap:8px;">
+          ${tracksGridHTML}
+        </div>
+      `;
+    }
+  };
+
   return `
     <div class="container dashboard-container">
 
       <!-- Топбар Эшелона Linear -->
-      <div class="echelon-topbar-clean" style="padding:12px 18px;border-radius:18px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;background:rgba(18,22,31,0.65);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.08);box-shadow:var(--shadow-1);">
+      <div class="echelon-topbar-clean" style="padding:12px 18px;border-radius:18px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;background:rgba(18,22,31,0.65);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.08);box-shadow:var(--shadow-1);">
         <div style="display:flex;align-items:center;gap:12px;min-width:0;flex-wrap:wrap;">
           <h1 class="rank-title-glow echelon-bordeaux-title" style="margin:0;font-size:1.18rem;">${readinessRank}</h1>
           <span class="meta" style="font-size:0.76rem;color:var(--ink-muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:3px 9px;border-radius:8px;">
@@ -54009,6 +54225,34 @@ viewDashboard = function(){
           </svg>
           <span>Брифинг</span>
         </button>
+      </div>
+
+      <!-- ЕДИНЫЙ КОМАНДНЫЙ СРЕЗ (FOUR PILLARS: Эшелоны · Пробелы · 7 Треков · Память SRS) -->
+      <div class="linear-command-bar">
+        <div class="linear-command-chip" data-cmd="echelon" onclick="toggleLinearCommandSheet('echelon')" title="Нажмите, чтобы открыть карту 4 эшелонов до Middle">
+          <span class="cmd-chip-icon">🏛️</span>
+          <span class="cmd-chip-title">Эшелон 1: <b style="color:#34d399;">${e1Pct}%</b></span>
+        </div>
+
+        <div class="linear-command-chip ${openGapsCount > 0 ? 'cmd-chip--warn' : ''}" data-cmd="gaps" onclick="toggleLinearCommandSheet('gaps')" title="Нажмите, чтобы посмотреть диагностированные пробелы">
+          <span class="cmd-chip-icon">${openGapsCount > 0 ? '⚠️' : '🛡️'}</span>
+          <span class="cmd-chip-title">${openGapsCount > 0 ? `${openGapsCount} пробела` : '0 пробелов ✓'}</span>
+        </div>
+
+        <div class="linear-command-chip" data-cmd="tracks" onclick="toggleLinearCommandSheet('tracks')" title="Нажмите, чтобы открыть покрытие 7 направлений бэкенда">
+          <span class="cmd-chip-icon">🧭</span>
+          <span class="cmd-chip-title">7 треков</span>
+        </div>
+
+        <a href="#/cards" ${targetDeckId ? `data-srs-open-deck="${targetDeckId}"` : ''} class="linear-command-chip ${dueTodayCardsCount > 0 ? 'cmd-chip--due' : ''}" style="text-decoration:none;" title="Нажмите, чтобы открыть очередь интервального повторения">
+          <span class="cmd-chip-icon">🔄</span>
+          <span class="cmd-chip-title">${dueTodayCardsCount > 0 ? `${dueTodayCardsCount} SRS к повтору` : 'Память 100% ✓'}</span>
+        </a>
+      </div>
+
+      <!-- Выдвижная Шторка Детализации Командного Среза -->
+      <div id="linearCmdDetail" class="linear-cmd-detail" style="display:none;">
+        <div id="linearCmdDetailContent"></div>
       </div>
 
       <!-- Главная Hero-карточка Фокуса (Linear Developer Style) -->
