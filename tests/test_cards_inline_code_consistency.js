@@ -59,7 +59,11 @@ console.log('--- Запуск теста консистентности инла
   assert(content.includes('fc-answer-item'), `${fileName}: должны быть пункты fc-answer-item`);
   assert(content.includes('fc-answer-bullet'), `${fileName}: должны быть маркеры fc-answer-bullet`);
 
-  console.log(`✓ ${fileName}: все инварианты десктопа, сайдбара, бусин и карточек соблюдены.`);
+  // З) Анимация разлетающихся искорок типа ✨
+  assert(content.includes('M12,0 Q12,12 24,12 Q12,12 12,24 Q12,12 0,12 Q12,12 12,0 Z'), `${fileName}: triggerSparksBurst должна генерировать 4-конечные векторные звёзды ✨`);
+  assert(content.includes('viewBox="0 0 32 32"'), `${fileName}: triggerSparksBurst должна включать кластерные звёзды в стиле эмодзи ✨`);
+
+  console.log(`✓ ${fileName}: все инварианты десктопа, сайдбара, бусин, карточек и салюта ✨ соблюдены.`);
 });
 
 // 2. Имитационный юнит-тест логики formatCardAnswerHTML

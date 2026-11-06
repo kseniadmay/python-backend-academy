@@ -37343,7 +37343,7 @@ function triggerSparksBurst(anchorOrEvent, gradeOrAmount, maybeEvent){
     if(anchorEl){
       if(anchorEl._sparksTriggered) return;
       anchorEl._sparksTriggered = true;
-      setTimeout(() => { try { delete anchorEl._sparksTriggered; } catch(_e){} }, 350);
+      setTimeout(() => { try { delete anchorEl._sparksTriggered; } catch(_e){} }, 300);
     }
 
     // Подбор цветовой палитры под оценку SRS (1..4) или начисление опыта
@@ -37358,40 +37358,40 @@ function triggerSparksBurst(anchorOrEvent, gradeOrAmount, maybeEvent){
     }
 
     let colors = ['#fbbf24', '#f59e0b', '#34d399', '#10b981', '#38bdf8', '#ffffff', '#fde68a'];
-    let sparkCount = 24;
-    let minDistance = 55;
-    let maxDistance = 95;
+    let sparkCount = 28;
+    let minDistance = 60;
+    let maxDistance = 110;
 
     if(grade === 4){
-      // «Сходу» / Easy — яркий изумрудно-бирюзовый триумф с золотыми звёздами
-      colors = ['#38bdf8', '#06b6d4', '#34d399', '#10b981', '#fbbf24', '#ffffff', '#a7f3d0'];
-      sparkCount = 30;
-      minDistance = 70;
-      maxDistance = 115;
+      // «Сходу» ✨+10 — триумфальный взрыв золотых и лазурных звёзд ✨
+      colors = ['#fbbf24', '#f59e0b', '#38bdf8', '#06b6d4', '#ffffff', '#fef08a', '#34d399'];
+      sparkCount = 34;
+      minDistance = 75;
+      maxDistance = 135;
     } else if(grade === 3){
-      // «Вспомнил» / Good — сочный мятно-изумрудный всплеск с золотом
-      colors = ['#34d399', '#10b981', '#059669', '#6ee7b7', '#fbbf24', '#ffffff'];
-      sparkCount = 24;
+      // «Вспомнил» ⚡+5 — сочный мятно-изумрудный блеск со звёздочками ✨
+      colors = ['#34d399', '#10b981', '#fbbf24', '#059669', '#6ee7b7', '#ffffff'];
+      sparkCount = 26;
       minDistance = 60;
-      maxDistance = 95;
+      maxDistance = 105;
     } else if(grade === 2){
-      // «Частично» / Hard — тёплый солнечный янтарно-цитриновый блеск
+      // «Частично» ⚡+2 — тёплый солнечный янтарно-золотой россыпью
       colors = ['#fbbf24', '#f59e0b', '#d97706', '#fde68a', '#ffffff'];
-      sparkCount = 20;
+      sparkCount = 22;
       minDistance = 50;
-      maxDistance = 85;
+      maxDistance = 90;
     } else if(grade === 1){
-      // «Не знаю» / Again — ободряющие кораллово-розовые и золотые искорки
+      // «Не знаю» 0 XP — мягкие кораллово-розовые и золотистые искорки
       colors = ['#fb7185', '#f43f5e', '#fda4af', '#f59e0b', '#fbbf24', '#ffffff'];
-      sparkCount = 18;
+      sparkCount = 20;
       minDistance = 45;
-      maxDistance = 75;
+      maxDistance = 80;
     } else if(typeof grade === 'number' && grade >= 10){
       // Бонусные очки опыта
       colors = ['#fbbf24', '#f59e0b', '#34d399', '#38bdf8', '#ffffff'];
-      sparkCount = 26;
-      minDistance = 65;
-      maxDistance = 105;
+      sparkCount = 30;
+      minDistance = 70;
+      maxDistance = 120;
     }
 
     const container = document.createElement('div');
@@ -37401,44 +37401,78 @@ function triggerSparksBurst(anchorOrEvent, gradeOrAmount, maybeEvent){
 
     for(let i = 0; i < sparkCount; i++){
       const spark = document.createElement('div');
-      const isStar = (i % 4 === 0);
       const color = colors[i % colors.length];
-      const size = isStar ? 12 : (3 + Math.random() * 4);
+      const isBigSparkle = (i % 3 === 0);
+      const isClusterSparkle = (i % 5 === 0);
+      const isTinyOrb = (i % 6 === 1);
 
       spark.style.cssText = `
         position:absolute;
         left:${originX}px;
         top:${originY}px;
-        width:${size}px;
-        height:${size}px;
-        border-radius:${isStar ? '0' : '50%'};
-        background:${isStar ? 'transparent' : color};
-        box-shadow:${isStar ? 'none' : '0 0 6px ' + color};
         pointer-events:none;
         will-change:transform, opacity;
       `;
 
-      if(isStar){
-        spark.innerHTML = `<span style="display:block;font-size:11px;line-height:1;color:${color};text-shadow:0 0 8px ${color};user-select:none;">✦</span>`;
+      if(isTinyOrb){
+        const orbSize = 3 + Math.random() * 3;
+        spark.style.width = orbSize + 'px';
+        spark.style.height = orbSize + 'px';
+        spark.style.borderRadius = '50%';
+        spark.style.background = color;
+        spark.style.boxShadow = `0 0 6px ${color}, 0 0 10px #ffffff`;
+      } else if(isClusterSparkle){
+        // Кластер из главной и спутниковой звезды, в точности как эмодзи ✨
+        const sSize = 16 + Math.round(Math.random() * 8);
+        spark.innerHTML = `
+          <svg viewBox="0 0 32 32" width="${sSize}" height="${sSize}" style="overflow:visible;filter:drop-shadow(0 0 5px ${color}) drop-shadow(0 0 10px ${color});">
+            <path d="M16,2 Q16,16 30,16 Q16,16 16,30 Q16,16 2,16 Q16,16 16,2 Z" fill="${color}"/>
+            <circle cx="16" cy="16" r="2.2" fill="#ffffff"/>
+            <path d="M26,2 Q26,6 30,6 Q26,6 26,10 Q26,6 22,6 Q26,6 26,2 Z" fill="#ffffff"/>
+          </svg>
+        `;
+      } else {
+        // Одиночная сияющая 4-конечная звезда ✨ с ярким белым ядром
+        const sSize = isBigSparkle ? (14 + Math.round(Math.random() * 6)) : (9 + Math.round(Math.random() * 4));
+        spark.innerHTML = `
+          <svg viewBox="0 0 24 24" width="${sSize}" height="${sSize}" style="overflow:visible;filter:drop-shadow(0 0 4px ${color}) drop-shadow(0 0 8px ${color});">
+            <path d="M12,0 Q12,12 24,12 Q12,12 12,24 Q12,12 0,12 Q12,12 12,0 Z" fill="${color}"/>
+            <circle cx="12" cy="12" r="${isBigSparkle ? 2 : 1.4}" fill="#ffffff"/>
+          </svg>
+        `;
       }
 
       container.appendChild(spark);
 
-      // Радиальный разлёт искр во все 360 градусов с лёгким дрейфом
-      const angle = (i / sparkCount) * 2 * Math.PI + (Math.random() - 0.5) * 0.45;
+      // Радиальный разлёт искр во все 360 градусов с лёгким гравитационным дрейфом
+      const angle = (i / sparkCount) * 2 * Math.PI + (Math.random() - 0.5) * 0.4;
       const distance = minDistance + Math.random() * (maxDistance - minDistance);
       const destX = Math.cos(angle) * distance;
-      const destY = Math.sin(angle) * distance + (Math.random() * 22);
-      const rotation = (Math.random() - 0.5) * 720;
+      const destY = Math.sin(angle) * distance + (Math.random() * 20) + 8;
+      const rotation = (Math.random() - 0.5) * 540;
 
       if(typeof spark.animate === 'function'){
         spark.animate([
-          { transform: 'translate(-50%, -50%) scale(0.6) rotate(0deg)', opacity: 1 },
-          { transform: `translate(calc(-50% + ${destX * 0.45}px), calc(-50% + ${destY * 0.45}px)) scale(1.3) rotate(${rotation * 0.45}deg)`, opacity: 1, offset: 0.35 },
-          { transform: `translate(calc(-50% + ${destX}px), calc(-50% + ${destY}px)) scale(0) rotate(${rotation}deg)`, opacity: 0, offset: 1.0 }
+          { 
+            transform: 'translate(-50%, -50%) scale(0.2) rotate(0deg)', 
+            opacity: 1,
+            filter: 'brightness(1.8)'
+          },
+          { 
+            transform: `translate(calc(-50% + ${destX * 0.45}px), calc(-50% + ${destY * 0.45}px)) scale(1.4) rotate(${rotation * 0.45}deg)`, 
+            opacity: 1, 
+            filter: 'brightness(1.4)',
+            offset: 0.32 
+          },
+          { 
+            transform: `translate(calc(-50% + ${destX}px), calc(-50% + ${destY}px)) scale(0) rotate(${rotation}deg)`, 
+            opacity: 0, 
+            filter: 'brightness(0.8)',
+            offset: 1.0 
+          }
         ], {
-          duration: 420 + Math.random() * 240,
-          easing: 'cubic-bezier(0.12, 0.85, 0.32, 1)',
+          duration: 500 + Math.random() * 280,
+          easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
           fill: 'forwards'
         });
       }
@@ -37446,7 +37480,7 @@ function triggerSparksBurst(anchorOrEvent, gradeOrAmount, maybeEvent){
 
     setTimeout(() => {
       try{ container.remove(); }catch(_e){}
-    }, 720);
+    }, 850);
   }catch(_err){}
 }
 window.triggerSparksBurst = triggerSparksBurst;
