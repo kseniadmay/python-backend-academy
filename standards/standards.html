@@ -16984,11 +16984,23 @@
 
 
   /* ========== Плавающий стеклянный остров мобильного таббара (Floating Liquid Glass Island) ========== */
-  :root {
-    --tabbar-h: 64px;
+  @media (min-width: 881px) {
+    .tabbar,
+    #tabbar {
+      display: none !important;
+      pointer-events: none !important;
+      visibility: hidden !important;
+      height: 0 !important;
+      overflow: hidden !important;
+    }
   }
 
-  .tabbar {
+  @media (max-width: 880px) {
+    :root {
+      --tabbar-h: 64px;
+    }
+
+    .tabbar {
     display: flex !important;
     position: fixed !important;
     left: 14px !important;
@@ -17109,6 +17121,8 @@
     border-radius: 99px !important;
     background: #10b981 !important;
     box-shadow: 0 0 8px rgba(16, 185, 129, 0.8) !important;
+  }
+
   }
 
   /* ========== Мобильный боковой ящик (Left Side Drawer) ========== */
@@ -28064,6 +28078,17 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
   .dot-jewel.bead-active-leading,
 
+  @keyframes srs-active-bead-pulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 10px #10b981, 0 0 20px rgba(52, 211, 153, 0.85);
+    }
+    50% {
+      transform: scale(1.22);
+      box-shadow: 0 0 14px #34d399, 0 0 28px rgba(52, 211, 153, 0.95), 0 0 6px #ffffff;
+    }
+  }
+
   .cards-hub-container .srs-deck-beads-bar .dot-jewel.active,
 
   .cards-hub-container .dot-jewel.bead-active-leading,
@@ -28078,11 +28103,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
     border: 2px solid #ffffff !important;
 
-    box-shadow: 0 0 12px #10b981, 0 0 22px rgba(52, 211, 153, 0.85) !important;
-
-    animation: none !important;
-
-    transform: none !important;
+    animation: srs-active-bead-pulse 2s infinite ease-in-out !important;
 
   }
 
@@ -29354,6 +29375,38 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   @keyframes fadeInSlide {
     from { opacity: 0; transform: translateY(-6px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+
+
+  /* Стилизация многострочных структурированных ответов карточек SRS */
+  .fc-answer-multiline {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+    margin: 4px auto;
+    width: 100%;
+    max-width: 540px;
+  }
+  .fc-answer-item {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .fc-answer-bullet {
+    color: #10b981;
+    font-weight: 700;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    user-select: none;
+  }
+  .fc-answer-text {
+    flex: 1 1 auto;
+  }
+  #srs-hint-btn, .fc-hint-chip[data-action="show-hint"], [data-hub-rescue] {
+    display: none !important;
   }
 
 </style>
@@ -42306,7 +42359,7 @@ function viewPythonSkill(sid){
             <!-- Кнопка 1: Не знаю -->
             <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-py-rate-card="1" title="Не знаю (Повтор сегодня · интервал ${srsPrev.again.days} дн)">
               <span class="srs-btn-title">Не знаю</span>
-              <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-again">Сброс</span></span>
+              <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-again">0 XP</span></span>
             </button>
 
             <!-- Кнопка 2: Частично -->
@@ -43962,75 +44015,56 @@ window.buildSrsDailyProgressBarHTML = buildSrsDailyProgressBarHTML;
 
 
 function formatCardAnswerHTML(rawAnswer){
-
   if(!rawAnswer) return '';
-
   let s = String(rawAnswer).trim();
 
-  
-
-  // Проверяем наличие ведущего блока кода с разделителем: <code>...</code> — Пояснение
-
-  const codeMatch = s.match(/^(?:<code>([\s\S]*?)<\/code>|`([^`\n]+)`|<pre class="[^"]*"><code>([\s\S]*?)<\/code><\/pre>)\s*(?:—|–|-|:)\s*([\s\S]*)$/i);
-
-  
-
-  if(codeMatch){
-
-    const rawCode = codeMatch[1] || codeMatch[2] || codeMatch[3];
-
-    const explanation = codeMatch[4];
-
-    
-
-    const cleanCode = rawCode
-
-      .replace(/&amp;/g, '&')
-
-      .replace(/&lt;/g, '<')
-
-      .replace(/&gt;/g, '>')
-
-      .replace(/&quot;/g, '"')
-
-      .replace(/&#x27;/g, "'")
-
-      .replace(/&#39;/g, "'");
-
-      
-
-    const reescaped = escapeHtmlStr(cleanCode);
-
-    const codeHtml = (typeof highlightPythonTokens === 'function') ? highlightPythonTokens(reescaped) : reescaped;
-
-    const expFormatted = (typeof formatRichInlineText === 'function') ? formatRichInlineText(explanation) : explanation;
-
-    
-
-    return `
-
-      <div class="fc-code-capsule">
-
-        <code class="fc-code-primary">${codeHtml}</code>
-
-      </div>
-
-      <div class="fc-answer-explanation">
-
-        ${expFormatted}
-
-      </div>
-
-    `;
-
+  // Если ответ содержит точки с запятой (мульти-ответ или сравнение, напр. 401 и 403):
+  // разделяем по ';' на аккуратный структурированный список пунктов
+  if(s.includes(';') && !s.includes('```')){
+    const parts = s.split(';').map(p => p.trim()).filter(Boolean);
+    if(parts.length > 1){
+      const itemsHtml = parts.map(part => {
+        const normalized = part.replace(/\s+(?:—|–|-)\s+/g, ' — ');
+        const formatted = (typeof formatRichInlineText === 'function') ? formatRichInlineText(normalized) : normalized;
+        return `<div class="fc-answer-item"><span class="fc-answer-bullet">•</span> <span class="fc-answer-text">${formatted}</span></div>`;
+      }).join('');
+      return `<div class="fc-answer-multiline">${itemsHtml}</div>`;
+    }
   }
 
-  
+  // Проверяем наличие ведущего блока кода с разделителем: <code>...</code> — Пояснение
+  const codeMatch = s.match(/^(?:<code>([\s\S]*?)<\/code>|`([^`\n]+)`|<pre class="[^"]*"><code>([\s\S]*?)<\/code><\/pre>)\s*(?:—|–|-|:)\s*([\s\S]*)$/i);
+
+  if(codeMatch){
+    const rawCode = codeMatch[1] || codeMatch[2] || codeMatch[3];
+    const explanation = codeMatch[4];
+
+    // Если пояснение содержит другие инлайн-блоки кода или точку с запятой,
+    // не выносим первый код в большую капсулу, а форматируем все инлайн-коды одинаково!
+    if(!explanation.includes('`') && !explanation.includes('<code>') && !explanation.includes(';')){
+      const cleanCode = rawCode
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#x27;/g, "'")
+        .replace(/&#39;/g, "'");
+      const reescaped = escapeHtmlStr(cleanCode);
+      const codeHtml = (typeof highlightPythonTokens === 'function') ? highlightPythonTokens(reescaped) : reescaped;
+      const expFormatted = (typeof formatRichInlineText === 'function') ? formatRichInlineText(explanation) : explanation;
+      return `
+        <div class="fc-code-capsule">
+          <code class="fc-code-primary">${codeHtml}</code>
+        </div>
+        <div class="fc-answer-explanation">
+          ${expFormatted}
+        </div>
+      `;
+    }
+  }
 
   return (typeof formatRichInlineText === 'function') ? formatRichInlineText(s) : s;
-
 }
-
 window.formatCardAnswerHTML = formatCardAnswerHTML;
 
 
@@ -44073,7 +44107,7 @@ function buildSrsRatingDockHTML(srsInfo, isFlipped){
 
           <span class="srs-btn-title">Не знаю</span>
 
-          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-again">Сброс</span></span>
+          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-again">0 XP</span></span>
 
         </button>
 
@@ -44359,35 +44393,7 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
 
 
-        <details class="srs-more-details" style="position:relative;display:inline-flex;align-items:center;height:30px;margin:0;padding:0;">
-
-          <summary class="btn btn-ghost srs-quiet-icon-btn srs-more-trigger" style="width:30px;height:30px;min-width:30px;min-height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--ink-muted);cursor:pointer;list-style:none;font-size:0.95rem;line-height:1;box-sizing:border-box;" title="Настройки и действия">···</summary>
-
-          <div class="srs-more-menu" style="position:absolute;right:0;top:calc(100% + 6px);background:var(--surface,#0f172a);border:1px solid var(--line,rgba(255,255,255,0.10));border-radius:14px;padding:6px;min-width:230px;box-shadow:0 14px 36px rgba(0,0,0,0.55);z-index:100;display:flex;flex-direction:column;gap:4px;backdrop-filter:blur(20px);">
-
-            <div style="padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:2px;">
-
-              <div style="font-size:0.68rem;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Финал 15 карточек</div>
-
-              <button type="button" class="btn btn-ghost" data-action="toggle-srs-finish-mode" style="width:100%;justify-content:space-between;font-size:0.78rem;padding:6px 8px;border-radius:8px;color:var(--ink);background:rgba(255,255,255,0.04);cursor:pointer;">
-
-                <span>🧘 Дзен-пауза для глаз</span>
-
-                <span style="color:${finishMode === 'zen' ? '#10b981' : 'var(--ink-muted)'};font-weight:700;">${finishMode === 'zen' ? 'ВКЛ' : 'ВЫКЛ'}</span>
-
-              </button>
-
-            </div>
-
-            <a href="#/docs" class="btn btn-ghost" data-hub-cheatsheet style="justify-content:flex-start;font-size:0.82rem;padding:8px 12px;border-radius:8px;text-decoration:none;color:var(--ink);">💡 Шпаргалка</a>
-
-            <button type="button" class="btn btn-ghost" data-srs-switch-tab="notes" style="justify-content:flex-start;font-size:0.82rem;padding:8px 12px;border-radius:8px;color:var(--ink);text-align:left;">📖 К конспектам</button>
-
-            <a href="#/practice" class="btn btn-ghost" style="justify-content:flex-start;font-size:0.82rem;padding:8px 12px;border-radius:8px;text-decoration:none;color:var(--ink);">💻 К тренажёру задач</a>
-
-          </div>
-
-        </details>
+        <!-- srs-more-details moved to sidebar -->
 
 
 
@@ -44943,7 +44949,7 @@ function viewCardsHub(){
 
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
 
-                  <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curKey}" id="srs-hint-btn" title="Шпаргалка (H)">💡</button>
+                  <!-- hint removed -->
 
                 </div>
 
@@ -45117,7 +45123,7 @@ function viewCardsHub(){
 
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
 
-                  <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curCardKey}" id="srs-hint-btn" title="Шпаргалка (H)">💡</button>
+                  <!-- hint removed -->
 
                 </div>
 
@@ -45417,7 +45423,7 @@ function viewCardsHub(){
 
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
 
-                  <button type="button" class="btn btn-ghost fc-hint-chip" data-action="show-hint" data-hub-rescue="${curCardKey}" id="srs-hint-btn" title="Шпаргалка (H)">💡</button>
+                  <!-- hint removed -->
 
                 </div>
 
@@ -52656,7 +52662,7 @@ function viewNotesSrsHub(noteSrsStats){
 
           <span class="srs-btn-title">Не знаю</span>
 
-          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-again">Сброс</span></span>
+          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-again">0 XP</span></span>
 
         </button>
 
@@ -55260,6 +55266,18 @@ document.addEventListener('keydown', function(e){
 
   if(!foot) return;
 
+  const srsSettingBox = document.createElement('div');
+  srsSettingBox.className = 'sidebar-srs-settings';
+  srsSettingBox.style.cssText = 'margin-bottom:8px;padding:8px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-between;gap:8px;';
+  const isZen = ((state.srsSprintFinishMode || 'zen') === 'zen');
+  srsSettingBox.innerHTML = `
+    <span style="font-size:0.76rem;color:var(--ink-muted);display:inline-flex;align-items:center;gap:6px;">🧘 <span>Дзен-пауза</span></span>
+    <button type="button" class="btn btn-ghost" data-action="toggle-srs-finish-mode" style="padding:3px 8px;font-size:0.72rem;font-weight:700;border-radius:6px;background:rgba(255,255,255,0.06);color:${isZen ? '#10b981' : 'var(--ink-muted)'};cursor:pointer;" title="Переключить режим завершения спринта (Дзен-пауза для глаз)">
+      ${isZen ? 'ВКЛ' : 'ВЫКЛ'}
+    </button>
+  `;
+  foot.insertBefore(srsSettingBox, foot.firstChild);
+
   const quickBtn = document.createElement('button');
 
   quickBtn.className = 'btn-quick-start';
@@ -55268,7 +55286,7 @@ document.addEventListener('keydown', function(e){
 
   quickBtn.innerHTML = '⚡ Микро-шаг';
 
-  foot.insertBefore(quickBtn, foot.firstChild);
+  foot.insertBefore(quickBtn, srsSettingBox.nextSibling);
 
 
 

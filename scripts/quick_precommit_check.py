@@ -124,6 +124,15 @@ def main() -> int:
                 return 1
             print(c_dom.stdout.strip())
 
+        # Защита от расхождений в инлайн-коде и регрессий карточек SRS
+        cards_test_path = os.path.join(_ROOT, 'tests', 'test_cards_inline_code_consistency.js')
+        if os.path.isfile(cards_test_path):
+            c_cards = subprocess.run(['node', cards_test_path], capture_output=True, text=True)
+            if c_cards.returncode != 0:
+                print(f'[HOOK ERROR] Сбой теста консистентности карточек SRS:\n{c_cards.stderr or c_cards.stdout}')
+                return 1
+            print('✓ [Pre-Commit] Тест консистентности инлайн-кода и карточек SRS пройден со 100% успехом.')
+
     print('✓ [Pre-Commit] Синтаксическая проверка пройдена (JS, Python, JSON, HTML inline в норме).')
     return 0
 
