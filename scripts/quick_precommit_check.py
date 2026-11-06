@@ -115,6 +115,15 @@ def main() -> int:
                 return 1
             print('✓ [Pre-Commit] Тест атомарности конспектов (Active Microlearning) пройден со 100% успехом.')
 
+        # Защита от белого/пустого экрана: проверка инициализации DOM, вызова render() и целостности ID
+        dom_smoke_path = os.path.join(_ROOT, 'tests', 'test_dom_init_smoke.js')
+        if os.path.isfile(dom_smoke_path):
+            c_dom = subprocess.run(['node', dom_smoke_path], capture_output=True, text=True)
+            if c_dom.returncode != 0:
+                print(f'[HOOK ERROR] Сбой теста инициализации DOM (Blank Screen Guard):\n{c_dom.stderr or c_dom.stdout}')
+                return 1
+            print(c_dom.stdout.strip())
+
     print('✓ [Pre-Commit] Синтаксическая проверка пройдена (JS, Python, JSON, HTML inline в норме).')
     return 0
 
