@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Шаг 6 · Визуализация подсветки фокусного навыка</title>
+  <style>
+    :root {
+      --bg: #0d1017;
+      --surface: #141923;
+      --surface-2: #1b2230;
+      --surface-3: #222b3d;
+      --line: rgba(255, 255, 255, 0.08);
+      --line-soft: rgba(255, 255, 255, 0.05);
+      --ink: #f1f5f9;
+      --ink-soft: #94a3b8;
+      --ink-muted: #64748b;
+      --emerald: #10b981;
+      --cyan: #00a2b9;
+      --font-d: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-m: "JetBrains Mono", Consolas, monospace;
+    }
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-2: #f1f5f9;
+      --surface-3: #e2e8f0;
+      --line: #e2e8f0;
+      --line-soft: #edf2f7;
+      --ink: #0f172a;
+      --ink-soft: #475569;
+      --ink-muted: #94a3b8;
+      --emerald: #059669;
+      --cyan: #007a87;
+    }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-d);
+      margin: 0;
+      padding: 24px;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--line);
+    }
+    .tab-btn {
+      padding: 8px 16px;
+      border-radius: 9px;
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      color: var(--ink);
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Step 6 Animations */
+    @keyframes emeraldPulse {
+      0%, 100% {
+        box-shadow: 0 0 0 1.5px #ffffff, 0 0 12px rgba(16, 185, 129, 0.95);
+        transform: scale(1.3);
+      }
+      50% {
+        box-shadow: 0 0 0 2.5px #ffffff, 0 0 22px rgba(16, 185, 129, 1);
+        transform: scale(1.42);
+      }
+    }
+
+    .pixel {
+      width: 18px;
+      height: 18px;
+      border-radius: 3px;
+      display: inline-block;
+      transition: transform 0.15s ease;
+      cursor: pointer;
+    }
+    .pixel:hover {
+      transform: scale(1.6);
+      z-index: 10;
+    }
+
+    .px--m { background: #006f82 !important; }
+    .px--l2 { background: #00a2b9 !important; }
+    .px--l1 { background: #29b6f6 !important; }
+    .px--pr { background: #80d8ff !important; }
+    .px--ns { background: rgba(255, 255, 255, 0.08) !important; border: 1px solid rgba(255, 255, 255, 0.05); }
+    [data-theme="light"] .px--ns { background: #e2e8f0 !important; border: 1px solid #cbd5e1; }
+
+    /* Focus Classes */
+    .focus-pulse {
+      animation: emeraldPulse 2s infinite ease-in-out !important;
+      z-index: 20 !important;
+      position: relative;
+    }
+    .focus-ring {
+      box-shadow: 0 0 0 2.5px #ffffff, 0 0 8px rgba(0,0,0,0.5) !important;
+      transform: scale(1.3) !important;
+      z-index: 15 !important;
+      position: relative;
+    }
+    .focus-none {
+      /* default */
+    }
+
+    .variant-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+    }
+    .variant-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      font-family: var(--font-m);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+    .badge-1 { background: rgba(16,185,129,0.18); color: #10b981; border: 1px solid rgba(16,185,129,0.35); }
+    .badge-2 { background: rgba(255,255,255,0.1); color: var(--ink); border: 1px solid rgba(255,255,255,0.2); }
+    .badge-3 { background: rgba(0,162,185,0.15); color: #00a2b9; border: 1px solid rgba(0,162,185,0.3); }
+
+    .matrix-box {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid var(--line-soft);
+      border-radius: 14px;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 18px);
+      gap: 5px;
+      margin-top: 14px;
+    }
+    [data-theme="light"] .matrix-box { background: rgba(0,0,0,0.02); }
+
+    /* Switcher bar */
+    .live-switcher {
+      display: flex;
+      gap: 8px;
+      background: var(--surface-2);
+      padding: 6px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .switch-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      background: none;
+      color: var(--ink-soft);
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .switch-btn.is-active {
+      background: var(--surface);
+      color: #00a2b9;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <div class="top-header">
+      <div>
+        <h1 style="font-size:1.45rem;font-weight:800;margin:0;">Шаг 6: Подсветка фокусного навыка (следующего шага дня)</h1>
+        <p style="font-size:0.84rem;color:var(--ink-soft);margin:4px 0 0;">
+          Как студент должен визуально находить свой активный рубеж в сетке мозаики
+        </p>
+      </div>
+      <button onclick="toggleTheme()" class="tab-btn">🌓 Тема (Светлая / Тёмная)</button>
+    </div>
+
+    <!-- Live Unified Matrix with Switcher -->
+    <div style="background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px;margin-bottom:28px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:12px;">
+        <div>
+          <span style="font-family:var(--font-m);font-size:0.72rem;font-weight:800;color:var(--ink-muted);text-transform:uppercase;">
+            Интерактивный тест в реальной сетке 1-го эшелона
+          </span>
+          <h2 style="font-size:1.15rem;font-weight:800;margin:2px 0 0;">Переключайте режим подсветки прямо в мозаике:</h2>
+        </div>
+
+        <div class="live-switcher" style="margin-bottom:0;">
+          <button class="switch-btn is-active" id="btn-m1" onclick="applyMode('pulse')">✨ 1. Пульсирующая аура</button>
+          <button class="switch-btn" id="btn-m2" onclick="applyMode('ring')">⚪ 2. Белая рамка</button>
+          <button class="switch-btn" id="btn-m3" onclick="applyMode('none')">⬛ 3. Без выделения</button>
+        </div>
+      </div>
+
+      <div style="font-size:0.78rem;color:var(--ink-muted);margin-bottom:8px;">
+        Текущий фокус дня: <b style="color:#34d399;">Тема 1.1.4 · match/case и структурная распаковка</b> (квадратик #14)
+      </div>
+
+      <div class="matrix-box" id="liveGrid"></div>
+    </div>
+
+    <!-- COMPARISON CARDS -->
+    <h3 style="font-size:1.15rem;font-weight:800;margin:0 0 16px;">Детальное сравнение 3 вариантов:</h3>
+
+    <!-- OPTION 1 -->
+    <div class="variant-card" style="border-color:rgba(16,185,129,0.35);">
+      <div class="variant-badge badge-1">Вариант 1 · Мягкая пульсирующая аура (Soft Emerald Pulse) [Рекомендуется]</div>
+      <h3 style="margin:0 0 6px;font-size:1.1rem;">Живое изумрудное дыхание: мгновенный визуальный маяк</h3>
+      <p style="font-size:0.84rem;color:var(--ink-muted);margin:0 0 16px;">
+        Квадратик текущей темы плавно «дышит» изумрудным светом. Взгляд студента мгновенно находит свой урок дня, чётко видна граница между уже сданным материалом (слева) и будущими темами.
+      </p>
+
+      <div style="background:var(--surface-2);padding:16px;border-radius:12px;border:1px solid var(--line-soft);display:flex;align-items:center;gap:10px;">
+        <div class="pixel px--m" title="1.1.1 Срезы (Сдано)"></div>
+        <div class="pixel px--m" title="1.1.2 Множества (Сдано)"></div>
+        <div class="pixel px--m" title="1.1.3 Генераторы (Сдано)"></div>
+        <div class="pixel px--l2 focus-pulse" title="Фокус дня: 1.1.4 match/case"></div>
+        <div class="pixel px--l1" title="1.1.5 Битовые операции"></div>
+        <div class="pixel px--ns" title="1.2.1 Словари"></div>
+        <div class="pixel px--ns" title="1.2.2 Defaultdict"></div>
+      </div>
+      <div style="font-size:0.74rem;color:var(--emerald);margin-top:8px;font-weight:700;">
+        ▲ Посмотрите на 4-й квадратик: плавная анимация дыхания привлекает внимание к задаче дня.
+      </div>
+    </div>
+
+    <!-- OPTION 2 -->
+    <div class="variant-card">
+      <div class="variant-badge badge-2">Вариант 2 · Белая контрастная рамка (White Ring)</div>
+      <h3 style="margin:0 0 6px;font-size:1.1rem;">Строгий ювелирный контур 2.5px без анимации</h3>
+      <p style="font-size:0.84rem;color:var(--ink-muted);margin:0 0 16px;">
+        Статичный контрастный белый ободок вокруг квадратика активного навыка. Спокойная классическая графика без мерцания и нагрузки на процессор.
+      </p>
+
+      <div style="background:var(--surface-2);padding:16px;border-radius:12px;border:1px solid var(--line-soft);display:flex;align-items:center;gap:10px;">
+        <div class="pixel px--m" title="1.1.1 Срезы (Сдано)"></div>
+        <div class="pixel px--m" title="1.1.2 Множества (Сдано)"></div>
+        <div class="pixel px--m" title="1.1.3 Генераторы (Сдано)"></div>
+        <div class="pixel px--l2 focus-ring" title="Фокус дня: 1.1.4 match/case"></div>
+        <div class="pixel px--l1" title="1.1.5 Битовые операции"></div>
+        <div class="pixel px--ns" title="1.2.1 Словари"></div>
+        <div class="pixel px--ns" title="1.2.2 Defaultdict"></div>
+      </div>
+      <div style="font-size:0.74rem;color:var(--ink-soft);margin-top:8px;font-weight:700;">
+        ▲ 4-й квадратик выделен чётким белым контуром 2.5px.
+      </div>
+    </div>
+
+    <!-- OPTION 3 -->
+    <div class="variant-card">
+      <div class="variant-badge badge-3">Вариант 3 · Чистый Khan Academy (Без спец-выделения)</div>
+      <h3 style="margin:0 0 6px;font-size:1.1rem;">100% однородная мозаика данных</h3>
+      <p style="font-size:0.84rem;color:var(--ink-muted);margin:0 0 16px;">
+        Все плитки абсолютно одинаковы и отображают строго цвет своего уровня освоения. Студент ориентируется по Hero-карточке дня выше, а сетка остаётся однородным массивом.
+      </p>
+
+      <div style="background:var(--surface-2);padding:16px;border-radius:12px;border:1px solid var(--line-soft);display:flex;align-items:center;gap:10px;">
+        <div class="pixel px--m" title="1.1.1 Срезы (Сдано)"></div>
+        <div class="pixel px--m" title="1.1.2 Множества (Сдано)"></div>
+        <div class="pixel px--m" title="1.1.3 Генераторы (Сдано)"></div>
+        <div class="pixel px--l2" title="Тема: 1.1.4 match/case"></div>
+        <div class="pixel px--l1" title="1.1.5 Битовые операции"></div>
+        <div class="pixel px--ns" title="1.2.1 Словари"></div>
+        <div class="pixel px--ns" title="1.2.2 Defaultdict"></div>
+      </div>
+      <div style="font-size:0.74rem;color:var(--ink-muted);margin-top:8px;font-weight:600;">
+        ▲ Все квадратики одинаковы, без спец-маркеров.
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let currentMode = 'pulse';
+
+    function renderLiveGrid() {
+      const g = document.getElementById('liveGrid');
+      let html = '';
+      for(let i = 0; i < 68; i++) {
+        let cls = 'px--ns';
+        if(i < 13) cls = 'px--m';
+        else if(i === 13) cls = 'px--l2'; // active focus
+        else if(i < 20) cls = 'px--l1';
+        else if(i < 24) cls = 'px--pr';
+
+        let focusCls = '';
+        if(i === 13) {
+          if(currentMode === 'pulse') focusCls = 'focus-pulse';
+          else if(currentMode === 'ring') focusCls = 'focus-ring';
+        }
+
+        html += `<div class="pixel ${cls} ${focusCls}" title="Тема #${i+1}"></div>`;
+      }
+      g.innerHTML = html;
+    }
+
+    function applyMode(m) {
+      currentMode = m;
+      document.querySelectorAll('.switch-btn').forEach(b => b.classList.remove('is-active'));
+      if(m === 'pulse') document.getElementById('btn-m1').classList.add('is-active');
+      else if(m === 'ring') document.getElementById('btn-m2').classList.add('is-active');
+      else document.getElementById('btn-m3').classList.add('is-active');
+      renderLiveGrid();
+    }
+
+    function toggleTheme() {
+      const cur = document.body.getAttribute('data-theme');
+      document.body.setAttribute('data-theme', cur === 'light' ? 'dark' : 'light');
+    }
+
+    renderLiveGrid();
+  </script>
+</body>
+</html>

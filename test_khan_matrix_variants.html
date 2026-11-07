@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Сводная визуализация сессии /grill-me | Python Backend Academy</title>
+  <style>
+    :root {
+      --bg: #0d1017;
+      --surface: #141923;
+      --surface-2: #1b2230;
+      --surface-3: #222b3d;
+      --line: rgba(255, 255, 255, 0.08);
+      --line-soft: rgba(255, 255, 255, 0.05);
+      --ink: #f1f5f9;
+      --ink-soft: #94a3b8;
+      --ink-muted: #64748b;
+      --emerald: #10b981;
+      --cyan: #00a2b9;
+      --font-d: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-m: "JetBrains Mono", Consolas, monospace;
+    }
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-2: #f1f5f9;
+      --surface-3: #e2e8f0;
+      --line: #e2e8f0;
+      --line-soft: #edf2f7;
+      --ink: #0f172a;
+      --ink-soft: #475569;
+      --ink-muted: #94a3b8;
+      --emerald: #059669;
+      --cyan: #007a87;
+    }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-d);
+      margin: 0;
+      padding: 24px;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    .session-stepper {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .step-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+    }
+    .step-pill.done {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.35);
+      color: #34d399;
+    }
+    .step-pill.active {
+      background: rgba(0, 162, 185, 0.15);
+      border-color: #00a2b9;
+      color: #00a2b9;
+      box-shadow: 0 0 12px rgba(0, 162, 185, 0.2);
+    }
+
+    /* Live Preview Component */
+    .khan-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 26px;
+      box-shadow: 0 6px 30px rgba(0,0,0,0.25);
+      margin-bottom: 30px;
+    }
+    .khan-progress-layout {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .donut-wrap {
+      position: relative;
+      width: 116px;
+      height: 116px;
+      flex-shrink: 0;
+    }
+    .donut-svg {
+      width: 116px;
+      height: 116px;
+      transform: rotate(-90deg);
+    }
+    .donut-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .donut-num {
+      font-family: var(--font-m);
+      font-size: 1.7rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--ink);
+    }
+    .donut-label {
+      font-size: 0.68rem;
+      color: var(--ink-muted);
+      margin-top: 3px;
+      font-weight: 600;
+    }
+
+    .legend-box {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      min-width: 260px;
+      flex: 1;
+    }
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.84rem;
+    }
+    .sq {
+      width: 13px;
+      height: 13px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .sq--m, .px--m { background: #006f82 !important; }
+    .sq--l2, .px--l2 { background: #00a2b9 !important; }
+    .sq--l1, .px--l1 { background: #29b6f6 !important; }
+    .sq--pr, .px--pr { background: #80d8ff !important; }
+    .sq--ns, .px--ns { background: rgba(255,255,255,0.08) !important; border: 1px solid rgba(255,255,255,0.05); }
+    [data-theme="light"] .sq--ns, [data-theme="light"] .px--ns { background: #e2e8f0 !important; border: 1px solid #cbd5e1; }
+
+    /* Supergrid */
+    .grid-wrap {
+      background: rgba(0,0,0,0.22);
+      border: 1px solid var(--line-soft);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    [data-theme="light"] .grid-wrap { background: rgba(0,0,0,0.02); }
+    .grid-monolith {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 16px);
+      gap: 4px;
+    }
+    .pixel {
+      width: 16px;
+      height: 16px;
+      border-radius: 2.5px;
+      cursor: pointer;
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s;
+    }
+    .pixel:hover {
+      transform: scale(1.65);
+      z-index: 10;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+    }
+
+    /* Modal Simulation */
+    .sim-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.72);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 999;
+      animation: fadeIn .15s ease-out;
+    }
+    .sim-modal-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      max-width: 520px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Switcher Pills */
+    .legend-switcher {
+      display: flex;
+      gap: 6px;
+      background: var(--surface-2);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      margin-bottom: 16px;
+    }
+    .switcher-btn {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      background: none;
+      color: var(--ink-soft);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .switcher-btn.is-active {
+      background: var(--surface);
+      color: var(--cyan);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .choice-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px;
+      transition: all 0.2s ease;
+    }
+    .choice-card.selected {
+      border-color: #00a2b9;
+      box-shadow: 0 0 16px rgba(0,162,185,0.25);
+    }
+  
+    /* Step 6 Focus Styles */
+    @keyframes focusPulse {
+      0%, 100% {
+        box-shadow: 0 0 0 1.5px #fff, 0 0 10px rgba(16, 185, 129, 0.9);
+        transform: scale(1.22);
+      }
+      50% {
+        box-shadow: 0 0 0 2px #fff, 0 0 18px rgba(16, 185, 129, 1);
+        transform: scale(1.32);
+      }
+    }
+    .px-focus-pulse {
+      animation: focusPulse 2s infinite ease-in-out !important;
+      z-index: 10 !important;
+      border-radius: 3px !important;
+    }
+    .px-focus-ring {
+      box-shadow: 0 0 0 2px #ffffff !important;
+      transform: scale(1.2) !important;
+      z-index: 9 !important;
+      border-radius: 3px !important;
+    }
+
+</style>
+</head>
+<body>
+
+  <div class="container">
+
+    <div class="header-bar">
+      <div>
+        <h1 style="font-size:1.45rem;font-weight:800;margin:0;">Сводная витрина решений сессии /grill-me</h1>
+        <p style="font-size:0.84rem;color:var(--ink-soft);margin:4px 0 0;">Полная визуализация согласованных решений и текущего выбора легенды</p>
+      </div>
+      <button onclick="toggleTheme()" class="switcher-btn" style="border:1px solid var(--line);background:var(--surface);">🌓 Тема</button>
+    </div>
+
+    <!-- Stepper of Session Decisions -->
+    <div class="session-stepper">
+      <div class="step-pill done">
+        <span>✓ Шаг 1: Компоновка</span>
+        <b style="color:#fff;">Вариант A (Монолитная мозаика)</b>
+      </div>
+      <div class="step-pill done">
+        <span>✓ Шаг 2: Клик по плитке</span>
+        <b style="color:#fff;">Вариант 1 (Khan Skill Modal)</b>
+      </div>
+      <div class="step-pill active">
+        <span>● Шаг 3: Выбор легенды</span>
+        <b>3 варианта формулировок</b>
+      </div>
+    </div>
+
+    <!-- Interactive Live Preview of Unified Component -->
+    <div class="khan-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
+        <div>
+          <span style="font-family:var(--font-m);font-size:0.72rem;font-weight:800;color:var(--ink-muted);letter-spacing:0.08em;text-transform:uppercase;">
+            MISSION PROGRESS · ЭШЕЛОН 1 (ФУНДАМЕНТ JUNIOR)
+          </span>
+          <h2 style="font-size:1.35rem;font-weight:800;margin:4px 0 0;">Эшелон 1: Допуск к тех-скринингу</h2>
+        </div>
+
+        <!-- Legend Switcher -->
+        <div class="legend-switcher">
+          <button class="switcher-btn is-active" id="btn-v1" onclick="selectLegendVariant('v1')">Вариант 1 · Русский + MP</button>
+          <button class="switcher-btn" id="btn-v2" onclick="selectLegendVariant('v2')">Вариант 2 · Khan EN</button>
+          <button class="switcher-btn" id="btn-v3" onclick="selectLegendVariant('v3')">Вариант 3 · Интервью</button>
+        </div>
+      </div>
+
+      <!-- Donut & Legend -->
+      <div class="khan-progress-layout">
+        <div class="donut-wrap">
+          <svg class="donut-svg" viewBox="0 0 112 112">
+            <circle cx="56" cy="56" r="44" fill="none" stroke="currentColor" style="stroke:rgba(255,255,255,0.08);" stroke-width="11"></circle>
+            <circle cx="56" cy="56" r="44" fill="none" stroke="#006f82" stroke-width="11" stroke-dasharray="165 111" stroke-dashoffset="0"></circle>
+            <circle cx="56" cy="56" r="44" fill="none" stroke="#00a2b9" stroke-width="11" stroke-dasharray="32 244" stroke-dashoffset="-165"></circle>
+            <circle cx="56" cy="56" r="44" fill="none" stroke="#29b6f6" stroke-width="11" stroke-dasharray="24 252" stroke-dashoffset="-197"></circle>
+            <circle cx="56" cy="56" r="44" fill="none" stroke="#80d8ff" stroke-width="11" stroke-dasharray="16 260" stroke-dashoffset="-221"></circle>
+          </svg>
+          <div class="donut-center">
+            <span class="donut-num">76%</span>
+            <span class="donut-label" id="donutSub">готовность</span>
+          </div>
+        </div>
+
+        <div class="legend-box" id="legendContainer">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:0.78rem;">
+        <span style="color:#00a2b9;text-decoration:underline;cursor:pointer;">❓ Как подтверждаются навыки?</span>
+        <span style="color:var(--ink-muted);">Кликните на любую плитку для проверки модалки Шага 2 ➔</span>
+      </div>
+
+      <!-- Supergrid (Decision 1: Monolith A) -->
+      <div class="grid-wrap">
+        <div class="grid-monolith" id="gridPix"></div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line-soft);padding-top:14px;">
+        <span style="font-size:0.76rem;color:var(--ink-muted);">Всего в 1-м эшелоне: <b>68 ключевых тем</b> для скрининга</span>
+        <button style="padding:6px 14px;border-radius:10px;background:none;border:1px solid rgba(16,185,129,0.3);color:var(--emerald);font-size:0.80rem;font-weight:700;cursor:pointer;">
+          Открыть полную матрицу бэкенда (4 эшелона) ➔
+        </button>
+      </div>
+    </div>
+
+    <!-- 3 Legend Cards Comparative Breakdown -->
+    <h3 style="font-size:1.15rem;font-weight:800;margin:0 0 14px;">Сравнение 3 вариантов формулировок легенды:</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:16px;">
+      
+      <!-- Card 1 -->
+      <div class="choice-card selected" id="c1" onclick="selectLegendVariant('v1')">
+        <div style="display:inline-block;padding:3px 8px;border-radius:6px;background:rgba(0,162,185,0.15);color:#00a2b9;font-size:0.72rem;font-weight:800;margin-bottom:8px;">
+          ВАРИАНТ 1 [Рекомендуется]
+        </div>
+        <h4 style="margin:0 0 4px;font-size:0.96rem;">Канонический русский + MP</h4>
+        <p style="font-size:0.78rem;color:var(--ink-muted);margin:0 0 12px;">Понятно студенту с первого взгляда, прямая связь с баллами Mastery Points платформы.</p>
+        <div class="legend-box" style="font-size:0.82rem;">
+          <div class="legend-row"><span class="sq sq--m"></span><span><b>42</b> тем освоено (👑 100 MP)</span></div>
+          <div class="legend-row"><span class="sq sq--l2"></span><span><b>7</b> тем уровень 2 (⚡ 80 MP)</span></div>
+          <div class="legend-row"><span class="sq sq--l1"></span><span><b>6</b> тем уровень 1 (📖 50 MP)</span></div>
+          <div class="legend-row"><span class="sq sq--pr"></span><span><b>4</b> темы начато (💡 10–30 MP)</span></div>
+          <div class="legend-row"><span class="sq sq--ns"></span><span><b>9</b> тем не начато (⚪ 0 MP)</span></div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="choice-card" id="c2" onclick="selectLegendVariant('v2')">
+        <div style="display:inline-block;padding:3px 8px;border-radius:6px;background:rgba(255,255,255,0.08);color:var(--ink-soft);font-size:0.72rem;font-weight:800;margin-bottom:8px;">
+          ВАРИАНТ 2
+        </div>
+        <h4 style="margin:0 0 4px;font-size:0.96rem;">100% Оригинал Khan Academy (EN)</h4>
+        <p style="font-size:0.78rem;color:var(--ink-muted);margin:0 0 12px;">Точное копирование английских терминов со скриншота "The World of Math".</p>
+        <div class="legend-box" style="font-size:0.82rem;">
+          <div class="legend-row"><span class="sq sq--m"></span><span><b>42</b> skills mastered</span></div>
+          <div class="legend-row"><span class="sq sq--l2"></span><span><b>7</b> skills level two</span></div>
+          <div class="legend-row"><span class="sq sq--l1"></span><span><b>6</b> skills level one</span></div>
+          <div class="legend-row"><span class="sq sq--pr"></span><span><b>4</b> skills practiced</span></div>
+          <div class="legend-row"><span class="sq sq--ns"></span><span><b>9</b> skills not started</span></div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="choice-card" id="c3" onclick="selectLegendVariant('v3')">
+        <div style="display:inline-block;padding:3px 8px;border-radius:6px;background:rgba(16,185,129,0.15);color:#10b981;font-size:0.72rem;font-weight:800;margin-bottom:8px;">
+          ВАРИАНТ 3
+        </div>
+        <h4 style="margin:0 0 4px;font-size:0.96rem;">Интервью-ориентированный</h4>
+        <p style="font-size:0.78rem;color:var(--ink-muted);margin:0 0 12px;">Фокус на готовности к собеседованию: сданные тесты, решённый в Zen IDE код.</p>
+        <div class="legend-box" style="font-size:0.82rem;">
+          <div class="legend-row"><span class="sq sq--m"></span><span><b>42</b> темы · Сдано на интервью (100%)</span></div>
+          <div class="legend-row"><span class="sq sq--l2"></span><span><b>7</b> тем · Решено в Zen IDE (80%)</span></div>
+          <div class="legend-row"><span class="sq sq--l1"></span><span><b>6</b> тем · Теория изучена (50%)</span></div>
+          <div class="legend-row"><span class="sq sq--pr"></span><span><b>4</b> темы · В процессе решения</span></div>
+          <div class="legend-row"><span class="sq sq--ns"></span><span><b>9</b> тем · Ожидает изучения</span></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  
+    <!-- STEP 4: NAV SLICES ON FULL MAP -->
+    <div style="margin-top:40px;border-top:2px dashed var(--line);padding-top:24px;">
+      <h2 style="font-size:1.3rem;font-weight:800;margin:0 0 6px;">Шаг 4: Навигация и фильтрация на полной странице матрицы (#/map)</h2>
+      <p style="font-size:0.84rem;color:var(--ink-muted);margin:0 0 20px;">Как студент переключает срезы на странице всех 300+ тем бэкенда?</p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:16px;">
+        
+        <!-- Nav Opt 1 -->
+        <div class="choice-card selected" style="cursor:default;">
+          <div style="display:inline-block;padding:3px 8px;border-radius:6px;background:rgba(0,162,185,0.15);color:#00a2b9;font-size:0.72rem;font-weight:800;margin-bottom:8px;">
+            ВАРИАНТ 1 [Рекомендуется]
+          </div>
+          <h4 style="margin:0 0 4px;font-size:0.96rem;">Двухуровневая лента чипов (Slices Bar)</h4>
+          <p style="font-size:0.78rem;color:var(--ink-muted);margin:0 0 12px;">Верхний ряд — 4 эшелона, нижний — 7 треков. Всё видно в 1 клик без скрытых меню.</p>
+          <div style="background:var(--surface-2);padding:10px;border-radius:10px;border:1px solid var(--line-soft);">
+            <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:6px;">
+              <span style="font-size:0.72rem;padding:3px 8px;border-radius:6px;background:rgba(0,162,185,0.2);color:#00a2b9;font-weight:700;">🌐 Все 4 эшелона</span>
+              <span style="font-size:0.72rem;padding:3px 8px;border-radius:6px;background:var(--surface);border:1px solid var(--line);color:var(--ink-soft);">🛡️ Эшелон 1</span>
+              <span style="font-size:0.72rem;padding:3px 8px;border-radius:6px;background:var(--surface);border:1px solid var(--line);color:var(--ink-soft);">🎯 Эшелон 2</span>
+            </div>
+            <div style="display:flex;gap:6px;overflow-x:auto;">
+              <span style="font-size:0.68rem;padding:2px 6px;border-radius:5px;background:var(--surface);border:1px solid var(--line);color:var(--ink-muted);">🐍 Python</span>
+              <span style="font-size:0.68rem;padding:2px 6px;border-radius:5px;background:var(--surface);border:1px solid var(--line);color:var(--ink-muted);">🌐 Web</span>
+              <span style="font-size:0.68rem;padding:2px 6px;border-radius:5px;background:var(--surface);border:1px solid var(--line);color:var(--ink-muted);">🗄️ SQL</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nav Opt 2 -->
+        <div class="choice-card" style="cursor:default;">
+          <div style="display:inline-block;padding:3px 8px;border-radius:6px;background:rgba(255,255,255,0.08);color:var(--ink-soft);font-size:0.72rem;font-weight:800;margin-bottom:8px;">
+            ВАРИАНТ 2
+          </div>
+          <h4 style="margin:0 0 4px;font-size:0.96rem;">Компактный селектор (Select Dropdown)</h4>
+          <p style="font-size:0.78rem;color:var(--ink-muted);margin:0 0 12px;">Один аккуратный выпадающий список в шапке страницы. Экономит вертикальное место.</p>
+          <div style="background:var(--surface-2);padding:10px;border-radius:10px;border:1px solid var(--line-soft);">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--line);font-size:0.78rem;">
+              <span>🌐 Все 4 эшелона бэкенда (300+ тем)</span>
+              <span style="color:var(--ink-muted);">▾</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nav Opt 3 -->
+        <div class="choice-card" style="cursor:default;">
+          <div style="display:inline-block;padding:3px 8px;border-radius:6px;background:rgba(16,185,129,0.15);color:#10b981;font-size:0.72rem;font-weight:800;margin-bottom:8px;">
+            ВАРИАНТ 3
+          </div>
+          <h4 style="margin:0 0 4px;font-size:0.96rem;">Боковой рейл (Left Rail Navigator)</h4>
+          <p style="font-size:0.78rem;color:var(--ink-muted);margin:0 0 12px;">Вертикальная колонка слева: переключение по модулям как в технической документации.</p>
+          <div style="background:var(--surface-2);padding:10px;border-radius:10px;border:1px solid var(--line-soft);display:flex;gap:8px;">
+            <div style="width:75px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:3px;font-size:0.68rem;color:var(--ink-soft);">
+              <span style="color:#00a2b9;font-weight:700;">● Все темы</span>
+              <span>● Эшелон 1</span>
+              <span>● Эшелон 2</span>
+            </div>
+            <div style="flex:1;font-size:0.70rem;color:var(--ink-muted);display:flex;align-items:center;justify-content:center;">
+              [Сетка справа]
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+<!-- Modal Container for Decision 2 verification -->
+  <div id="modalBox" style="display:none;"></div>
+
+  <script>
+    const sampleSkills = [
+      { id: '1.1.1', title: 'Базовые коллекции и срезы (list, tuple, slice)', mp: 100, lvl: 'm', desc: 'Реверс срезом [::-1], slice-assignment и O(k) срезов на скрининге.' },
+      { id: '1.1.2', title: 'Множества и аргументы *args/**kwargs', mp: 100, lvl: 'm', desc: 'Хеширование frozenset, разыменование словарей **kwargs.' },
+      { id: '1.1.3', title: 'Генераторы списков (Comprehensions)', mp: 100, lvl: 'm', desc: 'Защита от утечки переменных в скоуп генератора.' },
+      { id: '1.1.4', title: 'Оператор match/case и структурная распаковка', mp: 80, lvl: 'l2', desc: 'Паттерн-матчинг в Python 3.10+, проверка вложенных JSON-схем.' },
+      { id: '1.1.5', title: 'Битовые операции и маски прав доступа', mp: 50, lvl: 'l1', desc: 'Битовые флаги permissions, XOR и побитовое И (&).' },
+      { id: '1.2.1', title: 'Словари: устройство hash-таблицы под капотом', mp: 100, lvl: 'm', desc: 'Открытая адресация, коллизии и компактный массив индексов Python 3.6+.' },
+      { id: '1.2.2', title: 'Defaultdict и Counter в модуле collections', mp: 100, lvl: 'm', desc: 'Группировка данных без KeyError и быстрый поиск топ-K элементов.' },
+      { id: '1.2.3', title: 'Двусвязная очередь deque', mp: 80, lvl: 'l2', desc: 'Амортизированное O(1) добавление с обоих концов в отличие от list O(N).' },
+      { id: '1.3.1', title: 'Области видимости LEGB и global/nonlocal', mp: 100, lvl: 'm', desc: 'Разрешение переменных в замыканиях и ловушки изменяемых дефолтов.' },
+      { id: '1.3.2', title: 'Декораторы функций с аргументами', mp: 80, lvl: 'l2', desc: 'Трехуровневые замыкания и сохранение метаданных через functools.wraps.' },
+      { id: '1.4.1', title: 'Иерархия исключений и кастомные Exception', mp: 100, lvl: 'm', desc: 'Перехват BaseException vs Exception, цепочки исключений from e.' },
+      { id: '2.2.1', title: 'Анатомия HTTP-запроса: методы, заголовки, тело', mp: 100, lvl: 'm', desc: 'Идемпотентность методов (GET, PUT, DELETE vs POST).' },
+      { id: '2.2.2', title: 'Коды состояния HTTP 2xx, 3xx, 4xx, 5xx', mp: 80, lvl: 'l2', desc: 'Разница между 401 Unauthorized и 403 Forbidden на скрининге.' },
+      { id: '4.1.1', title: 'Базовый SELECT, WHERE, ORDER BY и LIMIT', mp: 100, lvl: 'm', desc: 'Порядок логического выполнения предложений SQL-запроса.' },
+      { id: '4.1.2', title: 'INNER JOIN vs LEFT JOIN и ловушки NULL', mp: 80, lvl: 'l2', desc: 'Корректная фильтрация по правой таблице в WHERE vs ON.' },
+      { id: '5.1.1', title: 'О-нотация: оценка времени и памяти алгоритма', mp: 100, lvl: 'm', desc: 'Асимптотика O(1), O(log N), O(N), O(N log N) и O(N^2).' },
+      { id: '5.1.2', title: 'Паттерн двух указателей (Two Pointers)', mp: 50, lvl: 'l1', desc: 'Схлопывание сложности поиска пар с O(N^2) до O(N).' },
+      { id: '5.1.3', title: 'Бинарный поиск в отсортированном массиве', mp: 0, lvl: 'ns', desc: 'Инвариант границ l <= r и предотвращение зацикливания.' },
+      { id: '7.1.1', title: 'Git: ветвление, merge vs rebase', mp: 80, lvl: 'l2', desc: 'Чистая линейная история коммитов и разрешение конфликтов.' },
+      { id: '7.1.2', title: 'Юнит-тестирование с pytest и фикстурами', mp: 0, lvl: 'ns', desc: 'Скоупы фикстур (function, module, session) и параметризация.' }
+    ];
+
+    while(sampleSkills.length < 68) {
+      const idx = sampleSkills.length + 1;
+      const lvls = ['m', 'm', 'l2', 'l1', 'pr', 'ns'];
+      sampleSkills.push({
+        id: '1.' + Math.floor(idx/5) + '.' + (idx%5 || 5),
+        title: 'Тема фундирования #' + idx,
+        mp: lvls[idx % lvls.length] === 'm' ? 100 : (lvls[idx % lvls.length] === 'l2' ? 80 : 50),
+        lvl: lvls[idx % lvls.length],
+        desc: 'Ключевая тема базовой программы бэкенда для первичного отбора.'
+      });
+    }
+
+    const legendVariants = {
+      v1: {
+        sub: 'готовность',
+        rows: [
+          { cls: 'sq--m', text: '<b>42</b> тем освоено (👑 100 MP)' },
+          { cls: 'sq--l2', text: '<b>7</b> тем уровень 2 (⚡ 80 MP)' },
+          { cls: 'sq--l1', text: '<b>6</b> тем уровень 1 (📖 50 MP)' },
+          { cls: 'sq--pr', text: '<b>4</b> темы начато (💡 10–30 MP)' },
+          { cls: 'sq--ns', text: '<b>9</b> тем не начато (⚪ 0 MP)' }
+        ]
+      },
+      v2: {
+        sub: 'progress',
+        rows: [
+          { cls: 'sq--m', text: '<b>42</b> skills mastered' },
+          { cls: 'sq--l2', text: '<b>7</b> skills level two' },
+          { cls: 'sq--l1', text: '<b>6</b> skills level one' },
+          { cls: 'sq--pr', text: '<b>4</b> skills practiced' },
+          { cls: 'sq--ns', text: '<b>9</b> skills not started' }
+        ]
+      },
+      v3: {
+        sub: 'к скринингу',
+        rows: [
+          { cls: 'sq--m', text: '<b>42</b> темы · Сдано на интервью (100%)' },
+          { cls: 'sq--l2', text: '<b>7</b> тем · Решено в Zen IDE (80%)' },
+          { cls: 'sq--l1', text: '<b>6</b> тем · Теория изучена (50%)' },
+          { cls: 'sq--pr', text: '<b>4</b> темы · В процессе решения' },
+          { cls: 'sq--ns', text: '<b>9</b> тем · Ожидает изучения' }
+        ]
+      }
+    };
+
+    function selectLegendVariant(v) {
+      document.querySelectorAll('.switcher-btn').forEach(b => b.classList.remove('is-active'));
+      const activeBtn = document.getElementById(`btn-${v}`);
+      if(activeBtn) activeBtn.classList.add('is-active');
+
+      document.querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected'));
+      const activeCard = document.getElementById(v === 'v1' ? 'c1' : (v === 'v2' ? 'c2' : 'c3'));
+      if(activeCard) activeCard.classList.add('selected');
+
+      const data = legendVariants[v];
+      document.getElementById('donutSub').textContent = data.sub;
+      document.getElementById('legendContainer').innerHTML = data.rows.map(r => `
+        <div class="legend-row">
+          <span class="sq ${r.cls}"></span>
+          <span>${r.text}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderMonolith() {
+      const g = document.getElementById('gridPix');
+      g.innerHTML = sampleSkills.map((s, idx) => `
+        <div class="pixel px--${s.lvl}" title="${s.id} · ${s.title}" onclick="openVerifiedModal(${idx})"></div>
+      `).join('');
+    }
+
+    function openVerifiedModal(idx) {
+      const s = sampleSkills[idx];
+      const mb = document.getElementById('modalBox');
+      mb.style.display = 'block';
+      mb.innerHTML = `
+        <div class="sim-modal-overlay" onclick="closeVerifiedModal(event)">
+          <div class="sim-modal-card" onclick="event.stopPropagation()">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;border-bottom:1px solid var(--line);padding-bottom:10px;">
+              <div>
+                <span style="font-family:var(--font-m);font-size:0.72rem;background:rgba(0,162,185,0.15);color:#00a2b9;padding:2px 7px;border-radius:6px;font-weight:700;">Тема ${s.id}</span>
+                <h3 style="font-size:1.15rem;margin:6px 0 0;font-weight:800;">${s.title}</h3>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:1.2rem;font-weight:800;color:var(--emerald);font-family:var(--font-m);">${s.mp} MP</div>
+                <div style="font-size:0.70rem;color:var(--ink-muted);">${s.mp >= 100 ? '👑 Освоено' : '⚡ Уровень 2'}</div>
+              </div>
+            </div>
+
+            <div style="font-size:0.84rem;margin-bottom:16px;">
+              <div style="font-weight:700;margin-bottom:4px;">Зачем это нужно на скрининге:</div>
+              <div style="background:var(--surface-2);border:1px solid var(--line-soft);border-radius:10px;padding:10px 12px;color:var(--ink-soft);line-height:1.45;">
+                ${s.desc}
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+              <button style="padding:10px 14px;border-radius:10px;background:var(--surface-2);border:1px solid var(--line);display:flex;justify-content:space-between;color:var(--ink);cursor:pointer;font-weight:600;">
+                <span>📖 Конспекты темы (3 шт.)</span><span style="color:#00a2b9;">Читать →</span>
+              </button>
+              <button style="padding:10px 14px;border-radius:10px;background:var(--surface-2);border:1px solid var(--line);display:flex;justify-content:space-between;color:var(--ink);cursor:pointer;font-weight:600;">
+                <span>🗂️ Карточки темы (SRS)</span><span style="color:#00a2b9;">Повторить →</span>
+              </button>
+              <button style="padding:10px 14px;border-radius:10px;background:#00a2b9;border:none;display:flex;justify-content:space-between;color:#fff;cursor:pointer;font-weight:700;">
+                <span>💻 Решить в Zen IDE (5 задач)</span><span>В редактор ➔</span>
+              </button>
+            </div>
+
+            <div style="display:flex;justify-content:flex-end;">
+              <button onclick="closeVerifiedModal()" style="padding:7px 16px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink);cursor:pointer;">Закрыть</button>
+            </div>
+          </div>
+        
+    <!-- STEP 6: FOCUS BEACON SHOWCASE -->
+    <div style="margin-top:40px;border-top:2px dashed var(--line);padding-top:24px;">
+      <h2 style="font-size:1.3rem;font-weight:800;margin:0 0 6px;">Шаг 6: Подсветка фокусного навыка (следующего шага дня)</h2>
+      <p style="font-size:0.84rem;color:var(--ink-muted);margin:0 0 20px;">Как студент должен видеть на полотне мозаики свой текущий рубеж?</p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:16px;">
+        
+        <!-- Focus Opt 1 -->
+        <div class="choice-card selected" style="cursor:default;">
+          <div style="display:inline-block;padding:3px 8px;border-radius:6px;background:rgba(16,185,129,0.15);color:#10b981;font-size:0.72rem;font-weight:800;margin-bottom:8px;">
+            ВАРИАНТ 1 [Рекомендуется]
+          </div>
+          <h4 style="margin:0 0 4px;font-size:0.96rem;">Мягкая пульсирующая аура (Soft Emerald Pulse)</h4>
+          <p style="font-size:0.78rem;color:var(--ink-muted);margin:0 0 12px;">Плитка плавно «дышит» изумрудным светом. Взгляд студента мгновенно находит свой текущий урок дня.</p>
+          <div style="background:var(--surface-2);padding:14px;border-radius:12px;border:1px solid var(--line-soft);">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div class="pixel px--m"></div>
+              <div class="pixel px--m"></div>
+              <div class="pixel px--m"></div>
+              <div class="pixel px--l2 px-focus-pulse" title="Фокус: 1.1.4 · match/case (В фокусе дня!)"></div>
+              <div class="pixel px--l1"></div>
+              <div class="pixel px--ns"></div>
+              <div class="pixel px--ns"></div>
+            </div>
+            <div style="font-size:0.72rem;color:var(--emerald);margin-top:8px;font-weight:700;">● Живая изумрудная пульсация</div>
+          </div>
+        </div>
+
+        <!-- Focus Opt 2 -->
+        <div class="choice-card" style="cursor:default;">
+          <div style="display:inline-block;padding:3px 8px;border-radius:6px;background:rgba(255,255,255,0.08);color:var(--ink-soft);font-size:0.72rem;font-weight:800;margin-bottom:8px;">
+            ВАРИАНТ 2
+          </div>
+          <h4 style="margin:0 0 4px;font-size:0.96rem;">Белая контрастная рамка (White Ring)</h4>
+          <p style="font-size:0.78rem;color:var(--ink-muted);margin:0 0 12px;">Статичный ювелирный белый контур вокруг активного квадратика. Без анимации, строгий спокойный маркер.</p>
+          <div style="background:var(--surface-2);padding:14px;border-radius:12px;border:1px solid var(--line-soft);">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div class="pixel px--m"></div>
+              <div class="pixel px--m"></div>
+              <div class="pixel px--m"></div>
+              <div class="pixel px--l2 px-focus-ring" title="Фокус: 1.1.4 (Белая рамка)"></div>
+              <div class="pixel px--l1"></div>
+              <div class="pixel px--ns"></div>
+              <div class="pixel px--ns"></div>
+            </div>
+            <div style="font-size:0.72rem;color:var(--ink-soft);margin-top:8px;font-weight:700;">● Статичный белый контур 2px</div>
+          </div>
+        </div>
+
+        <!-- Focus Opt 3 -->
+        <div class="choice-card" style="cursor:default;">
+          <div style="display:inline-block;padding:3px 8px;border-radius:6px;background:rgba(0,162,185,0.15);color:#00a2b9;font-size:0.72rem;font-weight:800;margin-bottom:8px;">
+            ВАРИАНТ 3
+          </div>
+          <h4 style="margin:0 0 4px;font-size:0.96rem;">Чистый Khan Academy (Без спец-выделения)</h4>
+          <p style="font-size:0.78rem;color:var(--ink-muted);margin:0 0 12px;">Все плитки строго равны и отображают только цвет статуса. Студент ориентируется по Hero-карточке дня выше.</p>
+          <div style="background:var(--surface-2);padding:14px;border-radius:12px;border:1px solid var(--line-soft);">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div class="pixel px--m"></div>
+              <div class="pixel px--m"></div>
+              <div class="pixel px--m"></div>
+              <div class="pixel px--l2" title="Тема 1.1.4"></div>
+              <div class="pixel px--l1"></div>
+              <div class="pixel px--ns"></div>
+              <div class="pixel px--ns"></div>
+            </div>
+            <div style="font-size:0.72rem;color:var(--ink-muted);margin-top:8px;font-weight:600;">● Все плитки в едином стиле</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+</div>
+      `;
+    }
+
+    function closeVerifiedModal() {
+      document.getElementById('modalBox').style.display = 'none';
+    }
+
+    function toggleTheme() {
+      const cur = document.body.getAttribute('data-theme');
+      document.body.setAttribute('data-theme', cur === 'light' ? 'dark' : 'light');
+    }
+
+    selectLegendVariant('v1');
+    renderMonolith();
+  </script>
+</body>
+</html>

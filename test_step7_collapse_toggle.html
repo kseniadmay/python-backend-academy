@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Шаг 7 · Поведение сворачивания матрицы на дашборде</title>
+  <style>
+    :root {
+      --bg: #0d1017;
+      --surface: #141923;
+      --surface-2: #1b2230;
+      --surface-3: #222b3d;
+      --line: rgba(255, 255, 255, 0.08);
+      --line-soft: rgba(255, 255, 255, 0.05);
+      --ink: #f1f5f9;
+      --ink-soft: #94a3b8;
+      --ink-muted: #64748b;
+      --emerald: #10b981;
+      --cyan: #00a2b9;
+      --font-d: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-m: "JetBrains Mono", Consolas, monospace;
+    }
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-2: #f1f5f9;
+      --surface-3: #e2e8f0;
+      --line: #e2e8f0;
+      --line-soft: #edf2f7;
+      --ink: #0f172a;
+      --ink-soft: #475569;
+      --ink-muted: #94a3b8;
+      --emerald: #059669;
+      --cyan: #007a87;
+    }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-d);
+      margin: 0;
+      padding: 24px;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--line);
+    }
+    .tab-btn {
+      padding: 8px 16px;
+      border-radius: 9px;
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      color: var(--ink);
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .variant-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+    }
+    .variant-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      font-family: var(--font-m);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+    .badge-1 { background: rgba(0,162,185,0.18); color: #00a2b9; border: 1px solid rgba(0,162,185,0.35); }
+    .badge-2 { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+    .badge-3 { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+
+    /* Khan Styles */
+    .khan-progress-layout {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .donut-wrap {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      flex-shrink: 0;
+    }
+    .donut-svg {
+      width: 100px;
+      height: 100px;
+      transform: rotate(-90deg);
+    }
+    .donut-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .donut-pct {
+      font-family: var(--font-m);
+      font-size: 1.55rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--ink);
+    }
+    .donut-sub {
+      font-size: 0.65rem;
+      color: var(--ink-muted);
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    .legend-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 0.82rem;
+      flex: 1;
+      min-width: 240px;
+    }
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sq {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .sq--m, .px--m { background: #006f82 !important; }
+    .sq--l2, .px--l2 { background: #00a2b9 !important; }
+    .sq--l1, .px--l1 { background: #29b6f6 !important; }
+    .sq--pr, .px--pr { background: #80d8ff !important; }
+    .sq--ns, .px--ns { background: rgba(255, 255, 255, 0.08) !important; border: 1px solid rgba(255,255,255,0.05); }
+    [data-theme="light"] .sq--ns, [data-theme="light"] .px--ns { background: #e2e8f0 !important; border: 1px solid #cbd5e1; }
+
+    /* Supergrid */
+    .grid-box {
+      background: rgba(0,0,0,0.22);
+      border: 1px solid var(--line-soft);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    [data-theme="light"] .grid-box { background: rgba(0,0,0,0.02); }
+    .pixels-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 16px);
+      gap: 4px;
+    }
+    .pixel {
+      width: 16px;
+      height: 16px;
+      border-radius: 2.5px;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+    .pixel:hover {
+      transform: scale(1.6);
+      z-index: 10;
+    }
+
+    .khan-link-btn {
+      color: #00a2b9;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 0.80rem;
+      font-family: inherit;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <div class="top-header">
+      <div>
+        <h1 style="font-size:1.45rem;font-weight:800;margin:0;">Шаг 7: Поведение сворачивания матрицы на дашборде</h1>
+        <p style="font-size:0.84rem;color:var(--ink-soft);margin:4px 0 0;">
+          Как ссылка «Скрыть/показать матрицу» (Hide skill breakdown) должна работать по умолчанию
+        </p>
+      </div>
+      <button onclick="toggleTheme()" class="tab-btn">🌓 Тема</button>
+    </div>
+
+    <!-- OPTION 1 -->
+    <div class="variant-card" style="border-color:rgba(0,162,185,0.4);">
+      <div class="variant-badge badge-1">Вариант 1 · По умолчанию развёрнута (Open by default) [Рекомендуется]</div>
+      <h3 style="margin:0 0 6px;font-size:1.1rem;">Сразу виден прогресс + возможность скрыть</h3>
+      <p style="font-size:0.84rem;color:var(--ink-muted);margin:0 0 16px;">
+        Студент открывает дашборд и сразу видит свою мозаику 1-го эшелона (дофаминовый стимул!). Но если хочется минимализма — в один клик сворачивает её.
+      </p>
+
+      <div style="background:var(--surface-2);border-radius:14px;padding:16px;border:1px solid var(--line-soft);">
+        <div class="khan-progress-layout">
+          <div class="donut-wrap">
+            <svg class="donut-svg" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="10"></circle>
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#00a2b9" stroke-width="10" stroke-dasharray="190 251"></circle>
+            </svg>
+            <div class="donut-center">
+              <span class="donut-pct">76%</span>
+              <span class="donut-sub">к скринингу</span>
+            </div>
+          </div>
+          <div class="legend-list">
+            <div class="legend-row"><span class="sq sq--m"></span><span><b>42</b> тем · Сдано на интервью (100%)</span></div>
+            <div class="legend-row"><span class="sq sq--l2"></span><span><b>7</b> тем · Решено в Zen IDE (80%)</span></div>
+            <div class="legend-row"><span class="sq sq--ns"></span><span><b>9</b> тем · Ожидает изучения</span></div>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+          <span style="font-size:0.78rem;color:#00a2b9;text-decoration:underline;">❓ Как подтверждаются навыки?</span>
+          <button class="khan-link-btn" onclick="toggleGrid1()">
+            <span id="btn-text-1">Скрыть матрицу навыков ▼</span>
+          </button>
+        </div>
+
+        <div class="grid-box" id="grid-box-1">
+          <div class="pixels-grid" id="grid1"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OPTION 2 -->
+    <div class="variant-card">
+      <div class="variant-badge badge-2">Вариант 2 · По умолчанию свёрнута (Closed by default)</div>
+      <h3 style="margin:0 0 6px;font-size:1.1rem;">Максимальный Zero-Scroll на первом экране</h3>
+      <p style="font-size:0.84rem;color:var(--ink-muted);margin:0 0 16px;">
+        При входе виден только компактный Donut и легенда. Сетка квадратиков раскрывается по клику «Показать матрицу».
+      </p>
+
+      <div style="background:var(--surface-2);border-radius:14px;padding:16px;border:1px solid var(--line-soft);">
+        <div class="khan-progress-layout" style="margin-bottom:8px;padding-bottom:8px;">
+          <div class="donut-wrap">
+            <svg class="donut-svg" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="10"></circle>
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#00a2b9" stroke-width="10" stroke-dasharray="190 251"></circle>
+            </svg>
+            <div class="donut-center">
+              <span class="donut-pct">76%</span>
+              <span class="donut-sub">к скринингу</span>
+            </div>
+          </div>
+          <div class="legend-list">
+            <div class="legend-row"><span class="sq sq--m"></span><span><b>42</b> тем · Сдано на интервью (100%)</span></div>
+            <div class="legend-row"><span class="sq sq--l2"></span><span><b>7</b> тем · Решено в Zen IDE (80%)</span></div>
+            <div class="legend-row"><span class="sq sq--ns"></span><span><b>9</b> тем · Ожидает изучения</span></div>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:0.78rem;color:#00a2b9;text-decoration:underline;">❓ Как подтверждаются навыки?</span>
+          <button class="khan-link-btn" onclick="toggleGrid2()">
+            <span id="btn-text-2">Показать матрицу навыков ▲</span>
+          </button>
+        </div>
+
+        <div class="grid-box" id="grid-box-2" style="display:none;">
+          <div class="pixels-grid" id="grid2"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OPTION 3 -->
+    <div class="variant-card">
+      <div class="variant-badge badge-3">Вариант 3 · Всегда открыта (Always Visible)</div>
+      <h3 style="margin:0 0 6px;font-size:1.1rem;">Монолит без кнопок сворачивания</h3>
+      <p style="font-size:0.84rem;color:var(--ink-muted);margin:0 0 16px;">
+        Убираем лишний контрол «Скрыть/показать». Сетка 1-го эшелона всегда видна как фундаментальная часть карточки дашборда.
+      </p>
+
+      <div style="background:var(--surface-2);border-radius:14px;padding:16px;border:1px solid var(--line-soft);">
+        <div class="khan-progress-layout">
+          <div class="donut-wrap">
+            <svg class="donut-svg" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="10"></circle>
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#00a2b9" stroke-width="10" stroke-dasharray="190 251"></circle>
+            </svg>
+            <div class="donut-center">
+              <span class="donut-pct">76%</span>
+              <span class="donut-sub">к скринингу</span>
+            </div>
+          </div>
+          <div class="legend-list">
+            <div class="legend-row"><span class="sq sq--m"></span><span><b>42</b> тем · Сдано на интервью (100%)</span></div>
+            <div class="legend-row"><span class="sq sq--l2"></span><span><b>7</b> тем · Решено в Zen IDE (80%)</span></div>
+            <div class="legend-row"><span class="sq sq--ns"></span><span><b>9</b> тем · Ожидает изучения</span></div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <span style="font-size:0.78rem;color:#00a2b9;text-decoration:underline;">❓ Как подтверждаются навыки?</span>
+        </div>
+
+        <div class="grid-box">
+          <div class="pixels-grid" id="grid3"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function renderGrids() {
+      let html = '';
+      for(let i = 0; i < 68; i++) {
+        let cls = 'px--ns';
+        if(i < 42) cls = 'px--m';
+        else if(i < 49) cls = 'px--l2';
+        else if(i < 55) cls = 'px--l1';
+        else if(i < 59) cls = 'px--pr';
+        html += `<div class="pixel ${cls}"></div>`;
+      }
+      document.getElementById('grid1').innerHTML = html;
+      document.getElementById('grid2').innerHTML = html;
+      document.getElementById('grid3').innerHTML = html;
+    }
+
+    function toggleGrid1() {
+      const g = document.getElementById('grid-box-1');
+      const b = document.getElementById('btn-text-1');
+      const isClosed = g.style.display === 'none';
+      g.style.display = isClosed ? 'block' : 'none';
+      b.textContent = isClosed ? 'Скрыть матрицу навыков ▼' : 'Показать матрицу навыков ▲';
+    }
+
+    function toggleGrid2() {
+      const g = document.getElementById('grid-box-2');
+      const b = document.getElementById('btn-text-2');
+      const isClosed = g.style.display === 'none';
+      g.style.display = isClosed ? 'block' : 'none';
+      b.textContent = isClosed ? 'Скрыть матрицу навыков ▼' : 'Показать матрицу навыков ▲';
+    }
+
+    function toggleTheme() {
+      const cur = document.body.getAttribute('data-theme');
+      document.body.setAttribute('data-theme', cur === 'light' ? 'dark' : 'light');
+    }
+
+    renderGrids();
+  </script>
+</body>
+</html>

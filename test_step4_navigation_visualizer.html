@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Шаг 4 · Визуализация навигации полной матрицы (#/map)</title>
+  <style>
+    :root {
+      --bg: #0d1017;
+      --surface: #141923;
+      --surface-2: #1b2230;
+      --surface-3: #222b3d;
+      --line: rgba(255, 255, 255, 0.08);
+      --line-soft: rgba(255, 255, 255, 0.05);
+      --ink: #f1f5f9;
+      --ink-soft: #94a3b8;
+      --ink-muted: #64748b;
+      --emerald: #10b981;
+      --cyan: #00a2b9;
+      --font-d: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-m: "JetBrains Mono", Consolas, monospace;
+    }
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-2: #f1f5f9;
+      --surface-3: #e2e8f0;
+      --line: #e2e8f0;
+      --line-soft: #edf2f7;
+      --ink: #0f172a;
+      --ink-soft: #475569;
+      --ink-muted: #94a3b8;
+      --emerald: #059669;
+      --cyan: #007a87;
+    }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-d);
+      margin: 0;
+      padding: 24px;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      background: var(--surface-2);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+    }
+    .tab-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      background: none;
+      color: var(--ink-soft);
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .15s ease;
+    }
+    .tab-btn.is-active {
+      background: var(--surface);
+      color: var(--cyan);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .demo-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+    }
+    .demo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      font-family: var(--font-m);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+    }
+    .badge-1 { background: rgba(0,162,185,0.15); color: #00a2b9; border: 1px solid rgba(0,162,185,0.3); }
+    .badge-2 { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+    .badge-3 { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+
+    /* Layout Elements */
+    .khan-progress-layout {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .donut-wrap {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      flex-shrink: 0;
+    }
+    .donut-svg {
+      width: 100px;
+      height: 100px;
+      transform: rotate(-90deg);
+    }
+    .donut-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .donut-pct {
+      font-family: var(--font-m);
+      font-size: 1.55rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--ink);
+    }
+    .donut-sub {
+      font-size: 0.65rem;
+      color: var(--ink-muted);
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    .legend-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 0.80rem;
+      flex: 1;
+      min-width: 240px;
+    }
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sq {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .sq--m, .px--m { background: #006f82 !important; }
+    .sq--l2, .px--l2 { background: #00a2b9 !important; }
+    .sq--l1, .px--l1 { background: #29b6f6 !important; }
+    .sq--pr, .px--pr { background: #80d8ff !important; }
+    .sq--ns, .px--ns { background: rgba(255,255,255,0.08) !important; border: 1px solid rgba(255,255,255,0.05); }
+    [data-theme="light"] .sq--ns, [data-theme="light"] .px--ns { background: #e2e8f0 !important; border: 1px solid #cbd5e1; }
+
+    /* Supergrid */
+    .grid-box {
+      background: rgba(0,0,0,0.22);
+      border: 1px solid var(--line-soft);
+      border-radius: 12px;
+      padding: 14px;
+    }
+    [data-theme="light"] .grid-box { background: rgba(0,0,0,0.02); }
+    .pixels-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 16px);
+      gap: 4px;
+    }
+    .pixel {
+      width: 16px;
+      height: 16px;
+      border-radius: 2.5px;
+      cursor: pointer;
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s;
+    }
+    .pixel:hover {
+      transform: scale(1.65);
+      z-index: 10;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+    }
+
+    /* Variant 1: Slices Bar */
+    .slices-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+      scrollbar-width: thin;
+    }
+    .slice-chip {
+      padding: 6px 13px;
+      border-radius: 10px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      color: var(--ink-soft);
+      font-size: 0.78rem;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all .15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .slice-chip:hover {
+      border-color: #00a2b9;
+      color: var(--ink);
+    }
+    .slice-chip.is-active {
+      background: rgba(0,162,185,0.18);
+      border-color: #00a2b9;
+      color: #00a2b9;
+      box-shadow: 0 0 10px rgba(0,162,185,0.2);
+    }
+
+    /* Variant 2: Dropdown */
+    .dropdown-box {
+      position: relative;
+      margin-bottom: 16px;
+      max-width: 380px;
+    }
+    .select-btn {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      font-size: 0.86rem;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all .15s ease;
+    }
+    .select-btn:hover { border-color: #00a2b9; }
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 8px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+      z-index: 50;
+      display: none;
+    }
+    .dropdown-item {
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+    }
+    .dropdown-item:hover {
+      background: var(--surface-2);
+      color: #00a2b9;
+    }
+
+    /* Variant 3: Left Rail */
+    .rail-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 820px) {
+      .rail-layout { grid-template-columns: 1fr; }
+    }
+    .rail-box {
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .rail-item {
+      padding: 9px 12px;
+      border-radius: 9px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--ink-soft);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all .15s ease;
+    }
+    .rail-item:hover {
+      background: var(--surface);
+      color: var(--ink);
+    }
+    .rail-item.is-active {
+      background: rgba(0,162,185,0.18);
+      border: 1px solid rgba(0,162,185,0.4);
+      color: #00a2b9;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <div class="top-header">
+      <div>
+        <h1 style="font-size:1.45rem;font-weight:800;margin:0;">Интерактивная визуализация: Шаг 4 (/grill-me)</h1>
+        <p style="font-size:0.84rem;color:var(--ink-soft);margin:4px 0 0;">
+          Попробуйте покликать по фильтрам каждого из 3 вариантов навигации для полной матрицы
+        </p>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button onclick="toggleTheme()" class="tab-btn" style="border:1px solid var(--line);background:var(--surface);">🌓 Тема</button>
+        <div class="nav-tabs">
+          <button class="tab-btn is-active" onclick="showDemo('all')">Все 3 варианта</button>
+          <button class="tab-btn" onclick="showDemo('1')">Вариант 1 (Чипы)</button>
+          <button class="tab-btn" onclick="showDemo('2')">Вариант 2 (Селектор)</button>
+          <button class="tab-btn" onclick="showDemo('3')">Вариант 3 (Боковой рейл)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEMO 1: SLICES BAR -->
+    <div class="demo-card" id="demo-1">
+      <div class="demo-badge badge-1">Вариант 1 · Двухуровневая лента чипов (Slices Bar) [Рекомендуется]</div>
+      <h3 style="margin:0 0 4px;font-size:1.15rem;">Всё перед глазами в 1 клик</h3>
+      <p style="font-size:0.82rem;color:var(--ink-muted);margin:0 0 16px;">
+        Верхний ряд переключает 4 эшелона с процентами прогресса. Нижний ряд переключает 7 технологических треков. Попробуйте кликнуть:
+      </p>
+
+      <!-- Slices Bar -->
+      <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:16px;">
+        <div class="slices-row" id="row-echelons-1">
+          <button class="slice-chip is-active" onclick="filterSlice1('all', this)"><span>🌐 Все 4 эшелона</span> <b>48%</b></button>
+          <button class="slice-chip" onclick="filterSlice1('e1', this)"><span>🛡️ Эшелон 1: Фундамент</span> <b>76%</b></button>
+          <button class="slice-chip" onclick="filterSlice1('e2', this)"><span>🎯 Эшелон 2: Стек & БД</span> <b>34%</b></button>
+          <button class="slice-chip" onclick="filterSlice1('e3', this)"><span>🚀 Эшелон 3: Прод</span> <b>12%</b></button>
+          <button class="slice-chip" onclick="filterSlice1('e4', this)"><span>🏛️ Эшелон 4: Middle</span> <b>0%</b></button>
+        </div>
+        <div class="slices-row" style="margin-bottom:0;" id="row-tracks-1">
+          <button class="slice-chip" onclick="filterSlice1('python', this)" style="font-size:0.74rem;padding:4px 10px;">🐍 Python Core</button>
+          <button class="slice-chip" onclick="filterSlice1('web', this)" style="font-size:0.74rem;padding:4px 10px;">🌐 Web & HTTP</button>
+          <button class="slice-chip" onclick="filterSlice1('backend', this)" style="font-size:0.74rem;padding:4px 10px;">⚙️ FastAPI & DRF</button>
+          <button class="slice-chip" onclick="filterSlice1('db', this)" style="font-size:0.74rem;padding:4px 10px;">🗄️ Базы данных SQL</button>
+          <button class="slice-chip" onclick="filterSlice1('algo', this)" style="font-size:0.74rem;padding:4px 10px;">⚡ Алгоритмы O(N)</button>
+          <button class="slice-chip" onclick="filterSlice1('docker', this)" style="font-size:0.74rem;padding:4px 10px;">🚀 Docker & Инфра</button>
+        </div>
+      </div>
+
+      <!-- Preview Component 1 -->
+      <div style="background:var(--surface-2);border-radius:14px;padding:16px;border:1px solid var(--line-soft);">
+        <div class="khan-progress-layout">
+          <div class="donut-wrap">
+            <svg class="donut-svg" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="10"></circle>
+              <circle id="donut1" cx="50" cy="50" r="40" fill="none" stroke="#00a2b9" stroke-width="10" stroke-dasharray="120 251" stroke-dashoffset="0"></circle>
+            </svg>
+            <div class="donut-center">
+              <span class="donut-pct" id="pct1">48%</span>
+              <span class="donut-sub">готовность</span>
+            </div>
+          </div>
+          <div class="legend-list">
+            <div class="legend-row"><span class="sq sq--m"></span><span id="txt-m1"><b>142</b> темы · Сдано на интервью (100%)</span></div>
+            <div class="legend-row"><span class="sq sq--l2"></span><span id="txt-l21"><b>34</b> темы · Решено в Zen IDE (80%)</span></div>
+            <div class="legend-row"><span class="sq sq--l1"></span><span id="txt-l11"><b>28</b> тем · Теория изучена (50%)</span></div>
+            <div class="legend-row"><span class="sq sq--pr"></span><span id="txt-pr1"><b>18</b> тем · В процессе решения</span></div>
+            <div class="legend-row"><span class="sq sq--ns"></span><span id="txt-ns1"><b>96</b> тем · Ожидает изучения</span></div>
+          </div>
+        </div>
+
+        <div class="grid-box">
+          <div class="pixels-grid" id="grid1"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEMO 2: SELECT DROPDOWN -->
+    <div class="demo-card" id="demo-2">
+      <div class="demo-badge badge-2">Вариант 2 · Компактный выпадающий селектор (Select Dropdown)</div>
+      <h3 style="margin:0 0 4px;font-size:1.15rem;">Строгий минимализм и экономия высоты</h3>
+      <p style="font-size:0.82rem;color:var(--ink-muted);margin:0 0 16px;">
+        Все срезы упакованы в один компактный дропдаун. Нажмите на селектор ниже, чтобы раскрыть варианты:
+      </p>
+
+      <div class="dropdown-box">
+        <button class="select-btn" onclick="toggleDropdown()">
+          <span id="dropdownSelectedText">🌐 Все 4 эшелона бэкенда (318 тем · 48%)</span>
+          <span style="color:#00a2b9;">▾</span>
+        </button>
+        <div class="dropdown-menu" id="dropdownMenu">
+          <div style="font-size:0.68rem;font-weight:800;color:var(--ink-muted);padding:4px 8px;text-transform:uppercase;">🏛️ 4 Эшелона программы:</div>
+          <div class="dropdown-item" onclick="selectDropSlice('all', '🌐 Все 4 эшелона (318 тем · 48%)')"><span>🌐 Все 4 эшелона</span> <b>48%</b></div>
+          <div class="dropdown-item" onclick="selectDropSlice('e1', '🛡️ Эшелон 1: Фундамент (68 тем · 76%)')"><span>🛡️ Эшелон 1: Фундамент</span> <b>76%</b></div>
+          <div class="dropdown-item" onclick="selectDropSlice('e2', '🎯 Эшелон 2: Стек разработчика (92 темы · 34%)')"><span>🎯 Эшелон 2: Стек</span> <b>34%</b></div>
+          <div class="dropdown-item" onclick="selectDropSlice('e3', '🚀 Эшелон 3: Прод-разработка (86 тем · 12%)')"><span>🚀 Эшелон 3: Прод</span> <b>12%</b></div>
+          <div style="font-size:0.68rem;font-weight:800;color:var(--ink-muted);padding:8px 8px 4px;text-transform:uppercase;border-top:1px solid var(--line-soft);margin-top:4px;">🧭 Направления:</div>
+          <div class="dropdown-item" onclick="selectDropSlice('python', '🐍 Python Core (88%)')"><span>🐍 Python Core</span> <b>88%</b></div>
+          <div class="dropdown-item" onclick="selectDropSlice('web', '🌐 Web & HTTP (45%)')"><span>🌐 Web & HTTP</span> <b>45%</b></div>
+          <div class="dropdown-item" onclick="selectDropSlice('db', '🗄️ Базы данных SQL (30%)')"><span>🗄️ SQL & БД</span> <b>30%</b></div>
+        </div>
+      </div>
+
+      <div style="background:var(--surface-2);border-radius:14px;padding:16px;border:1px solid var(--line-soft);">
+        <div class="khan-progress-layout">
+          <div class="donut-wrap">
+            <svg class="donut-svg" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="10"></circle>
+              <circle id="donut2" cx="50" cy="50" r="40" fill="none" stroke="#10b981" stroke-width="10" stroke-dasharray="120 251"></circle>
+            </svg>
+            <div class="donut-center">
+              <span class="donut-pct" id="pct2">48%</span>
+              <span class="donut-sub">готовность</span>
+            </div>
+          </div>
+          <div class="legend-list">
+            <div class="legend-row"><span class="sq sq--m"></span><span id="txt-m2"><b>142</b> темы · Сдано на интервью (100%)</span></div>
+            <div class="legend-row"><span class="sq sq--l2"></span><span id="txt-l22"><b>34</b> темы · Решено в Zen IDE (80%)</span></div>
+            <div class="legend-row"><span class="sq sq--ns"></span><span id="txt-ns2"><b>96</b> тем · Ожидает изучения</span></div>
+          </div>
+        </div>
+
+        <div class="grid-box">
+          <div class="pixels-grid" id="grid2"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEMO 3: LEFT RAIL -->
+    <div class="demo-card" id="demo-3">
+      <div class="demo-badge badge-3">Вариант 3 · Боковой рейл (Left Rail Navigator)</div>
+      <h3 style="margin:0 0 4px;font-size:1.15rem;">Двухколоночный макет технической документации</h3>
+      <p style="font-size:0.82rem;color:var(--ink-muted);margin:0 0 16px;">
+        Слева зафиксирована вертикальная панель разделов. Справа отображается карточка с сеткой. Попробуйте кликнуть:
+      </p>
+
+      <div class="rail-layout">
+        <!-- Left Column -->
+        <div class="rail-box">
+          <div style="font-size:0.72rem;font-weight:800;color:var(--ink-muted);padding:4px 8px;text-transform:uppercase;">🏛️ Эшелоны:</div>
+          <div class="rail-item is-active" onclick="filterRail('all', this)"><span>🌐 Все 4 эшелона</span> <b>48%</b></div>
+          <div class="rail-item" onclick="filterRail('e1', this)"><span>🛡️ Эшелон 1</span> <b>76%</b></div>
+          <div class="rail-item" onclick="filterRail('e2', this)"><span>🎯 Эшелон 2</span> <b>34%</b></div>
+          <div class="rail-item" onclick="filterRail('e3', this)"><span>🚀 Эшелон 3</span> <b>12%</b></div>
+          <div style="font-size:0.72rem;font-weight:800;color:var(--ink-muted);padding:8px 8px 4px;text-transform:uppercase;border-top:1px solid var(--line-soft);margin-top:4px;">🧭 Треки:</div>
+          <div class="rail-item" onclick="filterRail('python', this)"><span>🐍 Python Core</span> <b>88%</b></div>
+          <div class="rail-item" onclick="filterRail('web', this)"><span>🌐 Web & HTTP</span> <b>45%</b></div>
+          <div class="rail-item" onclick="filterRail('db', this)"><span>🗄️ SQL & БД</span> <b>30%</b></div>
+        </div>
+
+        <!-- Right Column -->
+        <div style="background:var(--surface-2);border-radius:14px;padding:16px;border:1px solid var(--line-soft);">
+          <div class="khan-progress-layout">
+            <div class="donut-wrap">
+              <svg class="donut-svg" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="10"></circle>
+                <circle id="donut3" cx="50" cy="50" r="40" fill="none" stroke="#f59e0b" stroke-width="10" stroke-dasharray="120 251"></circle>
+              </svg>
+              <div class="donut-center">
+                <span class="donut-pct" id="pct3">48%</span>
+                <span class="donut-sub">готовность</span>
+              </div>
+            </div>
+            <div class="legend-list">
+              <div class="legend-row"><span class="sq sq--m"></span><span id="txt-m3"><b>142</b> темы · Сдано на интервью</span></div>
+              <div class="legend-row"><span class="sq sq--l2"></span><span id="txt-l23"><b>34</b> темы · Решено в Zen IDE</span></div>
+              <div class="legend-row"><span class="sq sq--ns"></span><span id="txt-ns3"><b>96</b> тем · Ожидает изучения</span></div>
+            </div>
+          </div>
+
+          <div class="grid-box">
+            <div class="pixels-grid" id="grid3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const sampleData = {
+      all: { count: 318, pct: 48, m: 142, l2: 34, l1: 28, pr: 18, ns: 96, dash: '120 251' },
+      e1: { count: 68, pct: 76, m: 42, l2: 7, l1: 6, pr: 4, ns: 9, dash: '190 251' },
+      e2: { count: 92, pct: 34, m: 24, l2: 12, l1: 10, pr: 6, ns: 40, dash: '85 251' },
+      e3: { count: 86, pct: 12, m: 8, l2: 6, l1: 4, pr: 2, ns: 66, dash: '30 251' },
+      e4: { count: 72, pct: 0, m: 0, l2: 0, l1: 0, pr: 0, ns: 72, dash: '0 251' },
+      python: { count: 88, pct: 88, m: 70, l2: 8, l1: 5, pr: 3, ns: 2, dash: '221 251' },
+      web: { count: 54, pct: 45, m: 20, l2: 8, l1: 6, pr: 4, ns: 16, dash: '112 251' },
+      backend: { count: 62, pct: 30, m: 14, l2: 8, l1: 6, pr: 2, ns: 32, dash: '75 251' },
+      db: { count: 48, pct: 30, m: 12, l2: 6, l1: 4, pr: 2, ns: 24, dash: '75 251' },
+      algo: { count: 36, pct: 25, m: 6, l2: 4, l1: 3, pr: 2, ns: 21, dash: '62 251' },
+      docker: { count: 30, pct: 10, m: 2, l2: 2, l1: 1, pr: 1, ns: 24, dash: '25 251' }
+    };
+
+    function renderGridItems(targetId, data) {
+      const g = document.getElementById(targetId);
+      let html = '';
+      const total = Math.min(180, data.count);
+      for(let i = 0; i < total; i++) {
+        let cls = 'px--ns';
+        if(i < data.m) cls = 'px--m';
+        else if(i < data.m + data.l2) cls = 'px--l2';
+        else if(i < data.m + data.l2 + data.l1) cls = 'px--l1';
+        else if(i < data.m + data.l2 + data.l1 + data.pr) cls = 'px--pr';
+        html += `<div class="pixel ${cls}" title="Тема #${i+1}"></div>`;
+      }
+      g.innerHTML = html;
+    }
+
+    function filterSlice1(key, el) {
+      document.querySelectorAll('#row-echelons-1 .slice-chip, #row-tracks-1 .slice-chip').forEach(c => c.classList.remove('is-active'));
+      el.classList.add('is-active');
+      const d = sampleData[key] || sampleData.all;
+      document.getElementById('pct1').textContent = d.pct + '%';
+      document.getElementById('donut1').setAttribute('stroke-dasharray', d.dash);
+      document.getElementById('txt-m1').innerHTML = `<b>${d.m}</b> тем · Сдано на интервью (100%)`;
+      document.getElementById('txt-l21').innerHTML = `<b>${d.l2}</b> тем · Решено в Zen IDE (80%)`;
+      document.getElementById('txt-l11').innerHTML = `<b>${d.l1}</b> тем · Теория изучена (50%)`;
+      document.getElementById('txt-pr1').innerHTML = `<b>${d.pr}</b> тем · В процессе решения`;
+      document.getElementById('txt-ns1').innerHTML = `<b>${d.ns}</b> тем · Ожидает изучения`;
+      renderGridItems('grid1', d);
+    }
+
+    function toggleDropdown() {
+      const m = document.getElementById('dropdownMenu');
+      m.style.display = m.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function selectDropSlice(key, label) {
+      document.getElementById('dropdownSelectedText').textContent = label;
+      document.getElementById('dropdownMenu').style.display = 'none';
+      const d = sampleData[key] || sampleData.all;
+      document.getElementById('pct2').textContent = d.pct + '%';
+      document.getElementById('donut2').setAttribute('stroke-dasharray', d.dash);
+      document.getElementById('txt-m2').innerHTML = `<b>${d.m}</b> тем · Сдано на интервью`;
+      document.getElementById('txt-l22').innerHTML = `<b>${d.l2}</b> тем · Решено в Zen IDE`;
+      document.getElementById('txt-ns2').innerHTML = `<b>${d.ns}</b> тем · Ожидает изучения`;
+      renderGridItems('grid2', d);
+    }
+
+    function filterRail(key, el) {
+      document.querySelectorAll('.rail-item').forEach(c => c.classList.remove('is-active'));
+      el.classList.add('is-active');
+      const d = sampleData[key] || sampleData.all;
+      document.getElementById('pct3').textContent = d.pct + '%';
+      document.getElementById('donut3').setAttribute('stroke-dasharray', d.dash);
+      document.getElementById('txt-m3').innerHTML = `<b>${d.m}</b> тем · Сдано на интервью`;
+      document.getElementById('txt-l23').innerHTML = `<b>${d.l2}</b> тем · Решено в Zen IDE`;
+      document.getElementById('txt-ns3').innerHTML = `<b>${d.ns}</b> тем · Ожидает изучения`;
+      renderGridItems('grid3', d);
+    }
+
+    function showDemo(v) {
+      document.querySelectorAll('.nav-tabs .tab-btn').forEach(b => b.classList.remove('is-active'));
+      event.target.classList.add('is-active');
+      const d1 = document.getElementById('demo-1');
+      const d2 = document.getElementById('demo-2');
+      const d3 = document.getElementById('demo-3');
+      if(v === 'all') {
+        d1.style.display = 'block';
+        d2.style.display = 'block';
+        d3.style.display = 'block';
+      } else {
+        d1.style.display = v === '1' ? 'block' : 'none';
+        d2.style.display = v === '2' ? 'block' : 'none';
+        d3.style.display = v === '3' ? 'block' : 'none';
+      }
+    }
+
+    function toggleTheme() {
+      const cur = document.body.getAttribute('data-theme');
+      document.body.setAttribute('data-theme', cur === 'light' ? 'dark' : 'light');
+    }
+
+    renderGridItems('grid1', sampleData.all);
+    renderGridItems('grid2', sampleData.all);
+    renderGridItems('grid3', sampleData.all);
+  </script>
+</body>
+</html>
