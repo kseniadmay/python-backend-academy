@@ -138,13 +138,13 @@
 
   /* ---------- Frictionless Sidebar Enhancements (Grill-Me Approved) ---------- */
   .card-laser {
-    background: rgba(255, 255, 255, 0.035);
-    border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.1));
+    background: linear-gradient(145deg, rgba(16, 185, 129, 0.16) 0%, rgba(32, 36, 27, 0.75) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.38);
     border-radius: 14px;
     padding: 12px 13px;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.12);
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
     margin-bottom: 12px;
@@ -152,18 +152,26 @@
     text-decoration: none;
   }
   [data-theme="light"] .card-laser {
-    background: rgba(0, 0, 0, 0.03);
-    border-color: rgba(0, 0, 0, 0.08);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    background: linear-gradient(145deg, rgba(16, 185, 129, 0.12) 0%, rgba(240, 245, 240, 0.85) 100%);
+    border-color: rgba(16, 185, 129, 0.4);
   }
   .card-laser:hover {
     transform: translateY(-2px);
-    border-color: rgba(255, 255, 255, 0.22);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    border-color: rgba(16, 185, 129, 0.55);
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.22);
   }
   [data-theme="light"] .card-laser:hover {
-    border-color: rgba(0, 0, 0, 0.16);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    border-color: rgba(16, 185, 129, 0.6);
+  }
+  .card-laser::before {
+    content: '';
+    position: absolute;
+    top: -24px;
+    right: -24px;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.45) 0%, transparent 70%);
+    pointer-events: none;
   }
   .card-laser::before {
     content: '';
@@ -30370,8 +30378,8 @@ html:not([data-theme="dark"]) .fc-card--Answer,
           <span id="sidebar-cooldown-label"><span class="dazzling-gold-text">✨ 100%</span></span>
         </div>
       </div>
-      <div class="sidebar-service-row" style="display:flex;gap:6px;align-items:center;">
-        <button class="icon-btn-compact" id="sidebar-quick-search-btn" type="button" aria-label="Быстрый поиск по темам" title="Быстрый поиск (Ctrl+K)" style="flex:1;height:32px;border-radius:9px;">🔍</button>
+      <div class="sidebar-service-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+        <button class="icon-btn-compact" id="sidebar-quick-search-btn" type="button" aria-label="Быстрый поиск по темам" title="Быстрый поиск (Ctrl+K)" style="width:34px;height:34px;border-radius:10px;flex-shrink:0;">🔍</button>
         <button class="theme-pill-toggle" id="theme-toggle-d" role="switch" aria-checked="true" aria-label="Сменить тему оформления" title="Сменить тему оформления">
           <span class="theme-pill-track">
             <span class="theme-pill-icon theme-pill-sun" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg></span>
@@ -30379,7 +30387,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
             <span class="theme-pill-thumb" aria-hidden="true"></span>
           </span>
         </button>
-        <button class="icon-btn-compact sidebar-settings-btn" data-open-settings-modal="" type="button" title="Настройки" aria-label="Настройки" style="flex:1;height:32px;border-radius:9px;">⚙️</button>
+        <button class="icon-btn-compact sidebar-settings-btn" data-open-settings-modal="" type="button" title="Настройки" aria-label="Настройки" style="width:34px;height:34px;border-radius:10px;flex-shrink:0;">⚙️</button>
       </div>
       <button class="link-quiet" id="reset-btn-d" style="display:none;" aria-hidden="true">Сбросить прогресс</button>
     </div>
@@ -55944,9 +55952,10 @@ renderNav = function(){
       }
 
       heroBox.innerHTML = `
-        <a href="#/path" class="card-laser" title="Перейти к обучению">
+        <a href="#/path" class="card-laser" title="Перейти к текущему уроку">
           <div class="top-meta-row">
-            <span class="eta-chip" style="font-family:var(--font-m);font-size:0.7rem;color:var(--ink-muted);font-weight:600;">⏱ ~12 мин</span>
+            <span class="step-pill"><span class="pulse-dot"></span></span>
+            <span class="eta-chip">⏱ ~12 мин</span>
           </div>
           <div class="card-mission-title">${escapeHtmlStr(focusTitle)}</div>
           <button class="dominant-btn" type="button">
@@ -56286,9 +56295,10 @@ function openMobileDrawer(){
       </div>
 
       <!-- Single Dominant CTA: Hero-Action Card for Mobile -->
-      <a href="#/path" onclick="closeMobileDrawer();" class="card-laser" style="margin-bottom:14px;padding:11px 12px;text-decoration:none;display:block;" title="Перейти к обучению">
+      <a href="#/path" onclick="closeMobileDrawer();" class="card-laser" style="margin-bottom:14px;padding:11px 12px;text-decoration:none;display:block;" title="Перейти к текущему уроку">
         <div class="top-meta-row" style="margin-bottom:5px;">
-          <span class="eta-chip" style="font-family:var(--font-m);font-size:0.7rem;color:var(--ink-muted);font-weight:600;">⏱ ~12 мин</span>
+          <span class="step-pill"><span class="pulse-dot"></span></span>
+          <span class="eta-chip">⏱ ~12 мин</span>
         </div>
         <div class="card-mission-title" style="font-size:0.84rem;margin-bottom:8px;">${escapeHtmlStr(focusTitle)}</div>
         <button class="dominant-btn" type="button" style="padding:7px 10px;font-size:0.78rem;">
@@ -56373,9 +56383,9 @@ function openMobileDrawer(){
           </div>
         </div>
 
-        <div style="display:flex;gap:6px;align-items:center;">
-          <button type="button" class="btn btn-ghost" id="drawer-quick-search-btn" style="flex:1;height:32px;font-size:0.78rem;padding:0 8px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;gap:5px;">
-            🔍 <span>Поиск</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          <button type="button" class="btn btn-ghost" id="drawer-quick-search-btn" style="width:34px;height:34px;font-size:0.85rem;padding:0;border-radius:10px;background:var(--surface-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;" title="Поиск (Ctrl+K)">
+            🔍
           </button>
           <button type="button" class="theme-pill-toggle" id="drawer-theme-btn" role="switch" aria-label="Сменить тему оформления" title="Сменить тему оформления">
             <span class="theme-pill-track">
@@ -56384,7 +56394,7 @@ function openMobileDrawer(){
               <span class="theme-pill-thumb" aria-hidden="true"></span>
             </span>
           </button>
-          <button type="button" class="btn btn-ghost" onclick="closeMobileDrawer(); openSettingsModal();" style="width:36px;height:32px;font-size:0.9rem;padding:0;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;" title="Настройки (выбор языка внутри)">
+          <button type="button" class="btn btn-ghost" onclick="closeMobileDrawer(); openSettingsModal();" style="width:34px;height:34px;font-size:0.9rem;padding:0;border-radius:10px;background:var(--surface-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;" title="Настройки (выбор языка внутри)">
             ⚙️
           </button>
         </div>

@@ -216,10 +216,10 @@
       font-weight: 500;
     }
 
-    /* Hero Focus Action Card: Без зелёной рамки и без "Шаг 3" */
+    /* Hero Focus Action Card: Восстановлен фирменный изумрудный цвет и пульсирующая точка активности слева */
     .focus-card {
-      background: rgba(255, 255, 255, 0.035);
-      border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.1));
+      background: linear-gradient(145deg, rgba(16, 185, 129, 0.16) 0%, rgba(32, 36, 27, 0.75) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.38);
       border-radius: 14px;
       padding: 12px 12px 10px;
       display: flex;
@@ -227,17 +227,54 @@
       gap: 7px;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.12);
+    }
+
+    .focus-card::before {
+      content: '';
+      position: absolute;
+      top: -24px;
+      right: -24px;
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.45) 0%, transparent 70%);
+      pointer-events: none;
     }
 
     .fc-meta {
       display: flex;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .step-pill {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    @keyframes sbPulseAnim {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.6; }
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--emerald, #10b981);
+      box-shadow: 0 0 6px var(--emerald, #10b981);
+      animation: sbPulseAnim 2s infinite ease-in-out;
+    }
+
+    .eta-chip {
       font-family: var(--font-m);
-      font-size: 0.7rem;
-      font-weight: 600;
+      font-size: 0.66rem;
       color: var(--ink-muted);
+      background: rgba(0, 0, 0, 0.25);
+      padding: 2px 6px;
+      border-radius: 4px;
     }
 
     .fc-name {
@@ -315,7 +352,7 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    /* Bottom HUD: БЕЗ "плашки в плашке" */
+    /* Bottom HUD: Абсолютная гармония стилей и высот */
     .sb-footer {
       margin-top: 10px;
       padding-top: 12px;
@@ -325,7 +362,7 @@
       gap: 8px;
     }
 
-    /* Две самостоятельные кнопки 50/50 без внешней серой капсулы */
+    /* Верхний ряд: Помодоро + Энергия 50/50 */
     .hud-tandem-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -344,7 +381,7 @@
       border-radius: 10px;
       padding: 0 8px;
       font-family: var(--font-m);
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       font-weight: 700;
       color: var(--ink);
       cursor: pointer;
@@ -356,7 +393,7 @@
       transform: translateY(-1px);
     }
 
-    /* Живое свечение НАГРЕВА (heatGlowBreath) */
+    /* Свечение нагрева (heatGlowBreath) */
     @keyframes heatGlowBreath {
       0%, 100% {
         box-shadow: 0 0 10px rgba(245, 158, 11, 0.35), 0 0 20px rgba(245, 158, 11, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.35);
@@ -380,7 +417,7 @@
       border-radius: 10px;
       padding: 0 8px;
       font-family: var(--font-m);
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       font-weight: 800;
       cursor: pointer;
       animation: heatGlowBreath 2.8s infinite ease-in-out;
@@ -390,39 +427,40 @@
       transform: translateY(-1px);
     }
 
-    /* Bottom Trio Utilities Row */
+    /* Нижний ряд: Симметричный гармоничный трио-док (34px) */
     .trio-sys-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 6px;
+      gap: 8px;
     }
 
     .trio-icon-btn {
-      flex: 1;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       display: flex;
       align-items: center;
       justify-content: center;
       background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-glass);
-      border-radius: 9px;
+      border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.12));
+      border-radius: 10px;
       color: var(--ink-soft);
       cursor: pointer;
       font-size: 0.85rem;
       transition: all 0.15s;
+      flex-shrink: 0;
     }
     .trio-icon-btn:hover {
       background: rgba(255, 255, 255, 0.10);
       color: var(--ink);
     }
 
-    /* Каноническая капсула переключателя тем (58x32px) */
+    /* Каноническая капсула переключателя тем (64x34px) */
     .theme-pill-toggle {
-      width: 58px !important;
-      height: 32px !important;
-      min-width: 58px !important;
-      min-height: 32px !important;
+      width: 64px !important;
+      height: 34px !important;
+      min-width: 64px !important;
+      min-height: 34px !important;
       box-sizing: border-box !important;
       border-radius: 999px !important;
       background: rgba(255, 255, 255, 0.06) !important;
@@ -460,8 +498,8 @@
       display: inline-flex !important;
       align-items: center !important;
       justify-content: center !important;
-      width: 26px !important;
-      height: 26px !important;
+      width: 28px !important;
+      height: 28px !important;
       z-index: 2 !important;
       transition: color .2s ease, opacity .2s ease !important;
       pointer-events: none !important;
@@ -498,14 +536,14 @@
       position: absolute !important;
       top: 0px !important;
       left: 0px !important;
-      width: 26px !important;
-      height: 26px !important;
+      width: 28px !important;
+      height: 28px !important;
       border-radius: 50% !important;
       margin: 0 !important;
       background: rgba(255, 255, 255, 0.16) !important;
       border: 1px solid rgba(255, 255, 255, 0.28) !important;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
-      transform: translateX(26px) !important;
+      transform: translateX(30px) !important;
       transition: transform 0.25s cubic-bezier(0.34, 1.3, 0.64, 1), background 0.2s ease !important;
       z-index: 1 !important;
       pointer-events: none !important;
@@ -578,7 +616,6 @@
       <div class="sb-shell sb-desktop">
         <div class="sb-header">
           <div class="sb-brand">
-            <!-- Оригинальный статичный треугольник с кружками без плашки -->
             <svg class="brand-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <circle cx="6" cy="6" r="2.2" fill="currentColor"/>
               <circle cx="18" cy="6" r="2.2" fill="currentColor"/>
@@ -592,10 +629,11 @@
           </div>
         </div>
 
-        <!-- Hero Card: БЕЗ "Шаг 3" и БЕЗ зелёной рамки -->
+        <!-- Hero Card: Изумрудный цвет + точка активности слева + время справа -->
         <div class="focus-card">
           <div class="fc-meta">
-            <span>⏱ ~12 мин</span>
+            <span class="step-pill"><span class="pulse-dot"></span></span>
+            <span class="eta-chip">⏱ ~12 мин</span>
           </div>
           <div class="fc-name">Базовые коллекции и срезы</div>
           <button class="fc-btn-mastery">
@@ -620,7 +658,7 @@
           <a class="nav-item">🧪 Песочница</a>
         </div>
 
-        <!-- Футер: БЕЗ "плашки в плашке" + СВЕЧЕНИЕ НАГРЕВА -->
+        <!-- Футер: Полная гармония пропорций (34px) -->
         <div class="sb-footer">
           <div class="hud-tandem-row">
             <div class="pomo-btn" title="Запустить фокус-таймер">⏱ 15:00 ▶</div>
@@ -668,10 +706,11 @@
           </div>
         </div>
 
-        <!-- Hero Card: БЕЗ "Шаг 3" и БЕЗ зелёной рамки -->
+        <!-- Hero Card: Изумрудный цвет + точка активности слева + время справа -->
         <div class="focus-card">
           <div class="fc-meta">
-            <span>⏱ ~12 мин</span>
+            <span class="step-pill"><span class="pulse-dot"></span></span>
+            <span class="eta-chip">⏱ ~12 мин</span>
           </div>
           <div class="fc-name">Базовые коллекции и срезы</div>
           <button class="fc-btn-mastery">
@@ -696,7 +735,7 @@
           <a class="nav-item">🧪 Песочница</a>
         </div>
 
-        <!-- Футер: БЕЗ "плашки в плашке" + СВЕЧЕНИЕ НАГРЕВА -->
+        <!-- Футер: Полная гармония пропорций (34px) -->
         <div class="sb-footer">
           <div class="hud-tandem-row">
             <div class="pomo-btn" title="Запустить фокус-таймер">⏱ 15:00 ▶</div>
@@ -727,29 +766,29 @@
         <li>
           <span>✅</span>
           <div>
-            <strong>Убран «Шаг 3 в зеленой рамке»:</strong>
-            Удален бейдж шага и ядовито-зеленая рамка. Карточка оформлена в спокойном обсидиановом стекле с благородной темно-изумрудной кнопкой «Продолжить ➔».
+            <strong>Фирменный изумрудный цвет карточки:</strong>
+            Восстановлен глубокий градиент с подсветкой и неоновым свечением.
           </div>
         </li>
         <li>
           <span>✅</span>
           <div>
-            <strong>Ликвидирована «плашка в плашке» в футере:</strong>
-            Внешняя серая капсула сделана прозрачной (`background: transparent; border: none;`). Кнопки ⏱ 15:00 и ✨ 100% стали самостоятельными чистыми пилюлями.
+            <strong>Точка активности и позиция времени:</strong>
+            Слева мерцает зелёная точка активности (`.pulse-dot`), справа расположен чип `⏱ ~12 мин`. Текст «Шаг 3» исключён.
           </div>
         </li>
         <li>
           <span>✅</span>
           <div>
-            <strong>Возвращено живое свечение нагрева:</strong>
-            Индикатор энергии ✨ 100% дышит мягким янтарно-золотым термодинамическим накалом (`heatGlowBreath`) без паразитного ослепляющего блура.
+            <strong>Гармоничные вкладки в футере:</strong>
+            Оба ряда приведены к единой высоте 34px и радиусу 10px. В нижнем ряду боковые кнопки (🔍 и ⚙️) стали компактными квадратами 34×34px, обрамляющими центральную пилюлю темы (64×34px).
           </div>
         </li>
         <li>
           <span>✅</span>
           <div>
-            <strong>Идеальный свитчер тем (58×32px):</strong>
-            Точная центровка бегунка (26×26px) под солнцем и луной.
+            <strong>Живое свечение нагрева:</strong>
+            Плавный накал `heatGlowBreath` у бейджа `✨ 100%`.
           </div>
         </li>
       </ul>
