@@ -248,7 +248,7 @@
     letter-spacing: 0.02em;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     cursor: pointer;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
@@ -293,10 +293,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
+    gap: 6px;
     height: 34px !important;
     padding: 0 10px !important;
-    border-radius: 999px !important; /* Капсульная геометрия для верхнего ряда */
+    border-radius: 10px !important; /* Гармоничный сквиркл 10px */
     font-family: var(--font-m);
     font-size: 0.74rem;
     font-weight: 700;
@@ -310,19 +310,19 @@
     background: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.12)) !important;
     color: var(--ink) !important;
-    border-radius: 999px !important;
+    border-radius: 10px !important;
   }
   .sidebar-hud-cell.sidebar-pomo-pill:hover {
     background: rgba(255, 255, 255, 0.09) !important;
-    border-color: rgba(255, 255, 255, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.22) !important;
     transform: translateY(-1px);
   }
   [data-theme="light"] .sidebar-hud-cell.sidebar-pomo-pill {
-    background: rgba(0, 0, 0, 0.04) !important;
-    border-color: rgba(0, 0, 0, 0.1) !important;
+    background: rgba(0, 0, 0, 0.035) !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
   }
   .sidebar-hud-cell.cooldown-pill {
-    border-radius: 999px !important;
+    border-radius: 10px !important;
   }
   .sidebar-service-row {
     display: flex;
@@ -492,7 +492,7 @@
 
   .optics-dazzling-triumph,
   .optics-heat-glow {
-    border-radius: 999px !important;
+    border-radius: 10px !important;
     background: linear-gradient(135deg, rgba(254, 243, 199, 0.18) 0%, rgba(245, 158, 11, 0.24) 100%) !important;
     border: 1px solid rgba(251, 191, 36, 0.50) !important;
     position: relative;
@@ -30376,7 +30376,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
           🔥 <span id="streak-num-d">0</span>
         </button>
         <div class="cooldown-pill sidebar-hud-cell" id="sidebar-cooldown-pill" title="Остывание памяти: консолидация повторений">
-          <span class="cooldown-pulse" style="display:none;" aria-hidden="true"></span>
+          <span class="cooldown-pulse" aria-hidden="true"></span>
           <span id="sidebar-cooldown-label"><span class="dazzling-gold-text">✨ 100%</span></span>
         </div>
       </div>
@@ -55925,7 +55925,7 @@ renderNav = function(){
       } else if(it.route === '/cards'){
         // Анти-прокрастинация: спокойная изумрудная точка активности вместо тревожного бейджа долгов
         const hasDueCards = cardsDueCount > 0 || notesDueCount > 0;
-        badgeHtml = hasDueCards ? `<span class="activity-dot" title="Есть темы для повторения"></span>` : '';
+        badgeHtml = `<span class="activity-dot" title="${hasDueCards ? 'Есть темы для повторения' : 'Интервальные повторения доступны'}"></span>`;
       } else if(it.route === '/map' || it.route === '/matrix'){
         badgeHtml = '';
       } else if(it.route === '/path'){
@@ -55962,7 +55962,6 @@ renderNav = function(){
           <div class="card-mission-title">${escapeHtmlStr(focusTitle)}</div>
           <button class="dominant-btn" type="button">
             <span>Продолжить</span>
-            <span>➔</span>
           </button>
         </a>
       `;
@@ -56305,7 +56304,6 @@ function openMobileDrawer(){
         <div class="card-mission-title" style="font-size:0.84rem;margin-bottom:8px;">${escapeHtmlStr(focusTitle)}</div>
         <button class="dominant-btn" type="button" style="padding:7px 10px;font-size:0.78rem;">
           <span>Продолжить</span>
-          <span>➔</span>
         </button>
       </a>
 
@@ -56330,7 +56328,7 @@ function openMobileDrawer(){
           <svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px;"><rect x="3" y="4" width="18" height="16" rx="3"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           <span>Интервалка SRS</span>
         </div>
-        ${hasDueCards ? `<span class="activity-dot" style="margin-left:auto;" title="Есть темы для повторения"></span>` : ''}
+        <span class="activity-dot" style="margin-left:auto;" title="Интервальные повторения доступны"></span>
       </a>
 
       <a href="#/practice" class="drawer-nav-link ${curRoute === '/practice' ? 'active' : ''}" onclick="closeMobileDrawer();">
