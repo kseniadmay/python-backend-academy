@@ -30348,9 +30348,9 @@ html:not([data-theme="dark"]) .fc-card--Answer,
         <button class="sidebar-streak-badge sidebar-hud-cell" id="sidebar-streak-cell" title="Дней ударного режима подряд" aria-label="Дней ударного режима подряд">
           🔥 <span id="streak-num-d">0</span>
         </button>
-        <div class="cooldown-pill sidebar-hud-cell" id="sidebar-cooldown-pill" title="Жизненная сила цветка: от увядания к расцвету">
+        <div class="cooldown-pill sidebar-hud-cell" id="sidebar-cooldown-pill" title="Остывание памяти: консолидация повторений">
           <span class="cooldown-pulse" style="display:none;" aria-hidden="true"></span>
-          <span id="sidebar-cooldown-label">🥀 Опавший</span>
+          <span id="sidebar-cooldown-label">🥀 0%</span>
         </div>
       </div>
       <div class="sidebar-service-row">
@@ -45737,23 +45737,23 @@ function getSrsDailyProgressData(){
 
   let isComplete = false;
 
-  if(totalDueRemaining === 0 && totalDoneToday > 0){
+  if(totalDueRemaining === 0){
 
     pct = 100;
 
     isComplete = true;
 
-  } else if(totalTargetToday === 0){
+  } else if(totalTargetToday > 0){
 
-    totalTargetToday = 10;
+    pct = Math.min(99, Math.round((totalDoneToday / totalTargetToday) * 100));
 
-    pct = 0;
+    isComplete = false;
 
   } else {
 
-    pct = Math.min(100, Math.round((totalDoneToday / totalTargetToday) * 100));
+    pct = 0;
 
-    isComplete = (pct >= 100);
+    isComplete = false;
 
   }
 
@@ -55943,14 +55943,25 @@ renderNav = function(){
       streakNumEl.textContent = (typeof state !== 'undefined' && state.streak) ? state.streak : 0;
     }
 
-    // Flora Thermodynamics: Растительные эмодзи + Физика накала от холодного чугуна до бело-золотого сияния
+    // Шкала остывания: Фаза консолидации памяти (SRS) без упоминания XP и точного числа долгов
     const cdLabel = document.getElementById('sidebar-cooldown-label');
     const cdPill = document.getElementById('sidebar-cooldown-pill');
     if(cdLabel && cdPill){
-      const curXp = (typeof todayXp === 'function') ? todayXp() : 0;
-      const goalXp = (typeof state !== 'undefined' && state.dailyGoal) ? state.dailyGoal : 50;
-      const pct = Math.min(100, Math.round((curXp / Math.max(1, goalXp)) * 100));
-      const isDailyCompleted = (typeof isTodayGoalMet === 'function') ? isTodayGoalMet() : (pct >= 100);
+      const srsProgData = (typeof getSrsDailyProgressData === 'function')
+        ? getSrsDailyProgressData()
+        : { totalDueRemaining: 0, totalDoneToday: 0 };
+      const srsDue = Number(srsProgData.totalDueRemaining) || 0;
+      const srsDone = Number(srsProgData.totalDoneToday) || 0;
+      const srsTarget = srsDone + srsDue;
+
+      let pct = 0;
+      if(srsDue === 0){
+        pct = 100;
+      } else if(srsTarget > 0){
+        pct = Math.min(99, Math.round((srsDone / srsTarget) * 100));
+      } else {
+        pct = 0;
+      }
 
       // Сброс динамических инлайн-стилей для работы CSS-классов термодинамики
       cdPill.style.background = '';
@@ -55959,26 +55970,26 @@ renderNav = function(){
       cdPill.style.boxShadow = '';
       cdPill.className = 'cooldown-pill sidebar-hud-cell';
 
-      if(isDailyCompleted || pct >= 100){
+      if(pct >= 100){
         cdPill.classList.add('optics-dazzling-triumph');
-        cdLabel.innerHTML = '<span class="dazzling-gold-text">✨ 100% Триумф</span>';
-        cdPill.title = 'Цель дня закрыта на 100%: ослепляющий бело-золотой триумф!';
+        cdLabel.innerHTML = '<span class="dazzling-gold-text">✨ 100%</span>';
+        cdPill.title = 'Память консолидирована на 100%: все повторения закрыты!';
       } else if(pct >= 75){
         cdPill.classList.add('optics-golden-rose');
-        cdLabel.textContent = `🌺 ${pct}% Роза`;
-        cdPill.title = `Цель дня: ${curXp}/${goalXp} XP (${pct}%). Роза распахнулась в золотом огне!`;
+        cdLabel.textContent = `🌺 ${pct}%`;
+        cdPill.title = `Остывание: ${pct}% материала закреплено. Клик — перейти к карточкам`;
       } else if(pct >= 50){
         cdPill.classList.add('optics-ruby-bud');
-        cdLabel.textContent = `🌹 ${pct}% Бутон`;
-        cdPill.title = `Цель дня: ${curXp}/${goalXp} XP (${pct}%). Бутон налит горячим рубиновым жаром!`;
+        cdLabel.textContent = `🌹 ${pct}%`;
+        cdPill.title = `Остывание: ${pct}% материала закреплено. Клик — перейти к карточкам`;
       } else if(pct >= 25){
         cdPill.classList.add('optics-cherry-heat');
-        cdLabel.textContent = `🌱 ${pct}% Росток`;
-        cdPill.title = `Цель дня: ${curXp}/${goalXp} XP (${pct}%). Металл теплеет: тёмно-вишнёвый жар первого импульса ковки!`;
+        cdLabel.textContent = `🌱 ${pct}%`;
+        cdPill.title = `Остывание: ${pct}% материала закреплено. Клик — перейти к карточкам`;
       } else {
         cdPill.classList.add('optics-cold-iron');
-        cdLabel.textContent = '🥀 Опавший';
-        cdPill.title = `Цель дня: ${curXp}/${goalXp} XP (${pct}%). Остывший чугун, лепестки увяли во тьме. Решите задачу, чтобы зажечь огонь!`;
+        cdLabel.textContent = `🥀 ${pct}%`;
+        cdPill.title = `Остывание: ${pct}% материала закреплено. Есть материал для повторения. Нажмите, чтобы закрепить!`;
       }
     }
   }
@@ -56194,8 +56205,54 @@ function openMobileDrawer(){
   const kmStat = (typeof calculateKhanMastery === 'function') ? calculateKhanMastery('all') : (typeof window.calculateKhanMastery === 'function' ? window.calculateKhanMastery('all') : null);
   const mapBadgeHtml = (kmStat && kmStat.pct > 0) ? `<span style="font-family:var(--font-m);font-size:0.68rem;color:var(--ink-muted);">${kmStat.pct}%</span>` : '';
 
-  // Daily goal completed for cool-down
-  const isDailyCompleted = (typeof isTodayGoalMet === 'function') ? isTodayGoalMet() : ((typeof todayXp === 'function' && typeof state !== 'undefined') ? (todayXp() >= (state.dailyGoal || 50)) : false);
+  // SRS Cooldown Progress for Mobile Drawer
+  const mobSrsData = (typeof getSrsDailyProgressData === 'function')
+    ? getSrsDailyProgressData()
+    : { totalDueRemaining: 0, totalDoneToday: 0 };
+  const mobDue = Number(mobSrsData.totalDueRemaining) || 0;
+  const mobDone = Number(mobSrsData.totalDoneToday) || 0;
+  const mobTarget = mobDone + mobDue;
+
+  let mobPct = 0;
+  if(mobDue === 0){
+    mobPct = 100;
+  } else if(mobTarget > 0){
+    mobPct = Math.min(99, Math.round((mobDone / mobTarget) * 100));
+  } else {
+    mobPct = 0;
+  }
+
+  let mobCdClass = '';
+  let mobCdLabelHtml = '';
+  let mobCdTooltip = '';
+  let mobCdPulseStyle = 'background:var(--frost, #38bdf8);';
+
+  if(mobPct >= 100){
+    mobCdClass = 'optics-dazzling-triumph';
+    mobCdLabelHtml = '<span class="dazzling-gold-text">✨ 100%</span>';
+    mobCdTooltip = 'Память консолидирована на 100%: все повторения закрыты!';
+    mobCdPulseStyle = 'background:var(--emerald, #10b981);';
+  } else if(mobPct >= 75){
+    mobCdClass = 'optics-golden-rose';
+    mobCdLabelHtml = `🌺 ${mobPct}%`;
+    mobCdTooltip = `Остывание: ${mobPct}% материала закреплено. Клик — перейти к карточкам`;
+    mobCdPulseStyle = 'background:#fbbf24;';
+  } else if(mobPct >= 50){
+    mobCdClass = 'optics-ruby-bud';
+    mobCdLabelHtml = `🌹 ${mobPct}%`;
+    mobCdTooltip = `Остывание: ${mobPct}% материала закреплено. Клик — перейти к карточкам`;
+    mobCdPulseStyle = 'background:#f43f5e;';
+  } else if(mobPct >= 25){
+    mobCdClass = 'optics-cherry-heat';
+    mobCdLabelHtml = `🌱 ${mobPct}%`;
+    mobCdTooltip = `Остывание: ${mobPct}% материала закреплено. Клик — перейти к карточкам`;
+    mobCdPulseStyle = 'background:#e11d48;';
+  } else {
+    mobCdClass = 'optics-cold-iron';
+    mobCdLabelHtml = `🥀 ${mobPct}%`;
+    mobCdTooltip = `Остывание: ${mobPct}% материала закреплено. Есть материал для повторения. Нажмите, чтобы закрепить!`;
+    mobCdPulseStyle = 'background:var(--frost, #38bdf8);';
+  }
 
   const curRoute = (typeof currentRoute !== 'undefined') ? currentRoute : ((typeof location !== 'undefined' && location.hash) ? location.hash.replace('#', '') : '/');
 
@@ -56307,9 +56364,9 @@ function openMobileDrawer(){
       <!-- Footer HUD: Остывание + Стрик + Системная строка -->
       <div style="border-top:1px solid var(--line);padding-top:10px;margin-top:auto;display:flex;flex-direction:column;gap:8px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-          <div class="cooldown-pill" id="drawer-cooldown-pill" style="flex:1;padding:6px 10px;border-radius:9px;font-size:0.75rem;cursor:pointer;">
-            <span class="cooldown-pulse" style="background:${isDailyCompleted ? 'var(--emerald, #10b981)' : 'var(--frost, #38bdf8)'};"></span>
-            <span>${isDailyCompleted ? '🌿 Остывание: 100%' : '❄️ Остывание: 2м'}</span>
+          <div class="cooldown-pill ${mobCdClass}" id="drawer-cooldown-pill" style="flex:1;padding:6px 10px;border-radius:9px;font-size:0.75rem;cursor:pointer;" title="${mobCdTooltip}">
+            <span class="cooldown-pulse" style="${mobCdPulseStyle}"></span>
+            <span id="drawer-cooldown-label">${mobCdLabelHtml}</span>
           </div>
           <div class="streak-mini" style="padding:6px 10px;border-radius:9px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.28);font-size:0.76rem;">
             <svg class="icon" viewBox="0 0 24 24" style="width:13px;height:13px;color:var(--amber,#f59e0b);"><path fill="currentColor" d="M12 3c-.5 3-3 4-3 7.5A3.5 3.5 0 0 0 12 14a3.5 3.5 0 0 0 3-5c1.5 1 2 2.7 2 4.2A5 5 0 0 1 12 21a5 5 0 0 1-5-5.2C7 12 9 9 9 7c1 1 1.2 2 1.2 2S11 5 12 3Z"/></svg>
@@ -56371,14 +56428,15 @@ function openMobileDrawer(){
   if(cdBtn){
     cdBtn.onclick = () => {
       closeMobileDrawer();
-      const totalDue = cardsDueCount + notesDueCount;
+      const srsData = (typeof getSrsDailyProgressData === 'function') ? getSrsDailyProgressData() : null;
+      const totalDue = srsData ? Number(srsData.totalDueRemaining) || 0 : (cardsDueCount + notesDueCount);
       if(totalDue > 0){
         location.hash = '#/cards';
       } else {
         if(typeof showToast === 'function'){
           showToast('❄️ Фаза остывания: консолидация памяти завершена. Отличная работа!');
         } else {
-          alert('❄️ Фаза остывания: 2-минутная консолидация памяти завершена. Отличная работа на сегодня!');
+          alert('❄️ Фаза остывания: консолидация памяти завершена. Отличная работа на сегодня!');
         }
       }
     };
@@ -65630,16 +65688,17 @@ document.addEventListener('click', function(e){
   const cdBtn = e.target.closest('#sidebar-cooldown-pill');
   if(cdBtn){
     e.preventDefault();
+    const srsData = (typeof getSrsDailyProgressData === 'function') ? getSrsDailyProgressData() : null;
     const noteSrsStats = (typeof getNoteSpacedRepetitionStats === 'function') ? getNoteSpacedRepetitionStats() : { dueCount: 0 };
     const cardSrsStats = (typeof getSpacedRepetitionStats === 'function') ? getSpacedRepetitionStats() : { dueTodayCardsCount: 0 };
-    const totalDue = (Number(noteSrsStats.dueCount) || 0) + (Number(cardSrsStats.dueTodayCardsCount) || 0);
+    const totalDue = srsData ? (Number(srsData.totalDueRemaining) || 0) : ((Number(noteSrsStats.dueCount) || 0) + (Number(cardSrsStats.dueTodayCardsCount) || 0));
     if(totalDue > 0){
       location.hash = '#/cards';
     } else {
       if(typeof showToast === 'function'){
         showToast('❄️ Фаза остывания: консолидация памяти завершена. Отличная работа!');
       } else {
-        alert('❄️ Фаза остывания: 2-минутная консолидация памяти завершена. Отличная работа на сегодня!');
+        alert('❄️ Фаза остывания: консолидация памяти завершена. Отличная работа на сегодня!');
       }
     }
   }
