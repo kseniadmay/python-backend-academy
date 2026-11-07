@@ -218,7 +218,7 @@
     color: var(--ink-muted);
     background: rgba(0,0,0,0.25);
     padding: 2px 6px;
-    border-radius: 4px;
+    border-radius: 6px;
   }
   [data-theme="light"] .eta-chip {
     background: rgba(0,0,0,0.06);
@@ -241,7 +241,7 @@
     border: 1px solid rgba(52, 211, 153, 0.50);
     color: #ffffff !important;
     padding: 9px 12px;
-    border-radius: 9px;
+    border-radius: 10px;
     font-family: var(--font-d);
     font-size: 0.82rem;
     font-weight: 700;
@@ -18727,15 +18727,15 @@
 
     width: 64px !important;
 
-    height: 30px !important;
+    height: 34px !important;
 
     min-width: 64px !important;
 
-    min-height: 30px !important;
+    min-height: 34px !important;
 
     box-sizing: border-box !important;
 
-    border-radius: 999px !important;
+    border-radius: 10px !important;
 
     background: rgba(255, 255, 255, 0.05) !important;
 
@@ -18869,15 +18869,15 @@
 
     top: 50% !important;
 
-    width: 24px !important;
+    width: 28px !important;
 
-    height: 24px !important;
+    height: 28px !important;
 
-    border-radius: 50% !important;
+    border-radius: 7px !important;
 
-    margin-top: -12px !important; /* идеальное центрирование по высоте */
+    margin-top: -14px !important; /* идеальное центрирование по высоте */
 
-    left: 3px !important;
+    left: 2px !important;
 
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.08));
 
@@ -30376,12 +30376,11 @@ html:not([data-theme="dark"]) .fc-card--Answer,
           🔥 <span id="streak-num-d">0</span>
         </button>
         <div class="cooldown-pill sidebar-hud-cell" id="sidebar-cooldown-pill" title="Остывание памяти: консолидация повторений">
-          <span class="cooldown-pulse" aria-hidden="true"></span>
           <span id="sidebar-cooldown-label"><span class="dazzling-gold-text">✨ 100%</span></span>
         </div>
       </div>
       <div class="sidebar-service-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-        <button class="icon-btn-compact" id="sidebar-quick-search-btn" type="button" aria-label="Быстрый поиск по темам" title="Быстрый поиск (Ctrl+K)" style="width:34px;height:34px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);">🔍</button>
+        <button class="icon-btn-compact" id="sidebar-quick-search-btn" type="button" aria-label="Быстрый поиск по темам" title="Быстрый поиск (Ctrl+K)" style="width:34px;height:34px;border-radius:10px;flex-shrink:0;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);">🔍</button>
         <button class="theme-pill-toggle" id="theme-toggle-d" role="switch" aria-checked="true" aria-label="Сменить тему оформления" title="Сменить тему оформления">
           <span class="theme-pill-track">
             <span class="theme-pill-icon theme-pill-sun" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg></span>
@@ -30389,7 +30388,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
             <span class="theme-pill-thumb" aria-hidden="true"></span>
           </span>
         </button>
-        <button class="icon-btn-compact sidebar-settings-btn" data-open-settings-modal="" type="button" title="Настройки" aria-label="Настройки" style="width:34px;height:34px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);">⚙️</button>
+        <button class="icon-btn-compact sidebar-settings-btn" data-open-settings-modal="" type="button" title="Настройки" aria-label="Настройки" style="width:34px;height:34px;border-radius:10px;flex-shrink:0;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);">⚙️</button>
       </div>
       <button class="link-quiet" id="reset-btn-d" style="display:none;" aria-hidden="true">Сбросить прогресс</button>
     </div>
@@ -55939,7 +55938,7 @@ renderNav = function(){
       return `<a href="#${it.route}" class="navlink" data-route="${it.route}">${ICONS[it.icon] || ICONS.dot}<span>${it.label}</span>${badgeHtml}</a>${subListHtml}`;
     };
 
-    // Grill-Me Approved: Hero-Action Card injection
+    // Grill-Me Approved: Hero-Action Card injection (Seoul Dynamic: Debt ETA or Next Lesson)
     const heroBox = document.getElementById('sidebar-hero-action-container');
     if(heroBox){
       const mCount = (typeof state !== 'undefined' && state && Array.isArray(state.mastered)) ? state.mastered.length : 0;
@@ -55953,15 +55952,36 @@ renderNav = function(){
         }
       }
 
+      const srsProgData = (typeof getSrsDailyProgressData === 'function')
+        ? getSrsDailyProgressData()
+        : { totalDueRemaining: 0, totalDoneToday: 0 };
+      const srsDue = Number(srsProgData.totalDueRemaining) || (cardsDueCount + notesDueCount);
+
+      let heroHref = '#/path';
+      let heroTitle = focusTitle;
+      let heroEta = '⏱ ~12 мин';
+      let heroBtnText = 'Продолжить';
+      let heroTip = 'Перейти к текущему уроку';
+
+      if(srsDue > 0){
+        heroHref = '#/cards';
+        const dueMins = Math.max(1, Math.round(srsDue * 0.6));
+        heroEta = `⏱ ~${dueMins} мин`;
+        const topicWord = (srsDue === 1) ? 'тема' : ((srsDue >= 2 && srsDue <= 4) ? 'темы' : 'тем');
+        heroTitle = `Интервальное повторение (${srsDue} ${topicWord})`;
+        heroBtnText = 'Закрыть долг';
+        heroTip = 'Перейти к повторению долгов';
+      }
+
       heroBox.innerHTML = `
-        <a href="#/path" class="card-laser" title="Перейти к текущему уроку">
+        <a href="${heroHref}" class="card-laser" title="${heroTip}">
           <div class="top-meta-row">
             <span class="step-pill"><span class="pulse-dot"></span></span>
-            <span class="eta-chip">⏱ ~12 мин</span>
+            <span class="eta-chip">${heroEta}</span>
           </div>
-          <div class="card-mission-title">${escapeHtmlStr(focusTitle)}</div>
+          <div class="card-mission-title">${escapeHtmlStr(heroTitle)}</div>
           <button class="dominant-btn" type="button">
-            <span>Продолжить</span>
+            <span>${heroBtnText}</span>
           </button>
         </a>
       `;
@@ -56295,17 +56315,37 @@ function openMobileDrawer(){
         </div>
       </div>
 
-      <!-- Single Dominant CTA: Hero-Action Card for Mobile -->
-      <a href="#/path" onclick="closeMobileDrawer();" class="card-laser" style="margin-bottom:14px;padding:11px 12px;text-decoration:none;display:block;" title="Перейти к текущему уроку">
-        <div class="top-meta-row" style="margin-bottom:5px;">
-          <span class="step-pill"><span class="pulse-dot"></span></span>
-          <span class="eta-chip">⏱ ~12 мин</span>
-        </div>
-        <div class="card-mission-title" style="font-size:0.84rem;margin-bottom:8px;">${escapeHtmlStr(focusTitle)}</div>
-        <button class="dominant-btn" type="button" style="padding:7px 10px;font-size:0.78rem;">
-          <span>Продолжить</span>
-        </button>
-      </a>
+      <!-- Single Dominant CTA: Hero-Action Card for Mobile (Seoul Dynamic) -->
+      ${(() => {
+        let mobHeroHref = '#/path';
+        let mobHeroTitle = focusTitle;
+        let mobHeroEta = '⏱ ~12 мин';
+        let mobHeroBtnText = 'Продолжить';
+        let mobHeroTip = 'Перейти к текущему уроку';
+
+        if(mobDue > 0){
+          mobHeroHref = '#/cards';
+          const dueMins = Math.max(1, Math.round(mobDue * 0.6));
+          mobHeroEta = `⏱ ~${dueMins} мин`;
+          const topicWord = (mobDue === 1) ? 'тема' : ((mobDue >= 2 && mobDue <= 4) ? 'темы' : 'тем');
+          mobHeroTitle = `Интервальное повторение (${mobDue} ${topicWord})`;
+          mobHeroBtnText = 'Закрыть долг';
+          mobHeroTip = 'Перейти к повторению долгов';
+        }
+
+        return `
+          <a href="${mobHeroHref}" onclick="closeMobileDrawer();" class="card-laser" style="margin-bottom:14px;padding:11px 12px;text-decoration:none;display:block;" title="${mobHeroTip}">
+            <div class="top-meta-row" style="margin-bottom:5px;">
+              <span class="step-pill"><span class="pulse-dot"></span></span>
+              <span class="eta-chip">${mobHeroEta}</span>
+            </div>
+            <div class="card-mission-title" style="font-size:0.84rem;margin-bottom:8px;">${escapeHtmlStr(mobHeroTitle)}</div>
+            <button class="dominant-btn" type="button" style="padding:7px 10px;font-size:0.78rem;">
+              <span>${mobHeroBtnText}</span>
+            </button>
+          </a>
+        `;
+      })()}
 
       <!-- Группа 1: Маршрут (Синхронизировано с десктопом) -->
       <div class="drawer-nav-section-title" style="margin:4px 0 6px 2px;">Маршрут</div>
@@ -56374,17 +56414,16 @@ function openMobileDrawer(){
       <!-- Footer HUD: Помодоро + Энергия 50/50 (Стрик убран) + Трио-Док утилит -->
       <div style="border-top:1px solid rgba(255, 255, 255, 0.06);padding-top:10px;margin-top:auto;display:flex;flex-direction:column;gap:8px;">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          <button type="button" class="topbar-pomo-pill sidebar-pomo-pill sidebar-hud-cell" id="drawer-pomo-cell" data-pomo-toggle="" style="padding:0 8px;height:34px;border-radius:999px;font-family:var(--font-m);font-size:0.76rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink);" title="Запустить Pomodoro-фокус (15 мин)">
+          <button type="button" class="topbar-pomo-pill sidebar-pomo-pill sidebar-hud-cell" id="drawer-pomo-cell" data-pomo-toggle="" style="padding:0 8px;height:34px;border-radius:10px;font-family:var(--font-m);font-size:0.76rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink);" title="Запустить Pomodoro-фокус (15 мин)">
             <span class="pomo-icon" aria-hidden="true">⏱</span> <span>15:00</span> <span style="font-size:0.7rem;font-weight:700;">▶</span>
           </button>
-          <div class="cooldown-pill ${mobCdClass}" id="drawer-cooldown-pill" style="padding:0 8px;height:34px;border-radius:999px;font-size:0.78rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;" title="${mobCdTooltip}">
-            <span class="cooldown-pulse" style="${mobCdPulseStyle}"></span>
+          <div class="cooldown-pill ${mobCdClass}" id="drawer-cooldown-pill" style="padding:0 8px;height:34px;border-radius:10px;font-size:0.78rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;" title="${mobCdTooltip}">
             <span id="drawer-cooldown-label">${mobCdLabelHtml}</span>
           </div>
         </div>
 
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-          <button type="button" class="btn btn-ghost" id="drawer-quick-search-btn" style="width:34px;height:34px;font-size:0.85rem;padding:0;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;" title="Поиск (Ctrl+K)">
+          <button type="button" class="btn btn-ghost" id="drawer-quick-search-btn" style="width:34px;height:34px;font-size:0.85rem;padding:0;border-radius:10px;background:var(--surface-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;" title="Поиск (Ctrl+K)">
             🔍
           </button>
           <button type="button" class="theme-pill-toggle" id="drawer-theme-btn" role="switch" aria-label="Сменить тему оформления" title="Сменить тему оформления">
@@ -56394,7 +56433,7 @@ function openMobileDrawer(){
               <span class="theme-pill-thumb" aria-hidden="true"></span>
             </span>
           </button>
-          <button type="button" class="btn btn-ghost" onclick="closeMobileDrawer(); openSettingsModal();" style="width:34px;height:34px;font-size:0.9rem;padding:0;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;" title="Настройки (выбор языка внутри)">
+          <button type="button" class="btn btn-ghost" onclick="closeMobileDrawer(); openSettingsModal();" style="width:34px;height:34px;font-size:0.9rem;padding:0;border-radius:10px;background:var(--surface-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;" title="Настройки (выбор языка внутри)">
             ⚙️
           </button>
         </div>
