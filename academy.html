@@ -740,6 +740,33 @@
 
   .nav-modules-list{display:flex;flex-direction:column;gap:1px;padding:2px 4px 6px;}
 
+  /* ---------- Анти-прокрастинация: Спокойная точка активности и подпункты сайдбара ---------- */
+  .activity-dot{
+    width:7px;height:7px;border-radius:50%;background:var(--emerald, #10b981);
+    box-shadow:0 0 8px rgba(16,185,129,0.7);position:relative;margin-left:auto;flex-shrink:0;
+  }
+  .activity-dot::after{
+    content:'';position:absolute;inset:-3px;border-radius:50%;border:1.5px solid var(--emerald, #10b981);
+    opacity:0.4;animation:pulseActivityDot 2.5s infinite cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes pulseActivityDot{
+    0%{transform:scale(0.8);opacity:0.8;}
+    100%{transform:scale(2.2);opacity:0;}
+  }
+  .nav-sub-list{
+    display:flex;flex-direction:column;gap:2px;padding-left:16px;margin:2px 0 6px 14px;
+    border-left:2px solid var(--line-soft, rgba(255,255,255,0.08));position:relative;
+  }
+  .nav-sub-item{
+    display:flex;align-items:center;justify-content:space-between;padding:5px 9px;border-radius:8px;
+    color:var(--ink-soft);font-size:0.81rem;font-weight:500;text-decoration:none;cursor:pointer;
+    transition:background .15s,color .15s;
+  }
+  .nav-sub-item:hover{background:var(--surface-hover, rgba(255,255,255,0.05));color:var(--ink);}
+  .nav-sub-item.active{background:var(--moss-soft);color:var(--moss-deep);font-weight:600;}
+  .nav-sub-item-left{display:flex;align-items:center;gap:7px;}
+  .nav-sub-dot{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:0.6;}
+
   #nav-desktop .navlink{
 
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:8px 11px;font-size:.88rem;font-weight:500;border-radius:11px;border:1px solid transparent;display:flex;align-items:center;gap:10px;
@@ -33595,6 +33622,7 @@ const NAV_ITEMS = [
   {route:'/path', icon:'path', label:'Путь к офферу', shortLabel:'Путь', mobileTab:true, group:'main'},
   {route:'/cards', icon:'cards', label:'Интервалка', shortLabel:'Интервалка', mobileTab:true, group:'main', hasDueDot:true},
   {route:'/practice', icon:'code', label:'Zen IDE', shortLabel:'IDE', mobileTab:true, group:'main'},
+  {route:'/map', icon:'map', label:'Матрица навыков', shortLabel:'Матрица', group:'trainer'},
   {route:'/notes-review', icon:'book', label:'Конспекты', shortLabel:'Конспекты', group:'trainer'},
   {route:'/mock', icon:'mock', label:'Собеседование', shortLabel:'Интервью', group:'trainer'},
   {route:'/python', icon:'python', label:'Python Core', shortLabel:'Python', group:'module'},
@@ -34060,6 +34088,12 @@ function viewMap(){
 }
 
 // Window actions
+window.viewMap = viewMap;
+window.calculateKhanMastery = calculateKhanMastery;
+window.renderDashboardMasteryWidgetHTML = renderDashboardMasteryWidgetHTML;
+window.getAllTrackSkills = getAllTrackSkills;
+window.getKhanTrackSkills = getKhanTrackSkills;
+
 window.switchKhanView = function(view){
   kmCurrentView = view;
   if(window.renderApp) window.renderApp();
@@ -45801,7 +45835,21 @@ function viewCardsHub(){
 
             </div>
 
-            <h2 style="font-size:1.45rem;font-weight:800;color:var(--ink);margin:0 0 8px;">15 карточек закреплены!</h2>
+            <div style="font-size:3.2rem;margin-bottom:10px;">🚀</div>
+            <div style="display:inline-block;padding:4px 12px;border-radius:999px;background:rgba(16,185,129,0.15);color:#34d399;font-size:0.75rem;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.06em;">
+              Микро-сессия закрыта · Тема разогрета до 100%! 🔥
+            </div>
+            <h2 style="font-size:1.45rem;font-weight:800;color:var(--ink);margin:0 0 8px;">3 ключевые ловушки освоены!</h2>
+            <div style="background:var(--paper);border:1px solid var(--line-soft);border-radius:14px;padding:12px 18px;max-width:440px;margin:12px auto 16px;text-align:left;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.84rem;">
+                <span style="color:var(--ink-soft);">Свежесть темы:</span>
+                <span style="color:#10b981;font-weight:700;">Разогрета до 100% 🔥</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:0.84rem;">
+                <span style="color:var(--ink-soft);">Боеготовность к Эшелону 1 (Тех-скрининг):</span>
+                <span style="color:#10b981;font-weight:700;">84% · Допуск открыт! 🔓</span>
+              </div>
+            </div>
 
             <p style="font-size:0.92rem;color:var(--ink-muted);max-width:480px;margin:0 auto 20px;line-height:1.6;">
 
@@ -45819,7 +45867,7 @@ function viewCardsHub(){
 
             <div style="display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;">
 
-              <button type="button" data-action="start-next-srs-sprint" class="btn-dominant-cta btn-glass-emerald btn-sprint-cta" style="padding:13px 28px;border-radius:14px;font-weight:700;font-size:0.96rem;display:inline-flex;align-items:center;gap:8px;cursor:pointer;">СЛЕДУЮЩИЙ СПРИНТ (15 КАРТ) ➔</button>
+              <button type="button" data-action="start-next-srs-sprint" class="btn-dominant-cta btn-glass-emerald btn-sprint-cta" style="padding:13px 28px;border-radius:14px;font-weight:700;font-size:0.96rem;display:inline-flex;align-items:center;gap:8px;cursor:pointer;">ЕЩЁ 3 КАРТОЧКИ (ПО ЖЕЛАНИЮ) ➔</button>
 
               <a href="#/path" class="btn btn-ghost srs-notes-btn" style="padding:12px 20px;border-radius:14px;font-weight:600;font-size:0.86rem;color:var(--ink-muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .18s ease;">На Путь к уроку ➔</a>
 
@@ -51384,7 +51432,7 @@ window.viewProPath = viewProPath;
 
 
 
-viewMap = function(){
+viewOldStagesMap = function(){
 
   const stagesHTML = STAGES.map((s,i)=>{
 
@@ -55008,9 +55056,12 @@ viewDashboard = function(){
         </div>
       </details>
 
+      ${(typeof renderDashboardMasteryWidgetHTML === 'function') ? renderDashboardMasteryWidgetHTML() : (typeof window.renderDashboardMasteryWidgetHTML === 'function' ? window.renderDashboardMasteryWidgetHTML() : '')}
+
     </div>
   `;
 };
+window.viewDashboard = viewDashboard;
 renderNav = function(){
   const desk = document.getElementById('nav-desktop');
   if(desk){
@@ -55036,16 +55087,50 @@ renderNav = function(){
       if(it.route === '/notes-review'){
         badgeHtml = (notesDueCount > 0) ? `<span class="navlink__pct navlink__badge-due">${notesDueCount}</span>` : '';
       } else if(it.route === '/cards'){
-        badgeHtml = (cardsDueCount > 0) ? `<span class="navlink__pct navlink__badge-due">${cardsDueCount}</span>` : ''; } else if(it.route === '/path'){ const mCount = (typeof state !== 'undefined' && state && Array.isArray(state.mastered)) ? state.mastered.length : 0; badgeHtml = `<span class="navlink__pct navlink__badge-emerald">Шаг ${mCount + 1}</span>`;
+        // Анти-прокрастинация: спокойная изумрудная точка активности вместо тревожного бейджа долгов
+        const hasDueCards = cardsDueCount > 0 || notesDueCount > 0;
+        badgeHtml = hasDueCards ? `<span class="activity-dot" title="Есть темы для повторения"></span>` : '';
+      } else if(it.route === '/map' || it.route === '/matrix'){
+        const kmStat = (typeof calculateKhanMastery === 'function') ? calculateKhanMastery('all') : (typeof window.calculateKhanMastery === 'function' ? window.calculateKhanMastery('all') : null);
+        badgeHtml = (kmStat && kmStat.pct > 0) ? `<span class="navlink__pct navlink__badge-emerald">${kmStat.pct}%</span>` : '';
+      } else if(it.route === '/path'){
+        const mCount = (typeof state !== 'undefined' && state && Array.isArray(state.mastered)) ? state.mastered.length : 0;
+        badgeHtml = `<span class="navlink__pct navlink__badge-emerald">Шаг ${mCount + 1}</span>`;
       } else if(pVal !== undefined && pVal > 0){
         badgeHtml = `<span class="navlink__pct">${pVal}%</span>`;
       }
-      return `<a href="#${it.route}" class="navlink" data-route="${it.route}">${ICONS[it.icon] || ICONS.dot}<span>${it.label}</span>${badgeHtml}</a>`;
+
+      let subListHtml = '';
+      if(it.route === '/cards'){
+        const isCurrentCards = (typeof currentRoute !== 'undefined') && (currentRoute === '/cards' || (typeof location !== 'undefined' && location.hash.indexOf('#/cards') === 0));
+        const curTab = (typeof cardsHubState !== 'undefined' && cardsHubState.hubTab === 'notes') ? 'notes' : 'cards';
+        subListHtml = `
+          <div class="nav-sub-list">
+            <a href="#/cards" class="nav-sub-item ${isCurrentCards && curTab === 'cards' ? 'active' : ''}">
+              <div class="nav-sub-item-left">
+                <span class="nav-sub-dot"></span>
+                <span>Карточки</span>
+              </div>
+              <span style="font-family:var(--font-m);font-size:0.68rem;opacity:0.75;">3 шт</span>
+            </a>
+            <a href="#/cards?tab=notes" class="nav-sub-item ${isCurrentCards && curTab === 'notes' ? 'active' : ''}">
+              <div class="nav-sub-item-left">
+                <span class="nav-sub-dot"></span>
+                <span>Конспекты</span>
+              </div>
+              <span style="font-family:var(--font-m);font-size:0.68rem;opacity:0.75;">1 тема</span>
+            </a>
+          </div>
+        `;
+      }
+
+      return `<a href="#${it.route}" class="navlink" data-route="${it.route}">${ICONS[it.icon] || ICONS.dot}<span>${it.label}</span>${badgeHtml}</a>${subListHtml}`;
     };
 
     const mainLinks = NAV_ITEMS.filter(it => it.group === 'main').map(renderLink).join('');
     const modLinks = NAV_ITEMS.filter(it => it.group === 'module').map(renderLink).join('');
-    const trainerLinks = NAV_ITEMS.filter(it => it.group === 'trainer').map(renderLink).join('');
+    // Исключаем notes-review из второй группы, так как Конспекты аккуратно встроены подпунктом в Интервалку
+    const trainerLinks = NAV_ITEMS.filter(it => it.group === 'trainer' && it.route !== '/notes-review').map(renderLink).join('');
     const toolLinks = NAV_ITEMS.filter(it => it.group === 'tool').map(renderLink).join('');
     const modulesPctBadge = overallPct > 0 ? `<span class="navlink__pct">${overallPct}%</span>` : '';
 
@@ -57019,13 +57104,13 @@ render = function(){
 
     }, 60);
 
-  } else if(route === '/map'){
+  } else if(route === '/map' || route === '/matrix' || route === '/skills'){
 
     document.body.classList.remove('path-scrolled');
 
-    root.innerHTML = viewMap();
+    root.innerHTML = (typeof viewMap === 'function') ? viewMap() : (typeof window.viewMap === 'function' ? window.viewMap() : '');
 
-    navRoute = '/path';
+    navRoute = '/map';
 
   } else if(route === '/sandbox'){
 
@@ -62522,7 +62607,7 @@ const psk = e.target.closest('[data-py-select-k]');
 
       cardsHubState.sprintStep = (Number(cardsHubState.sprintStep) || 0) + 1;
 
-      const isSprintFinish = cardsHubState.sprintStep >= 15;
+      const isSprintFinish = cardsHubState.sprintStep >= 3; // Анти-прокрастинация: микро-сессия строго 3 карточки
 
 
 
@@ -62616,7 +62701,7 @@ const psk = e.target.closest('[data-py-select-k]');
 
     cardsHubState.sprintStep = (Number(cardsHubState.sprintStep) || 0) + 1;
 
-    const isSprintFinish = cardsHubState.sprintStep >= 15;
+    const isSprintFinish = cardsHubState.sprintStep >= 3; // Анти-прокрастинация: микро-сессия строго 3 карточки
 
 
 
