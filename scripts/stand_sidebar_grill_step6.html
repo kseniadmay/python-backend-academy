@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Визуальный стенд /grill-me — Шаг 6: Карточка прогресса Эшелона 1 на Главной</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #0a0d14;
+      --bg-surface: #10141f;
+      --bg-card: rgba(18, 24, 38, 0.75);
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --ink: #f1f5f9;
+      --ink-soft: #94a3b8;
+      --ink-muted: #64748b;
+      --emerald: #10b981;
+      --cyan: #06b6d4;
+      --amber: #f59e0b;
+      --font-d: 'Onest', -apple-system, sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+      --font-title: 'Unbounded', sans-serif;
+      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    [data-theme="light"] {
+      --bg-canvas: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.9);
+      --border-glass: rgba(0, 0, 0, 0.08);
+      --ink: #0f172a;
+      --ink-soft: #475569;
+      --ink-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-canvas);
+      color: var(--ink);
+      font-family: var(--font-d);
+      padding: 24px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.15;
+    }
+    .orb-1 { width: 400px; height: 400px; background: var(--cyan); top: -80px; left: -80px; }
+    .orb-2 { width: 450px; height: 450px; background: var(--emerald); bottom: -80px; right: -80px; }
+
+    header.stand-header {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-glass);
+    }
+
+    .stand-badge {
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--cyan);
+      border: 1px solid var(--cyan);
+      padding: 3px 10px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    h1.stand-title {
+      font-family: var(--font-title);
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+    }
+
+    .controls-panel {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-toggle {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      color: var(--ink);
+      font-family: var(--font-d);
+      font-weight: 600;
+      font-size: 0.82rem;
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: all 0.2s var(--spring);
+    }
+    .btn-toggle:hover {
+      border-color: var(--cyan);
+      transform: translateY(-1px);
+    }
+
+    .stands-grid {
+      position: relative;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .stand-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1.5px solid var(--border-glass);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: all 0.25s var(--spring);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+    }
+
+    .stand-card.recommended {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 1px var(--cyan), 0 16px 40px rgba(6, 182, 212, 0.12);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .option-tag {
+      font-family: var(--font-m);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 8px;
+    }
+    .tag-rec { background: rgba(6, 182, 212, 0.15); color: var(--cyan); border: 1px solid var(--cyan); }
+    .tag-alt { background: rgba(255, 255, 255, 0.05); color: var(--ink-soft); border: 1px solid var(--border-glass); }
+
+    .option-title {
+      font-family: var(--font-title);
+      font-size: 1.05rem;
+      margin-top: 4px;
+    }
+
+    .option-desc {
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      line-height: 1.45;
+    }
+
+    /* Mock Card Container */
+    .mock-echelon-box {
+      background: #0d121c;
+      border: 1px solid var(--border-glass);
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Variant A (Mastery Local Focus) */
+    .echelon-header-a {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .eh-tag {
+      font-family: var(--font-m);
+      font-size: 0.65rem;
+      color: var(--cyan);
+      letter-spacing: 0.05em;
+      font-weight: 700;
+    }
+    .eh-title {
+      font-family: var(--font-title);
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #fff;
+    }
+    .eh-sub {
+      font-size: 0.78rem;
+      color: var(--ink-soft);
+    }
+    .echelon-track-progress {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-glass);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .et-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 3px solid rgba(6, 182, 212, 0.3);
+      border-top-color: var(--cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-m);
+      font-weight: 800;
+      font-size: 0.75rem;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .et-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .et-target { font-size: 0.82rem; font-weight: 700; color: #fff; }
+    .et-note { font-size: 0.72rem; color: var(--emerald); }
+
+    /* Variant B (Current with 0% ring and 41 pending) */
+    .echelon-current-ring {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+    }
+    .ring-0 {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-m);
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #fff;
+    }
+    .ring-sub { font-size: 0.58rem; color: var(--ink-muted); text-transform: uppercase; }
+    .current-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 100%;
+      font-size: 0.72rem;
+      color: var(--ink-soft);
+      border-top: 1px solid var(--border-glass);
+      padding-top: 8px;
+    }
+
+    .key-points {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.8rem;
+    }
+    .key-points li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      color: var(--ink-soft);
+    }
+    .key-points li strong { color: var(--ink); }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <header class="stand-header">
+    <div>
+      <span class="stand-badge">ЭТАП 6 / GRILL-ME ИНТЕРВЬЮ</span>
+      <h1 class="stand-title">Главный экран: Ликвидация «0% к скринингу» и карточка Эшелона 1</h1>
+    </div>
+    <div class="controls-panel">
+      <button class="btn-toggle" onclick="toggleTheme()">🌓 Переключить тему (Dark/Light)</button>
+    </div>
+  </header>
+
+  <div class="stands-grid">
+
+    <!-- ВАРИАНТ A -->
+    <div class="stand-card recommended">
+      <div class="card-header">
+        <span class="option-tag tag-rec">РЕКОМЕНДУЕМЫЙ (ПОЗИТИВНЫЙ ФОКУС)</span>
+      </div>
+      <h2 class="option-title">Вариант A: Локальный прогресс первого рубежа (Без демотивации)</h2>
+      <p class="option-desc">
+        Исключение пугающего кольца «0%» и «41 тема ожидает». Вместо этого — фокусирующий бейдж активного рубежа: <code>Эшелон 1: Фундамент Junior · Первая тема активна</code> с позитивным подкреплением старта.
+      </p>
+
+      <div class="mock-echelon-box">
+        <div class="echelon-header-a">
+          <div class="eh-tag">MISSION PROGRESS · ЭШЕЛОН 1 (ФУНДАМЕНТ JUNIOR)</div>
+          <div class="eh-title">Эшелон 1: Допуск к тех-скринингу</div>
+          <div class="eh-sub">Освойте базовый синтаксис и коллекции для открытия первого мок-собеседования.</div>
+        </div>
+
+        <div class="echelon-track-progress">
+          <div class="et-circle">1/5</div>
+          <div class="et-info">
+            <div class="et-target">Модуль 1: Базовый синтаксис</div>
+            <div class="et-note">⚡ Шаг 1 активен · Готов к прохождению</div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="key-points">
+        <li>🌿 <strong>Психологический комфорт:</strong> студент не видит «0%» и гору из «41 темы», которые вызывают ощущение недостижимости цели.</li>
+        <li>🌿 <strong>Фокус на ближайшем шаге:</strong> понятная цель «1 из 5 тем модуля».</li>
+      </ul>
+    </div>
+
+    <!-- ВАРИАНТ B -->
+    <div class="stand-card">
+      <div class="card-header">
+        <span class="option-tag tag-alt">ВАРИАНТ B</span>
+      </div>
+      <h2 class="option-title">Вариант B: Текущее состояние (Кольцо 0% + 41 тема ожидает)</h2>
+      <p class="option-desc">
+        Оставить текущий вид со скриншота 2: крупное кольцо «0% к скринингу», и список из 5 строк (0 сдано, 0 решено, 0 изучено, 41 тема ожидает).
+      </p>
+
+      <div class="mock-echelon-box">
+        <div class="echelon-header-a">
+          <div class="eh-tag">MISSION PROGRESS · ЭШЕЛОН 1</div>
+          <div class="eh-title">Эшелон 1: Допуск к тех-скринингу</div>
+        </div>
+
+        <div class="echelon-current-ring">
+          <div class="ring-0">
+            0%
+            <span class="ring-sub">к скринингу</span>
+          </div>
+          <div class="current-legend">
+            <div>■ 0 тем · Сдано на интервью (100%)</div>
+            <div>■ 0 тем · Решено в Zen IDE (80%)</div>
+            <div>■ 0 тем · В процессе решения</div>
+            <div>■ 41 тем · Ожидает изучения</div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="key-points">
+        <li>⚡ <strong>Полная глобальная статистика:</strong> сразу виден весь объем программы.</li>
+        <li>⚠️ <strong>Высокое когнитивное давление:</strong> вид «0%» демотивирует новичка.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    }
+  </script>
+</body>
+</html>

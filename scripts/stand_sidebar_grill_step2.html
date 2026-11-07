@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Визуальный стенд /grill-me — Шаг 2: Фокус-карточка шага и Single Dominant CTA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #0a0d14;
+      --bg-surface: #10141f;
+      --bg-card: rgba(18, 24, 38, 0.75);
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(16, 185, 129, 0.4);
+      --ink: #f1f5f9;
+      --ink-soft: #94a3b8;
+      --ink-muted: #64748b;
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.25);
+      --emerald-soft: rgba(16, 185, 129, 0.12);
+      --amber: #f59e0b;
+      --font-d: 'Onest', -apple-system, sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+      --font-title: 'Unbounded', sans-serif;
+      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    [data-theme="light"] {
+      --bg-canvas: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.9);
+      --border-glass: rgba(0, 0, 0, 0.08);
+      --ink: #0f172a;
+      --ink-soft: #475569;
+      --ink-muted: #94a3b8;
+      --emerald: #059669;
+      --emerald-soft: rgba(5, 150, 105, 0.1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-canvas);
+      color: var(--ink);
+      font-family: var(--font-d);
+      padding: 24px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.15;
+    }
+    .orb-1 { width: 400px; height: 400px; background: var(--emerald); top: -80px; left: -80px; }
+    .orb-2 { width: 450px; height: 450px; background: var(--amber); bottom: -80px; right: -80px; }
+
+    header.stand-header {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-glass);
+    }
+
+    .stand-badge {
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: var(--emerald-soft);
+      color: var(--emerald);
+      border: 1px solid var(--emerald);
+      padding: 3px 10px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    h1.stand-title {
+      font-family: var(--font-title);
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+    }
+
+    .controls-panel {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-toggle {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      color: var(--ink);
+      font-family: var(--font-d);
+      font-weight: 600;
+      font-size: 0.82rem;
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: all 0.2s var(--spring);
+    }
+    .btn-toggle:hover {
+      border-color: var(--emerald);
+      transform: translateY(-1px);
+    }
+
+    .stands-grid {
+      position: relative;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .stand-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1.5px solid var(--border-glass);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: all 0.25s var(--spring);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+    }
+
+    .stand-card.recommended {
+      border-color: var(--emerald);
+      box-shadow: 0 0 0 1px var(--emerald), 0 16px 40px rgba(16, 185, 129, 0.12);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .option-tag {
+      font-family: var(--font-m);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 8px;
+    }
+    .tag-rec { background: var(--emerald-soft); color: var(--emerald); border: 1px solid var(--emerald); }
+    .tag-alt { background: rgba(255, 255, 255, 0.05); color: var(--ink-soft); border: 1px solid var(--border-glass); }
+
+    .option-title {
+      font-family: var(--font-title);
+      font-size: 1.05rem;
+      margin-top: 4px;
+    }
+
+    .option-desc {
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      line-height: 1.45;
+    }
+
+    /* Mock Box */
+    .mock-box {
+      background: #0d121c;
+      border: 1px solid var(--border-glass);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Card Variant A */
+    .focus-card-a {
+      background: linear-gradient(145deg, rgba(16, 185, 129, 0.15), rgba(6, 78, 59, 0.28));
+      border: 1.5px solid rgba(16, 185, 129, 0.45);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(6, 78, 59, 0.25);
+    }
+    .fc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .fc-pill {
+      font-family: var(--font-m);
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: var(--emerald);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .fc-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 8px var(--emerald);
+    }
+    .fc-time {
+      font-family: var(--font-m);
+      font-size: 0.68rem;
+      color: rgba(255, 255, 255, 0.6);
+      background: rgba(0,0,0,0.25);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+    .fc-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+    }
+    .fc-beads-progress {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .bead-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+    }
+    .bead-dot.active {
+      background: var(--emerald);
+      box-shadow: 0 0 6px var(--emerald);
+    }
+    .bead-text {
+      font-family: var(--font-m);
+      font-size: 0.62rem;
+      color: var(--ink-muted);
+      margin-left: auto;
+    }
+    .fc-btn-dominant {
+      background: var(--emerald);
+      color: #032014;
+      font-family: var(--font-d);
+      font-size: 0.82rem;
+      font-weight: 800;
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+      transition: all 0.2s var(--spring);
+    }
+    .fc-btn-dominant:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+    }
+
+    /* Variant B */
+    .focus-card-b {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .fc-b-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .fc-b-tag { font-family: var(--font-m); font-size: 0.65rem; color: var(--emerald); font-weight: 700; }
+    .fc-b-name { font-size: 0.82rem; font-weight: 700; color: #fff; }
+    .fc-b-btn {
+      background: var(--emerald);
+      color: #042517;
+      font-size: 0.76rem;
+      font-weight: 800;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* Variant C */
+    .focus-card-c {
+      background: #141a27;
+      border: 1px solid var(--border-glass);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .fc-c-header { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--ink-soft); }
+    .fc-c-title { font-size: 0.86rem; font-weight: 700; color: #fff; }
+    .fc-c-btn {
+      background: transparent;
+      border: 1px solid var(--emerald);
+      color: var(--emerald);
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .key-points {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.8rem;
+    }
+    .key-points li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      color: var(--ink-soft);
+    }
+    .key-points li strong { color: var(--ink); }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <header class="stand-header">
+    <div>
+      <span class="stand-badge">ЭТАП 2 / GRILL-ME ИНТЕРВЬЮ</span>
+      <h1 class="stand-title">Фокус-карточка текущего шага и Single Dominant CTA</h1>
+    </div>
+    <div class="controls-panel">
+      <button class="btn-toggle" onclick="toggleTheme()">🌓 Переключить тему (Dark/Light)</button>
+    </div>
+  </header>
+
+  <div class="stands-grid">
+
+    <!-- ВАРИАНТ A -->
+    <div class="stand-card recommended">
+      <div class="card-header">
+        <span class="option-tag tag-rec">РЕКОМЕНДУЕМЫЙ (MASTER-LEARNING)</span>
+      </div>
+      <h2 class="option-title">Вариант A: Изумрудный квант-капсюль с бусинами</h2>
+      <p class="option-desc">
+        Полноценная стеклянная карточка с точным таймингом <code>~2 мин</code>, мини-бусинами прогресса темы (1/4 кванта) и одной светящейся CTA-кнопкой «Продолжить ➔». Из шапки мобильного меню удаляется дублирующая кнопка «Старт».
+      </p>
+
+      <div class="mock-box">
+        <div class="focus-card-a">
+          <div class="fc-header">
+            <div class="fc-pill">
+              <span class="fc-dot"></span>
+              ШАГ 1
+            </div>
+            <div class="fc-time">⏱ ~2 мин</div>
+          </div>
+          <div class="fc-title">Базовые коллекции и срезы</div>
+          <div class="fc-beads-progress">
+            <div class="bead-dot active"></div>
+            <div class="bead-dot"></div>
+            <div class="bead-dot"></div>
+            <div class="bead-dot"></div>
+            <span class="bead-text">Квант 1 из 4</span>
+          </div>
+          <button class="fc-btn-dominant">Продолжить ➔</button>
+        </div>
+      </div>
+
+      <ul class="key-points">
+        <li>🌿 <strong>Закон Хика:</strong> 1 доминантный CTA, никаких конкурирующих кнопок в хэдере дровера.</li>
+        <li>🌿 <strong>Связка с бусинами:</strong> студент видит, что тема состоит из микро-квантов.</li>
+        <li>🌿 <strong>Психологический барьер:</strong> «2 минуты» не вызывают прокрастинации в отличие от 12 мин.</li>
+      </ul>
+    </div>
+
+    <!-- ВАРИАНТ B -->
+    <div class="stand-card">
+      <div class="card-header">
+        <span class="option-tag tag-alt">ВАРИАНТ B</span>
+      </div>
+      <h2 class="option-title">Вариант B: Компактный горизонтальный инлайн-чип</h2>
+      <p class="option-desc">
+        Сжатая однострочная плашка без бусин: название шага и компактная кнопка справа. Освобождает максимальное вертикальное пространство в мобильном дровере.
+      </p>
+
+      <div class="mock-box">
+        <div class="focus-card-b">
+          <div class="fc-b-left">
+            <div class="fc-b-tag">● ШАГ 1 · ~2 МИН</div>
+            <div class="fc-b-name">Базовые коллекции</div>
+          </div>
+          <button class="fc-b-btn">Старт ➔</button>
+        </div>
+      </div>
+
+      <ul class="key-points">
+        <li>⚡ <strong>Компактность:</strong> занимает всего 48px по высоте.</li>
+        <li>⚠️ <strong>Меньше фокуса:</strong> слабее визуальный вес доминантного действия.</li>
+      </ul>
+    </div>
+
+    <!-- ВАРИАНТ C -->
+    <div class="stand-card">
+      <div class="card-header">
+        <span class="option-tag tag-alt">ВАРИАНТ C</span>
+      </div>
+      <h2 class="option-title">Вариант C: Контурная карточка (Outline Minimal)</h2>
+      <p class="option-desc">
+        Классическая карточка без градиентных подложек: тонкая рамка, прозрачный фон, кнопка с изумрудным контуром.
+      </p>
+
+      <div class="mock-box">
+        <div class="focus-card-c">
+          <div class="fc-c-header">
+            <span>ШАГ 1</span>
+            <span>~2 МИН</span>
+          </div>
+          <div class="fc-c-title">Базовые коллекции и срезы</div>
+          <button class="fc-c-btn">Продолжить ➔</button>
+        </div>
+      </div>
+
+      <ul class="key-points">
+        <li>🍃 <strong>Сдержанность:</strong> не отвлекает от остальных ссылок.</li>
+        <li>⚠️ <strong>Слабый CTA:</strong> кнопка без заливки проигрывает в конверсии в клик.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    }
+  </script>
+</body>
+</html>

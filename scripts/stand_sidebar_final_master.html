@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мастер-стенд сайдбара — Python Backend Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #0a0d14;
+      --bg-surface: #10141f;
+      --bg-card: rgba(18, 24, 38, 0.75);
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --ink: #f1f5f9;
+      --ink-soft: #94a3b8;
+      --ink-muted: #64748b;
+      --emerald: #10b981;
+      --emerald-soft: rgba(16, 185, 129, 0.12);
+      --amber: #f59e0b;
+      --font-d: 'Onest', -apple-system, sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+      --font-title: 'Unbounded', sans-serif;
+      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    [data-theme="light"] {
+      --bg-canvas: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.9);
+      --border-glass: rgba(0, 0, 0, 0.08);
+      --ink: #0f172a;
+      --ink-soft: #475569;
+      --ink-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-canvas);
+      color: var(--ink);
+      font-family: var(--font-d);
+      padding: 24px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.15;
+    }
+    .orb-1 { width: 400px; height: 400px; background: #059669; top: -80px; left: -80px; }
+    .orb-2 { width: 450px; height: 450px; background: #be123c; bottom: -80px; right: -80px; }
+
+    header.master-header {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-glass);
+    }
+
+    .master-badge {
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: var(--emerald-soft);
+      color: var(--emerald);
+      border: 1px solid var(--emerald);
+      padding: 3px 10px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    h1.master-title {
+      font-family: var(--font-title);
+      font-size: 1.35rem;
+      letter-spacing: -0.02em;
+    }
+
+    .controls-panel {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-toggle {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      color: var(--ink);
+      font-family: var(--font-d);
+      font-weight: 600;
+      font-size: 0.82rem;
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: all 0.2s var(--spring);
+    }
+    .btn-toggle:hover {
+      border-color: var(--emerald);
+      transform: translateY(-1px);
+    }
+
+    .master-grid {
+      position: relative;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 32px;
+      align-items: flex-start;
+    }
+
+    .preview-column {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .col-title {
+      font-family: var(--font-title);
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .col-badge {
+      font-family: var(--font-m);
+      font-size: 0.68rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--ink-soft);
+    }
+
+    /* Sidebars */
+    .sb-shell {
+      background: #0d121c;
+      border: 1px solid var(--border-glass);
+      border-radius: 20px;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+    }
+    .sb-desktop { width: 100%; max-width: 256px; }
+    .sb-mobile { width: 100%; max-width: 346px; }
+
+    /* Header & Authentic Obsidian Logo */
+    .sb-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 8px;
+    }
+    .sb-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    /* Истинный благородный логотип: глубокий обсидиан + шелковые питоны (изумруд & бургунди) */
+    .sb-logo-wrap {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      overflow: hidden;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 
+        0 2px 10px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.25);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: #090c12;
+      transition: transform 0.25s var(--spring);
+    }
+    .sb-logo-wrap:hover {
+      transform: scale(1.05);
+    }
+    .sb-logo-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .sb-brand-name {
+      font-family: var(--font-title);
+      font-size: 0.96rem;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+    .sb-brand-sub {
+      font-size: 0.68rem;
+      color: var(--ink-muted);
+    }
+    .sb-close-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
+      color: var(--ink-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* Focus Card */
+    .focus-card {
+      background: linear-gradient(145deg, rgba(6, 78, 59, 0.25), rgba(13, 22, 34, 0.7));
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 13px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    .fc-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-m);
+      font-size: 0.68rem;
+      color: #34d399;
+      font-weight: 700;
+    }
+    .fc-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.25;
+    }
+
+    /* ========================================================
+       БЛАГОРОДНАЯ КНОПКА «ПРОДОЛЖИТЬ»:
+       Темный глубокий изумрудный стеклянный цвет + БЕЛЫЕ буквы
+       (Как в эталоне карточек интервального повторения SRS)
+       ======================================================== */
+    .fc-btn-mastery {
+      width: 100%;
+      background: linear-gradient(155deg, rgba(6, 78, 59, 0.72) 0%, rgba(13, 22, 34, 0.88) 50%, rgba(6, 78, 59, 0.52) 100%);
+      border: 1.5px solid rgba(16, 185, 129, 0.65);
+      color: #ffffff !important;
+      font-family: var(--font-d);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      padding: 9px 12px;
+      border-radius: 9px;
+      text-align: center;
+      cursor: pointer;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+      box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.28),
+        0 4px 16px rgba(6, 78, 59, 0.35);
+      transition: all 0.22s var(--spring);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .fc-btn-mastery:hover {
+      background: linear-gradient(155deg, rgba(6, 78, 59, 0.88) 0%, rgba(16, 28, 42, 0.92) 50%, rgba(6, 78, 59, 0.68) 100%);
+      border-color: rgba(52, 211, 153, 0.85);
+      box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.38),
+        0 6px 22px rgba(16, 185, 129, 0.45);
+      transform: translateY(-1.5px);
+    }
+    .fc-btn-mastery:active {
+      transform: translateY(0);
+      box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        0 2px 8px rgba(6, 78, 59, 0.3);
+    }
+
+    /* Navigation */
+    .nav-group-title {
+      font-size: 0.64rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+      padding: 6px 8px 3px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 10px;
+      border-radius: 9px;
+      font-size: 0.84rem;
+      font-weight: 500;
+      color: var(--ink-soft);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--ink);
+    }
+    .nav-item.active {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .nav-item .badge {
+      margin-left: auto;
+      font-family: var(--font-m);
+      font-size: 0.66rem;
+      padding: 1px 7px;
+      border-radius: 999px;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    /* Bottom HUD */
+    .sb-footer {
+      margin-top: 10px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-glass);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .hud-tandem-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .pomo-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
+      border-radius: 11px;
+      padding: 8px 6px;
+      font-family: var(--font-m);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--ink);
+      cursor: pointer;
+      transition: all 0.2s var(--spring);
+    }
+    .pomo-btn:hover {
+      background: rgba(255, 255, 255, 0.09);
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .energy-crystal-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: linear-gradient(135deg, rgba(254, 243, 199, 0.2) 0%, rgba(245, 158, 11, 0.25) 100%);
+      border: 1.5px solid rgba(251, 191, 36, 0.55);
+      color: #fff;
+      border-radius: 11px;
+      padding: 8px 6px;
+      font-family: var(--font-m);
+      font-size: 0.8rem;
+      font-weight: 800;
+      box-shadow: 
+        0 0 0 1px rgba(251, 191, 36, 0.3),
+        0 3px 14px rgba(245, 158, 11, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+      cursor: pointer;
+      transition: all 0.2s var(--spring);
+    }
+    .energy-crystal-badge:hover {
+      transform: translateY(-1px);
+      box-shadow: 
+        0 0 0 1px rgba(251, 191, 36, 0.45),
+        0 5px 18px rgba(245, 158, 11, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    }
+    .spark-icon { color: #fde047; }
+
+    /* Bottom Trio Utilities Row */
+    .trio-sys-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .trio-icon-btn {
+      width: 36px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-glass);
+      border-radius: 9px;
+      color: var(--ink-soft);
+      cursor: pointer;
+      font-size: 0.88rem;
+      transition: all 0.15s;
+    }
+    .trio-icon-btn:hover {
+      background: rgba(255, 255, 255, 0.09);
+      color: var(--ink);
+    }
+
+    .theme-slider-capsule {
+      flex: 1;
+      height: 34px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-glass);
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 3px 6px;
+      cursor: pointer;
+      position: relative;
+    }
+    .theme-icon-sun { font-size: 0.78rem; opacity: 0.4; }
+    .theme-icon-moon { font-size: 0.78rem; color: #38bdf8; }
+    .theme-thumb {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+    }
+
+    .decision-recap {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: 16px;
+      padding: 18px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .dr-title {
+      font-family: var(--font-title);
+      font-size: 0.95rem;
+      color: var(--emerald);
+    }
+    .dr-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 10px;
+      font-size: 0.82rem;
+      list-style: none;
+    }
+    .dr-list li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--ink-soft);
+    }
+    .dr-list li strong { color: var(--ink); }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <header class="master-header">
+    <div>
+      <span class="master-badge">ОБНОВЛЁННЫЙ МАСТЕР-СТЕНД / GRILL-ME</span>
+      <h1 class="master-title">Благородный логотип и тёмно-изумрудная стеклянная кнопка</h1>
+    </div>
+    <div class="controls-panel">
+      <button class="btn-toggle" onclick="toggleTheme()">🌓 Переключить тему (Dark/Light)</button>
+    </div>
+  </header>
+
+  <div class="master-grid">
+
+    <!-- DESKTOP VIEW (256px) -->
+    <div class="preview-column">
+      <div class="col-title">
+        🖥️ Десктопная панель
+        <span class="col-badge">256px · Sticky Fixed</span>
+      </div>
+
+      <div class="sb-shell sb-desktop">
+        <div class="sb-header">
+          <div class="sb-brand">
+            <!-- Благородный каноничный векторный логотип Обсидиан + Изумруд & Бургунди -->
+            <div class="sb-logo-wrap" title="Python Backend Academy">
+              <svg class="sb-logo-svg" viewBox="0 0 512 512">
+                <defs>
+                  <radialGradient id="obs-bg" cx="50%" cy="40%" r="65%">
+                    <stop offset="0%" stop-color="#121620"/>
+                    <stop offset="60%" stop-color="#090c12"/>
+                    <stop offset="100%" stop-color="#040508"/>
+                  </radialGradient>
+                  <linearGradient id="snk-em" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#6ee7b7"/>
+                    <stop offset="28%" stop-color="#059669"/>
+                    <stop offset="72%" stop-color="#047857"/>
+                    <stop offset="100%" stop-color="#022c22"/>
+                  </linearGradient>
+                  <linearGradient id="snk-bg" x1="100%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%" stop-color="#fda4af"/>
+                    <stop offset="28%" stop-color="#be123c"/>
+                    <stop offset="68%" stop-color="#881337"/>
+                    <stop offset="100%" stop-color="#3b0714"/>
+                  </linearGradient>
+                </defs>
+                <rect width="512" height="512" rx="116" fill="url(#obs-bg)"/>
+                <g transform="translate(118.5, 118.5) scale(2.5)">
+                  <!-- Верхняя изумрудная змея -->
+                  <path fill="url(#snk-em)" d="M55.023-0.077c-25.971,0-26.25,10.081-26.25,12.156c0,3.148,0,12.594,0,12.594h26.75v3.781 c0,0-27.852,0-37.375,0c-7.949,0-17.938,4.833-17.938,26.25c0,19.673,7.792,27.281,15.656,27.281c2.335,0,9.344,0,9.344,0 s0-9.765,0-13.125c0-5.491,2.721-15.656,15.406-15.656c15.91,0,19.971,0,26.531,0c3.902,0,14.906-1.696,14.906-14.406 c0-13.452,0-17.89,0-24.219C82.054,11.426,81.515-0.077,55.023-0.077z"/>
+                  <circle cx="40.27" cy="13.2" r="5.8" fill="#022c22"/>
+                  <circle cx="40.27" cy="13.2" r="2.2" fill="#ecfdf5"/>
+                  <!-- Нижняя бургундская змея -->
+                  <path fill="url(#snk-bg)" d="M55.397,109.923c25.959,0,26.282-10.271,26.282-12.156c0-3.148,0-12.594,0-12.594H54.897v-3.781 c0,0,28.032,0,37.375,0c8.009,0,17.938-4.954,17.938-26.25c0-23.322-10.538-27.281-15.656-27.281c-2.336,0-9.344,0-9.344,0 s0,10.216,0,13.125c0,5.491-2.631,15.656-15.406,15.656c-15.91,0-19.476,0-26.532,0c-3.892,0-14.906,1.896-14.906,14.406 c0,14.475,0,18.265,0,24.219C28.366,100.497,31.562,109.923,55.397,109.923z"/>
+                  <circle cx="70.15" cy="96.64" r="5.8" fill="#3b0714"/>
+                  <circle cx="70.15" cy="96.64" r="2.2" fill="#fff1f2"/>
+                </g>
+              </svg>
+            </div>
+            <div>
+              <div class="sb-brand-name">Academy</div>
+              <div class="sb-brand-sub">Python Backend</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="focus-card">
+          <div class="fc-meta">
+            <span>● ШАГ 1</span>
+            <span>⏱ ~12 мин</span>
+          </div>
+          <div class="fc-name">Базовые коллекции и срезы</div>
+          <!-- ТЕМНО-ИЗУМРУДНАЯ СТЕКЛЯННАЯ КНОПКА С БЕЛЫМИ БУКВАМИ -->
+          <button class="fc-btn-mastery">Продолжить ➔</button>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Маршрут</div>
+          <a class="nav-item active">🏠 Дашборд</a>
+          <a class="nav-item">🗺 Путь к офферу <span class="badge">Шаг 1</span></a>
+          <a class="nav-item">🗂 Интервалка SRS</a>
+          <a class="nav-item">&lt;/&gt; Zen IDE</a>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Ресурсы и тренажеры</div>
+          <a class="nav-item">💼 Собеседование</a>
+          <a class="nav-item">📊 Матрица навыков</a>
+          <a class="nav-item">📖 Справочник</a>
+          <a class="nav-item">🧪 Песочница</a>
+        </div>
+
+        <div class="sb-footer">
+          <div class="hud-tandem-row">
+            <div class="pomo-btn" title="Запустить фокус-таймер">⏱ 15:00 ▶</div>
+            <div class="energy-crystal-badge" title="Энергия: 100%">
+              <span class="spark-icon">✨</span> 100%
+            </div>
+          </div>
+
+          <div class="trio-sys-row">
+            <div class="trio-icon-btn" title="Поиск (Ctrl+K)">🔍</div>
+            <div class="theme-slider-capsule" onclick="toggleTheme()" title="Переключить тему">
+              <span class="theme-icon-sun">☼</span>
+              <div class="theme-thumb">◒</div>
+              <span class="theme-icon-moon">☾</span>
+            </div>
+            <div class="trio-icon-btn" title="Настройки (выбор языка внутри)">⚙</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOBILE DRAWER (346px) -->
+    <div class="preview-column">
+      <div class="col-title">
+        📱 Мобильный Drawer
+        <span class="col-badge">346px · Glass Overlay</span>
+      </div>
+
+      <div class="sb-shell sb-mobile">
+        <div class="sb-header">
+          <div class="sb-brand">
+            <div class="sb-logo-wrap" title="Python Backend Academy">
+              <svg class="sb-logo-svg" viewBox="0 0 512 512">
+                <defs>
+                  <radialGradient id="obs-bg-m" cx="50%" cy="40%" r="65%">
+                    <stop offset="0%" stop-color="#121620"/>
+                    <stop offset="60%" stop-color="#090c12"/>
+                    <stop offset="100%" stop-color="#040508"/>
+                  </radialGradient>
+                  <linearGradient id="snk-em-m" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#6ee7b7"/>
+                    <stop offset="28%" stop-color="#059669"/>
+                    <stop offset="72%" stop-color="#047857"/>
+                    <stop offset="100%" stop-color="#022c22"/>
+                  </linearGradient>
+                  <linearGradient id="snk-bg-m" x1="100%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%" stop-color="#fda4af"/>
+                    <stop offset="28%" stop-color="#be123c"/>
+                    <stop offset="68%" stop-color="#881337"/>
+                    <stop offset="100%" stop-color="#3b0714"/>
+                  </linearGradient>
+                </defs>
+                <rect width="512" height="512" rx="116" fill="url(#obs-bg-m)"/>
+                <g transform="translate(118.5, 118.5) scale(2.5)">
+                  <path fill="url(#snk-em-m)" d="M55.023-0.077c-25.971,0-26.25,10.081-26.25,12.156c0,3.148,0,12.594,0,12.594h26.75v3.781 c0,0-27.852,0-37.375,0c-7.949,0-17.938,4.833-17.938,26.25c0,19.673,7.792,27.281,15.656,27.281c2.335,0,9.344,0,9.344,0 s0-9.765,0-13.125c0-5.491,2.721-15.656,15.406-15.656c15.91,0,19.971,0,26.531,0c3.902,0,14.906-1.696,14.906-14.406 c0-13.452,0-17.89,0-24.219C82.054,11.426,81.515-0.077,55.023-0.077z"/>
+                  <circle cx="40.27" cy="13.2" r="5.8" fill="#022c22"/>
+                  <circle cx="40.27" cy="13.2" r="2.2" fill="#ecfdf5"/>
+                  <path fill="url(#snk-bg-m)" d="M55.397,109.923c25.959,0,26.282-10.271,26.282-12.156c0-3.148,0-12.594,0-12.594H54.897v-3.781 c0,0,28.032,0,37.375,0c8.009,0,17.938-4.954,17.938-26.25c0-23.322-10.538-27.281-15.656-27.281c-2.336,0-9.344,0-9.344,0 s0,10.216,0,13.125c0,5.491-2.631,15.656-15.406,15.656c-15.91,0-19.476,0-26.532,0c-3.892,0-14.906,1.896-14.906,14.406 c0,14.475,0,18.265,0,24.219C28.366,100.497,31.562,109.923,55.397,109.923z"/>
+                  <circle cx="70.15" cy="96.64" r="5.8" fill="#3b0714"/>
+                  <circle cx="70.15" cy="96.64" r="2.2" fill="#fff1f2"/>
+                </g>
+              </svg>
+            </div>
+            <div>
+              <div class="sb-brand-name">Academy</div>
+              <div class="sb-brand-sub">Python Backend</div>
+            </div>
+          </div>
+          <button class="sb-close-btn" title="Закрыть шторку">✕</button>
+        </div>
+
+        <div class="focus-card">
+          <div class="fc-meta">
+            <span>● ШАГ 1</span>
+            <span>⏱ ~12 мин</span>
+          </div>
+          <div class="fc-name">Базовые коллекции и срезы</div>
+          <!-- ТЕМНО-ИЗУМРУДНАЯ СТЕКЛЯННАЯ КНОПКА С БЕЛЫМИ БУКВАМИ -->
+          <button class="fc-btn-mastery">Продолжить ➔</button>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Маршрут</div>
+          <a class="nav-item active">🏠 Дашборд</a>
+          <a class="nav-item">🗺 Путь к офферу <span class="badge">Шаг 1</span></a>
+          <a class="nav-item">🗂 Интервалка SRS</a>
+          <a class="nav-item">&lt;/&gt; Zen IDE</a>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Ресурсы и тренажеры</div>
+          <a class="nav-item">💼 Собеседование</a>
+          <a class="nav-item">📊 Матрица навыков</a>
+          <a class="nav-item">📖 Справочник</a>
+          <a class="nav-item">🧪 Песочница</a>
+        </div>
+
+        <div class="sb-footer">
+          <div class="hud-tandem-row">
+            <div class="pomo-btn">⏱ 15:00 ▶</div>
+            <div class="energy-crystal-badge">
+              <span class="spark-icon">✨</span> 100%
+            </div>
+          </div>
+
+          <div class="trio-sys-row">
+            <div class="trio-icon-btn" title="Поиск">🔍</div>
+            <div class="theme-slider-capsule" onclick="toggleTheme()" title="Переключить тему">
+              <span class="theme-icon-sun">☼</span>
+              <div class="theme-thumb">◒</div>
+              <span class="theme-icon-moon">☾</span>
+            </div>
+            <div class="trio-icon-btn" title="Настройки (выбор языка внутри)">⚙</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="decision-recap">
+    <div class="dr-title">✓ Итоги правок по вашему запросу</div>
+    <ul class="dr-list">
+      <li>💎 <strong>Благородный логотип:</strong> восстановлен истинный обсидиановый знак Академии (дуальный питон Tourmaline & Velvet Burgundy с искрами) вместо зеленого блока.</li>
+      <li>🌿 <strong>Кнопка «Продолжить ➔»:</strong> переведена в глубокий темный изумрудный стеклянный градиент с чистыми белыми буквами и легкой тенью (как в карточках SRS).</li>
+      <li>✨ <strong>Стрик убран, батарея откалибрована:</strong> 50/50 ряд с Помодоро и кристальным золотым свечением 100%.</li>
+      <li>⚙ <strong>Трио-Док утилит:</strong> Поиск, слайдер тем ☼/☾ и Настройки с языком внутри.</li>
+    </ul>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    }
+  </script>
+</body>
+</html>

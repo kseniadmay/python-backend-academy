@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Визуальный стенд /grill-me — Шаг 5: Мобильный Drawer и Трио-док (Поиск, Тема, Настройки)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #0a0d14;
+      --bg-surface: #10141f;
+      --bg-card: rgba(18, 24, 38, 0.75);
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --ink: #f1f5f9;
+      --ink-soft: #94a3b8;
+      --ink-muted: #64748b;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --font-d: 'Onest', -apple-system, sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+      --font-title: 'Unbounded', sans-serif;
+      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    [data-theme="light"] {
+      --bg-canvas: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.9);
+      --border-glass: rgba(0, 0, 0, 0.08);
+      --ink: #0f172a;
+      --ink-soft: #475569;
+      --ink-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-canvas);
+      color: var(--ink);
+      font-family: var(--font-d);
+      padding: 24px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.15;
+    }
+    .orb-1 { width: 400px; height: 400px; background: var(--emerald); top: -80px; left: -80px; }
+    .orb-2 { width: 450px; height: 450px; background: var(--amber); bottom: -80px; right: -80px; }
+
+    header.stand-header {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-glass);
+    }
+
+    .stand-badge {
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald);
+      border: 1px solid var(--emerald);
+      padding: 3px 10px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    h1.stand-title {
+      font-family: var(--font-title);
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+    }
+
+    .controls-panel {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-toggle {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      color: var(--ink);
+      font-family: var(--font-d);
+      font-weight: 600;
+      font-size: 0.82rem;
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: all 0.2s var(--spring);
+    }
+    .btn-toggle:hover {
+      border-color: var(--emerald);
+      transform: translateY(-1px);
+    }
+
+    .stands-grid {
+      position: relative;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .stand-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1.5px solid var(--border-glass);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: all 0.25s var(--spring);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+    }
+
+    .stand-card.recommended {
+      border-color: var(--emerald);
+      box-shadow: 0 0 0 1px var(--emerald), 0 16px 40px rgba(16, 185, 129, 0.12);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .option-tag {
+      font-family: var(--font-m);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 8px;
+    }
+    .tag-rec { background: rgba(16, 185, 129, 0.15); color: var(--emerald); border: 1px solid var(--emerald); }
+    .tag-alt { background: rgba(255, 255, 255, 0.05); color: var(--ink-soft); border: 1px solid var(--border-glass); }
+
+    .option-title {
+      font-family: var(--font-title);
+      font-size: 1.05rem;
+      margin-top: 4px;
+    }
+
+    .option-desc {
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      line-height: 1.45;
+    }
+
+    /* Mobile Drawer Frame (346px width matching screenshot 2) */
+    .mobile-frame {
+      background: #0d121c;
+      border: 1px solid var(--border-glass);
+      border-radius: 20px;
+      padding: 16px 14px;
+      width: 100%;
+      max-width: 270px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+    }
+
+    /* Header */
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-glass);
+    }
+    .dh-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dh-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.85rem;
+    }
+    .dh-title {
+      font-family: var(--font-title);
+      font-size: 0.9rem;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+    .dh-sub { font-size: 0.66rem; color: var(--ink-muted); }
+
+    .dh-close-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
+      color: var(--ink-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.15s;
+    }
+    .dh-close-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--ink); }
+
+    /* Focus Card in Drawer (kept as is per user decision!) */
+    .drawer-focus-card {
+      background: linear-gradient(145deg, rgba(16, 185, 129, 0.18), rgba(6, 78, 59, 0.3));
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .dfc-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-m);
+      font-size: 0.65rem;
+      color: var(--emerald);
+      font-weight: 700;
+    }
+    .dfc-name {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.25;
+    }
+    .dfc-btn {
+      background: var(--emerald);
+      color: #042517;
+      font-size: 0.74rem;
+      font-weight: 800;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    /* Links */
+    .drawer-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .group-label {
+      font-size: 0.62rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+      padding: 4px 6px 2px;
+    }
+    .drawer-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 8px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--ink-soft);
+      cursor: pointer;
+    }
+    .drawer-link.active {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .drawer-link .badge {
+      margin-left: auto;
+      font-family: var(--font-m);
+      font-size: 0.65rem;
+      padding: 1px 6px;
+      border-radius: 999px;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    /* Bottom HUD with language moved into settings! */
+    .drawer-hud {
+      margin-top: 6px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-glass);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .hud-tandem-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .hud-pomo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
+      border-radius: 10px;
+      padding: 8px 6px;
+      font-family: var(--font-m);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .hud-energy {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: linear-gradient(135deg, rgba(254, 243, 199, 0.22) 0%, rgba(245, 158, 11, 0.28) 100%);
+      border: 1.5px solid rgba(251, 191, 36, 0.6);
+      color: #fff;
+      border-radius: 10px;
+      padding: 8px 6px;
+      font-family: var(--font-m);
+      font-size: 0.8rem;
+      font-weight: 800;
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.25);
+    }
+
+    /* TRIO DOCK (Поиск, Тема, Настройки) */
+    .trio-dock {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: 6px;
+    }
+    .trio-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-glass);
+      border-radius: 9px;
+      padding: 7px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .trio-btn:hover { background: rgba(255, 255, 255, 0.08); color: var(--ink); }
+
+    .key-points {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.8rem;
+    }
+    .key-points li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      color: var(--ink-soft);
+    }
+    .key-points li strong { color: var(--ink); }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <header class="stand-header">
+    <div>
+      <span class="stand-badge">ЭТАП 5 / GRILL-ME ИНТЕРВЬЮ</span>
+      <h1 class="stand-title">Мобильный Drawer и Трио-Док утилит (Поиск, Тема, Настройки)</h1>
+    </div>
+    <div class="controls-panel">
+      <button class="btn-toggle" onclick="toggleTheme()">🌓 Переключить тему (Dark/Light)</button>
+    </div>
+  </header>
+
+  <div class="stands-grid">
+
+    <!-- ВАРИАНТ A -->
+    <div class="stand-card recommended">
+      <div class="card-header">
+        <span class="option-tag tag-rec">РЕКОМЕНДУЕМЫЙ (SCANDI GLASS DRAWER)</span>
+      </div>
+      <h2 class="option-title">Вариант A: Трио-Док (Поиск, Тема, Настройки с языком внутри)</h2>
+      <p class="option-desc">
+        Язык вынесен внутрь окна «Настройки». Нижний ряд превращается в чистый сбалансированный Трио-Док: <code>[🔍 Поиск]</code>, <code>[🌓 Тема]</code> и <code>[⚙ Настройки]</code>. В шапке — только логотип и кнопка закрытия <code>✕</code>.
+      </p>
+
+      <div class="mobile-frame">
+        <div class="drawer-header">
+          <div class="dh-brand">
+            <div class="dh-logo">A</div>
+            <div>
+              <div class="dh-title">Academy</div>
+              <div class="dh-sub">Python Backend</div>
+            </div>
+          </div>
+          <button class="dh-close-btn" title="Закрыть">✕</button>
+        </div>
+
+        <div class="drawer-focus-card">
+          <div class="dfc-meta">
+            <span>● ШАГ 1</span>
+            <span>⏱ ~12 мин</span>
+          </div>
+          <div class="dfc-name">Базовые коллекции и срезы</div>
+          <button class="dfc-btn">Продолжить</button>
+        </div>
+
+        <div class="drawer-nav">
+          <div class="group-label">Маршрут</div>
+          <div class="drawer-link active">🏠 Дашборд</div>
+          <div class="drawer-link">🗺 Путь к офферу <span class="badge">Шаг 1</span></div>
+          <div class="drawer-link">🗂 Интервалка SRS</div>
+          <div class="drawer-link">&lt;/&gt; Zen IDE</div>
+        </div>
+
+        <div class="drawer-hud">
+          <div class="hud-tandem-row">
+            <div class="hud-pomo">⏱ 15:00 ▶</div>
+            <div class="hud-energy">✨ 100%</div>
+          </div>
+          <div class="trio-dock">
+            <div class="trio-btn">🔍 Поиск</div>
+            <div class="trio-btn">🌓 Тема</div>
+            <div class="trio-btn" title="Настройки (включая выбор языка RU/EN)">⚙ Опции</div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="key-points">
+        <li>🌿 <strong>Чистый нижний ряд:</strong> 3 кнопки вместо 4, язык убран внутрь Настроек.</li>
+        <li>🌿 <strong>Лаконичная шапка:</strong> убран конкурирующий «Старт», закрытие на привычном месте.</li>
+        <li>🌿 <strong>Стрик полностью убран:</strong> больше воздуха и фокуса на Помодоро и энергии.</li>
+      </ul>
+    </div>
+
+    <!-- ВАРИАНТ B -->
+    <div class="stand-card">
+      <div class="card-header">
+        <span class="option-tag tag-alt">ВАРИАНТ B</span>
+      </div>
+      <h2 class="option-title">Вариант B: Символьный Трио-Док (Только иконки без текста)</h2>
+      <p class="option-desc">
+        В нижнем ряду отображаются только 3 компактные квадратные иконки <code>[🔍]</code>, <code>[🌓]</code>, <code>[⚙]</code>, как на десктопном сайдбаре.
+      </p>
+
+      <div class="mobile-frame">
+        <div class="drawer-header">
+          <div class="dh-brand">
+            <div class="dh-logo">A</div>
+            <div>
+              <div class="dh-title">Academy</div>
+            </div>
+          </div>
+          <button class="dh-close-btn">✕</button>
+        </div>
+
+        <div class="drawer-focus-card">
+          <div class="dfc-meta">
+            <span>● ШАГ 1</span>
+            <span>⏱ ~12 мин</span>
+          </div>
+          <div class="dfc-name">Базовые коллекции и срезы</div>
+          <button class="dfc-btn">Продолжить</button>
+        </div>
+
+        <div class="drawer-nav">
+          <div class="drawer-link active">🏠 Дашборд</div>
+          <div class="drawer-link">🗺 Путь к офферу</div>
+          <div class="drawer-link">🗂 Интервалка SRS</div>
+          <div class="drawer-link">&lt;/&gt; Zen IDE</div>
+        </div>
+
+        <div class="drawer-hud">
+          <div class="hud-tandem-row">
+            <div class="hud-pomo">⏱ 15:00 ▶</div>
+            <div class="hud-energy">✨ 100%</div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+            <div class="trio-btn">🔍</div>
+            <div class="trio-btn">🌓</div>
+            <div class="trio-btn">⚙</div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="key-points">
+        <li>⚡ <strong>Сверхлаконично:</strong> визуально повторяет стиль десктопной панели.</li>
+        <li>⚠️ <strong>Без текстовых подсказок:</strong> немного менее очевидно для новых мобильных пользователей.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Визуальный стенд /grill-me — Шаг 1: Иерархия и унификация сайдбара</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #0a0d14;
+      --bg-surface: #10141f;
+      --bg-card: rgba(18, 24, 38, 0.75);
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(16, 185, 129, 0.4);
+      --ink: #f1f5f9;
+      --ink-soft: #94a3b8;
+      --ink-muted: #64748b;
+      --emerald: #10b981;
+      --emerald-soft: rgba(16, 185, 129, 0.12);
+      --amber: #f59e0b;
+      --amber-soft: rgba(245, 158, 11, 0.12);
+      --cyan: #06b6d4;
+      --rose: #f43f5e;
+      --font-d: 'Onest', -apple-system, sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+      --font-title: 'Unbounded', sans-serif;
+      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    [data-theme="light"] {
+      --bg-canvas: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.9);
+      --border-glass: rgba(0, 0, 0, 0.08);
+      --ink: #0f172a;
+      --ink-soft: #475569;
+      --ink-muted: #94a3b8;
+      --emerald: #059669;
+      --emerald-soft: rgba(5, 150, 105, 0.1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-canvas);
+      color: var(--ink);
+      font-family: var(--font-d);
+      padding: 24px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Ambient glow orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.15;
+    }
+    .orb-1 { width: 400px; height: 400px; background: var(--emerald); top: -80px; left: -80px; }
+    .orb-2 { width: 450px; height: 450px; background: var(--amber); bottom: -80px; right: -80px; }
+
+    header.stand-header {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-glass);
+    }
+
+    .stand-badge {
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: var(--emerald-soft);
+      color: var(--emerald);
+      border: 1px solid var(--emerald);
+      padding: 3px 10px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    h1.stand-title {
+      font-family: var(--font-title);
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+    }
+
+    .controls-panel {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-toggle {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      color: var(--ink);
+      font-family: var(--font-d);
+      font-weight: 600;
+      font-size: 0.82rem;
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: all 0.2s var(--spring);
+    }
+    .btn-toggle:hover {
+      border-color: var(--emerald);
+      transform: translateY(-1px);
+    }
+
+    /* Main Grid comparing the 3 options */
+    .stands-grid {
+      position: relative;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .stand-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1.5px solid var(--border-glass);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: all 0.25s var(--spring);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+    }
+
+    .stand-card.recommended {
+      border-color: var(--emerald);
+      box-shadow: 0 0 0 1px var(--emerald), 0 16px 40px rgba(16, 185, 129, 0.12);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .option-tag {
+      font-family: var(--font-m);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 8px;
+    }
+    .tag-rec { background: var(--emerald-soft); color: var(--emerald); border: 1px solid var(--emerald); }
+    .tag-alt { background: rgba(255, 255, 255, 0.05); color: var(--ink-soft); border: 1px solid var(--border-glass); }
+
+    .option-title {
+      font-family: var(--font-title);
+      font-size: 1.05rem;
+      margin-top: 4px;
+    }
+
+    .option-desc {
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      line-height: 1.45;
+    }
+
+    /* Mock Sidebar Preview Box */
+    .mock-preview {
+      background: #0d121c;
+      border: 1px solid var(--border-glass);
+      border-radius: 16px;
+      padding: 14px 10px;
+      width: 100%;
+      max-width: 256px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .mock-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 6px;
+    }
+    .brand-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #fff;
+      font-size: 0.85rem;
+    }
+    .brand-text {
+      font-family: var(--font-title);
+      font-size: 0.88rem;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+    .brand-sub {
+      font-size: 0.65rem;
+      color: var(--ink-muted);
+    }
+
+    /* Focus Card in Preview */
+    .mock-focus-card {
+      background: linear-gradient(145deg, rgba(16, 185, 129, 0.18), rgba(6, 78, 59, 0.3));
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .mock-focus-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-m);
+      font-size: 0.64rem;
+      color: var(--emerald);
+      font-weight: 700;
+    }
+    .mock-focus-name {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.25;
+    }
+    .mock-focus-btn {
+      background: var(--emerald);
+      color: #042517;
+      font-size: 0.74rem;
+      font-weight: 800;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    /* Nav items */
+    .mock-group-title {
+      font-size: 0.62rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+      padding: 4px 6px 2px;
+    }
+
+    .mock-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 8px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--ink-soft);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .mock-link:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--ink);
+    }
+    .mock-link.active {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .mock-link .badge {
+      margin-left: auto;
+      font-family: var(--font-m);
+      font-size: 0.65rem;
+      padding: 1px 6px;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+    .badge-step { background: rgba(16, 185, 129, 0.15); color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-count { background: rgba(255, 255, 255, 0.06); color: var(--ink-muted); }
+
+    /* Bottom HUD */
+    .mock-hud {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-glass);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .mock-hud-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .mock-hud-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
+      border-radius: 8px;
+      padding: 5px 8px;
+      font-size: 0.72rem;
+      font-family: var(--font-m);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .mock-energy-clean {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--amber);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.15); /* Soft, no blinding bloom! */
+    }
+
+    .key-points {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.8rem;
+    }
+    .key-points li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      color: var(--ink-soft);
+    }
+    .key-points li strong { color: var(--ink); }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <header class="stand-header">
+    <div>
+      <span class="stand-badge">ЭТАП 1 / GRILL-ME ИНТЕРВЬЮ</span>
+      <h1 class="stand-title">Архитектура и унификация навигации: Desktop vs Mobile Drawer</h1>
+    </div>
+    <div class="controls-panel">
+      <button class="btn-toggle" onclick="toggleTheme()">🌓 Переключить тему (Dark/Light)</button>
+    </div>
+  </header>
+
+  <div class="stands-grid">
+
+    <!-- ВАРИАНТ A -->
+    <div class="stand-card recommended">
+      <div class="card-header">
+        <span class="option-tag tag-rec">РЕКОМЕНДУЕМЫЙ (MASTER-HUD)</span>
+      </div>
+      <h2 class="option-title">Вариант A: Дзен-Маршрут (Unified Dashboard-First)</h2>
+      <p class="option-desc">
+        Единый строгий порядок разделов на десктопе и в мобильном дровере. Дашборд — главная точка входа. Устранён раздутый аккордеон SRS. Иконки строго согласованы.
+      </p>
+
+      <!-- Preview Mockup -->
+      <div class="mock-preview">
+        <div class="mock-brand">
+          <div class="brand-icon">A</div>
+          <div>
+            <div class="brand-text">Academy</div>
+            <div class="brand-sub">Python Backend</div>
+          </div>
+        </div>
+
+        <div class="mock-focus-card">
+          <div class="mock-focus-meta">
+            <span>● ШАГ 1</span>
+            <span>⏱ ~2 мин</span>
+          </div>
+          <div class="mock-focus-name">Базовые коллекции и срезы</div>
+          <button class="mock-focus-btn">Продолжить ➔</button>
+        </div>
+
+        <div>
+          <div class="mock-group-title">Маршрут</div>
+          <div class="mock-link active">🏠 Дашборд</div>
+          <div class="mock-link">🗺 Путь к офферу <span class="badge badge-step">Шаг 1</span></div>
+          <div class="mock-link">🗂 Интервалка SRS <span class="badge badge-count">0/12</span></div>
+          <div class="mock-link">&lt;/&gt; Zen IDE</div>
+        </div>
+
+        <div>
+          <div class="mock-group-title">Ресурсы и тренажеры</div>
+          <div class="mock-link">💼 Мок-собеседование</div>
+          <div class="mock-link">📊 Матрица навыков</div>
+          <div class="mock-link">📖 Справочник</div>
+          <div class="mock-link">🧪 Песочница</div>
+        </div>
+
+        <div class="mock-hud">
+          <div class="mock-hud-row">
+            <div class="mock-hud-pill">⏱ 15:00 ▶</div>
+            <div class="mock-hud-pill">🔥 1</div>
+            <div class="mock-hud-pill mock-energy-clean">✨ 100%</div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="key-points">
+        <li>🌿 <strong>100% синхронизация:</strong> порядок ссылок идентичен на Desktop и Mobile Drawer.</li>
+        <li>🌿 <strong>Соблюдение инварианта:</strong> тайминг микро-шага приведён к <strong>~2 мин</strong> (вместо ~12 мин).</li>
+        <li>🌿 <strong>Мягкая энергия:</strong> убран слепящий blur-пересвет у <code>100%</code>.</li>
+        <li>🌿 <strong>Чистая SRS:</strong> компактный счетчик вместо двух пустых строк «0K».</li>
+      </ul>
+    </div>
+
+    <!-- ВАРИАНТ B -->
+    <div class="stand-card">
+      <div class="card-header">
+        <span class="option-tag tag-alt">ВАРИАНТ B</span>
+      </div>
+      <h2 class="option-title">Вариант B: Journey-First (Поток оффера во главе)</h2>
+      <p class="option-desc">
+        «Путь к офферу [Шаг 1]» выносится на 1-ю позицию в блоке маршрутов везде (как на мобильном скриншоте), а «Дашборд» становится вспомогательным экраном обзорной аналитики.
+      </p>
+
+      <div class="mock-preview">
+        <div class="mock-brand">
+          <div class="brand-icon">A</div>
+          <div>
+            <div class="brand-text">Academy</div>
+            <div class="brand-sub">Python Backend</div>
+          </div>
+        </div>
+
+        <div class="mock-focus-card">
+          <div class="mock-focus-meta">
+            <span>● ШАГ 1</span>
+            <span>⏱ ~2 мин</span>
+          </div>
+          <div class="mock-focus-name">Базовые коллекции и срезы</div>
+          <button class="mock-focus-btn">Продолжить ➔</button>
+        </div>
+
+        <div>
+          <div class="mock-group-title">Маршрут</div>
+          <div class="mock-link active">🗺 Путь к офферу <span class="badge badge-step">Шаг 1</span></div>
+          <div class="mock-link">🗂 Интервалка SRS <span class="badge badge-count">0/12</span></div>
+          <div class="mock-link">&lt;/&gt; Zen IDE</div>
+          <div class="mock-link">🏠 Дашборд</div>
+        </div>
+
+        <div>
+          <div class="mock-group-title">Ресурсы и тренажеры</div>
+          <div class="mock-link">💼 Мок-собеседование</div>
+          <div class="mock-link">📊 Матрица навыков</div>
+          <div class="mock-link">📖 Справочник</div>
+          <div class="mock-link">🧪 Песочница</div>
+        </div>
+
+        <div class="mock-hud">
+          <div class="mock-hud-row">
+            <div class="mock-hud-pill">⏱ 15:00 ▶</div>
+            <div class="mock-hud-pill">🔥 1</div>
+            <div class="mock-hud-pill mock-energy-clean">✨ 100%</div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="key-points">
+        <li>⚡ <strong>Фокус на карте:</strong> первый клик сразу ведёт на змейку Пути обучения.</li>
+        <li>⚠️ <strong>Смещение дашборда:</strong> дашборд теряет статус домашней страницы (Home).</li>
+      </ul>
+    </div>
+
+    <!-- ВАРИАНТ C -->
+    <div class="stand-card">
+      <div class="card-header">
+        <span class="option-tag tag-alt">ВАРИАНТ C</span>
+      </div>
+      <h2 class="option-title">Вариант C: Adaptive Minimal (Ультра-лаконичный док)</h2>
+      <p class="option-desc">
+        Исключение дублирования: карточка «Шаг 1» сама является главным маршрутом. Разделы объединяются в единый непрерывный список без деления на подгруппы.
+      </p>
+
+      <div class="mock-preview">
+        <div class="mock-brand">
+          <div class="brand-icon">A</div>
+          <div>
+            <div class="brand-text">Academy</div>
+            <div class="brand-sub">Python Backend</div>
+          </div>
+        </div>
+
+        <div class="mock-focus-card">
+          <div class="mock-focus-meta">
+            <span>● ТЕКУЩИЙ КВАНТ</span>
+            <span>~2 мин</span>
+          </div>
+          <div class="mock-focus-name">Базовые коллекции и срезы</div>
+          <button class="mock-focus-btn">Учиться ➔</button>
+        </div>
+
+        <div>
+          <div class="mock-link active">🏠 Дашборд</div>
+          <div class="mock-link">🗺 Путь обучения</div>
+          <div class="mock-link">🗂 Карточки памяти</div>
+          <div class="mock-link">&lt;/&gt; Практика в IDE</div>
+          <div class="mock-link">💼 Собеседование</div>
+          <div class="mock-link">📊 Матрица знаний</div>
+        </div>
+
+        <div class="mock-hud">
+          <div class="mock-hud-row">
+            <div class="mock-hud-pill">🔥 Стрик: 1 дн</div>
+            <div class="mock-hud-pill mock-energy-clean">✨ 100%</div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="key-points">
+        <li>🍃 <strong>Минимум шума:</strong> нет промежуточных заголовков («Маршрут», «Ресурсы»).</li>
+        <li>⚠️ <strong>Меньше структурированности:</strong> плоский список сложнее сканировать взглядом.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    }
+  </script>
+</body>
+</html>
