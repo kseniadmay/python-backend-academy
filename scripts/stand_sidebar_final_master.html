@@ -98,185 +98,197 @@
     }
 
     .btn-toggle {
-      background: var(--bg-card);
+      background: rgba(255, 255, 255, 0.06);
       border: 1px solid var(--border-glass);
       color: var(--ink);
-      font-family: var(--font-d);
-      font-weight: 600;
-      font-size: 0.82rem;
       padding: 8px 14px;
       border-radius: 10px;
+      font-family: var(--font-d);
+      font-weight: 600;
+      font-size: 0.85rem;
       cursor: pointer;
-      backdrop-filter: blur(12px);
-      transition: all 0.2s var(--spring);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
     }
     .btn-toggle:hover {
-      border-color: var(--emerald);
+      background: rgba(255, 255, 255, 0.12);
       transform: translateY(-1px);
     }
 
+    /* GRID LAYOUT FOR COMPARISON */
     .master-grid {
+      display: grid;
+      grid-template-columns: 280px 380px 1fr;
+      gap: 28px;
+      align-items: start;
       position: relative;
       z-index: 10;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 32px;
-      align-items: flex-start;
+    }
+
+    @media (max-width: 1100px) {
+      .master-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     .preview-column {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
 
     .col-title {
       font-family: var(--font-title);
-      font-size: 1rem;
+      font-size: 0.85rem;
+      color: var(--ink-soft);
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: space-between;
+      padding: 0 4px;
     }
+
     .col-badge {
       font-family: var(--font-m);
       font-size: 0.68rem;
       padding: 2px 8px;
       border-radius: 6px;
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--ink-soft);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
     }
 
+    /* SIDEBAR SHELL (SSOT) */
     .sb-shell {
-      background: #0d121c;
+      background: var(--bg-surface);
       border: 1px solid var(--border-glass);
       border-radius: 20px;
-      padding: 16px 14px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45);
+      padding: 14px 12px 14px;
       display: flex;
       flex-direction: column;
       gap: 12px;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+      position: relative;
+      overflow: hidden;
     }
-    .sb-desktop { width: 100%; max-width: 256px; }
-    .sb-mobile { width: 100%; max-width: 346px; }
 
-    /* Header & Authentic Triangle-with-Circles Logo */
-    .sb-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-bottom: 8px;
+    .sb-desktop {
+      width: 256px;
     }
+
+    .sb-mobile {
+      width: 346px;
+      padding: 16px 14px 16px;
+    }
+
+    /* Brand Header: Чистый статичный треугольник без плашки */
     .sb-brand {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 9px;
+      padding: 0 4px 10px;
+      border-bottom: 1px solid var(--border-glass);
+      text-decoration: none;
+      color: inherit;
     }
-    
-    /* Логотип: треугольник с кружками в обсидиановом стекле (НЕ зеленый) */
-    .brand-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 9px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 8px rgba(0, 0, 0, 0.25);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+
+    .brand-glyph {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      color: var(--ink);
       flex-shrink: 0;
-      color: #ffffff;
-      transition: transform 0.2s var(--spring);
-    }
-    .brand-icon:hover {
-      transform: scale(1.05);
-    }
-    .brand-icon .icon {
-      width: 17px;
-      height: 17px;
-      stroke: #ffffff;
     }
 
     .sb-brand-name {
-      font-family: var(--font-title);
-      font-size: 0.96rem;
+      font-family: var(--font-d);
       font-weight: 800;
-      line-height: 1.1;
+      font-size: 1.05rem;
       letter-spacing: -0.02em;
-    }
-    .sb-brand-sub {
-      font-size: 0.68rem;
-      color: var(--ink-muted);
-    }
-    .sb-close-btn {
-      width: 30px;
-      height: 30px;
-      border-radius: 9px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-glass);
-      color: var(--ink-soft);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
+      line-height: 1.15;
+      color: var(--ink);
     }
 
-    /* Focus Card */
+    .sb-brand-sub {
+      font-size: 0.75rem;
+      color: var(--ink-muted);
+      line-height: 1.1;
+      font-weight: 500;
+    }
+
+    /* Hero Focus Action Card */
     .focus-card {
-      background: linear-gradient(145deg, rgba(6, 78, 59, 0.25), rgba(13, 22, 34, 0.7));
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      border-radius: 13px;
-      padding: 12px;
+      background: linear-gradient(145deg, rgba(16, 185, 129, 0.16) 0%, rgba(32, 36, 27, 0.75) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.38);
+      border-radius: 14px;
+      padding: 12px 12px 10px;
       display: flex;
       flex-direction: column;
-      gap: 9px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      gap: 7px;
+      position: relative;
+      overflow: hidden;
     }
+
+    .focus-card::before {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -20%;
+      width: 90px;
+      height: 90px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.35) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
     .fc-meta {
       display: flex;
       align-items: center;
       justify-content: space-between;
       font-family: var(--font-m);
       font-size: 0.68rem;
+      font-weight: 700;
       color: #34d399;
-      font-weight: 700;
-    }
-    .fc-name {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1.25;
+      letter-spacing: 0.04em;
     }
 
+    .fc-name {
+      font-family: var(--font-d);
+      font-weight: 800;
+      font-size: 0.88rem;
+      line-height: 1.25;
+      color: #ffffff;
+    }
+
+    /* Изумрудный благородный стеклянный градиент с белыми буквами */
     .fc-btn-mastery {
       width: 100%;
-      background: linear-gradient(155deg, rgba(6, 78, 59, 0.72) 0%, rgba(13, 22, 34, 0.88) 50%, rgba(6, 78, 59, 0.52) 100%);
-      border: 1.5px solid rgba(16, 185, 129, 0.65);
-      color: #ffffff !important;
-      font-family: var(--font-d);
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: 0.02em;
       padding: 9px 12px;
       border-radius: 9px;
-      text-align: center;
-      cursor: pointer;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+      font-family: var(--font-d);
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      border: 1.5px solid rgba(16, 185, 129, 0.65);
+      background: linear-gradient(155deg, rgba(6, 78, 59, 0.72) 0%, rgba(13, 22, 34, 0.88) 50%, rgba(6, 78, 59, 0.52) 100%);
+      color: #ffffff !important;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       box-shadow: 
-        inset 0 1px 0 rgba(255, 255, 255, 0.28),
-        0 4px 16px rgba(6, 78, 59, 0.35);
-      transition: all 0.22s var(--spring);
+        0 4px 14px rgba(6, 78, 59, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.22s var(--spring);
     }
     .fc-btn-mastery:hover {
-      background: linear-gradient(155deg, rgba(6, 78, 59, 0.88) 0%, rgba(16, 28, 42, 0.92) 50%, rgba(6, 78, 59, 0.68) 100%);
-      border-color: rgba(52, 211, 153, 0.85);
+      background: linear-gradient(155deg, rgba(6, 78, 59, 0.88) 0%, rgba(13, 22, 34, 0.94) 50%, rgba(6, 78, 59, 0.70) 100%);
+      border-color: rgba(52, 211, 153, 0.9);
       box-shadow: 
-        inset 0 1px 0 rgba(255, 255, 255, 0.38),
-        0 6px 22px rgba(16, 185, 129, 0.45);
+        0 6px 20px rgba(16, 185, 129, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
       transform: translateY(-1.5px);
     }
 
@@ -352,7 +364,7 @@
       transform: translateY(-1px);
     }
 
-    /* Живая батарея с золотым кристаллом (НЕ остывший черный чугун!) */
+    /* Живая батарея с золотым кристаллом ✨ 100% */
     .energy-crystal-badge {
       display: flex;
       align-items: center;
@@ -366,18 +378,12 @@
       font-family: var(--font-m);
       font-size: 0.8rem;
       font-weight: 800;
-      box-shadow: 
-        0 0 0 1px rgba(251, 191, 36, 0.3),
-        0 3px 14px rgba(245, 158, 11, 0.25),
-        inset 0 1px 0 rgba(255, 255, 255, 0.35);
       cursor: pointer;
       transition: all 0.2s var(--spring);
     }
     .energy-crystal-badge:hover {
       transform: translateY(-1px);
-      box-shadow: 
-        0 0 0 1px rgba(251, 191, 36, 0.45),
-        0 5px 18px rgba(245, 158, 11, 0.35);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
     }
     .spark-icon { color: #fde047; }
 
@@ -386,53 +392,126 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      gap: 6px;
     }
 
     .trio-icon-btn {
-      width: 36px;
-      height: 34px;
+      flex: 1;
+      height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border-glass);
       border-radius: 9px;
       color: var(--ink-soft);
       cursor: pointer;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       transition: all 0.15s;
     }
     .trio-icon-btn:hover {
-      background: rgba(255, 255, 255, 0.09);
+      background: rgba(255, 255, 255, 0.10);
       color: var(--ink);
     }
 
-    .theme-slider-capsule {
-      flex: 1;
-      height: 34px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border-glass);
-      border-radius: 999px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 3px 6px;
-      cursor: pointer;
-      position: relative;
+    /* Каноническая капсула переключателя тем */
+    .theme-pill-toggle {
+      width: 58px !important;
+      height: 32px !important;
+      min-width: 58px !important;
+      min-height: 32px !important;
+      box-sizing: border-box !important;
+      border-radius: 999px !important;
+      background: rgba(255, 255, 255, 0.06) !important;
+      border: 1px solid rgba(255, 255, 255, 0.14) !important;
+      padding: 3px !important;
+      cursor: pointer !important;
+      position: relative !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      flex-shrink: 0 !important;
+      outline: none !important;
+      overflow: hidden !important;
+      transition: background .2s ease, border-color .2s ease !important;
     }
-    .theme-icon-sun { font-size: 0.78rem; opacity: 0.4; }
-    .theme-icon-moon { font-size: 0.78rem; color: #38bdf8; }
-    .theme-thumb {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.72rem;
+    .theme-pill-toggle:hover {
+      background: rgba(255, 255, 255, 0.10) !important;
+      border-color: rgba(255, 255, 255, 0.22) !important;
+    }
+    [data-theme="light"] .theme-pill-toggle {
+      background: rgba(0, 0, 0, 0.05) !important;
+      border-color: rgba(0, 0, 0, 0.12) !important;
+    }
+
+    .theme-pill-track {
+      width: 100% !important;
+      height: 100% !important;
+      position: relative !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      box-sizing: border-box !important;
+    }
+
+    .theme-pill-icon {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 26px !important;
+      height: 26px !important;
+      z-index: 2 !important;
+      transition: color .2s ease, opacity .2s ease !important;
+      pointer-events: none !important;
+      flex-shrink: 0 !important;
+    }
+    .theme-pill-icon svg {
+      width: 14px !important;
+      height: 14px !important;
+      display: block !important;
+    }
+
+    .theme-pill-sun {
+      opacity: 0.35 !important;
+      color: var(--ink-muted) !important;
+    }
+    [data-theme="light"] .theme-pill-sun {
+      opacity: 1 !important;
+      color: #f59e0b !important;
+      filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.45)) !important;
+    }
+
+    .theme-pill-moon {
+      opacity: 1 !important;
+      color: #38bdf8 !important;
+      filter: drop-shadow(0 0 4px rgba(56, 189, 248, 0.45)) !important;
+    }
+    [data-theme="light"] .theme-pill-moon {
+      opacity: 0.35 !important;
+      color: var(--ink-muted) !important;
+      filter: none !important;
+    }
+
+    .theme-pill-thumb {
+      position: absolute !important;
+      top: 0px !important;
+      left: 0px !important;
+      width: 26px !important;
+      height: 26px !important;
+      border-radius: 50% !important;
+      margin: 0 !important;
+      background: rgba(255, 255, 255, 0.16) !important;
+      border: 1px solid rgba(255, 255, 255, 0.28) !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+      transform: translateX(26px) !important;
+      transition: transform 0.25s cubic-bezier(0.34, 1.3, 0.64, 1), background 0.2s ease !important;
+      z-index: 1 !important;
+      pointer-events: none !important;
+    }
+    [data-theme="light"] .theme-pill-thumb {
+      transform: translateX(0px) !important;
+      background: #ffffff !important;
+      border-color: rgba(0, 0, 0, 0.12) !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
     }
 
     .decision-recap {
@@ -458,24 +537,29 @@
     }
     .dr-list li {
       display: flex;
-      align-items: center;
       gap: 8px;
+      align-items: flex-start;
       color: var(--ink-soft);
     }
-    .dr-list li strong { color: var(--ink); }
+    .dr-list li strong {
+      color: var(--ink);
+    }
   </style>
 </head>
 <body>
+
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
 
   <header class="master-header">
     <div>
-      <span class="master-badge">ФИНАЛЬНАЯ ПОЛИРОВКА / GRILL-ME</span>
-      <h1 class="master-title">Треугольник с кружками, чистый путь без «Шаг 3» и кристальный HUD</h1>
+      <span class="master-badge">Канонический эталон дизайна</span>
+      <h1 class="master-title">Мастер-стенд: Сайдбар и Мобильный Drawer</h1>
     </div>
     <div class="controls-panel">
-      <button class="btn-toggle" onclick="toggleTheme()">🌓 Переключить тему (Dark/Light)</button>
+      <button class="btn-toggle" onclick="toggleTheme()">
+        <span id="theme-btn-label">☀️ Переключить на светлую тему</span>
+      </button>
     </div>
   </header>
 
@@ -491,15 +575,13 @@
       <div class="sb-shell sb-desktop">
         <div class="sb-header">
           <div class="sb-brand">
-            <!-- Логотип: треугольник с кружками в обсидиановом стекле -->
-            <div class="brand-icon" title="Python Backend Academy">
-              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="6" cy="6" r="2.2" fill="currentColor"/>
-                <circle cx="18" cy="6" r="2.2" fill="currentColor"/>
-                <circle cx="12" cy="18" r="2.2" fill="currentColor"/>
-                <path d="M7.8 7.6 10.5 16M16.2 7.6 13.5 16M8.3 6h7.4" stroke="currentColor" stroke-width="2"/>
-              </svg>
-            </div>
+            <!-- Логотип: оригинальный статичный треугольник с кружками без плашки -->
+            <svg class="brand-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="6" cy="6" r="2.2" fill="currentColor"/>
+              <circle cx="18" cy="6" r="2.2" fill="currentColor"/>
+              <circle cx="12" cy="18" r="2.2" fill="currentColor"/>
+              <path d="M7.8 7.6 10.5 16M16.2 7.6 13.5 16M8.3 6h7.4" stroke="currentColor" stroke-width="2"/>
+            </svg>
             <div>
               <div class="sb-brand-name">Academy</div>
               <div class="sb-brand-sub">Python Backend</div>
@@ -545,12 +627,14 @@
 
           <div class="trio-sys-row">
             <div class="trio-icon-btn" title="Поиск (Ctrl+K)">🔍</div>
-            <div class="theme-slider-capsule" onclick="toggleTheme()" title="Переключить тему">
-              <span class="theme-icon-sun">☼</span>
-              <div class="theme-thumb">◒</div>
-              <span class="theme-icon-moon">☾</span>
-            </div>
-            <div class="trio-icon-btn" title="Настройки (выбор языка внутри)">⚙</div>
+            <button class="theme-pill-toggle" onclick="toggleTheme()" title="Переключить тему">
+              <span class="theme-pill-track">
+                <span class="theme-pill-icon theme-pill-sun" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg></span>
+                <span class="theme-pill-icon theme-pill-moon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/></svg></span>
+                <span class="theme-pill-thumb" aria-hidden="true"></span>
+              </span>
+            </button>
+            <div class="trio-icon-btn" title="Настройки">⚙️</div>
           </div>
         </div>
       </div>
@@ -566,20 +650,18 @@
       <div class="sb-shell sb-mobile">
         <div class="sb-header">
           <div class="sb-brand">
-            <div class="brand-icon" title="Python Backend Academy">
-              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="6" cy="6" r="2.2" fill="currentColor"/>
-                <circle cx="18" cy="6" r="2.2" fill="currentColor"/>
-                <circle cx="12" cy="18" r="2.2" fill="currentColor"/>
-                <path d="M7.8 7.6 10.5 16M16.2 7.6 13.5 16M8.3 6h7.4" stroke="currentColor" stroke-width="2"/>
-              </svg>
-            </div>
+            <svg class="brand-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="6" cy="6" r="2.2" fill="currentColor"/>
+              <circle cx="18" cy="6" r="2.2" fill="currentColor"/>
+              <circle cx="12" cy="18" r="2.2" fill="currentColor"/>
+              <path d="M7.8 7.6 10.5 16M16.2 7.6 13.5 16M8.3 6h7.4" stroke="currentColor" stroke-width="2"/>
+            </svg>
             <div>
               <div class="sb-brand-name">Academy</div>
               <div class="sb-brand-sub">Python Backend</div>
             </div>
+            <div style="margin-left:auto;font-size:1.1rem;color:var(--ink-muted);cursor:pointer;">✕</div>
           </div>
-          <button class="sb-close-btn" title="Закрыть шторку">✕</button>
         </div>
 
         <div class="focus-card">
@@ -612,41 +694,71 @@
 
         <div class="sb-footer">
           <div class="hud-tandem-row">
-            <div class="pomo-btn">⏱ 15:00 ▶</div>
-            <div class="energy-crystal-badge">
+            <div class="pomo-btn" title="Запустить фокус-таймер">⏱ 15:00 ▶</div>
+            <div class="energy-crystal-badge" title="Энергия: 100%">
               <span class="spark-icon">✨</span> 100%
             </div>
           </div>
 
           <div class="trio-sys-row">
-            <div class="trio-icon-btn" title="Поиск">🔍</div>
-            <div class="theme-slider-capsule" onclick="toggleTheme()" title="Переключить тему">
-              <span class="theme-icon-sun">☼</span>
-              <div class="theme-thumb">◒</div>
-              <span class="theme-icon-moon">☾</span>
-            </div>
-            <div class="trio-icon-btn" title="Настройки (выбор языка внутри)">⚙</div>
+            <div class="trio-icon-btn" title="Поиск (Ctrl+K)">🔍</div>
+            <button class="theme-pill-toggle" onclick="toggleTheme()" title="Переключить тему">
+              <span class="theme-pill-track">
+                <span class="theme-pill-icon theme-pill-sun" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg></span>
+                <span class="theme-pill-icon theme-pill-moon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/></svg></span>
+                <span class="theme-pill-thumb" aria-hidden="true"></span>
+              </span>
+            </button>
+            <div class="trio-icon-btn" title="Настройки">⚙️</div>
           </div>
         </div>
       </div>
     </div>
 
-  </div>
+    <!-- RECAP SPECIFICATION -->
+    <div class="decision-recap">
+      <div class="dr-title">📋 Утвержденная спецификация полировки</div>
+      <ul class="dr-list">
+        <li>
+          <span>✅</span>
+          <div>
+            <strong>Логотип без движущейся плашки:</strong>
+            Чистый статичный треугольник с 3 кружками в нативном цвете текста. Никаких фоновых квадратов, рамок и hover-scale.
+          </div>
+        </li>
+        <li>
+          <span>✅</span>
+          <div>
+            <strong>Идеальный свитчер тем (58×32px):</strong>
+            Точная центровка бегунка (26×26px) под солнцем (светлая тема) и под луной (тёмная тема). Иконки светятся поверх бегунка.
+          </div>
+        </li>
+        <li>
+          <span>✅</span>
+          <div>
+            <strong>Кнопка «Продолжить ➔»:</strong>
+            Тёмно-изумрудный стеклянный градиент с контрастным белым шрифтом (#ffffff).
+          </div>
+        </li>
+        <li>
+          <span>✅</span>
+          <div>
+            <strong>Унифицированный футер:</strong>
+            Таймер фокуса + статус энергии ✨ 100% без слепящего блура, под ними ряд одинаковой высоты: 🔍, свитчер тем и ⚙️.
+          </div>
+        </li>
+      </ul>
+    </div>
 
-  <div class="decision-recap">
-    <div class="dr-title">✓ Полное устранение замечаний</div>
-    <ul class="dr-list">
-      <li>▲ <strong>Логотип:</strong> возвращён аутентичный треугольник с кружками в благородном обсидиановом стекле (без зелени).</li>
-      <li>🚫 <strong>«Шаг 3»:</strong> убран назойливый чип-бейдж из ссылки «Путь к офферу».</li>
-      <li>🌓 <strong>Переключатель тем:</strong> полноценный слайдер ☼/☾ в мобильном меню, переключает тему без закрытия дровера.</li>
-      <li>✨ <strong>«Остывший чугун»:</strong> убран чёрный мёртвый цветок 🥀, теперь всегда горит чистый живой золотой кристалл энергии.</li>
-    </ul>
   </div>
 
   <script>
     function toggleTheme() {
-      const current = document.documentElement.getAttribute('data-theme');
-      document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+      const html = document.documentElement;
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      const newTheme = isDark ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      document.getElementById('theme-btn-label').textContent = isDark ? '🌙 Переключить на тёмную тему' : '☀️ Переключить на светлую тему';
     }
   </script>
 </body>
