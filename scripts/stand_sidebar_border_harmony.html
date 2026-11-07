@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мастер-стенд /grill-me: Гармонизация рамок сайдбара</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #06080d;
+      --bg-surface: #0b0f19;
+      --bg-card: rgba(15, 23, 42, 0.75);
+      --ink: #f8fafc;
+      --ink-soft: #94a3b8;
+      --ink-muted: #64748b;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --font-d: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+    }
+
+    [data-theme="light"] {
+      --bg-base: #f1f5f9;
+      --bg-surface: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.9);
+      --ink: #0f172a;
+      --ink-soft: #334155;
+      --ink-muted: #64748b;
+      --emerald: #059669;
+      --amber: #d97706;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-base);
+      color: var(--ink);
+      font-family: var(--font-d);
+      padding: 32px 24px 60px;
+      min-height: 100vh;
+      transition: background 0.25s ease, color 0.25s ease;
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(16, 185, 129, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 90% 90%, rgba(245, 158, 11, 0.06) 0%, transparent 45%);
+    }
+
+    header {
+      max-width: 1200px;
+      margin: 0 auto 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    [data-theme="light"] header {
+      border-bottom-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .header-badge {
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    .header-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .header-desc {
+      color: var(--ink-soft);
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+
+    .btn-toggle-theme {
+      padding: 9px 18px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--ink);
+      font-family: var(--font-d);
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-toggle-theme:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1px);
+    }
+
+    /* 3 COLUMNS MASTER GRID */
+    .stand-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      max-width: 1200px;
+      margin: 0 auto;
+      align-items: start;
+    }
+
+    @media (max-width: 1060px) {
+      .stand-grid {
+        grid-template-columns: 1fr;
+        max-width: 340px;
+      }
+    }
+
+    .variant-column {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .variant-header {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    [data-theme="light"] .variant-header {
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .variant-tag {
+      font-family: var(--font-m);
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 2px 8px;
+      border-radius: 6px;
+      width: fit-content;
+    }
+    .tag-a { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .tag-b { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+    .tag-c { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+
+    .variant-name {
+      font-size: 1.02rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .variant-summary {
+      font-size: 0.8rem;
+      color: var(--ink-soft);
+      line-height: 1.4;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       КАНОНИЧЕСКИЙ САЙДБАР (256px)
+       ══════════════════════════════════════════════════════════════════ */
+    .sb-shell {
+      width: 256px;
+      margin: 0 auto;
+      background: rgba(11, 15, 25, 0.95);
+      border-radius: 16px;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(24px);
+    }
+    [data-theme="light"] .sb-shell {
+      background: #ffffff;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Логотип: канонический треугольник с тремя кружками */
+    .sb-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 8px;
+    }
+    .brand-triangle-icon {
+      width: 26px;
+      height: 26px;
+      stroke: var(--ink);
+      flex-shrink: 0;
+    }
+    .sb-brand-name {
+      font-family: var(--font-d);
+      font-weight: 800;
+      font-size: 1.05rem;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+    .sb-brand-sub {
+      font-size: 0.74rem;
+      color: var(--ink-muted);
+      line-height: 1.1;
+      font-weight: 500;
+    }
+
+    /* Hero Action Card */
+    .focus-card {
+      padding: 12px 12px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 14px;
+    }
+    .focus-card::before {
+      content: '';
+      position: absolute;
+      top: -24px;
+      right: -24px;
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.45) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .fc-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    @keyframes sbPulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.5; }
+    }
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--emerald, #10b981);
+      box-shadow: 0 0 6px var(--emerald, #10b981);
+      animation: sbPulseDot 2s infinite ease-in-out;
+    }
+    .eta-chip {
+      font-family: var(--font-m);
+      font-size: 0.65rem;
+      color: var(--ink-muted);
+      background: rgba(0, 0, 0, 0.25);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    [data-theme="light"] .eta-chip {
+      background: rgba(0, 0, 0, 0.06);
+      color: var(--ink-soft);
+    }
+    .fc-name {
+      font-family: var(--font-d);
+      font-weight: 800;
+      font-size: 0.88rem;
+      line-height: 1.25;
+      color: #ffffff;
+    }
+    [data-theme="light"] .fc-name {
+      color: #0f172a;
+    }
+    .fc-btn {
+      width: 100%;
+      padding: 8px 12px;
+      font-family: var(--font-d);
+      font-size: 0.82rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      border-radius: 9px;
+      letter-spacing: 0.01em;
+    }
+
+    /* Навигация */
+    .nav-group-title {
+      font-size: 0.66rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+      padding: 8px 6px 3px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 11px;
+      font-size: 0.84rem;
+      font-weight: 500;
+      color: var(--ink-soft);
+      text-decoration: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-bottom: 2px;
+      transition: all 0.15s ease;
+    }
+    .nav-item.active {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    /* Футер сайдбара */
+    .sb-foot {
+      margin-top: auto;
+      padding-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .hud-tandem {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .pomo-capsule {
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      border-radius: 999px;
+      font-family: var(--font-m);
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    @keyframes heatGlowBreath {
+      0%, 100% {
+        box-shadow: 0 0 10px rgba(245, 158, 11, 0.35), 0 0 20px rgba(245, 158, 11, 0.15);
+      }
+      50% {
+        box-shadow: 0 0 18px rgba(245, 158, 11, 0.6), 0 0 30px rgba(245, 158, 11, 0.25);
+      }
+    }
+    .energy-capsule {
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border-radius: 999px;
+      font-family: var(--font-m);
+      font-size: 0.75rem;
+      font-weight: 800;
+      cursor: pointer;
+      animation: heatGlowBreath 2.8s infinite ease-in-out;
+      text-shadow: 0 0 10px rgba(245, 158, 11, 0.65);
+    }
+
+    .dock-trio {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .dock-circle-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.82rem;
+      flex-shrink: 0;
+    }
+
+    /* Канонический свитчер темы (64x34px) */
+    .dock-theme-toggle {
+      width: 64px;
+      height: 34px;
+      border-radius: 999px;
+      padding: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      cursor: pointer;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .theme-icon-slot {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      z-index: 2;
+    }
+    .theme-thumb-slider {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      z-index: 1;
+      transform: translateX(30px);
+      transition: transform 0.25s cubic-bezier(0.34, 1.3, 0.64, 1);
+    }
+    [data-theme="light"] .theme-thumb-slider {
+      transform: translateX(0px);
+    }
+
+
+    /* ══════════════════════════════════════════════════════════════════
+       СТИЛИЗАЦИЯ 3 ВАРИАНТОВ РАМОК
+       ══════════════════════════════════════════════════════════════════ */
+
+    /* ВАРИАНТ A: SUBTLE GLASS & MICRO-STROKES (1px строгий баланс) */
+    .va .sb-shell {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    [data-theme="light"] .va .sb-shell {
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+    .va .sb-brand {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    [data-theme="light"] .va .sb-brand {
+      border-bottom-color: rgba(0, 0, 0, 0.06);
+    }
+    .va .focus-card {
+      background: linear-gradient(145deg, rgba(16, 185, 129, 0.14) 0%, rgba(13, 22, 34, 0.85) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.32); /* Ровно 1px */
+    }
+    .va .fc-btn {
+      background: linear-gradient(155deg, rgba(6, 78, 59, 0.75) 0%, rgba(13, 22, 34, 0.88) 100%);
+      border: 1px solid rgba(52, 211, 153, 0.5); /* Ровно 1px вместо 1.5px */
+      color: #ffffff;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+    .va .nav-item {
+      border: 1px solid transparent;
+    }
+    .va .nav-item.active {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.10); /* Ровно 1px */
+    }
+    [data-theme="light"] .va .nav-item.active {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+    .va .sb-foot {
+      border-top: 1px solid rgba(255, 255, 255, 0.06); /* Деликатный 1px */
+    }
+    [data-theme="light"] .va .sb-foot {
+      border-top-color: rgba(0, 0, 0, 0.06);
+    }
+    .va .pomo-capsule {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12); /* Ровно 1px */
+    }
+    .va .energy-capsule {
+      background: linear-gradient(135deg, rgba(254, 243, 199, 0.16) 0%, rgba(245, 158, 11, 0.22) 100%);
+      border: 1px solid rgba(251, 191, 36, 0.55); /* Ровно 1px вместо 1.5px */
+      color: #fef08a;
+    }
+    .va .dock-circle-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12); /* Ровно 1px */
+      color: var(--ink-soft);
+    }
+    .va .dock-theme-toggle {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14); /* Ровно 1px */
+    }
+    .va .theme-thumb-slider {
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+
+
+    /* ВАРИАНТ B: SEAMLESS & BORDERLESS (0px внешних рамок, чистый стеклянный свет) */
+    .vb .sb-shell {
+      border: none;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 16px 40px rgba(0, 0, 0, 0.45);
+    }
+    .vb .sb-brand {
+      border-bottom: none;
+    }
+    .vb .focus-card {
+      background: radial-gradient(circle at 100% 0%, rgba(16, 185, 129, 0.22) 0%, rgba(13, 22, 34, 0.95) 75%);
+      border: none; /* НЕТ рамки */
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+    .vb .fc-btn {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      border: none; /* НЕТ рамки */
+      color: #ffffff;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 4px 12px rgba(5, 150, 105, 0.4);
+    }
+    .vb .nav-item {
+      border: none;
+    }
+    .vb .nav-item.active {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+    }
+    .vb .sb-foot {
+      border-top: none; /* НЕТ черты */
+    }
+    .vb .pomo-capsule {
+      background: rgba(255, 255, 255, 0.06);
+      border: none; /* НЕТ рамки */
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+    .vb .energy-capsule {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.26) 0%, rgba(217, 119, 6, 0.3) 100%);
+      border: none; /* НЕТ рамки */
+      color: #fef08a;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 16px rgba(245, 158, 11, 0.3);
+    }
+    .vb .dock-circle-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: none; /* НЕТ рамки */
+      color: var(--ink-soft);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+    .vb .dock-theme-toggle {
+      background: rgba(255, 255, 255, 0.06);
+      border: none; /* НЕТ рамки */
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+    .vb .theme-thumb-slider {
+      background: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+
+
+    /* ВАРИАНТ C: ARCHITECTURAL OUTLINE (Единый строгий контур 1px для каждого блока) */
+    .vc .sb-shell {
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    .vc .sb-brand {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .vc .focus-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+    }
+    .vc .fc-btn {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.65);
+      color: #ffffff;
+    }
+    .vc .nav-item {
+      border: 1px solid transparent;
+    }
+    .vc .nav-item.active {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    .vc .sb-foot {
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .vc .pomo-capsule {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+    .vc .energy-capsule {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.55);
+      color: #fef08a;
+    }
+    .vc .dock-circle-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: var(--ink-soft);
+    }
+    .vc .dock-theme-toggle {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+    .vc .theme-thumb-slider {
+      background: rgba(255, 255, 255, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+    }
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <span class="header-badge">Сессия /grill-me · Визуальный стенд</span>
+      <h1 class="header-title">Гармонизация всех рамок в сайдбаре</h1>
+      <p class="header-desc">Сравнение 3 концепций контуров, толщин и прозрачностей на реальном сайдбаре 256px</p>
+    </div>
+    <div>
+      <button class="btn-toggle-theme" onclick="toggleTheme()">
+        <span id="theme-icon">☀️</span> <span id="theme-text">Светлая тема</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="stand-grid">
+
+    <!-- ВАРИАНТ A -->
+    <div class="variant-column va">
+      <div class="variant-header">
+        <span class="variant-tag tag-a">Вариант A · Рекомендуемый</span>
+        <h3 class="variant-name">Subtle Glass & Micro-Strokes</h3>
+        <p class="variant-summary">
+          Все рамки строго <strong>1px</strong>. Деликатное полупрозрачное стекло. Убраны грубые рамки 1.5px у кнопки и бейджа. Разделители едва заметны.
+        </p>
+      </div>
+
+      <div class="sb-shell">
+        <div class="sb-brand">
+          <svg class="brand-triangle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="6" cy="6" r="2.2" fill="currentColor"/>
+            <circle cx="18" cy="6" r="2.2" fill="currentColor"/>
+            <circle cx="12" cy="18" r="2.2" fill="currentColor"/>
+            <path d="M7.8 7.6 10.5 16M16.2 7.6 13.5 16M8.3 6h7.4"/>
+          </svg>
+          <div>
+            <div class="sb-brand-name">Academy</div>
+            <div class="sb-brand-sub">Python Backend</div>
+          </div>
+        </div>
+
+        <div class="focus-card">
+          <div class="fc-meta">
+            <span class="pulse-dot"></span>
+            <span class="eta-chip">⏱ ~12 мин</span>
+          </div>
+          <div class="fc-name">Базовые коллекции и срезы</div>
+          <button class="fc-btn" type="button">
+            <span>Продолжить</span>
+            <span>➔</span>
+          </button>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Маршрут</div>
+          <div class="nav-item active">🏠 Дашборд</div>
+          <div class="nav-item">🗺 Путь к офферу</div>
+          <div class="nav-item">🗂 Интервалка SRS</div>
+          <div class="nav-item">&lt;/&gt; Zen IDE</div>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Ресурсы и тренажеры</div>
+          <div class="nav-item">💼 Собеседование</div>
+          <div class="nav-item">📊 Матрица навыков</div>
+          <div class="nav-item">📖 Справочник</div>
+          <div class="nav-item">🧪 Песочница</div>
+        </div>
+
+        <div class="sb-foot">
+          <div class="hud-tandem">
+            <div class="pomo-capsule">⏱ 15:00 ▶</div>
+            <div class="energy-capsule">✨ 100%</div>
+          </div>
+          <div class="dock-trio">
+            <div class="dock-circle-btn">🔍</div>
+            <div class="dock-theme-toggle" onclick="toggleTheme()">
+              <span class="theme-icon-slot" style="opacity:0.35;">☀️</span>
+              <span class="theme-icon-slot" style="color:#38bdf8;">🌙</span>
+              <div class="theme-thumb-slider"></div>
+            </div>
+            <div class="dock-circle-btn">⚙️</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ВАРИАНТ B -->
+    <div class="variant-column vb">
+      <div class="variant-header">
+        <span class="variant-tag tag-b">Вариант B</span>
+        <h3 class="variant-name">Seamless & Borderless</h3>
+        <p class="variant-summary">
+          <strong>0px внешних рамок</strong>. Чистый монолит: слои отделяются за счёт градиентов, полупрозрачных подложек и микро-бликов <code>inset 0 1px 0</code>.
+        </p>
+      </div>
+
+      <div class="sb-shell">
+        <div class="sb-brand">
+          <svg class="brand-triangle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="6" cy="6" r="2.2" fill="currentColor"/>
+            <circle cx="18" cy="6" r="2.2" fill="currentColor"/>
+            <circle cx="12" cy="18" r="2.2" fill="currentColor"/>
+            <path d="M7.8 7.6 10.5 16M16.2 7.6 13.5 16M8.3 6h7.4"/>
+          </svg>
+          <div>
+            <div class="sb-brand-name">Academy</div>
+            <div class="sb-brand-sub">Python Backend</div>
+          </div>
+        </div>
+
+        <div class="focus-card">
+          <div class="fc-meta">
+            <span class="pulse-dot"></span>
+            <span class="eta-chip">⏱ ~12 мин</span>
+          </div>
+          <div class="fc-name">Базовые коллекции и срезы</div>
+          <button class="fc-btn" type="button">
+            <span>Продолжить</span>
+            <span>➔</span>
+          </button>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Маршрут</div>
+          <div class="nav-item active">🏠 Дашборд</div>
+          <div class="nav-item">🗺 Путь к офферу</div>
+          <div class="nav-item">🗂 Интервалка SRS</div>
+          <div class="nav-item">&lt;/&gt; Zen IDE</div>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Ресурсы и тренажеры</div>
+          <div class="nav-item">💼 Собеседование</div>
+          <div class="nav-item">📊 Матрица навыков</div>
+          <div class="nav-item">📖 Справочник</div>
+          <div class="nav-item">🧪 Песочница</div>
+        </div>
+
+        <div class="sb-foot">
+          <div class="hud-tandem">
+            <div class="pomo-capsule">⏱ 15:00 ▶</div>
+            <div class="energy-capsule">✨ 100%</div>
+          </div>
+          <div class="dock-trio">
+            <div class="dock-circle-btn">🔍</div>
+            <div class="dock-theme-toggle" onclick="toggleTheme()">
+              <span class="theme-icon-slot" style="opacity:0.35;">☀️</span>
+              <span class="theme-icon-slot" style="color:#38bdf8;">🌙</span>
+              <div class="theme-thumb-slider"></div>
+            </div>
+            <div class="dock-circle-btn">⚙️</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ВАРИАНТ C -->
+    <div class="variant-column vc">
+      <div class="variant-header">
+        <span class="variant-tag tag-c">Вариант C</span>
+        <h3 class="variant-name">Architectural Outline</h3>
+        <p class="variant-summary">
+          Строгий технический контур <strong>1px</strong> у каждого элемента с повышенной контрастностью (14–18%). Ощущение чёткого чертежа или blueprint.
+        </p>
+      </div>
+
+      <div class="sb-shell">
+        <div class="sb-brand">
+          <svg class="brand-triangle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="6" cy="6" r="2.2" fill="currentColor"/>
+            <circle cx="18" cy="6" r="2.2" fill="currentColor"/>
+            <circle cx="12" cy="18" r="2.2" fill="currentColor"/>
+            <path d="M7.8 7.6 10.5 16M16.2 7.6 13.5 16M8.3 6h7.4"/>
+          </svg>
+          <div>
+            <div class="sb-brand-name">Academy</div>
+            <div class="sb-brand-sub">Python Backend</div>
+          </div>
+        </div>
+
+        <div class="focus-card">
+          <div class="fc-meta">
+            <span class="pulse-dot"></span>
+            <span class="eta-chip">⏱ ~12 мин</span>
+          </div>
+          <div class="fc-name">Базовые коллекции и срезы</div>
+          <button class="fc-btn" type="button">
+            <span>Продолжить</span>
+            <span>➔</span>
+          </button>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Маршрут</div>
+          <div class="nav-item active">🏠 Дашборд</div>
+          <div class="nav-item">🗺 Путь к офферу</div>
+          <div class="nav-item">🗂 Интервалка SRS</div>
+          <div class="nav-item">&lt;/&gt; Zen IDE</div>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Ресурсы и тренажеры</div>
+          <div class="nav-item">💼 Собеседование</div>
+          <div class="nav-item">📊 Матрица навыков</div>
+          <div class="nav-item">📖 Справочник</div>
+          <div class="nav-item">🧪 Песочница</div>
+        </div>
+
+        <div class="sb-foot">
+          <div class="hud-tandem">
+            <div class="pomo-capsule">⏱ 15:00 ▶</div>
+            <div class="energy-capsule">✨ 100%</div>
+          </div>
+          <div class="dock-trio">
+            <div class="dock-circle-btn">🔍</div>
+            <div class="dock-theme-toggle" onclick="toggleTheme()">
+              <span class="theme-icon-slot" style="opacity:0.35;">☀️</span>
+              <span class="theme-icon-slot" style="color:#38bdf8;">🌙</span>
+              <div class="theme-thumb-slider"></div>
+            </div>
+            <div class="dock-circle-btn">⚙️</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      const nextTheme = isDark ? 'light' : 'dark';
+      html.setAttribute('data-theme', nextTheme);
+      document.getElementById('theme-icon').textContent = isDark ? '🌙' : '☀️';
+      document.getElementById('theme-text').textContent = isDark ? 'Тёмная тема' : 'Светлая тема';
+    }
+  </script>
+</body>
+</html>
