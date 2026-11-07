@@ -117,7 +117,7 @@
 
   #app{min-height:100vh;display:flex;}
 
-  .sidebar{width:256px;flex:none;background:var(--surface);border-right:1px solid var(--line);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);display:flex;flex-direction:column;padding:18px 14px;position:sticky;top:0;height:100vh;max-height:100vh;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;box-sizing:border-box;transition:transform 0.25s cubic-bezier(0.16,1,0.3,1),width 0.25s cubic-bezier(0.16,1,0.3,1);}
+  .sidebar{width:270px;flex:none;background:var(--surface);border-right:1px solid var(--line);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);display:flex;flex-direction:column;padding:18px 14px;position:sticky;top:0;height:100vh;max-height:100vh;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;box-sizing:border-box;transition:transform 0.25s cubic-bezier(0.16,1,0.3,1),width 0.25s cubic-bezier(0.16,1,0.3,1);}
 
   .sidebar::-webkit-scrollbar{display:none;}
 
@@ -134,6 +134,196 @@
   .level-tag-unified{font-size:0.68rem;font-weight:800;padding:3px 8px;border-radius:7px;background:var(--emerald-soft, rgba(16,185,129,0.15));color:var(--emerald, #10b981);border:1px solid rgba(16,185,129,0.25);font-family:var(--font-m);letter-spacing:0.02em;flex-shrink:0;}
   .quick-search-btn{width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:6px 10px;display:flex;align-items:center;gap:8px;color:var(--ink-muted);font-size:0.78rem;cursor:pointer;transition:background .15s, border-color .15s, color .15s;font-family:var(--font-d);}
   .quick-search-btn:hover{border-color:var(--moss);color:var(--ink);background:var(--surface-hover, rgba(255,255,255,0.06));}
+
+  /* ---------- Frictionless Sidebar Enhancements (Grill-Me Approved) ---------- */
+  .card-laser {
+    background: linear-gradient(145deg, rgba(16, 185, 129, 0.16) 0%, rgba(32, 36, 27, 0.75) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.38);
+    border-radius: 14px;
+    padding: 12px 13px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.12);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+    margin-bottom: 12px;
+    display: block;
+    text-decoration: none;
+  }
+  [data-theme="light"] .card-laser {
+    background: linear-gradient(145deg, rgba(16, 185, 129, 0.12) 0%, rgba(240, 245, 240, 0.85) 100%);
+    border-color: rgba(16, 185, 129, 0.4);
+  }
+  .card-laser:hover {
+    transform: translateY(-2px);
+    border-color: rgba(16, 185, 129, 0.55);
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.22);
+  }
+  .card-laser::before {
+    content: '';
+    position: absolute;
+    top: -24px;
+    right: -24px;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.45) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .top-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .step-pill {
+    font-family: var(--font-m);
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--emerald, #10b981);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .pulse-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--emerald, #10b981);
+    box-shadow: 0 0 6px var(--emerald, #10b981);
+    animation: sbPulseAnim 2s infinite ease-in-out;
+  }
+  @keyframes sbPulseAnim {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+  }
+  .eta-chip {
+    font-family: var(--font-m);
+    font-size: 0.65rem;
+    color: var(--ink-muted);
+    background: rgba(0,0,0,0.25);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  [data-theme="light"] .eta-chip {
+    background: rgba(0,0,0,0.06);
+    color: var(--ink-soft);
+  }
+  .card-mission-title {
+    font-family: var(--font-d);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.25;
+    margin-bottom: 9px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .dominant-btn {
+    width: 100%;
+    background: var(--emerald, #10b981);
+    color: #0b150f;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 9px;
+    font-family: var(--font-d);
+    font-size: 0.82rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+    transition: all 0.18s;
+  }
+  .dominant-btn:hover {
+    background: #059669;
+    transform: scale(0.99);
+  }
+  .kbd-tag {
+    font-family: var(--font-m);
+    font-size: 0.65rem;
+    font-weight: 700;
+    background: rgba(0,0,0,0.25);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: #0b150f;
+  }
+
+  /* Compact Motivation HUD & Footer */
+  .sb-footer-compact {
+    padding: 8px 4px 2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .cooldown-pill {
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: var(--frost, #38bdf8);
+    padding: 4px 8px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-m);
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
+    user-select: none;
+  }
+  [data-theme="light"] .cooldown-pill {
+    background: rgba(2, 132, 199, 0.1);
+    border-color: rgba(2, 132, 199, 0.25);
+    color: #0284c7;
+  }
+  .cooldown-pill:hover {
+    background: rgba(56, 189, 248, 0.22);
+    border-color: rgba(56, 189, 248, 0.5);
+    transform: translateY(-1px);
+  }
+  .cooldown-pulse {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--frost, #38bdf8);
+    box-shadow: 0 0 6px var(--frost, #38bdf8);
+  }
+  .streak-mini {
+    font-family: var(--font-m);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--amber, #f59e0b);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    user-select: none;
+  }
+  .icon-btn-compact {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    width: 27px;
+    height: 27px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    transition: all 0.15s;
+    padding: 0;
+  }
+  .icon-btn-compact:hover {
+    background: var(--surface-hover, rgba(255,255,255,0.08));
+    color: var(--ink);
+    border-color: var(--line-soft);
+  }
+
   .search-kbd{margin-left:auto;font-family:var(--font-m);font-size:0.66rem;padding:2px 5px;border-radius:5px;background:var(--surface);border:1px solid var(--line);color:var(--ink-soft);font-weight:700;}
 
   /* Quick Search Command Palette Modal */
@@ -29927,10 +30117,11 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
 
 
-  <aside class="sidebar">
+  <aside class="sidebar" id="main-sidebar">
 
-    <div class="brand-box-unified">
-      <div class="brand-row-unified">
+    <!-- Brand Header (Clickable link to Dashboard) -->
+    <a href="#/" class="brand-box-unified" title="Перейти на Дашборд" style="text-decoration:none;display:block;">
+      <div class="brand-row-unified" style="margin-bottom:0;">
         <div class="brand-left">
           <div class="brand-icon"><svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M7.8 7.6 10.5 16M16.2 7.6 13.5 16M8.3 6h7.4"/></svg></div>
           <div>
@@ -29940,47 +30131,36 @@ html:not([data-theme="dark"]) .fc-card--Answer,
         </div>
         <span class="level-tag-unified" id="sidebar-level-badge">Junior 1</span>
       </div>
-      <button class="quick-search-btn" id="sidebar-quick-search-btn" type="button" aria-label="Быстрый поиск по темам" title="Быстрый поиск (Ctrl+K)">
-        <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <span>Поиск по темам...</span>
-        <span class="search-kbd">Ctrl K</span>
-      </button>
-    </div>
+    </a>
 
+    <!-- Single Dominant CTA: Laser Hero-Action Card -->
+    <div id="sidebar-hero-action-container"></div>
 
-
+    <!-- Approved 2 Semantic Nav Groups (0 Duplicates) -->
     <nav id="nav-desktop">
-
+      <a href="#/path" class="navlink" data-route="/path"></a>
+      <a href="#/cards" class="navlink" data-route="/cards"></a>
+      <a href="#/practice" class="navlink" data-route="/practice"></a>
       <a href="#/" class="navlink" data-route="/"></a>
-
-      <a href="#/map" class="navlink" data-route="/map"></a>
-
-      <a href="#/sandbox" class="navlink" data-route="/sandbox"></a>
-
     </nav>
 
+    <!-- Ultra-compact HUD with Cool-down (Остывание) -->
     <div class="sidebar-foot">
-
-      <div class="streak-pill" style="display:none;" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" id="flame-icon-d"><path d="M12 3c-.5 3-3 4-3 7.5A3.5 3.5 0 0 0 12 14a3.5 3.5 0 0 0 3-5c1.5 1 2 2.7 2 4.2A5 5 0 0 1 12 21a5 5 0 0 1-5-5.2C7 12 9 9 9 7c1 1 1.2 2 1.2 2S11 5 12 3Z"/></svg><span id="streak-num-d">0</span> <span id="streak-word-d">дней подряд</span></div>
-
-      <div class="sidebar-foot-controls-row" style="display:flex;align-items:center;gap:8px;">
-
-        <div class="ru-en-pill-toggle" role="group" aria-label="Выбор языка">
-
-          <button type="button" class="ru-en-btn active" data-lang="ru">RU</button>
-
-          <button type="button" class="ru-en-btn" data-lang="en">EN</button>
-
+      <div class="sb-footer-compact">
+        <div class="cooldown-pill" id="sidebar-cooldown-pill" title="Цель дня: Остывание (закрепление без стресса)">
+          <span class="cooldown-pulse"></span>
+          <span id="sidebar-cooldown-label">❄️ Остывание: 2м</span>
         </div>
-
-        <button class="icon-btn sidebar-theme-btn theme-pill-toggle" id="theme-toggle-d" role="switch" aria-checked="true" aria-label="Сменить тему оформления" title="Сменить тему оформления"></button>
-
-        <button class="icon-btn sidebar-settings-btn" data-open-settings-modal="" title="Настройки" aria-label="Настройки">⚙️</button>
-
+        <div class="streak-mini" title="Стрик дней">
+          <svg class="icon" viewBox="0 0 24 24" id="flame-icon-d" style="width:13px;height:13px;color:var(--amber, #f59e0b);"><path fill="currentColor" d="M12 3c-.5 3-3 4-3 7.5A3.5 3.5 0 0 0 12 14a3.5 3.5 0 0 0 3-5c1.5 1 2 2.7 2 4.2A5 5 0 0 1 12 21a5 5 0 0 1-5-5.2C7 12 9 9 9 7c1 1 1.2 2 1.2 2S11 5 12 3Z"/></svg>
+          <span id="streak-num-d">0</span>
+        </div>
+        <button class="icon-btn-compact" id="sidebar-quick-search-btn" type="button" aria-label="Быстрый поиск по темам" title="Быстрый поиск (Ctrl+K)">🔍</button>
+        <button class="icon-btn-compact sidebar-theme-btn theme-pill-toggle" id="theme-toggle-d" role="switch" aria-checked="true" aria-label="Сменить тему оформления" title="Сменить тему оформления">🌙</button>
+        <button class="icon-btn-compact ru-en-btn active" data-lang="ru" type="button" aria-label="Выбор языка" title="Сменить язык">RU</button>
+        <button class="icon-btn-compact sidebar-settings-btn" data-open-settings-modal="" type="button" title="Настройки" aria-label="Настройки">⚙️</button>
       </div>
-
       <button class="link-quiet" id="reset-btn-d" style="display:none;" aria-hidden="true">Сбросить прогресс</button>
-
     </div>
 
   </aside>
@@ -55538,22 +55718,75 @@ renderNav = function(){
       return `<a href="#${it.route}" class="navlink" data-route="${it.route}">${ICONS[it.icon] || ICONS.dot}<span>${it.label}</span>${badgeHtml}</a>${subListHtml}`;
     };
 
-    const mainLinks = NAV_ITEMS.filter(it => it.group === 'main').map(renderLink).join('');
-    const modLinks = NAV_ITEMS.filter(it => it.group === 'module').map(renderLink).join('');
-    // Исключаем notes-review из второй группы, так как Конспекты аккуратно встроены подпунктом в Интервалку
-    const trainerLinks = NAV_ITEMS.filter(it => it.group === 'trainer' && it.route !== '/notes-review').map(renderLink).join('');
-    const toolLinks = NAV_ITEMS.filter(it => it.group === 'tool').map(renderLink).join('');
-    const modulesPctBadge = overallPct > 0 ? `<span class="navlink__pct">${overallPct}%</span>` : '';
+    // Grill-Me Approved: Hero-Action Card injection
+    const heroBox = document.getElementById('sidebar-hero-action-container');
+    if(heroBox){
+      const mCount = (typeof state !== 'undefined' && state && Array.isArray(state.mastered)) ? state.mastered.length : 0;
+      const stepNum = mCount + 1;
+      
+      let focusTitle = 'Async & Await в FastAPI эндпоинтах';
+      if(typeof ALL_PY_SKILLS !== 'undefined' && Array.isArray(ALL_PY_SKILLS)){
+        const unmastered = ALL_PY_SKILLS.find(s => !state.mastered || !state.mastered.includes(s.id));
+        if(unmastered && unmastered.title){
+          focusTitle = String(unmastered.title).replace(/^[\d.]+\s*[:·•\-]\s*/i, '').replace(/^[·•\-]\s*/, '').replace(/\s*\([^)]*\)\s*$/, '').trim();
+        }
+      }
+
+      heroBox.innerHTML = `
+        <a href="#/path" class="card-laser" title="Перейти к шагу ${stepNum}">
+          <div class="top-meta-row">
+            <span class="step-pill"><span class="pulse-dot"></span> Шаг ${stepNum}</span>
+            <span class="eta-chip">⏱ ~12 мин</span>
+          </div>
+          <div class="card-mission-title">${escapeHtmlStr(focusTitle)}</div>
+          <button class="dominant-btn" type="button">
+            <span>Продолжить</span>
+            <span class="kbd-tag">Enter ↵</span>
+          </button>
+        </a>
+      `;
+    }
+
+    // Grill-Me Approved: 2 Semantic Groups (0 Duplicates)
+    // Группа 1: Маршрут (Путь, Интервалка SRS, Zen IDE, Дашборд)
+    // Группа 2: Ресурсы и тренажеры (Собеседование, Матрица навыков, Справочник, Песочница)
+    const routeOrder1 = ['/path', '/cards', '/practice', '/'];
+    const routeOrder2 = ['/mock', '/map', '/docs', '/sandbox'];
+
+    const group1Links = routeOrder1.map(r => NAV_ITEMS.find(it => it.route === r)).filter(Boolean).map(renderLink).join('');
+    const group2Links = routeOrder2.map(r => NAV_ITEMS.find(it => it.route === r)).filter(Boolean).map(renderLink).join('');
 
     desk.innerHTML = `
-      <div class="nav-group-label">Обучение и практика</div>
-      ${mainLinks}
-      <div class="nav-group-label" style="margin-top:14px;">Собеседование и ретеншн</div>
-      ${trainerLinks}
-      <div class="nav-group-label" style="margin-top:14px;">База знаний и лаборатория</div>
-      ${toolLinks}
+      <div class="nav-group-label">Маршрут</div>
+      ${group1Links}
+      <div class="nav-group-label" style="margin-top:14px;">Ресурсы и тренажеры</div>
+      ${group2Links}
     `;
     if(typeof updateSidebarLevelBadge === 'function') updateSidebarLevelBadge();
+
+    // Update Streak in compact footer
+    const streakNumEl = document.getElementById('streak-num-d');
+    if(streakNumEl){
+      streakNumEl.textContent = (typeof state !== 'undefined' && state.streak) ? state.streak : 0;
+    }
+
+    // Update Cool-down (Остывание) status in compact footer
+    const cdLabel = document.getElementById('sidebar-cooldown-label');
+    const cdPill = document.getElementById('sidebar-cooldown-pill');
+    if(cdLabel && cdPill){
+      const isDailyCompleted = (typeof isTodayGoalMet === 'function') ? isTodayGoalMet() : ((typeof todayXp === 'function' && typeof state !== 'undefined') ? (todayXp() >= (state.dailyGoal || 50)) : false);
+      if(isDailyCompleted){
+        cdPill.style.background = 'rgba(16, 185, 129, 0.15)';
+        cdPill.style.borderColor = 'rgba(16, 185, 129, 0.35)';
+        cdPill.style.color = 'var(--emerald, #10b981)';
+        cdLabel.textContent = '🌿 Остывание: 100%';
+      } else {
+        cdPill.style.background = 'rgba(56, 189, 248, 0.12)';
+        cdPill.style.borderColor = 'rgba(56, 189, 248, 0.3)';
+        cdPill.style.color = 'var(--frost, #38bdf8)';
+        cdLabel.textContent = '❄️ Остывание: 2м';
+      }
+    }
   }
 
   const mobItems = NAV_ITEMS.filter(it => it.mobileTab);
@@ -65138,6 +65371,37 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 renderNav();
 
 applyThemeIcon();
+
+// Grill-Me Approved: Cool-down modal/flow & Enter hotkey for sidebar
+document.addEventListener('click', function(e){
+  const cdBtn = e.target.closest('#sidebar-cooldown-pill');
+  if(cdBtn){
+    e.preventDefault();
+    const noteSrsStats = (typeof getNoteSpacedRepetitionStats === 'function') ? getNoteSpacedRepetitionStats() : { dueCount: 0 };
+    const cardSrsStats = (typeof getSpacedRepetitionStats === 'function') ? getSpacedRepetitionStats() : { dueTodayCardsCount: 0 };
+    const totalDue = (Number(noteSrsStats.dueCount) || 0) + (Number(cardSrsStats.dueTodayCardsCount) || 0);
+    if(totalDue > 0){
+      location.hash = '#/cards';
+    } else {
+      if(typeof showToast === 'function'){
+        showToast('❄️ Фаза остывания: консолидация памяти завершена. Отличная работа!');
+      } else {
+        alert('❄️ Фаза остывания: 2-минутная консолидация памяти завершена. Отличная работа на сегодня!');
+      }
+    }
+  }
+});
+
+document.addEventListener('keydown', function(e){
+  // If Enter pressed outside of inputs/textareas, trigger primary action
+  if(e.key === 'Enter' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName) && !document.activeElement.isContentEditable){
+    const heroBtn = document.querySelector('#sidebar-hero-action-container .card-laser');
+    if(heroBtn && !document.querySelector('.modal.is-open, .search-modal-backdrop.is-open')){
+      heroBtn.click();
+    }
+  }
+});
+
 
 
 

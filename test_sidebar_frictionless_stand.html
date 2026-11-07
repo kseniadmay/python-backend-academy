@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Финальный эталонный стенд: Бестрениевый сайдбар Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #0b0f14;
+      --bg-subtle: #12171f;
+      --paper: #14160F;
+      --surface: #181b14;
+      --surface-2: #20241b;
+      --surface-3: #282d22;
+      --surface-hover: rgba(255, 255, 255, 0.06);
+      --ink: #f0f2e8;
+      --ink-soft: #b8baa9;
+      --ink-muted: #7d806f;
+      --line: #2e3325;
+      --line-soft: #23271c;
+      --moss: #74AC82;
+      --moss-deep: #CDE8D2;
+      --moss-soft: #223028;
+      --emerald: #10B981;
+      --emerald-glow: rgba(16, 185, 129, 0.25);
+      --amber: #F59E0B;
+      --amber-glow: rgba(245, 158, 11, 0.2);
+      --clay: #DA9C63;
+      --frost: #38BDF8;
+      --frost-soft: rgba(56, 189, 248, 0.15);
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --font-d: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+      --font-title: 'Unbounded', sans-serif;
+      --spring: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    [data-theme="light"] {
+      --bg-canvas: #f4f6f8;
+      --bg-subtle: #ffffff;
+      --paper: #F1F2EC;
+      --surface: #ffffff;
+      --surface-2: #F5F6F0;
+      --surface-3: #ECEEE4;
+      --surface-hover: rgba(0, 0, 0, 0.04);
+      --ink: #191c18;
+      --ink-soft: #565a4e;
+      --ink-muted: #8c8f82;
+      --line: #e2e4d8;
+      --line-soft: #ebeee0;
+      --moss: #356641;
+      --moss-deep: #20442a;
+      --moss-soft: #e2ede5;
+      --emerald: #059669;
+      --emerald-glow: rgba(5, 150, 105, 0.15);
+      --amber: #d97706;
+      --amber-glow: rgba(217, 119, 6, 0.15);
+      --clay: #b8703b;
+      --frost: #0284c7;
+      --frost-soft: rgba(2, 132, 199, 0.12);
+      --border-glass: rgba(0, 0, 0, 0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-canvas);
+      color: var(--ink);
+      font-family: var(--font-d);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    .ambient-glow {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.14;
+    }
+    .orb-1 { width: 500px; height: 500px; background: #10B981; top: -150px; left: 10%; }
+    .orb-2 { width: 450px; height: 450px; background: #38BDF8; bottom: -100px; right: 5%; }
+
+    /* Top Showcase Bar */
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(24, 27, 20, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--line);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    [data-theme="light"] .top-bar {
+      background: rgba(255, 255, 255, 0.9);
+    }
+    .top-bar__left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .badge-pill-success {
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .top-bar__title {
+      font-family: var(--font-title);
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .top-bar__controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-icon-switch {
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    /* Main Showcase Canvas */
+    .showcase-canvas {
+      flex: 1;
+      display: flex;
+      padding: 24px 32px;
+      gap: 32px;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Fixed Sidebar Frame (270px) */
+    .sb-container {
+      width: 270px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      height: calc(100vh - 120px);
+      position: sticky;
+      top: 90px;
+    }
+
+    /* Brand Header with Clickable Home/Dashboard */
+    .sb-brand {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .sb-brand:hover {
+      background: var(--surface-hover);
+    }
+    .sb-brand__left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sb-brand__logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      color: white;
+      font-family: var(--font-title);
+      font-size: 0.95rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    .sb-brand__name {
+      font-family: var(--font-title);
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.1;
+    }
+    .sb-brand__sub {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--ink-muted);
+      letter-spacing: 0.02em;
+    }
+    .sb-level-pill {
+      font-family: var(--font-m);
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 8px;
+      background: rgba(245, 158, 11, 0.12);
+      color: var(--amber);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+    }
+
+    /* Body */
+    .sb-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .sb-body::-webkit-scrollbar { width: 4px; }
+    .sb-body::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+
+    /* APPROVED HERO ACTION CARD */
+    .card-laser {
+      background: linear-gradient(145deg, rgba(16, 185, 129, 0.16) 0%, rgba(32, 36, 27, 0.75) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.38);
+      border-radius: 14px;
+      padding: 12px 13px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.12);
+      cursor: pointer;
+      transition: all 0.25s var(--spring);
+    }
+    .card-laser:hover {
+      transform: translateY(-2px);
+      border-color: rgba(16, 185, 129, 0.55);
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.22);
+    }
+    .card-laser::before {
+      content: '';
+      position: absolute;
+      top: -24px;
+      right: -24px;
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.45) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .top-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .step-pill {
+      font-family: var(--font-m);
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--emerald);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 6px var(--emerald);
+      animation: pulseAnim 2s infinite ease-in-out;
+    }
+    @keyframes pulseAnim {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+    .eta-chip {
+      font-family: var(--font-m);
+      font-size: 0.65rem;
+      color: var(--ink-muted);
+      background: rgba(0,0,0,0.25);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .card-mission-title {
+      font-family: var(--font-d);
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.25;
+      margin-bottom: 9px;
+    }
+    .dominant-btn {
+      width: 100%;
+      background: var(--emerald);
+      color: #0b150f;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 9px;
+      font-family: var(--font-d);
+      font-size: 0.82rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+      transition: all 0.18s;
+    }
+    .dominant-btn:hover {
+      background: #059669;
+      transform: scale(0.99);
+    }
+    .kbd-tag {
+      font-family: var(--font-m);
+      font-size: 0.65rem;
+      font-weight: 700;
+      background: rgba(0,0,0,0.25);
+      padding: 1px 5px;
+      border-radius: 4px;
+      color: #0b150f;
+    }
+
+    /* Nav Item Links */
+    .sb-nav-section {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .sb-section-title {
+      font-family: var(--font-m);
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+      padding: 4px 8px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sb-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-radius: 10px;
+      color: var(--ink-soft);
+      text-decoration: none;
+      font-size: 0.86rem;
+      font-weight: 500;
+      transition: all 0.18s var(--spring);
+      border: 1px solid transparent;
+      user-select: none;
+      cursor: pointer;
+    }
+    .sb-link:hover {
+      background: var(--surface-hover);
+      color: var(--ink);
+      transform: translateX(2px);
+    }
+    .sb-link.active {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--ink);
+      font-weight: 600;
+      border-color: rgba(16, 185, 129, 0.25);
+    }
+    .sb-link__left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sb-icon {
+      width: 17px;
+      height: 17px;
+      stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
+      opacity: 0.8;
+      flex-shrink: 0;
+    }
+    .sb-link.active .sb-icon {
+      stroke: var(--emerald);
+      opacity: 1;
+    }
+    .sb-badge {
+      font-family: var(--font-m);
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: var(--surface-2);
+      color: var(--ink-muted);
+      border: 1px solid var(--line);
+    }
+    .sb-badge--emerald {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    .sb-dot-due {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 8px var(--emerald);
+    }
+
+    /* Subitems */
+    .sb-sublist {
+      margin-left: 28px;
+      padding-left: 8px;
+      border-left: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 2px;
+      margin-bottom: 4px;
+    }
+    .sb-subitem {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .sb-subitem:hover { color: var(--ink); background: var(--surface-hover); }
+    .sb-subitem.active { color: var(--emerald); font-weight: 600; }
+
+    /* APPROVED ULTRA-COMPACT FOOTER WITH "ОСТЫВАНИЕ" */
+    .sb-footer-compact {
+      padding: 10px 12px;
+      border-top: 1px solid var(--line-soft);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .cooldown-pill {
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--frost);
+      padding: 4px 8px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s var(--spring);
+    }
+    .cooldown-pill:hover {
+      background: rgba(56, 189, 248, 0.22);
+      border-color: rgba(56, 189, 248, 0.5);
+      transform: translateY(-1px);
+    }
+    .cooldown-pulse {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--frost);
+      box-shadow: 0 0 6px var(--frost);
+    }
+    .streak-mini {
+      font-family: var(--font-m);
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--amber);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .icon-btn-compact {
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.78rem;
+      color: var(--ink-soft);
+      transition: all 0.15s;
+    }
+    .icon-btn-compact:hover {
+      background: var(--surface-3);
+      color: var(--ink);
+    }
+
+    /* Right Explanation & Interactive Inspector Panel */
+    .inspector-panel {
+      flex: 1;
+      background: var(--surface);
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+    }
+    .inspector-header {
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 16px;
+    }
+    .inspector-badge {
+      display: inline-block;
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .inspector-title {
+      font-family: var(--font-title);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .inspector-desc {
+      color: var(--ink-soft);
+      font-size: 0.94rem;
+      line-height: 1.55;
+    }
+
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 10px;
+    }
+    .matrix-card {
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .matrix-card__icon {
+      font-size: 1.5rem;
+    }
+    .matrix-card__title {
+      font-family: var(--font-d);
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--ink);
+    }
+    .matrix-card__text {
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      line-height: 1.45;
+    }
+    .matrix-card__score {
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      align-self: flex-start;
+      margin-top: auto;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald);
+    }
+
+    .action-summary-box {
+      background: var(--surface-2);
+      border-left: 4px solid var(--emerald);
+      border-radius: 0 12px 12px 0;
+      padding: 16px 20px;
+      margin-top: auto;
+    }
+    .action-summary-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .action-summary-sub {
+      font-size: 0.85rem;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow orb-1"></div>
+  <div class="ambient-glow orb-2"></div>
+
+  <!-- Top Showcase Controller -->
+  <header class="top-bar">
+    <div class="top-bar__left">
+      <span class="badge-pill-success">Финальный утвержденный эталон</span>
+      <h1 class="top-bar__title">Бестрениевый сайдбар Academy (Фиксированный 270px)</h1>
+    </div>
+
+    <div class="top-bar__controls">
+      <button class="cooldown-pill" onclick="simulateCooldown()">
+        <span>❄️ Симулировать завершение «Остывания»</span>
+      </button>
+      <button class="btn-icon-switch" id="theme-btn" onclick="toggleTheme()" title="Переключить тему">🌙</button>
+    </div>
+  </header>
+
+  <!-- Showcase Canvas -->
+  <main class="showcase-canvas">
+    
+    <!-- LIVE SIDEBAR MOCKUP -->
+    <aside class="sb-container" id="sidebar-mockup">
+      <!-- Clickable Brand Header (Dashboard Access) -->
+      <a href="#/" class="sb-brand" title="Перейти на Дашборд">
+        <div class="sb-brand__left">
+          <div class="sb-brand__logo">A</div>
+          <div>
+            <div class="sb-brand__name">Academy</div>
+            <div class="sb-brand__sub">Python Backend</div>
+          </div>
+        </div>
+        <span class="sb-level-pill">Junior 2</span>
+      </a>
+
+      <!-- BODY: HERO CARD + APPROVED 2-GROUP NAVIGATION -->
+      <div class="sb-body">
+        
+        <!-- APPROVED HERO ACTION CARD -->
+        <div class="card-laser" id="hero-card-el" onclick="alert('Старт: Шаг 14!')">
+          <div class="top-meta-row">
+            <span class="step-pill"><span class="pulse-dot"></span> Шаг 14</span>
+            <span class="eta-chip">⏱ ~12 мин</span>
+          </div>
+          <div class="card-mission-title">Async & Await в FastAPI эндпоинтах</div>
+          <button class="dominant-btn">
+            <span>Продолжить</span>
+            <span class="kbd-tag">Enter ↵</span>
+          </button>
+        </div>
+
+        <!-- ГРУППА 1: МАРШРУТ ОБУЧЕНИЯ -->
+        <div class="sb-nav-section">
+          <div class="sb-section-title">
+            <span>Маршрут</span>
+          </div>
+          <a href="#/path" class="sb-link active" title="Путь к офферу">
+            <div class="sb-link__left">
+              <svg class="sb-icon" viewBox="0 0 24 24"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+              <span>Путь к офферу</span>
+            </div>
+            <span class="sb-badge sb-badge--emerald">Шаг 14</span>
+          </a>
+          <a href="#/cards" class="sb-link" title="Интервалка SRS">
+            <div class="sb-link__left">
+              <svg class="sb-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>Интервалка SRS</span>
+            </div>
+            <span class="sb-dot-due" title="Есть темы для повторения"></span>
+          </a>
+          <div class="sb-sublist">
+            <a href="#/cards" class="sb-subitem active"><span>Карточки</span><span>3 шт</span></a>
+            <a href="#/cards?tab=notes" class="sb-subitem"><span>Конспекты</span><span>1 тема</span></a>
+          </div>
+          <a href="#/practice" class="sb-link" title="Zen IDE">
+            <div class="sb-link__left">
+              <svg class="sb-icon" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              <span>Zen IDE</span>
+            </div>
+          </a>
+          <a href="#/" class="sb-link" title="Дашборд">
+            <div class="sb-link__left">
+              <svg class="sb-icon" viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5M6 10v9h5v-5h2v5h5v-9"/></svg>
+              <span>Дашборд</span>
+            </div>
+          </a>
+        </div>
+
+        <!-- ГРУППА 2: РЕСУРСЫ И ТРЕНАЖЕРЫ -->
+        <div class="sb-nav-section" style="margin-top: 6px;">
+          <div class="sb-section-title">
+            <span>Ресурсы и тренажеры</span>
+          </div>
+          <a href="#/mock" class="sb-link" title="Мок-собеседование">
+            <div class="sb-link__left">
+              <svg class="sb-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+              <span>Мок-собеседование</span>
+            </div>
+          </a>
+          <a href="#/map" class="sb-link" title="Матрица навыков">
+            <div class="sb-link__left">
+              <svg class="sb-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <span>Матрица навыков</span>
+            </div>
+            <span class="sb-badge">72%</span>
+          </a>
+          <a href="#/docs" class="sb-link" title="Справочник">
+            <div class="sb-link__left">
+              <svg class="sb-icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              <span>Справочник</span>
+            </div>
+          </a>
+          <a href="#/sandbox" class="sb-link" title="Песочница">
+            <div class="sb-link__left">
+              <svg class="sb-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 9l3 3-3 3M13 15h4"/></svg>
+              <span>Песочница</span>
+            </div>
+          </a>
+        </div>
+
+      </div>
+
+      <!-- APPROVED ULTRA-COMPACT FOOTER WITH "ОСТЫВАНИЕ" -->
+      <div class="sb-footer-compact">
+        <div class="cooldown-pill" id="cooldown-pill-el" onclick="triggerCooldownModal()" title="Цель дня: Остывание (закрепление без стресса)">
+          <span class="cooldown-pulse"></span>
+          <span id="cooldown-label">❄️ Остывание: 2м</span>
+        </div>
+        <div class="streak-mini" title="Стрик дней">
+          <span>🔥 4</span>
+        </div>
+        <button class="icon-btn-compact" onclick="alert('Ctrl+K Быстрый поиск')" title="Поиск Ctrl+K">🔍</button>
+        <button class="icon-btn-compact" onclick="toggleTheme()" title="Сменить тему">🌙</button>
+        <button class="icon-btn-compact" onclick="toggleLang(this)" title="Сменить язык">RU</button>
+        <button class="icon-btn-compact" onclick="alert('Настройки')" title="Настройки">⚙️</button>
+      </div>
+    </aside>
+
+    <!-- RIGHT INSPECTOR & SUMMARY SPECIFICATION -->
+    <section class="inspector-panel" id="inspector-panel">
+      <div class="inspector-header">
+        <span class="inspector-badge">Все решения согласованы</span>
+        <h2 class="inspector-title">Спецификация утвержденного сайдбара</h2>
+        <p class="inspector-desc">
+          Полная гармонизация требований: нулевое трение при входе, абсолютная мотивация через Single Dominant CTA и педагогическую концепцию «Остывания», стабильный 270px лейаут без анимационных дерганий и полное устранение дубликатов.
+        </p>
+      </div>
+
+      <div class="matrix-grid">
+        <div class="matrix-card">
+          <div class="matrix-card__icon">⚡</div>
+          <div class="matrix-card__title">Laser Hero Card</div>
+          <div class="matrix-card__text">Кнопка «Продолжить [Enter]» с точным расчетом времени (~12 мин) сразу погружает в поток.</div>
+          <div class="matrix-card__score">0 сомнений</div>
+        </div>
+        <div class="matrix-card">
+          <div class="matrix-card__icon">❄️</div>
+          <div class="matrix-card__title">Цель дня: «Остывание»</div>
+          <div class="matrix-card__text">Вместо бесконечной гонки — спокойная 2-минутная консолидация памяти и триумфальное завершение.</div>
+          <div class="matrix-card__score">Защита от выгорания</div>
+        </div>
+        <div class="matrix-card">
+          <div class="matrix-card__icon">📐</div>
+          <div class="matrix-card__title">Стабильный 270px</div>
+          <div class="matrix-card__text">Фиксированная ширина без авто-сворачивания и дерганий, 0 layout shifts.</div>
+          <div class="matrix-card__score">Предсказуемость</div>
+        </div>
+      </div>
+
+      <div class="action-summary-box">
+        <div class="action-summary-title">Удаленные дубли:</div>
+        <div class="action-summary-sub">
+          ✓ Исключены отдельные «Конспекты» из группы тренажеров (они встроены в «Интервалку SRS»).<br>
+          ✓ Исключена нижняя кнопка «Быстрый шаг» (ее функционал теперь выполняет Hero Action Card).<br>
+          ✓ Разделены «Zen IDE» (задачи платформы) и «Песочница» (чистый REPL).<br>
+          ✓ Навигация сжата в 2 понятные группы: «Маршрут» и «Ресурсы и тренажеры».
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    let isCooldownDone = false;
+
+    function simulateCooldown() {
+      isCooldownDone = !isCooldownDone;
+      const pill = document.getElementById('cooldown-pill-el');
+      const label = document.getElementById('cooldown-label');
+      const hero = document.getElementById('hero-card-el');
+
+      if (isCooldownDone) {
+        pill.style.background = 'rgba(16, 185, 129, 0.15)';
+        pill.style.borderColor = 'rgba(16, 185, 129, 0.35)';
+        pill.style.color = 'var(--emerald)';
+        label.textContent = '🌿 Остывание: 100% Готово!';
+        hero.style.opacity = '0.75';
+      } else {
+        pill.style.background = 'rgba(56, 189, 248, 0.12)';
+        pill.style.borderColor = 'rgba(56, 189, 248, 0.3)';
+        pill.style.color = 'var(--frost)';
+        label.textContent = '❄️ Остывание: 2м';
+        hero.style.opacity = '1';
+      }
+    }
+
+    function triggerCooldownModal() {
+      alert('Фаза Остывания: 3 микро-карточки спокойного закрепления изученного материала перед завершением дня!');
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const cur = html.getAttribute('data-theme');
+      const next = cur === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      document.getElementById('theme-btn').textContent = next === 'dark' ? '🌙' : '☀️';
+    }
+
+    function toggleLang(btn) {
+      btn.textContent = btn.textContent === 'RU' ? 'EN' : 'RU';
+    }
+  </script>
+</body>
+</html>
