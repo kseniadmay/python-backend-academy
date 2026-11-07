@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Стенд: Золотые искры и кристально ясная палитра цветка — Python Backend Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #07090e;
+      --bg-card: rgba(13, 17, 28, 0.75);
+      --surface: #0c101a;
+      --surface-2: #161b2a;
+      --surface-hover: rgba(255, 255, 255, 0.06);
+      --ink: #f8fafc;
+      --ink-soft: #94a3b8;
+      --ink-muted: #64748b;
+      --line: rgba(255, 255, 255, 0.08);
+      --line-soft: rgba(255, 255, 255, 0.04);
+      --emerald: #10b981;
+      --gold: #fbbf24;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --font-d: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+      --font-title: 'Unbounded', sans-serif;
+      --spring: cubic-bezier(0.16, 1, 0.3, 1);
+      --spring-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    [data-theme="light"] {
+      --bg-canvas: #f8fafc;
+      --bg-card: rgba(255, 255, 255, 0.88);
+      --surface: #ffffff;
+      --surface-2: #f1f5f9;
+      --surface-hover: rgba(0, 0, 0, 0.04);
+      --ink: #0f172a;
+      --ink-soft: #475569;
+      --ink-muted: #94a3b8;
+      --line: rgba(0, 0, 0, 0.08);
+      --line-soft: rgba(0, 0, 0, 0.04);
+      --emerald: #059669;
+      --gold: #d97706;
+      --amber: #b45309;
+      --rose: #e11d48;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-canvas);
+      color: var(--ink);
+      font-family: var(--font-d);
+      min-height: 100vh;
+      overflow-x: auto;
+      padding-bottom: 70px;
+    }
+
+    .ambient-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.16;
+    }
+    .orb-1 { width: 550px; height: 550px; background: #fbbf24; top: -120px; left: -100px; }
+    .orb-2 { width: 500px; height: 500px; background: #f43f5e; bottom: 40px; right: 80px; }
+
+    .top-header {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--line);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .top-header h1 {
+      font-family: var(--font-title);
+      font-size: 1.05rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .badge-gold {
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--gold);
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+    }
+    .btn-theme-toggle {
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Slider Stage */
+    .slider-stage {
+      max-width: 860px;
+      margin: 26px auto 0;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+      position: relative;
+      z-index: 10;
+    }
+    .slider-stage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .slider-stage-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .gold-status-pill {
+      font-family: var(--font-m);
+      font-size: 0.88rem;
+      font-weight: 800;
+      padding: 6px 16px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s var(--spring-bounce);
+    }
+    .progress-slider {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+    .progress-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #fbbf24;
+      box-shadow: 0 0 16px rgba(251, 191, 36, 0.8);
+      cursor: pointer;
+      transition: all 0.2s var(--spring-bounce);
+    }
+    .progress-slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
+    .slider-ticks {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+      font-family: var(--font-m);
+    }
+
+    /* Comparison Stage */
+    .stage-wrapper {
+      position: relative;
+      z-index: 10;
+      max-width: 900px;
+      margin: 36px auto 0;
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+    }
+
+    .column-box {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .col-title-card {
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .col-title-card.col-gold {
+      border-color: rgba(251, 191, 36, 0.45);
+      background: rgba(245, 158, 11, 0.08);
+      box-shadow: 0 8px 24px rgba(245, 158, 11, 0.15);
+    }
+    .tag {
+      font-family: var(--font-m);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--ink-muted);
+    }
+    .title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .desc {
+      font-size: 0.75rem;
+      color: var(--ink-soft);
+    }
+
+    /* Mockup Sidebar Frame (290px) */
+    .mockup-sidebar {
+      width: 290px;
+      height: 670px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .sb-brand {
+      padding: 16px 16px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .sb-brand-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sb-logo-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+    }
+    .sb-brand-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--ink);
+      line-height: 1.1;
+    }
+    .sb-brand-sub {
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+    }
+
+    .sb-hero-card {
+      margin: 12px 14px 6px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: linear-gradient(150deg, rgba(16, 185, 129, 0.16) 0%, rgba(15, 23, 42, 0.6) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.12);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .sb-hero-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.72rem;
+    }
+    .step-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--emerald);
+      font-weight: 800;
+      text-transform: uppercase;
+      font-family: var(--font-m);
+    }
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 8px var(--emerald);
+    }
+    .eta-chip {
+      color: var(--ink-muted);
+      font-family: var(--font-m);
+      font-size: 0.7rem;
+    }
+    .card-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.25;
+    }
+    .btn-dominant {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #10b981;
+      color: #042f2e;
+      font-weight: 800;
+      font-size: 0.8rem;
+      border: none;
+      cursor: pointer;
+    }
+
+    .sb-nav-feed {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .group-label {
+      font-size: 0.65rem;
+      font-family: var(--font-m);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
+      padding: 6px 8px 2px;
+      font-weight: 700;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      border-radius: 9px;
+      font-size: 0.8rem;
+      color: var(--ink-soft);
+      text-decoration: none;
+    }
+    .nav-item.active {
+      background: var(--surface-2);
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .nav-item-left { display: flex; align-items: center; gap: 8px; }
+    .due-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--emerald);
+    }
+
+    /* Approved Clean Footer */
+    .sb-footer-clean {
+      border-top: 1px solid var(--line);
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(12px);
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .hud-capsule {
+      display: grid;
+      grid-template-columns: 0.95fr 0.8fr 1.35fr;
+      align-items: center;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .hud-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 5px 6px;
+      border-radius: 999px;
+      font-family: var(--font-m);
+      font-size: 0.7rem;
+      font-weight: 700;
+      border: none;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.25s var(--spring);
+    }
+    .hud-cell.hud-streak { color: var(--amber); background: var(--amber-soft); }
+
+    .service-row-zen {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 2px 2px 0;
+    }
+    .zen-tool-btn {
+      flex: 1;
+      height: 30px;
+      border-radius: 8px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--ink-soft);
+      font-size: 0.78rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      font-family: var(--font-d);
+      font-weight: 500;
+    }
+    .zen-tool-btn:hover { background: var(--surface-2); color: var(--ink); }
+
+    /* Exquisite Rose Pill */
+    .rose-hud-pill {
+      font-size: 0.72rem;
+      letter-spacing: -0.01em;
+      border: 1px solid transparent;
+      transition: all 0.25s var(--spring-bounce);
+      font-weight: 800;
+    }
+
+    /* Master Journey Grid */
+    .master-journey-card {
+      max-width: 900px;
+      margin: 28px auto 0;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .master-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+    .master-box {
+      background: var(--surface-2);
+      border: 1px solid var(--line-soft);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: all 0.25s var(--spring);
+    }
+    .master-box.active-box {
+      transform: translateY(-4px);
+    }
+  
+    /* Живой золотой шиммер и дыхание */
+    @keyframes goldShimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    @keyframes roseBreathe {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(244, 63, 94, 0.35); }
+      50% { transform: scale(1.02); box-shadow: 0 0 18px rgba(244, 63, 94, 0.6); }
+    }
+    @keyframes sproutAwake {
+      0%, 100% { box-shadow: inset 0 0 6px rgba(52, 211, 153, 0.25); }
+      50% { box-shadow: inset 0 0 12px rgba(52, 211, 153, 0.5); }
+    }
+    @keyframes emberPulse {
+      0%, 100% { opacity: 0.85; border-color: rgba(249, 115, 22, 0.3); }
+      50% { opacity: 1; border-color: rgba(249, 115, 22, 0.6); box-shadow: 0 0 8px rgba(249, 115, 22, 0.35); }
+    }
+
+    .shimmer-gold {
+      background: linear-gradient(110deg, rgba(245, 158, 11, 0.18) 20%, rgba(254, 240, 138, 0.45) 50%, rgba(245, 158, 11, 0.18) 80%) !important;
+      background-size: 200% 100% !important;
+      animation: goldShimmer 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite !important;
+      border-color: #f59e0b !important;
+      color: #fef08a !important;
+      box-shadow: 0 0 18px rgba(245, 158, 11, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+    }
+    .pulse-rose {
+      animation: roseBreathe 2.8s ease-in-out infinite !important;
+    }
+    .awake-sprout {
+      animation: sproutAwake 3s ease-in-out infinite !important;
+    }
+    .pulse-ember {
+      animation: emberPulse 3.5s ease-in-out infinite !important;
+    }
+
+    /* Concept selector tabs */
+    .concept-nav {
+      display: flex;
+      gap: 10px;
+      margin: 18px 0 6px;
+      flex-wrap: wrap;
+    }
+    .concept-btn {
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      color: var(--ink-soft);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.2s var(--spring);
+    }
+    .concept-btn.active {
+      background: rgba(245, 158, 11, 0.16);
+      border-color: var(--gold);
+      color: var(--gold);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+    }
+
+
+    /* ══════════════════════════════════════════════════════════════════
+       ADVANCED LIGHT ENGINE: Многослойная физическая оптика света
+       ══════════════════════════════════════════════════════════════════ */
+    
+    /* 1. Золотой металлический градиент текста с кристальным блеском */
+    .gold-metallic-text {
+      background: linear-gradient(135deg, #ffffff 0%, #fef08a 35%, #fbbf24 70%, #d97706 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+      filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.4));
+      font-weight: 900;
+    }
+
+    /* 2. Каустический скользящий луч по золоту (Шелковистый блик) */
+    @keyframes liquidGoldFlow {
+      0% {
+        background-position: -200% 0;
+      }
+      100% {
+        background-position: 200% 0;
+      }
+    }
+
+    /* 3. Дыхание света без рывков масштаба (только яркость и объемный ореол) */
+    @keyframes deepLightBreathe {
+      0%, 100% {
+        box-shadow: 
+          inset 0 1px 1px rgba(255, 255, 255, 0.35),
+          inset 0 -6px 14px rgba(244, 63, 94, 0.25),
+          0 4px 14px -2px rgba(244, 63, 94, 0.35);
+        border-color: rgba(244, 63, 94, 0.55);
+      }
+      50% {
+        box-shadow: 
+          inset 0 1px 2px rgba(255, 255, 255, 0.6),
+          inset 0 -8px 20px rgba(244, 63, 94, 0.45),
+          0 8px 24px -1px rgba(244, 63, 94, 0.55),
+          0 0 40px rgba(244, 63, 94, 0.25);
+        border-color: rgba(244, 63, 94, 0.85);
+      }
+    }
+
+    /* 4. Мерцание золотых микро-искр */
+    @keyframes sparkTwinkle {
+      0%, 100% { opacity: 0.85; filter: drop-shadow(0 0 4px #fbbf24); }
+      50% { opacity: 1; filter: drop-shadow(0 0 10px #fef08a) drop-shadow(0 0 18px #f59e0b); }
+    }
+
+    /* 5. Мягкое просыпание ростка (подповерхностное свечение хлорофилла) */
+    @keyframes mintChlorophyll {
+      0%, 100% {
+        box-shadow: 
+          inset 0 1px 1px rgba(255, 255, 255, 0.3),
+          inset 0 -4px 12px rgba(52, 211, 153, 0.25),
+          0 2px 8px rgba(52, 211, 153, 0.2);
+      }
+      50% {
+        box-shadow: 
+          inset 0 1px 2px rgba(255, 255, 255, 0.5),
+          inset 0 -6px 16px rgba(52, 211, 153, 0.45),
+          0 4px 14px rgba(52, 211, 153, 0.35);
+      }
+    }
+
+    /* Пресеты классов оптики */
+    .optics-gold-triumph {
+      background: linear-gradient(115deg, 
+        rgba(245, 158, 11, 0.16) 0%, 
+        rgba(254, 240, 138, 0.42) 48%, 
+        rgba(255, 255, 255, 0.65) 50%, 
+        rgba(254, 240, 138, 0.42) 52%, 
+        rgba(245, 158, 11, 0.16) 100%) !important;
+      background-size: 250% 100% !important;
+      animation: liquidGoldFlow 3.4s cubic-bezier(0.4, 0, 0.2, 1) infinite, sparkTwinkle 2.2s ease-in-out infinite !important;
+      border: 1px solid rgba(245, 158, 11, 0.75) !important;
+      box-shadow: 
+        inset 0 1px 2px rgba(255, 255, 255, 0.6),
+        inset 0 -8px 20px rgba(245, 158, 11, 0.35),
+        0 4px 16px -2px rgba(245, 158, 11, 0.45),
+        0 8px 32px -4px rgba(245, 158, 11, 0.25) !important;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .optics-breathe-rose {
+      animation: deepLightBreathe 3s ease-in-out infinite !important;
+      background: linear-gradient(180deg, rgba(244, 63, 94, 0.22) 0%, rgba(244, 63, 94, 0.08) 100%) !important;
+    }
+
+    .optics-bud-warm {
+      background: linear-gradient(180deg, rgba(251, 113, 133, 0.20) 0%, rgba(249, 115, 22, 0.10) 100%) !important;
+      border-color: rgba(251, 113, 133, 0.55) !important;
+      box-shadow: 
+        inset 0 1px 1px rgba(255, 255, 255, 0.3),
+        inset 0 -5px 14px rgba(251, 113, 133, 0.25),
+        0 3px 10px rgba(251, 113, 133, 0.25) !important;
+    }
+
+    .optics-sprout-mint {
+      background: linear-gradient(180deg, rgba(52, 211, 153, 0.18) 0%, rgba(52, 211, 153, 0.06) 100%) !important;
+      border-color: rgba(52, 211, 153, 0.5) !important;
+      animation: mintChlorophyll 3.2s ease-in-out infinite !important;
+    }
+
+    .optics-seed-opal {
+      background: linear-gradient(180deg, rgba(148, 163, 184, 0.12) 0%, rgba(148, 163, 184, 0.04) 100%) !important;
+      border: 1px solid rgba(148, 163, 184, 0.32) !important;
+      box-shadow: 
+        inset 0 1px 1px rgba(255, 255, 255, 0.2),
+        inset 0 -4px 10px rgba(148, 163, 184, 0.1),
+        0 2px 6px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    /* Macro Inspector Box */
+    .macro-inspector {
+      max-width: 860px;
+      margin: 24px auto 0;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+    }
+    .macro-inspector-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .macro-preview-canvas {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 36px 20px;
+      border-radius: 16px;
+      background: radial-gradient(circle at center, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.95) 100%);
+      border: 1px solid var(--line);
+      position: relative;
+      overflow: hidden;
+    }
+    .macro-pill {
+      font-size: 1.35rem;
+      font-weight: 800;
+      padding: 12px 32px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      letter-spacing: 0.02em;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .optics-mode-pill-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .optics-mode-btn {
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      color: var(--ink-soft);
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .optics-mode-btn.active {
+      background: rgba(245, 158, 11, 0.16);
+      border-color: #f59e0b;
+      color: #fbbf24;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+    }
+
+
+    /* ══════════════════════════════════════════════════════════════════
+       ДРАМАТУРГИЯ: От Чёрно-Кровавого Ужаса (0%) к Золотому Экстазу (100%)
+       ══════════════════════════════════════════════════════════════════ */
+    
+    /* 0%: Зловещий, нагнетающий чёрно-кровавый пульс (Ужас стагнации) */
+    @keyframes darkAbyssAlarm {
+      0%, 100% {
+        background: radial-gradient(circle at center, #180306 0%, #050102 100%);
+        border-color: rgba(239, 68, 68, 0.7);
+        box-shadow: 
+          inset 0 0 14px rgba(220, 38, 38, 0.5),
+          0 0 8px rgba(220, 38, 38, 0.35);
+        color: #fca5a5;
+      }
+      50% {
+        background: radial-gradient(circle at center, #2e060c 0%, #050102 100%);
+        border-color: #ef4444;
+        box-shadow: 
+          inset 0 0 24px rgba(239, 68, 68, 0.8),
+          0 0 24px rgba(220, 38, 38, 0.75),
+          0 0 45px rgba(185, 28, 28, 0.45);
+        color: #ffffff;
+      }
+    }
+
+    .optics-dark-abyss {
+      animation: darkAbyssAlarm 1.8s ease-in-out infinite !important;
+      border: 1px solid #ef4444 !important;
+      font-weight: 900 !important;
+      letter-spacing: 0.04em !important;
+    }
+
+    /* 25%: Раскалённая лава / Прорыв тьмы */
+    @keyframes lavaBreakout {
+      0%, 100% {
+        background: linear-gradient(135deg, #1f0808 0%, #450a0a 100%);
+        border-color: #f97316;
+        box-shadow: inset 0 0 10px rgba(249, 115, 22, 0.4), 0 0 12px rgba(239, 68, 68, 0.35);
+      }
+      50% {
+        background: linear-gradient(135deg, #380d0d 0%, #7c2d12 100%);
+        border-color: #fb923c;
+        box-shadow: inset 0 0 16px rgba(249, 115, 22, 0.6), 0 0 20px rgba(249, 115, 22, 0.5);
+      }
+    }
+    .optics-lava-break {
+      animation: lavaBreakout 2.4s ease-in-out infinite !important;
+      color: #fdba74 !important;
+      border: 1px solid #f97316 !important;
+    }
+
+    /* 50%: Горн / Жидкая бронза */
+    .optics-forge-bronze {
+      background: linear-gradient(135deg, #2a1104 0%, #78350f 100%) !important;
+      border: 1px solid #d97706 !important;
+      color: #fed7aa !important;
+      box-shadow: 
+        inset 0 1px 2px rgba(255, 255, 255, 0.3),
+        inset 0 -6px 14px rgba(217, 119, 6, 0.4),
+        0 4px 16px rgba(217, 119, 6, 0.4) !important;
+    }
+
+    /* 75%: Белое каление / Платиновый рассвет */
+    @keyframes platinumIncandescence {
+      0%, 100% {
+        background: linear-gradient(135deg, #451a03 0%, #b45309 60%, #fef08a 100%);
+        border-color: #fef08a;
+        box-shadow: 0 0 18px rgba(245, 158, 11, 0.5);
+      }
+      50% {
+        background: linear-gradient(135deg, #78350f 0%, #d97706 50%, #ffffff 100%);
+        border-color: #ffffff;
+        box-shadow: 0 0 28px rgba(254, 240, 138, 0.75), 0 0 45px rgba(245, 158, 11, 0.4);
+      }
+    }
+    .optics-platinum-dawn {
+      animation: platinumIncandescence 2.2s ease-in-out infinite !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+    }
+
+    /* 100%: ЗОЛОТОЙ ЭКСТАЗ (24-каратный взрыв сияния, сусальный шиммер и россыпь искр) */
+    @keyframes goldEcstasySuperFlow {
+      0% {
+        background-position: -250% 0;
+      }
+      100% {
+        background-position: 250% 0;
+      }
+    }
+    @keyframes goldHaloSurge {
+      0%, 100% {
+        box-shadow: 
+          inset 0 1px 3px rgba(255, 255, 255, 0.95),
+          inset 0 -8px 24px rgba(217, 119, 6, 0.6),
+          0 4px 20px rgba(245, 158, 11, 0.65),
+          0 10px 40px rgba(245, 158, 11, 0.45);
+        border-color: #fef08a;
+      }
+      50% {
+        box-shadow: 
+          inset 0 1px 4px rgba(255, 255, 255, 1),
+          inset 0 -10px 28px rgba(245, 158, 11, 0.8),
+          0 6px 30px rgba(254, 240, 138, 0.85),
+          0 14px 60px rgba(245, 158, 11, 0.65),
+          0 0 90px rgba(251, 191, 36, 0.45);
+        border-color: #ffffff;
+      }
+    }
+
+    .optics-gold-ecstasy {
+      background: linear-gradient(110deg, 
+        rgba(180, 83, 9, 0.55) 0%, 
+        rgba(245, 158, 11, 0.85) 28%, 
+        #ffffff 50%, 
+        rgba(254, 240, 138, 0.95) 60%, 
+        rgba(180, 83, 9, 0.55) 100%) !important;
+      background-size: 280% 100% !important;
+      animation: 
+        goldEcstasySuperFlow 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite,
+        goldHaloSurge 2s ease-in-out infinite !important;
+      border: 1.5px solid #fef08a !important;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gold-ecstasy-text {
+      background: linear-gradient(135deg, #ffffff 0%, #fffbeb 25%, #fef08a 50%, #f59e0b 75%, #b45309 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 12px #fef08a);
+      font-weight: 900;
+      letter-spacing: 0.03em;
+    }
+
+
+    /* ══════════════════════════════════════════════════════════════════
+       ТЕРМОДИНАМИКА МЕТАЛЛА: От Остывшего Чугуна до Бело-Золотого Накала
+       ══════════════════════════════════════════════════════════════════ */
+    
+    /* 0%: Почти чёрный остывший металл (тяжёлый холодный чугун с тревожным остыванием) */
+    @keyframes coldIronAlarm {
+      0%, 100% {
+        background: radial-gradient(circle at center, #141416 0%, #060709 100%);
+        border-color: rgba(71, 85, 105, 0.4);
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.6);
+        color: #64748b;
+      }
+      50% {
+        background: radial-gradient(circle at center, #1c1517 0%, #060709 100%);
+        border-color: rgba(239, 68, 68, 0.45);
+        box-shadow: inset 0 0 12px rgba(220, 38, 38, 0.25), 0 0 10px rgba(220, 38, 38, 0.2);
+        color: #94a3b8;
+      }
+    }
+    .optics-cold-iron {
+      animation: coldIronAlarm 2.8s ease-in-out infinite !important;
+      border: 1px solid rgba(71, 85, 105, 0.5) !important;
+      font-weight: 800 !important;
+    }
+
+    /* 25%: Тёмно-вишнёвый жар (Первый нагрев металла) */
+    @keyframes cherryGlow {
+      0%, 100% {
+        background: linear-gradient(135deg, #180306 0%, #3d0a11 100%);
+        border-color: rgba(225, 29, 72, 0.55);
+        box-shadow: inset 0 0 10px rgba(225, 29, 72, 0.35), 0 0 12px rgba(225, 29, 72, 0.25);
+      }
+      50% {
+        background: linear-gradient(135deg, #28070c 0%, #58101a 100%);
+        border-color: #f43f5e;
+        box-shadow: inset 0 0 16px rgba(244, 63, 94, 0.55), 0 0 18px rgba(225, 29, 72, 0.45);
+      }
+    }
+    .optics-cherry-glow {
+      animation: cherryGlow 2.5s ease-in-out infinite !important;
+      color: #fda4af !important;
+      border: 1px solid #f43f5e !important;
+    }
+
+    /* 50%: Раскалённый янтарь / Рабочий горн */
+    @keyframes amberForgeGlow {
+      0%, 100% {
+        background: linear-gradient(135deg, #240d03 0%, #7c2d12 100%);
+        border-color: #ea580c;
+        box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.25), 0 0 14px rgba(234, 88, 12, 0.45);
+      }
+      50% {
+        background: linear-gradient(135deg, #3d1706 0%, #9a3412 100%);
+        border-color: #f97316;
+        box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.4), 0 0 22px rgba(249, 115, 22, 0.65);
+      }
+    }
+    .optics-amber-forge {
+      animation: amberForgeGlow 2.2s ease-in-out infinite !important;
+      color: #fed7aa !important;
+      border: 1px solid #f97316 !important;
+    }
+
+    /* 75%: Ослепительный золотой накал */
+    @keyframes goldenHeatGlow {
+      0%, 100% {
+        background: linear-gradient(135deg, #3a1a04 0%, #b45309 60%, #fef08a 100%);
+        border-color: #fbbf24;
+        box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.6), 0 0 20px rgba(245, 158, 11, 0.6);
+      }
+      50% {
+        background: linear-gradient(135deg, #5c2908 0%, #d97706 50%, #ffffff 100%);
+        border-color: #fef08a;
+        box-shadow: inset 0 1px 4px rgba(255, 255, 255, 0.85), 0 0 32px rgba(254, 240, 138, 0.8), 0 0 55px rgba(245, 158, 11, 0.45);
+      }
+    }
+    .optics-golden-heat {
+      animation: goldenHeatGlow 2.0s ease-in-out infinite !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
+    }
+
+    /* 100%: БЕЛО-ЗОЛОТОЙ СВЕРХНАКАЛ (White-Gold Incandescence) */
+    @keyframes whiteGoldEcstasy {
+      0% {
+        background-position: -250% 0;
+      }
+      100% {
+        background-position: 250% 0;
+      }
+    }
+    @keyframes whiteGoldSuperSurge {
+      0%, 100% {
+        box-shadow: 
+          inset 0 1px 4px rgba(255, 255, 255, 1),
+          inset 0 -8px 24px rgba(217, 119, 6, 0.7),
+          0 4px 22px rgba(254, 240, 138, 0.85),
+          0 10px 48px rgba(245, 158, 11, 0.55);
+        border-color: #ffffff;
+      }
+      50% {
+        box-shadow: 
+          inset 0 2px 6px #ffffff,
+          inset 0 -12px 32px rgba(245, 158, 11, 0.9),
+          0 6px 36px #ffffff,
+          0 16px 70px rgba(254, 240, 138, 0.95),
+          0 0 110px rgba(251, 191, 36, 0.6);
+        border-color: #ffffff;
+      }
+    }
+
+    .optics-white-gold {
+      background: linear-gradient(110deg, 
+        rgba(180, 83, 9, 0.6) 0%, 
+        #f59e0b 22%, 
+        #ffffff 48%, 
+        #ffffff 52%, 
+        #fef08a 65%, 
+        rgba(180, 83, 9, 0.6) 100%) !important;
+      background-size: 280% 100% !important;
+      animation: 
+        whiteGoldEcstasy 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite,
+        whiteGoldSuperSurge 1.9s ease-in-out infinite !important;
+      border: 1.5px solid #ffffff !important;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .white-gold-text {
+      background: linear-gradient(135deg, #ffffff 0%, #ffffff 35%, #fef08a 60%, #fbbf24 85%, #d97706 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 14px #ffffff);
+      font-weight: 900;
+      letter-spacing: 0.03em;
+    }
+
+
+    /* ══════════════════════════════════════════════════════════════════
+       PERFECTION LAB: Ювелирная настройка цвета и физики свечения
+       ══════════════════════════════════════════════════════════════════ */
+    
+    /* Вариант 1: Органический Фотосинтез (Зелёный росток гармоничен иконке 🌱) */
+    .glow-palette-photosynthesis-0 {
+      background: radial-gradient(circle at center, #111318 0%, #050608 100%) !important;
+      border: 1px solid rgba(220, 38, 38, 0.45) !important;
+      box-shadow: inset 0 0 10px rgba(220, 38, 38, 0.25), 0 0 12px rgba(220, 38, 38, 0.2) !important;
+      color: #94a3b8 !important;
+    }
+    .glow-palette-photosynthesis-25 {
+      background: linear-gradient(135deg, rgba(6, 78, 59, 0.4) 0%, rgba(5, 150, 105, 0.2) 100%) !important;
+      border: 1.5px solid #10b981 !important;
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.4), inset 0 -4px 14px rgba(16, 185, 129, 0.35), 0 0 18px rgba(16, 185, 129, 0.4) !important;
+      color: #6ee7b7 !important;
+    }
+    .glow-palette-photosynthesis-50 {
+      background: linear-gradient(135deg, rgba(136, 19, 55, 0.4) 0%, rgba(225, 29, 72, 0.25) 100%) !important;
+      border: 1.5px solid #f43f5e !important;
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.4), inset 0 -6px 16px rgba(244, 63, 94, 0.4), 0 0 22px rgba(244, 63, 94, 0.45) !important;
+      color: #fda4af !important;
+    }
+    .glow-palette-photosynthesis-75 {
+      background: linear-gradient(135deg, rgba(120, 53, 15, 0.5) 0%, rgba(245, 158, 11, 0.3) 100%) !important;
+      border: 1.5px solid #fbbf24 !important;
+      box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.6), inset 0 -8px 20px rgba(245, 158, 11, 0.5), 0 0 28px rgba(251, 191, 36, 0.65) !important;
+      color: #ffffff !important;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+    }
+    .glow-palette-photosynthesis-100 {
+      background: linear-gradient(110deg, rgba(180, 83, 9, 0.6) 0%, #f59e0b 22%, #ffffff 48%, #ffffff 52%, #fef08a 65%, rgba(180, 83, 9, 0.6) 100%) !important;
+      background-size: 280% 100% !important;
+      animation: whiteGoldEcstasy 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite, whiteGoldSuperSurge 1.9s ease-in-out infinite !important;
+      border: 1.5px solid #ffffff !important;
+    }
+
+    /* Настройка мягкости диффузии света через CSS переменные */
+    :root {
+      --glow-intensity: 1;
+      --glow-blur: 16px;
+      --glow-fresnel: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Интерактивный пульт тонкой настройки */
+    .perfection-lab-panel {
+      max-width: 860px;
+      margin: 20px auto 0;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 22px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+    }
+    .lab-controls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .lab-control-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: var(--surface-2);
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+    }
+    .lab-control-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--ink);
+      display: flex;
+      justify-content: space-between;
+    }
+
+
+  /* ══════════════════════════════════════════════════════════════════
+     DAZZLING GOLD & ULTRA-CONTRAST FLORA SPECTRUM
+     0%: Плотный остывший чугун ➔ 100%: Ослепляющий бело-золотой взрыв
+     ══════════════════════════════════════════════════════════════════ */
+  
+  /* 0% 🥀 Опавший: глубокий матовый чернёный чугун со скрытым затухающим фитилём */
+  @keyframes coldIronDazzle {
+    0%, 100% {
+      background: radial-gradient(circle at 50% 120%, #17070a 0%, #06070a 70%, #020305 100%);
+      border-color: rgba(71, 85, 105, 0.45);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.06), inset 0 -3px 8px rgba(220, 38, 38, 0.25), 0 2px 8px rgba(0, 0, 0, 0.7);
+      color: #94a3b8;
+    }
+    50% {
+      background: radial-gradient(circle at 50% 120%, #240a0f 0%, #0a0c12 70%, #020305 100%);
+      border-color: rgba(239, 68, 68, 0.55);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), inset 0 -4px 14px rgba(220, 38, 38, 0.45), 0 0 14px rgba(220, 38, 38, 0.25);
+      color: #cbd5e1;
+    }
+  }
+
+    /* 25% 🌱 Росток: тёмно-вишнёвый калёный металл (первый нагрев чугуна) */
+  @keyframes cherryHeatIronDazzle {
+    0%, 100% {
+      background: linear-gradient(135deg, #180306 0%, #3d0810 50%, #200408 100%);
+      border-color: #e11d48;
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.35), inset 0 -4px 14px rgba(225, 29, 72, 0.4), 0 0 18px rgba(225, 29, 72, 0.45);
+      color: #fda4af;
+    }
+    50% {
+      background: linear-gradient(135deg, #2a050b 0%, #580d19 50%, #30060d 100%);
+      border-color: #f43f5e;
+      box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.6), inset 0 -6px 18px rgba(244, 63, 94, 0.6), 0 0 26px rgba(244, 63, 94, 0.65);
+      color: #ffffff;
+    }
+  }
+
+  .optics-cherry-heat {
+    animation: cherryHeatIronDazzle 2.5s ease-in-out infinite !important;
+    border: 1.5px solid #f43f5e !important;
+  }
+
+  /* 50% 🌹 Бутон: бархатный рубиновый горн с горячим ядром */
+  @keyframes rubyBudDazzle {
+    0%, 100% {
+      background: linear-gradient(135deg, #20040a 0%, #881337 50%, #3f0713 100%);
+      border-color: #f43f5e;
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.4), inset 0 -5px 16px rgba(244, 63, 94, 0.45), 0 0 22px rgba(244, 63, 94, 0.5);
+      color: #fecdd3;
+    }
+    50% {
+      background: linear-gradient(135deg, #380712 0%, #be123c 50%, #5c0d1e 100%);
+      border-color: #fb7185;
+      box-shadow: inset 0 1px 3px #ffffff, inset 0 -8px 22px rgba(251, 113, 133, 0.65), 0 0 32px rgba(244, 63, 94, 0.75);
+      color: #ffffff;
+    }
+  }
+
+  /* 75% 🌺 Роза: огненный янтарь высокой температуры ковки */
+  @keyframes goldenRoseDazzle {
+    0%, 100% {
+      background: linear-gradient(135deg, #3b1404 0%, #b45309 50%, #78350f 100%);
+      border-color: #fbbf24;
+      box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.7), inset 0 -6px 20px rgba(245, 158, 11, 0.6), 0 0 30px rgba(245, 158, 11, 0.7);
+      color: #fef08a;
+    }
+    50% {
+      background: linear-gradient(135deg, #571e06 0%, #d97706 50%, #9a3412 100%);
+      border-color: #fef08a;
+      box-shadow: inset 0 1px 4px #ffffff, inset 0 -8px 26px rgba(254, 240, 138, 0.8), 0 0 45px rgba(251, 191, 36, 0.9);
+      color: #ffffff;
+    }
+  }
+
+    /* 100% ✨ ТРИУМФ: БЕЛО-ЗОЛОТОЙ ФОН ПЛАШКИ (соответствует собственному сиянию) */
+  @keyframes dazzlingWhiteGoldFlow {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  @keyframes dazzlingSunSurge {
+    0%, 100% {
+      border-color: #ffffff;
+      box-shadow: 
+        inset 0 2px 6px #ffffff,
+        inset 0 0 20px #ffffff,
+        inset 0 -6px 18px rgba(245, 158, 11, 0.6),
+        0 0 25px #ffffff,
+        0 0 60px #fbbf24,
+        0 0 110px rgba(245, 158, 11, 0.9),
+        0 0 160px rgba(251, 191, 36, 0.7);
+      transform: scale(1);
+    }
+    50% {
+      border-color: #ffffff;
+      box-shadow: 
+        inset 0 3px 10px #ffffff,
+        inset 0 0 30px #ffffff,
+        inset 0 -10px 24px rgba(245, 158, 11, 0.8),
+        0 0 40px #ffffff,
+        0 0 85px #fef08a,
+        0 0 140px #f59e0b,
+        0 0 190px rgba(251, 191, 36, 0.95);
+      transform: scale(1.02);
+    }
+  }
+
+  .optics-dazzling-triumph {
+    background: linear-gradient(110deg, 
+      #fef08a 0%, 
+      #ffffff 25%, 
+      #fffbeb 45%, 
+      #ffffff 55%, 
+      #fef08a 75%, 
+      #fde047 100%) !important;
+    background-size: 250% 100% !important;
+    animation: 
+      dazzlingWhiteGoldFlow 3.0s cubic-bezier(0.4, 0, 0.2, 1) infinite,
+      dazzlingSunSurge 2.0s ease-in-out infinite !important;
+    border: 2px solid #ffffff !important;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .dazzling-gold-text {
+    color: #78350f !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.02em !important;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 0 12px rgba(251, 191, 36, 0.6) !important;
+  }
+
+
+</style>
+</head>
+<body>
+
+  <div class="ambient-orb orb-1"></div>
+  <div class="ambient-orb orb-2"></div>
+
+  <header class="top-header">
+    <h1>
+      <span>Чистая палитра: Золотые Искры ✨ и Живой Цветок</span>
+      <span class="badge-gold">✨ Golden Sparkles</span>
+    </h1>
+    <button class="btn-theme-toggle" onclick="toggleStandTheme()">
+      <span id="theme-icon">🌙</span> <span id="theme-label">Темная тема</span>
+    </button>
+  </header>
+
+  <!-- Интерактивный слайдер -->
+  <div class="slider-stage">
+    <div class="slider-stage-header">
+      <span class="slider-stage-title"><span>🥀 ➔ ✨</span> <span>Жизненная сила цветка:</span></span>
+      <span class="gold-status-pill" id="stage-chip">
+        100% · ✨ 100% Триумф
+      </span>
+    </div>
+    <input type="range" min="0" max="100" value="100" step="25" class="progress-slider" id="progress-slider-input" oninput="updateRoseCycle(this.value)">
+    <div class="slider-ticks">
+      <span>0% (🥀 Опавший)</span>
+      <span>25% (🌱 Росток)</span>
+      <span>50% (🌹 Бутон)</span>
+      <span>75% (🌺 Роза)</span>
+      <span style="color:#fbbf24;font-weight:800;">100% (✨ Золотые Искры!)</span>
+    </div>
+  </div>
+
+  <div class="stage-wrapper">
+
+    <!-- 0%: ОПАВШИЙ ЦВЕТ (УВЯДАНИЕ) -->
+    <div class="column-box">
+      <div class="col-title-card">
+        <span class="tag">0% · Начало дня / Стагнация</span>
+        <span class="title">🥀 Опавший</span>
+        <span class="desc">Спокойный пепельно-винный контур без кислотности</span>
+      </div>
+
+      <div class="mockup-sidebar">
+        <div class="sb-brand">
+          <div class="sb-brand-left">
+            <div class="sb-logo-box">⬡</div>
+            <div>
+              <div class="sb-brand-title">Academy</div>
+              <div class="sb-brand-sub">Python Backend</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sb-hero-card">
+          <div class="sb-hero-top">
+            <span class="step-pill"><span class="pulse-dot"></span> Шаг 3</span>
+            <span class="eta-chip">⏱ ~12 мин</span>
+          </div>
+          <div class="card-title">Базовые коллекции и срезы</div>
+          <button class="btn-dominant" type="button"><span>Продолжить</span></button>
+        </div>
+
+        <div class="sb-nav-feed">
+          <div class="group-label">Маршрут</div>
+          <a href="#" class="nav-item active"><div class="nav-item-left"><span>🏠</span><span>Дашборд</span></div></a>
+          <a href="#" class="nav-item"><div class="nav-item-left"><span>⚡</span><span>Путь к офферу</span></div></a>
+          <a href="#" class="nav-item"><div class="nav-item-left"><span>🗂</span><span>Интервалка</span></div><span class="due-dot"></span></a>
+          <a href="#" class="nav-item"><div class="nav-item-left"><span>&lt;/&gt;</span><span>Zen IDE</span></div></a>
+          <div class="group-label" style="margin-top:6px;">Ресурсы</div>
+          <a href="#" class="nav-item"><div class="nav-item-left"><span>💼</span><span>Собеседование</span></div></a>
+          <a href="#" class="nav-item"><div class="nav-item-left"><span>🗺</span><span>Матрица навыков</span></div></a>
+          <a href="#" class="nav-item"><div class="nav-item-left"><span>📖</span><span>Справочник</span></div></a>
+          <a href="#" class="nav-item"><div class="nav-item-left"><span>⌨️</span><span>Песочница</span></div></a>
+        </div>
+
+        <div class="sb-footer-clean">
+          <div class="hud-capsule">
+            <button class="hud-cell">⏱ 15:00 ▶</button>
+            <button class="hud-cell hud-streak">🔥 7</button>
+            <div class="hud-cell rose-hud-pill" style="color:#f43f5e;background:rgba(244,63,94,0.12);border-color:rgba(244,63,94,0.35);">
+              🥀 Опавший
+            </div>
+          </div>
+          <div class="service-row-zen">
+            <button class="zen-tool-btn"><span>🔍</span> <span>Поиск</span></button>
+            <button class="zen-tool-btn"><span>🌙</span> <span>Тема</span></button>
+            <button class="zen-tool-btn"><span>⚙️</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ТЕКУЩИЙ СТАТУС СО СЛАЙДЕРА (100% ЗОЛОТО ПО УМОЛЧАНИЮ) -->
+    <div class="column-box">
+      <div class="col-title-card col-gold">
+        <span class="tag" style="color:#fbbf24;">100% · Цель выполнена</span>
+        <span class="title" id="dyn-title" style="color:#fbbf24;">✨ 100% Триумф</span>
+        <span class="desc" id="dyn-desc">Золотые искры победы с тёплым солнечным сиянием</span>
+      </div>
+
+      <div class="mockup-sidebar">
+        <div class="sb-brand">
+          <div class="sb-brand-left">
+            <div class="sb-logo-box">⬡</div>
+            <div>
+              <div class="sb-brand-title">Academy</div>
+              <div class="sb-brand-sub">Python Backend</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sb-hero-card">
+          <div class="sb-hero-top">
+            <span class="step-pill"><span class="pulse-dot"></span> Шаг 3</span>
+            <span class="eta-chip">⏱ ~12 мин</span>
+          </div>
+          <div class="card-title">Базовые коллекции и срезы</div>
+          <button class="btn-dominant" type="button"><span>Продолжить</span></button>
+        </div>
+
+        <div class="sb-nav-feed">
+          <div class="group-label">Маршрут</div>
+          <a href="#" class="nav-item active"><div class="nav-item-left"><span>🏠</span><span>Дашборд</span></div></a>
+          <a href="#" class="nav-item"><div class="nav-item-left"><span>⚡</span><span>Путь к офферу</span></div></a>
+          <a href="#" class="nav-item"><div class="nav-item-left"><span>🗂</span><span>Интервалка</span></div><span class="due-dot"></span></a>
+          <a href="#" class="nav-item"><div class="nav-item-left"><span>&lt;/&gt;</span><span>Zen IDE</span></div></a>
+          <div class="group-label" style="margin-top:6px;">Ресурсы</div>
+          <a href="#" class="nav-item"><div class="nav-item-left"><span>💼</span><span>Собеседование</span></div></a>
+          <a href="#" class="nav-item"><div class="nav-item-left"><span>🗺</span><span>Матрица навыков</span></div></a>
+          <a href="#" class="nav-item"><div class="nav-item-left"><span>📖</span><span>Справочник</span></div></a>
+          <a href="#" class="nav-item"><div class="nav-item-left"><span>⌨️</span><span>Песочница</span></div></a>
+        </div>
+
+        <div class="sb-footer-clean">
+          <div class="hud-capsule">
+            <button class="hud-cell">⏱ 15:00 ▶</button>
+            <button class="hud-cell hud-streak">🔥 7</button>
+            <div class="hud-cell rose-hud-pill" id="dyn-rose-pill">
+              ✨ 100% Триумф
+            </div>
+          </div>
+          <div class="service-row-zen">
+            <button class="zen-tool-btn"><span>🔍</span> <span>Поиск</span></button>
+            <button class="zen-tool-btn"><span>🌙</span> <span>Тема</span></button>
+            <button class="zen-tool-btn"><span>⚙️</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- МАКРО-ИНСПЕКТОР СВЕТА: Рассмотреть физику свечения под лупой (3x Zoom) -->
+  <div class="macro-inspector">
+    <div class="macro-inspector-header">
+      <div>
+        <div style="font-size: 1.05rem; font-weight: 800; display:flex; align-items:center; gap:8px;">
+          <span>🔬 Макро-инспектор физики света (3× Zoom)</span>
+        </div>
+        <div style="font-size: 0.78rem; color: var(--ink-muted); margin-top: 3px;">
+          Послойная проверка: верхний стеклянный скос (фаска) + подповерхностный свет ядра + живой шиммер золота
+        </div>
+      </div>
+      <div class="optics-mode-pill-group">
+        <button class="optics-mode-btn active" id="btn-opt-volumetric" onclick="switchOpticsMode('volumetric')">💎 Объемное стекло (VisionOS)</button>
+        <button class="optics-mode-btn" id="btn-opt-kinetic" onclick="switchOpticsMode('kinetic')">⚡ Кинетический луч (Raycast)</button>
+        <button class="optics-mode-btn" id="btn-opt-organic" onclick="switchOpticsMode('organic')">🌿 Органический туман (Soft Glow)</button>
+      </div>
+    </div>
+
+    <!-- Область увеличенного рендера -->
+    <div class="macro-preview-canvas">
+      <div class="macro-pill optics-gold-triumph" id="macro-pill-el">
+        <span id="macro-pill-text" class="gold-metallic-text">✨ 100% Триумф</span>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; font-size: 0.76rem; color: var(--ink-soft);">
+      <div style="background:var(--surface-2); padding:10px 14px; border-radius:10px; border:1px solid var(--line);">
+        <strong style="color:var(--ink);">1. Верхняя фаска стекла</strong><br>
+        Тонкий белый блик <code>inset 0 1px 2px rgba(255,255,255,0.6)</code> дает ощущение настоящего полированного стекла.
+      </div>
+      <div style="background:var(--surface-2); padding:10px 14px; border-radius:10px; border:1px solid var(--line);">
+        <strong style="color:var(--ink);">2. Подповерхностный свет</strong><br>
+        Свет идет из глубины колбы снизу вверх (subsurface glow), убирая эффект плоского неонового пятна.
+      </div>
+      <div style="background:var(--surface-2); padding:10px 14px; border-radius:10px; border:1px solid var(--line);">
+        <strong style="color:var(--ink);">3. Жидкое золото и искры</strong><br>
+        Шелковистый блик скользит под углом 115°, а текст переливается металлическим золотом с микро-мерцанием.
+      </div>
+    </div>
+  </div>
+
+  <!-- Карточки всех 5 стадий с ясными цветами -->
+  <div class="master-journey-card">
+    <div style="font-size:0.95rem;font-weight:800;display:flex;align-items:center;gap:10px;">
+      <span>🥀 ➔ ✨</span> <span>Кристально ясная палитра (без кислотного неона):</span>
+    </div>
+    <div class="master-grid" id="master-grid-el"></div>
+  </div>
+
+  <script>
+    function toggleStandTheme(){
+      const html = document.documentElement;
+      const cur = html.getAttribute('data-theme') || 'dark';
+      const next = cur === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      const icon = next === 'dark' ? '🌙' : '☀️';
+      document.getElementById('theme-icon').textContent = icon;
+      document.getElementById('theme-label').textContent = next === 'dark' ? 'Темная тема' : 'Светлая тема';
+    }
+
+        // 3 Дизайнерские Концепции: как решить проблему "Опавшего", сияния промежуточных стадий и золотых искр
+    const CONCEPTS = {
+      flora: {
+        name: 'Живой Сад (Mastery Flora)',
+        stages: {
+          0: {
+            label: '🌰 0% Семя',
+            short: '🌰 Семя',
+            color: '#a8a29e',
+            bg: 'rgba(168, 162, 158, 0.12)',
+            border: 'rgba(168, 162, 158, 0.35)',
+            glow: 'none',
+            animClass: '',
+            desc: 'Вместо депрессивного «Опавший»: дремлющее зерно в плодородной почве. Никаких штрафов или вины — сила для нового старта!'
+          },
+          25: {
+            label: '🌱 25% Росток',
+            short: '🌱 25% Росток',
+            color: '#34d399',
+            bg: 'rgba(52, 211, 153, 0.14)',
+            border: 'rgba(52, 211, 153, 0.45)',
+            glow: 'inset 0 0 8px rgba(52, 211, 153, 0.3)',
+            animClass: 'awake-sprout',
+            desc: 'Нежное биолюминесцентное свечение изнутри стебля (внутренний glow) — хлорофилл просыпается.'
+          },
+          50: {
+            label: '🌹 50% Бутон',
+            short: '🌹 50% Бутон',
+            color: '#fb7185',
+            bg: 'rgba(251, 113, 133, 0.15)',
+            border: 'rgba(251, 113, 133, 0.45)',
+            glow: '0 0 10px rgba(251, 113, 133, 0.3)',
+            animClass: '',
+            desc: 'Тёплый алый бутон налит соком: свет начинает мягко выходить наружу через лепестки.'
+          },
+          75: {
+            label: '🌺 75% Роза',
+            short: '🌺 75% Роза',
+            color: '#f43f5e',
+            bg: 'rgba(244, 63, 94, 0.18)',
+            border: '#f43f5e',
+            glow: '0 0 14px rgba(244, 63, 94, 0.45)',
+            animClass: 'pulse-rose',
+            desc: 'Благородное бархатное дыхание цветка (плавная пульсация 2.8s) — бутон раскрылся и дышит!'
+          },
+          100: {
+            label: '✨ 100% Триумф',
+            short: '✨ 100% Триумф',
+            color: '#fef08a',
+            bg: 'rgba(245, 158, 11, 0.22)',
+            border: '#f59e0b',
+            glow: '0 0 18px rgba(245, 158, 11, 0.55)',
+            animClass: 'shimmer-gold',
+            desc: 'Живой золотой шиммер: световой блик струится по золотой капсуле — чистый триумф без неоновой грязи!'
+          }
+        }
+      },
+      ember: {
+        name: 'Тлеющий Огонь (Zen Ember)',
+        stages: {
+          0: {
+            label: '🕯️ 0% Уголёк',
+            short: '🕯️ Уголёк',
+            color: '#fb923c',
+            bg: 'rgba(249, 115, 22, 0.10)',
+            border: 'rgba(249, 115, 22, 0.35)',
+            glow: '0 0 8px rgba(249, 115, 22, 0.2)',
+            animClass: 'pulse-ember',
+            desc: 'Тёплый тлеющий огонёк в очаге: тихий уют, готовый вспыхнуть от первого написанного теста.'
+          },
+          25: {
+            label: '⚡ 25% Искра',
+            short: '⚡ 25% Искра',
+            color: '#facc15',
+            bg: 'rgba(250, 204, 21, 0.14)',
+            border: 'rgba(250, 204, 21, 0.45)',
+            glow: '0 0 10px rgba(250, 204, 21, 0.3)',
+            animClass: '',
+            desc: 'Яркая искра озаряет путь: импульс набран!'
+          },
+          50: {
+            label: '🔥 50% Пламя',
+            short: '🔥 50% Пламя',
+            color: '#f97316',
+            bg: 'rgba(249, 115, 22, 0.16)',
+            border: '#f97316',
+            glow: '0 0 12px rgba(249, 115, 22, 0.4)',
+            animClass: '',
+            desc: 'Уверенное ровное горение: ритм практики установлен.'
+          },
+          75: {
+            label: '🌟 75% Сияние',
+            short: '🌟 75% Сияние',
+            color: '#e11d48',
+            bg: 'rgba(225, 29, 72, 0.18)',
+            border: '#e11d48',
+            glow: '0 0 16px rgba(225, 29, 72, 0.5)',
+            animClass: 'pulse-rose',
+            desc: 'Накаливание добела: финал цели дня совсем близко!'
+          },
+          100: {
+            label: '👑 100% Золотое Пламя',
+            short: '👑 100% Пламя',
+            color: '#fef08a',
+            bg: 'rgba(245, 158, 11, 0.24)',
+            border: '#f59e0b',
+            glow: '0 0 20px rgba(245, 158, 11, 0.6)',
+            animClass: 'shimmer-gold',
+            desc: 'Корона победителя: золотое струящееся сияние истинного мастера!'
+          }
+        }
+      },
+      zen: {
+        name: 'Дзен-Поток (Crystal Resonance)',
+        stages: {
+          0: {
+            label: '💧 0% Роса',
+            short: '💧 Роса',
+            color: '#94a3b8',
+            bg: 'rgba(148, 163, 184, 0.10)',
+            border: 'rgba(148, 163, 184, 0.30)',
+            glow: 'none',
+            animClass: '',
+            desc: 'Капля чистой утренней росы на прозрачном стекле: нулевое сопротивление, ясный разум.'
+          },
+          25: {
+            label: '🔹 25% Пробуждение',
+            short: '🔹 25% Пульс',
+            color: '#38bdf8',
+            bg: 'rgba(56, 189, 248, 0.12)',
+            border: 'rgba(56, 189, 248, 0.40)',
+            glow: 'inset 0 0 8px rgba(56, 189, 248, 0.3)',
+            animClass: 'awake-sprout',
+            desc: 'Первый чистый импульс мысли: кристальное стекло обретает лазурное свечение.'
+          },
+          50: {
+            label: '💠 50% Фокус',
+            short: '💠 50% Фокус',
+            color: '#818cf8',
+            bg: 'rgba(129, 140, 248, 0.15)',
+            border: 'rgba(129, 140, 248, 0.45)',
+            glow: '0 0 12px rgba(129, 140, 248, 0.35)',
+            animClass: '',
+            desc: 'Состояние глубокого погружения: индиго-свет концентрируется в капсуле.'
+          },
+          75: {
+            label: '🔮 75% Поток',
+            short: '🔮 75% Поток',
+            color: '#c084fc',
+            bg: 'rgba(192, 132, 252, 0.18)',
+            border: '#c084fc',
+            glow: '0 0 16px rgba(192, 132, 252, 0.5)',
+            animClass: 'pulse-rose',
+            desc: 'Максимальный резонанс потока: фиолетовая аметистовая аура дышит в унисон.'
+          },
+          100: {
+            label: '✨ 100% Сверхновая',
+            short: '✨ 100% Триумф',
+            color: '#fef08a',
+            bg: 'rgba(245, 158, 11, 0.22)',
+            border: '#f59e0b',
+            glow: '0 0 20px rgba(245, 158, 11, 0.6)',
+            animClass: 'shimmer-gold',
+            desc: 'Вспышка золотой сверхновой: абсолютная кристальная ясность и золотой шиммер!'
+          }
+        }
+      }
+    };
+
+    
+    let currentOpticsMode = 'volumetric';
+
+    function switchOpticsMode(mode){
+      currentOpticsMode = mode;
+      document.querySelectorAll('.optics-mode-btn').forEach(b => b.classList.remove('active'));
+      const btn = document.getElementById('btn-opt-' + mode);
+      if(btn) btn.classList.add('active');
+
+      const slider = document.getElementById('progress-slider-input');
+      const val = slider ? slider.value : 100;
+      updateRoseCycle(val);
+    }
+
+    // Расширенная физическая оптика для стадий
+    const OPTICS_ENGINE = {
+      volumetric: {
+        0: { pillClass: 'optics-seed-opal', textClass: '', descExtra: '· Лунный матовый опал: мягкий дзен-покой без укоров.' },
+        25: { pillClass: 'optics-sprout-mint', textClass: '', descExtra: '· Подповерхностный хлорофилл: нежный свет изнутри стебля.' },
+        50: { pillClass: 'optics-bud-warm', textClass: '', descExtra: '· Двухслойный бутон: теплое ядро + коралловая аура.' },
+        75: { pillClass: 'optics-breathe-rose', textClass: '', descExtra: '· Дышащий бархат: глубокая модуляция объема без рывков.' },
+        100: { pillClass: 'optics-gold-triumph', textClass: 'gold-metallic-text', descExtra: '· Жидкое сусальное золото: скользящий каустический блик и золотые искры.' }
+      },
+      kinetic: {
+        0: { pillClass: '', textClass: '', descExtra: '· Минималистичный чистый контур (Linear style).' },
+        25: { pillClass: 'awake-sprout', textClass: '', descExtra: '· Точечный импульс света по периметру.' },
+        50: { pillClass: '', textClass: '', descExtra: '· Сфокусированный теплый луч.' },
+        75: { pillClass: 'pulse-rose', textClass: '', descExtra: '· Скоростной кинетический поток по контуру.' },
+        100: { pillClass: 'shimmer-gold', textClass: '', descExtra: '· Высокоскоростной золотой шиммер.' }
+      },
+      organic: {
+        0: { pillClass: 'optics-seed-opal', textClass: '', descExtra: '· Ночная роса в тумане.' },
+        25: { pillClass: 'optics-sprout-mint', textClass: '', descExtra: '· Биолюминесценция светлячка.' },
+        50: { pillClass: 'optics-bud-warm', textClass: '', descExtra: '· Закатный рассвет сквозь листву.' },
+        75: { pillClass: 'optics-breathe-rose', textClass: '', descExtra: '· Теплое органическое сердце цветка.' },
+        100: { pillClass: 'optics-gold-triumph', textClass: 'gold-metallic-text', descExtra: '· Золотая пыльца утреннего солнца.' }
+      }
+    };
+
+    
+
+    // Новые концепции драматургии: Чёрный/Красный ужас ➔ Золотой экстаз
+    const DRAMA_CONCEPTS = {
+      thermo: {
+        name: '🌸 Огненный Сад (Растения + Термодинамика Света: Остывший ➔ Белое Золото)',
+        stages: {
+          0: {
+            label: '🥀 0% Опавший',
+            short: '🥀 Опавший',
+            color: '#94a3b8',
+            bg: '#08090c',
+            border: '#334155',
+            glow: 'none',
+            pillClass: 'optics-cold-iron',
+            textClass: '',
+            desc: 'Почти чёрный остывший металл: лепестки осыпались в холодный чугун. Тревожный глухой пульс стагнации — пора разжечь пламя знаний!'
+          },
+          25: {
+            label: '🌱 25% Росток',
+            short: '🌱 25% Росток',
+            color: '#fda4af',
+            bg: '#180306',
+            border: '#f43f5e',
+            glow: '0 0 14px rgba(244, 63, 94, 0.4)',
+            pillClass: 'optics-cherry-heat',
+            textClass: '',
+            desc: 'Тёмно-вишнёвый жар: первый зелёный росток жизни пробивает остывшую корку!'
+          },
+          50: {
+            label: '🌹 50% Бутон',
+            short: '🌹 50% Бутон',
+            color: '#fed7aa',
+            bg: '#240d03',
+            border: '#f97316',
+            glow: '0 0 18px rgba(249, 115, 22, 0.55)',
+            pillClass: 'optics-ruby-bud',
+            textClass: '',
+            desc: 'Янтарный огонь: алый бутон налит рабочей температурой практики и ковки бэкенда.'
+          },
+          75: {
+            label: '🌺 75% Роза',
+            short: '🌺 75% Роза',
+            color: '#ffffff',
+            bg: '#3a1a04',
+            border: '#fbbf24',
+            glow: '0 0 28px rgba(254, 240, 138, 0.75)',
+            pillClass: 'optics-golden-rose',
+            textClass: '',
+            desc: 'Золотой накал: роза распахнула лепестки в ослепительном сиянии высокой температуры!'
+          },
+          100: {
+            label: '✨ 100% Триумф',
+            short: '✨ 100% Триумф',
+            color: '#ffffff',
+            bg: '#d97706',
+            border: '#ffffff',
+            glow: '0 0 60px rgba(254, 240, 138, 0.95)',
+            pillClass: 'optics-dazzling-triumph',
+            textClass: 'dazzling-gold-text',
+            desc: 'Бело-золотой сверхнакал! Ослепительное платиновое ядро с переливами расплавленного 24-каратного золота и россыпью искр!'
+          }
+        }
+      },
+      alchemy: {
+        name: '🔥 Алхимия Металлов (Черный Ужас ➔ Золотой Экстаз)',
+        stages: {
+          0: {
+            label: '💀 0% Нигредо (Бездна)',
+            short: '💀 0% Бездна',
+            color: '#ef4444',
+            bg: '#0a0102',
+            border: '#ef4444',
+            glow: '0 0 20px rgba(220, 38, 38, 0.7)',
+            pillClass: 'optics-dark-abyss',
+            textClass: '',
+            desc: 'Чёрный обсидиан и тревожный кровавый пульс! Нагнетает и пугает: знания гибнут в абсолютной тьме без практики!'
+          },
+          25: {
+            label: '🌋 25% Прорыв Лавы',
+            short: '🌋 25% Лава',
+            color: '#fb923c',
+            bg: '#1f0808',
+            border: '#f97316',
+            glow: '0 0 16px rgba(249, 115, 22, 0.5)',
+            pillClass: 'optics-lava-break',
+            textClass: '',
+            desc: 'Раскалённая трещина пробивает чёрную корку: первый акт воли, огонь начинает плавить камень.'
+          },
+          50: {
+            label: '🔥 50% Жидкая Бронза',
+            short: '🔥 50% Бронза',
+            color: '#f59e0b',
+            bg: '#2a1104',
+            border: '#d97706',
+            glow: '0 0 16px rgba(217, 119, 6, 0.45)',
+            pillClass: 'optics-forge-bronze',
+            textClass: '',
+            desc: 'Горн ревёт: металл кипит густым огнём практики, тьма отступила, рождается сплав мастерства.'
+          },
+          75: {
+            label: '⚡ 75% Белое Каление',
+            short: '⚡ 75% Платина',
+            color: '#fef08a',
+            bg: '#451a03',
+            border: '#fef08a',
+            glow: '0 0 25px rgba(254, 240, 138, 0.7)',
+            pillClass: 'optics-platinum-dawn',
+            textClass: '',
+            desc: 'Платиновое ослепительное свечение перед взрывом: шлак выгорел, металл очищен добела!'
+          },
+          100: {
+            label: '👑 100% Золотой Экстаз',
+            short: '👑 100% Экстаз',
+            color: '#ffffff',
+            bg: '#d97706',
+            border: '#ffffff',
+            glow: '0 0 45px rgba(245, 158, 11, 0.85)',
+            pillClass: 'optics-gold-ecstasy',
+            textClass: 'gold-ecstasy-text',
+            desc: 'Вспышка 24-каратного золота: струящийся шелк света, каскад золотых искр, чистый визуальный экстаз!'
+          }
+        }
+      },
+      gothic_rose: {
+        name: '🥀 Кровавая Роза Бездны (Dark Fantasy)',
+        stages: {
+          0: {
+            label: '🥀 0% Мёртвый Шип',
+            short: '🥀 0% Шип',
+            color: '#f87171',
+            bg: '#050102',
+            border: '#ef4444',
+            glow: '0 0 18px rgba(239, 68, 68, 0.65)',
+            pillClass: 'optics-dark-abyss',
+            textClass: '',
+            desc: 'Чёрный обугленный терновник с кровавой тревогой: цветок знаний погиб от бездействия!'
+          },
+          25: {
+            label: '🩸 25% Капля Крови',
+            short: '🩸 25% Кровь',
+            color: '#fca5a5',
+            bg: '#250508',
+            border: '#e11d48',
+            glow: '0 0 14px rgba(225, 29, 72, 0.5)',
+            pillClass: 'optics-lava-break',
+            textClass: '',
+            desc: 'Сквозь чёрный шип пробивается густой рубиновый сок: преодоление боли первой задачи.'
+          },
+          50: {
+            label: '🍷 50% Рубиновый Бутон',
+            short: '🍷 50% Рубин',
+            color: '#f43f5e',
+            bg: '#3f0713',
+            border: '#f43f5e',
+            glow: '0 0 18px rgba(244, 63, 94, 0.5)',
+            pillClass: 'optics-breathe-rose',
+            textClass: '',
+            desc: 'Плотный бархатный рубин налит силой: жизнь торжествует над увяданием.'
+          },
+          75: {
+            label: '🌅 75% Огненный Цветок',
+            short: '🌅 75% Огонь',
+            color: '#fbbf24',
+            bg: '#701a08',
+            border: '#fbbf24',
+            glow: '0 0 24px rgba(251, 191, 36, 0.6)',
+            pillClass: 'optics-platinum-dawn',
+            textClass: '',
+            desc: 'Лепестки начинают гореть золотым пламенем рассвета!'
+          },
+          100: {
+            label: '✨ 100% Золотая Роза',
+            short: '✨ 100% Золото',
+            color: '#ffffff',
+            bg: '#d97706',
+            border: '#ffffff',
+            glow: '0 0 45px rgba(245, 158, 11, 0.85)',
+            pillClass: 'optics-gold-ecstasy',
+            textClass: 'gold-ecstasy-text',
+            desc: 'Мифическая золотая роза расцвела: фонтан искр и абсолютное торжество мастерства!'
+          }
+        }
+      },
+      supernova: {
+        name: '🌌 Космический Коллапс ➔ Сверхновая',
+        stages: {
+          0: {
+            label: '🕳️ 0% Черная Дыра',
+            short: '🕳️ 0% Дыра',
+            color: '#ef4444',
+            bg: '#020205',
+            border: '#ef4444',
+            glow: '0 0 22px rgba(220, 38, 38, 0.75)',
+            pillClass: 'optics-dark-abyss',
+            textClass: '',
+            desc: 'Сингулярность поглощает свет: тревожный красный горизонт событий, звезда угасает!'
+          },
+          25: {
+            label: '⚡ 25% Грави-Всплеск',
+            short: '⚡ 25% Всплеск',
+            color: '#c084fc',
+            bg: '#1e052e',
+            border: '#a855f7',
+            glow: '0 0 16px rgba(168, 85, 247, 0.5)',
+            pillClass: 'optics-lava-break',
+            textClass: '',
+            desc: 'Первый термоядерный импульс разрывает сингулярность.'
+          },
+          50: {
+            label: '💠 50% Термояд',
+            short: '💠 50% Плазма',
+            color: '#38bdf8',
+            bg: '#0c2240',
+            border: '#0284c7',
+            glow: '0 0 20px rgba(2, 132, 199, 0.6)',
+            pillClass: 'optics-sprout-mint',
+            textClass: '',
+            desc: 'Ядерное горение плазмы в сердце звезды: стабильная цепная реакция.'
+          },
+          75: {
+            label: '☀️ 75% Коронарный Выброс',
+            short: '☀️ 75% Выброс',
+            color: '#fef08a',
+            bg: '#451a03',
+            border: '#fef08a',
+            glow: '0 0 28px rgba(254, 240, 138, 0.7)',
+            pillClass: 'optics-platinum-dawn',
+            textClass: '',
+            desc: 'Вспышка пробивает корону, сжатие перед великим взрывом!'
+          },
+          100: {
+            label: '🌟 100% Золотая Сверхновая',
+            short: '🌟 100% Взрыв',
+            color: '#ffffff',
+            bg: '#d97706',
+            border: '#ffffff',
+            glow: '0 0 50px rgba(245, 158, 11, 0.9)',
+            pillClass: 'optics-gold-ecstasy',
+            textClass: 'gold-ecstasy-text',
+            desc: 'Золотой гамма-всплеск: ослепительный экстаз рождения сверхновой!'
+          }
+        }
+      }
+    };
+
+    
+    let currentGlowPalette = 'thermo';
+
+    function switchGlowPalette(pal){
+      currentGlowPalette = pal;
+      document.getElementById('btn-pal-thermo').classList.toggle('active', pal === 'thermo');
+      document.getElementById('btn-pal-photosynth').classList.toggle('active', pal === 'photosynth');
+      
+      const slider = document.getElementById('progress-slider-input');
+      const val = slider ? slider.value : 100;
+      updateRoseCycle(val);
+    }
+
+    function adjustGlowBlur(val){
+      document.getElementById('label-glow-blur').textContent = val + 'px';
+      document.documentElement.style.setProperty('--glow-blur', val + 'px');
+    }
+
+    function adjustFresnel(val){
+      document.getElementById('label-fresnel').textContent = val;
+      document.documentElement.style.setProperty('--glow-fresnel', `rgba(255, 255, 255, ${val})`);
+    }
+
+    let activeDramaKey = 'thermo';
+
+    function switchDramaConcept(key){
+      activeDramaKey = key;
+      document.querySelectorAll('.concept-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById('btn-d-' + key) || document.getElementById('btn-c-' + key);
+      if(activeBtn) activeBtn.classList.add('active');
+
+      const slider = document.getElementById('progress-slider-input');
+      const val = slider ? slider.value : 100;
+      updateRoseCycle(val);
+    }
+
+
+    function switchConcept(key){
+      activeConceptKey = key;
+      document.querySelectorAll('.concept-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById('btn-c-' + key);
+      if(activeBtn) activeBtn.classList.add('active');
+
+      const slider = document.getElementById('progress-slider-input');
+      const val = slider ? slider.value : 100;
+      updateRoseCycle(val);
+    }
+
+    function updateRoseCycle(val){
+      const v = Number(val);
+      const concept = (typeof DRAMA_CONCEPTS !== 'undefined' && DRAMA_CONCEPTS[activeDramaKey]) ? DRAMA_CONCEPTS[activeDramaKey] : CONCEPTS[activeConceptKey];
+      const cur = concept.stages[v];
+
+      const chip = document.getElementById('stage-chip');
+      chip.textContent = `${v}% · ${cur.label}`;
+      chip.style.color = cur.color;
+      chip.style.background = cur.bg;
+      chip.style.borderColor = cur.border;
+      chip.style.boxShadow = cur.glow;
+      chip.className = 'gold-status-pill ' + (cur.animClass || '');
+
+      const dynPill = document.getElementById('dyn-rose-pill');
+      const optData = (typeof OPTICS_ENGINE !== 'undefined' && OPTICS_ENGINE[currentOpticsMode]) ? OPTICS_ENGINE[currentOpticsMode][v] : {};
+      let finalPillClass = cur.pillClass || optData.pillClass || cur.animClass || '';
+      let finalTextClass = cur.textClass || optData.textClass || '';
+
+      if(currentGlowPalette === 'photosynth'){
+        if(v === 100){
+          finalPillClass = 'glow-palette-photosynthesis-100';
+          finalTextClass = 'dazzling-gold-text';
+        } else if(v === 75){
+          finalPillClass = 'glow-palette-photosynthesis-75';
+        } else if(v === 50){
+          finalPillClass = 'glow-palette-photosynthesis-50';
+        } else if(v === 25){
+          finalPillClass = 'glow-palette-photosynthesis-25';
+        } else {
+          finalPillClass = 'glow-palette-photosynthesis-0';
+        }
+      }
+
+      
+      dynPill.textContent = cur.short;
+      dynPill.className = 'cooldown-pill ' + finalPillClass;
+      if(finalTextClass) {
+        dynPill.innerHTML = `<span class="${finalTextClass}">${cur.short}</span>`;
+      }
+      if(finalPillClass){
+        dynPill.style.color = '';
+        dynPill.style.background = '';
+        dynPill.style.borderColor = '';
+        dynPill.style.boxShadow = '';
+      } else {
+        dynPill.style.color = cur.color;
+        dynPill.style.background = cur.bg;
+        dynPill.style.borderColor = cur.border;
+        dynPill.style.boxShadow = cur.glow;
+      }
+
+      document.getElementById('dyn-title').textContent = cur.label;
+      document.getElementById('dyn-title').style.color = cur.color;
+      document.getElementById('dyn-desc').textContent = cur.desc;
+
+      renderMasterGrid(v);
+
+      // Обновление макро-пилла
+      const macroPill = document.getElementById('macro-pill-el');
+      const macroText = document.getElementById('macro-pill-text');
+      if(macroPill && macroText){
+        macroPill.className = 'macro-pill ' + finalPillClass;
+        macroText.className = finalTextClass;
+        macroText.textContent = cur.label;
+        if(!finalTextClass){
+          macroText.style.color = cur.color;
+        } else {
+          macroText.style.color = '';
+        }
+        if(!finalPillClass){
+          macroPill.style.color = cur.color;
+          macroPill.style.background = cur.bg;
+          macroPill.style.borderColor = cur.border;
+          macroPill.style.boxShadow = cur.glow;
+        } else {
+          macroPill.style.color = '';
+          macroPill.style.background = '';
+          macroPill.style.borderColor = '';
+          macroPill.style.boxShadow = '';
+        }
+      }
+
+    }
+
+    function renderMasterGrid(activeVal){
+      const grid = document.getElementById('master-grid-el');
+      const stages = (typeof DRAMA_CONCEPTS !== 'undefined' && DRAMA_CONCEPTS[activeDramaKey]) ? DRAMA_CONCEPTS[activeDramaKey].stages : CONCEPTS[activeConceptKey].stages;
+      grid.innerHTML = [0, 25, 50, 75, 100].map(pct => {
+        const item = stages[pct];
+        const isActive = (pct === Number(activeVal));
+        return `
+          <div class="master-box ${isActive ? 'active-box ' + (item.animClass || '') : ''}" 
+               onclick="document.getElementById('progress-slider-input').value = ${pct}; updateRoseCycle(${pct});"
+               style="cursor:pointer; ${isActive ? 'border-color:' + item.border + ';background:' + item.bg + ';box-shadow:' + item.glow + ';' : ''}">
+            <div style="font-family:var(--font-m);font-size:0.68rem;font-weight:800;color:${item.color}">${pct}% ${isActive ? '● ВЫБРАНО' : ''}</div>
+            <div style="font-size:0.86rem;font-weight:800;color:${item.color}">${item.label}</div>
+            <div style="font-size:0.7rem;color:var(--ink-soft);line-height:1.35;">${item.desc}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Default: 100% to showcase golden sparkles
+    updateRoseCycle(100);
+
+  </script>
+</body>
+</html>
