@@ -418,8 +418,8 @@
     min-width: 30px !important;
     min-height: 30px !important;
     border-radius: 50% !important;
-    border: none !important;
-    background: transparent !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background: rgba(255, 255, 255, 0.035) !important;
     color: var(--ink-muted) !important;
     display: flex !important;
     align-items: center !important;
@@ -428,15 +428,24 @@
     flex-shrink: 0 !important;
     cursor: pointer !important;
     box-shadow: none !important;
-    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease !important;
+    box-sizing: border-box !important;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease !important;
   }
   .sidebar-hud-deck .icon-btn-compact:hover {
     background: rgba(255, 255, 255, 0.09) !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
     color: var(--ink) !important;
     transform: scale(1.06) !important;
   }
+  [data-theme="light"] .sidebar-hud-deck .icon-btn-compact {
+    background: rgba(0, 0, 0, 0.025) !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    color: var(--ink-muted) !important;
+  }
   [data-theme="light"] .sidebar-hud-deck .icon-btn-compact:hover {
     background: rgba(0, 0, 0, 0.06) !important;
+    border-color: rgba(0, 0, 0, 0.14) !important;
+    color: var(--ink) !important;
   }
   .sidebar-hud-deck .icon-btn-compact .icon {
     width: 16px !important;
@@ -474,20 +483,21 @@
   .glass-hud-tooltip {
     position: absolute;
     bottom: calc(100% + 10px);
-    right: 0;
+    left: 0;
+    right: auto;
     width: max-content;
-    max-width: 230px;
-    min-width: 180px;
+    max-width: 220px;
+    min-width: 170px;
     box-sizing: border-box;
-    padding: 10px 12px;
-    background: rgba(15, 23, 42, 0.94);
+    padding: 8px 12px;
+    background: rgba(13, 17, 23, 0.96);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 12px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 14px rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 10px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.35);
     color: #f1f5f9;
-    font-size: 0.76rem;
+    font-size: 0.74rem;
     line-height: 1.35;
     white-space: normal;
     word-break: normal;
@@ -503,34 +513,33 @@
     transform: translateY(0);
   }
   [data-theme="light"] .glass-hud-tooltip {
-    background: rgba(255, 255, 255, 0.96);
-    border-color: rgba(0, 0, 0, 0.12);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12), 0 0 10px rgba(0, 0, 0, 0.05);
+    background: rgba(255, 255, 255, 0.98);
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.10);
     color: #0f172a;
   }
   .glass-hud-tooltip .tooltip-tag {
     font-family: var(--font-m);
-    font-size: 0.68rem;
+    font-size: 0.70rem;
     font-weight: 700;
     display: flex;
     align-items: center;
     gap: 5px;
-    margin-bottom: 3px;
+    margin-bottom: 2px;
   }
   .glass-hud-tooltip .tooltip-body {
-    font-size: 0.74rem;
-    opacity: 0.9;
+    font-size: 0.72rem;
+    opacity: 0.85;
     color: inherit;
   }
   [data-theme="light"] .cooldown-pill {
-    background: rgba(2, 132, 199, 0.1);
-    border-color: rgba(2, 132, 199, 0.25);
-    color: #0284c7;
+    background: rgba(0, 0, 0, 0.025);
+    border-color: rgba(0, 0, 0, 0.05);
+    color: var(--ink);
   }
   .cooldown-pill:hover {
-    background: rgba(56, 189, 248, 0.22);
-    border-color: rgba(56, 189, 248, 0.5);
-    transform: none;
+    filter: brightness(1.15);
+    transform: translateY(-0.5px);
   }
   .cooldown-pulse {
     width: 5px;
@@ -18974,7 +18983,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 5px;
+    padding: 0 4px !important;
     box-sizing: border-box;
   }
 
@@ -18982,8 +18991,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 14px;
-    height: 14px;
+    width: 20px !important;
+    height: 20px !important;
     z-index: 3 !important;
     color: var(--ink-muted);
     transition: color .25s ease, opacity .25s ease;
@@ -18993,6 +19002,8 @@
   .theme-pill-icon svg {
     width: 13px !important;
     height: 13px !important;
+    display: block !important;
+    margin: auto !important;
   }
 
   .theme-pill-sun {
@@ -19008,7 +19019,7 @@
 
   .theme-pill-moon svg {
     display: block !important;
-    transform: translate(0.5px, 0.5px) !important;
+    transform: none !important;
   }
 
   :root[data-theme="light"] .theme-pill-sun {
@@ -19037,7 +19048,7 @@
     backdrop-filter: blur(8px) !important;
     -webkit-backdrop-filter: blur(8px) !important;
     transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease !important;
-    transform: translateX(30px) !important; /* темная тема: строго по центру месяца */
+    transform: translateX(24px) !important; /* темная тема: строго по центру месяца (24px сдвиг при ширине 58px) */
     z-index: 1 !important;
     pointer-events: none;
   }
