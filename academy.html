@@ -22,7 +22,7 @@
 <style>
 
   :root{
-    --tabbar-h:68px;
+    --tabbar-h: 0px;
     --paper:#faf8f5; --surface:rgba(255,255,255,0.88); --surface-2:rgba(15,23,42,0.045);
     --ink:#0f172a; --ink-soft:#334155; --ink-muted:#475569;
     --line:rgba(0,0,0,0.07); --line-soft:rgba(0,0,0,0.045); --hairline-light:rgba(0,0,0,0.07);
@@ -85,11 +85,8 @@
   body{
     margin:0;
     background-color:var(--paper);
-    background-image: 
-      radial-gradient(circle at 20% 18%, rgba(5, 150, 105, 0.15) 0%, transparent 45%),
-      radial-gradient(circle at 82% 82%, rgba(136, 19, 55, 0.16) 0%, transparent 45%),
-      radial-gradient(rgba(255, 255, 255, 0.055) 1.2px, transparent 1.2px);
-    background-size: 100% 100%, 100% 100%, 24px 24px;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.055) 1.2px, transparent 1.2px);
+    background-size: 24px 24px;
     background-attachment: fixed;
     color:var(--ink);
     font-family:var(--font-b);
@@ -98,11 +95,8 @@
   }
   [data-theme="light"] body{
     background-color:var(--paper);
-    background-image: 
-      radial-gradient(circle at 20% 18%, rgba(5, 150, 105, 0.08) 0%, transparent 45%),
-      radial-gradient(circle at 82% 82%, rgba(136, 19, 55, 0.06) 0%, transparent 45%),
-      radial-gradient(rgba(0, 0, 0, 0.045) 1.2px, transparent 1.2px);
-    background-size: 100% 100%, 100% 100%, 24px 24px;
+    background-image: radial-gradient(rgba(0, 0, 0, 0.045) 1.2px, transparent 1.2px);
+    background-size: 24px 24px;
     background-attachment: fixed;
   }
 
@@ -17688,7 +17682,7 @@
 
     :root {
 
-      --tabbar-h: 68px;
+      --tabbar-h: 0px;
 
     }
 
@@ -17828,7 +17822,7 @@
 
   @media (max-width: 880px) {
     :root {
-      --tabbar-h: 64px;
+      --tabbar-h: 0px;
     }
 
     .tabbar {
@@ -23379,7 +23373,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
   body:not(.is-sprint-focus) .srs-action-dock {
 
-    bottom: calc(var(--tabbar-h, 68px) + 16px + env(safe-area-inset-bottom, 0px)) !important;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
 
     border-radius: 20px !important;
 
@@ -30404,6 +30398,27 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   box-shadow: 0 0 10px rgba(0, 162, 185, 0.2);
 }
 
+
+  /* ==========================================================================
+     Master Liquidation: Мобильный таббар полностью упразднён.
+     Вся навигация переведена исключительно в боковой сайдбар Drawer.
+     ========================================================================== */
+  .tabbar,
+  #tabbar,
+  nav.tabbar,
+  .tabbar__item {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    opacity: 0 !important;
+    overflow: hidden !important;
+  }
 </style>
 
 <link rel="manifest" href="manifest.json">
@@ -47184,7 +47199,7 @@ function viewCardsHub(){
 
                 <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
 
-                  ${cleanDeckName ? `<span class="srs-card-topic-chip" style="color:#a7f3d0;opacity:0.9;" title="${escapeHtmlStr(cleanDeckName)}">${escapeHtmlStr(cleanDeckName)}</span>` : ''}
+                  <span class="srs-card-otvet-chip" style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.20);border:1px solid rgba(16,185,129,0.50);padding:3px 10px;border-radius:999px;box-shadow:0 0 12px rgba(16,185,129,0.28);white-space:nowrap;flex-shrink:0;">✓ Ответ</span>
 
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
 
@@ -47484,7 +47499,7 @@ function viewCardsHub(){
 
                 <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
 
-                  ${cleanCurDeckTitle ? `<span class="srs-card-topic-chip" style="color:#a7f3d0;opacity:0.9;" title="${escapeHtmlStr(cleanCurDeckTitle)}">${escapeHtmlStr(cleanCurDeckTitle)}</span>` : ''}
+                  <span class="srs-card-otvet-chip" style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.20);border:1px solid rgba(16,185,129,0.50);padding:3px 10px;border-radius:999px;box-shadow:0 0 12px rgba(16,185,129,0.28);white-space:nowrap;flex-shrink:0;">✓ Ответ</span>
 
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
 
