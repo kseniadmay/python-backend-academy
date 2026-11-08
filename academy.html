@@ -24996,19 +24996,44 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
   }
 
-  /* Все пройденные бусины светятся сочным изумрудом независимо от ответа */
+  /* Пройденные бусины: визуализация каждого выбора сессии (SRS Grade Visualization) */
+  .fc-progress-header .dot-jewel.done.rating-easy,
+  .fc-beads-necklace .dot-jewel.done.rating-easy,
+  .srs-beads-necklace .dot-jewel.done.rating-easy,
+  .cards-hub-container .dot-jewel.done.rating-easy {
+    background: #10b981 !important;
+    border: 1.5px solid #34d399 !important;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.75) !important;
+    opacity: 1 !important;
+  }
+
   .fc-progress-header .dot-jewel.done.rating-good,
   .fc-beads-necklace .dot-jewel.done.rating-good,
   .srs-beads-necklace .dot-jewel.done.rating-good,
+  .cards-hub-container .dot-jewel.done.rating-good {
+    background: #f59e0b !important;
+    border: 1.5px solid #fbbf24 !important;
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.75) !important;
+    opacity: 1 !important;
+  }
+
   .fc-progress-header .dot-jewel.done.rating-hard,
   .fc-beads-necklace .dot-jewel.done.rating-hard,
   .srs-beads-necklace .dot-jewel.done.rating-hard,
+  .cards-hub-container .dot-jewel.done.rating-hard {
+    background: #d97706 !important;
+    border: 1.5px solid #f59e0b !important;
+    box-shadow: 0 0 8px rgba(217, 119, 6, 0.75) !important;
+    opacity: 1 !important;
+  }
+
   .fc-progress-header .dot-jewel.done.rating-again,
   .fc-beads-necklace .dot-jewel.done.rating-again,
-  .srs-beads-necklace .dot-jewel.done.rating-again {
-    background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;
-    border: 1.5px solid #a7f3d0 !important;
-    box-shadow: 0 0 10px #10b981, 0 0 20px rgba(52, 211, 153, 0.75), inset 0 1px 2px #ffffff !important;
+  .srs-beads-necklace .dot-jewel.done.rating-again,
+  .cards-hub-container .dot-jewel.done.rating-again {
+    background: #f43f5e !important;
+    border: 1.5px solid #fb7185 !important;
+    box-shadow: 0 0 8px rgba(244, 63, 94, 0.75) !important;
     opacity: 1 !important;
   }
 
@@ -28577,42 +28602,40 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     border: 1.5px solid #34d399 !important;
     box-shadow: 0 0 7px rgba(16, 185, 129, 0.70), 0 0 14px rgba(52, 211, 153, 0.30) !important;
   }
-  /* Каноническое живое дыхание квантового маяка активной бусины SRS (2.0s ease-in-out + волна beacon wave) */
-  @keyframes srs-active-bead-pulse {
-    0%, 100% {
-      transform: scale(1);
-      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.45), 0 0 10px rgba(52, 211, 153, 0.85);
+  /* Историческая каноническая пульсация активной бусины pulse-ring (коммит 7572058 / ada0800) */
+  @keyframes pulse-ring {
+    0% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.80), 0 0 6px rgba(52, 211, 153, 0.90);
     }
-    50% {
-      transform: scale(1.28);
-      box-shadow: 0 0 0 4.5px rgba(16, 185, 129, 0.65), 0 0 20px #34d399, 0 0 34px rgba(16, 185, 129, 0.75);
+    65% {
+      box-shadow: 0 0 0 9px rgba(16, 185, 129, 0), 0 0 12px rgba(52, 211, 153, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0), 0 0 6px rgba(52, 211, 153, 0.90);
+    }
+  }
+
+  @keyframes srs-active-bead-pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.80), 0 0 6px rgba(52, 211, 153, 0.90);
+    }
+    65% {
+      box-shadow: 0 0 0 9px rgba(16, 185, 129, 0), 0 0 12px rgba(52, 211, 153, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0), 0 0 6px rgba(52, 211, 153, 0.90);
     }
   }
 
   @keyframes jewel-soft-breathe {
-    0%, 100% {
-      transform: scale(1);
-      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.45), 0 0 10px rgba(52, 211, 153, 0.85);
-    }
-    50% {
-      transform: scale(1.28);
-      box-shadow: 0 0 0 4.5px rgba(16, 185, 129, 0.65), 0 0 20px #34d399, 0 0 34px rgba(16, 185, 129, 0.75);
-    }
-  }
-
-  @keyframes srs-bead-beacon-wave {
     0% {
-      transform: scale(0.85);
-      opacity: 0.95;
-      box-shadow: 0 0 4px rgba(52, 211, 153, 0.9);
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.80), 0 0 6px rgba(52, 211, 153, 0.90);
     }
-    60% {
-      opacity: 0.45;
+    65% {
+      box-shadow: 0 0 0 9px rgba(16, 185, 129, 0), 0 0 12px rgba(52, 211, 153, 0);
     }
     100% {
-      transform: scale(2.3);
-      opacity: 0;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0);
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0), 0 0 6px rgba(52, 211, 153, 0.90);
     }
   }
 
@@ -28622,8 +28645,8 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   .fc-beads-necklace .dot-jewel.active,
   .cards-hub-container .srs-deck-beads-bar .dot-jewel.active,
   .cards-hub-container .dot-jewel.bead-active-leading {
-    width: 11px !important;
-    height: 11px !important;
+    width: 10px !important;
+    height: 10px !important;
     background: #ffffff !important;
     border: 2px solid #34d399 !important;
     border-radius: 50% !important;
@@ -28633,38 +28656,23 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     z-index: 5 !important;
     margin: 0 4px !important;
     overflow: visible !important;
-    transform-origin: center center !important;
-    animation: srs-active-bead-pulse 2.0s infinite ease-in-out !important;
-    will-change: transform, box-shadow !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+    animation: pulse-ring 2s infinite !important;
   }
 
-  /* Мягкая расходящаяся кольцевая волна маяка активности */
-  .dot-jewel.active::before,
-  .dot-jewel.bead-active-leading::before,
-  .srs-beads-necklace .dot-jewel.active::before,
-  .fc-beads-necklace .dot-jewel.active::before,
-  .cards-hub-container .srs-deck-beads-bar .dot-jewel.active::before,
-  .cards-hub-container .dot-jewel.bead-active-leading::before {
-    content: '' !important;
-    display: block !important;
-    position: absolute !important;
-    inset: -3.5px !important;
-    border-radius: 50% !important;
-    border: 1.5px solid #34d399 !important;
-    pointer-events: none !important;
-    z-index: 1 !important;
-    transform-origin: center center !important;
-    animation: srs-bead-beacon-wave 2.2s infinite cubic-bezier(0.1, 0.2, 0.7, 1) !important;
-    will-change: transform, opacity !important;
-  }
-
-  /* Исключение вторичных псевдоэлементов и защита пассивных бусин */
   .dot-jewel.active::after,
+  .dot-jewel.active::before,
   .dot-jewel.bead-active-leading::after,
+  .dot-jewel.bead-active-leading::before,
   .srs-beads-necklace .dot-jewel.active::after,
+  .srs-beads-necklace .dot-jewel.active::before,
   .fc-beads-necklace .dot-jewel.active::after,
+  .fc-beads-necklace .dot-jewel.active::before,
   .cards-hub-container .srs-deck-beads-bar .dot-jewel.active::after,
+  .cards-hub-container .srs-deck-beads-bar .dot-jewel.active::before,
   .cards-hub-container .dot-jewel.bead-active-leading::after,
+  .cards-hub-container .dot-jewel.bead-active-leading::before,
   .cards-hub-container .dot-jewel:not(.active):not(.bead-active-leading)::after,
   .cards-hub-container .dot-jewel:not(.active):not(.bead-active-leading)::before,
   .srs-deck-beads-bar .dot-jewel:not(.active):not(.bead-active-leading)::after,
@@ -46435,16 +46443,16 @@ function buildSrsDeckContextBarHTML(deckTitle, total, currentIdx, getRatingOrIte
     let cls = 'dot-jewel';
 
     if(i === cur){
-
       cls += ' active bead-active-leading';
-
     } else if(i < cur){
-      // Пройденные карточки — все светятся изумрудно-зеленым независимо от ответа
-      cls += ' done bead-done rating-easy';
+      cls += ' done bead-done';
+      if(r === 4) cls += ' rating-easy';
+      else if(r === 3) cls += ' rating-good';
+      else if(r === 2) cls += ' rating-hard';
+      else if(r === 1) cls += ' rating-again';
+      else cls += ' rating-easy';
     } else {
-
       cls += ' future bead-future';
-
     }
 
 
@@ -46835,7 +46843,7 @@ function viewCardsHub(){
 
       <!-- Уровень 2: Единая строка контекста колоды и прогресса сессии (Deck & Beads Bar, 32px) -->
 
-      ${(typeof buildSrsDeckContextBarHTML === 'function' ? buildSrsDeckContextBarHTML(cleanTitle, 15, Math.min(14, sprintStepNum - 1), (i) => {
+      ${(typeof buildSrsDeckContextBarHTML === 'function' ? buildSrsDeckContextBarHTML(cleanTitle, freeCards.length, freeIdx, (i) => {
 
         const ck = freeDeckId + ':' + i;
 
@@ -47021,7 +47029,7 @@ function viewCardsHub(){
 
       <!-- Уровень 2: Единая строка контекста колоды и прогресса сессии (Deck & Beads Bar) -->
 
-      ${(typeof buildSrsDeckContextBarHTML === 'function' ? buildSrsDeckContextBarHTML(cleanDeckName, 15, Math.min(14, sprintStepNum - 1), cardsHubState.dueQueue || [], 'data-hub-goto-due', echelonOpts, unitOpts, deckOpts) : '')}
+      ${(typeof buildSrsDeckContextBarHTML === 'function' ? buildSrsDeckContextBarHTML(cleanDeckName, qLen, duePos, cardsHubState.dueQueue || [], 'data-hub-goto-due', echelonOpts, unitOpts, deckOpts) : '')}
 
 
 
@@ -47309,7 +47317,7 @@ function viewCardsHub(){
 
       <!-- Уровень 2: Единая строка контекста колоды и прогресса сессии (Deck & Beads Bar) -->
 
-      ${(typeof buildSrsDeckContextBarHTML === 'function' ? buildSrsDeckContextBarHTML(cleanCurDeckTitle, 15, Math.min(14, sprintStepNum - 1), (i) => {
+      ${(typeof buildSrsDeckContextBarHTML === 'function' ? buildSrsDeckContextBarHTML(cleanCurDeckTitle, cards.length, cIdx, (i) => {
 
         const ck = cardsHubState.deckId + ':' + i;
 
