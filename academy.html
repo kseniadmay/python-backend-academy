@@ -28534,6 +28534,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   .dot-jewel::before,
 
   .dot-jewel.active::after,
+  .dot-jewel.active::before,
   .cards-hub-container .dot-jewel:not(.active):not(.bead-active-leading)::after,
   .cards-hub-container .dot-jewel:not(.active):not(.bead-active-leading)::before {
     display: none;
@@ -28577,65 +28578,80 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     box-shadow: 0 0 7px rgba(16, 185, 129, 0.70), 0 0 14px rgba(52, 211, 153, 0.30) !important;
   }
 
-  /* Ведущая активная бусина SRS — Живое глубокое дыхание ядра (1.8s ease-in-out) с квантовым ореолом */
+  /* Историческая каноническая пульсация активной бусины (коммит 7572058) */
+  @keyframes bead-pulse-emerald {
+    0%, 100% {
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35), 0 0 6px rgba(52, 211, 153, 0.65);
+    }
+    50% {
+      box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.45), 0 0 15px rgba(16, 185, 129, 0.95), 0 0 22px rgba(52, 211, 153, 0.5);
+    }
+  }
+
+  @keyframes srs-active-bead-pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35), 0 0 6px rgba(52, 211, 153, 0.65);
+    }
+    50% {
+      box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.45), 0 0 15px rgba(16, 185, 129, 0.95), 0 0 22px rgba(52, 211, 153, 0.5);
+    }
+  }
+
+  @keyframes bead-ping-wave {
+    0% {
+      transform: scale(1);
+      opacity: 0.85;
+    }
+    75%, 100% {
+      transform: scale(2.6);
+      opacity: 0;
+    }
+  }
+
   .dot-jewel.active,
   .dot-jewel.bead-active-leading,
   .srs-beads-necklace .dot-jewel.active,
   .fc-beads-necklace .dot-jewel.active,
   .cards-hub-container .srs-deck-beads-bar .dot-jewel.active,
   .cards-hub-container .dot-jewel.bead-active-leading {
-    display: inline-block !important;
-    vertical-align: middle !important;
-    width: 13px !important;
-    height: 13px !important;
+    width: 9px !important;
+    height: 9px !important;
     background: #ffffff !important;
-    border: 2.5px solid #34d399 !important;
+    border: 1.5px solid #10b981 !important;
+    animation: srs-active-bead-pulse 2s infinite ease-in-out !important;
+    transform: none !important;
     position: relative !important;
     z-index: 5 !important;
-    margin: 0 4px !important;
+    border-radius: 50% !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
     overflow: visible !important;
-    animation: srs-active-bead-pulse 1.8s infinite ease-in-out !important;
-    transform-origin: center center !important;
-    will-change: transform, box-shadow !important;
+    margin: 0 3.5px !important;
   }
 
+  .dot-jewel.active::after,
   .dot-jewel.active::before,
+  .dot-jewel.bead-active-leading::after,
   .dot-jewel.bead-active-leading::before,
+  .srs-beads-necklace .dot-jewel.active::after,
   .srs-beads-necklace .dot-jewel.active::before,
+  .fc-beads-necklace .dot-jewel.active::after,
   .fc-beads-necklace .dot-jewel.active::before,
+  .cards-hub-container .srs-deck-beads-bar .dot-jewel.active::after,
   .cards-hub-container .srs-deck-beads-bar .dot-jewel.active::before,
+  .cards-hub-container .dot-jewel.bead-active-leading::after,
   .cards-hub-container .dot-jewel.bead-active-leading::before {
     content: '' !important;
     display: block !important;
     position: absolute !important;
-    top: -6px !important;
-    left: -6px !important;
-    right: -6px !important;
-    bottom: -6px !important;
+    inset: -2px !important;
     border-radius: 50% !important;
-    border: 1.5px solid rgba(52, 211, 153, 0.65) !important;
+    border: 1.5px solid rgba(52, 211, 153, 0.8) !important;
     pointer-events: none !important;
-    animation: srs-active-bead-halo 1.8s infinite ease-in-out !important;
-    transform-origin: center center !important;
-    will-change: transform, opacity !important;
+    animation: bead-ping-wave 2s cubic-bezier(0.2, 0.8, 0.4, 1) infinite !important;
+    z-index: 1 !important;
   }
 
-  @keyframes srs-active-bead-pulse {
-    0%, 100% {
-      transform: scale(1);
-      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.45), 0 0 10px rgba(52, 211, 153, 0.75);
-    }
-    50% {
-      transform: scale(1.35);
-      box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.7), 0 0 24px #34d399, 0 0 38px rgba(16, 185, 129, 0.8);
-    }
-  }
-
-  @keyframes srs-active-bead-halo {
-    0%, 100% {
-      transform: scale(0.9);
-      opacity: 0.35;
-    }
     50% {
       transform: scale(1.5);
       opacity: 0.95;
@@ -39470,8 +39486,7 @@ function buildFcProgressHeaderHTML(total, currentIdx, getRatingOrItems, clickAtt
 
     const gotoAttr = attrName === 'data-hub-goto-due' ? `data-hub-goto-due="${i}"` : `data-hub-goto-card="${i}"`;
 
-    const inlineBreath = (i === cur) ? ' style="display:inline-block !important;width:13px !important;height:13px !important;animation:srs-active-bead-pulse 1.8s infinite ease-in-out !important;position:relative !important;z-index:5 !important;"' : '';
-    jewels.push(`<span class="${cls}"${inlineBreath} ${gotoAttr} role="button" tabindex="0" title="${titleAttr}"></span>`);
+    jewels.push(`<span class="${cls}" ${gotoAttr} role="button" tabindex="0" title="${titleAttr}"></span>`);
 
   }
 
@@ -44165,8 +44180,7 @@ function viewPythonSkill(sid){
             else if(idx === stepIdx) cls += ' active bead-active-leading';
             else cls += ' future bead-future';
             const stTitle = (st.title || ('Шаг ' + (idx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-            const noteBreath = (idx === stepIdx) ? ' style="display:inline-block !important;width:13px !important;height:13px !important;animation:srs-active-bead-pulse 1.8s infinite ease-in-out !important;position:relative !important;z-index:5 !important;"' : '';
-            return `<span class="${cls}"${noteBreath} data-py-jump-step="${idx}" role="button" tabindex="0" title="${escapeHtmlStr(stTitle)}"></span>`;
+            return `<span class="${cls}" data-py-jump-step="${idx}" role="button" tabindex="0" title="${escapeHtmlStr(stTitle)}"></span>`;
           }).join('')}
         </div>
       </div>
