@@ -162,24 +162,25 @@
     position: relative;
     overflow: hidden;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.30);
-    cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+    cursor: default !important;
+    transition: background 0.25s cubic-bezier(0.16,1,0.3,1), border-color 0.25s cubic-bezier(0.16,1,0.3,1);
     margin-bottom: 12px;
     display: block;
     text-decoration: none;
+    user-select: none;
   }
   [data-theme="light"] .card-laser {
     background: linear-gradient(145deg, rgba(16, 185, 129, 0.06) 0%, rgba(245, 248, 245, 0.90) 100%);
     border-color: rgba(16, 185, 129, 0.22);
   }
   .card-laser:hover {
-    transform: none;
-    border-color: rgba(16, 185, 129, 0.28);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    transform: none !important;
+    border-color: rgba(16, 185, 129, 0.18) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.30) !important;
   }
   [data-theme="light"] .card-laser:hover {
-    transform: none;
-    border-color: rgba(16, 185, 129, 0.30);
+    transform: none !important;
+    border-color: rgba(16, 185, 129, 0.22) !important;
   }
   .card-laser::before {
     content: '';
@@ -214,11 +215,11 @@
     border-radius: 50%;
     background: var(--emerald, #10b981);
     box-shadow: 0 0 6px var(--emerald, #10b981);
-    animation: sbPulseAnim 2s infinite ease-in-out;
+    animation: sbPulseAnim 2.4s infinite ease-in-out;
   }
   @keyframes sbPulseAnim {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.85); }
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
   }
   .eta-chip {
     font-family: var(--font-m);
@@ -255,25 +256,29 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
+    cursor: pointer !important;
+    pointer-events: auto !important;
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
     box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.20), 0 4px 20px -2px rgba(16, 185, 129, 0.35);
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: background 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateZ(0);
+    contain: layout paint;
   }
-  .card-laser .dominant-btn { pointer-events: none !important; }
-  .card-laser:hover .dominant-btn,
+  .card-laser .dominant-btn { pointer-events: auto !important; }
   .dominant-btn:hover {
-    background: linear-gradient(180deg, rgba(16, 185, 129, 0.36) 0%, rgba(6, 78, 59, 0.35) 100%);
-    border-color: rgba(52, 211, 153, 0.95);
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 6px 24px -2px rgba(16, 185, 129, 0.50);
-    transform: translateY(-1.5px);
+    background: linear-gradient(180deg, rgba(16, 185, 129, 0.36) 0%, rgba(6, 78, 59, 0.35) 100%) !important;
+    border-color: rgba(52, 211, 153, 0.95) !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 6px 24px -2px rgba(16, 185, 129, 0.50) !important;
+    transform: none !important;
     color: #ffffff !important;
   }
-  .card-laser:active .dominant-btn,
+  .card-laser:hover .dominant-btn {
+    /* Бейдж не реагирует на движение курсора, ховер только на кнопке */
+  }
   .dominant-btn:active {
-    transform: scale(0.985) translateY(0);
+    transform: scale(0.985) !important;
   }
   .kbd-tag {
     font-family: var(--font-m);
@@ -626,7 +631,7 @@
     50% {
       border-color: rgba(244, 63, 94, 0.85);
       box-shadow: inset 0 1px 2.5px rgba(255,255,255,0.60), 0 0 18px rgba(225, 29, 72, 0.60);
-      transform: translateY(-0.5px);
+      transform: none;
     }
   }
   .cooldown-pill.optics-cherry-heat,
@@ -635,6 +640,8 @@
     border: 1px solid rgba(244, 63, 94, 0.68) !important;
     color: #fecdd3 !important;
     animation: cherryHeatIronDazzle 2.8s infinite ease-in-out !important;
+    transform: translateZ(0);
+    contain: layout paint;
   }
 
   /* 50% 🌹 Ярко-алый горн: Чистый пламенный спелый рубин (~850°C) */
@@ -646,7 +653,7 @@
     50% {
       border-color: #fca5a5;
       box-shadow: inset 0 1px 3px rgba(255,255,255,0.80), 0 0 24px rgba(239, 68, 68, 0.78);
-      transform: translateY(-0.5px);
+      transform: none;
     }
   }
   .cooldown-pill.optics-ruby-bud,
@@ -655,6 +662,8 @@
     border: 1px solid rgba(251, 113, 133, 0.80) !important;
     color: #ffe4e6 !important;
     animation: rubyBudDazzle 2.6s infinite ease-in-out !important;
+    transform: translateZ(0);
+    contain: layout paint;
   }
 
   /* 75% 🌺 Оранжевый накал ковки: Спелая раскалённая янтарная сталь (~1050°C, мост к золоту) */
@@ -666,7 +675,7 @@
     50% {
       border-color: #fed7aa;
       box-shadow: inset 0 1px 3px rgba(255,255,255,0.85), 0 0 26px rgba(249, 115, 22, 0.80);
-      transform: translateY(-0.5px);
+      transform: none;
     }
   }
   .cooldown-pill.optics-golden-rose,
@@ -675,6 +684,8 @@
     border: 1.2px solid rgba(253, 186, 116, 0.90) !important;
     color: #ffedd5 !important;
     animation: goldenRoseDazzle 2.6s infinite ease-in-out !important;
+    transform: translateZ(0);
+    contain: layout paint;
   }
 
   /* 100% ✨ Белое каление металла: Раскаленный канареечно-золотой кристалл (~1350°C) с ослепительным ядром */
@@ -696,7 +707,7 @@
         inset 0 -2px 5px rgba(217, 119, 6, 0.30),
         0 0 26px rgba(255, 255, 255, 0.90),
         0 0 44px rgba(251, 191, 36, 0.70);
-      transform: translateY(-0.5px);
+      transform: none;
     }
   }
 
@@ -2359,19 +2370,9 @@
   .heat-cell.active:hover, .heat-cell.high:hover, .heat-cell.today:hover{transform:translateY(-2px);box-shadow:0 3px 8px rgba(0,0,0,0.2);}
 
   .btn-sprint-cta::after{
-
-    content:'';
-
-    position:absolute;top:-50%;left:-60%;width:35%;height:200%;
-
-    background:linear-gradient(60deg, transparent, rgba(255,255,255,0.22), transparent);
-
-    transform:rotate(25deg);
-
-    animation:btn-shimmer 3.5s infinite ease-in-out;
-
-    pointer-events:none;
-
+    display: none !important;
+    animation: none !important;
+    content: none !important;
   }
 
   @keyframes btn-shimmer{
@@ -17580,29 +17581,10 @@
   }
 
   .btn-dominant-cta::after,
-
   .btn-sprint-cta::after {
-
-    content: '';
-
-    position: absolute;
-
-    top: -50%;
-
-    left: -60%;
-
-    width: 35%;
-
-    height: 200%;
-
-    transform: rotate(25deg);
-
-    pointer-events: none;
-
-    animation: btn-shimmer 3.5s infinite ease-in-out !important;
-
-    background: linear-gradient(60deg, transparent, rgba(255, 255, 255, 0.30), transparent) !important;
-
+    display: none !important;
+    animation: none !important;
+    content: none !important;
   }
 
   .btn-reward-badge {
@@ -22921,17 +22903,11 @@
 
 
 .btn-cta-dominant:hover,
-
 .btn-style-glass:hover {
-
   background: linear-gradient(135deg, rgba(16, 185, 129, 0.48) 0%, rgba(5, 150, 105, 0.32) 100%) !important;
-
   border-color: rgba(52, 211, 153, 0.95) !important;
-
   box-shadow: 0 12px 32px rgba(16, 185, 129, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
-
-  transform: translateY(-1.5px) !important;
-
+  transform: none !important;
 }
 
 
@@ -25564,21 +25540,13 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   }
 
   .btn-cta-dominant:hover,
-
   .btn-glass-emerald:hover,
-
   .btn-style-glass:hover,
-
   #btn-show-answer:hover {
-
-    transform: translateY(-1.5px) !important;
-
+    transform: none !important;
     background: linear-gradient(180deg, rgba(16, 185, 129, 0.36) 0%, rgba(6, 78, 59, 0.35) 100%) !important;
-
     border-color: rgba(52, 211, 153, 0.95) !important;
-
     box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 6px 24px -2px rgba(16, 185, 129, 0.50) !important;
-
   }
 
   .btn-cta-dominant:active,
@@ -56218,7 +56186,16 @@ function getDominantHeroCardData(){
   const cardSrsStats = (typeof getSpacedRepetitionStats === 'function') ? getSpacedRepetitionStats() : { dueTodayCardsCount: 0 };
   const notesDueCount = Number(noteSrsStats.dueCount) || 0;
   const cardsDueCount = Number(cardSrsStats.dueTodayCardsCount) || 0;
-  const srsDue = Number(srsProgData.totalDueRemaining) || (cardsDueCount + notesDueCount);
+  const queueLen = (typeof cardsHubState !== 'undefined' && Array.isArray(cardsHubState.dueQueue)) ? cardsHubState.dueQueue.length : 0;
+  const collectedDueLen = (typeof collectDueCardsQueue === 'function') ? collectDueCardsQueue().length : 0;
+
+  // Single Source of Truth for SRS Debt
+  const srsDue = Math.max(
+    Number(srsProgData.totalDueRemaining) || 0,
+    cardsDueCount + notesDueCount,
+    queueLen,
+    collectedDueLen
+  );
 
   let href = '#/path';
   let title = focusTitle;
@@ -56241,40 +56218,85 @@ function getDominantHeroCardData(){
 function renderDominantHeroCard(isMobile){
   const d = getDominantHeroCardData();
   const clickAttr = isMobile ? 'onclick="closeMobileDrawer();"' : '';
-  const marginStyle = isMobile ? 'margin-bottom:14px;padding:11px 12px;text-decoration:none;display:block;' : '';
+  const marginStyle = isMobile ? 'margin-bottom:14px;padding:11px 12px;display:block;' : '';
   const btnStyle = isMobile ? 'padding:7px 10px;font-size:0.78rem;' : '';
   const titleStyle = isMobile ? 'font-size:0.84rem;margin-bottom:8px;' : '';
 
   return `
-    <a href="${d.href}" ${clickAttr} class="card-laser" style="${marginStyle}" title="${d.tip}">
+    <div class="card-laser" style="${marginStyle}cursor:default;user-select:none;" title="${d.tip}">
       <div class="top-meta-row" style="${isMobile ? 'margin-bottom:5px;' : ''}">
         <span class="step-pill"><span class="pulse-dot"></span></span>
         <span class="eta-chip">${d.eta}</span>
       </div>
       <div class="card-mission-title" style="${titleStyle}">${escapeHtmlStr(d.title)}</div>
-      <div class="dominant-btn" role="presentation" style="${btnStyle}">
+      <a href="${d.href}" ${clickAttr} class="dominant-btn" style="${btnStyle}text-decoration:none;display:flex;" title="${d.tip}">
         <span>${d.btnText}</span>
-      </div>
-    </a>
+      </a>
+    </div>
   `;
 }
 
-// 2. Single Source of Truth for Thermodynamic Cooldown Progress
+// 2. Single Source of Truth for Thermodynamic Cooldown Progress (Глобальное здоровье памяти)
 function getThermodynamicCooldownData(){
-  const srsProgData = (typeof getSrsDailyProgressData === 'function')
-    ? getSrsDailyProgressData()
-    : { totalDueRemaining: 0, totalDoneToday: 0 };
-  const srsDue = Number(srsProgData.totalDueRemaining) || 0;
-  const srsDone = Number(srsProgData.totalDoneToday) || 0;
-  const srsTarget = srsDone + srsDue;
+  ensureExtendedState();
+  const today = (typeof dateIsoKey === 'function') ? dateIsoKey() : new Date().toISOString().slice(0, 10);
+  const srsMap = state.cardSrs || {};
+  const ratings = state.cardRatings || {};
+  const decks = (typeof ALL_DECKS_COMBINED !== 'undefined') ? ALL_DECKS_COMBINED : {};
 
-  let pct = 0;
-  if(srsDue === 0){
-    pct = 100;
-  } else if(srsTarget > 0){
-    pct = Math.min(99, Math.round((srsDone / srsTarget) * 100));
-  } else {
+  let totalStudied = 0;
+  let overdueCount = 0;
+  const countedKeys = new Set();
+
+  Object.keys(srsMap).forEach(k => {
+    const item = srsMap[k];
+    if(item && typeof item === 'object'){
+      const parts = k.split(':');
+      const did = parts[0];
+      const cIdx = parseInt(parts[1], 10);
+      if(!decks[did] || !decks[did].cards || !decks[did].cards[cIdx]) return;
+      totalStudied++;
+      countedKeys.add(k);
+      if(item.dueDate && item.dueDate <= today){
+        overdueCount++;
+      }
+    }
+  });
+
+  Object.keys(ratings).forEach(k => {
+    if(countedKeys.has(k)) return;
+    const r = Number(ratings[k]);
+    if(r > 0){
+      const parts = k.split(':');
+      const did = parts[0];
+      const cIdx = parseInt(parts[1], 10);
+      if(!decks[did] || !decks[did].cards || !decks[did].cards[cIdx]) return;
+      totalStudied++;
+      countedKeys.add(k);
+      if(r >= 1 && r <= 2){
+        overdueCount++;
+      }
+    }
+  });
+
+  const noteSrsStats = (typeof getNoteSpacedRepetitionStats === 'function') ? getNoteSpacedRepetitionStats() : { dueCount: 0, totalStudiedNotesCount: 0 };
+  const notesDue = Number(noteSrsStats.dueCount) || 0;
+  const notesTotal = Number(noteSrsStats.totalStudiedNotesCount) || notesDue;
+  totalStudied += notesTotal;
+  overdueCount += notesDue;
+
+  let pct = 100;
+  if(totalStudied === 0){
     pct = 0;
+  } else if(overdueCount >= totalStudied){
+    pct = 0;
+  } else {
+    pct = Math.max(0, Math.min(100, Math.round(((totalStudied - overdueCount) / totalStudied) * 100)));
+  }
+
+  // При наличии долга процент не может быть 100%
+  if(overdueCount > 0 && pct === 100){
+    pct = 99;
   }
 
   if(pct >= 100){
@@ -58370,6 +58392,9 @@ render = function(){
   }
 
   markActiveNav(isSprintFocus ? null : navRoute);
+  if(typeof renderNav === 'function'){
+    try { renderNav(); } catch(_e) {}
+  }
 
   // V8: экспресс-песочница навыка растёт по контенту — последняя строка кода не срезается
 
@@ -58645,8 +58670,8 @@ document.addEventListener('click', async function(e){
 
 
 
-    // Клик по зелёному бейджу в сайдбаре (.card-laser)
-  const heroLaser = e.target.closest('.card-laser');
+    // Клик по кнопке внутри бейджа в сайдбаре (.dominant-btn)
+  const heroLaser = e.target.closest('.card-laser .dominant-btn, #sidebar-hero-action-container .dominant-btn');
   if(heroLaser){
     const href = heroLaser.getAttribute('href');
     if(href && href.startsWith('#')){
@@ -66056,7 +66081,7 @@ applyThemeIcon();
 document.addEventListener('keydown', function(e){
   // If Enter pressed outside of inputs/textareas, trigger primary action
   if(e.key === 'Enter' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName) && !document.activeElement.isContentEditable){
-    const heroBtn = document.querySelector('#sidebar-hero-action-container .card-laser');
+    const heroBtn = document.querySelector('#sidebar-hero-action-container .dominant-btn') || document.querySelector('#sidebar-hero-action-container .card-laser');
     if(heroBtn && !document.querySelector('.modal.is-open, .search-modal-backdrop.is-open')){
       heroBtn.click();
     }
