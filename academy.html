@@ -4902,8 +4902,11 @@
 
     line-height:1.35;
 
-    white-space:nowrap;
-
+    white-space:pre-wrap !important;
+    word-break:break-word !important;
+    overflow-wrap:break-word !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
     margin:0 1px;
 
   }
@@ -14186,9 +14189,15 @@
 
   .srs-card-status-badge{
 
-    font-size:0.72rem;
+    font-size:0.74rem;
 
-    padding:2px 8px;
+    height:25px;
+
+    min-height:25px;
+
+    line-height:23px;
+
+    padding:0 10px;
 
     border-radius:999px;
 
@@ -14198,9 +14207,11 @@
 
     align-items:center;
 
-    gap:4px;
+    gap:5px;
 
     white-space:nowrap;
+
+    box-sizing:border-box;
 
   }
 
@@ -28749,7 +28760,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     vertical-align: middle !important;
     position: relative !important;
     z-index: 5 !important;
-    margin: 0 4px !important;
+    margin: 0 !important;
     overflow: visible !important;
     transform: none !important;
     box-sizing: border-box !important;
@@ -30422,21 +30433,27 @@ html:not([data-theme="dark"]) .fc-card--Answer,
      ========================================================================== */
   @media (max-width: 880px) {
     .cards-hub-container {
-      min-height: calc(100vh - 120px) !important;
+      min-height: auto !important;
       display: flex !important;
       flex-direction: column !important;
-      padding-bottom: 24px !important;
+      padding-top: 6px !important;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom, 16px)) !important;
     }
 
     .cards-hub-content {
       display: flex !important;
       flex-direction: column !important;
-      justify-content: center !important;
-      flex: 1 !important;
-      min-height: calc(100vh - 170px) !important;
-      margin: 0 auto !important;
+      justify-content: flex-start !important;
+      flex: 0 1 auto !important;
+      min-height: auto !important;
+      margin: 4px auto 16px !important;
       width: 100% !important;
       max-width: 700px !important;
+    }
+
+    .srs-deck-beads-bar,
+    .srs-deck-context-bar {
+      margin: 8px auto 14px !important;
     }
 
     .srs-action-dock,
@@ -30444,7 +30461,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     body:not(.is-sprint-focus) .srs-action-dock {
       position: relative !important;
       bottom: auto !important;
-      margin-top: 16px !important;
+      margin-top: 14px !important;
       margin-bottom: 0 !important;
       padding: 0 !important;
       width: 100% !important;
@@ -44582,7 +44599,7 @@ function viewPythonSkill(sid){
             <div class="card-face card-back fc-card-back">
               <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
                 <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
-                  <span class="srs-card-otvet-chip" style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.20);border:1px solid rgba(16,185,129,0.50);padding:3px 10px;border-radius:999px;box-shadow:0 0 12px rgba(16,185,129,0.28);white-space:nowrap;flex-shrink:0;">✓ Ответ</span>
+                  <span class="srs-card-otvet-chip" style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.20);border:1px solid rgba(16,185,129,0.50);padding:0 10px;height:25px;min-height:25px;line-height:23px;border-radius:999px;box-shadow:0 0 12px rgba(16,185,129,0.28);white-space:nowrap;flex-shrink:0;box-sizing:border-box;">✓ Ответ</span>
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
@@ -47106,7 +47123,7 @@ function viewCardsHub(){
 
                 <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
 
-                  <span class="srs-card-otvet-chip" style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.20);border:1px solid rgba(16,185,129,0.50);padding:3px 10px;border-radius:999px;box-shadow:0 0 12px rgba(16,185,129,0.28);white-space:nowrap;flex-shrink:0;">✓ Ответ</span>
+                  <span class="srs-card-otvet-chip" style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.20);border:1px solid rgba(16,185,129,0.50);padding:0 10px;height:25px;min-height:25px;line-height:23px;border-radius:999px;box-shadow:0 0 12px rgba(16,185,129,0.28);white-space:nowrap;flex-shrink:0;box-sizing:border-box;">✓ Ответ</span>
 
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curKey) : ''}
 
@@ -47114,7 +47131,7 @@ function viewCardsHub(){
 
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
 
-                  <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><span class="fc-kbd-sep"> </span><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
+                  <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--ink-soft);font-size:0.74rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;height:25px;min-height:25px;line-height:23px;padding:0 12px;border-radius:999px;box-sizing:border-box;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><span class="fc-kbd-sep"> </span><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
 
                 </div>
 
@@ -47250,7 +47267,7 @@ function viewCardsHub(){
 
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
 
-                  <span class="badge-counter srs-card-counter-badge" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#e2e8f0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:8px;white-space:nowrap;">${duePos + 1} / ${qLen}</span>
+                  <span class="badge-counter srs-card-counter-badge" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);color:#cbd5e1;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:0.74rem;font-weight:700;height:25px;min-height:25px;line-height:23px;padding:0 10px;border-radius:999px;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;">${duePos + 1} / ${qLen}</span>
 
                 </div>
 
@@ -47280,7 +47297,7 @@ function viewCardsHub(){
 
                 <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
 
-                  <span class="srs-card-otvet-chip" style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.20);border:1px solid rgba(16,185,129,0.50);padding:3px 10px;border-radius:999px;box-shadow:0 0 12px rgba(16,185,129,0.28);white-space:nowrap;flex-shrink:0;">✓ Ответ</span>
+                  <span class="srs-card-otvet-chip" style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.20);border:1px solid rgba(16,185,129,0.50);padding:0 10px;height:25px;min-height:25px;line-height:23px;border-radius:999px;box-shadow:0 0 12px rgba(16,185,129,0.28);white-space:nowrap;flex-shrink:0;box-sizing:border-box;">✓ Ответ</span>
 
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
 
@@ -47288,7 +47305,7 @@ function viewCardsHub(){
 
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
 
-                  <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><span class="fc-kbd-sep"> </span><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
+                  <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--ink-soft);font-size:0.74rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;height:25px;min-height:25px;line-height:23px;padding:0 12px;border-radius:999px;box-sizing:border-box;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><span class="fc-kbd-sep"> </span><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
 
                 </div>
 
@@ -47580,7 +47597,7 @@ function viewCardsHub(){
 
                 <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
 
-                  <span class="srs-card-otvet-chip" style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.20);border:1px solid rgba(16,185,129,0.50);padding:3px 10px;border-radius:999px;box-shadow:0 0 12px rgba(16,185,129,0.28);white-space:nowrap;flex-shrink:0;">✓ Ответ</span>
+                  <span class="srs-card-otvet-chip" style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.20);border:1px solid rgba(16,185,129,0.50);padding:0 10px;height:25px;min-height:25px;line-height:23px;border-radius:999px;box-shadow:0 0 12px rgba(16,185,129,0.28);white-space:nowrap;flex-shrink:0;box-sizing:border-box;">✓ Ответ</span>
 
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
 
@@ -47588,7 +47605,7 @@ function viewCardsHub(){
 
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
 
-                  <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:8px;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><span class="fc-kbd-sep"> </span><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
+                  <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-action="flip-card" data-hub-prev style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--ink-soft);font-size:0.74rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;height:25px;min-height:25px;line-height:23px;padding:0 12px;border-radius:999px;box-sizing:border-box;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><span class="fc-kbd-sep"> </span><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
 
                 </div>
 
