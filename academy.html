@@ -82,7 +82,29 @@
 
   html{-webkit-text-size-adjust:100%;}
 
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-b);line-height:1.55;-webkit-font-smoothing:antialiased;}
+  body{
+    margin:0;
+    background-color:var(--paper);
+    background-image: 
+      radial-gradient(circle at 20% 18%, rgba(5, 150, 105, 0.15) 0%, transparent 45%),
+      radial-gradient(circle at 82% 82%, rgba(136, 19, 55, 0.16) 0%, transparent 45%),
+      radial-gradient(rgba(255, 255, 255, 0.055) 1.2px, transparent 1.2px);
+    background-size: 100% 100%, 100% 100%, 24px 24px;
+    background-attachment: fixed;
+    color:var(--ink);
+    font-family:var(--font-b);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  [data-theme="light"] body{
+    background-color:var(--paper);
+    background-image: 
+      radial-gradient(circle at 20% 18%, rgba(5, 150, 105, 0.08) 0%, transparent 45%),
+      radial-gradient(circle at 82% 82%, rgba(136, 19, 55, 0.06) 0%, transparent 45%),
+      radial-gradient(rgba(0, 0, 0, 0.045) 1.2px, transparent 1.2px);
+    background-size: 100% 100%, 100% 100%, 24px 24px;
+    background-attachment: fixed;
+  }
 
   h1,h2,h3{font-family:var(--font-d);margin:0;letter-spacing:-.01em;color:var(--ink);}
 
@@ -802,7 +824,7 @@
 
   .container{max-width:840px;margin:0 auto;}
 
-  .tabbar{display:none;}
+  .tabbar{display:none !important;}
 
 
 
@@ -812,9 +834,9 @@
 
     .topbar{display:flex;}
 
-    main{padding:20px 16px 96px;}
+    main{padding:20px 16px 28px;}
 
-    .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:10;}
+    .tabbar{display:none !important;}
 
     .tabbar__item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:var(--ink-muted);font-size:.72rem;font-weight:500;padding:6px 2px;border-radius:10px;}
 
@@ -18010,27 +18032,27 @@
     margin: 14px 0 8px 4px !important;
   }
 
-  .drawer-nav-link {
+    .drawer-nav-link {
     display: flex !important;
     align-items: center !important;
     gap: 10px !important;
-    padding: 10px 12px !important;
-    border-radius: 12px !important;
-    background: var(--surface-2, rgba(255, 255, 255, 0.04)) !important;
-    border: 1px solid var(--line, rgba(255, 255, 255, 0.08)) !important;
-    color: var(--ink, #ffffff) !important;
+    padding: 9px 12px !important;
+    border-radius: 11px !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    color: var(--ink-soft, #cbd5e1) !important;
     text-decoration: none !important;
-    font-size: 0.85rem !important;
+    font-size: 0.88rem !important;
     font-weight: 600 !important;
-    margin-bottom: 6px !important;
-    transition: all 0.18s ease !important;
+    margin-bottom: 2px !important;
+    transition: all 0.15s ease !important;
   }
 
   .drawer-nav-link:hover,
   .drawer-nav-link:active {
-    background: rgba(16, 185, 129, 0.12) !important;
-    border-color: rgba(52, 211, 153, 0.35) !important;
-    color: #10b981 !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: transparent !important;
+    color: var(--ink, #ffffff) !important;
   }
 
   /* ========== ТЗ: Исправление хитбоксов и корректного загорания бусин (.dot-jewel) ========== */
@@ -22775,11 +22797,11 @@
 
     .srs-card-topic-chip {
 
-      max-width: 120px !important;
+      max-width: 175px !important;
 
-      font-size: 0.70rem !important;
+      font-size: 0.72rem !important;
 
-      padding: 2px 6px !important;
+      padding: 2px 7px !important;
 
     }
 
@@ -38610,6 +38632,30 @@ window.pluralize = pluralizeRu;
 // Web Audio API Synthesizer (SoundFx: zero external audio files)
 
 const SoundFx = {
+  playTimerComplete: function(){
+    try {
+      const ctx = this._getCtx();
+      if(!ctx) return;
+      const now = ctx.currentTime;
+      const notes = [
+        { f: 523.25, t: 0.00, d: 0.35 },
+        { f: 659.25, t: 0.12, d: 0.40 },
+        { f: 783.99, t: 0.24, d: 0.75 }
+      ];
+      notes.forEach(n => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(n.f, now + n.t);
+        gain.gain.setValueAtTime(0.26, now + n.t);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + n.t + n.d);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + n.t);
+        osc.stop(now + n.t + n.d);
+      });
+    } catch(e) {}
+  },
   playFinaleFanfare: function(){
     try {
       const ctx = this._getCtx();
@@ -39008,7 +39054,8 @@ function playSound(kind, opt){
 
   if(!state || !state.soundEnabled) return;
 
-  if(kind === 'xp') SoundFx.playXp();
+  if(kind === 'timerComplete' || kind === 'timer') SoundFx.playTimerComplete();
+    else if(kind === 'xp') SoundFx.playXp();
 
   else if(kind === 'mastery' || kind === 'success') SoundFx.playSuccess();
 
@@ -40380,7 +40427,7 @@ function togglePomodoro(mins){
 
         pomoState.running = false;
 
-        playSound('success');
+        playSound('timerComplete');
 
         awardXp(25);
 
@@ -44461,8 +44508,7 @@ function viewPythonSkill(sid){
             <div class="card-face card-back fc-card-back">
               <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
                 <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
-                  <span class="srs-card-topic-chip" style="color:#a7f3d0;opacity:0.9;" title="${escapeHtmlStr(cleanDeckTitle)}">${escapeHtmlStr(cleanDeckTitle)}</span>
-                  <span style="color:#a7f3d0;opacity:0.8;font-size:0.75rem;font-weight:600;">${cardCounterLabel}</span>
+                  <span class="srs-card-otvet-chip" style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.20);border:1px solid rgba(16,185,129,0.50);padding:3px 10px;border-radius:999px;box-shadow:0 0 12px rgba(16,185,129,0.28);white-space:nowrap;flex-shrink:0;">✓ Ответ</span>
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
@@ -46964,7 +47010,7 @@ function viewCardsHub(){
 
                 <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
 
-                  ${cleanTitle ? `<span class="srs-card-topic-chip" style="color:#a7f3d0;opacity:0.9;" title="${escapeHtmlStr(cleanTitle)}">${escapeHtmlStr(cleanTitle)}</span>` : ''}
+                  <span class="srs-card-otvet-chip" style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.20);border:1px solid rgba(16,185,129,0.50);padding:3px 10px;border-radius:999px;box-shadow:0 0 12px rgba(16,185,129,0.28);white-space:nowrap;flex-shrink:0;">✓ Ответ</span>
 
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curKey) : ''}
 
