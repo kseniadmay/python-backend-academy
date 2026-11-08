@@ -357,12 +357,20 @@
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    font-size: 0.88rem !important;
     padding: 0 !important;
     flex: none !important;
     cursor: pointer !important;
     box-shadow: none !important;
     transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease !important;
+  }
+  .sidebar-service-row .icon-btn-compact .icon {
+    width: 17px !important;
+    height: 17px !important;
+    stroke: currentColor !important;
+    stroke-width: 1.9 !important;
+    display: block !important;
+    vertical-align: middle !important;
+    transition: stroke 0.2s ease !important;
   }
   .sidebar-service-row .icon-btn-compact:hover {
     background: rgba(255, 255, 255, 0.09) !important;
@@ -18915,7 +18923,7 @@
     justify-content: center;
     width: 14px;
     height: 14px;
-    z-index: 1;
+    z-index: 3 !important;
     color: var(--ink-muted);
     transition: color .25s ease, opacity .25s ease;
     pointer-events: none;
@@ -18932,8 +18940,9 @@
   }
 
   .theme-pill-moon {
-    opacity: 0.95;
-    color: #34d399;
+    opacity: 1 !important;
+    color: #34d399 !important;
+    filter: drop-shadow(0 0 3px rgba(52, 211, 153, 0.5));
   }
 
   .theme-pill-moon svg {
@@ -18942,13 +18951,15 @@
   }
 
   :root[data-theme="light"] .theme-pill-sun {
-    opacity: 1;
-    color: #f59e0b;
+    opacity: 1 !important;
+    color: #f59e0b !important;
+    filter: drop-shadow(0 0 3px rgba(245, 158, 11, 0.4));
   }
 
   :root[data-theme="light"] .theme-pill-moon {
-    opacity: 0.3;
-    color: var(--ink-muted);
+    opacity: 0.35 !important;
+    color: var(--ink-muted) !important;
+    filter: none !important;
   }
 
   .theme-pill-thumb {
@@ -18959,20 +18970,22 @@
     border-radius: 50% !important;
     margin-top: -12px !important;
     left: 2px !important;
-    background: #ffffff !important;
-    border: 1px solid rgba(255, 255, 255, 0.25) !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35) !important;
+    background: rgba(255, 255, 255, 0.16) !important;
+    border: 1px solid rgba(255, 255, 255, 0.28) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
     transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease !important;
     transform: translateX(30px) !important; /* темная тема: строго по центру месяца */
-    z-index: 2;
+    z-index: 1 !important;
     pointer-events: none;
   }
 
   :root[data-theme="light"] .theme-pill-thumb {
     transform: translateX(0px) !important; /* светлая тема: строго по центру солнца */
-    background: #f59e0b !important;
-    border-color: rgba(245, 158, 11, 0.5) !important;
-    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.35) !important;
+    background: #ffffff !important;
+    border-color: rgba(0, 0, 0, 0.10) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12), inset 0 1px 0 #ffffff !important;
   }
 
 
@@ -30448,7 +30461,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
         </div>
       </div>
       <div class="sidebar-service-row">
-        <button class="icon-btn-compact btn-ghost" id="sidebar-quick-search-btn" type="button" aria-label="Быстрый поиск по темам" title="Быстрый поиск (Ctrl+K)">🔍</button>
+        <button class="icon-btn-compact btn-ghost" id="sidebar-quick-search-btn" type="button" aria-label="Быстрый поиск по темам" title="Быстрый поиск (Ctrl+K)"><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
         <button class="theme-pill-toggle" id="theme-toggle-d" role="switch" aria-checked="true" aria-label="Сменить тему оформления" title="Сменить тему оформления">
           <span class="theme-pill-track">
             <span class="theme-pill-icon theme-pill-sun" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg></span>
@@ -30456,7 +30469,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
             <span class="theme-pill-thumb" aria-hidden="true"></span>
           </span>
         </button>
-        <button class="icon-btn-compact sidebar-settings-btn btn-ghost" data-open-settings-modal="" type="button" title="Настройки" aria-label="Настройки">⚙️</button>
+        <button class="icon-btn-compact sidebar-settings-btn btn-ghost" data-open-settings-modal="" type="button" title="Настройки" aria-label="Настройки"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
       </div>
       <button class="link-quiet" id="reset-btn-d" style="display:none;" aria-hidden="true">Сбросить прогресс</button>
     </div>
@@ -30535,6 +30548,10 @@ const ICONS = {
   sun:'<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg>',
 
   moon:'<svg class="icon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/></svg>',
+
+  search:'<svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+
+  settings:'<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
 
   bullet:'<svg class="icon" viewBox="0 0 24 24" style="width:.5em;height:.5em;"><circle cx="12" cy="12" r="10"/></svg>'
 
@@ -56185,7 +56202,7 @@ function buildUnifiedSidebarFootHTML(isMobile){
       </div>
     </div>
     <div class="sidebar-service-row">
-      <button class="icon-btn-compact btn-ghost" id="${prefix}-quick-search-btn" data-open-quick-search="" type="button" aria-label="Быстрый поиск по темам" title="Быстрый поиск (Ctrl+K)">🔍</button>
+      <button class="icon-btn-compact btn-ghost" id="${prefix}-quick-search-btn" data-open-quick-search="" type="button" aria-label="Быстрый поиск по темам" title="Быстрый поиск (Ctrl+K)">${ICONS.search}</button>
       <button class="theme-pill-toggle" id="${isMobile ? 'drawer-theme-btn' : 'theme-toggle-d'}" ${isMobile ? 'onclick="toggleTheme();"' : ''} role="switch" aria-checked="true" aria-label="Сменить тему оформления" title="Сменить тему оформления">
         <span class="theme-pill-track">
           <span class="theme-pill-icon theme-pill-sun" aria-hidden="true">${ICONS.sun}</span>
@@ -56193,7 +56210,7 @@ function buildUnifiedSidebarFootHTML(isMobile){
           <span class="theme-pill-thumb" aria-hidden="true"></span>
         </span>
       </button>
-      <button class="icon-btn-compact sidebar-settings-btn btn-ghost" id="${prefix}-settings-btn" data-open-settings-modal="" type="button" title="Настройки" aria-label="Настройки">⚙️</button>
+      <button class="icon-btn-compact sidebar-settings-btn btn-ghost" id="${prefix}-settings-btn" data-open-settings-modal="" type="button" title="Настройки" aria-label="Настройки">${ICONS.settings}</button>
     </div>
   `;
 }
