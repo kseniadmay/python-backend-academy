@@ -278,78 +278,145 @@
     color: #0b150f;
   }
 
-  /* Compact Motivation HUD & Footer */
-  .sidebar-hud-capsule {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    align-items: center !important;
-    background: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
-    padding: 0 !important;
-    gap: 8px !important;
-    box-shadow: none !important;
-    margin-bottom: 8px !important;
+  /* Compact Motivation HUD & Harmonic Footer Layout */
+  .sidebar-search-row {
+    width: 100%;
+    margin-bottom: 2px;
   }
-  #sidebar-streak-cell {
-    display: none !important;
-  }
-  .sidebar-hud-cell {
+  .sidebar-search-bar {
+    width: 100%;
+    height: 32px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    color: var(--ink-muted);
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 6px;
-    height: 34px !important;
-    padding: 0 10px !important;
-    border-radius: 10px !important; /* Гармоничный сквиркл 10px */
-    font-family: var(--font-m);
-    font-size: 0.74rem;
-    font-weight: 700;
+    padding: 0 10px;
+    gap: 8px;
+    font-size: 0.78rem;
+    font-family: var(--font-d);
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
-    white-space: nowrap;
-    text-decoration: none;
-    box-sizing: border-box !important;
+    box-sizing: border-box;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
   }
-  .sidebar-hud-cell.sidebar-pomo-pill {
+  .sidebar-search-bar:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.16);
+    color: var(--ink);
+  }
+  .sidebar-search-bar .icon {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    stroke-width: 2;
+    flex-shrink: 0;
+  }
+  .sidebar-search-bar .search-placeholder {
+    flex: 1;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sidebar-search-bar .search-kbd {
+    font-family: var(--font-m);
+    font-size: 0.64rem;
+    font-weight: 700;
+    opacity: 0.55;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 1px 5px;
+    line-height: 1;
+  }
+  [data-theme="light"] .sidebar-search-bar {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.06);
+  }
+  [data-theme="light"] .sidebar-search-bar:hover {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.12);
+  }
+  [data-theme="light"] .sidebar-search-bar .search-kbd {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+
+  .sidebar-hud-capsule,
+  .sidebar-hud-deck {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 6px !important;
+    width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    margin-bottom: 0 !important;
+  }
+  #sidebar-streak-cell,
+  #drawer-streak-cell {
+    display: none !important;
+  }
+  .sidebar-hud-cell,
+  .sidebar-deck-cell {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    height: 30px !important;
+    padding: 0 4px !important;
+    border-radius: 9px !important;
+    font-family: var(--font-m) !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+    transition: all 0.2s cubic-bezier(0.16,1,0.3,1) !important;
+  }
+  .sidebar-hud-cell.sidebar-pomo-pill,
+  .sidebar-deck-cell.sidebar-pomo-pill {
     background: rgba(255, 255, 255, 0.035) !important;
     border: 1px solid rgba(255, 255, 255, 0.06) !important;
     color: var(--ink) !important;
-    border-radius: 10px !important;
   }
-  .sidebar-hud-cell.sidebar-pomo-pill:hover {
+  .sidebar-hud-cell.sidebar-pomo-pill:hover,
+  .sidebar-deck-cell.sidebar-pomo-pill:hover {
     background: rgba(255, 255, 255, 0.08) !important;
     border-color: rgba(255, 255, 255, 0.16) !important;
-    transform: translateY(-1px);
   }
-  [data-theme="light"] .sidebar-hud-cell.sidebar-pomo-pill {
+  [data-theme="light"] .sidebar-hud-cell.sidebar-pomo-pill,
+  [data-theme="light"] .sidebar-deck-cell.sidebar-pomo-pill {
     background: rgba(0, 0, 0, 0.025) !important;
     border-color: rgba(0, 0, 0, 0.05) !important;
   }
-  [data-theme="light"] .sidebar-hud-cell.sidebar-pomo-pill:hover {
-    background: rgba(0, 0, 0, 0.05) !important;
-    border-color: rgba(0, 0, 0, 0.10) !important;
-  }
-  .sidebar-hud-cell.cooldown-pill {
-    border-radius: 10px !important;
+  .sidebar-hud-cell.cooldown-pill,
+  .sidebar-deck-cell.cooldown-pill {
+    border-radius: 9px !important;
     cursor: default !important;
     border: 1px solid rgba(255, 255, 255, 0.06) !important;
   }
-  [data-theme="light"] .sidebar-hud-cell.cooldown-pill {
+  [data-theme="light"] .sidebar-hud-cell.cooldown-pill,
+  [data-theme="light"] .sidebar-deck-cell.cooldown-pill {
     border: 1px solid rgba(0, 0, 0, 0.05) !important;
   }
-  .sidebar-service-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    padding: 2px 2px 0;
+
+  .sidebar-hud-deck .theme-pill-toggle {
+    width: 58px !important;
+    height: 30px !important;
+    min-width: 58px !important;
+    flex-shrink: 0 !important;
   }
-  .sidebar-service-row .icon-btn-compact {
-    width: 32px !important;
-    height: 32px !important;
-    min-width: 32px !important;
-    min-height: 32px !important;
+  .sidebar-hud-deck .icon-btn-compact {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
     border-radius: 50% !important;
     border: none !important;
     background: transparent !important;
@@ -358,31 +425,25 @@
     align-items: center !important;
     justify-content: center !important;
     padding: 0 !important;
-    flex: none !important;
+    flex-shrink: 0 !important;
     cursor: pointer !important;
     box-shadow: none !important;
     transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease !important;
   }
-  .sidebar-service-row .icon-btn-compact .icon {
-    width: 17px !important;
-    height: 17px !important;
-    stroke: currentColor !important;
-    stroke-width: 1.9 !important;
-    display: block !important;
-    vertical-align: middle !important;
-    transition: stroke 0.2s ease !important;
-  }
-  .sidebar-service-row .icon-btn-compact:hover {
+  .sidebar-hud-deck .icon-btn-compact:hover {
     background: rgba(255, 255, 255, 0.09) !important;
     color: var(--ink) !important;
     transform: scale(1.06) !important;
   }
-  [data-theme="light"] .sidebar-service-row .icon-btn-compact {
-    color: var(--ink-muted) !important;
-  }
-  [data-theme="light"] .sidebar-service-row .icon-btn-compact:hover {
+  [data-theme="light"] .sidebar-hud-deck .icon-btn-compact:hover {
     background: rgba(0, 0, 0, 0.06) !important;
-    color: var(--ink) !important;
+  }
+  .sidebar-hud-deck .icon-btn-compact .icon {
+    width: 16px !important;
+    height: 16px !important;
+    stroke: currentColor !important;
+    stroke-width: 1.9 !important;
+    display: block !important;
   }
   .sb-footer-compact {
     padding: 8px 4px 2px;
@@ -30443,25 +30504,29 @@ html:not([data-theme="dark"]) .fc-card--Answer,
       <a href="#/" class="navlink" data-route="/"></a>
     </nav>
 
-    <!-- Ultra-compact Approved HUD Capsule & Clean Service Row -->
+    <!-- Harmonic Search Bar & HUD Deck Footer -->
     <div class="sidebar-foot" id="main-sidebar-foot">
-      <div class="sidebar-hud-capsule" id="sidebar-hud-capsule">
-        <button class="topbar-pomo-pill sidebar-pomo-pill sidebar-hud-cell" id="sidebar-pomo-cell" data-pomo-toggle="" title="Запустить Pomodoro-фокус (15 мин)" aria-label="Запустить Pomodoro-фокус (15 мин)">
-          <span class="pomo-icon" aria-hidden="true">⏱</span> <span id="sidebar-pomo-time">15:00</span> <span class="pomo-tag" style="font-size:0.7rem;margin-left:2px;font-weight:700;">▶</span>
+      <div class="sidebar-search-row">
+        <button class="sidebar-search-bar" id="sidebar-quick-search-btn" data-open-quick-search="" type="button" aria-label="Быстрый поиск по темам" title="Быстрый поиск (Ctrl+K)">
+          <svg class="icon search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span class="search-placeholder">Поиск по темам...</span>
+          <kbd class="search-kbd">Ctrl+K</kbd>
         </button>
-        <button class="sidebar-streak-badge sidebar-hud-cell" id="sidebar-streak-cell" title="Дней ударного режима подряд" aria-label="Дней ударного режима подряд">
+      </div>
+      <div class="sidebar-hud-deck" id="sidebar-hud-capsule">
+        <button class="topbar-pomo-pill sidebar-pomo-pill sidebar-deck-cell" id="sidebar-pomo-cell" data-pomo-toggle="" title="Запустить Pomodoro-фокус (15 мин)" aria-label="Запустить Pomodoro-фокус (15 мин)">
+          <span class="pomo-icon" aria-hidden="true">⏱</span> <span id="sidebar-pomo-time">15:00</span>
+        </button>
+        <button class="sidebar-streak-badge sidebar-deck-cell" id="sidebar-streak-cell" title="Дней ударного режима подряд" aria-label="Дней ударного режима подряд">
           🔥 <span id="streak-num-d">0</span>
         </button>
-        <div class="cooldown-pill sidebar-hud-cell" id="sidebar-cooldown-pill" style="opacity:0;">
+        <div class="cooldown-pill sidebar-deck-cell" id="sidebar-cooldown-pill" style="opacity:0;">
           <span id="sidebar-cooldown-label"></span>
           <div class="glass-hud-tooltip">
             <div class="tooltip-tag"></div>
             <div class="tooltip-body"></div>
           </div>
         </div>
-      </div>
-      <div class="sidebar-service-row">
-        <button class="icon-btn-compact btn-ghost" id="sidebar-quick-search-btn" type="button" aria-label="Быстрый поиск по темам" title="Быстрый поиск (Ctrl+K)"><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
         <button class="theme-pill-toggle" id="theme-toggle-d" role="switch" aria-checked="true" aria-label="Сменить тему оформления" title="Сменить тему оформления">
           <span class="theme-pill-track">
             <span class="theme-pill-icon theme-pill-sun" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg></span>
@@ -56186,23 +56251,27 @@ function buildUnifiedSidebarFootHTML(isMobile){
   const streakDays = (typeof state !== 'undefined' && state && state.streak) ? state.streak : 0;
 
   return `
-    <div class="sidebar-hud-capsule" id="${prefix}-hud-capsule">
-      <button type="button" class="topbar-pomo-pill sidebar-pomo-pill sidebar-hud-cell" id="${prefix}-pomo-cell" data-pomo-toggle="" title="Запустить Pomodoro-фокус (15 мин)" aria-label="Запустить Pomodoro-фокус (15 мин)">
-        <span class="pomo-icon" aria-hidden="true">⏱</span> <span id="${prefix}-pomo-time">${pomoTime}</span> <span class="pomo-tag" style="font-size:0.7rem;margin-left:2px;font-weight:700;">▶</span>
+    <div class="sidebar-search-row">
+      <button class="sidebar-search-bar" id="${prefix}-quick-search-btn" data-open-quick-search="" type="button" aria-label="Быстрый поиск по темам" title="Быстрый поиск (Ctrl+K)">
+        ${ICONS.search}
+        <span class="search-placeholder">${isMobile ? 'Поиск...' : 'Поиск по темам...'}</span>
+        ${!isMobile ? '<kbd class="search-kbd">Ctrl+K</kbd>' : ''}
       </button>
-      <button class="sidebar-streak-badge sidebar-hud-cell" id="${prefix}-streak-cell" style="display:none;" title="Дней ударного режима подряд" aria-label="Дней ударного режима подряд">
+    </div>
+    <div class="sidebar-hud-deck" id="${prefix}-hud-capsule">
+      <button type="button" class="topbar-pomo-pill sidebar-pomo-pill sidebar-deck-cell" id="${prefix}-pomo-cell" data-pomo-toggle="" title="Запустить Pomodoro-фокус (15 мин)" aria-label="Запустить Pomodoro-фокус (15 мин)">
+        <span class="pomo-icon" aria-hidden="true">⏱</span> <span id="${prefix}-pomo-time">${pomoTime}</span>
+      </button>
+      <button class="sidebar-streak-badge sidebar-deck-cell" id="${prefix}-streak-cell" style="display:none;" title="Дней ударного режима подряд" aria-label="Дней ударного режима подряд">
         🔥 <span id="streak-num-${isMobile ? 'm' : 'd'}">${streakDays}</span>
       </button>
-      <div class="cooldown-pill sidebar-hud-cell ${cdData.cssClass}" id="${prefix}-cooldown-pill" style="cursor:default;">
+      <div class="cooldown-pill sidebar-deck-cell ${cdData.cssClass}" id="${prefix}-cooldown-pill" style="cursor:default;">
         <span id="${prefix}-cooldown-label">${cdData.labelHtml}</span>
         <div class="glass-hud-tooltip">
           <div class="tooltip-tag" style="color:${cdData.tagColor};">${cdData.tooltipTag}</div>
           ${cdData.tooltipDesc ? `<div class="tooltip-body">${cdData.tooltipDesc}</div>` : ''}
         </div>
       </div>
-    </div>
-    <div class="sidebar-service-row">
-      <button class="icon-btn-compact btn-ghost" id="${prefix}-quick-search-btn" data-open-quick-search="" type="button" aria-label="Быстрый поиск по темам" title="Быстрый поиск (Ctrl+K)">${ICONS.search}</button>
       <button class="theme-pill-toggle" id="${isMobile ? 'drawer-theme-btn' : 'theme-toggle-d'}" ${isMobile ? 'onclick="toggleTheme();"' : ''} role="switch" aria-checked="true" aria-label="Сменить тему оформления" title="Сменить тему оформления">
         <span class="theme-pill-track">
           <span class="theme-pill-icon theme-pill-sun" aria-hidden="true">${ICONS.sun}</span>
@@ -57126,7 +57195,7 @@ window.closeQuickSearchModal = closeQuickSearchModal;
 
 // Quick search trigger buttons and keyboard shortcut Ctrl+K / Cmd+K
 document.addEventListener('click', function(e){
-  const btn = e.target.closest('#sidebar-quick-search-btn');
+  const btn = e.target.closest('#sidebar-quick-search-btn, #drawer-quick-search-btn, [data-open-quick-search]');
   if(btn){
     e.preventDefault();
     openQuickSearchModal();
