@@ -207,11 +207,6 @@
     border-radius: 50%;
     background: var(--emerald, #10b981);
     box-shadow: 0 0 6px var(--emerald, #10b981);
-    animation: sbPulseAnim 2s infinite ease-in-out;
-  }
-  @keyframes sbPulseAnim {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.85); }
   }
   .eta-chip {
     font-family: var(--font-m);
@@ -252,15 +247,27 @@
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 4px 16px rgba(6, 78, 59, 0.35);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.20), 0 4px 20px -2px rgba(16, 185, 129, 0.35);
+    animation: dominantBtnPulse 2.4s infinite ease-in-out;
     transition: all 0.2s var(--spring-smooth, ease);
+  }
+  @keyframes dominantBtnPulse {
+    0%, 100% {
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.20), 0 4px 20px -2px rgba(16, 185, 129, 0.35);
+      border-color: rgba(52, 211, 153, 0.50);
+    }
+    50% {
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.28), 0 6px 24px 2px rgba(16, 185, 129, 0.55);
+      border-color: rgba(52, 211, 153, 0.85);
+    }
   }
   .dominant-btn:hover {
     background: linear-gradient(155deg, rgba(6, 78, 59, 0.88) 0%, rgba(16, 28, 42, 0.92) 50%, rgba(6, 78, 59, 0.68) 100%);
-    border-color: rgba(52, 211, 153, 0.85);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38), 0 6px 22px rgba(16, 185, 129, 0.45);
-    transform: translateY(-1px);
+    border-color: rgba(52, 211, 153, 0.95);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 6px 24px -2px rgba(16, 185, 129, 0.50);
+    transform: translateY(-1.5px);
     color: #ffffff !important;
+    animation: none;
   }
   .kbd-tag {
     font-family: var(--font-m);
@@ -56095,8 +56102,8 @@ function getThermodynamicCooldownData(){
       pct: 100,
       cssClass: 'optics-dazzling-triumph',
       labelHtml: '<span class="dazzling-gold-text">✨ 100%</span>',
-      tooltipTag: '✨ Белое каление (1350°C)',
-      tooltipDesc: 'Память консолидирована на 100%',
+      tooltipTag: 'Белое каление (1350°C)',
+      tooltipDesc: '',
       tagColor: '#fef08a'
     };
   } else if(pct >= 75){
@@ -56104,8 +56111,8 @@ function getThermodynamicCooldownData(){
       pct,
       cssClass: 'optics-golden-rose',
       labelHtml: `<span style="color:#ffedd5;font-weight:800;">🌺 ${pct}%</span>`,
-      tooltipTag: '🌺 Оранжевый накал (1050°C)',
-      tooltipDesc: `${pct}% материала закреплено`,
+      tooltipTag: 'Оранжевый накал (1050°C)',
+      tooltipDesc: '',
       tagColor: '#fed7aa'
     };
   } else if(pct >= 50){
@@ -56113,8 +56120,8 @@ function getThermodynamicCooldownData(){
       pct,
       cssClass: 'optics-ruby-bud',
       labelHtml: `<span style="color:#fee2e2;font-weight:800;">🌹 ${pct}%</span>`,
-      tooltipTag: '🌹 Ярко-алый горн (850°C)',
-      tooltipDesc: `${pct}% материала закреплено`,
+      tooltipTag: 'Ярко-алый горн (850°C)',
+      tooltipDesc: '',
       tagColor: '#fca5a5'
     };
   } else if(pct >= 25){
@@ -56122,17 +56129,17 @@ function getThermodynamicCooldownData(){
       pct,
       cssClass: 'optics-cherry-heat',
       labelHtml: `<span style="color:#fda4af;font-weight:800;">🌱 ${pct}%</span>`,
-      tooltipTag: '🌱 Тёмно-вишнёвый жар (600°C)',
-      tooltipDesc: `${pct}% материала закреплено`,
+      tooltipTag: 'Тёмно-вишнёвый жар (600°C)',
+      tooltipDesc: '',
       tagColor: '#fda4af'
     };
   } else {
     return {
       pct,
       cssClass: 'optics-cold-iron',
-      labelHtml: `<span style="color:#cbd5e1;font-weight:800;">❄️ ${pct}%</span>`,
-      tooltipTag: '❄️ Остывшая сталь (20°C)',
-      tooltipDesc: `${pct}% материала закреплено`,
+      labelHtml: `<span style="color:#cbd5e1;font-weight:800;">🥀 ${pct}%</span>`,
+      tooltipTag: 'Остывшая сталь (20°C)',
+      tooltipDesc: '',
       tagColor: '#cbd5e1'
     };
   }
@@ -56217,7 +56224,7 @@ function buildUnifiedSidebarFootHTML(isMobile){
         <span id="${prefix}-cooldown-label">${cdData.labelHtml}</span>
         <div class="glass-hud-tooltip">
           <div class="tooltip-tag" style="color:${cdData.tagColor};">${cdData.tooltipTag}</div>
-          <div class="tooltip-body">${cdData.tooltipDesc}</div>
+          ${cdData.tooltipDesc ? `<div class="tooltip-body">${cdData.tooltipDesc}</div>` : ''}
         </div>
       </div>
     </div>
@@ -56272,7 +56279,7 @@ renderNav = function(){
         tipEl.className = 'glass-hud-tooltip';
         cdPill.appendChild(tipEl);
       }
-      tipEl.innerHTML = `<div class="tooltip-tag" style="color:${cdData.tagColor};">${cdData.tooltipTag}</div><div class="tooltip-body">${cdData.tooltipDesc}</div>`;
+      tipEl.innerHTML = `<div class="tooltip-tag" style="color:${cdData.tagColor};">${cdData.tooltipTag}</div>` + (cdData.tooltipDesc ? `<div class="tooltip-body">${cdData.tooltipDesc}</div>` : '');
     }
   }
 
@@ -56480,7 +56487,6 @@ function openMobileDrawer(){
           </div>
         </a>
         <div style="display:flex;align-items:center;gap:8px;">
-          <span class="level-tag-unified" style="font-size:0.66rem;font-weight:800;padding:2px 7px;border-radius:6px;background:var(--emerald-soft, rgba(16,185,129,0.15));color:var(--emerald, #10b981);border:1px solid rgba(16,185,129,0.25);font-family:var(--font-m);">${level}</span>
           <button class="btn btn-ghost" style="padding:4px 8px;font-size:1.1rem;border-radius:8px;min-width:32px;min-height:32px;display:flex;align-items:center;justify-content:center;" onclick="closeMobileDrawer();" aria-label="Закрыть">✕</button>
         </div>
       </div>
