@@ -122,7 +122,11 @@ const requiredSingleEngines = [
   { name: 'Единый прогресс-трекер карточек SRS', fn: 'function buildFcProgressHeaderHTML(' },
   { name: 'Единая оценка карточек интервального повторения', fn: 'function applyRemNoteCardRating(' },
   { name: 'Единый док кнопок оценки SRS', fn: 'function buildSrsRatingDockHTML(' },
-  { name: 'Единый запуск рубежного теста', fn: 'function viewPythonUnitTest(' }
+  { name: 'Единый запуск рубежного теста', fn: 'function viewPythonUnitTest(' },
+  { name: 'Единый генератор карточки героя', fn: 'function renderDominantHeroCard(' },
+  { name: 'Единый генератор ссылок сайдбара/дровера', fn: 'function renderUnifiedNavLinks(' },
+  { name: 'Единый расчет термодинамики остывания', fn: 'function getThermodynamicCooldownData(' },
+  { name: 'Единый генератор футера сайдбара/дровера', fn: 'function buildUnifiedSidebarFootHTML(' }
 ];
 
 requiredSingleEngines.forEach(eng => {
@@ -132,7 +136,7 @@ requiredSingleEngines.forEach(eng => {
 // Проверка вызова единого Zen IDE в спринте и банке задач
 assert(htmlContent.includes("bodyHTML = buildUnifiedZenIdeHTML({"), '[DRY ERROR] Спринт урока обязан вызывать buildUnifiedZenIdeHTML');
 assert(htmlContent.includes("const zenIdeHTML = buildUnifiedZenIdeHTML({"), '[DRY ERROR] Банк задач обязан вызывать buildUnifiedZenIdeHTML');
-console.log('  ✓ Все 8 ключевых UI-компонентов используют централизованные генераторы без дублирования разметки');
+console.log('  ✓ Все 12 ключевых UI-компонентов используют централизованные генераторы без дублирования разметки');
 
 
 // -----------------------------------------------------------------------------

@@ -55986,118 +55986,240 @@ viewDashboard = function(){
   `;
 };
 window.viewDashboard = viewDashboard;
+// ==================== DRY SINGLE ENGINE: NAVIGATION & SIDEBAR ====================
+
+// 1. Single Source of Truth for Dominant Hero Action Card
+function getDominantHeroCardData(){
+  ensureExtendedState();
+  const mCount = (typeof state !== 'undefined' && state && Array.isArray(state.mastered)) ? state.mastered.length : 0;
+  let focusTitle = 'Async & Await в FastAPI эндпоинтах';
+  if(typeof ALL_PY_SKILLS !== 'undefined' && Array.isArray(ALL_PY_SKILLS)){
+    const unmastered = ALL_PY_SKILLS.find(s => !state.mastered || !state.mastered.includes(s.id));
+    if(unmastered && unmastered.title){
+      focusTitle = String(unmastered.title).replace(/^[\d.]+\s*[:·•\-]\s*/i, '').replace(/^[·•\-]\s*/, '').replace(/\s*\([^)]*\)\s*$/, '').trim();
+    }
+  }
+
+  const srsProgData = (typeof getSrsDailyProgressData === 'function')
+    ? getSrsDailyProgressData()
+    : { totalDueRemaining: 0, totalDoneToday: 0 };
+  const noteSrsStats = (typeof getNoteSpacedRepetitionStats === 'function') ? getNoteSpacedRepetitionStats() : { dueCount: 0 };
+  const cardSrsStats = (typeof getSpacedRepetitionStats === 'function') ? getSpacedRepetitionStats() : { dueTodayCardsCount: 0 };
+  const notesDueCount = Number(noteSrsStats.dueCount) || 0;
+  const cardsDueCount = Number(cardSrsStats.dueTodayCardsCount) || 0;
+  const srsDue = Number(srsProgData.totalDueRemaining) || (cardsDueCount + notesDueCount);
+
+  let href = '#/path';
+  let title = focusTitle;
+  let eta = '⏱ ~12 мин';
+  let btnText = 'Продолжить';
+  let tip = 'Перейти к текущему уроку';
+
+  if(srsDue > 0){
+    href = '#/cards';
+    const dueMins = Math.max(1, Math.round(srsDue * 0.6));
+    eta = `⏱ ~${dueMins} мин`;
+    title = 'Интервальное повторение';
+    btnText = 'Продолжить';
+    tip = 'Перейти к интервальному повторению';
+  }
+
+  return { href, title, eta, btnText, tip, srsDue };
+}
+
+function renderDominantHeroCard(isMobile){
+  const d = getDominantHeroCardData();
+  const clickAttr = isMobile ? 'onclick="closeMobileDrawer();"' : '';
+  const marginStyle = isMobile ? 'margin-bottom:14px;padding:11px 12px;text-decoration:none;display:block;' : '';
+  const btnStyle = isMobile ? 'padding:7px 10px;font-size:0.78rem;' : '';
+  const titleStyle = isMobile ? 'font-size:0.84rem;margin-bottom:8px;' : '';
+
+  return `
+    <a href="${d.href}" ${clickAttr} class="card-laser" style="${marginStyle}" title="${d.tip}">
+      <div class="top-meta-row" style="${isMobile ? 'margin-bottom:5px;' : ''}">
+        <span class="step-pill"><span class="pulse-dot"></span></span>
+        <span class="eta-chip">${d.eta}</span>
+      </div>
+      <div class="card-mission-title" style="${titleStyle}">${escapeHtmlStr(d.title)}</div>
+      <button class="dominant-btn" type="button" style="${btnStyle}">
+        <span>${d.btnText}</span>
+      </button>
+    </a>
+  `;
+}
+
+// 2. Single Source of Truth for Thermodynamic Cooldown Progress
+function getThermodynamicCooldownData(){
+  const srsProgData = (typeof getSrsDailyProgressData === 'function')
+    ? getSrsDailyProgressData()
+    : { totalDueRemaining: 0, totalDoneToday: 0 };
+  const srsDue = Number(srsProgData.totalDueRemaining) || 0;
+  const srsDone = Number(srsProgData.totalDoneToday) || 0;
+  const srsTarget = srsDone + srsDue;
+
+  let pct = 0;
+  if(srsDue === 0){
+    pct = 100;
+  } else if(srsTarget > 0){
+    pct = Math.min(99, Math.round((srsDone / srsTarget) * 100));
+  } else {
+    pct = 0;
+  }
+
+  if(pct >= 100){
+    return {
+      pct: 100,
+      cssClass: 'optics-dazzling-triumph',
+      labelHtml: '<span class="dazzling-gold-text">✨ 100%</span>',
+      tooltipTag: '✨ Белое каление (1350°C)',
+      tooltipDesc: 'Память консолидирована на 100%',
+      tagColor: '#fef08a'
+    };
+  } else if(pct >= 75){
+    return {
+      pct,
+      cssClass: 'optics-golden-rose',
+      labelHtml: `<span style="color:#ffedd5;font-weight:800;">🌺 ${pct}%</span>`,
+      tooltipTag: '🌺 Оранжевый накал (1050°C)',
+      tooltipDesc: `${pct}% материала закреплено`,
+      tagColor: '#fed7aa'
+    };
+  } else if(pct >= 50){
+    return {
+      pct,
+      cssClass: 'optics-ruby-bud',
+      labelHtml: `<span style="color:#fee2e2;font-weight:800;">🌹 ${pct}%</span>`,
+      tooltipTag: '🌹 Ярко-алый горн (850°C)',
+      tooltipDesc: `${pct}% материала закреплено`,
+      tagColor: '#fca5a5'
+    };
+  } else if(pct >= 25){
+    return {
+      pct,
+      cssClass: 'optics-cherry-heat',
+      labelHtml: `<span style="color:#fda4af;font-weight:800;">🌱 ${pct}%</span>`,
+      tooltipTag: '🌱 Тёмно-вишнёвый жар (600°C)',
+      tooltipDesc: `${pct}% материала закреплено`,
+      tagColor: '#fda4af'
+    };
+  } else {
+    return {
+      pct,
+      cssClass: 'optics-cold-iron',
+      labelHtml: `<span style="color:#cbd5e1;font-weight:800;">🥀 ${pct}%</span>`,
+      tooltipTag: '🥀 Остывающий антрацит (20°C)',
+      tooltipDesc: `${pct}% материала закреплено`,
+      tagColor: '#cbd5e1'
+    };
+  }
+}
+
+// 3. Single Source of Truth for Unified Navigation Groups
+const UNIFIED_NAV_SECTIONS = [
+  { id: 'top', title: null, routes: ['/', '/path'] },
+  { id: 'trainers', title: 'Тренажёры', routes: ['/cards', '/practice', '/mock'] },
+  { id: 'tools', title: 'Инструменты', routes: ['/map', '/docs', '/sandbox'] }
+];
+
+function renderUnifiedNavLinks(isMobile, curRoute){
+  const activeRoute = curRoute || (typeof currentRoute !== 'undefined' ? currentRoute : ((typeof location !== 'undefined' && location.hash) ? location.hash.replace('#', '') : '/'));
+  const cardSrsStats = (typeof getSpacedRepetitionStats === 'function') ? getSpacedRepetitionStats() : { dueTodayCardsCount: 0 };
+  const noteSrsStats = (typeof getNoteSpacedRepetitionStats === 'function') ? getNoteSpacedRepetitionStats() : { dueCount: 0 };
+  const hasDueCards = (Number(cardSrsStats.dueTodayCardsCount) || 0) > 0 || (Number(noteSrsStats.dueCount) || 0) > 0;
+
+  return UNIFIED_NAV_SECTIONS.map(section => {
+    const headerHtml = section.title
+      ? (isMobile
+          ? `<div class="drawer-nav-section-title" style="margin:10px 0 6px 2px;">${section.title}</div>`
+          : `<div class="nav-group-label" style="margin-top:12px;">${section.title}</div>`)
+      : '';
+
+    const linksHtml = section.routes.map(r => {
+      const it = NAV_ITEMS.find(item => item.route === r);
+      if(!it) return '';
+
+      const isActive = activeRoute === it.route;
+      const cls = isMobile
+        ? `drawer-nav-link ${isActive ? 'active' : ''}`
+        : `navlink ${isActive ? 'active' : ''}`;
+      const clickAttr = isMobile ? 'onclick="closeMobileDrawer();"' : '';
+
+      let dotHtml = '';
+      if(it.route === '/cards'){
+        dotHtml = `<span class="activity-dot" style="${isMobile ? 'margin-left:auto;' : ''}" title="${hasDueCards ? 'Есть темы для повторения' : 'Интервальные повторения доступны'}"></span>`;
+      }
+
+      if(isMobile){
+        return `
+          <a href="#${it.route}" class="${cls}" ${clickAttr}>
+            <div style="display:flex;align-items:center;gap:9px;">
+              ${ICONS[it.icon] || ''}
+              <span>${it.label}</span>
+            </div>
+            ${dotHtml}
+          </a>
+        `;
+      } else {
+        return `
+          <a href="#${it.route}" class="${cls}" data-route="${it.route}">
+            ${ICONS[it.icon] || ''}
+            <span>${it.label}</span>
+            ${dotHtml}
+          </a>
+        `;
+      }
+    }).join('');
+
+    return headerHtml + linksHtml;
+  }).join('');
+}
+
+// 4. Single Source of Truth for Unified Sidebar Footer HUD
+function buildUnifiedSidebarFootHTML(isMobile){
+  const cdData = getThermodynamicCooldownData();
+  const pomoTime = (typeof pomoState !== 'undefined' && pomoState && pomoState.timeStr) ? pomoState.timeStr : '15:00';
+  const prefix = isMobile ? 'drawer' : 'sidebar';
+  const streakDays = (typeof state !== 'undefined' && state && state.streak) ? state.streak : 0;
+
+  return `
+    <div class="sidebar-hud-capsule" id="${prefix}-hud-capsule">
+      <button type="button" class="topbar-pomo-pill sidebar-pomo-pill sidebar-hud-cell" id="${prefix}-pomo-cell" data-pomo-toggle="" title="Запустить Pomodoro-фокус (15 мин)" aria-label="Запустить Pomodoro-фокус (15 мин)">
+        <span class="pomo-icon" aria-hidden="true">⏱</span> <span id="${prefix}-pomo-time">${pomoTime}</span> <span class="pomo-tag" style="font-size:0.7rem;margin-left:2px;font-weight:700;">▶</span>
+      </button>
+      <button class="sidebar-streak-badge sidebar-hud-cell" id="${prefix}-streak-cell" style="display:none;" title="Дней ударного режима подряд" aria-label="Дней ударного режима подряд">
+        🔥 <span id="streak-num-${isMobile ? 'm' : 'd'}">${streakDays}</span>
+      </button>
+      <div class="cooldown-pill sidebar-hud-cell ${cdData.cssClass}" id="${prefix}-cooldown-pill" style="cursor:default;">
+        <span id="${prefix}-cooldown-label">${cdData.labelHtml}</span>
+        <div class="glass-hud-tooltip">
+          <div class="tooltip-tag" style="color:${cdData.tagColor};">${cdData.tooltipTag}</div>
+          <div class="tooltip-body">${cdData.tooltipDesc}</div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-service-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+      <button class="icon-btn-compact btn-ghost" id="${prefix}-quick-search-btn" data-open-quick-search="" type="button" aria-label="Быстрый поиск по темам" title="Быстрый поиск (Ctrl+K)" style="width:34px;height:34px;border-radius:10px;flex-shrink:0;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;font-size:0.85rem;">🔍</button>
+      <button class="theme-pill-toggle" id="${isMobile ? 'drawer-theme-btn' : 'theme-toggle-d'}" ${isMobile ? 'onclick="toggleTheme();"' : ''} role="switch" aria-checked="true" aria-label="Сменить тему оформления" title="Сменить тему оформления">
+        <span class="theme-pill-track">
+          <span class="theme-pill-icon theme-pill-sun" aria-hidden="true">${ICONS.sun}</span>
+          <span class="theme-pill-icon theme-pill-moon" aria-hidden="true">${ICONS.moon}</span>
+          <span class="theme-pill-thumb" aria-hidden="true"></span>
+        </span>
+      </button>
+      <button class="icon-btn-compact sidebar-settings-btn btn-ghost" id="${prefix}-settings-btn" data-open-settings-modal="" type="button" title="Настройки" aria-label="Настройки" style="width:34px;height:34px;border-radius:10px;flex-shrink:0;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;font-size:0.9rem;">⚙️</button>
+    </div>
+  `;
+}
+
+
 renderNav = function(){
   const desk = document.getElementById('nav-desktop');
+  const heroBox = document.getElementById('sidebar-hero-action-container');
+  if(heroBox){
+    heroBox.innerHTML = renderDominantHeroCard(false);
+  }
   if(desk){
-    const noteSrsStats = (typeof getNoteSpacedRepetitionStats === 'function') ? getNoteSpacedRepetitionStats() : { dueCount: 0 };
-    const cardSrsStats = (typeof getSpacedRepetitionStats === 'function') ? getSpacedRepetitionStats() : { dueTodayCardsCount: 0 };
-    const notesDueCount = Number(noteSrsStats.dueCount) || 0;
-    const cardsDueCount = Number(cardSrsStats.dueTodayCardsCount) || 0;
-    const modPctMap = {
-      '/python': Math.round(totalPythonMP() / maxPythonMP() * 100),
-      '/web': Math.round(totalWebMP() / 1000 * 100),
-      '/backend': Math.round(totalBackendMP() / 2400 * 100),
-      '/algorithms': Math.round(totalAlgoMP() / 1200 * 100),
-      '/databases': Math.round(totalDbMP() / 1700 * 100),
-      '/architecture': Math.round(totalArchMP() / 1400 * 100),
-      '/infra': Math.round(totalInfraMP() / 2100 * 100)
-    };
-    const totalAllMp = totalPythonMP() + totalWebMP() + totalBackendMP() + totalAlgoMP() + totalDbMP() + totalArchMP() + totalInfraMP();
-    const overallPct = Math.round(totalAllMp / 12600 * 100);
-
-    const renderLink = function(it){
-      const pVal = modPctMap[it.route];
-      let badgeHtml = '';
-      if(it.route === '/notes-review'){
-        badgeHtml = (notesDueCount > 0) ? `<span class="navlink__pct navlink__badge-due">${notesDueCount}</span>` : '';
-      } else if(it.route === '/cards'){
-        // Анти-прокрастинация: спокойная изумрудная точка активности вместо тревожного бейджа долгов
-        const hasDueCards = cardsDueCount > 0 || notesDueCount > 0;
-        badgeHtml = `<span class="activity-dot" title="${hasDueCards ? 'Есть темы для повторения' : 'Интервальные повторения доступны'}"></span>`;
-      } else if(it.route === '/map' || it.route === '/matrix'){
-        badgeHtml = '';
-      } else if(it.route === '/path'){
-        badgeHtml = '';
-      } else if(pVal !== undefined && pVal > 0){
-        badgeHtml = `<span class="navlink__pct">${pVal}%</span>`;
-      }
-
-      let subListHtml = '';
-
-      return `<a href="#${it.route}" class="navlink" data-route="${it.route}">${ICONS[it.icon] || ICONS.dot}<span>${it.label}</span>${badgeHtml}</a>${subListHtml}`;
-    };
-
-    // Grill-Me Approved: Hero-Action Card injection (Seoul Dynamic: Debt ETA or Next Lesson)
-    const heroBox = document.getElementById('sidebar-hero-action-container');
-    if(heroBox){
-      const mCount = (typeof state !== 'undefined' && state && Array.isArray(state.mastered)) ? state.mastered.length : 0;
-      const stepNum = mCount + 1;
-      
-      let focusTitle = 'Async & Await в FastAPI эндпоинтах';
-      if(typeof ALL_PY_SKILLS !== 'undefined' && Array.isArray(ALL_PY_SKILLS)){
-        const unmastered = ALL_PY_SKILLS.find(s => !state.mastered || !state.mastered.includes(s.id));
-        if(unmastered && unmastered.title){
-          focusTitle = String(unmastered.title).replace(/^[\d.]+\s*[:·•\-]\s*/i, '').replace(/^[·•\-]\s*/, '').replace(/\s*\([^)]*\)\s*$/, '').trim();
-        }
-      }
-
-      const srsProgData = (typeof getSrsDailyProgressData === 'function')
-        ? getSrsDailyProgressData()
-        : { totalDueRemaining: 0, totalDoneToday: 0 };
-      const srsDue = Number(srsProgData.totalDueRemaining) || (cardsDueCount + notesDueCount);
-
-      let heroHref = '#/path';
-      let heroTitle = focusTitle;
-      let heroEta = '⏱ ~12 мин';
-      let heroBtnText = 'Продолжить';
-      let heroTip = 'Перейти к текущему уроку';
-
-      if(srsDue > 0){
-        heroHref = '#/cards';
-        const dueMins = Math.max(1, Math.round(srsDue * 0.6));
-        heroEta = `⏱ ~${dueMins} мин`;
-        const topicWord = (srsDue === 1) ? 'тема' : ((srsDue >= 2 && srsDue <= 4) ? 'темы' : 'тем');
-        heroTitle = 'Интервальное повторение';
-        heroBtnText = 'Продолжить';
-        heroTip = 'Перейти к интервальному повторению';
-      }
-
-      heroBox.innerHTML = `
-        <a href="${heroHref}" class="card-laser" title="${heroTip}">
-          <div class="top-meta-row">
-            <span class="step-pill"><span class="pulse-dot"></span></span>
-            <span class="eta-chip">${heroEta}</span>
-          </div>
-          <div class="card-mission-title">${escapeHtmlStr(heroTitle)}</div>
-          <button class="dominant-btn" type="button">
-            <span>${heroBtnText}</span>
-          </button>
-        </a>
-      `;
-    }
-
-    // Grill-Me Approved: 2 Semantic Groups (0 Duplicates)
-    // Группа 1: Маршрут (Путь, Интервалка SRS, Zen IDE, Дашборд)
-    // Группа 2: Ресурсы и тренажеры (Собеседование, Матрица навыков, Справочник, Песочница)
-    // Grill-Me Approved: Чистая семантическая структура
-    // Вне категорий: Дашборд, Путь
-    // Группа 1: Тренажёры (Интервалка SRS, Zen IDE, Собеседование)
-    // Группа 2: Инструменты (Матрица навыков, Справочник, Песочница)
-    const topRoutes = ['/', '/path'];
-    const trainersRoutes = ['/cards', '/practice', '/mock'];
-    const toolsRoutes = ['/map', '/docs', '/sandbox'];
-
-    const topLinks = topRoutes.map(r => NAV_ITEMS.find(it => it.route === r)).filter(Boolean).map(renderLink).join('');
-    const trainersLinks = trainersRoutes.map(r => NAV_ITEMS.find(it => it.route === r)).filter(Boolean).map(renderLink).join('');
-    const toolsLinks = toolsRoutes.map(r => NAV_ITEMS.find(it => it.route === r)).filter(Boolean).map(renderLink).join('');
-
-    desk.innerHTML = `
-      ${topLinks}
-      <div class="nav-group-label" style="margin-top:12px;">Тренажёры</div>
-      ${trainersLinks}
-      <div class="nav-group-label" style="margin-top:14px;">Инструменты</div>
-      ${toolsLinks}
-    `;
+    desk.innerHTML = renderUnifiedNavLinks(false);
     if(typeof updateSidebarLevelBadge === 'function') updateSidebarLevelBadge();
 
     // Update Streak in compact footer
@@ -56106,75 +56228,19 @@ renderNav = function(){
       streakNumEl.textContent = (typeof state !== 'undefined' && state.streak) ? state.streak : 0;
     }
 
-    // Шкала остывания: Фаза консолидации памяти (SRS) без упоминания XP и точного числа долгов
+    // Cooldown pill SSOT
     const cdLabel = document.getElementById('sidebar-cooldown-label');
     const cdPill = document.getElementById('sidebar-cooldown-pill');
     if(cdLabel && cdPill){
-      const srsProgData = (typeof getSrsDailyProgressData === 'function')
-        ? getSrsDailyProgressData()
-        : { totalDueRemaining: 0, totalDoneToday: 0 };
-      const srsDue = Number(srsProgData.totalDueRemaining) || 0;
-      const srsDone = Number(srsProgData.totalDoneToday) || 0;
-      const srsTarget = srsDone + srsDue;
-
-      let pct = 0;
-      if(srsDue === 0){
-        pct = 100;
-      } else if(srsTarget > 0){
-        pct = Math.min(99, Math.round((srsDone / srsTarget) * 100));
-      } else {
-        pct = 0;
-      }
-
-      // Сброс динамических инлайн-стилей для работы CSS-классов термодинамики
+      const cdData = getThermodynamicCooldownData();
+      cdPill.className = `cooldown-pill sidebar-hud-cell ${cdData.cssClass}`;
       cdPill.style.background = '';
       cdPill.style.borderColor = '';
       cdPill.style.color = '';
       cdPill.style.boxShadow = '';
       cdPill.style.opacity = '1';
       cdPill.style.cursor = 'default';
-
-      cdPill.removeAttribute('title');
-      let tooltipTag = '';
-      let tooltipDesc = '';
-      let tagColor = '';
-
-      if(pct >= 100){
-        cdPill.className = 'cooldown-pill sidebar-hud-cell optics-dazzling-triumph';
-        cdLabel.innerHTML = '<span class="dazzling-gold-text">✨ 100%</span>';
-        tooltipTag = '✨ Белое каление (1350°C)';
-        tooltipDesc = 'Память консолидирована на 100%';
-        tagColor = '#fef08a';
-        cdPill.style.cursor = 'default';
-      } else if(pct >= 75){
-        cdPill.className = 'cooldown-pill sidebar-hud-cell optics-golden-rose';
-        cdLabel.innerHTML = `<span style="color:#ffedd5;font-weight:800;">🌺 ${pct}%</span>`;
-        tooltipTag = '🌺 Оранжевый накал (1050°C)';
-        tooltipDesc = `${pct}% материала закреплено`;
-        tagColor = '#fed7aa';
-        cdPill.style.cursor = 'default';
-      } else if(pct >= 50){
-        cdPill.className = 'cooldown-pill sidebar-hud-cell optics-ruby-bud';
-        cdLabel.innerHTML = `<span style="color:#fee2e2;font-weight:800;">🌹 ${pct}%</span>`;
-        tooltipTag = '🌹 Ярко-алый горн (850°C)';
-        tooltipDesc = `${pct}% материала закреплено`;
-        tagColor = '#fca5a5';
-        cdPill.style.cursor = 'default';
-      } else if(pct >= 25){
-        cdPill.className = 'cooldown-pill sidebar-hud-cell optics-cherry-heat';
-        cdLabel.innerHTML = `<span style="color:#fda4af;font-weight:800;">🌱 ${pct}%</span>`;
-        tooltipTag = '🌱 Тёмно-вишнёвый жар (600°C)';
-        tooltipDesc = `${pct}% материала закреплено`;
-        tagColor = '#fda4af';
-        cdPill.style.cursor = 'default';
-      } else {
-        cdPill.className = 'cooldown-pill sidebar-hud-cell optics-cold-iron';
-        cdLabel.innerHTML = `<span style="color:#cbd5e1;font-weight:800;">🥀 ${pct}%</span>`;
-        tooltipTag = '🥀 Остывающий антрацит (20°C)';
-        tooltipDesc = `${pct}% материала закреплено`;
-        tagColor = '#cbd5e1';
-        cdPill.style.cursor = 'default';
-      }
+      cdLabel.innerHTML = cdData.labelHtml;
 
       let tipEl = cdPill.querySelector('.glass-hud-tooltip');
       if(!tipEl){
@@ -56182,7 +56248,7 @@ renderNav = function(){
         tipEl.className = 'glass-hud-tooltip';
         cdPill.appendChild(tipEl);
       }
-      tipEl.innerHTML = `<div class="tooltip-tag" style="color:${tagColor};">${tooltipTag}</div><div class="tooltip-body">${tooltipDesc}</div>`;
+      tipEl.innerHTML = `<div class="tooltip-tag" style="color:${cdData.tagColor};">${cdData.tooltipTag}</div><div class="tooltip-body">${cdData.tooltipDesc}</div>`;
     }
   }
 
@@ -56193,10 +56259,9 @@ renderNav = function(){
   document.querySelectorAll('.tabbar').forEach(tb => {
     tb.innerHTML = mobItems.map(it => {
       const lbl = it.shortLabel || it.label;
-      const isCards = it.route === '/cards';
-      const hasDue = isCards && cardsDueCount > 0;
-      const dotHtml = hasDue ? '<span class="tabbar__due-dot" aria-label="Есть карточки для повторения"></span>' : '';
-      return `<a href="#${it.route}" class="tabbar__item" data-route="${it.route}">
+      const act = (it.route === '/' && (!location.hash || location.hash === '#/')) || (it.route !== '/' && location.hash.startsWith('#' + it.route));
+      const dotHtml = (it.hasDueDot && cardsDueCount > 0) ? '<span class="tabbar__due-dot" title="Есть темы для повторения"></span>' : '';
+      return `<a href="#${it.route}" class="tabbar__item ${act ? 'active' : ''}" data-route="${it.route}">
         <span class="tabbar__icon-wrap">${ICONS[it.icon] || ICONS.dot}${dotHtml}</span>
         <span>${lbl}</span>
       </a>`;
@@ -56366,93 +56431,13 @@ function openMobileDrawer(){
   modal.setAttribute('role', 'dialog');
   modal.setAttribute('aria-modal', 'true');
 
-  const streakDays = (typeof state !== 'undefined' && state && state.streak) ? state.streak : 0;
+  const curRoute = (typeof currentRoute !== 'undefined') ? currentRoute : ((typeof location !== 'undefined' && location.hash) ? location.hash.replace('#', '') : '/');
   const mCount = (typeof state !== 'undefined' && state && Array.isArray(state.mastered)) ? state.mastered.length : 0;
-  const stepNum = mCount + 1;
-
-  // Level badge calculation
   let level = 'Старт';
   if(mCount >= 80) level = 'Middle';
   else if(mCount >= 50) level = 'Junior+';
   else if(mCount >= 25) level = 'Junior 2';
   else if(mCount >= 10) level = 'Junior 1';
-
-  // Current focus title
-  let focusTitle = 'Async & Await в FastAPI эндпоинтах';
-  if(typeof ALL_PY_SKILLS !== 'undefined' && Array.isArray(ALL_PY_SKILLS)){
-    const unmastered = ALL_PY_SKILLS.find(s => !state.mastered || !state.mastered.includes(s.id));
-    if(unmastered && unmastered.title){
-      focusTitle = String(unmastered.title).replace(/^[\d.]+\s*[:·•\-]\s*/i, '').replace(/^[·•\-]\s*/, '').replace(/\s*\([^)]*\)\s*$/, '').trim();
-    }
-  }
-
-  // SRS Stats
-  const noteSrsStats = (typeof getNoteSpacedRepetitionStats === 'function') ? getNoteSpacedRepetitionStats() : { dueCount: 0 };
-  const cardSrsStats = (typeof getSpacedRepetitionStats === 'function') ? getSpacedRepetitionStats() : { dueTodayCardsCount: 0 };
-  const notesDueCount = Number(noteSrsStats.dueCount) || 0;
-  const cardsDueCount = Number(cardSrsStats.dueTodayCardsCount) || 0;
-  const hasDueCards = cardsDueCount > 0 || notesDueCount > 0;
-
-  // Khan mastery stat for /map
-  const kmStat = (typeof calculateKhanMastery === 'function') ? calculateKhanMastery('all') : (typeof window.calculateKhanMastery === 'function' ? window.calculateKhanMastery('all') : null);
-  const mapBadgeHtml = '';
-
-  // SRS Cooldown Progress for Mobile Drawer
-  const mobSrsData = (typeof getSrsDailyProgressData === 'function')
-    ? getSrsDailyProgressData()
-    : { totalDueRemaining: 0, totalDoneToday: 0 };
-  const mobDue = Number(mobSrsData.totalDueRemaining) || 0;
-  const mobDone = Number(mobSrsData.totalDoneToday) || 0;
-  const mobTarget = mobDone + mobDue;
-
-  let mobPct = 0;
-  if(mobDue === 0){
-    mobPct = 100;
-  } else if(mobTarget > 0){
-    mobPct = Math.min(99, Math.round((mobDone / mobTarget) * 100));
-  } else {
-    mobPct = 0;
-  }
-
-  let mobCdClass = '';
-  let mobCdLabelHtml = '';
-  let mobTooltipTag = '';
-  let mobTooltipDesc = '';
-  let mobTagColor = '';
-
-  if(mobPct >= 100){
-    mobCdClass = 'optics-dazzling-triumph';
-    mobCdLabelHtml = '<span class="dazzling-gold-text">✨ 100%</span>';
-    mobTooltipTag = '✨ Белое каление (1350°C)';
-    mobTooltipDesc = 'Память консолидирована на 100%';
-    mobTagColor = '#fef08a';
-  } else if(mobPct >= 75){
-    mobCdClass = 'optics-golden-rose';
-    mobCdLabelHtml = `<span style="color:#ffedd5;font-weight:800;">🌺 ${mobPct}%</span>`;
-    mobTooltipTag = '🌺 Оранжевый накал (1050°C)';
-    mobTooltipDesc = `${mobPct}% материала закреплено`;
-    mobTagColor = '#fed7aa';
-  } else if(mobPct >= 50){
-    mobCdClass = 'optics-ruby-bud';
-    mobCdLabelHtml = `<span style="color:#fee2e2;font-weight:800;">🌹 ${mobPct}%</span>`;
-    mobTooltipTag = '🌹 Ярко-алый горн (850°C)';
-    mobTooltipDesc = `${mobPct}% материала закреплено`;
-    mobTagColor = '#fca5a5';
-  } else if(mobPct >= 25){
-    mobCdClass = 'optics-cherry-heat';
-    mobCdLabelHtml = `<span style="color:#fda4af;font-weight:800;">🌱 ${mobPct}%</span>`;
-    mobTooltipTag = '🌱 Тёмно-вишнёвый жар (600°C)';
-    mobTooltipDesc = `${mobPct}% материала закреплено`;
-    mobTagColor = '#fda4af';
-  } else {
-    mobCdClass = 'optics-cold-iron';
-    mobCdLabelHtml = `<span style="color:#cbd5e1;font-weight:800;">🥀 ${mobPct}%</span>`;
-    mobTooltipTag = '🥀 Остывающий антрацит (20°C)';
-    mobTooltipDesc = `${mobPct}% материала закреплено`;
-    mobTagColor = '#cbd5e1';
-  }
-
-  const curRoute = (typeof currentRoute !== 'undefined') ? currentRoute : ((typeof location !== 'undefined' && location.hash) ? location.hash.replace('#', '') : '/');
 
   modal.innerHTML = `
     <div class="mobile-side-drawer-panel">
@@ -56472,186 +56457,31 @@ function openMobileDrawer(){
         </a>
         <div style="display:flex;align-items:center;gap:8px;">
           <span class="level-tag-unified" style="font-size:0.66rem;font-weight:800;padding:2px 7px;border-radius:6px;background:var(--emerald-soft, rgba(16,185,129,0.15));color:var(--emerald, #10b981);border:1px solid rgba(16,185,129,0.25);font-family:var(--font-m);">${level}</span>
-          <button class="btn btn-ghost" style="padding:4px 8px;font-size:1.1rem;border-radius:8px;min-width:32px;min-height:32px;display:flex;align-items:center;justify-content:center;" data-close-drawer aria-label="Закрыть">✕</button>
+          <button class="btn btn-ghost" style="padding:4px 8px;font-size:1.1rem;border-radius:8px;min-width:32px;min-height:32px;display:flex;align-items:center;justify-content:center;" onclick="closeMobileDrawer();" aria-label="Закрыть">✕</button>
         </div>
       </div>
 
-      <!-- Single Dominant CTA: Hero-Action Card for Mobile (Seoul Dynamic) -->
-      ${(() => {
-        let mobHeroHref = '#/path';
-        let mobHeroTitle = focusTitle;
-        let mobHeroEta = '⏱ ~12 мин';
-        let mobHeroBtnText = 'Продолжить';
-        let mobHeroTip = 'Перейти к текущему уроку';
+      <!-- Single Dominant CTA: Hero-Action Card for Mobile -->
+      ${renderDominantHeroCard(true)}
 
-        if(mobDue > 0){
-          mobHeroHref = '#/cards';
-          const dueMins = Math.max(1, Math.round(mobDue * 0.6));
-          mobHeroEta = `⏱ ~${dueMins} мин`;
-          const topicWord = (mobDue === 1) ? 'тема' : ((mobDue >= 2 && mobDue <= 4) ? 'темы' : 'тем');
-          mobHeroTitle = 'Интервальное повторение';
-          mobHeroBtnText = 'Продолжить';
-          mobHeroTip = 'Перейти к интервальному повторению';
-        }
-
-        return `
-          <a href="${mobHeroHref}" onclick="closeMobileDrawer();" class="card-laser" style="margin-bottom:14px;padding:11px 12px;text-decoration:none;display:block;" title="${mobHeroTip}">
-            <div class="top-meta-row" style="margin-bottom:5px;">
-              <span class="step-pill"><span class="pulse-dot"></span></span>
-              <span class="eta-chip">${mobHeroEta}</span>
-            </div>
-            <div class="card-mission-title" style="font-size:0.84rem;margin-bottom:8px;">${escapeHtmlStr(mobHeroTitle)}</div>
-            <button class="dominant-btn" type="button" style="padding:7px 10px;font-size:0.78rem;">
-              <span>${mobHeroBtnText}</span>
-            </button>
-          </a>
-        `;
-      })()}
-
-      <!-- Вне категорий: Дашборд и Путь -->
-      <a href="#/" class="drawer-nav-link ${curRoute === '/' ? 'active' : ''}" onclick="closeMobileDrawer();">
-        <div style="display:flex;align-items:center;gap:9px;">
-          <svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px;"><path d="M4 11.5 12 4l8 7.5M6 10v9h5v-5h2v5h5v-9"/></svg>
-          <span>Дашборд</span>
-        </div>
-      </a>
-
-      <a href="#/path" class="drawer-nav-link ${curRoute === '/path' ? 'active' : ''}" onclick="closeMobileDrawer();">
-        <div style="display:flex;align-items:center;gap:9px;">
-          <svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px;"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
-          <span>Путь</span>
-        </div>
-      </a>
-
-      <!-- Категория 1: Тренажёры -->
-      <div class="drawer-nav-section-title" style="margin:10px 0 6px 2px;">Тренажёры</div>
-      <a href="#/cards" class="drawer-nav-link ${curRoute === '/cards' ? 'active' : ''}" onclick="closeMobileDrawer();">
-        <div style="display:flex;align-items:center;gap:9px;">
-          <svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px;"><rect x="3" y="4" width="18" height="16" rx="3"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <span>Интервалка SRS</span>
-        </div>
-        <span class="activity-dot" style="margin-left:auto;" title="Интервальные повторения доступны"></span>
-      </a>
-
-      <a href="#/practice" class="drawer-nav-link ${curRoute === '/practice' ? 'active' : ''}" onclick="closeMobileDrawer();">
-        <div style="display:flex;align-items:center;gap:9px;">
-          <svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px;"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-          <span>Zen IDE</span>
-        </div>
-      </a>
-
-      <a href="#/mock" class="drawer-nav-link ${curRoute === '/mock' ? 'active' : ''}" onclick="closeMobileDrawer();">
-        <div style="display:flex;align-items:center;gap:9px;">
-          <svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px;"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-          <span>Собеседование</span>
-        </div>
-      </a>
-
-      <a href="#/map" class="drawer-nav-link ${curRoute === '/map' ? 'active' : ''}" onclick="closeMobileDrawer();">
-        <div style="display:flex;align-items:center;gap:9px;">
-          <svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <span>Матрица навыков</span>
-        </div>
-      </a>
-
-      <a href="#/docs" class="drawer-nav-link ${curRoute === '/docs' ? 'active' : ''}" onclick="closeMobileDrawer();">
-        <div style="display:flex;align-items:center;gap:9px;">
-          <svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-          <span>Справочник</span>
-        </div>
-      </a>
-
-      <a href="#/sandbox" class="drawer-nav-link ${curRoute === '/sandbox' ? 'active' : ''}" onclick="closeMobileDrawer();">
-        <div style="display:flex;align-items:center;gap:9px;">
-          <svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px;"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 9l3 3-3 3M13 15h4"/></svg>
-          <span>Песочница</span>
-        </div>
-      </a>
+      <!-- Unified Nav Groups (Top, Тренажёры, Инструменты) -->
+      ${renderUnifiedNavLinks(true, curRoute)}
 
       <div style="flex:1 1 auto;min-height:12px;"></div>
 
-      <!-- Footer HUD: Помодоро + Энергия 50/50 (Стрик убран) + Трио-Док утилит -->
+      <!-- Unified Footer HUD: Pomodoro + Cooldown + Service Row -->
       <div style="border-top:1px solid rgba(255, 255, 255, 0.06);padding-top:10px;margin-top:auto;display:flex;flex-direction:column;gap:8px;">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          <button type="button" class="topbar-pomo-pill sidebar-pomo-pill sidebar-hud-cell" id="drawer-pomo-cell" data-pomo-toggle="" style="padding:0 8px;height:34px;border-radius:10px;font-family:var(--font-m);font-size:0.76rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink);" title="Запустить Pomodoro-фокус (15 мин)">
-            <span class="pomo-icon" aria-hidden="true">⏱</span> <span>15:00</span> <span style="font-size:0.7rem;font-weight:700;">▶</span>
-          </button>
-          <div class="cooldown-pill ${mobCdClass}" id="drawer-cooldown-pill" style="padding:0 8px;height:34px;border-radius:10px;font-size:0.78rem;cursor:default;display:flex;align-items:center;justify-content:center;gap:5px;position:relative;">
-            <span id="drawer-cooldown-label">${mobCdLabelHtml}</span>
-            <div class="glass-hud-tooltip">
-              <div class="tooltip-tag" style="color:${mobTagColor};">${mobTooltipTag}</div>
-              <div class="tooltip-body">${mobTooltipDesc}</div>
-            </div>
-          </div>
-        </div>
-
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-          <button type="button" class="btn btn-ghost" id="drawer-quick-search-btn" style="width:34px;height:34px;font-size:0.85rem;padding:0;border-radius:10px;background:var(--surface-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;" title="Поиск (Ctrl+K)">
-            🔍
-          </button>
-          <button type="button" class="theme-pill-toggle" id="drawer-theme-btn" role="switch" aria-label="Сменить тему оформления" title="Сменить тему оформления">
-            <span class="theme-pill-track">
-              <span class="theme-pill-icon theme-pill-sun" aria-hidden="true">${ICONS.sun}</span>
-              <span class="theme-pill-icon theme-pill-moon" aria-hidden="true">${ICONS.moon}</span>
-              <span class="theme-pill-thumb" aria-hidden="true"></span>
-            </span>
-          </button>
-          <button type="button" class="btn btn-ghost" onclick="closeMobileDrawer(); openSettingsModal();" style="width:34px;height:34px;font-size:0.9rem;padding:0;border-radius:10px;background:var(--surface-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;" title="Настройки (выбор языка внутри)">
-            ⚙️
-          </button>
-        </div>
+        ${buildUnifiedSidebarFootHTML(true)}
       </div>
     </div>
   `;
 
+  modal.addEventListener('click', function(e){
+    if(e.target === modal) closeMobileDrawer();
+  });
+
   document.body.appendChild(modal);
-
-  const closeBtn = modal.querySelector('[data-close-drawer]');
-  if(closeBtn) closeBtn.onclick = closeMobileDrawer;
-  modal.onclick = (e) => { if(e.target === modal) closeMobileDrawer(); };
-
-  const themeBtn = modal.querySelector('#drawer-theme-btn');
-  if(themeBtn){
-    themeBtn.onclick = (e) => {
-      e.stopPropagation();
-      toggleTheme();
-    };
-  }
-  if(typeof applyThemeIcon === 'function') applyThemeIcon();
-
-  const langBtn = modal.querySelector('#drawer-lang-btn');
-  if(langBtn){
-    langBtn.onclick = () => {
-      state.lang = state.lang === 'en' ? 'ru' : 'en';
-      saveState(state);
-      closeMobileDrawer();
-      renderAll();
-    };
-  }
-
-  const searchBtn = modal.querySelector('#drawer-quick-search-btn');
-  if(searchBtn){
-    searchBtn.onclick = () => {
-      closeMobileDrawer();
-      openQuickSearchModal();
-    };
-  }
-
-  const cdBtn = modal.querySelector('#drawer-cooldown-pill');
-  if(cdBtn){
-    cdBtn.onclick = (e) => {
-      const srsData = (typeof getSrsDailyProgressData === 'function') ? getSrsDailyProgressData() : null;
-      const totalDue = srsData ? Number(srsData.totalDueRemaining) || 0 : (cardsDueCount + notesDueCount);
-      if(totalDue > 0){
-        closeMobileDrawer();
-        location.hash = '#/cards';
-      } else {
-        if(typeof triggerSparksBurst === 'function'){
-          triggerSparksBurst(e || cdBtn, 4);
-        }
-      }
-    };
-  }
+  requestAnimationFrame(() => modal.classList.add('is-open'));
 }
 window.openMobileDrawer = openMobileDrawer;
 
