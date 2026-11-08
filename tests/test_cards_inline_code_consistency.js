@@ -51,7 +51,7 @@ console.log('--- Запуск теста консистентности инла
 
   // Е) Кнопка "Не знаю" содержит "0 XP" вместо "Сброс"
   assert(!content.includes('xp-gem-again">Сброс</span>'), `${fileName}: подпись на кнопке Не знаю не должна быть 'Сброс'`);
-  assert(content.includes('xp-gem-again">0 XP</span>'), `${fileName}: подпись на кнопке Не знаю должна быть '0 XP'`);
+  assert(content.includes('xp-gem-again">0°C</span>') || content.includes('xp-gem-again">0 XP</span>'), `${fileName}: подпись на кнопке Не знаю должна быть '0°C' или '0 XP'`);
 
   // Ж) Функция formatCardAnswerHTML и структурирование ответов с точкой с запятой
   assert(content.includes("if(s.includes(';') && !s.includes('```'))"), `${fileName}: formatCardAnswerHTML должна разбивать ответы с ';'`);

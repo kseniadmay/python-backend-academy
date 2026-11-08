@@ -366,7 +366,10 @@
     position: absolute;
     bottom: calc(100% + 10px);
     right: 0;
-    width: 224px;
+    width: max-content;
+    max-width: 230px;
+    min-width: 180px;
+    box-sizing: border-box;
     padding: 10px 12px;
     background: rgba(15, 23, 42, 0.94);
     backdrop-filter: blur(20px);
@@ -376,7 +379,9 @@
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 14px rgba(255, 255, 255, 0.12);
     color: #f1f5f9;
     font-size: 0.76rem;
-    line-height: 1.4;
+    line-height: 1.35;
+    white-space: normal;
+    word-break: normal;
     pointer-events: none;
     opacity: 0;
     transform: translateY(6px);
@@ -39280,8 +39285,8 @@ function awardXp(amount, anchorEl){
   try {
     const dayVal = (typeof todayXp === 'function') ? todayXp() : (state.dailyXpByDate[k] || 0);
     document.querySelectorAll('.sprint-xp-pill').forEach(function(el){
-      el.innerHTML = `⚡ +${dayVal} XP<span class="sprint-xp-subtext"> за сутки</span>`;
-      el.title = `Заработано за сутки: ${dayVal} XP`;
+      el.innerHTML = `🔥 +${dayVal}°C<span class="sprint-xp-subtext"> за сутки</span>`;
+      el.title = `Прогрев горна за сутки: ${dayVal}°C`;
     });
   } catch(e){}
 }
@@ -44147,7 +44152,7 @@ function viewPythonSkill(sid){
     if(hasMoreChunks){
       primaryActionHTML = `
         <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" style="height:52px;border-radius:16px;font-size:0.94rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:1;max-width:440px;width:100%;" data-chunk-more="py">
-          <span>Понятно, дальше (+10 XP)</span> <span>➔</span>
+          <span>Понятно, дальше (+5°C)</span> <span>➔</span>
         </button>`;
     } else if(stepIdx + 1 < steps.length){
       const activeK = pySkillViewState.kId || 'unknown';
@@ -44155,12 +44160,12 @@ function viewPythonSkill(sid){
       const stepAlreadyDone = isRead || (state.completedNoteSteps && state.completedNoteSteps[stepKey]);
       primaryActionHTML = `
         <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" style="height:52px;border-radius:16px;font-size:0.94rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:1;max-width:440px;width:100%;" data-py-next-step="${stepIdx+1}">
-          <span>К следующей подтеме${stepAlreadyDone ? '' : ' (+10 XP)'}</span> <span>➔</span>
+          <span>К следующей подтеме${stepAlreadyDone ? '' : ' (+5°C)'}</span> <span>➔</span>
         </button>`;
     } else {
       primaryActionHTML = `
         <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" style="height:52px;border-radius:16px;font-size:0.94rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:1;max-width:440px;width:100%;" data-py-finish-note="${activeK}">
-          <span>Закрепить в карточках (+10 XP)</span> <span>➔</span>
+          <span>Закрепить в карточках (+10°C)</span> <span>➔</span>
         </button>`;
     }
 
@@ -44272,12 +44277,12 @@ function viewPythonSkill(sid){
     if(pySkillViewState.sessionDone || cards.length === 0){
       const curFidx = (sk.fIds || []).indexOf(activeF);
       const hasNextDeck = (curFidx >= 0 && curFidx + 1 < (sk.fIds || []).length);
-      let nextActionBtnText = 'Перейти к практике в IDE (+15 XP)';
+      let nextActionBtnText = 'Перейти к практике в IDE (+15°C)';
       if(hasNextDeck){
         const nextFid = sk.fIds[curFidx + 1];
         const nextDeckObj = ALL_DECKS_COMBINED[nextFid] || {};
         const cleanNextDeckTitle = (nextDeckObj.title || nextFid).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
-        nextActionBtnText = `К следующей колоде: «${cleanNextDeckTitle}» (+10 XP)`;
+        nextActionBtnText = `К следующей колоде: «${cleanNextDeckTitle}» (+10°C)`;
       } else {
         const curKidx = (sk.kIds || []).indexOf(pySkillViewState.kId);
         const topicIdx = (curFidx >= 0 && (sk.kIds || []).length === (sk.fIds || []).length) ? curFidx : Math.max(0, curKidx);
@@ -44286,7 +44291,7 @@ function viewPythonSkill(sid){
           const nextKid = sk.kIds[topicIdx + 1];
           const nextNoteObj = ALL_NOTES_COMBINED[nextKid] || {};
           const cleanNextNoteTitle = (nextNoteObj.title || nextKid).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-          nextActionBtnText = `К следующей теме: «${cleanNextNoteTitle}» (+10 XP)`;
+          nextActionBtnText = `К следующей теме: «${cleanNextNoteTitle}» (+10°C)`;
         }
       }
 
@@ -44408,25 +44413,25 @@ function viewPythonSkill(sid){
             <!-- Кнопка 1: Не знаю -->
             <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-py-rate-card="1" title="Не вспомнил (Повтор сегодня · интервал ${srsPrev.again.days} дн)">
               <span class="srs-btn-title">Не вспомнил</span>
-              <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-again">0 XP</span></span>
+              <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-again">0°C</span></span>
             </button>
 
             <!-- Кнопка 2: Частично -->
             <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--hard fc-rate-btn--hard" data-py-rate-card="2" title="Со скрипом (+2 XP · интервал ${srsPrev.hard.days} дн)">
               <span class="srs-btn-title">Со скрипом</span>
-              <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-amber">⚡+2</span></span>
+              <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-amber">🔥+2°C</span></span>
             </button>
 
             <!-- Кнопка 3: Вспомнил -->
             <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-py-rate-card="3" title="Вспомнил (+5 XP · интервал ${srsPrev.good.days} дн)">
               <span class="srs-btn-title">Вспомнил</span>
-              <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-emerald">⚡+5</span></span>
+              <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-emerald">🔥+5°C</span></span>
             </button>
 
             <!-- Кнопка 4: Сходу -->
             <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-py-rate-card="4" title="На автомате (+10 XP · интервал ${srsPrev.easy.days} дн)">
               <span class="srs-btn-title">На автомате</span>
-              <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-cyan">✨+10</span></span>
+              <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-cyan">✨+10°C</span></span>
             </button>
           </div>
         </footer>`;
@@ -46022,7 +46027,7 @@ function buildSrsRatingDockHTML(srsInfo, isFlipped){
 
           <span class="srs-btn-title">Не вспомнил</span>
 
-          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-again">0 XP</span></span>
+          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-again">0°C</span></span>
 
         </button>
 
@@ -46030,11 +46035,11 @@ function buildSrsRatingDockHTML(srsInfo, isFlipped){
 
         <!-- Кнопка 2: Частично (+2 XP, янтарь) -->
 
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--hard fc-rate-btn--hard" data-hub-rate="2" title="Со скрипом (+2 XP · интервал ${hardDays} дн)">
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--hard fc-rate-btn--hard" data-hub-rate="2" title="Со скрипом (+2°C · интервал ${hardDays} дн)">
 
           <span class="srs-btn-title">Со скрипом</span>
 
-          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-amber">⚡+2</span></span>
+          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-amber">🔥+2°C</span></span>
 
         </button>
 
@@ -46042,11 +46047,11 @@ function buildSrsRatingDockHTML(srsInfo, isFlipped){
 
         <!-- Кнопка 3: Вспомнил (+5 XP, изумруд) -->
 
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-hub-rate="3" title="Вспомнил (+5 XP · интервал ${goodDays} дн)">
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-hub-rate="3" title="Вспомнил (+5°C · интервал ${goodDays} дн)">
 
           <span class="srs-btn-title">Вспомнил</span>
 
-          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-emerald">⚡+5</span></span>
+          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-emerald">🔥+5°C</span></span>
 
         </button>
 
@@ -46054,11 +46059,11 @@ function buildSrsRatingDockHTML(srsInfo, isFlipped){
 
         <!-- Кнопка 4: Сходу (+10 XP, циан) -->
 
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-hub-rate="4" title="На автомате (+10 XP · интервал ${easyDays} дн)">
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-hub-rate="4" title="На автомате (+10°C · интервал ${easyDays} дн)">
 
           <span class="srs-btn-title">На автомате</span>
 
-          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-cyan">✨+10</span></span>
+          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-cyan">✨+10°C</span></span>
 
         </button>
 
@@ -52835,15 +52840,15 @@ lessonTheoryHTML = function(){
 
   if(hasMoreChunks){
 
-    primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-chunk-more="lesson">Понятно, дальше (+10 XP) ➔</button>`;
+    primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-chunk-more="lesson">Понятно, дальше (+5°C) ➔</button>`;
 
   } else if(sIdx + 1 < steps.length){
 
-    primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-lstep-jump="${sIdx+1}">Следующий шаг (${sIdx+2}/${steps.length}) (+10 XP) ➔</button>`;
+    primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-lstep-jump="${sIdx+1}">Следующий шаг (${sIdx+2}/${steps.length}) (+5°C) ➔</button>`;
 
   } else {
 
-    primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-lesson-next="check">Дальше: мини-проверка (+10 XP) ${ICONS.arrowRight}</button>`;
+    primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-lesson-next="check">Дальше: мини-проверка (+5°C) ${ICONS.arrowRight}</button>`;
 
   }
 
@@ -52893,9 +52898,9 @@ lessonTheoryHTML = function(){
 
         <div class="stat-card">
 
-          <div class="stat-head">XP ЗАРАБОТАНО</div>
+          <div class="stat-head">ПРОГРЕВ ТЕМЫ</div>
 
-          <div class="stat-val">+10 XP</div>
+          <div class="stat-val">+10°C</div>
 
         </div>
 
@@ -53029,7 +53034,7 @@ lessonTheoryHTML = function(){
 
         </div>
 
-        <span class="sprint-xp-pill">⚡ +10 XP</span>
+        <span class="sprint-xp-pill">🔥 +10°C</span>
 
       </div>
 
@@ -53139,7 +53144,7 @@ lessonCheckHTML = function(){
 
   const pct = Math.min(95, Math.max(45, Math.round(45 + ((idx + 1) / Math.max(1, checks.length)) * 20)));
 
-  const topbar = buildLessonStageTopbarHTML(l, `Мини-проверка ${idx+1}/${checks.length}`, pct, '⚡ +10 XP');
+  const topbar = buildLessonStageTopbarHTML(l, `Мини-проверка ${idx+1}/${checks.length}`, pct, '🔥 +10°C');
 
 
 
@@ -53371,9 +53376,9 @@ lessonDoneHTML = function(){
 
         <div class="stat-card">
 
-          <div class="stat-head">XP ЗАРАБОТАНО</div>
+          <div class="stat-head">ПРОГРЕВ ТЕМЫ</div>
 
-          <div class="stat-val">+30 XP</div>
+          <div class="stat-val">+30°C</div>
 
         </div>
 
@@ -54397,11 +54402,11 @@ function viewNotesSrsHub(noteSrsStats){
 
         <!-- Кнопка 1: Не вспомнил -->
 
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-srs-note-reset="${curItem.noteId}" title="Не знаю">
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-srs-note-reset="${curItem.noteId}" title="Не знаю (0°C)">
 
           <span class="srs-btn-title">Не вспомнил</span>
 
-          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-again">0 XP</span></span>
+          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-again">0°C</span></span>
 
         </button>
 
@@ -54409,11 +54414,11 @@ function viewNotesSrsHub(noteSrsStats){
 
         <!-- Кнопка 2: Вспомнил (+15 XP) -->
 
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-srs-note-pass="${curItem.noteId}" title="Вспомнил (+15 XP)">
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-srs-note-pass="${curItem.noteId}" title="Вспомнил (+15°C)">
 
           <span class="srs-btn-title">Вспомнил</span>
 
-          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-emerald">⚡+15</span></span>
+          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-emerald">🔥+15°C</span></span>
 
         </button>
 
@@ -54421,11 +54426,11 @@ function viewNotesSrsHub(noteSrsStats){
 
         <!-- Кнопка 3: Сходу (+20 XP) -->
 
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-srs-note-easy="${curItem.noteId}" title="На автомате (+20 XP)">
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-srs-note-easy="${curItem.noteId}" title="На автомате (+20°C)">
 
           <span class="srs-btn-title">На автомате</span>
 
-          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-cyan">✨+20</span></span>
+          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-cyan">✨+20°C</span></span>
 
         </button>
 
@@ -55586,33 +55591,33 @@ viewDashboard = function(){
 
   // Single Dominant CTA конфигурация
   let ctaLabel = 'Продолжить';
-  let ctaBadge = '+15 XP ⚡';
+  let ctaBadge = '+15°C 🔥';
   let ctaAttrs = '';
   let activeStageSubtext = '';
 
   if(firstUnreadK){
     ctaLabel = `Продолжить: Теория — Шаг ${doneTheoryCount + 1}`;
-    ctaBadge = '+15 XP ⚡';
+    ctaBadge = '+15°C 🔥';
     ctaAttrs = `class="linear-cta-btn cocoon-focus-cta" data-quick-microstep="${focusSid}" data-quick-kid="${firstUnreadK}"`;
     activeStageSubtext = `Интуиция синтаксиса · микро-шаг ${doneTheoryCount + 1} из 3`;
   } else if(firstUnreviewedF){
     ctaLabel = `Продолжить: Флеш-карточки темы`;
-    ctaBadge = '+10 XP ⚡';
+    ctaBadge = '+10°C 🔥';
     ctaAttrs = `href="#/cards" data-srs-open-deck="${firstUnreviewedF}" class="linear-cta-btn cocoon-focus-cta"`;
     activeStageSubtext = `Интервальное закрепление понятий в карточках`;
   } else if(firstUnsolvedT){
     ctaLabel = `Решить задачу в Zen IDE (Задача ${donePracticeCount + 1}/6)`;
-    ctaBadge = '+15 XP ⚡';
+    ctaBadge = '+15°C 🔥';
     ctaAttrs = `href="#/practice?task=${firstUnsolvedT}" class="linear-cta-btn cocoon-focus-cta"`;
     activeStageSubtext = `Практическое решение на чистом Python в Zen IDE`;
   } else if(!isUnitExamPassed){
     ctaLabel = `Сдать рубежный тест юнита`;
-    ctaBadge = '+50 XP ⚡';
+    ctaBadge = '+50°C 🔥';
     ctaAttrs = `class="linear-cta-btn cocoon-focus-cta" data-open-quiz-modal="${activeUnitId}" data-track="${focusTrackKey}"`;
     activeStageSubtext = `Рубежная проверка mastery-освоения темы`;
   } else {
     ctaLabel = `Продолжить на Тропе обучения`;
-    ctaBadge = '+20 XP ⚡';
+    ctaBadge = '+20°C 🔥';
     ctaAttrs = `href="#/path" class="linear-cta-btn cocoon-focus-cta"`;
     activeStageSubtext = `Все этапы темы закрыты на 100%!`;
   }
@@ -56141,28 +56146,28 @@ renderNav = function(){
         cdPill.className = 'cooldown-pill sidebar-hud-cell optics-golden-rose';
         cdLabel.innerHTML = `<span style="color:#ffedd5;font-weight:800;">🌺 ${pct}%</span>`;
         tooltipTag = '🌺 Оранжевый накал (1050°C)';
-        tooltipDesc = `${pct}% материала закреплено · Кликните для повторения тем`;
+        tooltipDesc = `${pct}% материала закреплено`;
         tagColor = '#fed7aa';
         cdPill.style.cursor = 'pointer';
       } else if(pct >= 50){
         cdPill.className = 'cooldown-pill sidebar-hud-cell optics-ruby-bud';
         cdLabel.innerHTML = `<span style="color:#fee2e2;font-weight:800;">🌹 ${pct}%</span>`;
         tooltipTag = '🌹 Ярко-алый горн (850°C)';
-        tooltipDesc = `${pct}% материала закреплено · Кликните для повторения тем`;
+        tooltipDesc = `${pct}% материала закреплено`;
         tagColor = '#fca5a5';
         cdPill.style.cursor = 'pointer';
       } else if(pct >= 25){
         cdPill.className = 'cooldown-pill sidebar-hud-cell optics-cherry-heat';
         cdLabel.innerHTML = `<span style="color:#fda4af;font-weight:800;">🌱 ${pct}%</span>`;
         tooltipTag = '🌱 Тёмно-вишнёвый жар (600°C)';
-        tooltipDesc = `${pct}% материала закреплено · Кликните для повторения тем`;
+        tooltipDesc = `${pct}% материала закреплено`;
         tagColor = '#fda4af';
         cdPill.style.cursor = 'pointer';
       } else {
         cdPill.className = 'cooldown-pill sidebar-hud-cell optics-cold-iron';
         cdLabel.innerHTML = `<span style="color:#cbd5e1;font-weight:800;">🥀 ${pct}%</span>`;
-        tooltipTag = '🥀 Остывающий антрацит';
-        tooltipDesc = `${pct}% материала закреплено · Кликните для повторения тем`;
+        tooltipTag = '🥀 Остывающий антрацит (20°C)';
+        tooltipDesc = `${pct}% материала закреплено`;
         tagColor = '#cbd5e1';
         cdPill.style.cursor = 'pointer';
       }
@@ -56421,25 +56426,25 @@ function openMobileDrawer(){
     mobCdClass = 'optics-golden-rose';
     mobCdLabelHtml = `<span style="color:#ffedd5;font-weight:800;">🌺 ${mobPct}%</span>`;
     mobTooltipTag = '🌺 Оранжевый накал (1050°C)';
-    mobTooltipDesc = `${mobPct}% материала закреплено · Кликните для повторения тем`;
+    mobTooltipDesc = `${mobPct}% материала закреплено`;
     mobTagColor = '#fed7aa';
   } else if(mobPct >= 50){
     mobCdClass = 'optics-ruby-bud';
     mobCdLabelHtml = `<span style="color:#fee2e2;font-weight:800;">🌹 ${mobPct}%</span>`;
     mobTooltipTag = '🌹 Ярко-алый горн (850°C)';
-    mobTooltipDesc = `${mobPct}% материала закреплено · Кликните для повторения тем`;
+    mobTooltipDesc = `${mobPct}% материала закреплено`;
     mobTagColor = '#fca5a5';
   } else if(mobPct >= 25){
     mobCdClass = 'optics-cherry-heat';
     mobCdLabelHtml = `<span style="color:#fda4af;font-weight:800;">🌱 ${mobPct}%</span>`;
     mobTooltipTag = '🌱 Тёмно-вишнёвый жар (600°C)';
-    mobTooltipDesc = `${mobPct}% материала закреплено · Кликните для повторения тем`;
+    mobTooltipDesc = `${mobPct}% материала закреплено`;
     mobTagColor = '#fda4af';
   } else {
     mobCdClass = 'optics-cold-iron';
     mobCdLabelHtml = `<span style="color:#cbd5e1;font-weight:800;">🥀 ${mobPct}%</span>`;
-    mobTooltipTag = '🥀 Остывающий антрацит';
-    mobTooltipDesc = `${mobPct}% материала закреплено · Кликните для повторения тем`;
+    mobTooltipTag = '🥀 Остывающий антрацит (20°C)';
+    mobTooltipDesc = `${mobPct}% материала закреплено`;
     mobTagColor = '#cbd5e1';
   }
 
@@ -60104,13 +60109,13 @@ document.addEventListener('click', async function(e){
 
             chunkMoreBtn.setAttribute('data-lstep-jump', curSIdx + 1);
 
-            chunkMoreBtn.textContent = `Следующий шаг (${curSIdx+2}/${steps.length}) (+10 XP) ➔`;
+            chunkMoreBtn.textContent = `Следующий шаг (${curSIdx+2}/${steps.length}) (+5°C) ➔`;
 
           } else {
 
             chunkMoreBtn.setAttribute('data-lesson-next', 'check');
 
-            chunkMoreBtn.innerHTML = `Дальше: мини-проверка (+10 XP) ${ICONS.arrowRight}`;
+            chunkMoreBtn.innerHTML = `Дальше: мини-проверка (+5°C) ${ICONS.arrowRight}`;
 
           }
 
@@ -60154,7 +60159,7 @@ document.addEventListener('click', async function(e){
 
           const dayXpVal = todayXp();
 
-          xpPill.textContent = `⚡ +${dayXpVal} XP за сутки`;
+          xpPill.textContent = `🔥 +${dayXpVal}°C за сутки`;
 
           xpPill.title = `Заработано за сутки: ${dayXpVal} XP`;
 
@@ -60280,7 +60285,7 @@ document.addEventListener('click', async function(e){
 
             chunkMoreBtn.setAttribute('data-py-next-step', curSIdx + 1);
 
-            chunkMoreBtn.textContent = `Понятно, дальше${stepAlreadyDone ? '' : ' (+10 XP)'} ➔`;
+            chunkMoreBtn.textContent = `Понятно, дальше${stepAlreadyDone ? '' : ' (+5°C)'} ➔`;
 
           } else {
 
@@ -60326,7 +60331,7 @@ document.addEventListener('click', async function(e){
 
           const dayXpVal = todayXp();
 
-          xpPill.textContent = `⚡ +${dayXpVal} XP за сутки`;
+          xpPill.textContent = `🔥 +${dayXpVal}°C за сутки`;
 
           xpPill.title = `Заработано за сутки: ${dayXpVal} XP`;
 
@@ -60414,7 +60419,7 @@ document.addEventListener('click', async function(e){
 
             actBtn.setAttribute('data-chunk-more', 'lesson');
 
-            actBtn.textContent = 'Понятно, дальше (+10 XP) ➔';
+            actBtn.textContent = 'Понятно, дальше (+5°C) ➔';
 
           }
 
@@ -60532,7 +60537,7 @@ document.addEventListener('click', async function(e){
 
             actBtn.setAttribute('data-chunk-more', 'py');
 
-            actBtn.textContent = 'Понятно, дальше (+10 XP) ➔';
+            actBtn.textContent = 'Понятно, дальше (+5°C) ➔';
 
           }
 
@@ -61388,7 +61393,7 @@ const psk = e.target.closest('[data-py-select-k]');
 
         pns.setAttribute('data-chunk-more', 'py');
 
-        pns.textContent = 'Понятно, дальше (+10 XP) ➔';
+        pns.textContent = 'Понятно, дальше (+5°C) ➔';
 
       } else if(nextStepIdx + 1 < steps.length){
 
@@ -61398,7 +61403,7 @@ const psk = e.target.closest('[data-py-select-k]');
 
         pns.setAttribute('data-py-next-step', nextStepIdx + 1);
 
-        pns.textContent = `Понятно, дальше${stepAlreadyDone ? '' : ' (+10 XP)'} ➔`;
+        pns.textContent = `Понятно, дальше${stepAlreadyDone ? '' : ' (+5°C)'} ➔`;
 
       } else {
 
@@ -61406,7 +61411,7 @@ const psk = e.target.closest('[data-py-select-k]');
 
         pns.setAttribute('data-py-finish-note', activeK);
 
-        pns.textContent = 'Закрепить в карточках (+10 XP) ➔';
+        pns.textContent = 'Закрепить в карточках (+10°C) ➔';
 
       }
 
@@ -61460,7 +61465,7 @@ const psk = e.target.closest('[data-py-select-k]');
 
         const dayXpVal = todayXp();
 
-        xpPill.textContent = `⚡ +${dayXpVal} XP за сутки`;
+        xpPill.textContent = `🔥 +${dayXpVal}°C за сутки`;
 
         xpPill.title = `Заработано за сутки: ${dayXpVal} XP`;
 
