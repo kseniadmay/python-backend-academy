@@ -16,7 +16,8 @@
 
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@500;600;700;800&display=optional">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@500;600;700;800&display=optional">
 
 <style>
 
@@ -321,6 +322,7 @@
   }
   .sidebar-hud-cell.cooldown-pill {
     border-radius: 10px !important;
+    cursor: default !important;
   }
   .sidebar-service-row {
     display: flex;
@@ -356,7 +358,7 @@
     font-family: var(--font-m);
     font-size: 0.72rem;
     font-weight: 700;
-    cursor: pointer;
+    cursor: default;
     transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
     user-select: none;
   }
@@ -421,7 +423,7 @@
   .cooldown-pill:hover {
     background: rgba(56, 189, 248, 0.22);
     border-color: rgba(56, 189, 248, 0.5);
-    transform: translateY(-1px);
+    transform: none;
   }
   .cooldown-pulse {
     width: 5px;
@@ -30459,11 +30461,11 @@ html:not([data-theme="dark"]) .fc-card--Answer,
         <button class="sidebar-streak-badge sidebar-hud-cell" id="sidebar-streak-cell" title="Дней ударного режима подряд" aria-label="Дней ударного режима подряд">
           🔥 <span id="streak-num-d">0</span>
         </button>
-        <div class="cooldown-pill sidebar-hud-cell optics-dazzling-triumph" id="sidebar-cooldown-pill">
-          <span id="sidebar-cooldown-label"><span class="dazzling-gold-text">✨ 100%</span></span>
+        <div class="cooldown-pill sidebar-hud-cell" id="sidebar-cooldown-pill" style="opacity:0;">
+          <span id="sidebar-cooldown-label"></span>
           <div class="glass-hud-tooltip">
-            <div class="tooltip-tag" style="color:#fef08a;">✨ Белое каление (1350°C)</div>
-            <div class="tooltip-body">Память консолидирована на 100% · Кликните, чтобы высечь искры триумфа!</div>
+            <div class="tooltip-tag"></div>
+            <div class="tooltip-body"></div>
           </div>
         </div>
       </div>
@@ -56129,6 +56131,8 @@ renderNav = function(){
       cdPill.style.borderColor = '';
       cdPill.style.color = '';
       cdPill.style.boxShadow = '';
+      cdPill.style.opacity = '1';
+      cdPill.style.cursor = 'default';
 
       cdPill.removeAttribute('title');
       let tooltipTag = '';
@@ -56139,37 +56143,37 @@ renderNav = function(){
         cdPill.className = 'cooldown-pill sidebar-hud-cell optics-dazzling-triumph';
         cdLabel.innerHTML = '<span class="dazzling-gold-text">✨ 100%</span>';
         tooltipTag = '✨ Белое каление (1350°C)';
-        tooltipDesc = 'Память консолидирована на 100% · Кликните, чтобы высечь искры триумфа!';
+        tooltipDesc = 'Память консолидирована на 100%';
         tagColor = '#fef08a';
-        cdPill.style.cursor = 'pointer';
+        cdPill.style.cursor = 'default';
       } else if(pct >= 75){
         cdPill.className = 'cooldown-pill sidebar-hud-cell optics-golden-rose';
         cdLabel.innerHTML = `<span style="color:#ffedd5;font-weight:800;">🌺 ${pct}%</span>`;
         tooltipTag = '🌺 Оранжевый накал (1050°C)';
         tooltipDesc = `${pct}% материала закреплено`;
         tagColor = '#fed7aa';
-        cdPill.style.cursor = 'pointer';
+        cdPill.style.cursor = 'default';
       } else if(pct >= 50){
         cdPill.className = 'cooldown-pill sidebar-hud-cell optics-ruby-bud';
         cdLabel.innerHTML = `<span style="color:#fee2e2;font-weight:800;">🌹 ${pct}%</span>`;
         tooltipTag = '🌹 Ярко-алый горн (850°C)';
         tooltipDesc = `${pct}% материала закреплено`;
         tagColor = '#fca5a5';
-        cdPill.style.cursor = 'pointer';
+        cdPill.style.cursor = 'default';
       } else if(pct >= 25){
         cdPill.className = 'cooldown-pill sidebar-hud-cell optics-cherry-heat';
         cdLabel.innerHTML = `<span style="color:#fda4af;font-weight:800;">🌱 ${pct}%</span>`;
         tooltipTag = '🌱 Тёмно-вишнёвый жар (600°C)';
         tooltipDesc = `${pct}% материала закреплено`;
         tagColor = '#fda4af';
-        cdPill.style.cursor = 'pointer';
+        cdPill.style.cursor = 'default';
       } else {
         cdPill.className = 'cooldown-pill sidebar-hud-cell optics-cold-iron';
         cdLabel.innerHTML = `<span style="color:#cbd5e1;font-weight:800;">🥀 ${pct}%</span>`;
         tooltipTag = '🥀 Остывающий антрацит (20°C)';
         tooltipDesc = `${pct}% материала закреплено`;
         tagColor = '#cbd5e1';
-        cdPill.style.cursor = 'pointer';
+        cdPill.style.cursor = 'default';
       }
 
       let tipEl = cdPill.querySelector('.glass-hud-tooltip');
@@ -56391,7 +56395,7 @@ function openMobileDrawer(){
 
   // Khan mastery stat for /map
   const kmStat = (typeof calculateKhanMastery === 'function') ? calculateKhanMastery('all') : (typeof window.calculateKhanMastery === 'function' ? window.calculateKhanMastery('all') : null);
-  const mapBadgeHtml = (kmStat && kmStat.pct > 0) ? `<span style="font-family:var(--font-m);font-size:0.68rem;color:var(--ink-muted);">${kmStat.pct}%</span>` : '';
+  const mapBadgeHtml = '';
 
   // SRS Cooldown Progress for Mobile Drawer
   const mobSrsData = (typeof getSrsDailyProgressData === 'function')
@@ -56420,7 +56424,7 @@ function openMobileDrawer(){
     mobCdClass = 'optics-dazzling-triumph';
     mobCdLabelHtml = '<span class="dazzling-gold-text">✨ 100%</span>';
     mobTooltipTag = '✨ Белое каление (1350°C)';
-    mobTooltipDesc = 'Память консолидирована на 100% · Кликните, чтобы высечь искры триумфа!';
+    mobTooltipDesc = 'Память консолидирована на 100%';
     mobTagColor = '#fef08a';
   } else if(mobPct >= 75){
     mobCdClass = 'optics-golden-rose';
@@ -56548,7 +56552,6 @@ function openMobileDrawer(){
           <svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           <span>Матрица навыков</span>
         </div>
-        ${mapBadgeHtml}
       </a>
 
       <a href="#/docs" class="drawer-nav-link ${curRoute === '/docs' ? 'active' : ''}" onclick="closeMobileDrawer();">
@@ -56573,7 +56576,7 @@ function openMobileDrawer(){
           <button type="button" class="topbar-pomo-pill sidebar-pomo-pill sidebar-hud-cell" id="drawer-pomo-cell" data-pomo-toggle="" style="padding:0 8px;height:34px;border-radius:10px;font-family:var(--font-m);font-size:0.76rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink);" title="Запустить Pomodoro-фокус (15 мин)">
             <span class="pomo-icon" aria-hidden="true">⏱</span> <span>15:00</span> <span style="font-size:0.7rem;font-weight:700;">▶</span>
           </button>
-          <div class="cooldown-pill ${mobCdClass}" id="drawer-cooldown-pill" style="padding:0 8px;height:34px;border-radius:10px;font-size:0.78rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;position:relative;">
+          <div class="cooldown-pill ${mobCdClass}" id="drawer-cooldown-pill" style="padding:0 8px;height:34px;border-radius:10px;font-size:0.78rem;cursor:default;display:flex;align-items:center;justify-content:center;gap:5px;position:relative;">
             <span id="drawer-cooldown-label">${mobCdLabelHtml}</span>
             <div class="glass-hud-tooltip">
               <div class="tooltip-tag" style="color:${mobTagColor};">${mobTooltipTag}</div>
@@ -65892,24 +65895,7 @@ renderNav();
 applyThemeIcon();
 
 // Grill-Me Approved: Cool-down modal/flow & Enter hotkey for sidebar
-document.addEventListener('click', function(e){
-  const cdBtn = e.target.closest('#sidebar-cooldown-pill');
-  if(cdBtn){
-    const srsData = (typeof getSrsDailyProgressData === 'function') ? getSrsDailyProgressData() : null;
-    const noteSrsStats = (typeof getNoteSpacedRepetitionStats === 'function') ? getNoteSpacedRepetitionStats() : { dueCount: 0 };
-    const cardSrsStats = (typeof getSpacedRepetitionStats === 'function') ? getSpacedRepetitionStats() : { dueTodayCardsCount: 0 };
-    const totalDue = srsData ? (Number(srsData.totalDueRemaining) || 0) : ((Number(noteSrsStats.dueCount) || 0) + (Number(cardSrsStats.dueTodayCardsCount) || 0));
-    if(totalDue > 0){
-      e.preventDefault();
-      location.hash = '#/cards';
-    } else {
-      // Предложение #1: Тактильные искры ковки при 100% готовности
-      if(typeof triggerSparksBurst === 'function'){
-        triggerSparksBurst(e, 4);
-      }
-    }
-  }
-});
+
 
 document.addEventListener('keydown', function(e){
   // If Enter pressed outside of inputs/textareas, trigger primary action
