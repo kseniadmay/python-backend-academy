@@ -139,13 +139,13 @@
 
   /* ---------- Frictionless Sidebar Enhancements (Grill-Me Approved) ---------- */
   .card-laser {
-    background: linear-gradient(145deg, rgba(16, 185, 129, 0.16) 0%, rgba(32, 36, 27, 0.75) 100%);
-    border: 1px solid rgba(16, 185, 129, 0.30);
+    background: linear-gradient(145deg, rgba(16, 185, 129, 0.08) 0%, rgba(22, 27, 20, 0.70) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.18);
     border-radius: 14px;
     padding: 12px 13px;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.12);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.30);
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
     margin-bottom: 12px;
@@ -153,17 +153,17 @@
     text-decoration: none;
   }
   [data-theme="light"] .card-laser {
-    background: linear-gradient(145deg, rgba(16, 185, 129, 0.12) 0%, rgba(240, 245, 240, 0.85) 100%);
-    border-color: rgba(16, 185, 129, 0.4);
+    background: linear-gradient(145deg, rgba(16, 185, 129, 0.06) 0%, rgba(245, 248, 245, 0.90) 100%);
+    border-color: rgba(16, 185, 129, 0.22);
   }
   .card-laser:hover {
     transform: none;
-    border-color: rgba(16, 185, 129, 0.30);
-    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.28);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
   }
   [data-theme="light"] .card-laser:hover {
     transform: none;
-    border-color: rgba(16, 185, 129, 0.4);
+    border-color: rgba(16, 185, 129, 0.30);
   }
   .card-laser::before {
     content: '';
@@ -172,17 +172,7 @@
     right: -24px;
     width: 80px;
     height: 80px;
-    background: radial-gradient(circle, rgba(16, 185, 129, 0.45) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .card-laser::before {
-    content: '';
-    position: absolute;
-    top: -24px;
-    right: -24px;
-    width: 80px;
-    height: 80px;
-    background: radial-gradient(circle, rgba(16, 185, 129, 0.45) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
     pointer-events: none;
   }
   .top-meta-row {
@@ -17924,6 +17914,13 @@
   }
 
   /* ========== Мобильный боковой ящик (Left Side Drawer) ========== */
+  body.mobile-drawer-open,
+  html.mobile-drawer-open {
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    touch-action: none !important;
+  }
+
   .mobile-side-drawer-backdrop {
     position: fixed !important;
     inset: 0 !important;
@@ -17935,6 +17932,8 @@
     align-items: stretch !important;
     justify-content: flex-start !important;
     animation: drawerFadeIn 0.25s ease forwards !important;
+    touch-action: none !important;
+    overscroll-behavior: contain !important;
   }
 
   .mobile-side-drawer-panel {
@@ -17948,6 +17947,8 @@
     flex-direction: column !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    touch-action: pan-y !important;
     animation: drawerSlideLeft 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
     padding: calc(16px + env(safe-area-inset-top, 0px)) 16px calc(20px + env(safe-area-inset-bottom, 0px)) !important;
     box-sizing: border-box !important;
@@ -56575,12 +56576,24 @@ function openMobileDrawer(){
     if(e.target === modal) closeMobileDrawer();
   });
 
+  modal.addEventListener('touchmove', function(e){
+    if(e.target === modal) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  document.body.classList.add('mobile-drawer-open');
+  document.documentElement.classList.add('mobile-drawer-open');
+
   document.body.appendChild(modal);
   requestAnimationFrame(() => modal.classList.add('is-open'));
 }
 window.openMobileDrawer = openMobileDrawer;
 
 function closeMobileDrawer(){
+  document.body.classList.remove('mobile-drawer-open');
+  document.documentElement.classList.remove('mobile-drawer-open');
+
   const m = document.getElementById('mobile-drawer-modal');
   if(!m) return;
   if(m.classList.contains('is-closing')) return;
