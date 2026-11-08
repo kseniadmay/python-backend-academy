@@ -22682,21 +22682,21 @@
 
   .bead-active-leading {
 
-    width: 10px !important;
+    width: 11px !important;
 
-    height: 10px !important;
+    height: 11px !important;
 
     background: #ffffff !important;
 
-    border: 2px solid #10b981 !important;
+    border: 2px solid #34d399 !important;
 
-    animation: leadingBeadPulse 2.2s infinite ease-in-out !important;
+    box-shadow: 0 0 8px rgba(52, 211, 153, 0.9), 0 0 16px rgba(16, 185, 129, 0.5) !important;
 
     position: relative !important;
 
-    z-index: 2 !important;
+    z-index: 3 !important;
 
-    margin: 0 2px !important;
+    margin: 0 3px !important;
 
   }
 
@@ -22968,7 +22968,7 @@
 
 .fc-rate-btn, .card-rating-btn, .btn-rating {
 
-  min-height: 52px;
+  min-height: 48px;
 
   border-radius: 14px;
 
@@ -23006,7 +23006,7 @@
 
   .fc-rate-btn, .card-rating-btn, .btn-rating {
 
-    min-height: 52px;
+    min-height: 48px;
 
   }
 
@@ -23142,9 +23142,11 @@
 
 .srs-btn-title {
 
-  font-size: 0.88rem;
+  font-size: 0.92rem;
 
   font-weight: 700;
+
+  letter-spacing: -0.01em;
 
 }
 
@@ -24935,23 +24937,21 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
   .bead-active-leading {
 
-    width: 13px !important;
+    width: 11px !important;
 
-    height: 13px !important;
+    height: 11px !important;
 
     background: #ffffff !important;
 
-    border: 2.5px solid #10b981 !important;
+    border: 2px solid #34d399 !important;
 
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.40), 0 0 14px #34d399, 0 0 28px rgba(16, 185, 129, 0.95), 0 0 40px rgba(52, 211, 153, 0.65) !important;
+    box-shadow: 0 0 8px rgba(52, 211, 153, 0.9), 0 0 16px rgba(16, 185, 129, 0.5) !important;
 
     opacity: 1 !important;
 
-    transform: scale(1.1) !important;
-
-    animation: jewel-aurora-glow 2.2s infinite ease-in-out !important;
-
     z-index: 3 !important;
+
+    margin: 0 3px !important;
 
   }
 
@@ -28618,37 +28618,73 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
   /* Активная ведущая бусина шага — сияющий изумрудный самоцвет с белым контуром фокуса */
 
+  /* Ведущая активная бусина SRS — Квантовый маяк с плавной кольцевой волной (Wave Ripple 2.8s) */
   .dot-jewel.active,
-
   .dot-jewel.bead-active-leading,
+  .srs-beads-necklace .dot-jewel.active,
+  .fc-beads-necklace .dot-jewel.active,
+  .cards-hub-container .srs-deck-beads-bar .dot-jewel.active,
+  .cards-hub-container .dot-jewel.bead-active-leading {
+    width: 11px !important;
+    height: 11px !important;
+    background: #ffffff !important;
+    border: 2px solid #34d399 !important;
+    box-shadow: 0 0 8px rgba(52, 211, 153, 0.9), 0 0 16px rgba(16, 185, 129, 0.5) !important;
+    position: relative !important;
+    z-index: 3 !important;
+    margin: 0 3px !important;
+    overflow: visible !important;
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .dot-jewel.active::before,
+  .dot-jewel.bead-active-leading::before,
+  .srs-beads-necklace .dot-jewel.active::before,
+  .fc-beads-necklace .dot-jewel.active::before,
+  .cards-hub-container .srs-deck-beads-bar .dot-jewel.active::before {
+    content: '' !important;
+    position: absolute !important;
+    top: -4px !important;
+    left: -4px !important;
+    right: -4px !important;
+    bottom: -4px !important;
+    border-radius: 50% !important;
+    border: 1.5px solid #34d399 !important;
+    pointer-events: none !important;
+    animation: srs-active-bead-pulse 2.8s infinite cubic-bezier(0, 0.2, 0.8, 1) !important;
+  }
 
   @keyframes srs-active-bead-pulse {
-    0%, 100% {
-      transform: scale(1);
-      box-shadow: 0 0 10px #10b981, 0 0 20px rgba(52, 211, 153, 0.85);
+    0% {
+      transform: scale(0.85);
+      opacity: 1;
+      box-shadow: 0 0 6px rgba(52, 211, 153, 0.85);
     }
-    50% {
-      transform: scale(1.22);
-      box-shadow: 0 0 14px #34d399, 0 0 28px rgba(52, 211, 153, 0.95), 0 0 6px #ffffff;
+    100% {
+      transform: scale(2.4);
+      opacity: 0;
+      box-shadow: 0 0 0 transparent;
     }
   }
 
-  .cards-hub-container .srs-deck-beads-bar .dot-jewel.active,
-
-  .cards-hub-container .dot-jewel.bead-active-leading,
-
-  .cards-hub-container .dot-jewel.active {
-
-    width: 11px !important;
-
-    height: 11px !important;
-
-    background: #34d399 !important;
-
-    border: 2px solid #ffffff !important;
-
-    animation: srs-active-bead-pulse 2s infinite ease-in-out !important;
-
+  @keyframes srsFloatDegreeToast {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, 0) scale(0.7);
+    }
+    20% {
+      opacity: 1;
+      transform: translate(-50%, -24px) scale(1.15);
+    }
+    70% {
+      opacity: 0.95;
+      transform: translate(-50%, -44px) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -64px) scale(0.92);
+    }
   }
 
   .srs-live-status-dot {
@@ -39156,6 +39192,84 @@ function triggerSparksBurst(anchorOrEvent, gradeOrAmount, maybeEvent){
 }
 window.triggerSparksBurst = triggerSparksBurst;
 
+function triggerSrsDegreeToast(anchorOrEvent, ratingOrGrade, maybeEvent){
+  try{
+    if(!document || !document.body) return;
+    let rate = ratingOrGrade;
+    if(typeof rate === 'string'){
+      const parsed = parseInt(rate, 10);
+      if(!isNaN(parsed)) rate = parsed;
+      else if(rate === 'again' || rate === 'reset') rate = 1;
+      else if(rate === 'hard') rate = 2;
+      else if(rate === 'good' || rate === 'pass') rate = 3;
+      else if(rate === 'easy') rate = 4;
+    }
+    // Для «Не помню» (1) всплывашка скрыта (Mastery Learning без негатива)
+    if(rate === 1) return;
+
+    let toastText = '';
+    let colorStyle = '';
+    let shadowStyle = '';
+
+    if(rate === 2){
+      toastText = '+2°';
+      colorStyle = 'color:#fde68a;background:rgba(245,158,11,0.22);border:1.5px solid rgba(245,158,11,0.65);';
+      shadowStyle = 'box-shadow:0 0 18px rgba(245,158,11,0.5), 0 8px 24px rgba(0,0,0,0.5);';
+    } else if(rate === 3){
+      toastText = '+5°';
+      colorStyle = 'color:#a7f3d0;background:rgba(16,185,129,0.24);border:1.5px solid rgba(52,211,153,0.75);';
+      shadowStyle = 'box-shadow:0 0 20px rgba(16,185,129,0.6), 0 8px 24px rgba(0,0,0,0.5);';
+    } else if(rate === 4){
+      toastText = '+10°';
+      colorStyle = 'color:#a5f3fc;background:rgba(6,182,212,0.24);border:1.5px solid rgba(6,182,212,0.75);';
+      shadowStyle = 'box-shadow:0 0 22px rgba(6,182,212,0.65), 0 8px 24px rgba(0,0,0,0.5);';
+    } else {
+      return;
+    }
+
+    let originX = window.innerWidth / 2;
+    let originY = window.innerHeight / 2;
+    let anchorEl = null;
+    let evt = null;
+
+    if(anchorOrEvent && anchorOrEvent.target && anchorOrEvent.clientX !== undefined){
+      evt = anchorOrEvent;
+      anchorEl = anchorOrEvent.target;
+    } else if(anchorOrEvent && typeof anchorOrEvent.getBoundingClientRect === 'function'){
+      anchorEl = anchorOrEvent;
+    } else if(anchorOrEvent && anchorOrEvent.clientX !== undefined && anchorOrEvent.clientY !== undefined){
+      originX = anchorOrEvent.clientX;
+      originY = anchorOrEvent.clientY;
+    }
+
+    if(maybeEvent && maybeEvent.clientX !== undefined){
+      evt = maybeEvent;
+    }
+
+    if(anchorEl && typeof anchorEl.getBoundingClientRect === 'function'){
+      const r = anchorEl.getBoundingClientRect();
+      if(r && (r.width > 0 || r.height > 0)){
+        originX = Math.round(r.left + r.width / 2);
+        originY = Math.round(r.top);
+      }
+    } else if(evt && typeof evt.clientX === 'number' && typeof evt.clientY === 'number' && (evt.clientX > 0 || evt.clientY > 0)){
+      originX = evt.clientX;
+      originY = evt.clientY;
+    }
+
+    const toast = document.createElement('div');
+    toast.className = 'srs-floating-degree-toast';
+    toast.textContent = toastText;
+    toast.style.cssText = `position:fixed;left:${originX}px;top:${originY}px;transform:translate(-50%,-100%);pointer-events:none;z-index:100000;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:14.5px;font-weight:800;padding:4px 11px;border-radius:999px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);white-space:nowrap;animation:srsFloatDegreeToast 0.85s cubic-bezier(0.16,1,0.3,1) forwards;${colorStyle}${shadowStyle}`;
+
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      try { if(toast && toast.parentNode) toast.parentNode.removeChild(toast); } catch(_e){}
+    }, 900);
+  }catch(_err){}
+}
+window.triggerSrsDegreeToast = triggerSrsDegreeToast;
+
 function awardXp(amount, anchorEl){
   ensureExtendedState();
   state.xp += amount;
@@ -44294,28 +44408,24 @@ function viewPythonSkill(sid){
           </button>
 
           <div class="srs-rating-grid card-rating-grid ${pySkillViewState.cardFlipped ? '' : 'srs-hidden'}" style="${pySkillViewState.cardFlipped ? 'display:grid !important;' : 'display:none !important;'}">
-            <!-- Кнопка 1: Не знаю -->
-            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-py-rate-card="1" title="Не вспомнил (Повтор сегодня · интервал ${srsPrev.again.days} дн)">
-              <span class="srs-btn-title">Не вспомнил</span>
-              <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-again">0°C</span></span>
+            <!-- Кнопка 1: Не помню -->
+            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-py-rate-card="1" title="Не помню (Повтор сегодня · интервал ${srsPrev.again.days} дн)">
+              <span class="srs-btn-title">Не помню</span>
             </button>
 
-            <!-- Кнопка 2: Частично -->
-            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--hard fc-rate-btn--hard" data-py-rate-card="2" title="Со скрипом (+2 XP · интервал ${srsPrev.hard.days} дн)">
+            <!-- Кнопка 2: Со скрипом -->
+            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--hard fc-rate-btn--hard" data-py-rate-card="2" title="Со скрипом · интервал ${srsPrev.hard.days} дн">
               <span class="srs-btn-title">Со скрипом</span>
-              <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-amber">🔥+2°C</span></span>
             </button>
 
-            <!-- Кнопка 3: Вспомнил -->
-            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-py-rate-card="3" title="Вспомнил (+5 XP · интервал ${srsPrev.good.days} дн)">
-              <span class="srs-btn-title">Вспомнил</span>
-              <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-emerald">🔥+5°C</span></span>
+            <!-- Кнопка 3: Помню -->
+            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-py-rate-card="3" title="Помню · интервал ${srsPrev.good.days} дн">
+              <span class="srs-btn-title">Помню</span>
             </button>
 
-            <!-- Кнопка 4: Сходу -->
-            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-py-rate-card="4" title="На автомате (+10 XP · интервал ${srsPrev.easy.days} дн)">
+            <!-- Кнопка 4: На автомате -->
+            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-py-rate-card="4" title="На автомате · интервал ${srsPrev.easy.days} дн">
               <span class="srs-btn-title">На автомате</span>
-              <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-cyan">✨+10°C</span></span>
             </button>
           </div>
         </footer>`;
@@ -45905,49 +46015,41 @@ function buildSrsRatingDockHTML(srsInfo, isFlipped){
 
       <div class="srs-rating-grid card-rating-grid ${isFlipped ? '' : 'srs-hidden'}" id="srs-rating-panel" style="${isFlipped ? 'display:grid !important;' : 'display:none !important;'}">
 
-        <!-- Кнопка 1: Не знаю (Повтор сегодня, кармин) -->
+        <!-- Кнопка 1: Не помню (Повтор сегодня, кармин) -->
 
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-hub-rate="1" title="Не вспомнил (Повтор сегодня · интервал 1 дн)">
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-hub-rate="1" title="Не помню (Повтор сегодня · интервал 1 дн)">
 
-          <span class="srs-btn-title">Не вспомнил</span>
-
-          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-again">0°C</span></span>
+          <span class="srs-btn-title">Не помню</span>
 
         </button>
 
 
 
-        <!-- Кнопка 2: Частично (+2 XP, янтарь) -->
+        <!-- Кнопка 2: Со скрипом (янтарь) -->
 
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--hard fc-rate-btn--hard" data-hub-rate="2" title="Со скрипом (+2°C · интервал ${hardDays} дн)">
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--hard fc-rate-btn--hard" data-hub-rate="2" title="Со скрипом · интервал ${hardDays} дн">
 
           <span class="srs-btn-title">Со скрипом</span>
 
-          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-amber">🔥+2°C</span></span>
+        </button>
+
+
+
+        <!-- Кнопка 3: Помню (изумруд) -->
+
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-hub-rate="3" title="Помню · интервал ${goodDays} дн">
+
+          <span class="srs-btn-title">Помню</span>
 
         </button>
 
 
 
-        <!-- Кнопка 3: Вспомнил (+5 XP, изумруд) -->
+        <!-- Кнопка 4: На автомате (циан) -->
 
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-hub-rate="3" title="Вспомнил (+5°C · интервал ${goodDays} дн)">
-
-          <span class="srs-btn-title">Вспомнил</span>
-
-          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-emerald">🔥+5°C</span></span>
-
-        </button>
-
-
-
-        <!-- Кнопка 4: Сходу (+10 XP, циан) -->
-
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-hub-rate="4" title="На автомате (+10°C · интервал ${easyDays} дн)">
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-hub-rate="4" title="На автомате · интервал ${easyDays} дн">
 
           <span class="srs-btn-title">На автомате</span>
-
-          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-cyan">✨+10°C</span></span>
 
         </button>
 
@@ -54284,37 +54386,31 @@ function viewNotesSrsHub(noteSrsStats){
 
       <div class="fc-rate-row note-rate-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:440px;margin:0 auto;width:100%;">
 
-        <!-- Кнопка 1: Не вспомнил -->
+        <!-- Кнопка 1: Не помню -->
 
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-srs-note-reset="${curItem.noteId}" title="Не знаю (0°C)">
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-srs-note-reset="${curItem.noteId}" title="Не помню">
 
-          <span class="srs-btn-title">Не вспомнил</span>
-
-          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-again">0°C</span></span>
+          <span class="srs-btn-title">Не помню</span>
 
         </button>
 
 
 
-        <!-- Кнопка 2: Вспомнил (+15 XP) -->
+        <!-- Кнопка 2: Помню -->
 
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-srs-note-pass="${curItem.noteId}" title="Вспомнил (+15°C)">
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-srs-note-pass="${curItem.noteId}" title="Помню">
 
-          <span class="srs-btn-title">Вспомнил</span>
-
-          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-emerald">🔥+15°C</span></span>
+          <span class="srs-btn-title">Помню</span>
 
         </button>
 
 
 
-        <!-- Кнопка 3: Сходу (+20 XP) -->
+        <!-- Кнопка 3: На автомате -->
 
-        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-srs-note-easy="${curItem.noteId}" title="На автомате (+20°C)">
+        <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-srs-note-easy="${curItem.noteId}" title="На автомате">
 
           <span class="srs-btn-title">На автомате</span>
-
-          <span class="srs-btn-sub"><span class="srs-gem-xp xp-gem-cyan">✨+20°C</span></span>
 
         </button>
 
@@ -58787,6 +58883,7 @@ document.addEventListener('click', async function(e){
 
     if(nid){
       try { triggerSparksBurst(srsNotePassBtn, 3, e); } catch(_e){}
+      try { triggerSrsDegreeToast(srsNotePassBtn, 3, e); } catch(_e){}
       applyNoteReview(nid, 'pass', srsNotePassBtn);
 
       cardsHubState.forcedNoteId = null;
@@ -58819,6 +58916,7 @@ document.addEventListener('click', async function(e){
 
     if(nid){
       try { triggerSparksBurst(srsNoteEasyBtn, 4, e); } catch(_e){}
+      try { triggerSrsDegreeToast(srsNoteEasyBtn, 4, e); } catch(_e){}
       applyNoteReview(nid, 'easy', srsNoteEasyBtn);
 
       cardsHubState.forcedNoteId = null;
@@ -61963,6 +62061,7 @@ window.animateCardFlip = animateCardFlip;
 
     // Радиальный разлет искр при нажатии любой оценки с палитрой под тип ответа
     try { triggerSparksBurst(prc, rating, e); } catch(_e){}
+    try { triggerSrsDegreeToast(prc, rating, e); } catch(_e){}
 
     const fid = pySkillViewState.fId;
 
@@ -63465,6 +63564,7 @@ window.animateCardFlip = animateCardFlip;
 
     // Радиальный разлет искр при нажатии любой оценки с палитрой под тип ответа
     try { triggerSparksBurst(hRate, rSound, e); } catch(_e){}
+    try { triggerSrsDegreeToast(hRate, rSound, e); } catch(_e){}
 
     try { playSound('rate', rSound); } catch(_e){}
 

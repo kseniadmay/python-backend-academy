@@ -49,9 +49,9 @@ console.log('--- Запуск теста консистентности инла
   assert(content.includes('srs-active-bead-pulse'), `${fileName}: активная бусина должна анимироваться через srs-active-bead-pulse`);
   assert(!content.includes('box-shadow: 0 0 12px #10b981, 0 0 22px rgba(52, 211, 153, 0.85) !important;\n\n    animation: none !important;'), `${fileName}: анимация активной бусины не должна блокироваться animation: none`);
 
-  // Е) Кнопка "Не знаю" содержит "0 XP" вместо "Сброс"
+  // Е) Кнопка "Не помню" чистая от визуального шума градусов и без "Сброс"
   assert(!content.includes('xp-gem-again">Сброс</span>'), `${fileName}: подпись на кнопке Не знаю не должна быть 'Сброс'`);
-  assert(content.includes('xp-gem-again">0°C</span>') || content.includes('xp-gem-again">0 XP</span>'), `${fileName}: подпись на кнопке Не знаю должна быть '0°C' или '0 XP'`);
+  assert(content.includes('Не помню</span>') || content.includes('xp-gem-again">0°C</span>') || content.includes('xp-gem-again">0 XP</span>'), `${fileName}: кнопка Не помню должна быть переименована и чистой от шума`);
 
   // Ж) Функция formatCardAnswerHTML и структурирование ответов с точкой с запятой
   assert(content.includes("if(s.includes(';') && !s.includes('```'))"), `${fileName}: formatCardAnswerHTML должна разбивать ответы с ';'`);
