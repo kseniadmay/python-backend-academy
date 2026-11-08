@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Интерактивный стенд геймификации SRS: Дышащая бусина и Всплывающие градусы</title>
+  <style>
+    :root {
+      --paper: #090d14;
+      --surface: rgba(18, 24, 35, 0.78);
+      --surface-elevated: rgba(26, 34, 48, 0.88);
+      --border: rgba(255, 255, 255, 0.09);
+      --border-focus: rgba(52, 211, 153, 0.45);
+      
+      --emerald: #10b981;
+      --emerald-glow: #34d399;
+      --emerald-surface: rgba(16, 185, 129, 0.16);
+      
+      --amber: #f59e0b;
+      --amber-surface: rgba(245, 158, 11, 0.14);
+      
+      --rose: #f43f5e;
+      --rose-surface: rgba(244, 63, 94, 0.14);
+      
+      --cyan: #06b6d4;
+      --cyan-surface: rgba(6, 182, 212, 0.14);
+      
+      --ink: #f8fafc;
+      --ink-muted: #94a3b8;
+      --ink-faint: #64748b;
+      
+      --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-ui);
+      padding: 24px 16px 48px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-image: 
+        radial-gradient(circle at 20% 15%, rgba(16, 185, 129, 0.09) 0%, transparent 45%),
+        radial-gradient(circle at 80% 85%, rgba(6, 182, 212, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.8) 0%, transparent 100%);
+      background-attachment: fixed;
+    }
+
+    .stand-wrapper {
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    /* Верхняя плашка стенда */
+    .stand-header {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px 22px;
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      margin-bottom: 20px;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.45);
+    }
+
+    .stand-header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .stand-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: #fff;
+    }
+
+    .pulse-beacon {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--emerald-glow);
+      box-shadow: 0 0 12px var(--emerald-glow);
+      animation: beaconFlash 2s infinite ease-in-out;
+    }
+
+    @keyframes beaconFlash {
+      0%, 100% { opacity: 0.6; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.15); box-shadow: 0 0 16px #34d399; }
+    }
+
+    .badge-info {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      color: var(--emerald-glow);
+      font-weight: 700;
+    }
+
+    .stand-desc {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--ink-muted);
+    }
+
+    /* Панели управления вариантами */
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .control-card {
+      background: rgba(15, 20, 30, 0.72);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px 16px;
+      backdrop-filter: blur(16px);
+    }
+
+    .control-label {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-faint);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .opt-pill {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--ink-muted);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 13px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .opt-pill:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.16);
+    }
+
+    .opt-pill.active {
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.18);
+      border-color: rgba(52, 211, 153, 0.45);
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.22);
+    }
+
+    /* Основная интерактивная сцена */
+    .interactive-stage {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+      position: relative;
+    }
+
+    /* Ожерелье бусин */
+    .necklace-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .necklace-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 12px;
+      padding: 0 4px;
+    }
+
+    .necklace-topic {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--ink-muted);
+      letter-spacing: 0.02em;
+    }
+
+    .necklace-step {
+      font-size: 11.5px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--emerald-glow);
+    }
+
+    .srs-beads-necklace {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      position: relative;
+    }
+
+    .dot-jewel {
+      display: inline-block;
+      border-radius: 50%;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+      flex-shrink: 0;
+    }
+
+    /* Завершённая бусина */
+    .dot-jewel.done {
+      width: 8px;
+      height: 8px;
+      background: var(--emerald);
+      border: 1px solid var(--emerald-glow);
+      box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+    }
+
+    /* Будущая бусина */
+    .dot-jewel.future {
+      width: 7px;
+      height: 7px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* ВАРИАНТ 1 ДЫХАНИЯ: Мягкий органический изумрудный ореол (Рекомендуемый) */
+    .bead-breath-soft.active {
+      width: 12px;
+      height: 12px;
+      background: #ffffff;
+      border: 2px solid var(--emerald-glow);
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3), 0 0 16px rgba(52, 211, 153, 0.85);
+      animation: auraBreathSoft 2.0s infinite ease-in-out;
+      z-index: 2;
+    }
+
+    @keyframes auraBreathSoft {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35), 0 0 10px rgba(52, 211, 153, 0.7);
+      }
+      50% {
+        transform: scale(1.22);
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.55), 0 0 22px rgba(52, 211, 153, 1), 0 0 32px rgba(16, 185, 129, 0.6);
+      }
+    }
+
+    /* ВАРИАНТ 2 ДЫХАНИЯ: Квантовый маяк с расходящейся кольцевой волной */
+    .bead-breath-beacon.active {
+      width: 11px;
+      height: 11px;
+      background: #ffffff;
+      border: 2px solid var(--emerald-glow);
+      position: relative;
+      z-index: 2;
+    }
+
+    .bead-breath-beacon.active::before {
+      content: '';
+      position: absolute;
+      top: -4px; left: -4px; right: -4px; bottom: -4px;
+      border-radius: 50%;
+      border: 1.5px solid var(--emerald-glow);
+      animation: beaconRipple 2.8s infinite cubic-bezier(0, 0.2, 0.8, 1);
+    }
+
+    @keyframes beaconRipple {
+      0% {
+        transform: scale(0.85);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(2.2);
+        opacity: 0;
+      }
+    }
+
+    /* ВАРИАНТ 3 ДЫХАНИЯ: Интенсивный неоновый кристалл (Без изменения геометрии) */
+    .bead-breath-crystal.active {
+      width: 12px;
+      height: 12px;
+      background: #ffffff;
+      border: 2px solid #34d399;
+      animation: crystalGlow 1.6s infinite alternate ease-in-out;
+      z-index: 2;
+    }
+
+    @keyframes crystalGlow {
+      0% {
+        box-shadow: 0 0 4px #fff, 0 0 10px #10b981;
+      }
+      100% {
+        box-shadow: 0 0 8px #fff, 0 0 24px #34d399, 0 0 36px #10b981;
+      }
+    }
+
+    /* Карточка SRS */
+    .card-stage {
+      perspective: 1200px;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .demo-card {
+      width: 100%;
+      min-height: 180px;
+      background: linear-gradient(165deg, rgba(26, 33, 44, 0.85) 0%, rgba(18, 24, 34, 0.92) 55%, rgba(13, 17, 25, 0.96) 100%);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px 24px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 20px 48px rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(24px);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .demo-card:hover {
+      border-color: rgba(52, 211, 153, 0.35);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 22px 52px rgba(0, 0, 0, 0.65), 0 0 28px rgba(16, 185, 129, 0.12);
+    }
+
+    .demo-card.card-flipped {
+      background: linear-gradient(165deg, rgba(16, 80, 60, 0.38) 0%, rgba(18, 26, 34, 0.92) 55%, rgba(13, 20, 26, 0.96) 100%);
+      border-color: rgba(52, 211, 153, 0.5);
+      box-shadow: inset 0 1px 0 rgba(167, 243, 208, 0.25), 0 24px 56px rgba(0, 0, 0, 0.65), 0 0 36px rgba(16, 185, 129, 0.18);
+    }
+
+    .card-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .topic-chip {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink-muted);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 3px 9px;
+      border-radius: 8px;
+    }
+
+    .topic-chip.green {
+      color: #a7f3d0;
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(52, 211, 153, 0.25);
+    }
+
+    .card-question {
+      font-size: 18px;
+      line-height: 1.5;
+      font-weight: 600;
+      color: #fff;
+      padding: 4px 0 12px;
+    }
+
+    .card-answer {
+      display: none;
+      padding-top: 8px;
+      border-top: 1px solid rgba(52, 211, 153, 0.25);
+      margin-top: 8px;
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: #e2e8f0;
+    }
+
+    .demo-card.card-flipped .card-answer {
+      display: block;
+      animation: srsFadeIn 0.26s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+
+    .card-turn-back {
+      font-size: 11px;
+      font-weight: 600;
+      color: #cbd5e1;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .demo-card.card-flipped .card-turn-back {
+      display: inline-block;
+    }
+
+    /* Док действий */
+    .action-dock {
+      width: 100%;
+      position: relative;
+    }
+
+    .btn-flip-cta {
+      width: 100%;
+      height: 50px;
+      border-radius: 14px;
+      background: rgba(16, 185, 129, 0.18);
+      border: 1.5px solid rgba(52, 211, 153, 0.5);
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-flip-cta:hover {
+      background: rgba(16, 185, 129, 0.28);
+      border-color: rgba(52, 211, 153, 0.8);
+      transform: translateY(-1px);
+    }
+
+    .btn-flip-cta.hidden {
+      display: none;
+    }
+
+    /* Сетка 4 кнопок оценок */
+    .rating-grid {
+      display: none;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      animation: srsFadeIn 0.26s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+
+    .rating-grid.visible {
+      display: grid;
+    }
+
+    @keyframes srsFadeIn {
+      from { opacity: 0; transform: scale(0.985); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .rate-btn {
+      position: relative;
+      border-radius: 14px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      user-select: none;
+      -webkit-user-select: none;
+      outline: none;
+    }
+
+    .rate-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* Вариант 1 кнопок: Лаконичный однострочный (Рекомендуемый) */
+    .buttons-mode-clean .rate-btn {
+      height: 48px;
+      padding: 0 12px;
+    }
+
+    .buttons-mode-clean .rate-btn .btn-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .buttons-mode-clean .rate-btn .btn-sub {
+      display: none;
+    }
+
+    /* Вариант 2 кнопок: С микро-интервалом (без градусов) */
+    .buttons-mode-intervals .rate-btn {
+      height: 52px;
+      padding: 6px 10px;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .buttons-mode-intervals .rate-btn .btn-title {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .buttons-mode-intervals .rate-btn .btn-sub {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 600;
+      opacity: 0.75;
+      font-family: var(--font-mono);
+    }
+
+    /* Цвета кнопок */
+    .rate-btn.btn-again {
+      background: var(--rose-surface);
+      border-color: rgba(244, 63, 94, 0.35);
+      color: #fda4af;
+    }
+    .rate-btn.btn-again:hover {
+      background: rgba(244, 63, 94, 0.22);
+      border-color: rgba(244, 63, 94, 0.55);
+      box-shadow: 0 4px 14px rgba(244, 63, 94, 0.25);
+    }
+
+    .rate-btn.btn-hard {
+      background: var(--amber-surface);
+      border-color: rgba(245, 158, 11, 0.35);
+      color: #fde68a;
+    }
+    .rate-btn.btn-hard:hover {
+      background: rgba(245, 158, 11, 0.22);
+      border-color: rgba(245, 158, 11, 0.55);
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25);
+    }
+
+    .rate-btn.btn-good {
+      background: var(--emerald-surface);
+      border-color: rgba(52, 211, 153, 0.45);
+      color: #a7f3d0;
+    }
+    .rate-btn.btn-good:hover {
+      background: rgba(16, 185, 129, 0.26);
+      border-color: rgba(52, 211, 153, 0.7);
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+    }
+
+    .rate-btn.btn-easy {
+      background: var(--cyan-surface);
+      border-color: rgba(6, 182, 212, 0.45);
+      color: #a5f3fc;
+    }
+    .rate-btn.btn-easy:hover {
+      background: rgba(6, 182, 212, 0.24);
+      border-color: rgba(6, 182, 212, 0.7);
+      box-shadow: 0 4px 16px rgba(6, 182, 212, 0.3);
+    }
+
+    /* =========================================================
+       ВСПЛЫВАЮЩИЕ ГРАДУСЫ (GAMIFICATION TOASTS / PARTICLES)
+       ========================================================= */
+
+    /* Контейнер для парящих частиц */
+    #gamification-fx-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: visible;
+      z-index: 100;
+    }
+
+    /* ВАРИАНТ 1 ВСПЛЫВАШКИ: Неоновый кристаллический термо-бейдж (Рекомендуемый) */
+    .float-toast-badge {
+      position: absolute;
+      transform: translate(-50%, -100%);
+      pointer-events: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      animation: floatUpToast 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      white-space: nowrap;
+    }
+
+    @keyframes floatUpToast {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, 0) scale(0.7);
+      }
+      20% {
+        opacity: 1;
+        transform: translate(-50%, -24px) scale(1.15);
+      }
+      70% {
+        opacity: 0.95;
+        transform: translate(-50%, -46px) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -64px) scale(0.92);
+      }
+    }
+
+    .toast-amber {
+      color: #fde68a;
+      background: rgba(245, 158, 11, 0.22);
+      border: 1.5px solid rgba(245, 158, 11, 0.6);
+      box-shadow: 0 0 18px rgba(245, 158, 11, 0.45);
+    }
+
+    .toast-emerald {
+      color: #a7f3d0;
+      background: rgba(16, 185, 129, 0.25);
+      border: 1.5px solid rgba(52, 211, 153, 0.7);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.55);
+    }
+
+    .toast-cyan {
+      color: #a5f3fc;
+      background: rgba(6, 182, 212, 0.25);
+      border: 1.5px solid rgba(6, 182, 212, 0.7);
+      box-shadow: 0 0 22px rgba(6, 182, 212, 0.6);
+    }
+
+    .toast-gray {
+      color: #94a3b8;
+      background: rgba(148, 163, 184, 0.16);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+    }
+
+    /* Лог событий стенда */
+    .stand-log-footer {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11.5px;
+      color: var(--ink-faint);
+    }
+
+    .last-action-tag {
+      font-family: var(--font-mono);
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.12);
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stand-wrapper">
+    <!-- Шапка стенда -->
+    <header class="stand-header">
+      <div class="stand-header-top">
+        <div class="stand-title">
+          <span class="pulse-beacon"></span>
+          <span>Интерактивный стенд SRS-геймификации</span>
+        </div>
+        <span class="badge-info" id="live-config-badge">Премиум · Живой стенд</span>
+      </div>
+      <p class="stand-desc">
+        Попробуйте в действии варианты ведущей бусины, очистки кнопок от шума и всплывающих градусов при нажатии оценок.
+      </p>
+    </header>
+
+    <!-- Панели переключения вариантов -->
+    <div class="controls-grid">
+      <!-- Контрол 1: Ведущая бусина -->
+      <div class="control-card">
+        <div class="control-label">1. Анимация ведущей бусины (дыхание):</div>
+        <div class="pill-group" id="bead-controls">
+          <button type="button" class="opt-pill" data-bead="soft">
+            ✨ Изумрудное дыхание (Soft Halo)
+          </button>
+          <button type="button" class="opt-pill active" data-bead="beacon">
+            📡 (Выбран) Квантовый маяк 2.8s (Wave Ripple)
+          </button>
+          <button type="button" class="opt-pill" data-bead="crystal">
+            💎 Неоновый кристалл (Solid Glow)
+          </button>
+        </div>
+      </div>
+
+      <!-- Контрол 2: Формат кнопок -->
+      <div class="control-card">
+        <div class="control-label">2. Формат кнопок (без градусов):</div>
+        <div class="pill-group" id="button-controls">
+          <button type="button" class="opt-pill active" data-btn-mode="clean">
+            ✨ (Рекомендация) Чистые монолитные (Только действие)
+          </button>
+          <button type="button" class="opt-pill" data-btn-mode="intervals">
+            📅 С микро-интервалами («2 дн», «3 дн» без градусов)
+          </button>
+        </div>
+      </div>
+
+      <!-- Контрол 3: Всплывающие градусы -->
+      <div class="control-card">
+        <div class="control-label">3. Формат всплывающих градусов:</div>
+        <div class="pill-group" id="toast-controls">
+          <button type="button" class="opt-pill active" data-toast-mode="clean">
+            ✨ (Рекомендация) «+2°», «+5°», «+10°» (Для «Не помню» скрыто)
+          </button>
+          <button type="button" class="opt-pill" data-toast-mode="emoji">
+            🔥 С эмодзи («🔥+2°», «🔥+5°», «✨+10°»)
+          </button>
+          <button type="button" class="opt-pill" data-toast-mode="celsius">
+            🌡 Полный градусник («+2°C», «+5°C», «+10°C»)
+          </button>
+          <button type="button" class="opt-pill" data-toast-mode="with-zero">
+            ⚪ Показывать «0°» для «Не помню»
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Интерактивная сцена карточки SRS -->
+    <main class="interactive-stage" id="stage-box">
+      <!-- Слой для парящих градусов -->
+      <div id="gamification-fx-layer"></div>
+
+      <!-- Бусины прогресса (Necklace) -->
+      <div class="necklace-wrapper">
+        <div class="necklace-label-row">
+          <span class="necklace-topic">Спринт карточек · List &amp; Dict Comprehensions</span>
+          <span class="necklace-step" id="bead-step-label">Шаг 4 из 10</span>
+        </div>
+        <div class="srs-beads-necklace" id="beads-bar">
+          <!-- 10 бусин: 3 done, 1 active, 6 future -->
+          <span class="dot-jewel done" title="Карточка 1"></span>
+          <span class="dot-jewel done" title="Карточка 2"></span>
+          <span class="dot-jewel done" title="Карточка 3"></span>
+          <span class="dot-jewel active bead-breath-beacon" id="active-bead" title="Текущая карточка 4"></span>
+          <span class="dot-jewel future" title="Карточка 5"></span>
+          <span class="dot-jewel future" title="Карточка 6"></span>
+          <span class="dot-jewel future" title="Карточка 7"></span>
+          <span class="dot-jewel future" title="Карточка 8"></span>
+          <span class="dot-jewel future" title="Карточка 9"></span>
+          <span class="dot-jewel future" title="Карточка 10"></span>
+        </div>
+      </div>
+
+      <!-- Каноническая карточка -->
+      <div class="card-stage">
+        <div class="demo-card" id="card-element">
+          <div class="card-meta-row">
+            <span class="topic-chip" id="card-state-chip">Вопрос</span>
+            <span class="card-turn-back" id="turn-back-hint">← К вопросу (Esc)</span>
+          </div>
+          <div class="card-question">
+            В чём разница между оператором <code style="color:#34d399;background:rgba(16,185,129,0.15);padding:2px 6px;border-radius:6px;font-family:var(--font-mono);font-size:15px;">is</code> и оператором <code style="color:#34d399;background:rgba(16,185,129,0.15);padding:2px 6px;border-radius:6px;font-family:var(--font-mono);font-size:15px;">==</code> в Python?
+          </div>
+          <div class="card-answer">
+            <b>is</b> сравнивает идентичность объектов в памяти (совпадение адресов <code style="color:#38bdf8;">id()</code>), а оператор <b>==</b> проверяет эквивалентность значений через вызов магического метода <code style="color:#38bdf8;">__eq__()</code>.
+          </div>
+        </div>
+      </div>
+
+      <!-- Док действий -->
+      <div class="action-dock buttons-mode-clean" id="dock-box">
+        <!-- Кнопка 1: Показать ответ -->
+        <button type="button" class="btn-flip-cta" id="btn-show-answer">
+          <span>Показать ответ</span>
+          <span style="font-family:var(--font-mono);font-size:11px;opacity:0.7;padding:2px 6px;border:1px solid rgba(255,255,255,0.25);border-radius:4px;">Пробел</span>
+        </button>
+
+        <!-- 4 кнопки оценок (новые названия: «Не помню», «Со скрипом», «Помню», «На автомате») -->
+        <div class="rating-grid" id="rating-panel">
+          <!-- 1: Не помню -->
+          <button type="button" class="rate-btn btn-again" data-rate="1">
+            <span class="btn-title">Не помню</span>
+            <span class="btn-sub">повтор</span>
+          </button>
+
+          <!-- 2: Со скрипом -->
+          <button type="button" class="rate-btn btn-hard" data-rate="2">
+            <span class="btn-title">Со скрипом</span>
+            <span class="btn-sub">2 дн</span>
+          </button>
+
+          <!-- 3: Помню -->
+          <button type="button" class="rate-btn btn-good" data-rate="3">
+            <span class="btn-title">Помню</span>
+            <span class="btn-sub">3 дн</span>
+          </button>
+
+          <!-- 4: На автомате -->
+          <button type="button" class="rate-btn btn-easy" data-rate="4">
+            <span class="btn-title">На автомате</span>
+            <span class="btn-sub">7 дн</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Подвал лога -->
+      <footer class="stand-log-footer">
+        <span>Кликните по карточке или кнопкам для тестирования анимаций</span>
+        <span class="last-action-tag" id="last-action-msg">Готов к тесту</span>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Текущее состояние стенда
+    const state = {
+      isFlipped: false,
+      beadStyle: 'beacon',        // soft | beacon | crystal
+      btnMode: 'clean',         // clean | intervals
+      toastMode: 'clean',       // clean | emoji | celsius | with-zero
+      stepIndex: 3
+    };
+
+    const cardEl = document.getElementById('card-element');
+    const showBtn = document.getElementById('btn-show-answer');
+    const ratingPanel = document.getElementById('rating-panel');
+    const activeBead = document.getElementById('active-bead');
+    const dockBox = document.getElementById('dock-box');
+    const fxLayer = document.getElementById('gamification-fx-layer');
+    const lastActionMsg = document.getElementById('last-action-msg');
+    const stateChip = document.getElementById('card-state-chip');
+
+    // Переворот карточки
+    function setFlipped(flipped) {
+      state.isFlipped = flipped;
+      if (flipped) {
+        cardEl.classList.add('card-flipped');
+        stateChip.textContent = 'Ответ (Изумруд)';
+        stateChip.classList.add('green');
+        showBtn.classList.add('hidden');
+        ratingPanel.classList.add('visible');
+      } else {
+        cardEl.classList.remove('card-flipped');
+        stateChip.textContent = 'Вопрос';
+        stateChip.classList.remove('green');
+        showBtn.classList.remove('hidden');
+        ratingPanel.classList.remove('visible');
+      }
+    }
+
+    cardEl.addEventListener('click', () => {
+      setFlipped(!state.isFlipped);
+      lastActionMsg.textContent = state.isFlipped ? 'Карточка перевёрнута' : 'Возврат к вопросу';
+    });
+
+    showBtn.addEventListener('click', () => {
+      setFlipped(true);
+      lastActionMsg.textContent = 'Открыт ответ';
+    });
+
+    // Обработка кликов по кнопкам оценки и спавн всплывающих градусов
+    ratingPanel.addEventListener('click', (e) => {
+      const btn = e.target.closest('.rate-btn');
+      if (!btn) return;
+
+      const rate = parseInt(btn.getAttribute('data-rate'), 10);
+      spawnFloatingToast(btn, rate);
+
+      // Шаг вперёд по бусинам
+      advanceBead();
+
+      // Сброс карточки обратно к вопросу через 350мс
+      setTimeout(() => {
+        setFlipped(false);
+      }, 350);
+    });
+
+    // Спавн парящей плашки градусов
+    function spawnFloatingToast(btnEl, rate) {
+      let toastText = '';
+      let colorClass = '';
+
+      if (rate === 1) {
+        if (state.toastMode === 'with-zero') {
+          toastText = '0°';
+          colorClass = 'toast-gray';
+        } else {
+          lastActionMsg.textContent = 'Не помню: карта в повторе (без градусов)';
+          return; // Для «Не помню» по умолчанию не спавним градусы
+        }
+      } else if (rate === 2) {
+        colorClass = 'toast-amber';
+        if (state.toastMode === 'emoji') toastText = '🔥 +2°';
+        else if (state.toastMode === 'celsius') toastText = '+2°C';
+        else toastText = '+2°';
+      } else if (rate === 3) {
+        colorClass = 'toast-emerald';
+        if (state.toastMode === 'emoji') toastText = '🔥 +5°';
+        else if (state.toastMode === 'celsius') toastText = '+5°C';
+        else toastText = '+5°';
+      } else if (rate === 4) {
+        colorClass = 'toast-cyan';
+        if (state.toastMode === 'emoji') toastText = '✨ +10°';
+        else if (state.toastMode === 'celsius') toastText = '+10°C';
+        else toastText = '+10°';
+      }
+
+      lastActionMsg.textContent = `Оценка ${rate}: всплыло «${toastText}»`;
+
+      const btnRect = btnEl.getBoundingClientRect();
+      const stageRect = document.getElementById('stage-box').getBoundingClientRect();
+
+      const posX = (btnRect.left + btnRect.width / 2) - stageRect.left;
+      const posY = btnRect.top - stageRect.top;
+
+      const toast = document.createElement('div');
+      toast.className = `float-toast-badge ${colorClass}`;
+      toast.textContent = toastText;
+      toast.style.left = posX + 'px';
+      toast.style.top = posY + 'px';
+
+      fxLayer.appendChild(toast);
+
+      setTimeout(() => {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 900);
+    }
+
+    // Продвижение по бусинам
+    function advanceBead() {
+      const beads = document.querySelectorAll('#beads-bar .dot-jewel');
+      state.stepIndex = (state.stepIndex + 1) % beads.length;
+      if (state.stepIndex === 0) state.stepIndex = 1;
+
+      beads.forEach((b, idx) => {
+        b.className = 'dot-jewel';
+        if (idx < state.stepIndex) {
+          b.classList.add('done');
+        } else if (idx === state.stepIndex) {
+          b.classList.add('active');
+          applyBeadClass(b);
+        } else {
+          b.classList.add('future');
+        }
+      });
+
+      document.getElementById('bead-step-label').textContent = `Шаг ${state.stepIndex + 1} из ${beads.length}`;
+    }
+
+    function applyBeadClass(el) {
+      el.classList.remove('bead-breath-soft', 'bead-breath-beacon', 'bead-breath-crystal');
+      if (state.beadStyle === 'soft') el.classList.add('bead-breath-soft');
+      else if (state.beadStyle === 'beacon') el.classList.add('bead-breath-beacon');
+      else if (state.beadStyle === 'crystal') el.classList.add('bead-breath-crystal');
+    }
+
+    // Переключение стилей бусины
+    document.getElementById('bead-controls').addEventListener('click', (e) => {
+      const btn = e.target.closest('.opt-pill');
+      if (!btn) return;
+      document.querySelectorAll('#bead-controls .opt-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.beadStyle = btn.getAttribute('data-bead');
+      applyBeadClass(document.querySelector('#beads-bar .dot-jewel.active'));
+      lastActionMsg.textContent = `Бусина: ${btn.textContent.trim()}`;
+    });
+
+    // Переключение режима кнопок
+    document.getElementById('button-controls').addEventListener('click', (e) => {
+      const btn = e.target.closest('.opt-pill');
+      if (!btn) return;
+      document.querySelectorAll('#button-controls .opt-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.btnMode = btn.getAttribute('data-btn-mode');
+      
+      dockBox.classList.remove('buttons-mode-clean', 'buttons-mode-intervals');
+      dockBox.classList.add(`buttons-mode-${state.btnMode}`);
+      lastActionMsg.textContent = `Кнопки: ${btn.textContent.trim()}`;
+    });
+
+    // Переключение формата всплывашек градусов
+    document.getElementById('toast-controls').addEventListener('click', (e) => {
+      const btn = e.target.closest('.opt-pill');
+      if (!btn) return;
+      document.querySelectorAll('#toast-controls .opt-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.toastMode = btn.getAttribute('data-toast-mode');
+      lastActionMsg.textContent = `Градусы: ${btn.textContent.trim()}`;
+    });
+
+    // Хоткеи Esc и Пробел для удобства
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && !state.isFlipped) {
+        e.preventDefault();
+        setFlipped(true);
+      } else if (e.code === 'Escape' && state.isFlipped) {
+        e.preventDefault();
+        setFlipped(false);
+      }
+    });
+  </script>
+</body>
+</html>

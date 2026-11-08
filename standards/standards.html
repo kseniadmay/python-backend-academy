@@ -246,6 +246,7 @@
     box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.20), 0 4px 20px -2px rgba(16, 185, 129, 0.35);
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
+  .card-laser .dominant-btn { pointer-events: none !important; }
   .card-laser:hover .dominant-btn,
   .dominant-btn:hover {
     background: linear-gradient(180deg, rgba(16, 185, 129, 0.36) 0%, rgba(6, 78, 59, 0.35) 100%);
@@ -28618,24 +28619,25 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
   /* Активная ведущая бусина шага — сияющий изумрудный самоцвет с белым контуром фокуса */
 
-  /* Ведущая активная бусина SRS — Квантовый маяк с плавной кольцевой волной (Wave Ripple 2.8s) */
+  /* Ведущая активная бусина SRS — Живое глубокое дыхание ядра (2.2s ease-in-out) с квантовым ореолом */
   .dot-jewel.active,
   .dot-jewel.bead-active-leading,
   .srs-beads-necklace .dot-jewel.active,
   .fc-beads-necklace .dot-jewel.active,
   .cards-hub-container .srs-deck-beads-bar .dot-jewel.active,
   .cards-hub-container .dot-jewel.bead-active-leading {
-    width: 11px !important;
-    height: 11px !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+    width: 12px !important;
+    height: 12px !important;
     background: #ffffff !important;
-    border: 2px solid #34d399 !important;
-    box-shadow: 0 0 8px rgba(52, 211, 153, 0.9), 0 0 16px rgba(16, 185, 129, 0.5) !important;
+    border: 2.5px solid #34d399 !important;
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.95), 0 0 20px rgba(16, 185, 129, 0.65) !important;
     position: relative !important;
-    z-index: 3 !important;
-    margin: 0 3px !important;
+    z-index: 4 !important;
+    margin: 0 4px !important;
     overflow: visible !important;
-    animation: none !important;
-    transform: none !important;
+    animation: srs-active-bead-pulse 2.2s infinite ease-in-out !important;
   }
 
   .dot-jewel.active::before,
@@ -28645,26 +28647,35 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   .cards-hub-container .srs-deck-beads-bar .dot-jewel.active::before {
     content: '' !important;
     position: absolute !important;
-    top: -4px !important;
-    left: -4px !important;
-    right: -4px !important;
-    bottom: -4px !important;
+    top: -5px !important;
+    left: -5px !important;
+    right: -5px !important;
+    bottom: -5px !important;
     border-radius: 50% !important;
-    border: 1.5px solid #34d399 !important;
+    border: 1.5px solid rgba(52, 211, 153, 0.55) !important;
     pointer-events: none !important;
-    animation: srs-active-bead-pulse 2.8s infinite cubic-bezier(0, 0.2, 0.8, 1) !important;
+    animation: srs-active-bead-halo 2.2s infinite ease-in-out !important;
   }
 
   @keyframes srs-active-bead-pulse {
-    0% {
-      transform: scale(0.85);
-      opacity: 1;
-      box-shadow: 0 0 6px rgba(52, 211, 153, 0.85);
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.4), 0 0 10px rgba(52, 211, 153, 0.75);
     }
-    100% {
-      transform: scale(2.4);
-      opacity: 0;
-      box-shadow: 0 0 0 transparent;
+    50% {
+      transform: scale(1.28);
+      box-shadow: 0 0 0 4.5px rgba(16, 185, 129, 0.6), 0 0 22px #34d399, 0 0 32px rgba(16, 185, 129, 0.65);
+    }
+  }
+
+  @keyframes srs-active-bead-halo {
+    0%, 100% {
+      transform: scale(0.95);
+      opacity: 0.35;
+    }
+    50% {
+      transform: scale(1.4);
+      opacity: 0.9;
     }
   }
 
@@ -55883,7 +55894,7 @@ viewDashboard = function(){
 
         <!-- Доминантный Single Dominant CTA -->
         <div class="focus-cta-wrap" style="margin-top:4px;">
-          <${firstUnreadK || !isPracticeActive && !isCardsActive ? 'button' : 'a'} ${ctaAttrs}>
+          <${(ctaAttrs && ctaAttrs.includes('href=')) ? 'a' : 'button'} ${ctaAttrs}>
             <span style="display:inline-flex;align-items:center;gap:8px;">
               <span>${ctaLabel}</span>
             </span>
@@ -55891,7 +55902,7 @@ viewDashboard = function(){
               <span class="linear-cta-badge">${ctaBadge}</span>
               <span style="font-size:1.1rem;line-height:1;">➔</span>
             </div>
-          </${firstUnreadK || !isPracticeActive && !isCardsActive ? 'button' : 'a'}>
+          </${(ctaAttrs && ctaAttrs.includes('href=')) ? 'a' : 'button'}>
         </div>
       </div>
 
@@ -56028,9 +56039,9 @@ function renderDominantHeroCard(isMobile){
         <span class="eta-chip">${d.eta}</span>
       </div>
       <div class="card-mission-title" style="${titleStyle}">${escapeHtmlStr(d.title)}</div>
-      <button class="dominant-btn" type="button" style="${btnStyle}">
+      <div class="dominant-btn" role="presentation" style="${btnStyle}">
         <span>${d.btnText}</span>
-      </button>
+      </div>
     </a>
   `;
 }
@@ -58420,6 +58431,32 @@ document.addEventListener('click', async function(e){
   }
 
 
+
+    // Клик по зелёному бейджу в сайдбаре (.card-laser)
+  const heroLaser = e.target.closest('.card-laser');
+  if(heroLaser){
+    const href = heroLaser.getAttribute('href');
+    if(href && href.startsWith('#')){
+      if(location.hash === href){
+        e.preventDefault();
+        if(typeof render === 'function') render();
+        return;
+      }
+    }
+  }
+
+  // Клик по Single Dominant CTA фокус-карточки (.cocoon-focus-cta)
+  const focusDominantCta = e.target.closest('.cocoon-focus-cta');
+  if(focusDominantCta){
+    const href = focusDominantCta.getAttribute('href');
+    if(href && href.startsWith('#')){
+      if(location.hash === href){
+        e.preventDefault();
+        if(typeof render === 'function') render();
+        return;
+      }
+    }
+  }
 
   const runInl = e.target.closest('[data-run-inline], [data-run-snippet]');
 
@@ -65960,6 +65997,15 @@ window.handleSilkActionClick = function(){
   window.closeSilkSheet();
 
   if(d.type === 'chapter'){
+    const act = document.getElementById('active-target-lesson') || document.querySelector('.hex-node--active');
+    if(act){
+      act.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const link = act.querySelector('a') || (act.tagName === 'A' ? act : null);
+      if(link && link.getAttribute('href')){
+        location.hash = link.getAttribute('href');
+        return;
+      }
+    }
     const pill = document.getElementById(`chapter-${d.chapNum}-pill`);
     if(pill) pill.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
