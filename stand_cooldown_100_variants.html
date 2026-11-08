@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Визуализация Варианта 3: Темное стекло с пылающим золотым сердцем</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg-obsidian: #090d16;
+      --sidebar-bg: rgba(11, 15, 24, 0.94);
+      --card-surface: rgba(18, 24, 34, 0.92);
+      --ink: #f8fafc;
+      --ink-soft: #cbd5e1;
+      --ink-muted: #64748b;
+      --border-subtle: rgba(255, 255, 255, 0.10);
+      --font-code: "JetBrains Mono", Consolas, Monaco, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg-obsidian);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stand-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+
+    .sidebar-deck-cell {
+      height: 28px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: default;
+      user-select: none;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       СИЛА СИЯНИЯ (КАНОН 1 В 1 СОХРАНЕНА):
+       0%:  0 0 16px rgba(255, 255, 255, 0.60), 0 0 28px rgba(251, 191, 36, 0.45)
+       50%: 0 0 26px rgba(255, 255, 255, 0.90), 0 0 44px rgba(251, 191, 36, 0.70)
+       ════════════════════════════════════════════════════════════════ */
+    @keyframes animGoldCanon {
+      0%, 100% {
+        border-color: rgba(254, 240, 138, 0.95);
+        box-shadow: 
+          inset 0 1px 2px #ffffff,
+          inset 0 0 10px rgba(251, 191, 36, 0.50),
+          inset 0 -1.5px 4px rgba(217, 119, 6, 0.30),
+          0 0 16px rgba(255, 255, 255, 0.60),
+          0 0 28px rgba(251, 191, 36, 0.45);
+      }
+      50% {
+        border-color: #ffffff;
+        box-shadow: 
+          inset 0 1.5px 4px #ffffff,
+          inset 0 0 18px rgba(251, 191, 36, 0.85),
+          inset 0 -2px 6px rgba(217, 119, 6, 0.45),
+          0 0 26px rgba(255, 255, 255, 0.90),
+          0 0 44px rgba(251, 191, 36, 0.70);
+        transform: translateY(-0.5px);
+      }
+    }
+
+    /* ВАРИАНТ 3.1: ЗОЛОТОЙ ОБСИДИАН (BLACK-GOLD OBSIDIAN JEWEL)
+       Плотное темное ювелирное стекло с чистым золотым огнем и сияющим белым кантом */
+    .badge-dark-obsidian {
+      background: linear-gradient(145deg, rgba(48, 36, 18, 0.88) 0%, rgba(28, 20, 10, 0.94) 50%, rgba(14, 10, 6, 0.98) 100%) !important;
+      border: 1.5px solid rgba(254, 240, 138, 0.95) !important;
+      color: #ffffff !important;
+      animation: animGoldCanon 2.6s infinite ease-in-out !important;
+    }
+
+    /* ВАРИАНТ 3.2: ПЫЛАЮЩЕЕ ЗОЛОТОЕ СЕРДЦЕ (RADIAL GOLDEN CORE)
+       Яркий золотой фокус в центре, плавно уходящий в темные стеклянные края */
+    .badge-dark-radial {
+      background: radial-gradient(ellipse at 50% 50%, rgba(254, 240, 138, 0.55) 0%, rgba(245, 158, 11, 0.35) 45%, rgba(24, 16, 8, 0.94) 100%) !important;
+      border: 1.5px solid rgba(254, 240, 138, 0.95) !important;
+      color: #ffffff !important;
+      animation: animGoldCanon 2.6s infinite ease-in-out !important;
+    }
+
+    /* ВАРИАНТ 3.3: ЧИСТЫЙ ЯНТАРНЫЙ КРИСТАЛЛ (LIQUID AMBER GLASS)
+       Благородный медовый янтарь средней плотности, без черного нагара */
+    .badge-dark-amber {
+      background: linear-gradient(145deg, rgba(245, 158, 11, 0.45) 0%, rgba(180, 83, 9, 0.65) 50%, rgba(78, 28, 4, 0.92) 100%) !important;
+      border: 1.5px solid rgba(254, 240, 138, 0.95) !important;
+      color: #ffffff !important;
+      animation: animGoldCanon 2.6s infinite ease-in-out !important;
+    }
+
+    /* Текст внутри плашек */
+    .gold-crisp-text {
+      color: #ffffff !important;
+      font-weight: 800 !important;
+      letter-spacing: -0.01em !important;
+      text-shadow: 0 0 6px rgba(255, 255, 255, 0.9), 0 0 14px rgba(251, 191, 36, 0.7) !important;
+      white-space: nowrap;
+    }
+
+    /* Было: Оригинал с нагаром */
+    .badge-tier-100-old {
+      background: linear-gradient(140deg, rgba(255, 255, 255, 0.70) 0%, rgba(254, 240, 138, 0.45) 28%, rgba(245, 158, 11, 0.38) 65%, rgba(40, 18, 5, 0.92) 100%) !important;
+      border: 1.5px solid rgba(255, 255, 255, 0.90) !important;
+      color: #ffffff !important;
+    }
+
+    /* Было: Сплошная белая плашка (4-B.3) для контраста */
+    .badge-white-slab {
+      background: linear-gradient(135deg, #ffffff 0%, #fef9c3 22%, #fde047 55%, #eab308 100%) !important;
+      border: 1.5px solid #ffffff !important;
+      color: #ffffff !important;
+    }
+
+    /* Ступени 0-75% из физической шкалы */
+    .pill-opt-0 {
+      background: linear-gradient(145deg, rgba(30, 41, 59, 0.70) 0%, rgba(15, 23, 42, 0.90) 100%) !important;
+      border: 1px solid rgba(148, 163, 184, 0.28) !important;
+      color: #94a3b8 !important;
+    }
+    .pill-opt-25 {
+      background: linear-gradient(145deg, rgba(127, 29, 29, 0.60) 0%, rgba(69, 10, 10, 0.85) 100%) !important;
+      border: 1px solid rgba(239, 68, 68, 0.45) !important;
+      color: #fca5a5 !important;
+    }
+    .pill-opt-50 {
+      background: linear-gradient(145deg, rgba(194, 65, 12, 0.60) 0%, rgba(124, 45, 18, 0.85) 100%) !important;
+      border: 1px solid rgba(249, 115, 22, 0.60) !important;
+      color: #fed7aa !important;
+    }
+    .pill-opt-75 {
+      background: linear-gradient(145deg, rgba(217, 119, 6, 0.65) 0%, rgba(146, 64, 14, 0.88) 100%) !important;
+      border: 1px solid rgba(245, 158, 11, 0.75) !important;
+      color: #fef3c7 !important;
+    }
+
+    /* Имитация колоды сайдбара */
+    .sidebar-hud-deck {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      background: rgba(0, 0, 0, 0.40);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      width: fit-content;
+    }
+    .fake-pomo-pill {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+    }
+    .fake-theme-toggle {
+      width: 44px;
+      height: 24px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      position: relative;
+    }
+    .fake-theme-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #34d399;
+      position: absolute;
+      top: 2px;
+      right: 3px;
+    }
+    .fake-settings-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body class="p-6">
+
+  <!-- ШАПКА СТЕНДА -->
+  <header class="stand-header rounded-2xl mb-8">
+    <div class="flex items-center gap-3">
+      <span class="w-3 h-3 rounded-full bg-amber-400 animate-pulse"></span>
+      <div>
+        <h1 class="text-base font-bold text-white flex items-center gap-2">
+          <span>Стенд Варианта 3: Тёмное стекло с пылающим золотым сердцем</span>
+          <code class="text-xs text-amber-300 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/30">Dark Gold Glass</code>
+        </h1>
+        <p class="text-xs text-slate-400 mt-0.5">Единая стеклянная глубина капсулы со всеми плашками в сайдбаре + ослепительный золотой огонь внутри</p>
+      </div>
+    </div>
+    <div class="text-xs text-slate-400 flex items-center gap-2">
+      <span class="px-2.5 py-1 rounded-md bg-amber-950/60 text-amber-300 border border-amber-500/30 font-mono">100% Dark Glass</span>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto space-y-10">
+
+    <!-- ТРИ ВОПЛОЩЕНИЯ ВАРИАНТА 3 КРУПНО -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <!-- 3.1: ЗОЛОТОЙ ОБСИДИАН -->
+      <div class="p-5 rounded-2xl bg-slate-900/90 border-2 border-amber-500/60 shadow-[0_0_24px_rgba(245,158,11,0.20)] flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase text-amber-400 flex items-center gap-1.5">
+              <span>★ Рекомендуемый (3.1)</span>
+            </span>
+            <span class="text-[11px] font-mono text-amber-300 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/30">Золотой Обсидиан</span>
+          </div>
+          <h3 class="text-sm font-semibold text-white mb-1">Золотой обсидиан (Black-Gold)</h3>
+          <p class="text-xs text-slate-400 mb-6">Темное ювелирное стекло с золотыми переливами. Сияющий золотой кант, роскошное внешнее свечение и 100% читаемость белого текста.</p>
+        </div>
+        
+        <div class="bg-black/60 p-8 rounded-xl flex flex-col items-center justify-center gap-4 border border-white/5">
+          <div class="sidebar-deck-cell badge-dark-obsidian">
+            <span class="gold-crisp-text">✨ 100%</span>
+          </div>
+          <span class="text-[11px] text-amber-400 font-mono">Глубокое темное стекло + золотой огонь</span>
+        </div>
+      </div>
+
+      <!-- 3.2: РАДИАЛЬНОЕ ЗОЛОТОЕ СЕРДЦЕ -->
+      <div class="p-5 rounded-2xl bg-slate-900/80 border border-yellow-500/30 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase text-yellow-300">Вариант 3.2</span>
+            <span class="text-[11px] font-mono text-slate-400">Пульсирующее ядро</span>
+          </div>
+          <h3 class="text-sm font-semibold text-white mb-1">Пылающее золотое ядро</h3>
+          <p class="text-xs text-slate-400 mb-6">Яркий золотой свет горит в самом центре плашки, а к краям мягко рассеивается в дымчатое стекло.</p>
+        </div>
+        
+        <div class="bg-black/60 p-8 rounded-xl flex flex-col items-center justify-center gap-4 border border-white/5">
+          <div class="sidebar-deck-cell badge-dark-radial">
+            <span class="gold-crisp-text">✨ 100%</span>
+          </div>
+          <span class="text-[11px] text-yellow-300 font-mono">Светящийся центр + мягкие края</span>
+        </div>
+      </div>
+
+      <!-- 3.3: ЧИСТЫЙ ЯНТАРНЫЙ КРИСТАЛЛ -->
+      <div class="p-5 rounded-2xl bg-slate-900/80 border border-orange-500/30 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold uppercase text-orange-400">Вариант 3.3</span>
+            <span class="text-[11px] font-mono text-slate-400">Жидкий янтарь</span>
+          </div>
+          <h3 class="text-sm font-semibold text-white mb-1">Жидкий медовый янтарь</h3>
+          <p class="text-xs text-slate-400 mb-6">Теплый янтарный полупрозрачный леденец без черноты и без слепящей белизны. Очень сочный и мягкий.</p>
+        </div>
+        
+        <div class="bg-black/60 p-8 rounded-xl flex flex-col items-center justify-center gap-4 border border-white/5">
+          <div class="sidebar-deck-cell badge-dark-amber">
+            <span class="gold-crisp-text">✨ 100%</span>
+          </div>
+          <span class="text-[11px] text-orange-400 font-mono">Теплый медовый кристалл</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- СРАВНЕНИЕ ТРЁХ ПОДХОДОВ В КОНТЕКСТЕ САЙДБАРА -->
+    <div class="p-6 rounded-2xl bg-slate-900/90 border border-white/10 space-y-6">
+      <div class="flex items-center justify-between border-b border-white/10 pb-4">
+        <div>
+          <h2 class="text-sm font-bold text-white uppercase tracking-wider">Сравнение философии: Было ➔ Белая плашка (4-B.3) ➔ Золотой Обсидиан (3.1)</h2>
+          <p class="text-xs text-slate-400 mt-1">Посмотрите, как органично Вариант 3.1 вписывается в общую массу футера</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- 1. Было (Чернеющий нагар) -->
+        <div class="p-4 rounded-xl bg-[#0b0f18] border border-rose-500/20 space-y-2">
+          <span class="text-[11px] font-mono text-rose-400">1. Было (Грязный нагар):</span>
+          <div class="py-2 flex justify-center">
+            <div class="sidebar-hud-deck">
+              <div class="sidebar-deck-cell fake-pomo-pill">⏱ 15:00</div>
+              <div class="sidebar-deck-cell badge-tier-100-old"><span>✨ 100%</span></div>
+              <div class="fake-theme-toggle"><div class="fake-theme-thumb"></div></div>
+              <div class="fake-settings-btn">⚙</div>
+            </div>
+          </div>
+          <p class="text-[10px] text-slate-500 text-center">Глухое коричнево-черное пятно</p>
+        </div>
+
+        <!-- 2. Сплошная белая плашка 4-B.3 -->
+        <div class="p-4 rounded-xl bg-[#0b0f18] border border-yellow-500/30 space-y-2">
+          <span class="text-[11px] font-mono text-yellow-300">2. Сплошная белая (4-B.3):</span>
+          <div class="py-2 flex justify-center">
+            <div class="sidebar-hud-deck">
+              <div class="sidebar-deck-cell fake-pomo-pill">⏱ 15:00</div>
+              <div class="sidebar-deck-cell badge-white-slab"><span class="text-white font-extrabold font-mono">✨ 100%</span></div>
+              <div class="fake-theme-toggle"><div class="fake-theme-thumb"></div></div>
+              <div class="fake-settings-btn">⚙</div>
+            </div>
+          </div>
+          <p class="text-[10px] text-slate-500 text-center">Очень яркая, выбивается по массе</p>
+        </div>
+
+        <!-- 3. Золотой Обсидиан 3.1 -->
+        <div class="p-4 rounded-xl bg-[#0b0f18] border-2 border-amber-500/60 shadow-[0_0_20px_rgba(245,158,11,0.25)] space-y-2">
+          <span class="text-[11px] font-mono text-amber-300 font-bold">★ 3. Золотой Обсидиан (3.1):</span>
+          <div class="py-2 flex justify-center">
+            <div class="sidebar-hud-deck">
+              <div class="sidebar-deck-cell fake-pomo-pill">⏱ 15:00</div>
+              <div class="sidebar-deck-cell badge-dark-obsidian"><span class="gold-crisp-text">✨ 100%</span></div>
+              <div class="fake-theme-toggle"><div class="fake-theme-thumb"></div></div>
+              <div class="fake-settings-btn">⚙</div>
+            </div>
+          </div>
+          <p class="text-[10px] text-amber-300 text-center">Идеальная масса + сияющее золото + резкий текст</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ПОЛНАЯ ШКАЛА С ВАРИАНТОМ 3.1 В КОНЦЕ -->
+    <div class="p-6 rounded-2xl bg-slate-900/90 border border-white/10 space-y-4">
+      <h2 class="text-sm font-bold text-white uppercase tracking-wider">Как Вариант 3.1 венчает единую гармоничную шкалу</h2>
+      <p class="text-xs text-slate-400">Все 5 плашек имеют одинаковую благородную плотность темного стекла, но огонь нарастает от искры до золотого триумфа:</p>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 pt-2">
+        <div class="p-3 rounded-lg bg-black/60 border border-white/5 flex flex-col items-center gap-2">
+          <span class="text-[10px] text-slate-400 font-mono">0% Титан</span>
+          <div class="sidebar-deck-cell pill-opt-0"><span>🌱 0%</span></div>
+        </div>
+        <div class="p-3 rounded-lg bg-black/60 border border-white/5 flex flex-col items-center gap-2">
+          <span class="text-[10px] text-red-400 font-mono">25% Уголь</span>
+          <div class="sidebar-deck-cell pill-opt-25"><span>🌱 25%</span></div>
+        </div>
+        <div class="p-3 rounded-lg bg-black/60 border border-white/5 flex flex-col items-center gap-2">
+          <span class="text-[10px] text-orange-400 font-mono">50% Горн</span>
+          <div class="sidebar-deck-cell pill-opt-50"><span>🌹 50%</span></div>
+        </div>
+        <div class="p-3 rounded-lg bg-black/60 border border-white/5 flex flex-col items-center gap-2">
+          <span class="text-[10px] text-amber-400 font-mono">75% Янтарь</span>
+          <div class="sidebar-deck-cell pill-opt-75"><span>🌺 75%</span></div>
+        </div>
+        <div class="p-3 rounded-lg bg-amber-950/30 border border-amber-500/50 flex flex-col items-center gap-2 shadow-[0_0_16px_rgba(245,158,11,0.25)]">
+          <span class="text-[10px] text-amber-300 font-mono font-bold">100% Обсидиан ★</span>
+          <div class="sidebar-deck-cell badge-dark-obsidian"><span class="gold-crisp-text">✨ 100%</span></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+</body>
+</html>
