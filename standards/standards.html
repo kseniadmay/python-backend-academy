@@ -4888,11 +4888,11 @@
 
     font-weight:700 !important;
 
-    color:var(--gold, #f59e0b) !important;
+    color:#34d399 !important;
 
-    background:rgba(245,158,11,0.12) !important;
+    background:rgba(16,185,129,0.14) !important;
 
-    border:1px solid rgba(245,158,11,0.32) !important;
+    border:1px solid rgba(16,185,129,0.35) !important;
 
     border-radius:6px;
 
@@ -4901,6 +4901,22 @@
     display:inline-block;
 
     line-height:1.35;
+
+    white-space:nowrap;
+
+    margin:0 1px;
+
+  }
+
+  [data-theme="light"] .fc-a code,
+
+  [data-theme="light"] #srs-card-answer code {
+
+    color:#059669 !important;
+
+    background:rgba(16,185,129,0.08) !important;
+
+    border-color:rgba(16,185,129,0.28) !important;
 
   }
 
@@ -30399,6 +30415,49 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 }
 
 
+    /* ==========================================================================
+     SRS Mobile UX Centered Layout & Void Elimination (Вариант 2):
+     Карточка и док действий объединены в единый центрированный блок с отступом 16px.
+     0 черных пустот и зазоров.
+     ========================================================================== */
+  @media (max-width: 880px) {
+    .cards-hub-container {
+      min-height: calc(100vh - 120px) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      padding-bottom: 24px !important;
+    }
+
+    .cards-hub-content {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      flex: 1 !important;
+      min-height: calc(100vh - 170px) !important;
+      margin: 0 auto !important;
+      width: 100% !important;
+      max-width: 700px !important;
+    }
+
+    .srs-action-dock,
+    footer.srs-action-dock,
+    body:not(.is-sprint-focus) .srs-action-dock {
+      position: relative !important;
+      bottom: auto !important;
+      margin-top: 16px !important;
+      margin-bottom: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      max-width: 700px !important;
+    }
+
+    #srs-card-answer,
+    .fc-a-mastery {
+      overflow-wrap: break-word !important;
+      word-break: normal !important;
+    }
+  }
+
   /* ==========================================================================
      Master Liquidation: Мобильный таббар полностью упразднён.
      Вся навигация переведена исключительно в боковой сайдбар Drawer.
@@ -46075,16 +46134,38 @@ function formatCardAnswerHTML(rawAnswer){
   let s = String(rawAnswer).trim();
 
   // Если ответ содержит точки с запятой (мульти-ответ или сравнение, напр. 401 и 403):
-  // разделяем по ';' на аккуратный структурированный список пунктов
+  // разделяем по ';' на аккуратный структурированный список пунктов ТОЛЬКО если точка с запятой
+  // не является частью HTML-сущности (&gt;, &lt;, &amp; и т.д.) и не находится внутри кода!
   if(s.includes(';') && !s.includes('```')){
-    const parts = s.split(';').map(p => p.trim()).filter(Boolean);
-    if(parts.length > 1){
-      const itemsHtml = parts.map(part => {
-        const normalized = part.replace(/\s+(?:—|–|-)\s+/g, ' — ');
-        const formatted = (typeof formatRichInlineText === 'function') ? formatRichInlineText(normalized) : normalized;
-        return `<div class="fc-answer-item"><span class="fc-answer-bullet">•</span> <span class="fc-answer-text">${formatted}</span></div>`;
-      }).join('');
-      return `<div class="fc-answer-multiline">${itemsHtml}</div>`;
+    const cleanForCheck = s.replace(/&[a-zA-Z0-9#]+;/g, '').replace(/<code>[\s\S]*?<\/code>/gi, '').replace(/`[^`\n]+`/g, '');
+    if(cleanForCheck.includes(';')){
+      const codeTokens = [];
+      const masked = s
+        .replace(/&[a-zA-Z0-9#]+;/g, m => {
+          codeTokens.push(m);
+          return `___ENTITY_${codeTokens.length - 1}___`;
+        })
+        .replace(/<code>[\s\S]*?<\/code>/gi, m => {
+          codeTokens.push(m);
+          return `___CODE_${codeTokens.length - 1}___`;
+        })
+        .replace(/`[^`\n]+`/g, m => {
+          codeTokens.push(m);
+          return `___CODE_${codeTokens.length - 1}___`;
+        });
+
+      const rawParts = masked.split(';').map(p => p.trim()).filter(Boolean);
+      if(rawParts.length > 1){
+        const parts = rawParts.map(p => {
+          return p.replace(/___(ENTITY|CODE)_(\d+)___/g, (_, type, idx) => codeTokens[Number(idx)]);
+        });
+        const itemsHtml = parts.map(part => {
+          const normalized = part.replace(/\s+(?:—|–|-)\s+/g, ' — ');
+          const formatted = (typeof formatRichInlineText === 'function') ? formatRichInlineText(normalized) : normalized;
+          return `<div class="fc-answer-item"><span class="fc-answer-bullet">•</span> <span class="fc-answer-text">${formatted}</span></div>`;
+        }).join('');
+        return `<div class="fc-answer-multiline">${itemsHtml}</div>`;
+      }
     }
   }
 
@@ -46987,7 +47068,7 @@ function viewCardsHub(){
 
                 <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
 
-                  ${cleanTitle ? `<span class="srs-card-topic-chip" title="${escapeHtmlStr(cleanTitle)}">${escapeHtmlStr(cleanTitle)}</span>` : ''}
+                  
 
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curKey) : ''}
 
@@ -47161,7 +47242,7 @@ function viewCardsHub(){
 
                 <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
 
-                  ${cleanDeckName ? `<span class="srs-card-topic-chip" title="${escapeHtmlStr(cleanDeckName)}">${escapeHtmlStr(cleanDeckName)}</span>` : ''}
+                  
 
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
 
@@ -47461,7 +47542,7 @@ function viewCardsHub(){
 
                 <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
 
-                  ${cleanCurDeckTitle ? `<span class="srs-card-topic-chip" title="${escapeHtmlStr(cleanCurDeckTitle)}">${escapeHtmlStr(cleanCurDeckTitle)}</span>` : ''}
+                  
 
                   ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
 
