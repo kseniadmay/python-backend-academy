@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Стенд в контексте веб-страницы — Python Backend Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #090c13;
+      --bg-surface: #0f1420;
+      --bg-card: rgba(18, 24, 38, 0.7);
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --line: rgba(255, 255, 255, 0.08);
+      --ink: #f8fafc;
+      --ink-soft: #cbd5e1;
+      --ink-muted: #94a3b8;
+      --emerald: #10b981;
+      --emerald-soft: rgba(16, 185, 129, 0.14);
+      --amber: #f59e0b;
+      --font-d: 'Onest', -apple-system, sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+      --font-title: 'Unbounded', sans-serif;
+      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    [data-theme="light"] {
+      --bg-canvas: #faf8f5;
+      --bg-surface: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.9);
+      --border-glass: rgba(0, 0, 0, 0.08);
+      --line: rgba(0, 0, 0, 0.07);
+      --ink: #0f172a;
+      --ink-soft: #334155;
+      --ink-muted: #64748b;
+      --emerald: #059669;
+      --emerald-soft: rgba(5, 150, 105, 0.1);
+      --amber: #d97706;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-canvas);
+      color: var(--ink);
+      font-family: var(--font-d);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    /* Верхняя панель переключения вариантов стенда */
+    .stand-bar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-glass);
+      padding: 12px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+    }
+    .stand-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .stand-bar-title {
+      font-family: var(--font-title);
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+    .variant-pills {
+      display: flex;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-glass);
+      border-radius: 9999px;
+      padding: 3px;
+      gap: 3px;
+    }
+    [data-theme="light"] .variant-pills {
+      background: rgba(0, 0, 0, 0.04);
+    }
+    .var-btn {
+      padding: 6px 14px;
+      border-radius: 9999px;
+      border: none;
+      background: transparent;
+      color: var(--ink-soft);
+      font-family: var(--font-m);
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .var-btn:hover {
+      color: var(--ink);
+    }
+    .var-btn.active {
+      background: #38bdf8;
+      color: #090c13;
+      box-shadow: 0 2px 8px rgba(56, 189, 248, 0.4);
+    }
+
+    .theme-flip-btn {
+      padding: 7px 16px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-glass);
+      color: var(--ink);
+      font-family: var(--font-m);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .theme-flip-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1px);
+    }
+
+    /* ОСНОВНОЙ ЛЕЙАУТ СТРАНИЦЫ АКАДЕМИИ */
+    .app-shell {
+      flex: 1;
+      display: flex;
+      min-height: calc(100vh - 58px);
+    }
+
+    /* Сайдбар */
+    .sidebar {
+      width: 270px;
+      flex: none;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--line);
+      padding: 18px 14px;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 58px;
+      height: calc(100vh - 58px);
+      box-sizing: border-box;
+      backdrop-filter: blur(24px);
+    }
+
+    /* Бренд */
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    [data-theme="light"] .brand-wrap {
+      border-bottom-color: rgba(0, 0, 0, 0.06);
+    }
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-d);
+      font-weight: 800;
+      font-size: 1.05rem;
+    }
+    .level-badge {
+      font-family: var(--font-m);
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: var(--emerald-soft);
+      color: var(--emerald);
+      border: 1px solid var(--emerald);
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+
+    /* Hero CTA Card */
+    .hero-action-card {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.14), rgba(5, 150, 105, 0.05));
+      border: 1.5px solid rgba(16, 185, 129, 0.35);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .hero-action-card:hover {
+      border-color: rgba(16, 185, 129, 0.6);
+      transform: translateY(-1px);
+    }
+    .hero-action-tag {
+      font-family: var(--font-m);
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--emerald);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .hero-action-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    /* Навигация */
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+    .nav-item {
+      height: 34px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 10px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--ink);
+    }
+    .nav-item.active {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--emerald);
+      font-weight: 700;
+    }
+    [data-theme="light"] .nav-item:hover {
+      background: rgba(0, 0, 0, 0.04);
+    }
+    [data-theme="light"] .nav-item.active {
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    /* ФУТЕР САЙДБАРА */
+    .sidebar-foot {
+      margin-top: auto;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+    [data-theme="light"] .sidebar-foot {
+      border-top-color: rgba(0, 0, 0, 0.06);
+    }
+
+    /* ВЕРХНИЙ РЯД ФУТЕРА: HUD */
+    .hud-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .pomo-btn, .heat-btn {
+      height: 33px;
+      border-radius: 10px;
+      font-family: var(--font-m);
+      font-size: 0.74rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .pomo-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--ink);
+    }
+    .pomo-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+    [data-theme="light"] .pomo-btn {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.07);
+    }
+    .heat-btn {
+      background: linear-gradient(135deg, rgba(254, 243, 199, 0.12), rgba(245, 158, 11, 0.18));
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      color: #fef08a;
+      animation: heatBreath 2.8s infinite ease-in-out;
+    }
+    @keyframes heatBreath {
+      0%, 100% {
+        box-shadow: 0 0 8px rgba(245, 158, 11, 0.35);
+        border-color: rgba(251, 191, 36, 0.5);
+      }
+      50% {
+        box-shadow: 0 0 16px rgba(245, 158, 11, 0.6);
+        border-color: rgba(251, 191, 36, 0.85);
+      }
+    }
+
+    /* СТИЛИ СЕРВИСНОГО РЯДА ПО ВАРИАНТАМ */
+
+    /* 0. ТЕКУЩИЙ (5 РАМОК, СКВИРКЛЫ 10px) */
+    .foot-mode-0 .svc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .foot-mode-0 .svc-icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    [data-theme="light"] .foot-mode-0 .svc-icon-btn {
+      background: rgba(0, 0, 0, 0.035);
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+    .foot-mode-0 .theme-pill-box {
+      width: 64px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      cursor: pointer;
+    }
+    [data-theme="light"] .foot-mode-0 .theme-pill-box {
+      background: rgba(0, 0, 0, 0.035);
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+    .foot-mode-0 .thumb {
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      right: 3px;
+      top: 3px;
+      transition: all 0.25s ease;
+    }
+    [data-theme="light"] .foot-mode-0 .thumb {
+      right: calc(100% - 29px);
+      background: #ffffff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* 1. ВАРИАНТ А: 60x30px (РЕКОМЕНДУЕМЫЙ GHOST + СБАЛАНСИРОВАННАЯ ПИЛЮЛЯ) */
+    .foot-mode-a .svc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2px;
+    }
+    .foot-mode-a .svc-icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--ink-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .foot-mode-a .svc-icon-btn:hover {
+      background: rgba(255, 255, 255, 0.09);
+      color: var(--ink);
+      transform: scale(1.06);
+    }
+    [data-theme="light"] .foot-mode-a .svc-icon-btn:hover {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    .foot-mode-a .theme-pill-box {
+      width: 60px;
+      height: 30px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      padding: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      cursor: pointer;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
+      transition: all 0.25s ease;
+    }
+    .foot-mode-a .theme-pill-box:hover {
+      border-color: rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    [data-theme="light"] .foot-mode-a .theme-pill-box {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.08);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    .foot-mode-a .thumb {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+      top: 2px;
+      right: 3px;
+      transition: transform 0.32s var(--spring), background-color 0.25s ease;
+      z-index: 1;
+    }
+    [data-theme="light"] .foot-mode-a .thumb {
+      transform: translateX(-30px);
+      background: #f59e0b;
+      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);
+    }
+
+    /* 2. ВАРИАНТ Б: 64x32px (ШИРОКАЯ ПИЛЮЛЯ) */
+    .foot-mode-b .svc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2px;
+    }
+    .foot-mode-b .svc-icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--ink-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .foot-mode-b .svc-icon-btn:hover {
+      background: rgba(255, 255, 255, 0.09);
+      color: var(--ink);
+    }
+    [data-theme="light"] .foot-mode-b .svc-icon-btn:hover {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    .foot-mode-b .theme-pill-box {
+      width: 64px;
+      height: 32px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      padding: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      cursor: pointer;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
+    }
+    [data-theme="light"] .foot-mode-b .theme-pill-box {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+    .foot-mode-b .thumb {
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+      top: 2px;
+      right: 3px;
+      transition: transform 0.32s var(--spring), background-color 0.25s ease;
+      z-index: 1;
+    }
+    [data-theme="light"] .foot-mode-b .thumb {
+      transform: translateX(-32px);
+      background: #f59e0b;
+    }
+
+    /* 3. ВАРИАНТ В: 52x26px (МИНИ-ПИЛЮЛЯ) */
+    .foot-mode-c .svc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2px;
+    }
+    .foot-mode-c .svc-icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--ink-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .foot-mode-c .svc-icon-btn:hover {
+      background: rgba(255, 255, 255, 0.09);
+      color: var(--ink);
+    }
+    [data-theme="light"] .foot-mode-c .svc-icon-btn:hover {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    .foot-mode-c .theme-pill-box {
+      width: 52px;
+      height: 26px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      cursor: pointer;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
+    }
+    [data-theme="light"] .foot-mode-c .theme-pill-box {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+    .foot-mode-c .thumb {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+      top: 2px;
+      right: 2px;
+      transition: transform 0.32s var(--spring), background-color 0.25s ease;
+      z-index: 1;
+    }
+    [data-theme="light"] .foot-mode-c .thumb {
+      transform: translateX(-26px);
+      background: #f59e0b;
+    }
+
+    /* Иконки солнца и луны в свитчере */
+    .icon-sun, .icon-moon {
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .icon-sun svg, .icon-moon svg {
+      width: 14px;
+      height: 14px;
+    }
+    [data-theme="dark"] .icon-sun { opacity: 0.35; color: #f59e0b; }
+    [data-theme="dark"] .icon-moon { opacity: 0.95; color: #34d399; }
+    [data-theme="light"] .icon-sun { opacity: 1; color: #f59e0b; }
+    [data-theme="light"] .icon-moon { opacity: 0.3; color: var(--ink-muted); }
+
+    /* КОНТЕНТНАЯ ОБЛАСТЬ СТРАНИЦЫ АКАДЕМИИ (КАРТА МАСТЕРСТВА) */
+    .main-canvas {
+      flex: 1;
+      padding: 32px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      max-width: 960px;
+    }
+    .content-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: 16px;
+      padding: 24px;
+      backdrop-filter: blur(16px);
+    }
+    .content-title {
+      font-family: var(--font-title);
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+    }
+    .content-subtitle {
+      font-size: 0.88rem;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+
+    /* Дерево уроков на карте */
+    .track-preview {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .track-node {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--border-glass);
+      transition: all 0.2s;
+    }
+    [data-theme="light"] .track-node {
+      background: rgba(0, 0, 0, 0.02);
+    }
+    .node-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+    .node-info {
+      flex: 1;
+    }
+    .node-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+    .node-desc {
+      font-size: 0.76rem;
+      color: var(--ink-muted);
+    }
+    .node-badge {
+      font-family: var(--font-m);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--emerald);
+    }
+
+    /* Плашка пояснения выбранного режима */
+    .mode-explainer {
+      padding: 12px 18px;
+      border-radius: 12px;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      color: var(--ink);
+      font-size: 0.85rem;
+      line-height: 1.45;
+    }
+    .mode-explainer strong {
+      color: #38bdf8;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Верхняя панель переключения вариантов -->
+  <header class="stand-bar">
+    <div class="stand-bar-left">
+      <span class="stand-bar-title">Просмотр в реальном контексте страницы:</span>
+      <div class="variant-pills">
+        <button class="var-btn" onclick="setMode('0')">0. Текущий (5 рамок, 10px)</button>
+        <button class="var-btn active" onclick="setMode('a')">А. Топ: 60×30px (Ghost + Пилюля)</button>
+        <button class="var-btn" onclick="setMode('b')">Б. Широкая: 64×32px</button>
+        <button class="var-btn" onclick="setMode('c')">В. Мини: 52×26px</button>
+      </div>
+    </div>
+    <div>
+      <button class="theme-flip-btn" onclick="toggleTheme()">
+        <span id="stand-theme-icon">🌓</span> Сменить тему (Dark / Light)
+      </button>
+    </div>
+  </header>
+
+  <!-- Приложение со всем окружением -->
+  <div class="app-shell">
+
+    <!-- НАСТОЯЩИЙ САЙДБАР АКАДЕМИИ -->
+    <aside class="sidebar foot-mode-a" id="academy-sidebar">
+      <!-- 1. Бренд -->
+      <div class="brand-wrap">
+        <div class="brand-left">
+          <span>🐍</span> Academy
+        </div>
+        <span class="level-badge">Junior 1</span>
+      </div>
+
+      <!-- 2. Hero CTA Card -->
+      <div class="hero-action-card">
+        <div class="hero-action-tag">🚀 Доминантное действие</div>
+        <div class="hero-action-title">Урок 1.2: Переменные и типы данных</div>
+      </div>
+
+      <!-- 3. Навигация -->
+      <nav class="nav-list">
+        <a href="#/path" class="nav-item active">
+          <span>🗺️</span> <span>Карта Мастерства</span>
+        </a>
+        <a href="#/cards" class="nav-item">
+          <span>🗂️</span> <span>Тренажер SRS</span>
+        </a>
+        <a href="#/practice" class="nav-item">
+          <span>⚡</span> <span>Практика IDE</span>
+        </a>
+        <a href="#/dashboard" class="nav-item">
+          <span>📊</span> <span>Достижения</span>
+        </a>
+      </nav>
+
+      <!-- 4. ФУТЕР САЙДБАРА (ЦЕЛЬ РЕДИЗАЙНА) -->
+      <div class="sidebar-foot" id="sidebar-foot">
+        <!-- Верхний ряд: HUD (таймер фокуса + кулдаун) -->
+        <div class="hud-row">
+          <button class="pomo-btn" type="button" title="Pomodoro фокус">⏱ 15:00 ▶</button>
+          <div class="heat-btn" title="Кулдаун термодинамики">🔥 100%</div>
+        </div>
+
+        <!-- Нижний сервисный ряд (Поиск + Свитчер тем + Настройки) -->
+        <div class="svc-row">
+          <button class="svc-icon-btn" type="button" title="Быстрый поиск (Ctrl+K)">🔍</button>
+          
+          <button class="theme-pill-box" type="button" onclick="toggleTheme()" title="Переключить тему оформления">
+            <span class="icon-sun">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg>
+            </span>
+            <span class="icon-moon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/></svg>
+            </span>
+            <span class="thumb"></span>
+          </button>
+
+          <button class="svc-icon-btn" type="button" title="Настройки">⚙️</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ОСНОВНАЯ ОБЛАСТЬ ОБУЧЕНИЯ (КАРТА МАСТЕРСТВА) -->
+    <main class="main-canvas">
+      <div class="mode-explainer" id="mode-explainer">
+        <strong>Выбран Вариант А (Рекомендуемый: 60×30px)</strong>: Иконки поиска и настроек очищены от жестких рамок и подсвечиваются мягким ореолом только при наведении. Свитчер тем оформлен в виде гармоничной капсулы 60×30px со скользящим бегунком 24px. Сайдбар дышит, весь лишний визуальный шум ушёл.
+      </div>
+
+      <div class="content-card">
+        <h1 class="content-title">🗺️ Карта Мастерства — Python Backend</h1>
+        <p class="content-subtitle">Интерактивный трек подготовки к Junior Backend Developer. Вы видите реальный масштаб страницы с сайдбаром слева и рабочей областью по центру.</p>
+
+        <div class="track-preview">
+          <div class="track-node">
+            <div class="node-icon">01</div>
+            <div class="node-info">
+              <div class="node-title">Основы синтаксиса, типизация и функции</div>
+              <div class="node-desc">12 уроков · 48 интерактивных карточек · 6 тестов</div>
+            </div>
+            <span class="node-badge">Пройдено 100%</span>
+          </div>
+          <div class="track-node" style="border-color:rgba(16,185,129,0.4);background:rgba(16,185,129,0.06);">
+            <div class="node-icon" style="background:#10b981;color:#ffffff;">02</div>
+            <div class="node-info">
+              <div class="node-title">Коллекции, генераторы и структуры данных</div>
+              <div class="node-desc">8 уроков · 34 карточки · 4 задачи в Zen IDE</div>
+            </div>
+            <span class="node-badge" style="background:#10b981;color:#ffffff;">Текущий</span>
+          </div>
+          <div class="track-node" style="opacity:0.6;">
+            <div class="node-icon" style="background:rgba(255,255,255,0.05);color:var(--ink-muted);">03</div>
+            <div class="node-info">
+              <div class="node-title">ООП, протоколы и архитектурные паттерны</div>
+              <div class="node-desc">14 уроков · 60 карточек · 8 боевых задач</div>
+            </div>
+            <span class="node-badge" style="background:rgba(255,255,255,0.05);color:var(--ink-muted);">Заблокировано</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    const sidebar = document.getElementById('academy-sidebar');
+    const explainer = document.getElementById('mode-explainer');
+    const varButtons = document.querySelectorAll('.var-btn');
+
+    const descriptions = {
+      '0': '<strong>Выбран Текущий эталон (5 рамок, сквиркл 10px)</strong>: Обратите внимание на нижнюю часть сайдбара — таймер, нагрев, поиск, свитчер тем и настройки зажаты в 5 отдельных жестких рамок с радиусом 10px. Нижняя часть кажется тесной и «полосатой».',
+      'a': '<strong>Выбран Вариант А (Рекомендуемый: 60×30px)</strong>: Иконки поиска и настроек очищены от жестких рамок и подсвечиваются мягким ореолом только при наведении. Свитчер тем оформлен в виде гармоничной капсулы 60×30px со скользящим бегунком 24px. Сайдбар дышит, весь лишний визуальный шум ушёл.',
+      'b': '<strong>Выбран Вариант Б (Широкая пилюля: 64×32px)</strong>: Свитчер тем имеет высоту 32px (вровень с иконками 🔍 и ⚙️) и ширину 64px. Чуть более вытянутая форма, чуть ближе прижата к боковым иконкам.',
+      'c': '<strong>Выбран Вариант В (Миниатюрная пилюля: 52×26px)</strong>: Ультра-компактный переключатель с бегунком 20px. Дает максимальное количество «воздуха» по бокам, но иконки внутри чуть более миниатюрные.'
+    };
+
+    function setMode(modeKey) {
+      sidebar.className = 'sidebar foot-mode-' + modeKey;
+      explainer.innerHTML = descriptions[modeKey];
+
+      varButtons.forEach((btn, idx) => {
+        const keys = ['0', 'a', 'b', 'c'];
+        if(keys[idx] === modeKey) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+    }
+  </script>
+</body>
+</html>
