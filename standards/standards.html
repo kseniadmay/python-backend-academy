@@ -46216,11 +46216,11 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
 
 
-  // Честный старт с 0%: при 0% ширина строго 0, свечение 0
+  // Нулевой уровень прогресса: шкала не отображается вообще (без подложки и без трека)
 
   const progressFillWidth = echPct;
 
-  const progressFillTitle = `${em.shortLabel}: ${echPct}% · ${echCurMP} / ${echMaxMP} MP`;
+  const progressFillTitle = `${em.shortLabel} (Мастерство навыков): ${echPct}% · ${echCurMP} / ${echMaxMP} MP`;
 
 
 
@@ -46332,6 +46332,24 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
 
 
+  // Шкала отображается только при progressFillWidth > 0; при 0% подложка и паз полностью скрыты
+
+  const trackHTML = (progressFillWidth > 0) ? `
+
+      <!-- Фиксированная радужная шкала прогресса эшелона с физическим blur-glow сиянием (Вариант 1) -->
+
+      <div class="srs-header-progress-track" style="position:absolute;bottom:-16px;left:0;right:0;height:4px;background:rgba(255,255,255,0.06);border:none;border-radius:99px;overflow:visible;pointer-events:auto;box-shadow:none;" title="${progressFillTitle}">
+
+        <div class="srs-header-progress-glow" style="position:absolute;top:0;left:0;height:100%;width:${progressFillWidth}%;background:linear-gradient(90deg, #881337 0%, #be123c 28%, #059669 72%, #10b981 100%) no-repeat;background-size:700px 100%;background-position:left top;border-radius:99px;filter:blur(6px);opacity:0.75;transition:width 0.35s cubic-bezier(0.2, 0.8, 0.4, 1);pointer-events:none;"></div>
+
+        <div class="srs-header-progress-fill" style="position:relative;height:100%;width:${progressFillWidth}%;background:linear-gradient(90deg, #881337 0%, #be123c 28%, #059669 72%, #10b981 100%) no-repeat;background-size:700px 100%;background-position:left top;border-radius:99px;transition:width 0.35s cubic-bezier(0.2, 0.8, 0.4, 1);" title="${progressFillTitle}"></div>
+
+      </div>
+
+  ` : '';
+
+
+
   return `
 
     <header class="srs-unified-header-bar" style="position:relative;display:flex;justify-content:space-between;align-items:center;height:30px;min-height:30px;gap:12px;margin-bottom:20px;padding:0 2px;background:transparent;border:none;box-shadow:none;box-sizing:border-box;">
@@ -46366,15 +46384,7 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
 
 
-      <!-- Фиксированная радужная шкала прогресса эшелона с физическим blur-glow сиянием -->
-
-      <div class="srs-header-progress-track" style="position:absolute;bottom:-16px;left:0;right:0;height:4px;background:rgba(255,255,255,0.06);border:none;border-radius:99px;overflow:visible;pointer-events:none;box-shadow:none;">
-
-        <div class="srs-header-progress-glow" style="position:absolute;top:0;left:0;height:100%;width:${progressFillWidth}%;background:linear-gradient(90deg, #881337 0%, #be123c 28%, #059669 72%, #10b981 100%) no-repeat;background-size:700px 100%;background-position:left top;border-radius:99px;filter:blur(6px);opacity:${progressFillWidth === 0 ? 0 : 0.75};transition:width 0.35s cubic-bezier(0.2, 0.8, 0.4, 1);"></div>
-
-        <div class="srs-header-progress-fill" style="position:relative;height:100%;width:${progressFillWidth}%;background:linear-gradient(90deg, #881337 0%, #be123c 28%, #059669 72%, #10b981 100%) no-repeat;background-size:700px 100%;background-position:left top;border-radius:99px;transition:width 0.35s cubic-bezier(0.2, 0.8, 0.4, 1);" title="${progressFillTitle}"></div>
-
-      </div>
+      ${trackHTML}
 
     </header>
 
