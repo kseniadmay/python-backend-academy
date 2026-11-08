@@ -231,9 +231,7 @@
     color: var(--ink);
     line-height: 1.25;
     margin-bottom: 9px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
   }
   .dominant-btn {
     width: 100%;
@@ -346,6 +344,7 @@
     gap: 6px;
   }
   .cooldown-pill {
+    position: relative;
     background: rgba(56, 189, 248, 0.12);
     border: 1px solid rgba(56, 189, 248, 0.3);
     color: var(--frost, #38bdf8);
@@ -360,6 +359,54 @@
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
     user-select: none;
+  }
+
+  /* Subtle Glass HUD Tooltip (Фазы каления металла и прогресс консолидации памяти) */
+  .glass-hud-tooltip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    right: 0;
+    width: 224px;
+    padding: 10px 12px;
+    background: rgba(15, 23, 42, 0.94);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 14px rgba(255, 255, 255, 0.12);
+    color: #f1f5f9;
+    font-size: 0.76rem;
+    line-height: 1.4;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1000;
+    text-align: left;
+  }
+  .cooldown-pill:hover .glass-hud-tooltip {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  [data-theme="light"] .glass-hud-tooltip {
+    background: rgba(255, 255, 255, 0.96);
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12), 0 0 10px rgba(0, 0, 0, 0.05);
+    color: #0f172a;
+  }
+  .glass-hud-tooltip .tooltip-tag {
+    font-family: var(--font-m);
+    font-size: 0.68rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 3px;
+  }
+  .glass-hud-tooltip .tooltip-body {
+    font-size: 0.74rem;
+    opacity: 0.9;
+    color: inherit;
   }
   [data-theme="light"] .cooldown-pill {
     background: rgba(2, 132, 199, 0.1);
@@ -385,127 +432,133 @@
      0%: Плотный остывший чугун ➔ 100%: Ослепляющий бело-золотой взрыв
      ══════════════════════════════════════════════════════════════════ */
   
-  /* 0% 🥀 Опавший: глубокий матовый чернёный чугун со скрытым затухающим фитилём */
+  /* ══════════════════════════════════════════════════════════════════
+     ТЕРМОДИНАМИКА НАГРЕВА МЕТАЛЛА (0% -> 25% -> 50% -> 75% -> 100%)
+     Плотный осязаемый корпус + стеклянная фаска + выверенный контраст
+     ══════════════════════════════════════════════════════════════════ */
+
+  /* 0% 🥀 Остывший чугун: Плотное темное тело антрацита + скрытый тлеющий огонек (БЕЗ грубой красной рамки) */
   @keyframes coldIronDazzle {
     0%, 100% {
-      background: radial-gradient(circle at 50% 120%, #17070a 0%, #06070a 70%, #020305 100%);
-      border-color: rgba(71, 85, 105, 0.45);
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.06), inset 0 -3px 8px rgba(220, 38, 38, 0.25), 0 2px 8px rgba(0, 0, 0, 0.7);
-      color: #94a3b8;
+      border-color: rgba(244, 63, 94, 0.18);
+      box-shadow: inset 0 1px 1px rgba(255,255,255,0.12), inset 0 -3px 8px rgba(0,0,0,0.7), 0 0 6px rgba(225, 29, 72, 0.12);
     }
     50% {
-      background: radial-gradient(circle at 50% 120%, #240a0f 0%, #0a0c12 70%, #020305 100%);
-      border-color: rgba(239, 68, 68, 0.55);
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), inset 0 -4px 14px rgba(220, 38, 38, 0.45), 0 0 14px rgba(220, 38, 38, 0.25);
-      color: #cbd5e1;
+      border-color: rgba(244, 63, 94, 0.38);
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.25), inset 0 -3px 10px rgba(0,0,0,0.6), 0 0 14px rgba(225, 29, 72, 0.28);
     }
   }
+  .optics-cold-iron {
+    background: linear-gradient(145deg, rgba(30, 20, 24, 0.75) 0%, rgba(18, 14, 18, 0.90) 50%, rgba(8, 7, 10, 0.98) 100%) !important;
+    border: 1px solid rgba(244, 63, 94, 0.22) !important;
+    color: #cbd5e1 !important;
+    animation: coldIronDazzle 3.2s infinite ease-in-out !important;
+  }
 
-    /* 25% 🌱 Росток: тёмно-вишнёвый калёный металл (первый нагрев чугуна) */
+  /* 25% 🌱 Тёмно-вишнёвый накал: Глубокий темный бордо каленой стали (~600°C) */
   @keyframes cherryHeatIronDazzle {
     0%, 100% {
-      background: linear-gradient(135deg, #180306 0%, #3d0810 50%, #200408 100%);
-      border-color: #e11d48;
-      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.35), inset 0 -4px 14px rgba(225, 29, 72, 0.4), 0 0 18px rgba(225, 29, 72, 0.45);
-      color: #fda4af;
+      border-color: rgba(225, 29, 72, 0.45);
+      box-shadow: inset 0 1px 1.5px rgba(255,255,255,0.30), 0 0 10px rgba(225, 29, 72, 0.25);
     }
     50% {
-      background: linear-gradient(135deg, #2a050b 0%, #580d19 50%, #30060d 100%);
-      border-color: #f43f5e;
-      box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.6), inset 0 -6px 18px rgba(244, 63, 94, 0.6), 0 0 26px rgba(244, 63, 94, 0.65);
-      color: #ffffff;
+      border-color: rgba(244, 63, 94, 0.75);
+      box-shadow: inset 0 1px 2.5px rgba(255,255,255,0.55), 0 0 18px rgba(225, 29, 72, 0.50);
+      transform: translateY(-0.5px);
     }
   }
-
   .optics-cherry-heat {
-    animation: cherryHeatIronDazzle 2.5s ease-in-out infinite !important;
-    border: 1.5px solid #f43f5e !important;
+    background: linear-gradient(145deg, rgba(88, 13, 25, 0.55) 0%, rgba(50, 6, 14, 0.80) 50%, rgba(20, 2, 6, 0.95) 100%) !important;
+    border: 1px solid rgba(225, 29, 72, 0.60) !important;
+    color: #fda4af !important;
+    animation: cherryHeatIronDazzle 2.8s infinite ease-in-out !important;
   }
 
-  /* 50% 🌹 Бутон: бархатный рубиновый горн с горячим ядром */
+  /* 50% 🌹 Ярко-алый горн: Чистый пламенный алый огонь (~850°C, вдвое ярче вишни!) */
   @keyframes rubyBudDazzle {
     0%, 100% {
-      background: linear-gradient(135deg, #20040a 0%, #881337 50%, #3f0713 100%);
-      border-color: #f43f5e;
-      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.4), inset 0 -5px 16px rgba(244, 63, 94, 0.45), 0 0 22px rgba(244, 63, 94, 0.5);
-      color: #fecdd3;
+      border-color: rgba(248, 113, 113, 0.60);
+      box-shadow: inset 0 1px 1.5px rgba(255,255,255,0.40), 0 0 12px rgba(239, 68, 68, 0.35);
     }
     50% {
-      background: linear-gradient(135deg, #380712 0%, #be123c 50%, #5c0d1e 100%);
-      border-color: #fb7185;
-      box-shadow: inset 0 1px 3px #ffffff, inset 0 -8px 22px rgba(251, 113, 133, 0.65), 0 0 32px rgba(244, 63, 94, 0.75);
-      color: #ffffff;
+      border-color: rgba(254, 202, 202, 0.90);
+      box-shadow: inset 0 1px 3px rgba(255,255,255,0.75), 0 0 24px rgba(239, 68, 68, 0.70);
+      transform: translateY(-0.5px);
     }
   }
+  .optics-ruby-bud {
+    background: linear-gradient(145deg, rgba(220, 38, 38, 0.45) 0%, rgba(153, 27, 27, 0.75) 50%, rgba(45, 8, 8, 0.92) 100%) !important;
+    border: 1px solid rgba(248, 113, 113, 0.75) !important;
+    color: #fee2e2 !important;
+    animation: rubyBudDazzle 2.6s infinite ease-in-out !important;
+  }
 
-  /* 75% 🌺 Роза: огненный янтарь высокой температуры ковки */
+  /* 75% 🌺 Оранжевый накал ковки: Спелая раскалённая оранжевая сталь (~1050°C, чистый оранж) */
   @keyframes goldenRoseDazzle {
     0%, 100% {
-      background: linear-gradient(135deg, #3b1404 0%, #b45309 50%, #78350f 100%);
-      border-color: #fbbf24;
-      box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.7), inset 0 -6px 20px rgba(245, 158, 11, 0.6), 0 0 30px rgba(245, 158, 11, 0.7);
-      color: #fef08a;
+      border-color: rgba(251, 146, 60, 0.65);
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.45), 0 0 12px rgba(249, 115, 22, 0.40);
     }
     50% {
-      background: linear-gradient(135deg, #571e06 0%, #d97706 50%, #9a3412 100%);
-      border-color: #fef08a;
-      box-shadow: inset 0 1px 4px #ffffff, inset 0 -8px 26px rgba(254, 240, 138, 0.8), 0 0 45px rgba(251, 191, 36, 0.9);
-      color: #ffffff;
+      border-color: rgba(254, 215, 170, 0.95);
+      box-shadow: inset 0 1px 3px rgba(255,255,255,0.75), 0 0 24px rgba(249, 115, 22, 0.70);
+      transform: translateY(-0.5px);
     }
   }
-
-    /* 100% ✨ ТРИУМФ: БЕЛО-ЗОЛОТОЙ ФОН ПЛАШКИ (соответствует собственному сиянию) */
-  @keyframes dazzlingWhiteGoldFlow {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
+  .optics-golden-rose {
+    background: linear-gradient(145deg, rgba(249, 115, 22, 0.42) 0%, rgba(180, 83, 9, 0.70) 50%, rgba(60, 20, 5, 0.92) 100%) !important;
+    border: 1px solid rgba(251, 146, 60, 0.80) !important;
+    color: #ffedd5 !important;
+    animation: goldenRoseDazzle 2.6s infinite ease-in-out !important;
   }
 
-  @keyframes dazzlingSunSurge {
+  /* 100% ✨ Белое каление металла: Раскаленный добела металл (~1350°C) с ослепительным ядром */
+  @keyframes whiteHotMetalBreath {
     0%, 100% {
-      border-color: rgba(251, 191, 36, 0.6);
+      border-color: rgba(255, 255, 255, 0.85);
       box-shadow: 
-        0 0 0 1px rgba(251, 191, 36, 0.35),
-        0 3px 14px rgba(245, 158, 11, 0.28),
-        inset 0 1px 0 rgba(255, 255, 255, 0.4);
-      transform: scale(1);
+        inset 0 1px 2px #ffffff,
+        inset 0 0 10px rgba(255, 255, 255, 0.50),
+        inset 0 -3px 8px rgba(245, 158, 11, 0.40),
+        0 0 16px rgba(255, 255, 255, 0.60),
+        0 0 28px rgba(251, 191, 36, 0.45);
     }
     50% {
-      border-color: rgba(251, 191, 36, 0.75);
+      border-color: #ffffff;
       box-shadow: 
-        0 0 0 1px rgba(251, 191, 36, 0.5),
-        0 5px 18px rgba(245, 158, 11, 0.38),
-        inset 0 1px 0 rgba(255, 255, 255, 0.5);
-      transform: scale(1.015);
-    }
-  }
-
-  @keyframes heatGlowBreath {
-    0%, 100% {
-      box-shadow: 0 0 10px rgba(245, 158, 11, 0.35), 0 0 20px rgba(245, 158, 11, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-      border-color: rgba(251, 191, 36, 0.55);
-    }
-    50% {
-      box-shadow: 0 0 18px rgba(245, 158, 11, 0.65), 0 0 30px rgba(245, 158, 11, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.5);
-      border-color: rgba(251, 191, 36, 0.85);
+        inset 0 1.5px 4px #ffffff,
+        inset 0 0 18px rgba(255, 255, 255, 0.80),
+        inset 0 -3px 10px rgba(245, 158, 11, 0.55),
+        0 0 26px rgba(255, 255, 255, 0.90),
+        0 0 44px rgba(251, 191, 36, 0.70);
+      transform: translateY(-0.5px);
     }
   }
 
   .optics-dazzling-triumph,
-  .optics-heat-glow {
+  .optics-heat-glow,
+  .progress-tier-100 {
     border-radius: 10px !important;
-    background: linear-gradient(135deg, rgba(254, 243, 199, 0.18) 0%, rgba(245, 158, 11, 0.24) 100%) !important;
-    border: 1px solid rgba(251, 191, 36, 0.50) !important;
+    background: linear-gradient(140deg, rgba(255, 255, 255, 0.70) 0%, rgba(254, 240, 138, 0.45) 28%, rgba(245, 158, 11, 0.38) 65%, rgba(40, 18, 5, 0.92) 100%) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.90) !important;
     position: relative;
     overflow: hidden;
     color: #ffffff !important;
-    animation: heatGlowBreath 2.8s infinite ease-in-out !important;
+    animation: whiteHotMetalBreath 2.6s infinite ease-in-out !important;
+    cursor: default !important;
+  }
+  .optics-dazzling-triumph:hover,
+  .optics-heat-glow:hover,
+  .progress-tier-100:hover {
+    transform: none !important;
   }
 
-  .dazzling-gold-text {
-    color: #fef08a !important;
+  .dazzling-gold-text,
+  .white-hot-text {
+    color: #ffffff !important;
     font-weight: 800 !important;
     letter-spacing: -0.01em !important;
-    text-shadow: 0 0 10px rgba(245, 158, 11, 0.65) !important;
+    text-shadow: 0 0 6px #ffffff, 0 0 14px rgba(255, 255, 255, 0.95), 0 0 24px rgba(251, 191, 36, 0.75) !important;
   }
 
 
@@ -558,7 +611,23 @@
 
   .navlink:hover{background:var(--surface-hover, rgba(255,255,255,0.05));color:var(--ink);}
 
-  .navlink.active{background:rgba(255, 255, 255, 0.06);border:1px solid rgba(255, 255, 255, 0.10);color:var(--ink);font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,0.12);}
+  .navlink.active,
+  .drawer-nav-link.active {
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.14) 0%, rgba(255, 255, 255, 0.04) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-left: 3px solid #34d399 !important;
+    color: var(--ink) !important;
+    font-weight: 700 !important;
+    box-shadow: inset 3px 0 12px -6px rgba(16, 185, 129, 0.45), 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+  }
+  [data-theme="light"] .navlink.active,
+  [data-theme="light"] .drawer-nav-link.active {
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.12) 0%, rgba(0, 0, 0, 0.02) 100%) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-left: 3px solid #059669 !important;
+    color: #065f46 !important;
+    box-shadow: inset 3px 0 12px -6px rgba(5, 150, 105, 0.35), 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  }
 
   .sidebar-foot{margin-top:auto;padding-top:10px;border-top:1px solid rgba(255, 255, 255, 0.06);display:flex;flex-direction:column;gap:10px;}
 
@@ -1149,16 +1218,23 @@
 
   /* ---------- Анти-прокрастинация: Спокойная точка активности и подпункты сайдбара ---------- */
   .activity-dot{
-    width:7px;height:7px;border-radius:50%;background:var(--emerald, #10b981);
-    box-shadow:0 0 8px rgba(16,185,129,0.7);position:relative;margin-left:auto;flex-shrink:0;
+    width:7px;height:7px;border-radius:50%;background:#34d399;
+    box-shadow:0 0 8px rgba(52, 211, 153, 0.75), 0 0 2px #10b981;
+    position:relative;margin-left:auto;flex-shrink:0;
+    animation:emeraldSoftBreath 2.8s infinite ease-in-out;
   }
-  .activity-dot::after{
-    content:'';position:absolute;inset:-3px;border-radius:50%;border:1.5px solid var(--emerald, #10b981);
-    opacity:0.4;animation:pulseActivityDot 2.5s infinite cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  @keyframes pulseActivityDot{
-    0%{transform:scale(0.8);opacity:0.8;}
-    100%{transform:scale(2.2);opacity:0;}
+  .activity-dot::after{ display: none; }
+  @keyframes emeraldSoftBreath {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 6px rgba(52, 211, 153, 0.45), 0 0 12px rgba(16, 185, 129, 0.25);
+      opacity: 0.85;
+    }
+    50% {
+      transform: scale(1.15);
+      box-shadow: 0 0 12px rgba(52, 211, 153, 0.85), 0 0 20px rgba(16, 185, 129, 0.50), inset 0 0 3px #ffffff;
+      opacity: 1;
+    }
   }
   .nav-sub-list{
     display:flex;flex-direction:column;gap:2px;padding-left:16px;margin:2px 0 6px 14px;
@@ -1439,7 +1515,9 @@
 
     .topbar .streak-pill{padding:5px 8px !important;font-size:.80rem !important;}
 
-    .topbar .brand{min-width:0 !important;flex-shrink:1 !important;}
+    .topbar .brand{min-width:0 !important;flex-shrink:1 !important;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .15s ease,transform .1s ease;}
+.topbar .brand:hover{opacity:.85;}
+.topbar .brand:active{transform:scale(.97);}
 
     /* Anti-collision & zero-overlap layout for Echelon sprint topbars on mobile */
 
@@ -17677,6 +17755,7 @@
     background: #10b981 !important;
     box-shadow: 0 0 6px #10b981, 0 0 10px rgba(52, 211, 153, 0.8) !important;
     border: 1.5px solid #0d1117 !important;
+    animation: emeraldSoftBreath 2.8s infinite ease-in-out !important;
   }
 
   [data-theme="light"] .tabbar__due-dot,
@@ -30375,8 +30454,12 @@ html:not([data-theme="dark"]) .fc-card--Answer,
         <button class="sidebar-streak-badge sidebar-hud-cell" id="sidebar-streak-cell" title="Дней ударного режима подряд" aria-label="Дней ударного режима подряд">
           🔥 <span id="streak-num-d">0</span>
         </button>
-        <div class="cooldown-pill sidebar-hud-cell" id="sidebar-cooldown-pill" title="Остывание памяти: консолидация повторений">
+        <div class="cooldown-pill sidebar-hud-cell optics-dazzling-triumph" id="sidebar-cooldown-pill">
           <span id="sidebar-cooldown-label"><span class="dazzling-gold-text">✨ 100%</span></span>
+          <div class="glass-hud-tooltip">
+            <div class="tooltip-tag" style="color:#fef08a;">✨ Белое каление (1350°C)</div>
+            <div class="tooltip-body">Память консолидирована на 100% · Кликните, чтобы высечь искры триумфа!</div>
+          </div>
         </div>
       </div>
       <div class="sidebar-service-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
@@ -30400,12 +30483,11 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   <div class="shell">
 
     <header class="topbar">
-      <div class="brand" style="font-size:1.02rem;"><svg class="icon" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M7.8 7.6 10.5 16M16.2 7.6 13.5 16M8.3 6h7.4"/></svg>Academy</div>
+      <div class="brand mobile-brand-menu-trigger" data-open-mobile-drawer="" role="button" tabindex="0" title="Открыть меню платформы" aria-label="Открыть меню платформы" style="font-size:1.02rem;cursor:pointer;user-select:none;"><svg class="icon" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M7.8 7.6 10.5 16M16.2 7.6 13.5 16M8.3 6h7.4"/></svg>Academy</div>
       <div style="display:flex;align-items:center;gap:10px;">
         <button class="topbar-pomo-pill mobile-topbar-pomo" id="topbar-pomo-pill-el" data-pomo-toggle="" title="Запустить Pomodoro-фокус (15 мин)" aria-label="Запустить Pomodoro-фокус (15 мин)">
           <span class="pomo-icon" aria-hidden="true">⏱</span> <span id="topbar-pomo-time">15:00</span>
         </button>
-        <button class="icon-btn mobile-menu-drawer-btn" data-open-mobile-drawer="" title="Все разделы платформы" aria-label="Все разделы платформы"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg></button>
         <span id="streak-num-m" style="display:none;" aria-hidden="true">0</span>
         <button id="theme-toggle-m" style="display:none;" aria-hidden="true"></button>
       </div>
@@ -34311,7 +34393,7 @@ function toggleTheme(){ setTheme(effectiveDark() ? 'light' : 'dark'); }
 
 const NAV_ITEMS = [
   {route:'/', icon:'home', label:'Дашборд', shortLabel:'Дашборд', mobileTab:true, group:'main'},
-  {route:'/path', icon:'path', label:'Путь к офферу', shortLabel:'Путь', mobileTab:true, group:'main'},
+  {route:'/path', icon:'path', label:'Путь', shortLabel:'Путь', mobileTab:true, group:'main'},
   {route:'/cards', icon:'cards', label:'Интервалка', shortLabel:'Интервалка', mobileTab:true, group:'main', hasDueDot:true},
   {route:'/practice', icon:'code', label:'Zen IDE', shortLabel:'IDE', mobileTab:true, group:'main'},
   {route:'/map', icon:'map', label:'Матрица навыков', shortLabel:'Матрица', group:'trainer'},
@@ -55968,9 +56050,9 @@ renderNav = function(){
         const dueMins = Math.max(1, Math.round(srsDue * 0.6));
         heroEta = `⏱ ~${dueMins} мин`;
         const topicWord = (srsDue === 1) ? 'тема' : ((srsDue >= 2 && srsDue <= 4) ? 'темы' : 'тем');
-        heroTitle = `Интервальное повторение (${srsDue} ${topicWord})`;
-        heroBtnText = 'Закрыть долг';
-        heroTip = 'Перейти к повторению долгов';
+        heroTitle = 'Интервальное повторение';
+        heroBtnText = 'Продолжить';
+        heroTip = 'Перейти к интервальному повторению';
       }
 
       heroBox.innerHTML = `
@@ -55990,17 +56072,24 @@ renderNav = function(){
     // Grill-Me Approved: 2 Semantic Groups (0 Duplicates)
     // Группа 1: Маршрут (Путь, Интервалка SRS, Zen IDE, Дашборд)
     // Группа 2: Ресурсы и тренажеры (Собеседование, Матрица навыков, Справочник, Песочница)
-    const routeOrder1 = ['/', '/path', '/cards', '/practice'];
-    const routeOrder2 = ['/mock', '/map', '/docs', '/sandbox'];
+    // Grill-Me Approved: Чистая семантическая структура
+    // Вне категорий: Дашборд, Путь
+    // Группа 1: Тренажёры (Интервалка SRS, Zen IDE, Собеседование)
+    // Группа 2: Инструменты (Матрица навыков, Справочник, Песочница)
+    const topRoutes = ['/', '/path'];
+    const trainersRoutes = ['/cards', '/practice', '/mock'];
+    const toolsRoutes = ['/map', '/docs', '/sandbox'];
 
-    const group1Links = routeOrder1.map(r => NAV_ITEMS.find(it => it.route === r)).filter(Boolean).map(renderLink).join('');
-    const group2Links = routeOrder2.map(r => NAV_ITEMS.find(it => it.route === r)).filter(Boolean).map(renderLink).join('');
+    const topLinks = topRoutes.map(r => NAV_ITEMS.find(it => it.route === r)).filter(Boolean).map(renderLink).join('');
+    const trainersLinks = trainersRoutes.map(r => NAV_ITEMS.find(it => it.route === r)).filter(Boolean).map(renderLink).join('');
+    const toolsLinks = toolsRoutes.map(r => NAV_ITEMS.find(it => it.route === r)).filter(Boolean).map(renderLink).join('');
 
     desk.innerHTML = `
-      <div class="nav-group-label">Маршрут</div>
-      ${group1Links}
-      <div class="nav-group-label" style="margin-top:14px;">Ресурсы и тренажеры</div>
-      ${group2Links}
+      ${topLinks}
+      <div class="nav-group-label" style="margin-top:12px;">Тренажёры</div>
+      ${trainersLinks}
+      <div class="nav-group-label" style="margin-top:14px;">Инструменты</div>
+      ${toolsLinks}
     `;
     if(typeof updateSidebarLevelBadge === 'function') updateSidebarLevelBadge();
 
@@ -56035,16 +56124,56 @@ renderNav = function(){
       cdPill.style.borderColor = '';
       cdPill.style.color = '';
       cdPill.style.boxShadow = '';
-      cdPill.className = 'cooldown-pill sidebar-hud-cell';
 
-      cdPill.classList.add('optics-dazzling-triumph');
-      if(pct >= 100 || pct === 0){
+      cdPill.removeAttribute('title');
+      let tooltipTag = '';
+      let tooltipDesc = '';
+      let tagColor = '';
+
+      if(pct >= 100){
+        cdPill.className = 'cooldown-pill sidebar-hud-cell optics-dazzling-triumph';
         cdLabel.innerHTML = '<span class="dazzling-gold-text">✨ 100%</span>';
-        cdPill.title = 'Память консолидирована: энергия на максимуме!';
+        tooltipTag = '✨ Белое каление (1350°C)';
+        tooltipDesc = 'Память консолидирована на 100% · Кликните, чтобы высечь искры триумфа!';
+        tagColor = '#fef08a';
+        cdPill.style.cursor = 'pointer';
+      } else if(pct >= 75){
+        cdPill.className = 'cooldown-pill sidebar-hud-cell optics-golden-rose';
+        cdLabel.innerHTML = `<span style="color:#ffedd5;font-weight:800;">🌺 ${pct}%</span>`;
+        tooltipTag = '🌺 Оранжевый накал (1050°C)';
+        tooltipDesc = `${pct}% материала закреплено · Кликните для повторения тем`;
+        tagColor = '#fed7aa';
+        cdPill.style.cursor = 'pointer';
+      } else if(pct >= 50){
+        cdPill.className = 'cooldown-pill sidebar-hud-cell optics-ruby-bud';
+        cdLabel.innerHTML = `<span style="color:#fee2e2;font-weight:800;">🌹 ${pct}%</span>`;
+        tooltipTag = '🌹 Ярко-алый горн (850°C)';
+        tooltipDesc = `${pct}% материала закреплено · Кликните для повторения тем`;
+        tagColor = '#fca5a5';
+        cdPill.style.cursor = 'pointer';
+      } else if(pct >= 25){
+        cdPill.className = 'cooldown-pill sidebar-hud-cell optics-cherry-heat';
+        cdLabel.innerHTML = `<span style="color:#fda4af;font-weight:800;">🌱 ${pct}%</span>`;
+        tooltipTag = '🌱 Тёмно-вишнёвый жар (600°C)';
+        tooltipDesc = `${pct}% материала закреплено · Кликните для повторения тем`;
+        tagColor = '#fda4af';
+        cdPill.style.cursor = 'pointer';
       } else {
-        cdLabel.innerHTML = `<span class="dazzling-gold-text">✨ ${pct}%</span>`;
-        cdPill.title = `Остывание: ${pct}% материала закреплено. Клик — повторить`;
+        cdPill.className = 'cooldown-pill sidebar-hud-cell optics-cold-iron';
+        cdLabel.innerHTML = `<span style="color:#cbd5e1;font-weight:800;">🥀 ${pct}%</span>`;
+        tooltipTag = '🥀 Остывающий антрацит';
+        tooltipDesc = `${pct}% материала закреплено · Кликните для повторения тем`;
+        tagColor = '#cbd5e1';
+        cdPill.style.cursor = 'pointer';
       }
+
+      let tipEl = cdPill.querySelector('.glass-hud-tooltip');
+      if(!tipEl){
+        tipEl = document.createElement('div');
+        tipEl.className = 'glass-hud-tooltip';
+        cdPill.appendChild(tipEl);
+      }
+      tipEl.innerHTML = `<div class="tooltip-tag" style="color:${tagColor};">${tooltipTag}</div><div class="tooltip-body">${tooltipDesc}</div>`;
     }
   }
 
@@ -56278,17 +56407,40 @@ function openMobileDrawer(){
 
   let mobCdClass = '';
   let mobCdLabelHtml = '';
-  let mobCdTooltip = '';
-  let mobCdPulseStyle = 'background:var(--frost, #38bdf8);';
+  let mobTooltipTag = '';
+  let mobTooltipDesc = '';
+  let mobTagColor = '';
 
-  mobCdClass = 'optics-dazzling-triumph';
-  mobCdPulseStyle = 'background:var(--emerald, #10b981);';
-  if(mobPct >= 100 || mobPct === 0){
+  if(mobPct >= 100){
+    mobCdClass = 'optics-dazzling-triumph';
     mobCdLabelHtml = '<span class="dazzling-gold-text">✨ 100%</span>';
-    mobCdTooltip = 'Память консолидирована: энергия на максимуме!';
+    mobTooltipTag = '✨ Белое каление (1350°C)';
+    mobTooltipDesc = 'Память консолидирована на 100% · Кликните, чтобы высечь искры триумфа!';
+    mobTagColor = '#fef08a';
+  } else if(mobPct >= 75){
+    mobCdClass = 'optics-golden-rose';
+    mobCdLabelHtml = `<span style="color:#ffedd5;font-weight:800;">🌺 ${mobPct}%</span>`;
+    mobTooltipTag = '🌺 Оранжевый накал (1050°C)';
+    mobTooltipDesc = `${mobPct}% материала закреплено · Кликните для повторения тем`;
+    mobTagColor = '#fed7aa';
+  } else if(mobPct >= 50){
+    mobCdClass = 'optics-ruby-bud';
+    mobCdLabelHtml = `<span style="color:#fee2e2;font-weight:800;">🌹 ${mobPct}%</span>`;
+    mobTooltipTag = '🌹 Ярко-алый горн (850°C)';
+    mobTooltipDesc = `${mobPct}% материала закреплено · Кликните для повторения тем`;
+    mobTagColor = '#fca5a5';
+  } else if(mobPct >= 25){
+    mobCdClass = 'optics-cherry-heat';
+    mobCdLabelHtml = `<span style="color:#fda4af;font-weight:800;">🌱 ${mobPct}%</span>`;
+    mobTooltipTag = '🌱 Тёмно-вишнёвый жар (600°C)';
+    mobTooltipDesc = `${mobPct}% материала закреплено · Кликните для повторения тем`;
+    mobTagColor = '#fda4af';
   } else {
-    mobCdLabelHtml = `<span class="dazzling-gold-text">✨ ${mobPct}%</span>`;
-    mobCdTooltip = `Остывание: ${mobPct}% материала закреплено. Клик — повторить`;
+    mobCdClass = 'optics-cold-iron';
+    mobCdLabelHtml = `<span style="color:#cbd5e1;font-weight:800;">🥀 ${mobPct}%</span>`;
+    mobTooltipTag = '🥀 Остывающий антрацит';
+    mobTooltipDesc = `${mobPct}% материала закреплено · Кликните для повторения тем`;
+    mobTagColor = '#cbd5e1';
   }
 
   const curRoute = (typeof currentRoute !== 'undefined') ? currentRoute : ((typeof location !== 'undefined' && location.hash) ? location.hash.replace('#', '') : '/');
@@ -56328,9 +56480,9 @@ function openMobileDrawer(){
           const dueMins = Math.max(1, Math.round(mobDue * 0.6));
           mobHeroEta = `⏱ ~${dueMins} мин`;
           const topicWord = (mobDue === 1) ? 'тема' : ((mobDue >= 2 && mobDue <= 4) ? 'темы' : 'тем');
-          mobHeroTitle = `Интервальное повторение (${mobDue} ${topicWord})`;
-          mobHeroBtnText = 'Закрыть долг';
-          mobHeroTip = 'Перейти к повторению долгов';
+          mobHeroTitle = 'Интервальное повторение';
+          mobHeroBtnText = 'Продолжить';
+          mobHeroTip = 'Перейти к интервальному повторению';
         }
 
         return `
@@ -56347,8 +56499,7 @@ function openMobileDrawer(){
         `;
       })()}
 
-      <!-- Группа 1: Маршрут (Синхронизировано с десктопом) -->
-      <div class="drawer-nav-section-title" style="margin:4px 0 6px 2px;">Маршрут</div>
+      <!-- Вне категорий: Дашборд и Путь -->
       <a href="#/" class="drawer-nav-link ${curRoute === '/' ? 'active' : ''}" onclick="closeMobileDrawer();">
         <div style="display:flex;align-items:center;gap:9px;">
           <svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px;"><path d="M4 11.5 12 4l8 7.5M6 10v9h5v-5h2v5h5v-9"/></svg>
@@ -56359,10 +56510,12 @@ function openMobileDrawer(){
       <a href="#/path" class="drawer-nav-link ${curRoute === '/path' ? 'active' : ''}" onclick="closeMobileDrawer();">
         <div style="display:flex;align-items:center;gap:9px;">
           <svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px;"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
-          <span>Путь к офферу</span>
+          <span>Путь</span>
         </div>
       </a>
 
+      <!-- Категория 1: Тренажёры -->
+      <div class="drawer-nav-section-title" style="margin:10px 0 6px 2px;">Тренажёры</div>
       <a href="#/cards" class="drawer-nav-link ${curRoute === '/cards' ? 'active' : ''}" onclick="closeMobileDrawer();">
         <div style="display:flex;align-items:center;gap:9px;">
           <svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px;"><rect x="3" y="4" width="18" height="16" rx="3"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -56378,8 +56531,6 @@ function openMobileDrawer(){
         </div>
       </a>
 
-      <!-- Группа 2: Ресурсы и тренажеры -->
-      <div class="drawer-nav-section-title" style="margin:12px 0 6px 2px;">Ресурсы и тренажеры</div>
       <a href="#/mock" class="drawer-nav-link ${curRoute === '/mock' ? 'active' : ''}" onclick="closeMobileDrawer();">
         <div style="display:flex;align-items:center;gap:9px;">
           <svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px;"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
@@ -56417,8 +56568,12 @@ function openMobileDrawer(){
           <button type="button" class="topbar-pomo-pill sidebar-pomo-pill sidebar-hud-cell" id="drawer-pomo-cell" data-pomo-toggle="" style="padding:0 8px;height:34px;border-radius:10px;font-family:var(--font-m);font-size:0.76rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink);" title="Запустить Pomodoro-фокус (15 мин)">
             <span class="pomo-icon" aria-hidden="true">⏱</span> <span>15:00</span> <span style="font-size:0.7rem;font-weight:700;">▶</span>
           </button>
-          <div class="cooldown-pill ${mobCdClass}" id="drawer-cooldown-pill" style="padding:0 8px;height:34px;border-radius:10px;font-size:0.78rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;" title="${mobCdTooltip}">
+          <div class="cooldown-pill ${mobCdClass}" id="drawer-cooldown-pill" style="padding:0 8px;height:34px;border-radius:10px;font-size:0.78rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;position:relative;">
             <span id="drawer-cooldown-label">${mobCdLabelHtml}</span>
+            <div class="glass-hud-tooltip">
+              <div class="tooltip-tag" style="color:${mobTagColor};">${mobTooltipTag}</div>
+              <div class="tooltip-body">${mobTooltipDesc}</div>
+            </div>
           </div>
         </div>
 
@@ -56476,17 +56631,15 @@ function openMobileDrawer(){
 
   const cdBtn = modal.querySelector('#drawer-cooldown-pill');
   if(cdBtn){
-    cdBtn.onclick = () => {
-      closeMobileDrawer();
+    cdBtn.onclick = (e) => {
       const srsData = (typeof getSrsDailyProgressData === 'function') ? getSrsDailyProgressData() : null;
       const totalDue = srsData ? Number(srsData.totalDueRemaining) || 0 : (cardsDueCount + notesDueCount);
       if(totalDue > 0){
+        closeMobileDrawer();
         location.hash = '#/cards';
       } else {
-        if(typeof showToast === 'function'){
-          showToast('❄️ Фаза остывания: консолидация памяти завершена. Отличная работа!');
-        } else {
-          alert('❄️ Фаза остывания: консолидация памяти завершена. Отличная работа на сегодня!');
+        if(typeof triggerSparksBurst === 'function'){
+          triggerSparksBurst(e || cdBtn, 4);
         }
       }
     };
@@ -65737,18 +65890,17 @@ applyThemeIcon();
 document.addEventListener('click', function(e){
   const cdBtn = e.target.closest('#sidebar-cooldown-pill');
   if(cdBtn){
-    e.preventDefault();
     const srsData = (typeof getSrsDailyProgressData === 'function') ? getSrsDailyProgressData() : null;
     const noteSrsStats = (typeof getNoteSpacedRepetitionStats === 'function') ? getNoteSpacedRepetitionStats() : { dueCount: 0 };
     const cardSrsStats = (typeof getSpacedRepetitionStats === 'function') ? getSpacedRepetitionStats() : { dueTodayCardsCount: 0 };
     const totalDue = srsData ? (Number(srsData.totalDueRemaining) || 0) : ((Number(noteSrsStats.dueCount) || 0) + (Number(cardSrsStats.dueTodayCardsCount) || 0));
     if(totalDue > 0){
+      e.preventDefault();
       location.hash = '#/cards';
     } else {
-      if(typeof showToast === 'function'){
-        showToast('❄️ Фаза остывания: консолидация памяти завершена. Отличная работа!');
-      } else {
-        alert('❄️ Фаза остывания: консолидация памяти завершена. Отличная работа на сегодня!');
+      // Предложение #1: Тактильные искры ковки при 100% готовности
+      if(typeof triggerSparksBurst === 'function'){
+        triggerSparksBurst(e, 4);
       }
     }
   }
