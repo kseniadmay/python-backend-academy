@@ -444,7 +444,7 @@
      Плотный осязаемый корпус + стеклянная фаска + выверенный контраст
      ══════════════════════════════════════════════════════════════════ */
 
-  /* 0% 🥀 Остывший чугун: Плотное темное тело антрацита + скрытый тлеющий огонек (БЕЗ грубой красной рамки) */
+  /* 0% Остывшая сталь: Плотное темное тело холодной стали + скрытый тлеющий огонек (БЕЗ грубой красной рамки) */
   @keyframes coldIronDazzle {
     0%, 100% {
       border-color: rgba(244, 63, 94, 0.18);
@@ -55989,6 +55989,15 @@ window.viewDashboard = viewDashboard;
 // ==================== DRY SINGLE ENGINE: NAVIGATION & SIDEBAR ====================
 
 // 1. Single Source of Truth for Dominant Hero Action Card
+function formatDurationHuman(totalMins){
+  const mins = Math.max(1, Math.round(Number(totalMins) || 0));
+  if(mins < 60) return `${mins} мин`;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  if(m === 0) return `${h} ч`;
+  return `${h} ч ${m} мин`;
+}
+
 function getDominantHeroCardData(){
   ensureExtendedState();
   const mCount = (typeof state !== 'undefined' && state && Array.isArray(state.mastered)) ? state.mastered.length : 0;
@@ -56018,7 +56027,7 @@ function getDominantHeroCardData(){
   if(srsDue > 0){
     href = '#/cards';
     const dueMins = Math.max(1, Math.round(srsDue * 0.6));
-    eta = `⏱ ~${dueMins} мин`;
+    eta = `⏱ ~${formatDurationHuman(dueMins)}`;
     title = 'Интервальное повторение';
     btnText = 'Продолжить';
     tip = 'Перейти к интервальному повторению';
@@ -56106,8 +56115,8 @@ function getThermodynamicCooldownData(){
     return {
       pct,
       cssClass: 'optics-cold-iron',
-      labelHtml: `<span style="color:#cbd5e1;font-weight:800;">🥀 ${pct}%</span>`,
-      tooltipTag: '🥀 Остывающий антрацит (20°C)',
+      labelHtml: `<span style="color:#cbd5e1;font-weight:800;">${pct}%</span>`,
+      tooltipTag: 'Остывшая сталь (20°C)',
       tooltipDesc: `${pct}% материала закреплено`,
       tagColor: '#cbd5e1'
     };
