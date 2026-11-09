@@ -68,15 +68,19 @@ assert(content.includes('.fc-stage {\n    display: flex !important;\n    flex-di
   '❌ ZERO-JITTER VIOLATION: Мобильный .fc-stage обязан иметь min-height: 240px и contain: layout style.');
 console.log('✓ [5/12] [Zero-Jitter] Мобильная геометрия сцены карточки стабильно зафиксирована (240px).');
 
-// 6. Инвариант единого оптического свечения всех точек активности
-assert(content.includes('.pulse-dot {\n    width: 7px !important;\n    height: 7px !important;\n    min-width: 7px !important;\n    min-height: 7px !important;\n    max-width: 7px !important;\n    max-height: 7px !important;\n    border-radius: 50% !important;\n    background: #34d399 !important;\n    box-shadow: 0 0 7px rgba(52, 211, 153, 0.80), 0 0 2px #10b981 !important;\n    animation: emeraldSoftBreath 2.8s infinite ease-in-out !important;\n    transform: translateZ(0) !important;\n    contain: layout style !important;'),
-  '❌ ZERO-JITTER VIOLATION: .pulse-dot в Hero-карточке сайдбара обязан быть унифицирован до 7px, #34d399 и emeraldSoftBreath 2.8s.');
+// 6. Инвариант единого оптического свечения всех точек активности (Deep Neon Breath, 0 маяков)
+assert(content.includes('.pulse-dot {\n    width: 7px !important;\n    height: 7px !important;\n    min-width: 7px !important;\n    min-height: 7px !important;\n    max-width: 7px !important;\n    max-height: 7px !important;\n    border-radius: 50% !important;') &&
+       content.includes('background: radial-gradient(circle at 35% 35%, #a7f3d0 0%, #34d399 45%, #10b981 75%, #059669 100%) !important;') &&
+       content.includes('border: 0.8px solid #6ee7b7 !important;'),
+  '❌ ZERO-JITTER VIOLATION: .pulse-dot в Hero-карточке сайдбара обязан быть унифицирован до 7px, изумрудного 3D-градиента и микроободка #6ee7b7.');
 assert(content.includes('.activity-dot{\n    width:7px !important;\n    height:7px !important;') &&
-       content.includes('background:#34d399 !important;') &&
-       content.includes('animation:emeraldSoftBreath 2.8s infinite ease-in-out !important;'),
-  '❌ ZERO-JITTER VIOLATION: .activity-dot обязан быть унифицирован до 7px, #34d399 и emeraldSoftBreath 2.8s.');
-assert(content.includes('.srs-live-status-dot {\n    width: 7px !important;\n    height: 7px !important;\n    min-width: 7px !important;\n    min-height: 7px !important;\n    border-radius: 50% !important;\n    background: #34d399 !important;\n    box-shadow: 0 0 7px rgba(52, 211, 153, 0.80), 0 0 2px #10b981 !important;'),
-  '❌ ZERO-JITTER VIOLATION: .srs-live-status-dot обязан быть унифицирован до 7px, #34d399.');
+       content.includes('background: radial-gradient(circle at 35% 35%, #a7f3d0 0%, #34d399 45%, #10b981 75%, #059669 100%) !important;') &&
+       content.includes('border: 0.8px solid #6ee7b7 !important;'),
+  '❌ ZERO-JITTER VIOLATION: .activity-dot обязан быть унифицирован до 7px, изумрудного 3D-градиента и микроободка #6ee7b7.');
+assert(content.includes('.srs-live-status-dot {\n    width: 7px !important;\n    height: 7px !important;\n    min-width: 7px !important;\n    min-height: 7px !important;') &&
+       content.includes('background: radial-gradient(circle at 35% 35%, #a7f3d0 0%, #34d399 45%, #10b981 75%, #059669 100%) !important;') &&
+       content.includes('border: 0.8px solid #6ee7b7 !important;'),
+  '❌ ZERO-JITTER VIOLATION: .srs-live-status-dot обязан быть унифицирован до 7px, изумрудного 3D-градиента и микроободка #6ee7b7.');
 console.log('✓ [6/12] [Zero-Jitter] Полная оптическая идентичность всех точек активности (7px, #34d399, единый ореол) соблюдена.');
 
 // 7. Инвариант строгого запрета 2-секундного зацикленного подёргивания и масштабирования бусин
@@ -146,5 +150,5 @@ assert(content.includes('.activity-dot{\n    width:7px !important;\n    height:7
   '❌ NAV DOTS VIOLATION: Точки активности в сайдбаре и хэдере обязаны иметь унифицированные габариты 7px и оптическое дыхание.');
 console.log('✓ [14/14] [Zero-Jitter] Бусины активности сайдбара и хэдера надёжно зафиксированы.');
 
-console.log('\n>>> ВСЕ 14 ИНВАРИАНТОВ ZERO-JITTER, КВАНТОВОГО МАЯКА И СМОНОЛИТНОСТИ SRS УСПЕШНО ПРОЙДЕНЫ (100%) <<<\n');
+console.log('\n>>> ВСЕ 14 ИНВАРИАНТОВ ZERO-JITTER, КВАНТОВОГО МАЯКА И МОНОЛИТНОСТИ SRS УСПЕШНО ПРОЙДЕНЫ (100%) <<<\n');
 process.exit(0);
