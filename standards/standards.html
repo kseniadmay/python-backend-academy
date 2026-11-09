@@ -23391,7 +23391,6 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     flex-direction: column !important;
     justify-content: flex-start !important;
     box-sizing: border-box !important;
-    transition: height 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
   html:not([data-theme="dark"]) .cards-hub-container,
   :root[data-theme="light"] .cards-hub-container {
@@ -23401,8 +23400,41 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   }
 }
 
+/* Шкала эшелона SRS: адаптивный спектр 100cqw от бордового к изумрудному */
+.srs-header-progress-track {
+  container-type: inline-size !important;
+}
+.srs-header-progress-glow,
+.srs-header-progress-fill {
+  background-size: 100cqw 100% !important;
+}
+
 /* 2. Мобильная посадка парящей карточки SRS (Zero-Scroll & Atmospheric Zen) */
 @media (max-width: 640px) {
+  /* Плотная подложка шапки на мобилке (Спринт + ✕): сохраняем форму, исключаем просвечивание */
+  .srs-header-goal-status {
+    background: rgba(18, 24, 36, 0.88) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(16px) saturate(125%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(125%) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45) !important;
+  }
+  .srs-header-close-btn {
+    background: rgba(18, 24, 36, 0.88) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(16px) saturate(125%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(125%) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45) !important;
+    color: var(--ink-soft) !important;
+  }
+  .srs-header-mode-title {
+    background: rgba(18, 24, 36, 0.70) !important;
+    padding: 4px 10px !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+  }
   .cards-hub-container {
     min-height: calc(100dvh - 120px) !important;
     display: flex !important;
@@ -46645,11 +46677,11 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
       <!-- Фиксированная радужная шкала прогресса эшелона с физическим blur-glow сиянием (Вариант 1) -->
 
-      <div class="srs-header-progress-track" style="position:absolute;bottom:-16px;left:0;right:0;height:4px;background:rgba(255,255,255,0.06);border:none;border-radius:99px;overflow:visible;pointer-events:auto;box-shadow:none;" title="${progressFillTitle}">
+      <div class="srs-header-progress-track" style="position:absolute;bottom:-16px;left:0;right:0;height:4px;background:rgba(255,255,255,0.06);border:none;border-radius:99px;overflow:visible;pointer-events:auto;box-shadow:none;container-type:inline-size;" title="${progressFillTitle}">
 
-        <div class="srs-header-progress-glow" style="position:absolute;top:0;left:0;height:100%;width:${progressFillWidth}%;background:linear-gradient(90deg, #881337 0%, #be123c 28%, #059669 72%, #10b981 100%) no-repeat;background-size:700px 100%;background-position:left top;border-radius:99px;filter:blur(6px);opacity:0.75;transition:width 0.35s cubic-bezier(0.2, 0.8, 0.4, 1);pointer-events:none;"></div>
+        <div class="srs-header-progress-glow" style="position:absolute;top:0;left:0;height:100%;width:${progressFillWidth}%;background:linear-gradient(90deg, #881337 0%, #be123c 28%, #059669 72%, #10b981 100%) no-repeat;background-size:100cqw 100%;background-position:left top;border-radius:99px;filter:blur(6px);opacity:0.75;transition:width 0.35s cubic-bezier(0.2, 0.8, 0.4, 1);pointer-events:none;"></div>
 
-        <div class="srs-header-progress-fill" style="position:relative;height:100%;width:${progressFillWidth}%;background:linear-gradient(90deg, #881337 0%, #be123c 28%, #059669 72%, #10b981 100%) no-repeat;background-size:700px 100%;background-position:left top;border-radius:99px;transition:width 0.35s cubic-bezier(0.2, 0.8, 0.4, 1);" title="${progressFillTitle}"></div>
+        <div class="srs-header-progress-fill" style="position:relative;height:100%;width:${progressFillWidth}%;background:linear-gradient(90deg, #881337 0%, #be123c 28%, #059669 72%, #10b981 100%) no-repeat;background-size:100cqw 100%;background-position:left top;border-radius:99px;transition:width 0.35s cubic-bezier(0.2, 0.8, 0.4, 1);" title="${progressFillTitle}"></div>
 
       </div>
 
@@ -54422,8 +54454,6 @@ function getRemNoteCardStatusBadgeHTML(cardKey){
 
   const entry = state.cardSrs && state.cardSrs[cardKey];
 
-  const svgCurve = `<svg viewBox="0 0 16 16" style="width:12px;height:12px;fill:none;stroke:#34d399;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle;flex-shrink:0;"><path d="M2 13.5h12" stroke-opacity="0.35"/><path d="M2.5 12.5C5 12.5 7 6 13.5 3.5"/><circle cx="13.5" cy="3.5" r="1.5" fill="#34d399"/></svg>`;
-
   if(!entry || !entry.dueDate){
 
     return `<span class="srs-card-status-badge srs-status-new" style="display:inline-flex;align-items:center;gap:5px;border-radius:999px;"><span>🌱 Новая</span></span>`;
@@ -54436,15 +54466,15 @@ function getRemNoteCardStatusBadgeHTML(cardKey){
 
   if(daysDiff <= 0){
 
-    return `<span class="srs-card-status-badge srs-status-due" style="display:inline-flex;align-items:center;gap:5px;border-radius:999px;"><span>Сегодня</span></span>`;
+    return `<span class="srs-card-status-badge srs-status-due" style="display:inline-flex;align-items:center;gap:5px;border-radius:999px;"><span>⚡ Повторение</span></span>`;
 
   } else if(entry.interval >= 21){
 
-    return `<span class="srs-card-status-badge srs-status-mastered" style="display:inline-flex;align-items:center;gap:5px;border-radius:999px;">${svgCurve}<span>${entry.interval} дн</span></span>`;
+    return `<span class="srs-card-status-badge srs-status-mastered" style="display:inline-flex;align-items:center;gap:5px;border-radius:999px;"><span>👑 Закреплено</span></span>`;
 
   } else {
 
-    return `<span class="srs-card-status-badge srs-status-scheduled" style="display:inline-flex;align-items:center;gap:5px;border-radius:999px;">${svgCurve}<span>${daysDiff} дн</span></span>`;
+    return `<span class="srs-card-status-badge srs-status-scheduled" style="display:inline-flex;align-items:center;gap:5px;border-radius:999px;"><span>⚡ Повторение</span></span>`;
 
   }
 
