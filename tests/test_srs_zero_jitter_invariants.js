@@ -80,5 +80,27 @@ assert(!content.includes('margin-top: auto !important;\n    padding: 8px 10px ca
   'Док действий не должен иметь плавающего margin-top: auto, вызывающего подрагивание кнопок');
 console.log('✓ [Zero-Jitter] Док действий монолитно зафиксирован (margin-top: 14px, 0px jitter).');
 
+// 8. Инвариант оптического дыхания точек активности (СТРОГИЙ ЗАПРЕТ НА scale)
+const emeraldBreathMatch = content.match(/@keyframes emeraldSoftBreath\s*\{([\s\S]*?)\}/);
+assert(emeraldBreathMatch, '@keyframes emeraldSoftBreath обязан быть определен в CSS');
+assert(!emeraldBreathMatch[1].includes('scale('), 
+  '❌ ZERO-JITTER VIOLATION: В @keyframes emeraldSoftBreath запрещен scale()! Дыхание точек обязано производиться строго через box-shadow и opacity (0px jitter).');
+
+const srsPulseMatch = content.match(/@keyframes srsLiveDotPulse\s*\{([\s\S]*?)\}/);
+assert(srsPulseMatch, '@keyframes srsLiveDotPulse обязан быть определен в CSS');
+assert(!srsPulseMatch[1].includes('scale('), 
+  '❌ ZERO-JITTER VIOLATION: В @keyframes srsLiveDotPulse запрещен scale()! Дыхание точек обязано производиться строго через box-shadow и opacity (0px jitter).');
+
+// 9. Инвариант симметричной рамки кнопок сайдбара (0px Border Jump)
+assert(content.includes('.navlink{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:11px;text-decoration:none;color:var(--ink-soft);font-weight:500;font-size:.88rem;margin-bottom:2px;border:1px solid transparent;border-left:3px solid transparent;box-sizing:border-box;'),
+  '❌ ZERO-JITTER VIOLATION: .navlink обязан иметь border-left: 3px solid transparent для исключения 2px скачка при активации.');
+
+// 10. Инвариант аппаратной изоляции точек активности
+assert(content.includes('contain:layout style !important;'),
+  '❌ ZERO-JITTER VIOLATION: .activity-dot обязана содержать contain:layout style для изоляции от родительской кнопки.');
+assert(content.includes('.nav-sub-breath-dot') && content.includes('contain: layout style !important;'),
+  '❌ ZERO-JITTER VIOLATION: .nav-sub-breath-dot обязана содержать contain: layout style для изоляции от подпункта.');
+console.log('✓ [Zero-Jitter] Железный замок оптического дыхания и симметричных рамок соблюдён (0 scale, 0px border jump).');
+
 console.log('✓ [Pre-Commit] Все проверки Живого Дыхания и Zero-Jitter кнопок успешно пройдены (100%).');
 process.exit(0);
