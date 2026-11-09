@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ultra-Air Glass SRS: Финальная полировка</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #0d1016;
+      --surface: rgba(22, 27, 36, 0.74);
+      --ink: #f8fafc;
+      --ink-soft: #cbd5e1;
+      --ink-muted: #94a3b8;
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.22);
+      --font-d: 'Onest', -apple-system, sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html, body {
+      height: 100%;
+      margin: 0;
+      background-color: var(--paper);
+      background-image: radial-gradient(rgba(255, 255, 255, 0.055) 1.2px, transparent 1.2px);
+      background-size: 24px 24px;
+      background-attachment: fixed;
+      color: var(--ink);
+      font-family: var(--font-d);
+      overflow-x: hidden;
+    }
+
+    /* Фоновые небулы Academy со скриншота */
+    .ambient-orb {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      will-change: transform, opacity;
+    }
+    .ambient-orb--burgundy {
+      width: 480px;
+      height: 480px;
+      top: -80px;
+      left: 140px;
+      background: radial-gradient(circle, rgba(190, 18, 60, 0.34) 0%, rgba(136, 19, 55, 0.16) 60%, transparent 80%);
+      filter: blur(85px);
+      animation: driftBurgundy 22s infinite ease-in-out;
+    }
+    .ambient-orb--emerald {
+      width: 520px;
+      height: 520px;
+      bottom: -100px;
+      right: -80px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.28) 0%, rgba(6, 78, 59, 0.14) 60%, transparent 80%);
+      filter: blur(90px);
+      animation: driftEmerald 26s infinite ease-in-out;
+    }
+    @keyframes driftBurgundy {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.75; }
+      50% { transform: translate3d(30px, 40px, 0) scale(1.08); opacity: 0.90; }
+    }
+    @keyframes driftEmerald {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.70; }
+      50% { transform: translate3d(-35px, -30px, 0) scale(1.05); opacity: 0.85; }
+    }
+
+    /* Верхняя фиксированная плашка управления стендом */
+    .stand-bar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(11, 15, 23, 0.92);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+      backdrop-filter: blur(20px);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+    .sb-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sb-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .sb-badge {
+      font-family: var(--font-m);
+      font-size: 0.70rem;
+      font-weight: 700;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.16);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+    .sb-tabs {
+      display: flex;
+      gap: 8px;
+    }
+    .sb-tab-btn {
+      font-family: var(--font-d);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 7px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--ink-soft);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .sb-tab-btn:hover {
+      background: rgba(255, 255, 255, 0.09);
+      color: #fff;
+    }
+    .sb-tab-btn.active {
+      background: rgba(16, 185, 129, 0.22);
+      border-color: #34d399;
+      color: #34d399;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.3);
+    }
+
+    /* Макет приложения (App Layout) */
+    .app-layout {
+      display: flex;
+      min-height: calc(100vh - 58px);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Аутентичный сайдбар Academy */
+    .app-sidebar {
+      width: 230px;
+      background: rgba(11, 14, 20, 0.85);
+      border-right: 1px solid rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(24px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 18px 14px 16px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 58px;
+      height: calc(100vh - 58px);
+    }
+    .sb-top {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .brand-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .brand-sub {
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+      margin-top: 2px;
+    }
+
+    .sidebar-srs-widget {
+      background: rgba(16, 185, 129, 0.06);
+      border: 1px solid rgba(16, 185, 129, 0.22);
+      border-radius: 14px;
+      padding: 10px 12px;
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.08);
+    }
+    .srs-w-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .srs-w-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+    }
+    .srs-w-time {
+      font-family: var(--font-m);
+      font-size: 0.65rem;
+      color: var(--ink-muted);
+    }
+    .srs-w-title {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .srs-w-btn {
+      width: 100%;
+      background: rgba(16, 185, 129, 0.22);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      color: #34d399;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 5px 0;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .nav-section-label {
+      font-size: 0.64rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+      padding: 8px 6px 4px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      cursor: pointer;
+      margin-bottom: 2px;
+    }
+    .nav-item.active {
+      background: rgba(16, 185, 129, 0.12);
+      color: #34d399;
+      font-weight: 700;
+    }
+    .nav-item-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 999px;
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+    }
+    .sidebar-bottom {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .sb-search {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .sb-footer-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+    }
+    .sb-xp-pill {
+      background: rgba(225, 29, 72, 0.22);
+      border: 1px solid rgba(225, 29, 72, 0.40);
+      color: #fda4af;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 700;
+    }
+
+    /* Главная сцена десктопа */
+    .app-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 40px 60px;
+      position: relative;
+    }
+
+    /* Базовый контейнер SRS */
+    .cards-hub-container {
+      width: 100%;
+      max-width: 740px;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Шапка SRS */
+    .srs-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .sh-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--ink-soft);
+      letter-spacing: 0.03em;
+    }
+    .sh-dot-green {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+    .sh-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sh-sprint-badge {
+      font-family: var(--font-m);
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 3px 12px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sh-close-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--ink-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+    }
+
+    /* Прогресс-бар */
+    .srs-progress-track {
+      height: 2px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 2px;
+      margin-bottom: 14px;
+      overflow: hidden;
+      position: relative;
+    }
+    .srs-progress-fill {
+      width: 32%;
+      height: 100%;
+      background: linear-gradient(90deg, #ec4899, #10b981);
+      box-shadow: 0 0 10px #10b981;
+    }
+
+    /* Цепочка бусин */
+    .srs-beads-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 18px;
+    }
+    .s-bead {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+    }
+    .s-bead.active {
+      width: 8px;
+      height: 8px;
+      background: #34d399;
+      box-shadow: 0 0 8px #34d399;
+    }
+    .s-bead.done {
+      background: #10b981;
+    }
+
+    /* Карточка ответа */
+    .srs-card {
+      background: linear-gradient(165deg, rgba(16, 80, 60, 0.35) 0%, rgba(18, 26, 34, 0.88) 55%, rgba(13, 20, 26, 0.94) 100%);
+      border: 1.5px solid rgba(52, 211, 153, 0.45);
+      box-shadow: inset 0 1px 0 rgba(167, 243, 208, 0.22), 0 24px 56px -10px rgba(0, 0, 0, 0.65), 0 0 36px rgba(16, 185, 129, 0.18);
+      border-radius: 20px;
+      padding: 24px 28px;
+      backdrop-filter: blur(24px);
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 2;
+    }
+    .sc-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .sc-chips {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sc-chip-otvet {
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.20);
+      border: 1px solid rgba(16, 185, 129, 0.50);
+      padding: 2px 10px;
+      border-radius: 999px;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);
+    }
+    .sc-chip-due {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #fda4af;
+      background: rgba(244, 63, 94, 0.18);
+      border: 1px solid rgba(244, 63, 94, 0.35);
+      padding: 2px 9px;
+      border-radius: 999px;
+    }
+    .sc-btn-back {
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 3px 12px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sc-q-sub {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #a7f3d0;
+      margin-bottom: 10px;
+    }
+    .sc-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(52, 211, 153, 0.30), transparent);
+      margin-bottom: 12px;
+    }
+    .sc-answer-text {
+      font-size: 0.98rem;
+      line-height: 1.55;
+      color: #ffffff;
+      font-weight: 500;
+    }
+
+    /* 4 Кнопки оценки SRS */
+    .srs-dock-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      width: 100%;
+      position: relative;
+      z-index: 2;
+    }
+    .sd-rate-btn {
+      padding: 12px 10px;
+      border-radius: 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-align: center;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+    .sd-rate-again {
+      background: linear-gradient(180deg, rgba(244, 63, 94, 0.14) 0%, rgba(244, 63, 94, 0.05) 100%);
+      border: 1px solid rgba(244, 63, 94, 0.35);
+      color: #fda4af;
+    }
+    .sd-rate-hard {
+      background: linear-gradient(180deg, rgba(245, 158, 11, 0.14) 0%, rgba(245, 158, 11, 0.05) 100%);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #fcd34d;
+    }
+    .sd-rate-good {
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.16) 0%, rgba(16, 185, 129, 0.06) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.40);
+      color: #6ee7b7;
+    }
+    .sd-rate-easy {
+      background: linear-gradient(180deg, rgba(6, 182, 212, 0.14) 0%, rgba(6, 182, 212, 0.05) 100%);
+      border: 1px solid rgba(6, 182, 212, 0.35);
+      color: #67e8f9;
+    }
+
+    /* ========================================================
+       УТОЧНЁННЫЙ ВАРИАНТ 3: «БОЛЬШЕ ПРОЗРАЧНОСТИ + ТОНЬШЕ КАНТ»
+       ======================================================== */
+
+    /* Уровень 1: Ультра-воздушное стекло (90% прозрачности, тончайший кант 0.05, верхний блик 0.12) */
+    .glass-ultra-air {
+      background: linear-gradient(165deg, rgba(255, 255, 255, 0.035) 0%, rgba(14, 20, 30, 0.14) 100%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.05) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+      border-radius: 28px !important;
+      padding: 24px 28px 28px !important;
+      backdrop-filter: blur(14px) saturate(125%) !important;
+      -webkit-backdrop-filter: blur(14px) saturate(125%) !important;
+      box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.40), inset 0 1px 0 0 rgba(255, 255, 255, 0.08) !important;
+    }
+    .glass-ultra-air::before { display: none !important; }
+
+    /* Уровень 2: Чистая шелковистая дымка (94% прозрачности, микро-кант 0.04) */
+    .glass-whisper {
+      background: rgba(14, 20, 30, 0.08) !important;
+      border: 1px solid rgba(255, 255, 255, 0.04) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.09) !important;
+      border-radius: 28px !important;
+      padding: 24px 28px 28px !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.35) !important;
+    }
+    .glass-whisper::before { display: none !important; }
+
+    /* Уровень 3: Премиальный глянцевый микро-кант (ультратонкий зеркальный верх 0.18 + 88% прозрачность) */
+    .glass-gloss-rim {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(14, 20, 30, 0.18) 60%, rgba(8, 12, 18, 0.28) 100%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.06) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.18) !important;
+      border-radius: 28px !important;
+      padding: 24px 28px 28px !important;
+      backdrop-filter: blur(16px) saturate(135%) !important;
+      -webkit-backdrop-filter: blur(16px) saturate(135%) !important;
+      box-shadow: 0 24px 50px -12px rgba(0, 0, 0, 0.45), inset 0 1px 1px 0 rgba(255, 255, 255, 0.12) !important;
+    }
+    .glass-gloss-rim::before { display: none !important; }
+
+    /* Нижняя плашка вердикта */
+    .stand-verdict {
+      position: fixed;
+      bottom: 20px;
+      right: 24px;
+      max-width: 480px;
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 14px 18px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+      font-size: 0.84rem;
+      line-height: 1.45;
+      z-index: 100;
+    }
+    .verdict-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #34d399;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Небулы фона со скриншота -->
+  <div class="ambient-orb ambient-orb--burgundy"></div>
+  <div class="ambient-orb ambient-orb--emerald"></div>
+
+  <!-- Панель управления -->
+  <header class="stand-bar">
+    <div class="sb-left">
+      <span class="sb-title">Полировка Ultra-Air Glass</span>
+      <span class="sb-badge">Тонкий кант + Высокая прозрачность</span>
+    </div>
+    <div class="sb-tabs">
+      <button class="sb-tab-btn active" id="btn-u1" onclick="applyUltra(1)">
+        <span>1. Ultra-Air (90% прозрачности, микро-кант 0.05) ★</span>
+      </button>
+      <button class="sb-tab-btn" id="btn-u2" onclick="applyUltra(2)">
+        <span>2. Whisper Mist (94% прозрачности, тончайший кант 0.04)</span>
+      </button>
+      <button class="sb-tab-btn" id="btn-u3" onclick="applyUltra(3)">
+        <span>3. Glossy Rim (88% прозрачности, глянцевый кант 0.18)</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Макет экрана со скриншота -->
+  <div class="app-layout">
+
+    <!-- Левый сайдбар -->
+    <aside class="app-sidebar">
+      <div class="sb-top">
+        <div class="brand-header">
+          <div class="brand-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+            Academy
+          </div>
+          <div class="brand-sub">Python Backend</div>
+        </div>
+
+        <div class="sidebar-srs-widget">
+          <div class="srs-w-top">
+            <span class="srs-w-dot"></span>
+            <span class="srs-w-time">⏱ ~5 ч 32 мин</span>
+          </div>
+          <div class="srs-w-title">Интервальное повторение</div>
+          <div class="srs-w-btn">Продолжить</div>
+        </div>
+
+        <nav>
+          <div class="nav-item"><span>Дашборд</span></div>
+          <div class="nav-item"><span>Путь</span></div>
+          <div class="nav-section-label">Тренажёры</div>
+          <div class="nav-item active"><span>Интервалка</span><span class="nav-item-dot"></span></div>
+          <div class="nav-item"><span>Zen IDE</span></div>
+          <div class="nav-item"><span>Собеседование</span></div>
+          <div class="nav-section-label">Инструменты</div>
+          <div class="nav-item"><span>Матрица навыков</span></div>
+          <div class="nav-item"><span>Справочник</span></div>
+          <div class="nav-item"><span>Песочница</span></div>
+        </nav>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="sb-search">
+          <span>Поиск по темам...</span>
+          <kbd style="font-size:0.65rem;padding:1px 5px;background:rgba(255,255,255,0.08);border-radius:4px;">Ctrl+K</kbd>
+        </div>
+        <div class="sb-footer-status">
+          <span>⏱ 15:00</span>
+          <span class="sb-xp-pill">💎 29%</span>
+          <span>⚙</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Основная сцена -->
+    <main class="app-main">
+      <div class="cards-hub-container glass-ultra-air" id="srs-hub">
+
+        <!-- Шапка SRS -->
+        <header class="srs-header-bar">
+          <div class="sh-left">
+            <span class="sh-dot-green"></span>
+            <span>КАРТОЧКИ SRS</span>
+          </div>
+          <div class="sh-right">
+            <div class="sh-sprint-badge">⚡ Спринт 1 / 36</div>
+            <div class="sh-close-btn">✕</div>
+          </div>
+        </header>
+
+        <!-- Прогресс-бар -->
+        <div class="srs-progress-track">
+          <div class="srs-progress-fill"></div>
+        </div>
+
+        <!-- Цепочка бусин -->
+        <div class="srs-beads-row">
+          <div class="s-bead done"></div>
+          <div class="s-bead active"></div>
+          <div class="s-bead"></div>
+          <div class="s-bead"></div>
+          <div class="s-bead"></div>
+          <div class="s-bead"></div>
+          <div class="s-bead"></div>
+          <div class="s-bead"></div>
+          <div class="s-bead"></div>
+          <div class="s-bead"></div>
+          <div class="s-bead"></div>
+          <div class="s-bead"></div>
+        </div>
+
+        <!-- Карточка ответа -->
+        <div class="srs-card">
+          <div class="sc-top">
+            <div class="sc-chips">
+              <span class="sc-chip-otvet">✓ Ответ</span>
+              <span class="sc-chip-due">Сегодня</span>
+            </div>
+            <div class="sc-btn-back">
+              ← К вопросу <kbd style="font-size:0.65rem;padding:1px 4px;background:rgba(255,255,255,0.12);border-radius:4px;">Esc</kbd>
+            </div>
+          </div>
+          <div class="sc-q-sub">Каково основное назначение git stash?</div>
+          <div class="sc-divider"></div>
+          <div class="sc-answer-text">
+            Временно сохранить незафиксированные изменения в стек, очистить рабочую директорию и вернуться к состоянию последнего коммита – без создания коммита
+          </div>
+        </div>
+
+        <!-- Кнопки оценки -->
+        <div class="srs-dock-grid">
+          <button type="button" class="sd-rate-btn sd-rate-again">Не помню</button>
+          <button type="button" class="sd-rate-btn sd-rate-hard">Со скрипом</button>
+          <button type="button" class="sd-rate-btn sd-rate-good">Помню</button>
+          <button type="button" class="sd-rate-btn sd-rate-easy">На автомате</button>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Плашка вердикта -->
+  <aside class="stand-verdict" id="verdict-box">
+    <div class="verdict-title" id="verdict-title">1. Ultra-Air (90% прозрачности, микро-кант 0.05) ★</div>
+    <div id="verdict-desc">
+      Идеальная воздушность: прозрачность 90% позволяет небулам и точечной сетке мягко читаться сквозь стекло, а микро-кант <code>0.05</code> с верхним бликом <code>0.12</code> создаёт элегантный оптический объём без малейшей тяжести.
+    </div>
+  </aside>
+
+  <script>
+    const ultraData = {
+      1: {
+        cls: 'glass-ultra-air',
+        title: '1. Ultra-Air (90% прозрачности, микро-кант 0.05) ★',
+        desc: 'Идеальная воздушность: прозрачность 90% позволяет небулам и точечной сетке мягко читаться сквозь стекло, а микро-кант 0.05 с верхним бликом 0.12 создаёт элегантный оптический объём без малейшей тяжести.'
+      },
+      2: {
+        cls: 'glass-whisper',
+        title: '2. Whisper Mist (94% прозрачности, тончайший кант 0.04)',
+        desc: 'Практически неощутимая дымка: 94% прозрачность, ультра-тонкий кант 0.04. Почти растворяется в фоне, оставляя лишь нежное размытие точек под карточкой.'
+      },
+      3: {
+        cls: 'glass-gloss-rim',
+        title: '3. Glossy Rim (88% прозрачности, глянцевый кант 0.18)',
+        desc: 'Более выразительный глянцевый кант сверху (0.18) с лёгким градиентным скосом. Больше выражает стекло и оптическую грань.'
+      }
+    };
+
+    function applyUltra(num) {
+      document.querySelectorAll('.sb-tab-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', (idx + 1) === num);
+      });
+
+      const hub = document.getElementById('srs-hub');
+      hub.className = 'cards-hub-container ' + ultraData[num].cls;
+
+      document.getElementById('verdict-title').innerText = ultraData[num].title;
+      document.getElementById('verdict-desc').innerText = ultraData[num].desc;
+    }
+  </script>
+</body>
+</html>
