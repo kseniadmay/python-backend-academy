@@ -25592,28 +25592,21 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
   }
 
-  .fc-q code {
-
+  .fc-q code,
+  #srs-card-prompt code {
     background: rgba(16, 185, 129, 0.12) !important;
-
     border: 1px solid rgba(52, 211, 153, 0.40) !important;
-
     color: #a7f3d0 !important;
-
     padding: 2px 8px !important;
-
     border-radius: 8px !important;
-
     font-family: var(--font-m, monospace) !important;
-
     font-weight: 600 !important;
-
     display: inline-block !important;
-
-    line-height: 1.4 !important;
-
+    vertical-align: -1.5px !important;
+    line-height: 1.35 !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
     box-shadow: 0 0 10px rgba(16, 185, 129, 0.12) !important;
-
   }
 
 
@@ -28176,21 +28169,15 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   /* Оптический ритм: естественный отступ сверху и снизу, 0 пустоты и перерастяжения */
 
   .card-front .fc-card-body,
-
   #srs-active-card #srs-card-prompt {
-
     display: block !important;
-
     margin: 0 !important;
-
-    padding: 8px 0 16px !important;
-
+    padding: 14px 0 16px !important;
     font-size: clamp(1.12rem, 2.05vw, 1.28rem) !important;
-
-    line-height: 1.55 !important;
-
+    line-height: 1.6 !important;
     width: 100% !important;
-
+    box-sizing: border-box !important;
+    overflow: visible !important;
   }
 
   .card-back .fc-card-body {
@@ -44896,7 +44883,7 @@ function viewPythonSkill(sid){
                 </div>
               </div>
 
-              <div class="fc-card-body fc-q" style="margin:0;padding:8px 0 16px;font-size:clamp(1.15rem, 2.1vw, 1.35rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
+              <div class="fc-card-body fc-q" style="margin:0;padding:14px 0 16px;font-size:clamp(1.15rem, 2.1vw, 1.35rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
                 ${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(curCard.q) : curCard.q}
               </div>
             </div>
@@ -47458,7 +47445,7 @@ function viewCardsHub(){
 
 
 
-              <div class="fc-card-body fc-q" id="srs-card-prompt" style="margin:0;padding:8px 0 16px;font-size:clamp(1.15rem, 2.1vw, 1.35rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
+              <div class="fc-card-body fc-q" id="srs-card-prompt" style="margin:0;padding:14px 0 16px;font-size:clamp(1.15rem, 2.1vw, 1.35rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
 
                 ${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(cur.q) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.q) : curCard.q)}
 
@@ -47632,7 +47619,7 @@ function viewCardsHub(){
 
 
 
-              <div class="fc-card-body fc-q" id="srs-card-prompt" style="margin:0;padding:8px 0 16px;font-size:clamp(1.15rem, 2.1vw, 1.35rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
+              <div class="fc-card-body fc-q" id="srs-card-prompt" style="margin:0;padding:14px 0 16px;font-size:clamp(1.15rem, 2.1vw, 1.35rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
 
                 ${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(cur.q) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.q) : curCard.q)}
 
@@ -47932,7 +47919,7 @@ function viewCardsHub(){
 
 
 
-              <div class="fc-card-body fc-q" id="srs-card-prompt" style="margin:0;padding:8px 0 16px;font-size:clamp(1.15rem, 2.1vw, 1.35rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
+              <div class="fc-card-body fc-q" id="srs-card-prompt" style="margin:0;padding:14px 0 16px;font-size:clamp(1.15rem, 2.1vw, 1.35rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
 
                 ${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(cur.q) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.q) : curCard.q)}
 
@@ -56693,45 +56680,71 @@ function getThermodynamicCooldownData(){
       labelHtml: '<span class="dazzling-gold-text">✨ 100%</span>',
       tooltipTag: 'Белое каление (1350°C)',
       tooltipDesc: '',
-      tagColor: '#fef08a'
-    };
-  } else if(pct >= 75){
-    return {
-      pct,
-      cssClass: 'optics-golden-rose',
-      labelHtml: `<span style="color:#ffedd5;font-weight:800;">🌺 ${pct}%</span>`,
-      tooltipTag: 'Оранжевый накал (1050°C)',
-      tooltipDesc: '',
-      tagColor: '#fed7aa'
-    };
-  } else if(pct >= 50){
-    return {
-      pct,
-      cssClass: 'optics-ruby-bud',
-      labelHtml: `<span style="color:#fee2e2;font-weight:800;">🌹 ${pct}%</span>`,
-      tooltipTag: 'Ярко-алый горн (850°C)',
-      tooltipDesc: '',
-      tagColor: '#fca5a5'
-    };
-  } else if(pct >= 25){
-    return {
-      pct,
-      cssClass: 'optics-cherry-heat',
-      labelHtml: `<span style="color:#fda4af;font-weight:800;">🌱 ${pct}%</span>`,
-      tooltipTag: 'Тёмно-вишнёвый жар (600°C)',
-      tooltipDesc: '',
-      tagColor: '#fda4af'
-    };
-  } else {
-    return {
-      pct,
-      cssClass: 'optics-cold-iron',
-      labelHtml: `<span style="color:#cbd5e1;font-weight:800;">🥀 ${pct}%</span>`,
-      tooltipTag: 'Остывшая сталь (20°C)',
-      tooltipDesc: '',
-      tagColor: '#cbd5e1'
+      tagColor: '#fef08a',
+      bgGrad: '',
+      borderCol: '',
+      shadowGlow: '',
+      textCol: '#ffffff',
+      pillStyle: ''
     };
   }
+
+  // Непрерывная термодинамическая шкала накала памяти (плавный lerp на каждый 1%)
+  const THERMO_STOPS = [
+    { p: 0,   r: 45,  g: 24,  b: 32,  br: 244, bg: 63,  bb: 94,  tr: 203, tg: 213, tb: 225, name: 'Остывшая сталь (20°C)' },
+    { p: 25,  r: 120, g: 16,  b: 45,  br: 244, bg: 63,  bb: 94,  tr: 254, tg: 205, tb: 211, name: 'Тёмно-вишнёвый жар (600°C)' },
+    { p: 50,  r: 190, g: 22,  b: 60,  br: 251, bg: 113, bb: 133, tr: 254, tg: 226, tb: 226, name: 'Ярко-алый горн (850°C)' },
+    { p: 75,  r: 230, g: 90,  b: 18,  br: 253, bg: 186, bb: 116, tr: 255, tg: 237, tb: 213, name: 'Оранжевый накал (1050°C)' },
+    { p: 90,  r: 238, g: 150, b: 16,  br: 254, bg: 240, bb: 138, tr: 254, tg: 240, tb: 138, name: 'Янтарно-золотой кристалл (1200°C)' },
+    { p: 100, r: 255, g: 255, b: 255, br: 255, bg: 255, bb: 255, tr: 255, tg: 255, tb: 255, name: 'Белое каление (1350°C)' }
+  ];
+
+  let left = THERMO_STOPS[0], right = THERMO_STOPS[THERMO_STOPS.length - 1];
+  for(let i = 0; i < THERMO_STOPS.length - 1; i++){
+    if(pct >= THERMO_STOPS[i].p && pct <= THERMO_STOPS[i+1].p){
+      left = THERMO_STOPS[i];
+      right = THERMO_STOPS[i+1];
+      break;
+    }
+  }
+
+  const span = (right.p - left.p) || 1;
+  const t = Math.max(0, Math.min(1, (pct - left.p) / span));
+  const lerp = (a, b) => Math.round(a + (b - a) * t);
+
+  const r = lerp(left.r, right.r);
+  const g = lerp(left.g, right.g);
+  const b = lerp(left.b, right.b);
+  const br = lerp(left.br, right.br);
+  const bg = lerp(left.bg, right.bg);
+  const bb = lerp(left.bb, right.bb);
+  const tr = lerp(left.tr, right.tr);
+  const tg = lerp(left.tg, right.tg);
+  const tb = lerp(left.tb, right.tb);
+
+  const bgGrad = `linear-gradient(145deg, rgba(${r}, ${g}, ${b}, 0.85) 0%, rgba(${Math.round(r * 0.6)}, ${Math.round(g * 0.6)}, ${Math.round(b * 0.6)}, 0.92) 50%, rgba(15, 11, 14, 0.98) 100%)`;
+  const borderCol = `rgba(${br}, ${bg}, ${bb}, 0.75)`;
+  const shadowGlow = `inset 0 1px 1.5px rgba(255,255,255,0.30), 0 0 12px rgba(${br}, ${bg}, ${bb}, 0.35)`;
+  const textCol = `rgb(${tr}, ${tg}, ${tb})`;
+  const tagColor = `rgb(${br}, ${bg}, ${bb})`;
+
+  const iconStr = (pct < 25) ? '🥀' : (pct < 50 ? '🌱' : (pct < 75 ? '🌹' : (pct < 90 ? '🌺' : '✨')));
+  const labelHtml = `<span style="color:${textCol};font-weight:800;">${iconStr} ${pct}%</span>`;
+  const pillStyle = `background:${bgGrad} !important;border-color:${borderCol} !important;box-shadow:${shadowGlow} !important;color:${textCol} !important;`;
+
+  return {
+    pct,
+    cssClass: '',
+    labelHtml,
+    tooltipTag: right.name,
+    tooltipDesc: '',
+    tagColor,
+    bgGrad,
+    borderCol,
+    shadowGlow,
+    textCol,
+    pillStyle
+  };
 }
 
 // 3. Single Source of Truth for Unified Navigation Groups
@@ -56816,7 +56829,7 @@ function buildUnifiedSidebarFootHTML(isMobile){
       <button class="sidebar-streak-badge sidebar-deck-cell" id="${prefix}-streak-cell" style="display:none;" title="Дней ударного режима подряд" aria-label="Дней ударного режима подряд">
         🔥 <span id="streak-num-${isMobile ? 'm' : 'd'}">${streakDays}</span>
       </button>
-      <div class="cooldown-pill sidebar-deck-cell ${cdData.cssClass}" id="${prefix}-cooldown-pill" style="cursor:default;">
+      <div class="cooldown-pill sidebar-deck-cell ${cdData.cssClass}" id="${prefix}-cooldown-pill" style="cursor:default;${cdData.pillStyle || ''}">
         <span id="${prefix}-cooldown-label">${cdData.labelHtml}</span>
         <div class="glass-hud-tooltip">
           <div class="tooltip-tag" style="color:${cdData.tagColor};">${cdData.tooltipTag}</div>
@@ -56852,28 +56865,38 @@ renderNav = function(){
       streakNumEl.textContent = (typeof state !== 'undefined' && state.streak) ? state.streak : 0;
     }
 
-    // Cooldown pill SSOT
-    const cdLabel = document.getElementById('sidebar-cooldown-label');
-    const cdPill = document.getElementById('sidebar-cooldown-pill');
-    if(cdLabel && cdPill){
-      const cdData = getThermodynamicCooldownData();
-      cdPill.className = `cooldown-pill sidebar-hud-cell ${cdData.cssClass}`;
-      cdPill.style.background = '';
-      cdPill.style.borderColor = '';
-      cdPill.style.color = '';
-      cdPill.style.boxShadow = '';
-      cdPill.style.opacity = '1';
-      cdPill.style.cursor = 'default';
-      cdLabel.innerHTML = cdData.labelHtml;
+    // Cooldown pill SSOT (Плавная термодинамическая интерполяция каждого 1%)
+    ['sidebar', 'drawer'].forEach(pfx => {
+      const cdLabel = document.getElementById(`${pfx}-cooldown-label`);
+      const cdPill = document.getElementById(`${pfx}-cooldown-pill`);
+      if(cdLabel && cdPill){
+        const cdData = getThermodynamicCooldownData();
+        if(cdData.pct >= 100){
+          cdPill.className = `cooldown-pill sidebar-deck-cell optics-dazzling-triumph`;
+          cdPill.style.background = '';
+          cdPill.style.borderColor = '';
+          cdPill.style.color = '';
+          cdPill.style.boxShadow = '';
+        } else {
+          cdPill.className = `cooldown-pill sidebar-deck-cell`;
+          cdPill.style.background = cdData.bgGrad;
+          cdPill.style.borderColor = cdData.borderCol;
+          cdPill.style.boxShadow = cdData.shadowGlow;
+          cdPill.style.color = cdData.textCol;
+        }
+        cdPill.style.opacity = '1';
+        cdPill.style.cursor = 'default';
+        cdLabel.innerHTML = cdData.labelHtml;
 
-      let tipEl = cdPill.querySelector('.glass-hud-tooltip');
-      if(!tipEl){
-        tipEl = document.createElement('div');
-        tipEl.className = 'glass-hud-tooltip';
-        cdPill.appendChild(tipEl);
+        let tipEl = cdPill.querySelector('.glass-hud-tooltip');
+        if(!tipEl){
+          tipEl = document.createElement('div');
+          tipEl.className = 'glass-hud-tooltip';
+          cdPill.appendChild(tipEl);
+        }
+        tipEl.innerHTML = `<div class="tooltip-tag" style="color:${cdData.tagColor};">${cdData.tooltipTag}</div>` + (cdData.tooltipDesc ? `<div class="tooltip-body">${cdData.tooltipDesc}</div>` : '');
       }
-      tipEl.innerHTML = `<div class="tooltip-tag" style="color:${cdData.tagColor};">${cdData.tooltipTag}</div>` + (cdData.tooltipDesc ? `<div class="tooltip-body">${cdData.tooltipDesc}</div>` : '');
-    }
+    });
   }
 
   const mobItems = NAV_ITEMS.filter(it => it.mobileTab);
