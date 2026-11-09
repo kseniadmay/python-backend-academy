@@ -1,4 +1,4 @@
-const CACHE_NAME = 'academy-pwa-v95';
+const CACHE_NAME = 'academy-pwa-v96';
 const ASSETS_TO_CACHE = [
   './',
   'index.html',
@@ -8,10 +8,11 @@ const ASSETS_TO_CACHE = [
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE);
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
@@ -42,13 +43,32 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Стратегия Stale-While-Revalidate для мгновенного переключения и загрузки:
-  // 1. Мгновенная отдача из локального кэша (0-5 мс) без ожидания сети
-  // 2. Фоновое обновление кэша из сети (revalidate) без блокировки интерфейса
-  // 3. Fallback на academy.html для навигационных запросов
+  // Network-First для главного HTML-документа, чтобы обновления кода применялись немедленно
+  if (event.request.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname === '/' || url.pathname.endsWith('/')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          return caches.match(event.request).then((cachedResponse) => {
+            if (cachedResponse) return cachedResponse;
+            return caches.match('academy.html');
+          });
+        })
+    );
+    return;
+  }
+
+  // Stale-While-Revalidate для статичных ресурсов (иконки, манифест)
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      // Фоновое обновление из сети
       const networkFetch = fetch(event.request)
         .then((networkResponse) => {
           if (
@@ -63,24 +83,14 @@ self.addEventListener('fetch', (event) => {
           }
           return networkResponse;
         })
-        .catch(() => {
-          // Сеть недоступна (оффлайн)
-          if (event.request.mode === 'navigate') {
-            return caches.match('academy.html');
-          }
-        });
+        .catch(() => {});
 
-      // Если ресурс уже есть в кэше — отдаём его МОЛНИЕНОСНО (0 мс ожидания)
       if (cachedResponse) {
         return cachedResponse;
       }
 
-      // Если в кэше ресурса ещё нет (первое посещение) — ждём сетевого ответа
       return networkFetch.then((networkResponse) => {
         if (networkResponse) return networkResponse;
-        if (event.request.mode === 'navigate') {
-          return caches.match('academy.html');
-        }
         return new Response('Offline', { status: 503, statusText: 'Offline' });
       });
     })
