@@ -141,6 +141,15 @@ def main() -> int:
                 return 1
             print('✓ [Pre-Commit] Глобальный архитектурный DRY-тест (SSOT) пройден со 100% успехом.')
 
+        # Защита от мерцания, субпиксельного дрожания и скачков кнопок (Zero-Jitter SRS Guard)
+        jitter_test_path = os.path.join(_ROOT, 'tests', 'test_srs_zero_jitter_invariants.js')
+        if os.path.isfile(jitter_test_path):
+            c_jit = subprocess.run(['node', jitter_test_path], capture_output=True, text=True)
+            if c_jit.returncode != 0:
+                print(f'[HOOK ERROR] Сбой теста Zero-Jitter & Zero-Flicker SRS:\n{c_jit.stderr or c_jit.stdout}')
+                return 1
+            print('✓ [Pre-Commit] Тест стабильности Zero-Jitter SRS пройден со 100% успехом.')
+
     print('✓ [Pre-Commit] Синтаксическая проверка пройдена (JS, Python, JSON, HTML inline в норме).')
     return 0
 
