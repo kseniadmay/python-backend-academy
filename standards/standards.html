@@ -1416,19 +1416,101 @@
       opacity: 1;
     }
   }
-  .nav-sub-list{
-    display:flex;flex-direction:column;gap:2px;padding-left:16px;margin:2px 0 6px 14px;
-    border-left:2px solid var(--line-soft, rgba(255,255,255,0.08));position:relative;
+  .nav-sub-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding-left: 12px;
+    margin: 2px 0 6px 20px;
+    border-left: 1.5px solid rgba(255, 255, 255, 0.09);
+    position: relative;
+    user-select: none;
   }
-  .nav-sub-item{
-    display:flex;align-items:center;justify-content:space-between;padding:5px 9px;border-radius:8px;
-    color:var(--ink-soft);font-size:0.81rem;font-weight:500;text-decoration:none;cursor:pointer;
-    transition:background .15s,color .15s;
+  [data-theme="light"] .nav-sub-list {
+    border-left-color: rgba(0, 0, 0, 0.08);
   }
-  .nav-sub-item:hover{background:var(--surface-hover, rgba(255,255,255,0.05));color:var(--ink);}
-  .nav-sub-item.active{background:var(--moss-soft);color:var(--moss-deep);font-weight:600;}
-  .nav-sub-item-left{display:flex;align-items:center;gap:7px;}
-  .nav-sub-dot{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:0.6;}
+  .nav-sub-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px;
+    border-radius: 8px;
+    color: var(--ink-soft, #94a3b8);
+    font-size: 0.82rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .nav-sub-item:hover {
+    background: var(--surface-hover, rgba(255, 255, 255, 0.05));
+    color: var(--ink, #ffffff);
+  }
+  .nav-sub-item.active {
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.14) 0%, rgba(255, 255, 255, 0.03) 100%) !important;
+    border: 1px solid rgba(52, 211, 153, 0.22) !important;
+    color: #34d399 !important;
+    font-weight: 700 !important;
+  }
+  [data-theme="light"] .nav-sub-item {
+    color: #64748b;
+  }
+  [data-theme="light"] .nav-sub-item:hover {
+    background: rgba(0, 0, 0, 0.04);
+    color: #0f172a;
+  }
+  [data-theme="light"] .nav-sub-item.active {
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.12) 0%, rgba(0, 0, 0, 0.02) 100%) !important;
+    border: 1px solid rgba(5, 150, 105, 0.20) !important;
+    color: #065f46 !important;
+    font-weight: 700 !important;
+  }
+  .nav-sub-item-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-sub-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.55;
+    flex-shrink: 0;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+  .nav-sub-item.active .nav-sub-dot {
+    opacity: 1;
+    transform: scale(1.15);
+    box-shadow: 0 0 6px rgba(52, 211, 153, 0.8);
+  }
+  [data-theme="light"] .nav-sub-item.active .nav-sub-dot {
+    box-shadow: 0 0 6px rgba(5, 150, 105, 0.6);
+  }
+  .nav-sub-badge {
+    font-family: var(--font-m, monospace);
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1.25;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--ink-muted, #94a3b8);
+    letter-spacing: -0.01em;
+  }
+  .nav-sub-item.active .nav-sub-badge {
+    background: rgba(16, 185, 129, 0.20);
+    color: #6ee7b7;
+  }
+  [data-theme="light"] .nav-sub-badge {
+    background: rgba(0, 0, 0, 0.05);
+    color: #64748b;
+  }
+  [data-theme="light"] .nav-sub-item.active .nav-sub-badge {
+    background: rgba(16, 185, 129, 0.15);
+    color: #047857;
+  }
 
   #nav-desktop .navlink{
 
@@ -34897,13 +34979,15 @@ function renderNav(){
 }
 
 function markActiveNav(route){
-
+  const isSrs = (route === '/cards' || route === '/notes-review' || (route && (route.startsWith('/cards') || route.startsWith('/notes-review'))));
   document.querySelectorAll('[data-route]').forEach(el=>{
-
-    el.classList.toggle('active', el.getAttribute('data-route')===route);
-
+    const r = el.getAttribute('data-route');
+    if((el.classList.contains('navlink') || el.classList.contains('drawer-nav-link')) && r === '/cards' && isSrs){
+      el.classList.add('active');
+    } else {
+      el.classList.toggle('active', r === route);
+    }
   });
-
 }
 
 
@@ -56707,7 +56791,14 @@ const UNIFIED_NAV_SECTIONS = [
 ];
 
 function renderUnifiedNavLinks(isMobile, curRoute){
-  const activeRoute = curRoute || (typeof currentRoute !== 'undefined' ? currentRoute : ((typeof location !== 'undefined' && location.hash) ? location.hash.replace('#', '') : '/'));
+  const rawRoute = (curRoute !== undefined && curRoute !== null)
+    ? curRoute
+    : (typeof currentRoute === 'function'
+        ? currentRoute()
+        : (typeof currentRoute === 'string'
+            ? currentRoute
+            : ((typeof location !== 'undefined' && location.hash) ? location.hash.replace('#', '') : '/')));
+  const activeRoute = String(rawRoute || '/');
   const cardSrsStats = (typeof getSpacedRepetitionStats === 'function') ? getSpacedRepetitionStats() : { dueTodayCardsCount: 0 };
   const noteSrsStats = (typeof getNoteSpacedRepetitionStats === 'function') ? getNoteSpacedRepetitionStats() : { dueCount: 0 };
   const hasDueCards = (Number(cardSrsStats.dueTodayCardsCount) || 0) > 0 || (Number(noteSrsStats.dueCount) || 0) > 0;
@@ -56723,7 +56814,15 @@ function renderUnifiedNavLinks(isMobile, curRoute){
       const it = NAV_ITEMS.find(item => item.route === r);
       if(!it) return '';
 
-      const isActive = activeRoute === it.route;
+      const isSrs = (it.route === '/cards');
+      const isSrsActive = isSrs && (
+        activeRoute === '/cards' ||
+        activeRoute.indexOf('/cards') === 0 ||
+        activeRoute === '/notes-review' ||
+        activeRoute.indexOf('/notes-review') === 0
+      );
+
+      const isActive = isSrs ? isSrsActive : (activeRoute === it.route);
       const cls = isMobile
         ? `drawer-nav-link ${isActive ? 'active' : ''}`
         : `navlink ${isActive ? 'active' : ''}`;
@@ -56732,6 +56831,48 @@ function renderUnifiedNavLinks(isMobile, curRoute){
       let dotHtml = '';
       if(it.route === '/cards'){
         dotHtml = `<span class="activity-dot" style="${isMobile ? 'margin-left:auto;' : ''}" title="${hasDueCards ? 'Есть темы для повторения' : 'Интервальные повторения доступны'}"></span>`;
+      }
+
+      let subListHtml = '';
+      if(it.route === '/cards'){
+        const isNotesActive = isSrsActive && (
+          activeRoute === '/notes-review' ||
+          activeRoute.indexOf('/notes-review') === 0 ||
+          activeRoute.indexOf('tab=notes') !== -1 ||
+          (typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.hubTab === 'notes')
+        );
+        const isCardsActive = isSrsActive && !isNotesActive;
+
+        const dueCards = Number(cardSrsStats.dueTodayCardsCount) || 0;
+        const dueNotes = Number(noteSrsStats.dueCount) || 0;
+
+        const cardsBadgeText = dueCards > 0 ? `${dueCards} шт` : '';
+        const notesBadgeText = dueNotes > 0 ? `${dueNotes} ${dueNotes === 1 ? 'тема' : (dueNotes >= 2 && dueNotes <= 4 ? 'темы' : 'тем')}` : '';
+
+        const cardsBadgeHtml = cardsBadgeText ? `<span class="nav-sub-badge">${cardsBadgeText}</span>` : '';
+        const notesBadgeHtml = notesBadgeText ? `<span class="nav-sub-badge">${notesBadgeText}</span>` : '';
+
+        const subItemClsCards = `nav-sub-item ${isCardsActive ? 'active' : ''}`;
+        const subItemClsNotes = `nav-sub-item ${isNotesActive ? 'active' : ''}`;
+
+        subListHtml = `
+          <div class="nav-sub-list" id="${isMobile ? 'drawer' : 'sidebar'}-srs-sublist">
+            <a href="#/cards" class="${subItemClsCards}" data-route="/cards" data-srs-subtab="cards" ${clickAttr}>
+              <div class="nav-sub-item-left">
+                <div class="nav-sub-dot"></div>
+                <span>Карточки</span>
+              </div>
+              ${cardsBadgeHtml}
+            </a>
+            <a href="#/notes-review" class="${subItemClsNotes}" data-route="/notes-review" data-srs-subtab="notes" ${clickAttr}>
+              <div class="nav-sub-item-left">
+                <div class="nav-sub-dot"></div>
+                <span>Конспекты</span>
+              </div>
+              ${notesBadgeHtml}
+            </a>
+          </div>
+        `;
       }
 
       if(isMobile){
@@ -56743,6 +56884,7 @@ function renderUnifiedNavLinks(isMobile, curRoute){
             </div>
             ${dotHtml}
           </a>
+          ${subListHtml}
         `;
       } else {
         return `
@@ -56751,6 +56893,7 @@ function renderUnifiedNavLinks(isMobile, curRoute){
             <span>${it.label}</span>
             ${dotHtml}
           </a>
+          ${subListHtml}
         `;
       }
     }).join('');
@@ -58928,7 +59071,7 @@ document.addEventListener('click', async function(e){
 
   // Навигация по боковой панели сайдбара (десктоп .navlink)
 
-  const navLinkEl = e.target.closest('.navlink');
+  const navLinkEl = e.target.closest('.navlink, .drawer-nav-link, .nav-sub-item');
 
   if(navLinkEl){
 
