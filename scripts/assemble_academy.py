@@ -15447,6 +15447,16 @@ if _inline_scripts:
 
 print(f"Successfully wrote upgraded academy.html ({len(html_out)//1024} KB)")
 
+# Строгая верификация инвариантов Zero-Jitter и стабильности сцены SRS при сборке
+zero_jit_script = os.path.join(_UNPACKED_ROOT, 'tests', 'test_srs_zero_jitter_invariants.js')
+if not os.path.isfile(zero_jit_script) and os.path.isdir(_CLOUD_DIR):
+    zero_jit_script = os.path.join(_CLOUD_DIR, 'tests', 'test_srs_zero_jitter_invariants.js')
+if os.path.isfile(zero_jit_script) and shutil.which('node'):
+    res_jit = subprocess.run(['node', zero_jit_script], capture_output=True, text=True)
+    if res_jit.returncode != 0:
+        raise RuntimeError(f"[BUILD ERROR] Нарушены инварианты Zero-Jitter SRS при сборке:\n{res_jit.stderr or res_jit.stdout}")
+    print("✓ [Build Guard] Проверка монолитности сцены SRS и Zero-Jitter успешно пройдена.")
+
 # Sync canonical PROJECT_CONTEXT.md and HANDOVER_CONTEXT.md across all project directories with unified LF endings (strictly no loose files on Desktop)
 SCRATCH_CONTEXT_PATH = os.path.join(_HERE, 'PROJECT_CONTEXT.md')
 SCRATCH_HANDOVER_PATH = os.path.join(_HERE, 'HANDOVER_CONTEXT.md')

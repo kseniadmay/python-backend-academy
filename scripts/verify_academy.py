@@ -84,3 +84,10 @@ if os.path.isfile(zip_path):
             r_names = rzf.namelist()
             assert len(r_names) in (525, 526), f"Expected 525 or 526 files inside nested RemNote zip, got {len(r_names)}"
     print(f"2. [PASS] Project archive academy_backup.zip verified ({len(namelist)} items, nested RemNote 525 items)!", flush=True)
+
+# 4. Проверка инвариантов Zero-Jitter и стабильности сцены SRS
+zero_jit_test = os.path.normpath(os.path.join(_HERE, '..', 'tests', 'test_srs_zero_jitter_invariants.js'))
+if os.path.isfile(zero_jit_test) and shutil.which('node'):
+    res_jit = subprocess.run(['node', zero_jit_test], capture_output=True, text=True)
+    assert res_jit.returncode == 0, f"Zero-Jitter Invariants Failed:\n{res_jit.stderr or res_jit.stdout}"
+    print("3. [PASS] Zero-Jitter & SRS Scene Stability Invariants verified!", flush=True)
