@@ -29109,35 +29109,41 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
 
 
-  /* Устранение нервного тика: стабильные благородные бусины без дергающегося scale, без пульсаций и без bead-ping-wave */
-
-  .dot-jewel::after,
+  /* Каноническая система бусин платформы: Квантовый маяк (активная) + Сквозной каскадный шлейф сияния (остальные) */
 
   .dot-jewel::before,
-
-  .dot-jewel.active::after,
   .dot-jewel.active::before,
   .cards-hub-container .dot-jewel:not(.active):not(.bead-active-leading)::after,
-  .cards-hub-container .dot-jewel:not(.active):not(.bead-active-leading)::before {
-    display: none;
-    animation: none;
-    content: none;
+  .cards-hub-container .dot-jewel:not(.active):not(.bead-active-leading)::before,
+  .srs-deck-beads-bar .dot-jewel:not(.active):not(.bead-active-leading)::after,
+  .srs-deck-beads-bar .dot-jewel:not(.active):not(.bead-active-leading)::before {
+    display: none !important;
+    animation: none !important;
+    content: none !important;
   }
 
-  /* Бусины шагов конспекта — благородная изумрудная палитра */
+  /* 1. Будущие/нераскрытые бусины шагов — деликатный фоновый контур со сквозным дыханием */
   .dot-jewel,
   .srs-deck-beads-bar .dot-jewel,
   .srs-beads-necklace .dot-jewel,
   .cards-hub-container .dot-jewel {
     width: 8px !important;
     height: 8px !important;
+    min-width: 8px !important;
+    min-height: 8px !important;
+    max-width: 8px !important;
+    max-height: 8px !important;
     border-radius: 50% !important;
-    background: rgba(16, 185, 129, 0.20) !important;
-    border: 1.5px solid rgba(52, 211, 153, 0.38) !important;
+    background: rgba(16, 185, 129, 0.18) !important;
+    border: 1.5px solid rgba(52, 211, 153, 0.32) !important;
     box-shadow: none !important;
     cursor: pointer !important;
     display: inline-block !important;
     vertical-align: middle !important;
+    box-sizing: border-box !important;
+    transform: translateZ(0) !important;
+    contain: layout style !important;
+    animation: bead-future-glow-blink 2.8s infinite ease-in-out !important;
   }
 
   .srs-deck-beads-bar .dot-jewel:hover,
@@ -29145,21 +29151,32 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   .cards-hub-container .dot-jewel:hover {
     background: rgba(16, 185, 129, 0.45) !important;
     border-color: #34d399 !important;
-    transform: scale(1.3);
+    box-shadow: 0 0 8px rgba(52, 211, 153, 0.6) !important;
   }
 
-  /* Пройденные бусины шагов — сочный изумруд */
+  /* 2. Пройденные бусины шагов — сочный изумруд с живым дыханием сиянием */
   .dot-jewel.done,
   .dot-jewel.bead-done,
   .cards-hub-container .dot-jewel.done,
   .cards-hub-container .dot-jewel.bead-done {
     width: 8px !important;
     height: 8px !important;
+    min-width: 8px !important;
+    min-height: 8px !important;
+    max-width: 8px !important;
+    max-height: 8px !important;
     background: #10b981 !important;
     border: 1.5px solid #34d399 !important;
-    box-shadow: 0 0 7px rgba(16, 185, 129, 0.70), 0 0 14px rgba(52, 211, 153, 0.30) !important;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.70) !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+    box-sizing: border-box !important;
+    transform: translateZ(0) !important;
+    contain: layout style !important;
+    animation: bead-done-glow-surge 2.8s infinite ease-in-out !important;
   }
-  /* Историческая каноническая пульсация активной бусины pulse-ring (коммит 7572058 / ada0800) */
+
+  /* Историческая совместимость */
   @keyframes pulse-ring {
     0% {
       box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.80), 0 0 6px rgba(52, 211, 153, 0.90);
@@ -29196,24 +29213,55 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     }
   }
 
-  /* Каноническая расходящаяся кольцевая волна маяка активной бусины: Zen-темп 2.8s */
+  /* 3. Канонический Квантовый маяк активной бусины: Zen-темп 2.8s (волна + живое ядро) */
   @keyframes bead-pulse-emerald {
     0%, 100% {
-      box-shadow: 0 0 0 1.5px rgba(16, 185, 129, 0.40), 0 0 5px rgba(52, 211, 153, 0.65);
+      box-shadow: 0 0 0 1.5px rgba(16, 185, 129, 0.45), 0 0 6px rgba(52, 211, 153, 0.70);
     }
     50% {
-      box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.45), 0 0 12px rgba(16, 185, 129, 0.90), 0 0 18px rgba(52, 211, 153, 0.50);
+      box-shadow: 0 0 0 3.5px rgba(52, 211, 153, 0.55), 0 0 14px rgba(16, 185, 129, 0.95), 0 0 20px rgba(52, 211, 153, 0.55);
     }
   }
 
   @keyframes bead-ping-wave {
     0% {
-      transform: scale(1);
-      opacity: 0.85;
+      transform: scale(0.9);
+      opacity: 0.95;
+      border-color: rgba(52, 211, 153, 0.95);
     }
-    75%, 100% {
-      transform: scale(2.2);
+    65% {
+      opacity: 0.40;
+    }
+    100% {
+      transform: scale(2.4);
       opacity: 0;
+      border-color: rgba(16, 185, 129, 0);
+    }
+  }
+
+  /* 4. Сквозная волна: дыхание сиянием пройденных бусин */
+  @keyframes bead-done-glow-surge {
+    0%, 100% {
+      box-shadow: 0 0 4px rgba(16, 185, 129, 0.45);
+      opacity: 0.75;
+    }
+    50% {
+      box-shadow: 0 0 14px rgba(52, 211, 153, 1), 0 0 20px rgba(16, 185, 129, 0.65);
+      opacity: 1;
+    }
+  }
+
+  /* 5. Сквозная волна: деликатный блик контура будущих бусин */
+  @keyframes bead-future-glow-blink {
+    0%, 100% {
+      box-shadow: none;
+      opacity: 0.45;
+      border-color: rgba(52, 211, 153, 0.30);
+    }
+    50% {
+      box-shadow: 0 0 8px rgba(52, 211, 153, 0.70);
+      opacity: 0.95;
+      border-color: #34d399;
     }
   }
 
@@ -29240,7 +29288,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     overflow: visible !important;
     transform: translateZ(0) !important;
     box-sizing: border-box !important;
-    box-shadow: 0 0 8px rgba(16, 185, 129, 0.90), 0 0 2px #34d399 !important;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.95), 0 0 2px #34d399 !important;
     animation: bead-pulse-emerald 2.8s infinite ease-in-out !important;
     will-change: transform, box-shadow !important;
   }
@@ -29254,15 +29302,146 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     content: '' !important;
     display: block !important;
     position: absolute !important;
-    inset: -2px !important;
+    inset: -2.5px !important;
     border-radius: 50% !important;
-    border: 1.2px solid rgba(52, 211, 153, 0.85) !important;
+    border: 1.2px solid rgba(52, 211, 153, 0.90) !important;
     pointer-events: none !important;
     animation: bead-ping-wave 2.8s cubic-bezier(0.2, 0.8, 0.4, 1) infinite !important;
     z-index: 1 !important;
     will-change: transform, opacity !important;
     transform: translateZ(0) !important;
   }
+
+  /* 6. Каскадный шлейф сквозной волны (Staggered Wave, 0.16s шаг между бусинами) */
+  .srs-deck-beads-bar .dot-jewel:nth-child(1),
+  .srs-beads-necklace .dot-jewel:nth-child(1),
+  .fc-beads-necklace .dot-jewel:nth-child(1),
+  .dots-necklace .dot-jewel:nth-child(1),
+  .focus-mini-track .dot-jewel:nth-child(1),
+  .cards-hub-container .dot-jewel:nth-child(1) { animation-delay: 0s !important; }
+  .srs-deck-beads-bar .dot-jewel:nth-child(1)::after,
+  .srs-beads-necklace .dot-jewel:nth-child(1)::after,
+  .fc-beads-necklace .dot-jewel:nth-child(1)::after,
+  .dots-necklace .dot-jewel:nth-child(1)::after,
+  .focus-mini-track .dot-jewel:nth-child(1)::after,
+  .cards-hub-container .dot-jewel:nth-child(1)::after { animation-delay: 0s !important; }
+
+  .srs-deck-beads-bar .dot-jewel:nth-child(2),
+  .srs-beads-necklace .dot-jewel:nth-child(2),
+  .fc-beads-necklace .dot-jewel:nth-child(2),
+  .dots-necklace .dot-jewel:nth-child(2),
+  .focus-mini-track .dot-jewel:nth-child(2),
+  .cards-hub-container .dot-jewel:nth-child(2) { animation-delay: 0.16s !important; }
+  .srs-deck-beads-bar .dot-jewel:nth-child(2)::after,
+  .srs-beads-necklace .dot-jewel:nth-child(2)::after,
+  .fc-beads-necklace .dot-jewel:nth-child(2)::after,
+  .dots-necklace .dot-jewel:nth-child(2)::after,
+  .focus-mini-track .dot-jewel:nth-child(2)::after,
+  .cards-hub-container .dot-jewel:nth-child(2)::after { animation-delay: 0.16s !important; }
+
+  .srs-deck-beads-bar .dot-jewel:nth-child(3),
+  .srs-beads-necklace .dot-jewel:nth-child(3),
+  .fc-beads-necklace .dot-jewel:nth-child(3),
+  .dots-necklace .dot-jewel:nth-child(3),
+  .focus-mini-track .dot-jewel:nth-child(3),
+  .cards-hub-container .dot-jewel:nth-child(3) { animation-delay: 0.32s !important; }
+  .srs-deck-beads-bar .dot-jewel:nth-child(3)::after,
+  .srs-beads-necklace .dot-jewel:nth-child(3)::after,
+  .fc-beads-necklace .dot-jewel:nth-child(3)::after,
+  .dots-necklace .dot-jewel:nth-child(3)::after,
+  .focus-mini-track .dot-jewel:nth-child(3)::after,
+  .cards-hub-container .dot-jewel:nth-child(3)::after { animation-delay: 0.32s !important; }
+
+  .srs-deck-beads-bar .dot-jewel:nth-child(4),
+  .srs-beads-necklace .dot-jewel:nth-child(4),
+  .fc-beads-necklace .dot-jewel:nth-child(4),
+  .dots-necklace .dot-jewel:nth-child(4),
+  .focus-mini-track .dot-jewel:nth-child(4),
+  .cards-hub-container .dot-jewel:nth-child(4) { animation-delay: 0.48s !important; }
+  .srs-deck-beads-bar .dot-jewel:nth-child(4)::after,
+  .srs-beads-necklace .dot-jewel:nth-child(4)::after,
+  .fc-beads-necklace .dot-jewel:nth-child(4)::after,
+  .dots-necklace .dot-jewel:nth-child(4)::after,
+  .focus-mini-track .dot-jewel:nth-child(4)::after,
+  .cards-hub-container .dot-jewel:nth-child(4)::after { animation-delay: 0.48s !important; }
+
+  .srs-deck-beads-bar .dot-jewel:nth-child(5),
+  .srs-beads-necklace .dot-jewel:nth-child(5),
+  .fc-beads-necklace .dot-jewel:nth-child(5),
+  .dots-necklace .dot-jewel:nth-child(5),
+  .focus-mini-track .dot-jewel:nth-child(5),
+  .cards-hub-container .dot-jewel:nth-child(5) { animation-delay: 0.64s !important; }
+  .srs-deck-beads-bar .dot-jewel:nth-child(5)::after,
+  .srs-beads-necklace .dot-jewel:nth-child(5)::after,
+  .fc-beads-necklace .dot-jewel:nth-child(5)::after,
+  .dots-necklace .dot-jewel:nth-child(5)::after,
+  .focus-mini-track .dot-jewel:nth-child(5)::after,
+  .cards-hub-container .dot-jewel:nth-child(5)::after { animation-delay: 0.64s !important; }
+
+  .srs-deck-beads-bar .dot-jewel:nth-child(6),
+  .srs-beads-necklace .dot-jewel:nth-child(6),
+  .fc-beads-necklace .dot-jewel:nth-child(6),
+  .dots-necklace .dot-jewel:nth-child(6),
+  .focus-mini-track .dot-jewel:nth-child(6),
+  .cards-hub-container .dot-jewel:nth-child(6) { animation-delay: 0.80s !important; }
+  .srs-deck-beads-bar .dot-jewel:nth-child(6)::after,
+  .srs-beads-necklace .dot-jewel:nth-child(6)::after,
+  .fc-beads-necklace .dot-jewel:nth-child(6)::after,
+  .dots-necklace .dot-jewel:nth-child(6)::after,
+  .focus-mini-track .dot-jewel:nth-child(6)::after,
+  .cards-hub-container .dot-jewel:nth-child(6)::after { animation-delay: 0.80s !important; }
+
+  .srs-deck-beads-bar .dot-jewel:nth-child(7),
+  .srs-beads-necklace .dot-jewel:nth-child(7),
+  .fc-beads-necklace .dot-jewel:nth-child(7),
+  .dots-necklace .dot-jewel:nth-child(7),
+  .focus-mini-track .dot-jewel:nth-child(7),
+  .cards-hub-container .dot-jewel:nth-child(7) { animation-delay: 0.96s !important; }
+  .srs-deck-beads-bar .dot-jewel:nth-child(7)::after,
+  .srs-beads-necklace .dot-jewel:nth-child(7)::after,
+  .fc-beads-necklace .dot-jewel:nth-child(7)::after,
+  .dots-necklace .dot-jewel:nth-child(7)::after,
+  .focus-mini-track .dot-jewel:nth-child(7)::after,
+  .cards-hub-container .dot-jewel:nth-child(7)::after { animation-delay: 0.96s !important; }
+
+  .srs-deck-beads-bar .dot-jewel:nth-child(8),
+  .srs-beads-necklace .dot-jewel:nth-child(8),
+  .fc-beads-necklace .dot-jewel:nth-child(8),
+  .dots-necklace .dot-jewel:nth-child(8),
+  .focus-mini-track .dot-jewel:nth-child(8),
+  .cards-hub-container .dot-jewel:nth-child(8) { animation-delay: 1.12s !important; }
+  .srs-deck-beads-bar .dot-jewel:nth-child(8)::after,
+  .srs-beads-necklace .dot-jewel:nth-child(8)::after,
+  .fc-beads-necklace .dot-jewel:nth-child(8)::after,
+  .dots-necklace .dot-jewel:nth-child(8)::after,
+  .focus-mini-track .dot-jewel:nth-child(8)::after,
+  .cards-hub-container .dot-jewel:nth-child(8)::after { animation-delay: 1.12s !important; }
+
+  .srs-deck-beads-bar .dot-jewel:nth-child(9),
+  .srs-beads-necklace .dot-jewel:nth-child(9),
+  .fc-beads-necklace .dot-jewel:nth-child(9),
+  .dots-necklace .dot-jewel:nth-child(9),
+  .focus-mini-track .dot-jewel:nth-child(9),
+  .cards-hub-container .dot-jewel:nth-child(9) { animation-delay: 1.28s !important; }
+  .srs-deck-beads-bar .dot-jewel:nth-child(9)::after,
+  .srs-beads-necklace .dot-jewel:nth-child(9)::after,
+  .fc-beads-necklace .dot-jewel:nth-child(9)::after,
+  .dots-necklace .dot-jewel:nth-child(9)::after,
+  .focus-mini-track .dot-jewel:nth-child(9)::after,
+  .cards-hub-container .dot-jewel:nth-child(9)::after { animation-delay: 1.28s !important; }
+
+  .srs-deck-beads-bar .dot-jewel:nth-child(10),
+  .srs-beads-necklace .dot-jewel:nth-child(10),
+  .fc-beads-necklace .dot-jewel:nth-child(10),
+  .dots-necklace .dot-jewel:nth-child(10),
+  .focus-mini-track .dot-jewel:nth-child(10),
+  .cards-hub-container .dot-jewel:nth-child(10) { animation-delay: 1.44s !important; }
+  .srs-deck-beads-bar .dot-jewel:nth-child(10)::after,
+  .srs-beads-necklace .dot-jewel:nth-child(10)::after,
+  .fc-beads-necklace .dot-jewel:nth-child(10)::after,
+  .dots-necklace .dot-jewel:nth-child(10)::after,
+  .focus-mini-track .dot-jewel:nth-child(10)::after,
+  .cards-hub-container .dot-jewel:nth-child(10)::after { animation-delay: 1.44s !important; }
 
   .cards-hub-container .dot-jewel:not(.active):not(.bead-active-leading)::after,
   .cards-hub-container .dot-jewel:not(.active):not(.bead-active-leading)::before,

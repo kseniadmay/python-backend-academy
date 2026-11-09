@@ -86,31 +86,43 @@ assert(!content.includes('#radar-dots-necklace .dot-jewel.active {\n\n    width:
   '❌ ZERO-JITTER VIOLATION: Запрещена анимация pulse-ring 2s для активных бусин. Обязана использоваться bead-pulse-emerald 2.8s.');
 console.log('✓ [7/12] [Zero-Jitter] 2-секундный зацикленный всплеск и масштабирование бусин scale(1.15) ликвидированы.');
 
-// 8. Инвариант живого дыхания активных бусин
+// 8. Инвариант Квантового маяка активной бусины (Quantum Beacon SSOT Lock)
 assert(content.includes('animation: bead-pulse-emerald 2.8s infinite ease-in-out !important;'), 
-  'Активная бусина обязана дышать через анимацию bead-pulse-emerald');
+  '❌ BEACON VIOLATION: Активная бусина обязана дышать через bead-pulse-emerald 2.8s');
 assert(content.includes('animation: bead-ping-wave 2.8s cubic-bezier(0.2, 0.8, 0.4, 1) infinite !important;'), 
-  'Волна маяка активной бусины обязана дышать через bead-ping-wave');
-console.log('✓ [8/12] [Zero-Jitter] Активная бусина и расходящаяся волна маяка дышат в Zen-ритме 2.8s.');
+  '❌ BEACON VIOLATION: Волна маяка активной бусины обязана анимироваться через bead-ping-wave 2.8s');
+assert(content.includes('.dot-jewel.active::after') && content.includes('border: 1.2px solid rgba(52, 211, 153, 0.90) !important;'),
+  '❌ BEACON VIOLATION: Псевдоэлемент волны маяка .dot-jewel.active::after обязан быть активен и иметь изумрудный контур.');
+console.log('✓ [8/14] [Zero-Jitter] Квантовый маяк активной бусины (ядро + расходящаяся кольцевая волна 2.8s) аппаратно зафиксирован.');
 
-// 9. Инвариант строгой фиксации геометрии ожерелья бусин (Zero Layout Shift)
+// 9. Инвариант Сквозной каскадной волны сияния (Staggered Wave SSOT Lock)
+assert(content.includes('animation: bead-done-glow-surge 2.8s infinite ease-in-out !important;'),
+  '❌ STAGGERED WAVE VIOLATION: Пройденные бусины обязаны дышать сиянием через bead-done-glow-surge 2.8s.');
+assert(content.includes('animation: bead-future-glow-blink 2.8s infinite ease-in-out !important;'),
+  '❌ STAGGERED WAVE VIOLATION: Будущие бусины обязаны деликатно дышать контуром через bead-future-glow-blink 2.8s.');
+assert(content.includes('.dot-jewel:nth-child(2) { animation-delay: 0.16s !important; }') &&
+       content.includes('.dot-jewel:nth-child(3) { animation-delay: 0.32s !important; }'),
+  '❌ STAGGERED WAVE VIOLATION: Бусины обязаны иметь каскадный сдвиг animation-delay (0.16s, 0.32s...) для сквозной волны.');
+console.log('✓ [9/14] [Zero-Jitter] Сквозной каскадный шлейф сияния ожерелья (Staggered Wave 0.16s) аппаратно заблокирован от регрессий.');
+
+// 10. Инвариант строгой фиксации геометрии ожерелья бусин (Zero Layout Shift)
 assert(content.includes('height: 28px !important;\n\n    min-height: 28px !important;\n\n    max-height: 28px !important;') ||
        content.includes('height: 28px !important;\n    min-height: 28px !important;\n    max-height: 28px !important;'), 
   'Ожерелье бусин обязано иметь жесткую высоту 28px, чтобы дыхание не передавалось на лейаут');
 assert(content.includes('contain: layout !important;'), 
   'Ожерелье бусин обязано иметь contain: layout для изоляции анимаций');
-console.log('✓ [9/12] [Zero-Jitter] Высота ожерелья бусин строго зафиксирована (28px, contain: layout) — 0px смещения.');
+console.log('✓ [10/14] [Zero-Jitter] Высота ожерелья бусин строго зафиксирована (28px, contain: layout) — 0px смещения.');
 
-// 10. Инвариант монолитности кнопок ответа
+// 11. Инвариант монолитности кнопок ответа
 assert(content.includes('height: 52px !important;') &&
        content.includes('min-height: 52px !important;') &&
        content.includes('max-height: 52px !important;') &&
        content.includes('contain: layout style !important;') &&
        content.includes('-webkit-tap-highlight-color: transparent !important;'),
   '❌ ZERO-JITTER VIOLATION: Кнопки .fc-rate-btn обязаны иметь жесткую высоту 52px, contain: layout style и -webkit-tap-highlight-color: transparent.');
-console.log('✓ [10/12] [Zero-Jitter] Кнопки ответов .fc-rate-btn аппаратно монолитны (52px, contain: layout style).');
+console.log('✓ [11/14] [Zero-Jitter] Кнопки ответов .fc-rate-btn аппаратно монолитны (52px, contain: layout style).');
 
-// 11. Инвариант оптического дыхания точек активности (СТРОГИЙ ЗАПРЕТ НА scale)
+// 12. Инвариант оптического дыхания точек активности (СТРОГИЙ ЗАПРЕТ НА scale)
 const emeraldBreathMatch = content.match(/@keyframes emeraldSoftBreath\s*\{([\s\S]*?)\}/);
 assert(emeraldBreathMatch, '@keyframes emeraldSoftBreath обязан быть определен в CSS');
 assert(!emeraldBreathMatch[1].includes('scale('), 
@@ -120,12 +132,19 @@ const srsPulseMatch = content.match(/@keyframes srsLiveDotPulse\s*\{([\s\S]*?)\}
 assert(srsPulseMatch, '@keyframes srsLiveDotPulse обязан быть определен в CSS');
 assert(!srsPulseMatch[1].includes('scale('), 
   '❌ ZERO-JITTER VIOLATION: В @keyframes srsLiveDotPulse запрещен scale()! Дыхание точек обязано производиться строго через box-shadow и opacity (0px jitter).');
-console.log('✓ [11/12] [Zero-Jitter] Оптическое дыхание точек строго через box-shadow и opacity (0 scale).');
+console.log('✓ [12/14] [Zero-Jitter] Оптическое дыхание точек строго через box-shadow и opacity (0 scale).');
 
-// 12. Инвариант симметричной рамки кнопок сайдбара (0px Border Jump)
+// 13. Инвариант симметричной рамки кнопок сайдбара (0px Border Jump)
 assert(content.includes('.navlink{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:11px;text-decoration:none;color:var(--ink-soft);font-weight:500;font-size:.88rem;margin-bottom:2px;border:1px solid transparent;border-left:3px solid transparent;box-sizing:border-box;'),
   '❌ ZERO-JITTER VIOLATION: .navlink обязан иметь border-left: 3px solid transparent для исключения 2px скачка при активации.');
-console.log('✓ [12/12] [Zero-Jitter] Симметричные рамки кнопок сайдбара соблюдены (0px border jump).');
+console.log('✓ [13/14] [Zero-Jitter] Симметричные рамки кнопок сайдбара соблюдены (0px border jump).');
 
-console.log('\n>>> ВСЕ 12 ИНВАРИАНТОВ ZERO-JITTER И МОНОЛИТНОСТИ SRS УСПЕШНО ПРОЙДЕНЫ (100%) <<<\n');
+// 14. Инвариант защиты бусин активности в сайдбаре и хэдере
+assert(content.includes('.activity-dot{\n    width:7px !important;\n    height:7px !important;') &&
+       content.includes('.nav-sub-breath-dot {\n    width: 7px !important;\n    height: 7px !important;') &&
+       content.includes('.srs-live-status-dot {\n    width: 7px !important;\n    height: 7px !important;'),
+  '❌ NAV DOTS VIOLATION: Точки активности в сайдбаре и хэдере обязаны иметь унифицированные габариты 7px и оптическое дыхание.');
+console.log('✓ [14/14] [Zero-Jitter] Бусины активности сайдбара и хэдера надёжно зафиксированы.');
+
+console.log('\n>>> ВСЕ 14 ИНВАРИАНТОВ ZERO-JITTER, КВАНТОВОГО МАЯКА И СМОНОЛИТНОСТИ SRS УСПЕШНО ПРОЙДЕНЫ (100%) <<<\n');
 process.exit(0);
