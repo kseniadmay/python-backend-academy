@@ -65,8 +65,8 @@ assert(content.includes('contain: layout !important;'),
 console.log('✓ [Zero-Jitter] Высота ожерелья бусин строго зафиксирована (28px, contain: layout) — 0px смещения.');
 
 // 6. Инвариант монолитности кнопок ответа
-assert(content.includes('contain: layout style paint !important;'), 
-  'Кнопки .fc-rate-btn обязаны иметь аппаратную изоляцию contain: layout style paint');
+assert(content.includes('contain: layout style !important;') || content.includes('contain: layout style paint !important;'), 
+  'Кнопки .fc-rate-btn обязаны иметь аппаратную изоляцию contain: layout style');
 assert(content.includes('-webkit-tap-highlight-color: transparent !important;'), 
   'Кнопки .fc-rate-btn обязаны убирать синее выделение тапа (-webkit-tap-highlight-color: transparent)');
 assert(content.includes('user-select: none !important;'), 

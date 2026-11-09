@@ -23064,7 +23064,8 @@
 
   box-sizing: border-box;
 
-  contain: layout paint;
+  contain: layout style;
+  overflow: visible;
 
 }
 
@@ -23472,12 +23473,13 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     color: #ffffff !important;
   }
   .srs-header-mode-title {
-    background: rgba(15, 21, 32, 0.96) !important;
-    padding: 4px 10px !important;
-    border-radius: 8px !important;
-    border: 1px solid rgba(255, 255, 255, 0.18) !important;
-    backdrop-filter: blur(24px) !important;
-    -webkit-backdrop-filter: blur(24px) !important;
+    background: transparent !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
   }
   .cards-hub-container {
     min-height: auto !important;
@@ -23599,7 +23601,8 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     margin-top: 14px !important;
     padding: 0 0 calc(12px + env(safe-area-inset-bottom, 0px)) !important;
     flex-shrink: 0 !important;
-    contain: layout style paint !important;
+    contain: layout style !important;
+    overflow: visible !important;
   }
   .srs-rating-grid,
   .card-rating-grid {
@@ -27021,15 +27024,13 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
     border-radius: 99px;
 
-    background: linear-gradient(90deg, #be123c 0%, #e11d48 30%, #059669 72%, #10b981 100%) no-repeat !important;
+    background-size: 100% 100%;
 
-    background-size: 100% 100% !important;
-
-    background-position: left top !important;
+    background-position: left top;
 
     filter: blur(5px);
 
-    opacity: 0.82;
+    opacity: 0.85;
 
     pointer-events: none;
 
@@ -27041,15 +27042,11 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
     height: 100%;
 
-    border-radius: 99px !important;
+    border-radius: 99px;
 
-    background: linear-gradient(90deg, #be123c 0%, #e11d48 30%, #059669 72%, #10b981 100%) no-repeat !important;
+    background-size: 100% 100%;
 
-    background-size: 100% 100% !important;
-
-    background-position: left top !important;
-
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.85), 0 0 4px #34d399 !important;
+    background-position: left top;
 
   }
 
@@ -28386,7 +28383,8 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
     transform: none !important;
 
-    contain: layout style paint !important;
+    contain: layout style !important;
+    overflow: visible !important;
 
     -webkit-tap-highlight-color: transparent !important;
 
@@ -46647,6 +46645,56 @@ window.buildSrsFlowTabsHTML = buildSrsFlowTabsHTML;
 
 
 
+function getThermodynamicProgressStyle(pct){
+  const p = Math.max(0, Math.min(100, Number(pct) || 0));
+  const stops = [
+    { p: 0,   r: 136, g: 19,  b: 55 },
+    { p: 25,  r: 225, g: 29,  b: 72 },
+    { p: 50,  r: 244, g: 63,  b: 94 },
+    { p: 75,  r: 249, g: 115, b: 22 },
+    { p: 90,  r: 253, g: 224, b: 71 },
+    { p: 100, r: 255, g: 255, b: 255 }
+  ];
+
+  function interpolate(val){
+    const c = Math.max(0, Math.min(100, val));
+    let l = stops[0], r = stops[stops.length - 1];
+    for(let i = 0; i < stops.length - 1; i++){
+      if(c >= stops[i].p && c <= stops[i+1].p){
+        l = stops[i]; r = stops[i+1]; break;
+      }
+    }
+    const t = (c - l.p) / ((r.p - l.p) || 1);
+    return {
+      r: Math.round(l.r + (r.r - l.r) * t),
+      g: Math.round(l.g + (r.g - l.g) * t),
+      b: Math.round(l.b + (r.b - l.b) * t)
+    };
+  }
+
+  const head = interpolate(p);
+  const tail = interpolate(Math.max(0, p - 35));
+  const tailStr = `rgb(${tail.r}, ${tail.g}, ${tail.b})`;
+  const headStr = `rgb(${head.r}, ${head.g}, ${head.b})`;
+
+  if(p >= 98){
+    return {
+      bg: 'linear-gradient(90deg, #f59e0b 0%, #fef08a 30%, #ffffff 70%, #ffffff 100%)',
+      glow: '0 0 16px #ffffff, 0 0 32px rgba(254, 240, 138, 0.95)',
+      boxShadow: '0 0 14px #ffffff, 0 0 5px #ffffff',
+      title: `Белое каление (${Math.round(p)}% · 1350°C)`
+    };
+  }
+
+  return {
+    bg: `linear-gradient(90deg, ${tailStr} 0%, ${headStr} 100%)`,
+    glow: `0 0 12px rgba(${head.r}, ${head.g}, ${head.b}, 0.65)`,
+    boxShadow: `0 0 8px rgba(${head.r}, ${head.g}, ${head.b}, 0.8)`,
+    title: `Накал памяти: ${Math.round(p)}%`
+  };
+}
+window.getThermodynamicProgressStyle = getThermodynamicProgressStyle;
+
 function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProgress){
 
   const flowTabs = buildSrsFlowTabsHTML(activeTab, dueCardsCount, dueNotesCount);
@@ -46667,27 +46715,28 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
 
 
-  // 1. Прогресс текущего эшелона (радужная шкала прогресса)
+  // 1. Прогресс интервального повторения по непрерывной температурной шкале накала памяти
+  const cdData = (typeof getThermodynamicCooldownData === 'function') ? getThermodynamicCooldownData() : { pct: 100 };
+  const baseHeat = Math.max(0, Math.min(95, Number(cdData.pct) || 0));
 
-  const curEchelonTier = (typeof state !== 'undefined' && state.selectedEchelon) || 1;
+  let sessionRatio = 0;
+  if(isNotes){
+    const curStep = noteProgress ? (noteProgress.current || 0) : 0;
+    const totalStep = noteProgress ? Math.max(1, noteProgress.total || 1) : 1;
+    sessionRatio = Math.min(1, Math.max(0, (curStep + 1) / totalStep));
+  } else {
+    const cardsDoneToday = daily ? (daily.cardsDoneToday || 0) : 0;
+    const cardsDueRemaining = (typeof dueCardsCount === 'number') ? dueCardsCount : (daily ? (daily.cardsDueRemaining || 0) : 0);
+    const totalToday = cardsDoneToday + cardsDueRemaining;
+    sessionRatio = (totalToday > 0) ? Math.min(1, Math.max(0, cardsDoneToday / totalToday)) : 1;
+  }
 
-  const echProg = (typeof getEchelonProgress === 'function') ? getEchelonProgress(curEchelonTier) : null;
-
-  const echPct = echProg ? Math.max(0, Math.min(100, Number(echProg.pct) || 0)) : 0;
-
-  const echCurMP = echProg ? (echProg.curMp || 0) : 0;
-
-  const echMaxMP = echProg ? (echProg.maxMp || 100) : 100;
-
-  const em = (typeof getEchelonMeta === 'function') ? getEchelonMeta(curEchelonTier) : { shortLabel: 'Эшелон ' + curEchelonTier };
-
-
-
-  // Нулевой уровень прогресса: шкала не отображается вообще (без подложки и без трека)
-
-  const progressFillWidth = echPct;
-
-  const progressFillTitle = `${em.shortLabel} (Мастерство навыков): ${echPct}% · ${echCurMP} / ${echMaxMP} MP`;
+  const currentHeatPct = (sessionRatio >= 1) ? 100 : Math.round(baseHeat + (100 - baseHeat) * sessionRatio);
+  const progressFillWidth = currentHeatPct;
+  const thermo = (typeof getThermodynamicProgressStyle === 'function')
+    ? getThermodynamicProgressStyle(currentHeatPct)
+    : { bg: 'linear-gradient(90deg, #be123c 0%, #ffffff 100%)', glow: '0 0 12px rgba(255,255,255,0.7)', boxShadow: '0 0 8px #ffffff', title: `Накал памяти: ${currentHeatPct}%` };
+  const progressFillTitle = `${thermo.title} (Исходный накал: ${baseHeat}%)`;
 
 
 
@@ -46803,13 +46852,13 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
   const trackHTML = (progressFillWidth > 0) ? `
 
-      <!-- Фиксированная радужная шкала прогресса эшелона с физическим blur-glow сиянием (Вариант 1) -->
+      <!-- Фиксированная температурная шкала прогресса SRS с непрерывным накалом и белым калением на финише -->
 
       <div class="srs-header-progress-track" style="position:absolute;bottom:-16px;left:0;right:0;height:4px;background:rgba(255,255,255,0.06);border:none;border-radius:99px;overflow:visible;pointer-events:auto;box-shadow:none;container-type:inline-size;" title="${progressFillTitle}">
 
-        <div class="srs-header-progress-glow" style="position:absolute;top:0;left:0;height:100%;width:${progressFillWidth}%;background:linear-gradient(90deg, #be123c 0%, #e11d48 30%, #059669 72%, #10b981 100%) no-repeat;background-size:100% 100%;background-position:left top;border-radius:99px;filter:blur(5px);opacity:0.82;pointer-events:none;"></div>
+        <div class="srs-header-progress-glow" style="position:absolute;top:0;left:0;height:100%;width:${progressFillWidth}%;background:${thermo.bg};background-size:100% 100%;background-position:left top;border-radius:99px;filter:blur(5px);box-shadow:${thermo.glow};opacity:0.85;pointer-events:none;"></div>
 
-        <div class="srs-header-progress-fill" style="position:relative;height:100%;width:${progressFillWidth}%;background:linear-gradient(90deg, #be123c 0%, #e11d48 30%, #059669 72%, #10b981 100%) no-repeat;background-size:100% 100%;background-position:left top;border-radius:99px;box-shadow:0 0 10px rgba(16, 185, 129, 0.85), 0 0 4px #34d399;" title="${progressFillTitle}"></div>
+        <div class="srs-header-progress-fill" style="position:relative;height:100%;width:${progressFillWidth}%;background:${thermo.bg};background-size:100% 100%;background-position:left top;border-radius:99px;box-shadow:${thermo.boxShadow};" title="${progressFillTitle}"></div>
 
       </div>
 
@@ -46823,7 +46872,7 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
       <div style="min-width:0;flex-shrink:0;display:flex;align-items:center;height:30px;">
 
-        <span class="srs-header-mode-title" style="display:inline-flex;align-items:center;gap:7px;padding:0 10px;height:30px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);font-size:0.76rem;font-weight:700;color:var(--ink-soft);letter-spacing:0.04em;text-transform:uppercase;box-sizing:border-box;"><span class="srs-live-status-dot"></span>${activeTab === 'notes' ? 'Конспекты SRS' : 'Карточки SRS'}</span>
+        <span class="srs-header-mode-title" style="display:inline-flex;align-items:center;gap:7px;font-size:0.76rem;font-weight:700;color:var(--ink-soft);letter-spacing:0.04em;text-transform:uppercase;box-sizing:border-box;"><span class="srs-live-status-dot"></span>${activeTab === 'notes' ? 'Конспекты SRS' : 'Карточки SRS'}</span>
 
       </div>
 

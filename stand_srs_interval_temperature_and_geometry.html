@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Стенд: Температурная шкала, чистый заголовок SRS и мобильные кнопки</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #0b0e14;
+      --surface: rgba(18, 24, 38, 0.72);
+      --surface-border: rgba(255, 255, 255, 0.08);
+      --ink: #f8fafc;
+      --ink-soft: #cbd5e1;
+      --ink-muted: #94a3b8;
+      --font-d: 'Onest', -apple-system, sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+      --font-t: 'Unbounded', sans-serif;
+    }
+
+    [data-theme="light"] {
+      --paper: #f8fafc;
+      --surface: rgba(255, 255, 255, 0.88);
+      --surface-border: rgba(15, 23, 42, 0.08);
+      --ink: #0f172a;
+      --ink-soft: #334155;
+      --ink-muted: #64748b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      background-color: var(--paper);
+      background-image: radial-gradient(rgba(255, 255, 255, 0.055) 1.2px, transparent 1.2px);
+      background-size: 24px 24px;
+      color: var(--ink);
+      font-family: var(--font-d);
+      min-height: 100vh;
+      padding: 24px 16px 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+    [data-theme="light"] body {
+      background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1.2px, transparent 1.2px);
+    }
+
+    .ambient-orb {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .ambient-orb--burgundy {
+      width: 520px;
+      height: 520px;
+      top: -120px;
+      left: 10%;
+      background: radial-gradient(circle, rgba(225, 29, 72, 0.22) 0%, rgba(136, 19, 55, 0.08) 60%, transparent 80%);
+      filter: blur(90px);
+    }
+    .ambient-orb--amber {
+      width: 480px;
+      height: 480px;
+      bottom: -80px;
+      right: 5%;
+      background: radial-gradient(circle, rgba(249, 115, 22, 0.18) 0%, rgba(234, 179, 8, 0.06) 60%, transparent 80%);
+      filter: blur(85px);
+    }
+
+    /* Верхняя панель управления стендом */
+    .stand-controls-panel {
+      position: sticky;
+      top: 16px;
+      z-index: 200;
+      width: 100%;
+      max-width: 980px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 16px 20px;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+      margin-bottom: 24px;
+    }
+    [data-theme="light"] .stand-controls-panel {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    .stand-controls-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .stand-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .stand-pill-badge {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(244, 63, 94, 0.18);
+      border: 1px solid rgba(244, 63, 94, 0.4);
+      color: #fda4af;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .stand-slider-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      align-items: center;
+    }
+    .slider-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 10px 14px;
+    }
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .slider-val {
+      color: var(--ink);
+      font-weight: 800;
+      font-family: var(--font-m);
+    }
+    input[type=range] {
+      width: 100%;
+      accent-color: #f59e0b;
+      cursor: pointer;
+    }
+
+    .step-actions-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    .btn-step {
+      padding: 7px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-step:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-1px);
+    }
+    .btn-step.btn-accent {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.3) 0%, rgba(225, 29, 72, 0.35) 100%);
+      border-color: rgba(251, 191, 36, 0.5);
+      color: #fef08a;
+    }
+    .btn-step.btn-accent:hover {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.45) 0%, rgba(225, 29, 72, 0.5) 100%);
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+    }
+
+    .toggles-section {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      flex-wrap: wrap;
+    }
+
+    .toggle-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      cursor: pointer;
+      user-select: none;
+      font-weight: 700;
+      font-size: 0.8rem;
+      transition: all 0.16s ease;
+    }
+    .toggle-pill.active {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(52, 211, 153, 0.5);
+      color: #34d399;
+    }
+
+    /* Живой статус температуры */
+    .thermo-live-hud {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-top: 12px;
+      font-size: 0.82rem;
+    }
+    .thermo-hud-tag {
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .thermo-hud-chip {
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-family: var(--font-m);
+      font-size: 0.76rem;
+      font-weight: 700;
+      transition: all 0.25s linear;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ЭКРАН SRS
+       ══════════════════════════════════════════════════════════ */
+    .stand-viewports-wrapper {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 980px;
+      display: flex;
+      flex-direction: column;
+      gap: 36px;
+      align-items: center;
+    }
+
+    .demo-srs-container {
+      width: 100%;
+      max-width: 720px;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    /* ШАПКА SRS */
+    .srs-unified-header-bar {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 32px;
+      min-height: 32px;
+      margin-bottom: 22px;
+      padding: 0 2px;
+    }
+
+    /* Строка заголовка: БЫЛО (с плашкой) vs СТАЛО (без плашки, чистый текст) */
+    .srs-header-mode-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--ink-soft);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+    }
+
+    /* С плашкой (было) */
+    .srs-header-mode-title.mode-has-plate {
+      padding: 0 10px;
+      height: 30px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    /* Без плашки (чистый Zen текст) */
+    .srs-header-mode-title.mode-clean-text {
+      padding: 0;
+      height: auto;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    .srs-live-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+    .srs-header-goal-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 10px;
+      height: 30px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+    }
+
+    /* ТЕМПЕРАТУРНАЯ ШКАЛА ПРОГРЕССА */
+    .srs-header-progress-track {
+      position: absolute;
+      bottom: -14px;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 99px;
+      overflow: visible;
+    }
+    .srs-header-progress-glow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      border-radius: 99px;
+      filter: blur(5px);
+      pointer-events: none;
+      transition: width 0.35s cubic-bezier(0.2, 0.8, 0.4, 1), background 0.25s linear, opacity 0.25s linear;
+    }
+    .srs-header-progress-fill {
+      position: relative;
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.35s cubic-bezier(0.2, 0.8, 0.4, 1), background 0.25s linear, box-shadow 0.25s linear;
+    }
+
+    /* БУСИНЫ */
+    .srs-deck-beads-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .dot-jewel {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      transition: all 0.2s ease;
+    }
+    .dot-jewel.done {
+      background: #10b981;
+      border-color: #34d399;
+      box-shadow: 0 0 7px rgba(16, 185, 129, 0.7);
+    }
+    .dot-jewel.active {
+      background: #f59e0b;
+      border-color: #fbbf24;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.85);
+      transform: scale(1.15);
+    }
+
+    /* КАРТОЧКА ВОПРОСА SRS */
+    .fc-card {
+      width: 100%;
+      max-width: 700px;
+      margin: 0 auto;
+      border-radius: 24px;
+      background: linear-gradient(165deg, rgba(20, 27, 40, 0.88) 0%, rgba(11, 15, 23, 0.94) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-top: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      padding: 24px 28px;
+      min-height: 175px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-sizing: border-box;
+      position: relative;
+    }
+    .fc-card-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #38bdf8;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+    .fc-card-question {
+      font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 1.45;
+      color: #fff;
+    }
+    .fc-card-sub {
+      margin-top: 12px;
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      font-family: var(--font-m);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       КНОПКИ ДЕЙСТВИЙ (МОДЕЛИРОВАНИЕ БЫЛО / СТАЛО)
+       ══════════════════════════════════════════════════════════ */
+    .srs-action-dock {
+      width: 100%;
+      max-width: 700px;
+      margin: 14px auto 0;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    /* Базовый грид кнопок */
+    .srs-rating-grid {
+      display: grid;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Стили кнопок */
+    .fc-rate-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+      cursor: pointer;
+      box-sizing: border-box;
+      transition: background 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
+      position: relative;
+    }
+    .srs-btn-title {
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .srs-btn-sub {
+      font-weight: 600;
+      opacity: 0.75;
+      font-family: var(--font-m);
+      white-space: nowrap;
+    }
+
+    /* Цвета кнопок */
+    .fc-rate-btn--again {
+      background: linear-gradient(165deg, rgba(136, 19, 55, 0.55) 0%, rgba(76, 5, 25, 0.90) 100%);
+      border: 1px solid rgba(225, 29, 72, 0.55);
+      color: #fecdd3;
+      box-shadow: 0 4px 14px rgba(136, 19, 55, 0.35);
+    }
+    .fc-rate-btn--hard {
+      background: linear-gradient(165deg, rgba(146, 64, 14, 0.55) 0%, rgba(69, 26, 3, 0.90) 100%);
+      border: 1px solid rgba(245, 158, 11, 0.55);
+      color: #fde68a;
+      box-shadow: 0 4px 14px rgba(180, 83, 9, 0.35);
+    }
+    .fc-rate-btn--good {
+      background: linear-gradient(165deg, rgba(6, 95, 70, 0.58) 0%, rgba(2, 44, 34, 0.92) 100%);
+      border: 1.2px solid rgba(16, 185, 129, 0.65);
+      color: #a7f3d0;
+      box-shadow: 0 4px 16px rgba(6, 95, 70, 0.38);
+    }
+    .fc-rate-btn--easy {
+      background: linear-gradient(165deg, rgba(14, 116, 144, 0.55) 0%, rgba(21, 94, 117, 0.90) 100%);
+      border: 1px solid rgba(6, 182, 212, 0.55);
+      color: #bae6fd;
+      box-shadow: 0 4px 14px rgba(14, 116, 144, 0.35);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       СРАВНЕНИЕ МОБИЛЬНЫХ РЕЖИМОВ (СМАРТФОНЫ 375px)
+       ══════════════════════════════════════════════════════════ */
+    .mobile-comparison-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 24px;
+      width: 100%;
+    }
+
+    .phone-card {
+      background: #090c12;
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      border-radius: 36px;
+      padding: 20px 14px 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      box-sizing: border-box;
+      position: relative;
+    }
+    .phone-badge {
+      display: inline-block;
+      font-size: 0.74rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 99px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .phone-badge.badge-bad {
+      background: rgba(244, 63, 94, 0.2);
+      border: 1px solid rgba(244, 63, 94, 0.4);
+      color: #fca5a5;
+    }
+    .phone-badge.badge-good {
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid rgba(52, 211, 153, 0.5);
+      color: #34d399;
+    }
+
+    /* 1. БЫЛО: Ошибка contain: paint + широкий gap/overflow = срезанные углы */
+    .mobile-bad .srs-action-dock {
+      contain: layout style paint !important;
+      overflow: hidden !important;
+    }
+    .mobile-bad .srs-rating-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .mobile-bad .fc-rate-btn {
+      height: 52px;
+      padding: 6px 12px;
+      border-radius: 14px;
+      contain: layout style paint !important; /* КРИТИЧНО: срезает тени и углы в прямоугольник! */
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.05), 0 8px 18px rgba(0,0,0,0.5);
+    }
+    .mobile-bad .srs-btn-title { font-size: 0.8rem; }
+    .mobile-bad .srs-btn-sub { font-size: 0.65rem; }
+
+    /* 2. СТАЛО: 4 в ряд с каноническими скруглениями 12px, БЕЗ contain: paint */
+    .mobile-fixed .srs-action-dock {
+      contain: layout style !important;
+      overflow: visible !important;
+    }
+    .mobile-fixed .srs-rating-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+    .mobile-fixed .fc-rate-btn {
+      height: 48px;
+      min-height: 48px;
+      padding: 4px 4px;
+      border-radius: 12px;
+      contain: layout !important; /* БЕЗ paint! Полные скругления и мягкие тени */
+    }
+    .mobile-fixed .srs-btn-title { font-size: 0.76rem; }
+    .mobile-fixed .srs-btn-sub { font-size: 0.62rem; }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-orb ambient-orb--burgundy"></div>
+  <div class="ambient-orb ambient-orb--amber"></div>
+
+  <!-- Верхняя панель управления стендом -->
+  <header class="stand-controls-panel">
+    <div class="stand-controls-header">
+      <div class="stand-title">
+        <span>🔥 Финальный стенд: Температурная шкала интервалок & Мобильные кнопки</span>
+        <span class="stand-pill-badge">Интерактивная верификация</span>
+      </div>
+      <button class="toggle-pill" onclick="toggleTheme()">🌓 Тема</button>
+    </div>
+
+    <!-- Ползунки параметров -->
+    <div class="stand-slider-grid">
+      <div class="slider-card">
+        <div class="slider-header">
+          <span>Текущий накал памяти (честный старт 0–100%)</span>
+          <span class="slider-val" id="val-base-heat">35%</span>
+        </div>
+        <input type="range" id="input-base-heat" min="0" max="95" value="35" oninput="updateStand()">
+      </div>
+
+      <div class="slider-card">
+        <div class="slider-header">
+          <span>Сдано карточек долга</span>
+          <span class="slider-val" id="val-done-cards">3 из 8 (38%)</span>
+        </div>
+        <input type="range" id="input-done-cards" min="0" max="8" value="3" oninput="updateStand()">
+      </div>
+    </div>
+
+    <!-- Кнопки пошаговой сдачи -->
+    <div class="step-actions-row">
+      <button class="btn-step btn-accent" onclick="stepCard(+1)">⚡ Сдать следующую карточку (+1)</button>
+      <button class="btn-step" onclick="stepCard(-1)">↩ Вернуть карточку (-1)</button>
+      <button class="btn-step" onclick="resetCards()">🔄 Сбросить сессию</button>
+    </div>
+
+    <!-- Переключатели плашки "Карточки SRS" -->
+    <div class="toggles-section">
+      <span style="font-weight:700;color:var(--ink-soft);font-size:0.84rem;">Строка заголовка «Карточки SRS»:</span>
+      <button class="toggle-pill active" id="btn-toggle-title-plate" onclick="toggleTitlePlate()">
+        <span id="label-toggle-title-plate">Плашка заголовка: УБРАНА (Чистый текст) ★</span>
+      </button>
+    </div>
+
+    <!-- HUD температуры -->
+    <div class="thermo-live-hud">
+      <div class="thermo-hud-tag">
+        <span>Текущий накал:</span>
+        <span class="thermo-hud-chip" id="hud-temp-chip">48% · Ярко-алый горн (~850°C)</span>
+      </div>
+      <div style="font-family:var(--font-m);color:var(--ink-muted);" id="hud-formula-text">
+        Старт: 35% ➔ Финиш: 100% · Шаг за 1 карточку: +8.1%
+      </div>
+    </div>
+  </header>
+
+  <main class="stand-viewports-wrapper">
+
+    <!-- ДЕСКТОПНЫЙ ЭКРАН SRS -->
+    <section style="width:100%;display:flex;flex-direction:column;align-items:center;">
+      <div style="font-size:0.78rem;font-weight:800;letter-spacing:0.06em;color:var(--ink-muted);text-transform:uppercase;margin-bottom:12px;">
+        🖥️ Десктопный вид SRS (Плавная термодинамика от текущего накала к 100% белого каления)
+      </div>
+
+      <div class="demo-srs-container">
+        
+        <header class="srs-unified-header-bar">
+          <!-- Заголовок: переключается между чистым текстом и плашкой -->
+          <div class="srs-header-mode-title mode-clean-text" id="demo-mode-title">
+            <span class="srs-live-status-dot"></span>
+            Карточки SRS
+          </div>
+
+          <div class="srs-header-goal-status">
+            <span style="color:#f59e0b;">⚡</span>
+            <span id="header-goal-text">Спринт 1 / 3 · Долг 5</span>
+          </div>
+
+          <!-- Температурная шкала интервалок -->
+          <div class="srs-header-progress-track">
+            <div class="srs-header-progress-glow" id="progress-glow"></div>
+            <div class="srs-header-progress-fill" id="progress-fill"></div>
+          </div>
+        </header>
+
+        <!-- Бусины -->
+        <div class="srs-deck-beads-bar" id="beads-bar"></div>
+
+        <!-- Карточка вопроса SRS -->
+        <article class="fc-card">
+          <div>
+            <div class="fc-card-tag">Python Core · Словари</div>
+            <h2 class="fc-card-question">Какова средняя и худшая сложность операции поиска ключа `key in dict`?</h2>
+          </div>
+          <div class="fc-card-sub">Нажмите кнопку оценки или цифру 1–4 для ответа</div>
+        </article>
+
+        <!-- Кнопки оценок -->
+        <footer class="srs-action-dock" style="margin-top:14px;">
+          <div class="srs-rating-grid" style="grid-template-columns:repeat(4,1fr);gap:10px;">
+            <button type="button" class="fc-rate-btn fc-rate-btn--again" style="height:52px;border-radius:14px;" onclick="stepCard(+1)">
+              <span class="srs-btn-title">Не помню</span>
+              <span class="srs-btn-sub">10 мин</span>
+            </button>
+            <button type="button" class="fc-rate-btn fc-rate-btn--hard" style="height:52px;border-radius:14px;" onclick="stepCard(+1)">
+              <span class="srs-btn-title">Со скрипом</span>
+              <span class="srs-btn-sub">1 день</span>
+            </button>
+            <button type="button" class="fc-rate-btn fc-rate-btn--good" style="height:52px;border-radius:14px;" onclick="stepCard(+1)">
+              <span class="srs-btn-title">Помню</span>
+              <span class="srs-btn-sub">3 дня</span>
+            </button>
+            <button type="button" class="fc-rate-btn fc-rate-btn--easy" style="height:52px;border-radius:14px;" onclick="stepCard(+1)">
+              <span class="srs-btn-title">На автомате</span>
+              <span class="srs-btn-sub">7 дней</span>
+            </button>
+          </div>
+        </footer>
+
+      </div>
+    </section>
+
+    <!-- СРАВНЕНИЕ МОБИЛЬНЫХ ЭКРАНОВ 375px: БЫЛО vs СТАЛО -->
+    <section style="width:100%;display:flex;flex-direction:column;align-items:center;">
+      <div style="font-size:0.78rem;font-weight:800;letter-spacing:0.06em;color:var(--ink-muted);text-transform:uppercase;margin-bottom:16px;">
+        📱 Мобильный экран 375px: Сравнение геометрии кнопок
+      </div>
+
+      <div class="mobile-comparison-row">
+        
+        <!-- БЫЛО (Обрезанные углы) -->
+        <div class="phone-card mobile-bad">
+          <div class="phone-badge badge-bad">⚠️ Было (contain: paint срезает углы)</div>
+          <div style="font-size:0.78rem;color:var(--ink-muted);margin-bottom:12px;line-height:1.4;">
+            У кнопок включён <code>contain: paint</code>, а gap 10–12px распирает ширину: углы обрезаются в прямоугольник, тени срезаются маской.
+          </div>
+
+          <article class="fc-card" style="padding:14px 16px;min-height:110px;border-radius:16px;">
+            <div class="fc-card-tag" style="font-size:0.65rem;">Python Core</div>
+            <div style="font-size:0.88rem;font-weight:700;color:#fff;">Сложность поиска в dict?</div>
+          </article>
+
+          <footer class="srs-action-dock" style="margin-top:12px;">
+            <div class="srs-rating-grid">
+              <button type="button" class="fc-rate-btn fc-rate-btn--again">
+                <span class="srs-btn-title">Не помню</span>
+                <span class="srs-btn-sub">10м</span>
+              </button>
+              <button type="button" class="fc-rate-btn fc-rate-btn--hard">
+                <span class="srs-btn-title">Скрип</span>
+                <span class="srs-btn-sub">1д</span>
+              </button>
+              <button type="button" class="fc-rate-btn fc-rate-btn--good">
+                <span class="srs-btn-title">Помню</span>
+                <span class="srs-btn-sub">3д</span>
+              </button>
+              <button type="button" class="fc-rate-btn fc-rate-btn--easy">
+                <span class="srs-btn-title">Авто</span>
+                <span class="srs-btn-sub">7д</span>
+              </button>
+            </div>
+          </footer>
+        </div>
+
+        <!-- СТАЛО (Идеальные скругления 12px, 0 срезов) -->
+        <div class="phone-card mobile-fixed">
+          <div class="phone-badge badge-good">✅ Стало (4 в ряд, идеальные скругления 12px)</div>
+          <div style="font-size:0.78rem;color:var(--ink-muted);margin-bottom:12px;line-height:1.4;">
+            Снят <code>contain: paint</code>, gap выровнен до 6px, паддинги 4px. Кнопки идеально укладываются в 375px без единого среза.
+          </div>
+
+          <article class="fc-card" style="padding:14px 16px;min-height:110px;border-radius:16px;">
+            <div class="fc-card-tag" style="font-size:0.65rem;">Python Core</div>
+            <div style="font-size:0.88rem;font-weight:700;color:#fff;">Сложность поиска в dict?</div>
+          </article>
+
+          <footer class="srs-action-dock" style="margin-top:12px;">
+            <div class="srs-rating-grid">
+              <button type="button" class="fc-rate-btn fc-rate-btn--again" onclick="stepCard(+1)">
+                <span class="srs-btn-title">Не помню</span>
+                <span class="srs-btn-sub">10м</span>
+              </button>
+              <button type="button" class="fc-rate-btn fc-rate-btn--hard" onclick="stepCard(+1)">
+                <span class="srs-btn-title">Скрип</span>
+                <span class="srs-btn-sub">1д</span>
+              </button>
+              <button type="button" class="fc-rate-btn fc-rate-btn--good" onclick="stepCard(+1)">
+                <span class="srs-btn-title">Помню</span>
+                <span class="srs-btn-sub">3д</span>
+              </button>
+              <button type="button" class="fc-rate-btn fc-rate-btn--easy" onclick="stepCard(+1)">
+                <span class="srs-btn-title">Авто</span>
+                <span class="srs-btn-sub">7д</span>
+              </button>
+            </div>
+          </footer>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    let titlePlateEnabled = false;
+
+    // Цветовые термодинамические опорные узлы
+    const THERMO_STOPS = [
+      { p: 0,   r: 136, g: 19,  b: 55,  name: 'Остывшая сталь (~300°C)' },
+      { p: 25,  r: 225, g: 29,  b: 72,  name: 'Тёмно-вишнёвый накал (~600°C)' },
+      { p: 50,  r: 244, g: 63,  b: 94,  name: 'Ярко-алый горн (~850°C)' },
+      { p: 75,  r: 249, g: 115, b: 22,  name: 'Оранжевая ковка (~1050°C)' },
+      { p: 90,  r: 253, g: 224, b: 71,  name: 'Янтарно-золотой кристалл (~1200°C)' },
+      { p: 100, r: 255, g: 255, b: 255, name: 'Белое каление металла (~1350°C)' }
+    ];
+
+    function interpolateColor(p){
+      const clamped = Math.max(0, Math.min(100, p));
+      let left = THERMO_STOPS[0];
+      let right = THERMO_STOPS[THERMO_STOPS.length - 1];
+
+      for(let i = 0; i < THERMO_STOPS.length - 1; i++){
+        if(clamped >= THERMO_STOPS[i].p && clamped <= THERMO_STOPS[i+1].p){
+          left = THERMO_STOPS[i];
+          right = THERMO_STOPS[i+1];
+          break;
+        }
+      }
+
+      const range = (right.p - left.p) || 1;
+      const t = (clamped - left.p) / range;
+      const r = Math.round(left.r + (right.r - left.r) * t);
+      const g = Math.round(left.g + (right.g - left.g) * t);
+      const b = Math.round(left.b + (right.b - left.b) * t);
+
+      return { r, g, b, p: clamped, name: right.name };
+    }
+
+    function computeThermoStyle(pct){
+      const head = interpolateColor(pct);
+      const tail = interpolateColor(Math.max(0, pct - 35));
+
+      const tailStr = `rgb(${tail.r}, ${tail.g}, ${tail.b})`;
+      const headStr = `rgb(${head.r}, ${head.g}, ${head.b})`;
+
+      let bg = `linear-gradient(90deg, ${tailStr} 0%, ${headStr} 100%)`;
+      let glow = `0 0 12px rgba(${head.r}, ${head.g}, ${head.b}, 0.65)`;
+      let boxShadow = `0 0 8px rgba(${head.r}, ${head.g}, ${head.b}, 0.8)`;
+
+      if(pct >= 98){
+        bg = `linear-gradient(90deg, #f59e0b 0%, #fef08a 30%, #ffffff 70%, #ffffff 100%)`;
+        glow = `0 0 16px #ffffff, 0 0 32px rgba(254, 240, 138, 0.95)`;
+        boxShadow = `0 0 14px #ffffff, 0 0 5px #ffffff`;
+      }
+
+      return { bg, glow, boxShadow, headRGB: headStr, name: head.name, pct };
+    }
+
+    function stepCard(delta){
+      const input = document.getElementById('input-done-cards');
+      let val = parseInt(input.value, 10) + delta;
+      val = Math.max(0, Math.min(8, val));
+      input.value = val;
+      updateStand();
+    }
+
+    function resetCards(){
+      document.getElementById('input-done-cards').value = 0;
+      updateStand();
+    }
+
+    function toggleTitlePlate(){
+      titlePlateEnabled = !titlePlateEnabled;
+      const btn = document.getElementById('btn-toggle-title-plate');
+      const label = document.getElementById('label-toggle-title-plate');
+      const titleElem = document.getElementById('demo-mode-title');
+
+      if(titlePlateEnabled){
+        btn.classList.remove('active');
+        label.innerText = 'Плашка заголовка: ВКЛЮЧЕНА (Старая капсула)';
+        titleElem.className = 'srs-header-mode-title mode-has-plate';
+      } else {
+        btn.classList.add('active');
+        label.innerText = 'Плашка заголовка: УБРАНА (Чистый текст) ★';
+        titleElem.className = 'srs-header-mode-title mode-clean-text';
+      }
+    }
+
+    function toggleTheme(){
+      const html = document.documentElement;
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    }
+
+    function updateStand(){
+      const baseHeat = parseInt(document.getElementById('input-base-heat').value, 10);
+      const doneCards = parseInt(document.getElementById('input-done-cards').value, 10);
+      const totalCards = 8;
+      const sessionPct = (doneCards / totalCards);
+
+      document.getElementById('val-base-heat').innerText = baseHeat + '%';
+      document.getElementById('val-done-cards').innerText = `${doneCards} из ${totalCards} (${Math.round(sessionPct * 100)}%)`;
+
+      const currentPct = baseHeat + (100 - baseHeat) * sessionPct;
+      const thermo = computeThermoStyle(currentPct);
+
+      const fill = document.getElementById('progress-fill');
+      const glow = document.getElementById('progress-glow');
+
+      fill.style.width = currentPct + '%';
+      fill.style.background = thermo.bg;
+      fill.style.boxShadow = thermo.boxShadow;
+      fill.title = `${Math.round(currentPct)}% · ${thermo.name}`;
+
+      glow.style.width = currentPct + '%';
+      glow.style.background = thermo.bg;
+      glow.style.boxShadow = thermo.glow;
+
+      // HUD
+      const chip = document.getElementById('hud-temp-chip');
+      chip.innerText = `${Math.round(currentPct)}% · ${thermo.name}`;
+      chip.style.background = thermo.headRGB;
+      chip.style.color = (currentPct > 70) ? '#0f172a' : '#ffffff';
+
+      const perCard = ((100 - baseHeat) / totalCards).toFixed(1);
+      document.getElementById('hud-formula-text').innerText = 
+        `Старт: ${baseHeat}% ➔ Финиш: 100% · Шаг за 1 карточку: +${perCard}%`;
+
+      // Бусины
+      const beadsBar = document.getElementById('beads-bar');
+      beadsBar.innerHTML = '';
+      for(let i = 0; i < totalCards; i++){
+        const b = document.createElement('div');
+        b.className = 'dot-jewel' + (i < doneCards ? ' done' : (i === doneCards ? ' active' : ''));
+        beadsBar.appendChild(b);
+      }
+
+      const remaining = totalCards - doneCards;
+      document.getElementById('header-goal-text').innerText = `Спринт 1 / 3 · Долг ${remaining}`;
+    }
+
+    updateStand();
+  </script>
+</body>
+</html>
