@@ -23360,16 +23360,110 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
 
 
-/* 2. Снятие зажатия высоты карточки при раскрытии ответа на мобильных (против двойного скролла) */
-
+/* 2. Мобильная посадка парящей карточки SRS (Zero-Scroll & Atmospheric Zen) */
 @media (max-width: 640px) {
-
-  .fc-card.fc-card--Answer {
-
-    max-height: clamp(260px, 54vh, 460px) !important;
-
+  .cards-hub-container {
+    min-height: calc(100dvh - 120px) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    background: transparent !important;
   }
-
+  .cards-hub-content {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+  }
+  .fc-stage {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    flex: 1 1 auto !important;
+    margin: 0 !important;
+  }
+  .fc-card {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: auto 0 !important;
+    padding: 16px 16px !important;
+    border-radius: 20px !important;
+    box-shadow: 0 20px 48px -8px rgba(0, 0, 0, 0.75), 0 0 32px rgba(16, 185, 129, 0.22) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+  }
+  .fc-card.fc-card--Answer {
+    max-height: none !important;
+  }
+  .fc-q-sub {
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    line-height: 1.35 !important;
+    color: #a7f3d0 !important;
+    opacity: 0.9 !important;
+    margin-bottom: 6px !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+  }
+  .fc-code-capsule {
+    background: rgba(16, 185, 129, 0.14) !important;
+    border: 1px solid rgba(16, 185, 129, 0.35) !important;
+    border-radius: 8px !important;
+    padding: 6px 10px !important;
+    margin: 4px 0 8px !important;
+    box-shadow: none !important;
+  }
+  .fc-code-capsule::before { display: none !important; }
+  .fc-code-capsule .fc-code-primary {
+    font-family: var(--font-m, 'JetBrains Mono', monospace) !important;
+    font-size: 0.84rem !important;
+    font-weight: 700 !important;
+    color: #34d399 !important;
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+    line-height: 1.35 !important;
+  }
+  .fc-answer-explanation {
+    font-size: 0.89rem !important;
+    line-height: 1.5 !important;
+    color: #ffffff !important;
+    font-weight: 500 !important;
+  }
+  .fc-answer-explanation code,
+  #srs-card-answer code,
+  .fc-card-back code {
+    font-family: var(--font-m, 'JetBrains Mono', monospace) !important;
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    color: #34d399 !important;
+    background: rgba(16, 185, 129, 0.14) !important;
+    border: 1px solid rgba(16, 185, 129, 0.35) !important;
+    border-radius: 5px !important;
+    padding: 1px 6px !important;
+    display: inline !important;
+    vertical-align: baseline !important;
+    white-space: nowrap !important;
+    margin: 0 2px !important;
+  }
+  .srs-action-dock {
+    margin-top: auto !important;
+    padding: 8px 10px calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .srs-rating-grid,
+  .card-rating-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+  .fc-rate-btn {
+    min-height: 44px !important;
+    padding: 8px 10px !important;
+    border-radius: 12px !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+  }
 }
 
 
@@ -46177,7 +46271,7 @@ function formatCardAnswerHTML(rawAnswer){
 
     // Если пояснение содержит другие инлайн-блоки кода или точку с запятой,
     // не выносим первый код в большую капсулу, а форматируем все инлайн-коды одинаково!
-    if(!explanation.includes('`') && !explanation.includes('<code>') && !explanation.includes(';')){
+    if(!explanation.includes(';')){
       const cleanCode = rawCode
         .replace(/&amp;/g, '&')
         .replace(/&lt;/g, '<')
@@ -46193,7 +46287,7 @@ function formatCardAnswerHTML(rawAnswer){
           <code class="fc-code-primary">${codeHtml}</code>
         </div>
         <div class="fc-answer-explanation">
-          ${expFormatted}
+          <span class="fc-explanation-dash">—</span> ${expFormatted}
         </div>
       `;
     }
