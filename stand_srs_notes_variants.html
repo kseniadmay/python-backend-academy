@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Стенд /grill-me: Конспекты в экране интервалок (SRS)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090e;
+      --paper: #0b0e14;
+      --card-bg: rgba(15, 23, 42, 0.72);
+      --card-border: rgba(255, 255, 255, 0.10);
+      --ink: #f8fafc;
+      --ink-soft: #cbd5e1;
+      --ink-muted: #94a3b8;
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.28);
+      --emerald-dark: #064e3b;
+      --amber: #f59e0b;
+      --amber-glow: rgba(245, 158, 11, 0.24);
+      --rose: #f43f5e;
+      --rose-glow: rgba(244, 63, 94, 0.24);
+      --cyan: #06b6d4;
+      --font-d: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+      --font-t: 'Unbounded', sans-serif;
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --paper: #f1f5f9;
+      --card-bg: rgba(255, 255, 255, 0.92);
+      --card-border: rgba(15, 23, 42, 0.10);
+      --ink: #0f172a;
+      --ink-soft: #334155;
+      --ink-muted: #64748b;
+      --emerald: #059669;
+      --emerald-glow: rgba(5, 150, 105, 0.18);
+      --emerald-dark: #ecfdf5;
+      --amber: #d97706;
+      --amber-glow: rgba(217, 119, 6, 0.18);
+      --rose: #e11d48;
+      --rose-glow: rgba(225, 29, 72, 0.18);
+      --cyan: #0891b2;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1.2px, transparent 1.2px);
+      background-size: 24px 24px;
+      color: var(--ink);
+      font-family: var(--font-d);
+      min-height: 100vh;
+      padding: 24px 16px 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    [data-theme="light"] body {
+      background-image: radial-gradient(rgba(0, 0, 0, 0.045) 1.2px, transparent 1.2px);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ХЕДЕР СТЕНДА & ПАНЕЛЬ УПРАВЛЕНИЯ
+       ══════════════════════════════════════════════════════════ */
+    .stand-controls-panel {
+      width: 100%;
+      max-width: 1000px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 18px 22px;
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .stand-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .stand-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stand-title {
+      font-family: var(--font-t);
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stand-subtitle {
+      font-size: 0.82rem;
+      color: var(--ink-muted);
+    }
+
+    .stand-toggles-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toggle-pill-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.80rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--ink-soft);
+      transition: all 0.18s ease;
+      font-family: var(--font-d);
+    }
+    [data-theme="light"] .toggle-pill-btn {
+      border-color: rgba(0, 0, 0, 0.10);
+      background: rgba(0, 0, 0, 0.04);
+      color: var(--ink-soft);
+    }
+
+    .toggle-pill-btn:hover {
+      background: rgba(255, 255, 255, 0.10);
+      color: var(--ink);
+    }
+
+    .toggle-pill-btn.active {
+      background: #10b981;
+      color: #ffffff;
+      border-color: #10b981;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.40);
+    }
+
+    .toggle-pill-btn.active-theme {
+      background: rgba(255, 255, 255, 0.16);
+      color: var(--ink);
+      border-color: rgba(255, 255, 255, 0.28);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       СЕЛЕКТОР ВАРИАНТОВ СТЕНДА
+       ══════════════════════════════════════════════════════════ */
+    .variants-segmented-bar {
+      display: flex;
+      align-items: stretch;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 4px;
+      gap: 4px;
+      overflow-x: auto;
+    }
+    [data-theme="light"] .variants-segmented-bar {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .v-segment-btn {
+      flex: 1;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--ink-muted);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.18s ease;
+      font-family: var(--font-d);
+    }
+
+    .v-segment-btn:hover {
+      color: var(--ink-soft);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .v-segment-btn.active {
+      background: rgba(255, 255, 255, 0.10);
+      border-color: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    }
+    [data-theme="light"] .v-segment-btn.active {
+      background: #ffffff;
+      border-color: rgba(0, 0, 0, 0.12);
+      color: #0f172a;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .v-segment-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .v-segment-desc {
+      font-size: 0.70rem;
+      color: var(--ink-muted);
+      margin-top: 2px;
+      line-height: 1.25;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       КОНТЕЙНЕР ДЕМОНСТРАЦИИ (ДЕБРИЗ SRS ЭКРАНА)
+       ══════════════════════════════════════════════════════════ */
+    .viewport-sandbox {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      transition: max-width 0.28s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+
+    .viewport-sandbox.mobile-mode {
+      max-width: 410px;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ЭКРАН SRS 1: УНИФИЦИРОВАННЫЙ ВЕРХНИЙ БАР
+       ══════════════════════════════════════════════════════════ */
+    .srs-demo-header-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      padding: 0 4px;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+
+    .srs-flow-selector {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      height: 32px;
+      box-sizing: border-box;
+    }
+
+    .srs-flow-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 10px;
+      height: 32px;
+      border-radius: 9px;
+      font-size: 0.80rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-sizing: border-box;
+      line-height: 1;
+      border: 1px solid transparent;
+      color: var(--ink-muted);
+      background: transparent;
+      font-family: var(--font-d);
+    }
+
+    .srs-flow-tab.active-cards {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+    }
+
+    .srs-flow-tab.active-notes {
+      background: rgba(244, 63, 94, 0.10);
+      border-color: rgba(244, 63, 94, 0.28);
+      color: #ffffff;
+      box-shadow: 0 0 16px rgba(244, 63, 94, 0.15);
+    }
+    [data-theme="light"] .srs-flow-tab.active-notes {
+      background: rgba(225, 29, 72, 0.08);
+      border-color: rgba(225, 29, 72, 0.22);
+      color: #be123c;
+    }
+
+    .badge-counter-cards {
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #6ee7b7;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.18);
+    }
+
+    .badge-counter-notes {
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #fda4af;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: rgba(244, 63, 94, 0.20);
+    }
+
+    .srs-header-right-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--ink-soft);
+    }
+    [data-theme="light"] .srs-header-right-meta {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.08);
+      color: #334155;
+    }
+
+    /* Температурная шкала накала памяти */
+    .srs-thermo-track {
+      position: absolute;
+      bottom: -12px;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 99px;
+      overflow: visible;
+    }
+    [data-theme="light"] .srs-thermo-track {
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    .srs-thermo-fill {
+      position: relative;
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+
+    .srs-thermo-glow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      border-radius: 99px;
+      filter: blur(5px);
+      opacity: 0.85;
+      pointer-events: none;
+      transition: width 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ЭКРАН SRS 2: ЦЕПЬ БУСИН ПОДТЕМ КОНСПЕКТА
+       ══════════════════════════════════════════════════════════ */
+    .srs-beads-wrap {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 0 2px;
+    }
+
+    .srs-beads-chain {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 6px 14px;
+      border-radius: 999px;
+      backdrop-filter: blur(12px);
+    }
+    [data-theme="light"] .srs-beads-chain {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .srs-bead {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+
+    .srs-bead.completed {
+      background: #10b981;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.65);
+    }
+
+    .srs-bead.active {
+      width: 24px;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #f43f5e, #fb923c);
+      box-shadow: 0 0 12px rgba(244, 63, 94, 0.80);
+      transform: scale(1.08);
+    }
+
+    .srs-bead.future {
+      background: rgba(255, 255, 255, 0.20);
+    }
+    [data-theme="light"] .srs-bead.future {
+      background: rgba(0, 0, 0, 0.18);
+    }
+
+    .srs-bead:hover:not(.active) {
+      transform: scale(1.3);
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ЭКРАН SRS 3: КАРТОЧКА КОНСПЕКТА (LIQUID OBSIDIAN GLASS)
+       ══════════════════════════════════════════════════════════ */
+    .srs-note-card {
+      width: 100%;
+      position: relative;
+      border-radius: 24px;
+      background: linear-gradient(155deg, rgba(255, 255, 255, 0.06) 0%, rgba(18, 24, 38, 0.46) 45%, rgba(8, 12, 18, 0.64) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      transition: all 0.22s ease;
+    }
+
+    [data-theme="light"] .srs-note-card {
+      background: linear-gradient(155deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.92) 50%, rgba(241, 245, 249, 0.88) 100%);
+      border-color: rgba(15, 23, 42, 0.09);
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+    }
+
+    /* Верхняя строка карточки */
+    .fc-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .fc-badge-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .topic-chip {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #94a3b8;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    [data-theme="light"] .topic-chip {
+      color: #64748b;
+    }
+
+    .step-counter-chip {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-family: var(--font-m);
+    }
+    [data-theme="light"] .step-counter-chip {
+      color: #334155;
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.07);
+    }
+
+    .srs-top-right-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Лестница Эббингауза (1д - 3д - 7д - 21д - 30д) */
+    .note-memory-chain {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 8px;
+      background: rgba(245, 158, 11, 0.06);
+      border: 1px solid rgba(251, 191, 36, 0.22);
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+    }
+
+    .ladder-step {
+      padding: 1px 5px;
+      border-radius: 4px;
+      color: var(--ink-muted);
+      font-weight: 600;
+    }
+
+    .ladder-step.active {
+      background: rgba(245, 158, 11, 0.22);
+      color: #fbbf24;
+      font-weight: 800;
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.35);
+    }
+
+    .ladder-arrow {
+      color: rgba(255, 255, 255, 0.25);
+      font-size: 0.65rem;
+    }
+    [data-theme="light"] .ladder-arrow {
+      color: rgba(0, 0, 0, 0.25);
+    }
+
+    /* Кнопки утилит карточки [ ↶ ] и [ 📖 ] */
+    .card-util-capsule {
+      display: inline-flex;
+      border-radius: 8px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+    }
+    [data-theme="light"] .card-util-capsule {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .util-btn {
+      background: transparent;
+      border: none;
+      color: #cbd5e1;
+      padding: 4px 9px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+      font-family: var(--font-d);
+    }
+    [data-theme="light"] .util-btn {
+      color: #334155;
+    }
+
+    .util-btn:hover {
+      background: rgba(255, 255, 255, 0.10);
+      color: #ffffff;
+    }
+    [data-theme="light"] .util-btn:hover {
+      background: rgba(0, 0, 0, 0.08);
+      color: #0f172a;
+    }
+
+    .util-btn.active {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       СОДЕРЖИМОЕ ПОДТЕМЫ КОНСПЕКТА
+       ══════════════════════════════════════════════════════════ */
+    .note-content-body {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      line-height: 1.65;
+      font-size: 0.95rem;
+      color: var(--ink-soft);
+    }
+
+    .note-subtopic-h2 {
+      font-size: 1.32rem;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.015em;
+      line-height: 1.35;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Инлайн-код с фиксом среза границы */
+    code:not(pre code) {
+      font-family: var(--font-m);
+      font-size: 0.86em;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #fca5a5;
+      vertical-align: -1px;
+      box-sizing: border-box;
+      display: inline-block;
+    }
+    [data-theme="light"] code:not(pre code) {
+      background: rgba(225, 29, 72, 0.07);
+      border-color: rgba(225, 29, 72, 0.15);
+      color: #be123c;
+    }
+
+    .note-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 4px;
+    }
+
+    .note-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .bullet-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #34d399;
+      margin-top: 8px;
+      flex-shrink: 0;
+      box-shadow: 0 0 6px #34d399;
+    }
+
+    .bullet-dot.amber {
+      background: #fbbf24;
+      box-shadow: 0 0 6px #fbbf24;
+    }
+
+    /* Премиальная стеклянная капсула кода */
+    .snippet-wrap {
+      position: relative;
+      margin: 8px 0;
+      border-radius: 14px;
+      background: rgba(0, 0, 0, 0.50);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+    [data-theme="light"] .snippet-wrap {
+      background: #0f172a;
+      border-color: rgba(15, 23, 42, 0.12);
+      color: #f8fafc;
+    }
+
+    .snippet-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .mac-dots {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mac-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+    .mac-dot.red { background: #ef4444; }
+    .mac-dot.yellow { background: #f59e0b; }
+    .mac-dot.green { background: #10b981; }
+
+    .snippet-lang-tag {
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: lowercase;
+    }
+
+    .btn-inline-run {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.32);
+      color: #34d399;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: var(--font-m);
+    }
+    .btn-inline-run:hover {
+      background: #10b981;
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    }
+
+    .snippet-pre {
+      padding: 14px 16px;
+      font-family: var(--font-m);
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: #f8fafc;
+      overflow-x: auto;
+    }
+
+    /* Подсветка синтаксиса */
+    .tok-kw { color: #f472b6; font-weight: 700; }
+    .tok-fn { color: #60a5fa; font-weight: 600; }
+    .tok-num { color: #fbbf24; font-weight: 600; }
+    .tok-str { color: #34d399; }
+    .tok-com { color: #72849a; font-style: italic; }
+
+    /* ══════════════════════════════════════════════════════════
+       ВАРИАНТЫ НИЖНЕЙ ПАНЕЛИ ДЕЙСТВИЙ (FOOTER CTA)
+       ══════════════════════════════════════════════════════════ */
+    .variant-cta-container {
+      width: 100%;
+      margin-top: 10px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    [data-theme="light"] .variant-cta-container {
+      border-top-color: rgba(0, 0, 0, 0.08);
+    }
+
+    /* ВАРИАНТ 1: Single Dominant CTA */
+    .v1-actions-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .btn-step-prev {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 44px;
+      padding: 0 16px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      color: var(--ink-soft);
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: var(--font-d);
+    }
+    [data-theme="light"] .btn-step-prev {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.08);
+      color: #334155;
+    }
+    .btn-step-prev:hover {
+      background: rgba(255, 255, 255, 0.10);
+      color: #ffffff;
+    }
+
+    .btn-step-next {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      height: 44px;
+      padding: 0 20px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border: 1px solid rgba(255, 255, 255, 0.20);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.94rem;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+      transition: all 0.18s cubic-bezier(0.2, 0.9, 0.3, 1);
+      font-family: var(--font-d);
+    }
+    .btn-step-next:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 30px rgba(16, 185, 129, 0.50);
+      filter: brightness(1.08);
+    }
+    .btn-step-next:active {
+      transform: translateY(0);
+    }
+
+    .key-badge {
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 2px 6px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    /* Монолитная панель интервальной оценки (Rating Bar) */
+    .rating-buttons-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .rate-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-height: 52px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      cursor: pointer;
+      transition: all 0.18s cubic-bezier(0.2, 0.9, 0.3, 1);
+      font-family: var(--font-d);
+      box-sizing: border-box;
+    }
+
+    .rate-btn-again {
+      background: linear-gradient(145deg, rgba(244, 63, 94, 0.14) 0%, rgba(225, 29, 72, 0.06) 100%);
+      border-color: rgba(244, 63, 94, 0.28);
+      color: #fda4af;
+    }
+    .rate-btn-again:hover {
+      background: rgba(244, 63, 94, 0.26);
+      border-color: #f43f5e;
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(244, 63, 94, 0.40);
+    }
+
+    .rate-btn-good {
+      background: linear-gradient(145deg, rgba(16, 185, 129, 0.16) 0%, rgba(5, 150, 105, 0.08) 100%);
+      border-color: rgba(16, 185, 129, 0.32);
+      color: #6ee7b7;
+    }
+    .rate-btn-good:hover {
+      background: rgba(16, 185, 129, 0.28);
+      border-color: #10b981;
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.45);
+    }
+
+    .rate-btn-easy {
+      background: linear-gradient(145deg, rgba(6, 182, 212, 0.14) 0%, rgba(14, 165, 233, 0.06) 100%);
+      border-color: rgba(6, 182, 212, 0.28);
+      color: #7dd3fc;
+    }
+    .rate-btn-easy:hover {
+      background: rgba(6, 182, 212, 0.26);
+      border-color: #06b6d4;
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.40);
+    }
+
+    .rate-label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .rate-sub {
+      font-family: var(--font-m);
+      font-size: 0.70rem;
+      font-weight: 600;
+      opacity: 0.85;
+      line-height: 1;
+    }
+
+    /* ВАРИАНТ 2: Sticky / Bottom Quick-Rate Strip */
+    .v2-quick-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px dashed rgba(255, 255, 255, 0.12);
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+    }
+    [data-theme="light"] .v2-quick-strip {
+      background: rgba(0, 0, 0, 0.02);
+      border-color: rgba(0, 0, 0, 0.10);
+      color: #64748b;
+    }
+
+    .quick-rate-pills {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .quick-pill {
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      line-height: 1;
+    }
+    .quick-pill.again {
+      background: rgba(244, 63, 94, 0.12);
+      color: #f43f5e;
+      border-color: rgba(244, 63, 94, 0.25);
+    }
+    .quick-pill.good {
+      background: rgba(16, 185, 129, 0.12);
+      color: #10b981;
+      border-color: rgba(16, 185, 129, 0.25);
+    }
+    .quick-pill.easy {
+      background: rgba(6, 182, 212, 0.12);
+      color: #06b6d4;
+      border-color: rgba(6, 182, 212, 0.25);
+    }
+    .quick-pill:hover {
+      filter: brightness(1.25);
+      transform: translateY(-1px);
+    }
+
+    /* ВАРИАНТ 3: Triumph Summary Card */
+    .v3-summary-card {
+      background: rgba(16, 185, 129, 0.06);
+      border: 1px solid rgba(16, 185, 129, 0.22);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    [data-theme="light"] .v3-summary-card {
+      background: rgba(16, 185, 129, 0.04);
+      border-color: rgba(16, 185, 129, 0.18);
+    }
+
+    .v3-summary-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #34d399;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .v3-bullet-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      color: var(--ink-soft);
+    }
+
+    /* Нотификация фиксации интервала */
+    .toast-feedback {
+      position: fixed;
+      bottom: 28px;
+      padding: 12px 20px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid #10b981;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.90rem;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(16, 185, 129, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.28s cubic-bezier(0.2, 0.9, 0.3, 1);
+      pointer-events: none;
+      z-index: 9999;
+    }
+    .toast-feedback.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Режим полного обзора (Full Longread Scroll) */
+    .full-read-chunk {
+      padding-bottom: 16px;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+      margin-bottom: 16px;
+    }
+    .full-read-chunk:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    /* Адаптив для узких экранов */
+    @media (max-width: 600px) {
+      .srs-note-card {
+        padding: 18px 16px;
+      }
+      .rating-buttons-grid {
+        grid-template-columns: 1fr;
+      }
+      .rate-btn {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 10px 14px;
+        min-height: 44px;
+      }
+      .v2-quick-strip {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ВЕРХНИЙ БАР УПРАВЛЕНИЯ СТЕНДОМ -->
+  <header class="stand-controls-panel">
+    <div class="stand-top-row">
+      <div class="stand-title-wrap">
+        <div class="stand-title">
+          <span>📚 Стенд /grill-me: Конспекты в экране интервалок</span>
+          <span style="font-family:var(--font-m);font-size:0.70rem;font-weight:700;padding:2px 8px;border-radius:999px;background:rgba(244,63,94,0.18);color:#fda4af;border:1px solid rgba(244,63,94,0.30);">SRS v2.4</span>
+        </div>
+        <div class="stand-subtitle">
+          Архитектурная визуализация геометрии, шагов изучения и перехода к интервальной оценке Эббингауза
+        </div>
+      </div>
+
+      <div class="stand-toggles-row">
+        <!-- Тумблер темы -->
+        <button type="button" class="toggle-pill-btn active-theme" id="btnThemeToggle" title="Переключить тему">
+          <span id="themeIcon">🌙</span> <span id="themeLabel">Тёмная тема</span>
+        </button>
+
+        <!-- Тумблер вьюпорта: Desktop / Mobile -->
+        <button type="button" class="toggle-pill-btn" id="btnViewportToggle" title="Переключить ширину экрана">
+          <span id="viewportIcon">📱</span> <span id="viewportLabel">Мобильный вид (iPhone)</span>
+        </button>
+
+        <!-- Тумблер режима: Пошаговый / Полный лонгрид -->
+        <button type="button" class="toggle-pill-btn" id="btnModeToggle" title="Переключить режим чтения">
+          <span id="modeIcon">📖</span> <span id="modeLabel">Полный свиток</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Селектор 3 вариантов -->
+    <div class="variants-segmented-bar" role="tablist">
+      <button type="button" class="v-segment-btn active" data-variant="1" role="tab">
+        <span class="v-segment-title">⭐ Вариант 1: Zen Single CTA</span>
+        <span class="v-segment-desc">Чистый фокус на тексте; оценка появляется строго на финальном шаге</span>
+      </button>
+
+      <button type="button" class="v-segment-btn" data-variant="2" role="tab">
+        <span class="v-segment-title">⚡ Вариант 2: Quick-Rate Strip</span>
+        <span class="v-segment-desc">Доминантная кнопка + строка мгновенной оценки на каждом шаге</span>
+      </button>
+
+      <button type="button" class="v-segment-btn" data-variant="3" role="tab">
+        <span class="v-segment-title">🏆 Вариант 3: Triumph Summary</span>
+        <span class="v-segment-desc">Двухфазный финиш: после последнего шага карточка даёт выжимку и оценку</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ПЕСОЧНИЦА ОТОБРАЖЕНИЯ ЭКРАНА SRS -->
+  <main class="viewport-sandbox" id="viewportSandbox">
+
+    <!-- 1. ЕДИНЫЙ ВЕРХНИЙ БАР SRS (КАРТОЧКИ / КОНСПЕКТЫ) -->
+    <section class="srs-demo-header-bar">
+      <!-- Переключатель потоков -->
+      <div class="srs-flow-selector">
+        <button type="button" class="srs-flow-tab" id="tabFlowCards" title="Перейти к интервальным карточкам">
+          <span>Карточки</span>
+          <span class="badge-counter-cards">14</span>
+        </button>
+        <button type="button" class="srs-flow-tab active-notes" id="tabFlowNotes" title="Текущий поток: Конспекты">
+          <span>Конспекты</span>
+          <span class="badge-counter-notes">3</span>
+        </button>
+      </div>
+
+      <!-- Мета сессии спринта -->
+      <div class="srs-header-right-meta" id="headerSprintMeta" title="Текущий конспект в интервальной сессии">
+        <span>📖</span>
+        <span id="sprintChipLabel">Конспект 1 / 3</span>
+      </div>
+
+      <!-- Непрерывная температурная шкала накала памяти -->
+      <div class="srs-thermo-track" title="Температурный накал памяти (белое каление на финише)">
+        <div class="srs-thermo-glow" id="thermoGlow" style="width: 50%; background: linear-gradient(90deg, #be123c 0%, #fb923c 50%, #fef08a 100%);"></div>
+        <div class="srs-thermo-fill" id="thermoFill" style="width: 50%; background: linear-gradient(90deg, #be123c 0%, #fb923c 50%, #fef08a 100%);"></div>
+      </div>
+    </section>
+
+    <!-- 2. ЦЕПЬ БУСИН ПОДТЕМ КОНСПЕКТА -->
+    <nav class="srs-beads-wrap" id="beadsContainer" aria-label="Шаги конспекта">
+      <div class="srs-beads-chain">
+        <div class="srs-bead completed" data-step="0" title="Подтема 1: Почему выбор важен (Изучено)"></div>
+        <div class="srs-bead active" data-step="1" title="Подтема 2: List: массив и порядок (Текущий)"></div>
+        <div class="srs-bead future" data-step="2" title="Подтема 3: Dict: хэш-таблица и ключи"></div>
+        <div class="srs-bead future" data-step="3" title="Подтема 4: Set: уникальность O(1)"></div>
+      </div>
+    </nav>
+
+    <!-- 3. КАРТОЧКА КОНСПЕКТА (LIQUID OBSIDIAN GLASS) -->
+    <article class="srs-note-card" id="srsNoteCard">
+
+      <!-- Верхняя строка карточки -->
+      <div class="fc-top-row">
+        <div class="fc-badge-group">
+          <span class="topic-chip">
+            <span>🐍</span>
+            <span>Python · Структуры данных</span>
+          </span>
+          <span class="step-counter-chip" id="stepCounterChip">Шаг 2 из 4</span>
+        </div>
+
+        <div class="srs-top-right-group">
+          <!-- График Эббингауза -->
+          <div class="note-memory-chain" title="График повторений: 1д ➔ 3д ➔ 7д ➔ 21д ➔ 30д">
+            <span class="ladder-step">1д</span>
+            <span class="ladder-arrow">➔</span>
+            <span class="ladder-step active">3д</span>
+            <span class="ladder-arrow">➔</span>
+            <span class="ladder-step">7д</span>
+            <span class="ladder-arrow">➔</span>
+            <span class="ladder-step">21д</span>
+            <span class="ladder-arrow">➔</span>
+            <span class="ladder-step">30д</span>
+          </div>
+
+          <!-- Стеклянная капсула: Шаг назад и Полный обзор -->
+          <div class="card-util-capsule">
+            <button type="button" class="util-btn" id="btnStepPrevTop" title="Шаг назад (↶)">
+              <span>↶</span>
+            </button>
+            <button type="button" class="util-btn" id="btnFullToggleTop" title="Развернуть весь конспект целиком">
+              <span>📖</span>
+              <span style="font-size:0.74rem;font-weight:600;">Все</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ТЕЛО КОНСПЕКТА (ДИНАМИЧЕСКИЙ КОНТЕНТ) -->
+      <div class="note-content-body" id="noteContentArea">
+        <!-- Генерируется из JS в зависимости от шага -->
+      </div>
+
+      <!-- НИЖНЯЯ ПАНЕЛЬ ДЕЙСТВИЙ (FOOTER CTA) -->
+      <footer class="variant-cta-container" id="variantCtaContainer">
+        <!-- Генерируется из JS в зависимости от выбранного варианта -->
+      </footer>
+
+    </article>
+
+  </main>
+
+  <!-- ТОСТ ОБРАТНОЙ СВЯЗИ -->
+  <div class="toast-feedback" id="toastFeedback">
+    <span>✅</span>
+    <span id="toastMsg">Интервал повторения сохранён: +3 дня!</span>
+  </div>
+
+  <script>
+    // Данные шагов реального конспекта К-001
+    const NOTE_STEPS = [
+      {
+        title: "Почему выбор структуры данных важен",
+        html: `
+          <h2 class="note-subtopic-h2">⚖️ Почему выбор структуры данных критичен</h2>
+          <p>Программа стабильно работает на 10 элементах, но зависает на 10 000 при неверном выборе типа контейнера. Разные структуры обеспечивают различную асимптотическую сложность операций — это ключевой рычаг оптимизации backend-производительности.</p>
+          <ul class="note-list">
+            <li><span class="bullet-dot"></span><span><strong>Поиск по значению:</strong> в списке $O(n)$, в хэш-таблице (словаре / множестве) в среднем $O(1)$.</span></li>
+            <li><span class="bullet-dot"></span><span><strong>Вставка в начало:</strong> в списке $O(n)$ из-за сдвига указателей в памяти, в <code>collections.deque</code> — $O(1)$.</span></li>
+          </ul>
+        `
+      },
+      {
+        title: "List: динамический массив и порядок элементов",
+        html: `
+          <h2 class="note-subtopic-h2">📋 List: динамический массив указателей</h2>
+          <p>Список (<code>list</code>) — непрерывный массив указателей на объекты в CPython. Идеален, когда нужно сохранить строгий порядок добавления и обращаться к элементам по целочисленному индексу за <code>$O(1)$</code>.</p>
+          
+          <div class="snippet-wrap">
+            <div class="snippet-head">
+              <div class="mac-dots">
+                <span class="mac-dot red"></span>
+                <span class="mac-dot yellow"></span>
+                <span class="mac-dot green"></span>
+              </div>
+              <span class="snippet-lang-tag">python</span>
+              <button type="button" class="btn-inline-run" onclick="showToast('Код выполнен успешно: [0, 1, 2, 3]')">Запустить ⯈</button>
+            </div>
+            <pre class="snippet-pre"><code><span class="tok-com"># Вставка в начало сдвигает все N указателей в памяти</span>
+items = [<span class="tok-num">1</span>, <span class="tok-num">2</span>, <span class="tok-num">3</span>]
+items.<span class="tok-fn">insert</span>(<span class="tok-num">0</span>, <span class="tok-num">0</span>)  <span class="tok-com"># O(n) медленно!</span>
+<span class="tok-fn">print</span>(items)       <span class="tok-com"># [0, 1, 2, 3]</span></code></pre>
+          </div>
+
+          <ul class="note-list">
+            <li><span class="bullet-dot"></span><span><code>arr.append(x)</code> и <code>arr.pop()</code> выполняются амортизированно за $O(1)$.</span></li>
+            <li><span class="bullet-dot amber"></span><span>Оператор <code>+=</code> мутирует список in-place через <code>__iadd__</code>, не создавая новый объект.</span></li>
+          </ul>
+        `
+      },
+      {
+        title: "Dict: мгновенный поиск по хэш-таблице",
+        html: `
+          <h2 class="note-subtopic-h2">🗝️ Dict: хэш-таблица и ключи</h2>
+          <p>Словарь — структура «ключ – значение» на основе разрежённой хэш-таблицы (в CPython 3.6+ сохраняет порядок вставки с плотным массивом индексов). Хэш-функция мгновенно вычисляет ячейку памяти — доступ за <code>$O(1)$</code>.</p>
+          <ul class="note-list">
+            <li><span class="bullet-dot"></span><span><strong>Требование к ключу:</strong> объект обязан быть хэшируемым (<code>hashable</code>) — реализовывать неизменяемый метод <code>__hash__</code> и <code>__eq__</code>.</span></li>
+            <li><span class="bullet-dot"></span><span>Списки и словари <strong>не могут</strong> быть ключами, кортежи с неизменяемыми элементами — могут.</span></li>
+          </ul>
+        `
+      },
+      {
+        title: "Set: уникальность и проверка вхождения O(1)",
+        html: `
+          <h2 class="note-subtopic-h2">⚡ Set: уникальность и мгновенное вхождение</h2>
+          <p>Множество (<code>set</code>) — хэш-таблица, где хранятся только ключи без значений. Обеспечивает исключение дубликатов и мгновенную математическую теорию множеств (пересечение <code>&</code>, объединение <code>|</code>, разность <code>-</code>).</p>
+          <ul class="note-list">
+            <li><span class="bullet-dot"></span><span>Проверка <code>x in set_items</code> работает в среднем за <code>$O(1)$</code> (в отличие от <code>x in list_items</code> за $O(n)$).</span></li>
+            <li><span class="bullet-dot"></span><span>Неизменяемый аналог множества — <code>frozenset</code>, который сам может быть элементом множества или ключом словаря.</span></li>
+          </ul>
+        `
+      }
+    ];
+
+    // Состояние стенда
+    const state = {
+      variant: 1, // 1, 2, 3
+      currentStep: 1, // 0..3
+      isFullMode: false,
+      isMobile: false,
+      theme: 'dark'
+    };
+
+    // DOM-элементы
+    const viewportSandbox = document.getElementById('viewportSandbox');
+    const noteContentArea = document.getElementById('noteContentArea');
+    const variantCtaContainer = document.getElementById('variantCtaContainer');
+    const stepCounterChip = document.getElementById('stepCounterChip');
+    const beadsContainer = document.getElementById('beadsContainer');
+    const thermoFill = document.getElementById('thermoFill');
+    const thermoGlow = document.getElementById('thermoGlow');
+    const toastFeedback = document.getElementById('toastFeedback');
+    const toastMsg = document.getElementById('toastMsg');
+
+    // Функция обновления термо-шкалы накала
+    function updateThermo() {
+      const total = NOTE_STEPS.length;
+      const pct = state.isFullMode ? 100 : Math.round(((state.currentStep + 1) / total) * 100);
+      
+      let bg = 'linear-gradient(90deg, #be123c 0%, #fb923c 50%, #fef08a 100%)';
+      let glow = '0 0 12px rgba(251, 146, 60, 0.7)';
+      if (pct >= 100) {
+        bg = 'linear-gradient(90deg, #f59e0b 0%, #fef08a 35%, #ffffff 80%, #ffffff 100%)';
+        glow = '0 0 16px #ffffff, 0 0 28px rgba(254, 240, 138, 0.9)';
+      }
+      thermoFill.style.width = pct + '%';
+      thermoFill.style.background = bg;
+      thermoGlow.style.width = pct + '%';
+      thermoGlow.style.background = bg;
+      thermoGlow.style.boxShadow = glow;
+    }
+
+    // Отрисовка бусин
+    function renderBeads() {
+      const chain = beadsContainer.querySelector('.srs-beads-chain');
+      chain.innerHTML = NOTE_STEPS.map((step, idx) => {
+        let cls = 'future';
+        if (idx < state.currentStep) cls = 'completed';
+        if (idx === state.currentStep) cls = 'active';
+        return `<div class="srs-bead ${cls}" data-step="${idx}" title="Шаг ${idx + 1}: ${step.title}"></div>`;
+      }).join('');
+
+      chain.querySelectorAll('.srs-bead').forEach(el => {
+        el.addEventListener('click', () => {
+          state.currentStep = parseInt(el.getAttribute('data-step'), 10);
+          state.isFullMode = false;
+          renderAll();
+        });
+      });
+    }
+
+    // Отрисовка контента карточки
+    function renderContent() {
+      if (state.isFullMode) {
+        stepCounterChip.textContent = 'Полный обзор конспекта';
+        noteContentArea.innerHTML = NOTE_STEPS.map((s, idx) => `
+          <div class="full-read-chunk">
+            <div style="font-size:0.75rem;font-weight:700;color:var(--emerald);text-transform:uppercase;margin-bottom:4px;letter-spacing:0.04em;">Подтема ${idx + 1} из ${NOTE_STEPS.length}</div>
+            ${s.html}
+          </div>
+        `).join('');
+      } else {
+        stepCounterChip.textContent = `Шаг ${state.currentStep + 1} из ${NOTE_STEPS.length}`;
+        noteContentArea.innerHTML = NOTE_STEPS[state.currentStep].html;
+      }
+    }
+
+    // Отрисовка нижней панели действий (Footer CTA)
+    function renderFooterCTA() {
+      const isLast = (state.currentStep >= NOTE_STEPS.length - 1) || state.isFullMode;
+      const canGoBack = state.currentStep > 0 && !state.isFullMode;
+
+      if (state.variant === 1) {
+        // ВАРИАНТ 1: Zen Single CTA
+        if (!isLast) {
+          variantCtaContainer.innerHTML = `
+            <div class="v1-actions-row">
+              ${canGoBack ? `<button type="button" class="btn-step-prev" id="btnPrevAction">↶ Назад</button>` : ''}
+              <button type="button" class="btn-step-next" id="btnNextAction">
+                <span>Следующая подтема →</span>
+                <span class="key-badge">Space</span>
+              </button>
+            </div>
+          `;
+        } else {
+          variantCtaContainer.innerHTML = `
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;">
+              <span style="font-size:0.80rem;font-weight:700;color:var(--emerald);letter-spacing:0.04em;text-transform:uppercase;">✦ Все 4 подтемы изучены!</span>
+              <span style="font-size:0.76rem;color:var(--ink-muted);">Оцените память по Эббингаузу:</span>
+            </div>
+            <div class="rating-buttons-grid">
+              <button type="button" class="rate-btn rate-btn-again" onclick="rateInterval('Снова (+1 день)', 1)">
+                <span class="rate-label"><span>🔴</span> <span>Снова</span></span>
+                <span class="rate-sub">+1 день · [1]</span>
+              </button>
+              <button type="button" class="rate-btn rate-btn-good" onclick="rateInterval('Хорошо (+3 дня)', 3)">
+                <span class="rate-label"><span>🟢</span> <span>Хорошо</span></span>
+                <span class="rate-sub">+3 дня · [2]</span>
+              </button>
+              <button type="button" class="rate-btn rate-btn-easy" onclick="rateInterval('На автомате (+7 дней)', 7)">
+                <span class="rate-label"><span>⚡</span> <span>На автомате</span></span>
+                <span class="rate-sub">+7 дней · [3]</span>
+              </button>
+            </div>
+          `;
+        }
+      } else if (state.variant === 2) {
+        // ВАРИАНТ 2: Quick-Rate Strip
+        variantCtaContainer.innerHTML = `
+          <div class="v1-actions-row">
+            ${canGoBack ? `<button type="button" class="btn-step-prev" id="btnPrevAction">↶ Назад</button>` : ''}
+            <button type="button" class="btn-step-next" id="btnNextAction">
+              <span>${isLast ? 'Завершить чтение ✦' : 'Следующая подтема →'}</span>
+              <span class="key-badge">Space</span>
+            </button>
+          </div>
+          <div class="v2-quick-strip">
+            <span>Уже знаете тему наизусть? Зафиксировать:</span>
+            <div class="quick-rate-pills">
+              <button type="button" class="quick-pill again" onclick="rateInterval('Снова (+1 день)', 1)">Снова 1д</button>
+              <button type="button" class="quick-pill good" onclick="rateInterval('Хорошо (+3 дня)', 3)">Хорошо 3д</button>
+              <button type="button" class="quick-pill easy" onclick="rateInterval('На автомате (+7 дней)', 7)">Легко 7д</button>
+            </div>
+          </div>
+        `;
+      } else if (state.variant === 3) {
+        // ВАРИАНТ 3: Triumph Summary
+        if (!isLast) {
+          variantCtaContainer.innerHTML = `
+            <div class="v1-actions-row">
+              ${canGoBack ? `<button type="button" class="btn-step-prev" id="btnPrevAction">↶ Назад</button>` : ''}
+              <button type="button" class="btn-step-next" id="btnNextAction">
+                <span>Следующая подтема →</span>
+                <span class="key-badge">Space</span>
+              </button>
+            </div>
+          `;
+        } else {
+          variantCtaContainer.innerHTML = `
+            <div class="v3-summary-card">
+              <div class="v3-summary-head">
+                <span>🏆 Ключевые выводы конспекта</span>
+                <span style="font-family:var(--font-m);font-size:0.70rem;color:var(--emerald);">100% MASTERY</span>
+              </div>
+              <div class="v3-bullet-item"><span>✦</span><span><strong>List:</strong> динамический массив, быстрый доступ $O(1)$, но медленная вставка $O(n)$.</span></div>
+              <div class="v3-bullet-item"><span>✦</span><span><strong>Dict & Set:</strong> хэш-таблица, мгновенный доступ и проверка вхождения $O(1)$.</span></div>
+              <div class="v3-bullet-item"><span>✦</span><span>Ключи обязаны быть <code>hashable</code> (неизменяемыми).</span></div>
+            </div>
+            <div class="rating-buttons-grid" style="margin-top:6px;">
+              <button type="button" class="rate-btn rate-btn-again" onclick="rateInterval('Снова (+1 день)', 1)">
+                <span class="rate-label"><span>🔴</span> <span>Снова</span></span>
+                <span class="rate-sub">+1 день · [1]</span>
+              </button>
+              <button type="button" class="rate-btn rate-btn-good" onclick="rateInterval('Хорошо (+3 дня)', 3)">
+                <span class="rate-label"><span>🟢</span> <span>Хорошо</span></span>
+                <span class="rate-sub">+3 дня · [2]</span>
+              </button>
+              <button type="button" class="rate-btn rate-btn-easy" onclick="rateInterval('На автомате (+7 дней)', 7)">
+                <span class="rate-label"><span>⚡</span> <span>На автомате</span></span>
+                <span class="rate-sub">+7 дней · [3]</span>
+              </button>
+            </div>
+          `;
+        }
+      }
+
+      // Навешиваем обработчики на динамические кнопки
+      const btnNext = document.getElementById('btnNextAction');
+      if (btnNext) {
+        btnNext.addEventListener('click', () => {
+          if (state.currentStep < NOTE_STEPS.length - 1) {
+            state.currentStep++;
+            renderAll();
+          } else {
+            showToast('Конспект полностью прочитан! Оцените запоминание.');
+          }
+        });
+      }
+
+      const btnPrev = document.getElementById('btnPrevAction');
+      if (btnPrev) {
+        btnPrev.addEventListener('click', () => {
+          if (state.currentStep > 0) {
+            state.currentStep--;
+            renderAll();
+          }
+        });
+      }
+    }
+
+    // Общая перерисовка
+    function renderAll() {
+      updateThermo();
+      renderBeads();
+      renderContent();
+      renderFooterCTA();
+    }
+
+    // Тост обратной связи
+    function showToast(msg) {
+      toastMsg.textContent = msg;
+      toastFeedback.classList.add('show');
+      setTimeout(() => {
+        toastFeedback.classList.remove('show');
+      }, 2600);
+    }
+    window.showToast = showToast;
+
+    function rateInterval(label, days) {
+      showToast(`Интервал обновлён: ${label} (след. повторение через ${days} дн.)`);
+    }
+    window.rateInterval = rateInterval;
+
+    // Переключение вариантов (Вариант 1, 2, 3)
+    document.querySelectorAll('.v-segment-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.v-segment-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.variant = parseInt(btn.getAttribute('data-variant'), 10);
+        renderFooterCTA();
+      });
+    });
+
+    // Тумблер темы (Dark / Light)
+    const btnThemeToggle = document.getElementById('btnThemeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const themeLabel = document.getElementById('themeLabel');
+    btnThemeToggle.addEventListener('click', () => {
+      if (state.theme === 'dark') {
+        state.theme = 'light';
+        document.documentElement.setAttribute('data-theme', 'light');
+        themeIcon.textContent = '☀️';
+        themeLabel.textContent = 'Светлая тема';
+      } else {
+        state.theme = 'dark';
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeIcon.textContent = '🌙';
+        themeLabel.textContent = 'Тёмная тема';
+      }
+    });
+
+    // Тумблер вьюпорта (Desktop / Mobile)
+    const btnViewportToggle = document.getElementById('btnViewportToggle');
+    const viewportIcon = document.getElementById('viewportIcon');
+    const viewportLabel = document.getElementById('viewportLabel');
+    btnViewportToggle.addEventListener('click', () => {
+      state.isMobile = !state.isMobile;
+      if (state.isMobile) {
+        viewportSandbox.classList.add('mobile-mode');
+        btnViewportToggle.classList.add('active');
+        viewportIcon.textContent = '💻';
+        viewportLabel.textContent = 'Десктопный вид (780px)';
+      } else {
+        viewportSandbox.classList.remove('mobile-mode');
+        btnViewportToggle.classList.remove('active');
+        viewportIcon.textContent = '📱';
+        viewportLabel.textContent = 'Мобильный вид (iPhone)';
+      }
+    });
+
+    // Тумблер режима чтения (Пошаговый / Полный лонгрид)
+    const btnModeToggle = document.getElementById('btnModeToggle');
+    const modeLabel = document.getElementById('modeLabel');
+    const btnFullToggleTop = document.getElementById('btnFullToggleTop');
+
+    function toggleFullMode() {
+      state.isFullMode = !state.isFullMode;
+      if (state.isFullMode) {
+        btnModeToggle.classList.add('active');
+        btnFullToggleTop.classList.add('active');
+        modeLabel.textContent = 'Пошаговый Zen';
+      } else {
+        btnModeToggle.classList.remove('active');
+        btnFullToggleTop.classList.remove('active');
+        modeLabel.textContent = 'Полный свиток';
+      }
+      renderAll();
+    }
+
+    btnModeToggle.addEventListener('click', toggleFullMode);
+    btnFullToggleTop.addEventListener('click', toggleFullMode);
+
+    // Верхняя кнопка "Назад"
+    document.getElementById('btnStepPrevTop').addEventListener('click', () => {
+      if (state.currentStep > 0 && !state.isFullMode) {
+        state.currentStep--;
+        renderAll();
+      }
+    });
+
+    // Горячие клавиши (Space для перехода, 1, 2, 3 для оценок)
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        const btnNext = document.getElementById('btnNextAction');
+        if (btnNext) btnNext.click();
+      } else if (e.key === '1') {
+        rateInterval('Снова (+1 день)', 1);
+      } else if (e.key === '2') {
+        rateInterval('Хорошо (+3 дня)', 3);
+      } else if (e.key === '3') {
+        rateInterval('На автомате (+7 дней)', 7);
+      }
+    });
+
+    // Старт
+    renderAll();
+  </script>
+</body>
+</html>
