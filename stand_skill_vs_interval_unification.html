@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Стенд: Предельный лаконизм (Zero Lexical Clutter)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090e;
+      --paper: #0b0e14;
+      --surface: rgba(18, 24, 38, 0.72);
+      --ink: #f8fafc;
+      --ink-soft: #cbd5e1;
+      --ink-muted: #94a3b8;
+      --emerald: #10b981;
+      --font-d: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --paper: #f1f5f9;
+      --surface: rgba(255, 255, 255, 0.92);
+      --ink: #0f172a;
+      --ink-soft: #334155;
+      --ink-muted: #64748b;
+      --emerald: #059669;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background-color: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-d);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* Верхний пульт стенда (минималистичный) */
+    .stand-hud {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(11, 14, 20, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 8px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .hud-btn {
+      height: 26px;
+      padding: 0 10px;
+      border-radius: 6px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--ink-soft);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: inherit;
+    }
+    .hud-btn.active {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border-color: rgba(52, 211, 153, 0.4);
+    }
+
+    /* ОСНОВНОЙ КОНТЕЙНЕР (ЧИСТЫЙ, БЕЗ МУСОРА) */
+    .cards-hub-container {
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 32px 16px 60px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       1. ПРЕДЕЛЬНО ЧИСТАЯ ШАПКА: 0 МУСОРА, ТОЛЬКО ТЕМА И 4PX ЛИНИЯ
+       ══════════════════════════════════════════════════════════ */
+    .srs-unified-header-bar {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 30px;
+      margin-bottom: 28px;
+      padding: 0 2px;
+      background: transparent !important;
+      border: none !important;
+      box-sizing: border-box;
+    }
+
+    .srs-header-mode-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--ink-soft);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .srs-live-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      display: inline-block;
+      animation: liveDotPulse 2.4s ease-in-out infinite;
+    }
+    @keyframes liveDotPulse {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.25); filter: drop-shadow(0 0 4px #34d399); }
+    }
+
+    .srs-header-close-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--ink-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.80rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .srs-header-close-btn:hover {
+      background: rgba(255, 255, 255, 0.10);
+      color: #ffffff;
+    }
+
+    /* 4px линия эшелона под шапкой (не растянутая, чистая) */
+    .srs-header-progress-track {
+      position: absolute;
+      bottom: -12px;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    [data-theme="light"] .srs-header-progress-track {
+      background: rgba(0, 0, 0, 0.08);
+    }
+    .srs-header-progress-fill-echelon {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #881337 0%, #be123c 35%, #059669 80%, #10b981 100%);
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+      transition: width 0.4s ease;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       2. ЕДИНСТВЕННЫЙ РЯД ПАРЯЩИХ БУСИН (0 ДВОЙНЫХ БУСИН)
+       ══════════════════════════════════════════════════════════ */
+    .srs-deck-beads-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 14px auto 26px;
+      width: 100%;
+    }
+    .srs-beads-necklace {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .dot-jewel {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #0d1016;
+      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-sizing: border-box;
+      flex-shrink: 0;
+    }
+    [data-theme="light"] .dot-jewel {
+      background: #e2e8f0;
+      border-color: rgba(0, 0, 0, 0.25);
+    }
+    .dot-jewel:hover {
+      transform: scale(1.35);
+      border-color: var(--emerald);
+    }
+    .dot-jewel.active {
+      width: 12px;
+      height: 12px;
+      background: #34d399 !important;
+      border-color: #ffffff !important;
+      box-shadow: 0 0 14px rgba(52, 211, 153, 0.8), 0 0 4px #ffffff !important;
+      animation: jewelBeacon 2.4s ease-in-out infinite;
+    }
+    .dot-jewel.done {
+      background: #10b981;
+      border-color: #34d399;
+      opacity: 0.85;
+    }
+
+    @keyframes jewelBeacon {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 3px rgba(52,211,153,0.6)); }
+      50% { transform: scale(1.22); filter: drop-shadow(0 0 10px rgba(52,211,153,0.95)); }
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       3. ПРЕДЕЛЬНО ЧИСТАЯ КАРТОЧКА: 0 ТЕКСТОВОГО МУСОРА
+       ══════════════════════════════════════════════════════════ */
+    .srs-card-stage {
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+      perspective: 1200px;
+      box-sizing: border-box;
+    }
+
+    .fc-card {
+      width: 100%;
+      border-radius: 24px;
+      position: relative;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      -webkit-transform-style: preserve-3d;
+      transition: transform 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+      box-sizing: border-box;
+      min-height: 280px;
+    }
+    .fc-card.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 280px;
+      border-radius: 24px;
+      padding: 28px 32px;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+    }
+
+    /* Лицевая грань: Вопрос (Чистый обсидиановый кристалл) */
+    .fc-card-front {
+      background: linear-gradient(145deg, rgba(22, 29, 45, 0.88) 0%, rgba(13, 17, 28, 0.94) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.22),
+        0 24px 48px -12px rgba(0, 0, 0, 0.65),
+        0 0 32px -8px rgba(16, 185, 129, 0.15);
+      backdrop-filter: blur(28px);
+      z-index: 2;
+      transform: rotateY(0deg);
+    }
+    [data-theme="light"] .fc-card-front {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.96) 0%, rgba(241, 245, 249, 0.92) 100%);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Оборотная грань: Ответ */
+    .fc-card-back {
+      background: linear-gradient(145deg, rgba(16, 32, 28, 0.94) 0%, rgba(10, 20, 18, 0.98) 100%);
+      border: 1.5px solid rgba(52, 211, 153, 0.35);
+      box-shadow: 
+        inset 0 1.5px 0 rgba(52, 211, 153, 0.45),
+        0 24px 48px -12px rgba(0, 0, 0, 0.7),
+        0 0 36px -6px rgba(16, 185, 129, 0.28);
+      backdrop-filter: blur(28px);
+      transform: rotateY(180deg);
+      z-index: 1;
+      justify-content: space-between;
+      align-items: stretch;
+      padding: 24px 28px;
+    }
+    [data-theme="light"] .fc-card-back {
+      background: linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%);
+      border: 1.5px solid rgba(5, 150, 105, 0.35);
+    }
+
+    /* Крупный вопрос (фокус внимания) */
+    .fc-q-clean {
+      font-size: clamp(1.2rem, 2.4vw, 1.45rem);
+      line-height: 1.55;
+      font-weight: 600;
+      color: var(--ink);
+      text-align: center;
+      letter-spacing: -0.01em;
+      margin: auto 0;
+    }
+
+    .fc-back-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .srs-card-otvet-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      padding: 0 10px;
+      height: 24px;
+      line-height: 22px;
+      border-radius: 999px;
+    }
+
+    .fc-flip-back-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--ink-soft);
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      height: 24px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-family: inherit;
+    }
+
+    .fc-q-sub-clean {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #a7f3d0;
+      opacity: 0.85;
+      margin-bottom: 6px;
+    }
+    [data-theme="light"] .fc-q-sub-clean { color: #065f46; }
+
+    .fc-divider-clean {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(52, 211, 153, 0.35), transparent);
+      margin: 8px 0 12px;
+    }
+
+    .fc-a-clean {
+      font-size: 1.08rem;
+      line-height: 1.6;
+      color: #ffffff;
+      font-weight: 500;
+    }
+    [data-theme="light"] .fc-a-clean { color: #0f172a; }
+
+    /* ══════════════════════════════════════════════════════════
+       4. ЛАКОНИЧНЫЙ ДОК ДЕЙСТВИЙ (БЕЗ МУСОРА)
+       ══════════════════════════════════════════════════════════ */
+    .srs-action-dock {
+      margin-top: 18px;
+      max-width: 680px;
+      width: 100%;
+    }
+
+    .btn-cta-dominant {
+      width: 100%;
+      height: 50px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.96rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.92) 0%, rgba(5, 150, 105, 0.96) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+      box-shadow: 0 10px 24px rgba(16, 185, 129, 0.35);
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .btn-cta-dominant:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(16, 185, 129, 0.45);
+    }
+
+    .srs-rating-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      width: 100%;
+    }
+
+    .card-rating-btn {
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.86rem;
+      font-weight: 700;
+      transition: all 0.15s ease;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      color: var(--ink);
+    }
+    .card-rating-btn:hover {
+      transform: translateY(-2px);
+    }
+    .card-rating-btn--again {
+      border-color: rgba(244, 63, 94, 0.35);
+      background: rgba(244, 63, 94, 0.12);
+      color: #fda4af;
+    }
+    .card-rating-btn--hard {
+      border-color: rgba(245, 158, 11, 0.35);
+      background: rgba(245, 158, 11, 0.12);
+      color: #fde68a;
+    }
+    .card-rating-btn--good {
+      border-color: rgba(16, 185, 129, 0.45);
+      background: rgba(16, 185, 129, 0.18);
+      color: #6ee7b7;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+    }
+    .card-rating-btn--easy {
+      border-color: rgba(6, 182, 212, 0.35);
+      background: rgba(6, 182, 212, 0.12);
+      color: #67e8f9;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       5. ЛАКОНИЧНЫЙ КОНСПЕКТ (БЕЗ МУСОРА)
+       ══════════════════════════════════════════════════════════ */
+    .srs-note-card-clean {
+      width: 100%;
+      max-width: 680px;
+      background: linear-gradient(145deg, rgba(22, 29, 45, 0.88) 0%, rgba(13, 17, 28, 0.94) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      padding: 28px 30px;
+      box-shadow: 
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.22),
+        0 24px 48px -12px rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(28px);
+      box-sizing: border-box;
+    }
+    [data-theme="light"] .srs-note-card-clean {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.96) 0%, rgba(241, 245, 249, 0.92) 100%);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .note-clean-title {
+      font-size: 1.30rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.015em;
+      margin-bottom: 16px;
+      line-height: 1.35;
+    }
+    [data-theme="light"] .note-clean-title { color: #0f172a; }
+
+    .feed-chunk {
+      font-size: 0.98rem;
+      line-height: 1.7;
+      color: var(--ink-soft);
+      margin-bottom: 14px;
+    }
+    .feed-chunk code {
+      font-family: var(--font-m);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 2px 6px;
+      border-radius: 6px;
+      color: #6ee7b7;
+      font-size: 0.9em;
+    }
+
+    .note-rate-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      width: 100%;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ВЕРХНИЙ ПУЛЬТ СТЕНДА -->
+  <header class="stand-hud">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-weight:800;color:#34d399;font-size:0.82rem;">⚡ Grill-Me Стенд</span>
+      <span style="color:var(--ink-muted);font-size:0.75rem;">· Предельный лаконизм (Zero Lexical Clutter)</span>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button type="button" class="hud-btn" id="tab-notes-btn" onclick="switchMode('notes')">
+        <span>📖 Конспект</span>
+      </button>
+      <button type="button" class="hud-btn active" id="tab-cards-btn" onclick="switchMode('cards')">
+        <span>🃏 Карточки</span>
+      </button>
+      <button type="button" class="hud-btn" onclick="toggleTheme()" title="Тема">
+        <span id="theme-icon">🌙</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- СЦЕНА В СТИЛЕ ИНТЕРВАЛОК -->
+  <main class="cards-hub-container" id="hub-container">
+    <!-- Генерируется динамически через render() -->
+  </main>
+
+  <script>
+    let mode = 'cards'; // 'cards' | 'notes'
+    let isFlipped = false;
+    let currentCardIdx = 2;   // 0..11
+    let currentNoteStep = 1;  // 0..4
+    let noteChunkIdx = 1;     // 0..2
+    let echelonPct = 64;
+
+    const deckData = {
+      lessonTitle: "Python Core: Базовый синтаксис",
+      totalCards: 12,
+      q: "В чём разница между оператором <code>is</code> и оператором <code>==</code> в Python?",
+      a: "<code>==</code> проверяет равенство значений объектов (вызывает <code>__eq__</code>), а оператор <code>is</code> проверяет идентичность ссылки в памяти CPython (сравнивает <code>id(a) == id(b)</code>)."
+    };
+
+    const noteData = {
+      lessonTitle: "Python Core: Базовый синтаксис",
+      stepTitle: "Кэширование малых целых чисел",
+      totalSteps: 5,
+      chunks: [
+        "В CPython целые числа в диапазоне от <code>-5</code> до <code>256</code> предварительно аллоцируются в глобальном массиве интерпретатора.",
+        "При создании чисел из этого диапазона новые объекты в куче не создаются — Python просто возвращает ссылку на существующий синглтон.",
+        "Поэтому <code>a = 256; b = 256; a is b</code> вернёт <code>True</code>, а для чисел больше 256 результат <code>is</code> зависит от контекста компиляции."
+      ]
+    };
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      document.getElementById('theme-icon').textContent = isDark ? '☀️' : '🌙';
+    }
+
+    function switchMode(m) {
+      mode = m;
+      isFlipped = false;
+      document.getElementById('tab-cards-btn').classList.toggle('active', m === 'cards');
+      document.getElementById('tab-notes-btn').classList.toggle('active', m === 'notes');
+      render();
+    }
+
+    function toggleCardFlip() {
+      isFlipped = !isFlipped;
+      const cardEl = document.getElementById('active-flashcard');
+      if(cardEl) cardEl.classList.toggle('is-flipped', isFlipped);
+      const showBtn = document.getElementById('dock-show-btn');
+      const rateGrid = document.getElementById('dock-rate-grid');
+      if(showBtn && rateGrid) {
+        showBtn.style.display = isFlipped ? 'none' : 'flex';
+        rateGrid.style.display = isFlipped ? 'grid' : 'none';
+      }
+    }
+
+    function nextNoteChunk() {
+      if(noteChunkIdx < noteData.chunks.length - 1) {
+        noteChunkIdx++;
+      } else {
+        switchMode('cards');
+        return;
+      }
+      render();
+    }
+
+    function render() {
+      const container = document.getElementById('hub-container');
+      if(!container) return;
+
+      if(mode === 'cards') {
+        renderCards(container);
+      } else {
+        renderNotes(container);
+      }
+    }
+
+    function renderCards(container) {
+      // 1. ПРЕДЕЛЬНО ЧИСТАЯ ШАПКА: 0 МУСОРА, 0 ЛИШНИХ ЧИПОВ
+      const headerBarHtml = `
+        <header class="srs-unified-header-bar">
+          <span class="srs-header-mode-title">
+            <span class="srs-live-status-dot"></span>
+            <span>${deckData.lessonTitle}</span>
+          </span>
+
+          <a href="#/path" class="srs-header-close-btn" title="Закрыть (На Путь)">✕</a>
+
+          <!-- ТОНКАЯ 4PX ШКАЛА ЭШЕЛОНА НА ДНЕ ШАПКИ -->
+          <div class="srs-header-progress-track" title="Прогресс эшелона: ${echelonPct}%">
+            <div class="srs-header-progress-fill-echelon" style="width:${echelonPct}%;"></div>
+          </div>
+        </header>
+      `;
+
+      // 2. СТРОГО ОДИН РЯД ЧИСТЫХ ПАРЯЩИХ БУСИН
+      const beads = Array.from({length: deckData.totalCards}, (_, i) => {
+        let cls = 'dot-jewel';
+        if(i < currentCardIdx) cls += ' done';
+        else if(i === currentCardIdx) cls += ' active';
+        return `<span class="${cls}" onclick="currentCardIdx=${i};render();"></span>`;
+      }).join('');
+
+      const beadsBarHtml = `
+        <div class="srs-deck-beads-bar">
+          <div class="srs-beads-necklace">
+            ${beads}
+          </div>
+        </div>
+      `;
+
+      // 3. ЧИСТАЯ КАРТОЧКА БЕЗ СЛОВЕСНОГО МУСОРА
+      const cardHtml = `
+        <main class="srs-card-stage">
+          <div class="fc-card ${isFlipped ? 'is-flipped' : ''}" id="active-flashcard" onclick="toggleCardFlip()">
+            
+            <!-- Лицевая грань: ЧИСТЫЙ ВОПРОС -->
+            <div class="card-face fc-card-front">
+              <div class="fc-q-clean">${deckData.q}</div>
+            </div>
+
+            <!-- Оборотная грань: ЧИСТЫЙ ОТВЕТ -->
+            <div class="card-face fc-card-back">
+              <div class="fc-back-top">
+                <span class="srs-card-otvet-chip">✓ Ответ</span>
+                <button type="button" class="fc-flip-back-btn" onclick="event.stopPropagation();toggleCardFlip();">← К вопросу</button>
+              </div>
+
+              <div style="margin:auto 0;width:100%;">
+                <div class="fc-q-sub-clean">${deckData.q}</div>
+                <div class="fc-divider-clean"></div>
+                <div class="fc-a-clean">${deckData.a}</div>
+              </div>
+            </div>
+
+          </div>
+        </main>
+      `;
+
+      // 4. ДОК ДЕЙСТВИЙ
+      const dockHtml = `
+        <footer class="srs-action-dock">
+          <button type="button" class="btn-cta-dominant" id="dock-show-btn" style="${isFlipped ? 'display:none;' : 'display:flex;'}" onclick="toggleCardFlip()">
+            <span>Показать ответ</span>
+          </button>
+
+          <div class="srs-rating-grid" id="dock-rate-grid" style="${isFlipped ? 'display:grid;' : 'display:none;'}">
+            <button type="button" class="card-rating-btn card-rating-btn--again" onclick="onRateCard(1)">Не помню</button>
+            <button type="button" class="card-rating-btn card-rating-btn--hard" onclick="onRateCard(2)">Со скрипом</button>
+            <button type="button" class="card-rating-btn card-rating-btn--good" onclick="onRateCard(3)">Помню</button>
+            <button type="button" class="card-rating-btn card-rating-btn--easy" onclick="onRateCard(4)">На автомате</button>
+          </div>
+        </footer>
+      `;
+
+      container.innerHTML = headerBarHtml + beadsBarHtml + cardHtml + dockHtml;
+    }
+
+    function onRateCard(rate) {
+      if(currentCardIdx + 1 < deckData.totalCards) {
+        currentCardIdx++;
+        isFlipped = false;
+        render();
+      } else {
+        alert('Все карточки завершены! Переходим к следующему шагу урока.');
+        currentCardIdx = 0;
+        isFlipped = false;
+        render();
+      }
+    }
+
+    function renderNotes(container) {
+      // 1. ШАПКА ДЛЯ КОНСПЕКТА (БЕЗ МУСОРА)
+      const headerBarHtml = `
+        <header class="srs-unified-header-bar">
+          <span class="srs-header-mode-title">
+            <span class="srs-live-status-dot"></span>
+            <span>${noteData.lessonTitle}</span>
+          </span>
+
+          <a href="#/path" class="srs-header-close-btn" title="Закрыть (На Путь)">✕</a>
+
+          <!-- ТОНКАЯ 4PX ШКАЛА ЭШЕЛОНА НА ДНЕ ШАПКИ -->
+          <div class="srs-header-progress-track" title="Прогресс эшелона: ${echelonPct}%">
+            <div class="srs-header-progress-fill-echelon" style="width:${echelonPct}%;"></div>
+          </div>
+        </header>
+      `;
+
+      // 2. СТРОГО ОДИН РЯД ПАРЯЩИХ БУСИН
+      const stepDots = Array.from({length: noteData.totalSteps}, (_, i) => {
+        let cls = 'dot-jewel';
+        if(i < currentNoteStep) cls += ' done';
+        else if(i === currentNoteStep) cls += ' active';
+        return `<span class="${cls}" onclick="currentNoteStep=${i};noteChunkIdx=0;render();"></span>`;
+      }).join('');
+
+      const beadsBarHtml = `
+        <div class="srs-deck-beads-bar">
+          <div class="srs-beads-necklace">
+            ${stepDots}
+          </div>
+        </div>
+      `;
+
+      // 3. ЧИСТЫЙ КОНСПЕКТ
+      const visibleChunks = noteData.chunks.slice(0, noteChunkIdx + 1);
+      const hasMoreChunks = (noteChunkIdx + 1 < noteData.chunks.length);
+
+      const noteCardHtml = `
+        <div class="srs-note-card-clean">
+          <h2 class="note-clean-title">${noteData.stepTitle}</h2>
+
+          <div class="note-feed">
+            ${visibleChunks.map(ch => `<div class="feed-chunk">${ch}</div>`).join('')}
+          </div>
+
+          <footer style="margin-top:24px;">
+            ${hasMoreChunks ? `
+              <button type="button" class="btn-cta-dominant" onclick="nextNoteChunk()">
+                <span>Понятно, дальше ➔</span>
+              </button>
+            ` : `
+              <div class="note-rate-row">
+                <button type="button" class="card-rating-btn card-rating-btn--again" onclick="onRateNote(1)">Снова</button>
+                <button type="button" class="card-rating-btn card-rating-btn--good" onclick="onRateNote(2)">Хорошо</button>
+                <button type="button" class="card-rating-btn card-rating-btn--easy" onclick="onRateNote(3)">На автомате</button>
+              </div>
+            `}
+          </footer>
+        </div>
+      `;
+
+      container.innerHTML = headerBarHtml + beadsBarHtml + noteCardHtml;
+    }
+
+    function onRateNote(rate) {
+      if(currentNoteStep + 1 < noteData.totalSteps) {
+        currentNoteStep++;
+        noteChunkIdx = 0;
+        render();
+      } else {
+        alert('Конспект прочитан! Переходим к карточкам.');
+        currentNoteStep = 0;
+        noteChunkIdx = 0;
+        switchMode('cards');
+      }
+    }
+
+    // Клавиатура
+    window.addEventListener('keydown', (e) => {
+      if(e.code === 'Space') {
+        e.preventDefault();
+        if(mode === 'cards') toggleCardFlip();
+        else nextNoteChunk();
+      } else if(e.key === 'Escape' && isFlipped) {
+        e.preventDefault();
+        toggleCardFlip();
+      } else if(['1','2','3','4'].includes(e.key)) {
+        if(mode === 'cards' && isFlipped) onRateCard(parseInt(e.key, 10));
+        else if(mode === 'notes' && noteChunkIdx >= noteData.chunks.length - 1) onRateNote(parseInt(e.key, 10));
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>

@@ -43768,6 +43768,26 @@ function viewPythonSkill(sid){
 
   // Деликатный заголовок: название юнита приглушено (Refined Eyebrow), активная тема и ожерелье точек
 
+  const srsHeaderHTML = `
+    <header class="srs-unified-header-bar" style="position:relative;display:flex;justify-content:space-between;align-items:center;height:30px;min-height:30px;gap:12px;margin-bottom:28px;padding:0 2px;background:transparent !important;border:none !important;box-shadow:none !important;box-sizing:border-box;">
+      <div style="min-width:0;flex-shrink:0;display:flex;align-items:center;height:30px;">
+        <span class="srs-header-mode-title" style="display:inline-flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:700;color:var(--ink-soft);letter-spacing:0.03em;text-transform:uppercase;box-sizing:border-box;">
+          <span class="srs-live-status-dot"></span>
+          <span>${escapeHtmlStr(cleanUnitTitleVal)}</span>
+        </span>
+      </div>
+
+      <div class="srs-header-right-cluster" style="display:flex;align-items:center;gap:6px;height:30px;flex-shrink:0;">
+        <a href="#${tr.routePrefix}" class="srs-header-close-btn" style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;font-size:0.80rem;text-decoration:none;box-sizing:border-box;transition:all 0.15s ease;" title="Закрыть (На Путь)">✕</a>
+      </div>
+
+      <!-- Тонкая 4px бордово-изумрудная линия прогресса эшелона на дне шапки -->
+      <div class="srs-header-progress-track" style="position:absolute;bottom:-12px;left:0;right:0;height:4px;background:rgba(255,255,255,0.07);border:none;border-radius:99px;overflow:hidden;margin:0;padding:0;z-index:2;" title="Прогресс эшелона: ${displayEchPct}%">
+        <div class="srs-header-progress-fill-echelon" style="width:${displayEchPct}%;height:100%;border-radius:99px;background:linear-gradient(90deg, #881337 0%, #be123c 35%, #059669 80%, #10b981 100%);box-shadow:0 0 8px rgba(16,185,129,0.5);transition:width 0.4s ease;"></div>
+      </div>
+    </header>
+  `;
+
   const eyebrowDotsHTML = `
 
     <div class="topic-eyebrow-track" style="max-width:100%;margin:16px 0 22px;padding:0 2px;">
@@ -43804,95 +43824,51 @@ function viewPythonSkill(sid){
     ).join('') + `</div>`;
 
     const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
-    const canGoBack = (curChunkIdx > 0 || stepIdx > 0);
 
     let primaryActionHTML = '';
     if(hasMoreChunks){
       primaryActionHTML = `
-        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" style="height:52px;border-radius:16px;font-size:0.94rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:1;max-width:440px;width:100%;" data-chunk-more="py">
-          <span>Понятно, дальше (+5°C)</span> <span>➔</span>
+        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" style="height:50px;border-radius:14px;font-size:0.96rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:1;max-width:440px;width:100%;" data-chunk-more="py">
+          <span>Понятно, дальше ➔</span>
         </button>`;
     } else if(stepIdx + 1 < steps.length){
-      const activeK = pySkillViewState.kId || 'unknown';
-      const stepKey = `${activeK}:${stepIdx+1}`;
-      const stepAlreadyDone = isRead || (state.completedNoteSteps && state.completedNoteSteps[stepKey]);
       primaryActionHTML = `
-        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" style="height:52px;border-radius:16px;font-size:0.94rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:1;max-width:440px;width:100%;" data-py-next-step="${stepIdx+1}">
-          <span>К следующей подтеме${stepAlreadyDone ? '' : ' (+5°C)'}</span> <span>➔</span>
+        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" style="height:50px;border-radius:14px;font-size:0.96rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:1;max-width:440px;width:100%;" data-py-next-step="${stepIdx+1}">
+          <span>Следующая подтема ➔</span>
         </button>`;
     } else {
       primaryActionHTML = `
-        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" style="height:52px;border-radius:16px;font-size:0.94rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:1;max-width:440px;width:100%;" data-py-finish-note="${activeK}">
-          <span>Закрепить в карточках (+10°C)</span> <span>➔</span>
+        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" style="height:50px;border-radius:14px;font-size:0.96rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:1;max-width:440px;width:100%;" data-py-finish-note="${activeK}">
+          <span>Закрепить в карточках ➔</span>
         </button>`;
     }
-
-    const noteSrsInfo = (typeof getNoteSrsInfo === 'function') ? getNoteSrsInfo(activeK) : null;
-    const noteLadderHTML = (typeof NOTE_SRS_SCHEDULE !== 'undefined' && noteSrsInfo)
-      ? NOTE_SRS_SCHEDULE.map((days, idx) => {
-          let cls = 'm-bead';
-          let title = `Ступень ${idx + 1}: интервал ${days} дн`;
-          if(idx < noteSrsInfo.step) cls += ' done';
-          else if(idx === noteSrsInfo.step) cls += noteSrsInfo.isDue ? ' current active-due' : ' current';
-          return `<span class="${cls}" title="${title}">${days}д</span>`;
-        }).join('<span class="m-bead-sep" style="color:rgba(251,191,36,0.35);font-size:0.65rem;margin:0 1px;">—</span>')
-      : '';
 
     const cleanNoteTitle = (noteObj && noteObj.title ? noteObj.title : activeK).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
 
     bodyHTML = `
-      <!-- Уровень 2: Чистые центрированные парящие бусины шагов конспекта (как в тренажёре конспектов) -->
-      <div class="srs-deck-beads-bar srs-beads-pure-floating" style="display:flex;align-items:center;justify-content:center;margin:12px auto 22px;padding:0;background:transparent;border:none;box-shadow:none;width:100%;">
+      <!-- Уровень 2: Единственный ряд чистых парящих бусин шагов конспекта (Zero Lexical Clutter) -->
+      <div class="srs-deck-beads-bar srs-beads-pure-floating" style="display:flex;align-items:center;justify-content:center;margin:14px auto 26px;padding:0;background:transparent;border:none;box-shadow:none;width:100%;">
         <div class="srs-beads-necklace fc-beads-necklace" style="display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto;padding:2px 0;background:transparent;border:none;box-shadow:none;">
           ${steps.map((st, idx) => {
             let cls = 'dot-jewel';
-            if(idx < stepIdx) cls += ' done bead-done rating-easy';
+            if(idx < stepIdx) cls += ' done bead-done';
             else if(idx === stepIdx) cls += ' active bead-active-leading';
             else cls += ' future bead-future';
-            const stTitle = (st.title || ('Шаг ' + (idx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-            return `<span class="${cls}" data-py-jump-step="${idx}" role="button" tabindex="0" title="${escapeHtmlStr(stTitle)}"></span>`;
+            return `<span class="${cls}" data-py-jump-step="${idx}" role="button" tabindex="0"></span>`;
           }).join('')}
         </div>
       </div>
 
-      <!-- Уровень 3: Карточка конспекта в стиле Liquid Obsidian & Mastery Glass -->
-      <main class="srs-card-stage" style="margin-top:0;perspective:none;margin-bottom:0;width:100%;max-width:760px;margin-left:auto;margin-right:auto;">
-        <div class="card srs-note-card">
-          <!-- Верхняя строка карточки -->
-          <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:0;border-bottom:none;flex-wrap:wrap;">
-            <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex-shrink:0;">
-              <span class="srs-card-topic-chip" title="${escapeHtmlStr(cleanNoteTitle)}">
-                ${escapeHtmlStr((cleanNoteTitle.split(/[:·•\-]/)[0] || cleanNoteTitle).trim())}
-              </span>
-              <span style="font-size:0.75rem;color:var(--ink-muted);font-weight:600;">Шаг ${stepIdx + 1} из ${steps.length}</span>
-              ${typeof getNoteSrsBadgeHTML === 'function' ? getNoteSrsBadgeHTML(activeK) : ''}
-            </div>
-
-            <div class="srs-top-right-group" style="display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap;">
-              ${noteLadderHTML ? `
-                <div class="note-memory-chain" style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:8px;background:rgba(245,158,11,0.06);border:1px solid rgba(251,191,36,0.22);" title="График повторений Эббингауза: 1д ➔ 3д ➔ 7д ➔ 21д ➔ 30д">
-                  ${noteLadderHTML}
-                </div>
-              ` : ''}
-
-              <div style="display:inline-flex;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.10);">
-                ${canGoBack ? `
-                  <button type="button" class="btn btn-ghost fc-hint-chip" data-chunk-prev="py" title="Шаг назад (↶)" style="background:transparent;border:none;color:#cbd5e1;padding:5px 10px;font-size:0.85rem;cursor:pointer;line-height:1;display:inline-flex;align-items:center;">↶</button>
-                ` : ''}
-              </div>
-            </div>
-          </div>
-
-          <!-- Заголовок подтемы -->
-          <h2 style="font-size:1.35rem;font-weight:800;color:#ffffff;letter-spacing:-0.015em;margin:0 0 16px;line-height:1.35;text-align:left;">
+      <!-- Уровень 3: Лаконичный конспект без визуального мусора -->
+      <main class="srs-card-stage" style="margin-top:0;perspective:none;margin-bottom:0;width:100%;max-width:680px;margin-left:auto;margin-right:auto;">
+        <div class="card srs-note-card srs-note-card-clean" style="border-radius:24px;padding:28px 30px;">
+          <h2 style="font-size:1.30rem;font-weight:800;color:#ffffff;letter-spacing:-0.015em;margin:0 0 16px;line-height:1.35;text-align:left;">
             ${escapeHtmlStr(cleanStepTitle || cleanNoteTitle)}
           </h2>
 
-          <!-- Текст конспекта по квантам -->
           ${feedHTML}
 
-          <!-- Доминантное действие снизу -->
-          <div style="margin-top:20px;display:flex;justify-content:center;width:100%;">
+          <div style="margin-top:24px;display:flex;justify-content:center;width:100%;">
             ${primaryActionHTML}
           </div>
         </div>
@@ -43901,7 +43877,7 @@ function viewPythonSkill(sid){
     const deckObj = ALL_DECKS_COMBINED[activeF] || {id: activeF, title: activeF, cards: []};
     const cards = deckObj.cards || [];
 
-    // Инициализация внутрисессионной очереди повторения (Intra-Session Loop)
+    // Инициализация внутрисессионной очереди повторения
     if(pySkillViewState.sessionFid !== activeF || !Array.isArray(pySkillViewState.sessionQueue) || pySkillViewState.sessionQueueOriginalLen !== cards.length){
       const saved = (state.readingPositions && state.readingPositions[sk.id]) || {};
       const savedDeckInfo = (saved.deckPositions && saved.deckPositions[activeF]) || {};
@@ -43935,12 +43911,12 @@ function viewPythonSkill(sid){
     if(pySkillViewState.sessionDone || cards.length === 0){
       const curFidx = (sk.fIds || []).indexOf(activeF);
       const hasNextDeck = (curFidx >= 0 && curFidx + 1 < (sk.fIds || []).length);
-      let nextActionBtnText = 'Перейти к практике в IDE (+15°C)';
+      let nextActionBtnText = 'Перейти к практике в IDE ➔';
       if(hasNextDeck){
         const nextFid = sk.fIds[curFidx + 1];
         const nextDeckObj = ALL_DECKS_COMBINED[nextFid] || {};
         const cleanNextDeckTitle = (nextDeckObj.title || nextFid).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
-        nextActionBtnText = `К следующей колоде: «${cleanNextDeckTitle}» (+10°C)`;
+        nextActionBtnText = `К следующей колоде: «${cleanNextDeckTitle}» ➔`;
       } else {
         const curKidx = (sk.kIds || []).indexOf(pySkillViewState.kId);
         const topicIdx = (curFidx >= 0 && (sk.kIds || []).length === (sk.fIds || []).length) ? curFidx : Math.max(0, curKidx);
@@ -43949,145 +43925,83 @@ function viewPythonSkill(sid){
           const nextKid = sk.kIds[topicIdx + 1];
           const nextNoteObj = ALL_NOTES_COMBINED[nextKid] || {};
           const cleanNextNoteTitle = (nextNoteObj.title || nextKid).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-          nextActionBtnText = `К следующей теме: «${cleanNextNoteTitle}» (+10°C)`;
+          nextActionBtnText = `К следующей теме: «${cleanNextNoteTitle}» ➔`;
         }
       }
 
       bodyHTML = `
-        <div class="card srs-empty-glow-card srs-zen-rest-screen" style="margin-top:0;padding:36px 24px;text-align:center;border:1px solid rgba(255,255,255,0.14);border-radius:28px;background:linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(15,23,42,0.85) 50%, rgba(255,255,255,0.02) 100%);box-shadow:inset 0 1.5px 0 rgba(255,255,255,0.22),0 24px 64px -12px rgba(0,0,0,0.7),0 0 40px -10px rgba(16,185,129,0.25);backdrop-filter:blur(36px);position:relative;overflow:hidden;">
-          <div style="width:64px;height:64px;margin:0 auto 16px;border-radius:50%;background:rgba(16,185,129,0.18);color:#10b981;display:flex;align-items:center;justify-content:center;font-size:30px;border:1.5px solid rgba(16,185,129,0.45);box-shadow:0 0 20px rgba(16,185,129,0.25);">✓</div>
-          <div style="display:inline-block;padding:4px 12px;border-radius:999px;background:rgba(16,185,129,0.15);color:#34d399;font-size:0.75rem;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.06em;">Первичное усвоение завершено</div>
-          <h2 style="font-size:1.45rem;font-weight:800;color:var(--ink);margin:0 0 10px;">${cards.length} понятий успешно закреплены!</h2>
-          <p style="font-size:0.92rem;color:var(--ink-muted);max-width:520px;margin:0 auto 24px;line-height:1.6;">
-            Все карточки темы усвоены и перенесены в ваш постоянный тренажёр повторений в разделе <strong style="color:#10b981;">«Тренажёры → Карточки»</strong>.
-          </p>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:440px;margin:0 auto 28px;text-align:left;">
-            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px 16px;">
-              <div style="font-size:0.75rem;color:var(--ink-muted);">Усвоено в теме</div>
-              <div style="font-size:1.15rem;font-weight:700;color:#10b981;">${cards.length} из ${cards.length}</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px 16px;">
-              <div style="font-size:0.75rem;color:var(--ink-muted);">Повторено в сессии</div>
-              <div style="font-size:1.15rem;font-weight:700;color:var(--amber);">${pySkillViewState.sessionRepeats || 0} раз</div>
-            </div>
-          </div>
-          <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" style="width:100%;max-width:440px;padding:16px 24px;font-size:1rem;font-weight:800;border-radius:16px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:8px;" data-py-finish-cards-btn>
-            <span>${escapeHtmlStr(nextActionBtnText)}</span> <span>➔</span>
-          </button>
-          <div style="margin-top:12px;">
-            <button type="button" class="btn btn-ghost" data-py-restart-deck style="font-size:0.82rem;padding:6px 14px;border-radius:10px;color:var(--ink-muted);" title="Сбросить сессию и заново пройти карточки этой темы">🔄 Пройти карточки заново</button>
+        <div class="card srs-empty-glow-card srs-zen-rest-screen" style="margin-top:0;padding:36px 24px;text-align:center;border:1px solid rgba(255,255,255,0.14);border-radius:28px;background:linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(15,23,42,0.85) 50%, rgba(255,255,255,0.02) 100%);box-shadow:inset 0 1.5px 0 rgba(255,255,255,0.22),0 24px 64px -12px rgba(0,0,0,0.7),0 0 40px -10px rgba(16,185,129,0.25);backdrop-filter:blur(36px);position:relative;overflow:hidden;max-width:680px;margin-left:auto;margin-right:auto;">
+          <div style="width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:rgba(16,185,129,0.18);color:#10b981;display:flex;align-items:center;justify-content:center;font-size:26px;border:1.5px solid rgba(16,185,129,0.45);box-shadow:0 0 20px rgba(16,185,129,0.25);">✓</div>
+          <h2 style="font-size:1.35rem;font-weight:800;color:var(--ink);margin:0 0 6px;">Колода освоена</h2>
+          <p style="font-size:0.90rem;color:var(--ink-muted);line-height:1.5;margin:0 auto 20px;max-width:440px;">Все карточки темы изучены. Материал перенесён в график интервальных повторений.</p>
+          <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+            <button type="button" class="btn btn-primary btn-cta-dominant btn-glass-emerald btn-sprint-cta" data-py-next-deck style="height:50px;border-radius:14px;font-size:0.96rem;font-weight:700;max-width:380px;width:100%;">
+              <span>${escapeHtmlStr(nextActionBtnText)}</span>
+            </button>
           </div>
         </div>`;
     } else {
-      const qPos = Math.min(pySkillViewState.sessionPos || 0, pySkillViewState.sessionQueue.length - 1);
-      const cIdx = pySkillViewState.sessionQueue[qPos] !== undefined ? pySkillViewState.sessionQueue[qPos] : 0;
-      const curCard = cards[cIdx] || {q: 'Карточки загружаются', a: ''};
-      const curCardKey = activeF + ':' + cIdx;
-      const srsPrev = typeof computeRemNoteIntervals === 'function' ? computeRemNoteIntervals(curCardKey) : {again:{days:1},hard:{days:2},good:{days:3},easy:{days:7}};
-      const isRepeatPhase = qPos >= cards.length;
-      const cardCounterLabel = isRepeatPhase
-        ? `Повтор: ${qPos - cards.length + 1} из ${pySkillViewState.sessionQueue.length - cards.length}`
-        : `Карточка ${qPos + 1} из ${cards.length}`;
-
-      const showActiveRescue = !pySkillViewState.cardFlipped && (
-        pySkillViewState.rescueCardKey === curCardKey ||
-        (window.__rescuePrimedCards && window.__rescuePrimedCards[curCardKey])
-      );
-      const rescueHTML = (showActiveRescue && typeof buildActiveRescueScaffoldHTML === 'function')
-        ? buildActiveRescueScaffoldHTML(curCard.a, curCard.q, curCardKey)
-        : '';
-
-      const cleanDeckTitle = (deckObj.title || activeF).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
+      const qPos = Math.max(0, Math.min(pySkillViewState.sessionPos, cards.length - 1));
+      const curCardRealIdx = pySkillViewState.sessionQueue[qPos];
+      const curCard = cards[curCardRealIdx] || {q: 'Карточка не найдена', a: ''};
 
       bodyHTML = `
-        <!-- Уровень 2: Чистые центрированные парящие бусины карточек (как в тренажёре карточек) -->
-        <div class="srs-deck-beads-bar srs-beads-pure-floating" style="display:flex;align-items:center;justify-content:center;margin:12px auto 22px;padding:0;background:transparent;border:none;box-shadow:none;width:100%;">
+        <!-- Уровень 2: Единственный ряд чистых парящих бусин карточек (0 лексического шума) -->
+        <div class="srs-deck-beads-bar srs-beads-pure-floating" style="display:flex;align-items:center;justify-content:center;margin:14px auto 26px;padding:0;background:transparent;border:none;box-shadow:none;width:100%;">
           <div class="srs-beads-necklace fc-beads-necklace" style="display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto;padding:2px 0;background:transparent;border:none;box-shadow:none;">
             ${cards.map((_, idx) => {
               let cls = 'dot-jewel';
-              if(idx < qPos) cls += ' done bead-done rating-easy';
+              if(idx < qPos) cls += ' done bead-done';
               else if(idx === qPos) cls += ' active bead-active-leading';
               else cls += ' future bead-future';
-              return `<span class="${cls}" title="Карточка ${idx + 1} из ${cards.length}"></span>`;
+              return `<span class="${cls}" data-py-jump-card="${idx}" role="button" tabindex="0"></span>`;
             }).join('')}
           </div>
         </div>
 
-        <!-- Уровень 3: Каноническая 3D Карточка (Лицо: Liquid Obsidian Glass / Оборот: Mastery Emerald) -->
-        <main class="srs-card-stage fc-stage" style="width:100%;max-width:700px;margin:0 auto;padding:0;perspective:1200px;box-sizing:border-box;">
-          <div class="fc-card demo-card ${pySkillViewState.cardFlipped ? 'is-flipped fc-card--flipped' : ''}" id="srs-active-card" data-flipped="${pySkillViewState.cardFlipped ? 'true' : 'false'}" data-py-flip-card style="width:100%;max-width:700px;box-sizing:border-box;cursor:pointer;">
+        <!-- Уровень 3: Каноническая 3D Карточка (Лицо: Чистый вопрос / Оборот: Чистый ответ) -->
+        <main class="srs-card-stage fc-stage" style="width:100%;max-width:680px;margin:0 auto;padding:0;perspective:1200px;box-sizing:border-box;">
+          <div class="fc-card demo-card ${pySkillViewState.cardFlipped ? 'is-flipped fc-card--flipped' : ''}" id="srs-active-card" data-flipped="${pySkillViewState.cardFlipped ? 'true' : 'false'}" data-py-flip-card style="width:100%;max-width:680px;box-sizing:border-box;cursor:pointer;">
             
-            <!-- Лицевая грань: Вопрос -->
-            <div class="card-face card-front fc-card-front">
-              <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-                <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
-                  <span class="srs-card-topic-chip" title="${escapeHtmlStr(cleanDeckTitle)}">${escapeHtmlStr(cleanDeckTitle)}</span>
-                  <span style="color:var(--ink-muted);font-size:0.75rem;font-weight:600;">${cardCounterLabel}</span>
-                  ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
-                </div>
-                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                  <button type="button" class="btn btn-ghost fc-hint-chip" data-py-rescue-card="${curCardKey}" title="Шпаргалка / Мнемоническая зацепка (H)">💡</button>
-                </div>
-              </div>
-
-              <div class="fc-card-body fc-q" style="margin:0;padding:14px 0 16px;font-size:clamp(1.15rem, 2.1vw, 1.35rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
+            <!-- Лицевая грань: Вопрос (Чистый обсидиановый кристалл, 0 лексического шума) -->
+            <div class="card-face card-front fc-card-front" style="min-height:280px;padding:28px 32px;display:flex;flex-direction:column;justify-content:center;align-items:center;box-sizing:border-box;">
+              <div class="fc-card-body fc-q fc-q-clean" style="margin:auto 0;padding:0;font-size:clamp(1.2rem, 2.4vw, 1.45rem);line-height:1.55;font-weight:600;color:var(--ink);text-align:center;letter-spacing:-0.01em;">
                 ${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(curCard.q) : curCard.q}
               </div>
             </div>
 
-            <!-- Оборотная грань: Ответ -->
-            <div class="card-face card-back fc-card-back">
-              <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-                <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
-                  <span class="srs-card-otvet-chip" style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.20);border:1px solid rgba(16,185,129,0.50);padding:0 10px;height:25px;min-height:25px;line-height:23px;border-radius:999px;box-shadow:0 0 12px rgba(16,185,129,0.28);white-space:nowrap;flex-shrink:0;box-sizing:border-box;">✓ Ответ</span>
-                  ${typeof getRemNoteCardStatusBadgeHTML === 'function' ? getRemNoteCardStatusBadgeHTML(curCardKey) : ''}
-                </div>
-                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-                  <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-py-flip-card style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;">← К вопросу <span class="hide-on-mobile"><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
-                </div>
+            <!-- Оборотная грань: Ответ (Чистый ответ) -->
+            <div class="card-face card-back fc-card-back" style="min-height:280px;padding:24px 28px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;">
+              <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+                <span class="srs-card-otvet-chip" style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.45);padding:0 10px;height:25px;line-height:23px;border-radius:999px;white-space:nowrap;">✓ Ответ</span>
+                <button type="button" class="btn btn-ghost fc-flip-back-btn" data-py-flip-card style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--ink-soft);font-size:0.74rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;height:25px;padding:0 10px;border-radius:999px;">← К вопросу</button>
               </div>
 
               <div class="fc-card-body" style="margin:auto 0;padding:12px 0;width:100%;">
-                <div class="fc-q-sub" style="font-size:0.88rem;font-weight:600;line-height:1.4;color:#a7f3d0;opacity:0.85;margin-bottom:6px;">${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(curCard.q) : curCard.q}</div>
-                <div class="fc-divider" style="height:1px;background:linear-gradient(90deg, transparent, rgba(52,211,153,0.30), transparent);margin:6px 0 10px;"></div>
-                <div class="fc-a-mastery" style="font-size:1.06rem;line-height:1.6;color:#ffffff;font-weight:500;">${typeof formatCardAnswerHTML === 'function' ? formatCardAnswerHTML(curCard.a) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.a) : curCard.a)}</div>
+                <div class="fc-q-sub fc-q-sub-clean" style="font-size:0.88rem;font-weight:600;line-height:1.4;color:#a7f3d0;opacity:0.85;margin-bottom:6px;">${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(curCard.q) : curCard.q}</div>
+                <div class="fc-divider fc-divider-clean" style="height:1px;background:linear-gradient(90deg, transparent, rgba(52,211,153,0.35), transparent);margin:8px 0 12px;"></div>
+                <div class="fc-a-mastery fc-a-clean" style="font-size:1.08rem;line-height:1.6;color:#ffffff;font-weight:500;">${typeof formatCardAnswerHTML === 'function' ? formatCardAnswerHTML(curCard.a) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.a) : curCard.a)}</div>
               </div>
             </div>
 
           </div>
         </main>
 
-        ${rescueHTML}
-
-        <!-- Уровень 4: Док действий (Фаза 1: Доминантная кнопка переворота / Фаза 2: 4-кнопочная сетка оценок) -->
-        <footer class="srs-action-dock" style="margin-top:14px;max-width:700px;margin-left:auto;margin-right:auto;width:100%;">
-          <button type="button" class="btn-cta-dominant btn-glass-emerald btn-style-glass btn-sprint-cta ${pySkillViewState.cardFlipped ? 'srs-hidden' : ''}" data-py-flip-card style="${pySkillViewState.cardFlipped ? 'display:none !important;' : 'display:flex !important;'}">
+        <!-- Уровень 4: Док действий (Фаза 1: Доминантная кнопка переворота / Фаза 2: 4-кнопочная чистая сетка оценок) -->
+        <footer class="srs-action-dock" style="margin-top:18px;max-width:680px;margin-left:auto;margin-right:auto;width:100%;">
+          <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta ${pySkillViewState.cardFlipped ? 'srs-hidden' : ''}" data-py-flip-card style="height:50px;border-radius:14px;font-size:0.96rem;font-weight:700;${pySkillViewState.cardFlipped ? 'display:none !important;' : 'display:flex !important;'}">
             <span>Показать ответ</span>
           </button>
 
-          <div class="srs-rating-grid card-rating-grid ${pySkillViewState.cardFlipped ? '' : 'srs-hidden'}" style="${pySkillViewState.cardFlipped ? 'display:grid !important;' : 'display:none !important;'}">
-            <!-- Кнопка 1: Не помню -->
-            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-py-rate-card="1">
-              <span class="srs-btn-title">Не помню</span>
-            </button>
-
-            <!-- Кнопка 2: Со скрипом -->
-            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--hard fc-rate-btn--hard" data-py-rate-card="2">
-              <span class="srs-btn-title">Со скрипом</span>
-            </button>
-
-            <!-- Кнопка 3: Помню -->
-            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-py-rate-card="3">
-              <span class="srs-btn-title">Помню</span>
-            </button>
-
-            <!-- Кнопка 4: На автомате -->
-            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-py-rate-card="4">
-              <span class="srs-btn-title">На автомате</span>
-            </button>
+          <div class="srs-rating-grid card-rating-grid ${pySkillViewState.cardFlipped ? '' : 'srs-hidden'}" style="grid-template-columns:repeat(4,1fr);gap:10px;${pySkillViewState.cardFlipped ? 'display:grid !important;' : 'display:none !important;'}">
+            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-py-rate-card="1" style="height:48px;border-radius:12px;font-size:0.86rem;font-weight:700;">Не помню</button>
+            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--hard fc-rate-btn--hard" data-py-rate-card="2" style="height:48px;border-radius:12px;font-size:0.86rem;font-weight:700;">Со скрипом</button>
+            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-py-rate-card="3" style="height:48px;border-radius:12px;font-size:0.86rem;font-weight:700;">Помню</button>
+            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-py-rate-card="4" style="height:48px;border-radius:12px;font-size:0.86rem;font-weight:700;">На автомате</button>
           </div>
         </footer>`;
     }
+
   } else if(pySkillViewState.tab === 'code'){
 
     const tObj = IDE_TASKS_BY_ID[activeTid] || {id: activeTid, title: 'Задание ' + (tIds.indexOf(activeTid) + 1), desc: '', initialCode: ''};
@@ -44150,18 +44064,21 @@ function viewPythonSkill(sid){
 
 
 
+  if(pySkillViewState.tab === 'cards' || pySkillViewState.tab === 'theory'){
+    return `
+      <div class="container cards-hub-container" style="max-width:680px;padding:32px 16px 60px;margin:0 auto;">
+        ${srsHeaderHTML}
+        ${bodyHTML}
+        ${celebrationBanner}
+      </div>`;
+  }
+
   return `
-
     <div class="container" style="max-width:880px;">
-
       ${focusTopbarHTML}
-
       ${eyebrowDotsHTML}
-
       ${bodyHTML}
-
       ${celebrationBanner}
-
     </div>`;
 
 }
@@ -61106,6 +61023,19 @@ const psk = e.target.closest('[data-py-select-k]');
 
     return;
 
+  }
+
+  const pjc = e.target.closest('[data-py-jump-card]');
+  if(pjc){
+    const targetIdx = parseInt(pjc.getAttribute('data-py-jump-card'), 10);
+    if(!isNaN(targetIdx)){
+      pySkillViewState.sessionPos = targetIdx;
+      pySkillViewState.cardIdx = targetIdx;
+      pySkillViewState.cardFlipped = false;
+      saveReadingPosition();
+      render();
+      return;
+    }
   }
 
   const pjs = e.target.closest('[data-py-jump-step]');
