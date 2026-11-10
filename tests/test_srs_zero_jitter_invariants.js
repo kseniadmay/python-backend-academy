@@ -70,16 +70,16 @@ console.log('✓ [5/12] [Zero-Jitter] Мобильная геометрия сц
 
 // 6. Инвариант единого оптического свечения всех точек активности (Deep Neon Breath, 0 маяков)
 assert(content.includes('.pulse-dot {\n    width: 7px !important;\n    height: 7px !important;\n    min-width: 7px !important;\n    min-height: 7px !important;\n    max-width: 7px !important;\n    max-height: 7px !important;\n    border-radius: 50% !important;') &&
-       content.includes('background: radial-gradient(circle at 35% 35%, #ecfdf5 0%, #34d399 45%, #10b981 80%, #047857 100%) !important;') &&
-       content.includes('border: 0.8px solid rgba(52, 211, 153, 0.7) !important;'),
+       content.includes('background: radial-gradient(circle at 35% 35%, #ffffff 0%, #a7f3d0 30%, #34d399 65%, #059669 100%) !important;') &&
+       content.includes('border: 0.8px solid #6ee7b7 !important;'),
   '❌ ZERO-JITTER VIOLATION: .pulse-dot в Hero-карточке сайдбара обязан быть унифицирован до 7px, изумрудного 3D-градиента и микроободка #6ee7b7.');
 assert(content.includes('.activity-dot{\n    width:7px !important;\n    height:7px !important;') &&
-       content.includes('background: radial-gradient(circle at 35% 35%, #ecfdf5 0%, #34d399 45%, #10b981 80%, #047857 100%) !important;') &&
-       content.includes('border: 0.8px solid rgba(52, 211, 153, 0.7) !important;'),
+       content.includes('background: radial-gradient(circle at 35% 35%, #ffffff 0%, #a7f3d0 30%, #34d399 65%, #059669 100%) !important;') &&
+       content.includes('border: 0.8px solid #6ee7b7 !important;'),
   '❌ ZERO-JITTER VIOLATION: .activity-dot обязан быть унифицирован до 7px, изумрудного 3D-градиента и микроободка #6ee7b7.');
 assert(content.includes('.srs-live-status-dot {\n    width: 7px !important;\n    height: 7px !important;\n    min-width: 7px !important;\n    min-height: 7px !important;') &&
-       content.includes('background: radial-gradient(circle at 35% 35%, #ecfdf5 0%, #34d399 45%, #10b981 80%, #047857 100%) !important;') &&
-       content.includes('border: 0.8px solid rgba(52, 211, 153, 0.7) !important;'),
+       content.includes('background: radial-gradient(circle at 35% 35%, #ffffff 0%, #a7f3d0 30%, #34d399 65%, #059669 100%) !important;') &&
+       content.includes('border: 0.8px solid #6ee7b7 !important;'),
   '❌ ZERO-JITTER VIOLATION: .srs-live-status-dot обязан быть унифицирован до 7px, изумрудного 3D-градиента и микроободка #6ee7b7.');
 console.log('✓ [6/12] [Zero-Jitter] Полная оптическая идентичность всех точек активности (7px, #34d399, единый ореол) соблюдена.');
 
