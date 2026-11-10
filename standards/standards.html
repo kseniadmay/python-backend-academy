@@ -23518,9 +23518,12 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   }
   .fc-answer-explanation code,
   #srs-card-answer code,
-  .fc-card-back code {
+  .fc-card-back code,
+  .fc-a-mastery code,
+  .fc-answer-text code,
+  .fc-answer-multiline code {
     font-family: var(--font-m, 'JetBrains Mono', monospace) !important;
-    font-size: 0.78rem !important;
+    font-size: 0.80rem !important;
     font-weight: 700 !important;
     color: #34d399 !important;
     background: rgba(16, 185, 129, 0.14) !important;
@@ -23529,7 +23532,9 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     padding: 1px 6px !important;
     display: inline !important;
     vertical-align: baseline !important;
-    white-space: nowrap !important;
+    white-space: normal !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
     margin: 0 2px !important;
   }
   .srs-action-dock {
@@ -23563,11 +23568,19 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
     bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
 
-    border-radius: 20px !important;
+    border-radius: 0 !important;
 
-    border: 1px solid var(--glass-border) !important;
+    border: none !important;
 
-    margin: 0 4px !important;
+    background: transparent !important;
+
+    box-shadow: none !important;
+
+    backdrop-filter: none !important;
+
+    -webkit-backdrop-filter: none !important;
+
+    margin: 0 !important;
 
   }
 
@@ -27931,11 +27944,19 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     .rating-buttons-grid {
       grid-template-columns: 1fr !important;
     }
-    .fc-rate-btn {
+    .note-rate-row .fc-rate-btn {
       flex-direction: row !important;
       justify-content: space-between !important;
       padding: 10px 14px !important;
       min-height: 44px !important;
+    }
+    .card-rating-btn,
+    .card-rating-grid .fc-rate-btn,
+    .srs-rating-grid .fc-rate-btn {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-align: center !important;
     }
   }
 
@@ -29725,32 +29746,43 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   }
 
 
-  /* Стилизация многострочных структурированных ответов карточек SRS */
+  /* Стилизация многострочных структурированных ответов карточек SRS: чистые строки без маркеров, 100% ширины */
   .fc-answer-multiline {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     text-align: left;
-    margin: 4px auto;
+    margin: 4px 0;
     width: 100%;
-    max-width: 540px;
+    max-width: 100%;
   }
   .fc-answer-item {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-    font-size: 0.95rem;
-    line-height: 1.5;
+    display: block;
+    margin: 0;
+    padding: 0;
+    font-size: 0.98rem;
+    line-height: 1.55;
+    text-align: left;
   }
   .fc-answer-bullet {
-    color: #10b981;
-    font-weight: 700;
-    font-size: 1.1rem;
-    flex-shrink: 0;
-    user-select: none;
+    display: none !important;
   }
   .fc-answer-text {
-    flex: 1 1 auto;
+    display: inline;
+    width: 100%;
+  }
+  .card-rating-btn,
+  .card-rating-grid .fc-rate-btn,
+  .srs-rating-grid .fc-rate-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+  .card-rating-btn span,
+  .fc-rate-btn span {
+    text-align: center !important;
+    justify-content: center !important;
   }
   #srs-hint-btn, .fc-hint-chip[data-action="show-hint"], [data-hub-rescue] {
     display: none !important;
@@ -44295,10 +44327,10 @@ function viewPythonSkill(sid){
           </button>
 
           <div class="srs-rating-grid card-rating-grid ${pySkillViewState.cardFlipped ? '' : 'srs-hidden'}" style="grid-template-columns:repeat(4,1fr);gap:10px;${pySkillViewState.cardFlipped ? 'display:grid !important;' : 'display:none !important;'}">
-            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-py-rate-card="1" style="height:48px;border-radius:12px;font-size:0.86rem;font-weight:700;">Не помню</button>
-            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--hard fc-rate-btn--hard" data-py-rate-card="2" style="height:48px;border-radius:12px;font-size:0.86rem;font-weight:700;">Со скрипом</button>
-            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-py-rate-card="3" style="height:48px;border-radius:12px;font-size:0.86rem;font-weight:700;">Помню</button>
-            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-py-rate-card="4" style="height:48px;border-radius:12px;font-size:0.86rem;font-weight:700;">На автомате</button>
+            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again" data-py-rate-card="1" style="height:48px;border-radius:12px;font-size:0.86rem;font-weight:700;justify-content:center;text-align:center;">Не помню</button>
+            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--hard fc-rate-btn--hard" data-py-rate-card="2" style="height:48px;border-radius:12px;font-size:0.86rem;font-weight:700;justify-content:center;text-align:center;">Со скрипом</button>
+            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent" data-py-rate-card="3" style="height:48px;border-radius:12px;font-size:0.86rem;font-weight:700;justify-content:center;text-align:center;">Помню</button>
+            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy" data-py-rate-card="4" style="height:48px;border-radius:12px;font-size:0.86rem;font-weight:700;justify-content:center;text-align:center;">На автомате</button>
           </div>
         </footer>`;
     }
@@ -45828,32 +45860,49 @@ function formatCardAnswerHTML(rawAnswer){
   // разделяем по ';' на аккуратный структурированный список пунктов ТОЛЬКО если точка с запятой
   // не является частью HTML-сущности (&gt;, &lt;, &amp; и т.д.) и не находится внутри кода!
   if(s.includes(';') && !s.includes('```')){
-    const cleanForCheck = s.replace(/&[a-zA-Z0-9#]+;/g, '').replace(/<code>[\s\S]*?<\/code>/gi, '').replace(/`[^`\n]+`/g, '');
+    const cleanForCheck = s.replace(/&[a-zA-Z0-9#]+;/g, '').replace(/<pre[^>]*>[\s\S]*?<\/pre>/gi, '').replace(/<code>[\s\S]*?<\/code>/gi, '').replace(/`[^`\n]+`/g, '');
     if(cleanForCheck.includes(';')){
-      const codeTokens = [];
-      const masked = s
-        .replace(/&[a-zA-Z0-9#]+;/g, m => {
-          codeTokens.push(m);
-          return `___ENTITY_${codeTokens.length - 1}___`;
-        })
-        .replace(/<code>[\s\S]*?<\/code>/gi, m => {
-          codeTokens.push(m);
-          return `___CODE_${codeTokens.length - 1}___`;
-        })
-        .replace(/`[^`\n]+`/g, m => {
-          codeTokens.push(m);
-          return `___CODE_${codeTokens.length - 1}___`;
-        });
+      const tokenMap = {};
+      let tokenCounter = 0;
+      function createToken(val){
+        const key = `___TK_${tokenCounter++}___`;
+        tokenMap[key] = val;
+        return key;
+      }
+
+      // 1. Сначала маскируем кодовые блоки, чтобы сущности внутри кода не перебивались отдельными внешними токенами
+      let masked = s
+        .replace(/<pre\b[^>]*>[\s\S]*?<\/pre>/gi, m => createToken(m))
+        .replace(/<code>[\s\S]*?<\/code>/gi, m => createToken(m))
+        .replace(/`[^`\n]+`/g, m => createToken(m));
+
+      // 2. Затем маскируем оставшиеся HTML-сущности вне блоков кода (&amp;, &#x27; и т.д.)
+      masked = masked.replace(/&[a-zA-Z0-9#]+;/g, m => createToken(m));
 
       const rawParts = masked.split(';').map(p => p.trim()).filter(Boolean);
       if(rawParts.length > 1){
-        const parts = rawParts.map(p => {
-          return p.replace(/___(ENTITY|CODE)_(\d+)___/g, (_, type, idx) => codeTokens[Number(idx)]);
-        });
+        function restoreTokens(text){
+          let res = text;
+          let changed = true;
+          let limit = 10;
+          while(changed && limit-- > 0){
+            changed = false;
+            res = res.replace(/___TK_\d+___/g, m => {
+              if(tokenMap[m] !== undefined){
+                changed = true;
+                return tokenMap[m];
+              }
+              return m;
+            });
+          }
+          return res;
+        }
+
+        const parts = rawParts.map(p => restoreTokens(p));
         const itemsHtml = parts.map(part => {
           const normalized = part.replace(/\s+(?:—|–|-)\s+/g, ' — ');
           const formatted = (typeof formatRichInlineText === 'function') ? formatRichInlineText(normalized) : normalized;
-          return `<div class="fc-answer-item"><span class="fc-answer-bullet">•</span> <span class="fc-answer-text">${formatted}</span></div>`;
+          return `<div class="fc-answer-item"><span class="fc-answer-text">${formatted}</span></div>`;
         }).join('');
         return `<div class="fc-answer-multiline">${itemsHtml}</div>`;
       }
@@ -45867,8 +45916,6 @@ function formatCardAnswerHTML(rawAnswer){
     const rawCode = codeMatch[1] || codeMatch[2] || codeMatch[3];
     const explanation = codeMatch[4];
 
-    // Если пояснение содержит другие инлайн-блоки кода или точку с запятой,
-    // не выносим первый код в большую капсулу, а форматируем все инлайн-коды одинаково!
     if(!explanation.includes(';')){
       const cleanCode = rawCode
         .replace(/&amp;/g, '&')
