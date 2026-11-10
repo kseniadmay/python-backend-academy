@@ -43223,6 +43223,112 @@ const CANONICAL_NOTE_DECKS_MAP = {
 
 };
 
+// CANONICAL_NOTE_TASKS_MAP: Семантическое связывание конспектов и задач IDE
+const CANONICAL_NOTE_TASKS_MAP = {
+  // Unit 1.1
+  'К-001': [20, 19],
+  'К-002': [39],
+  'К-003': [255, 258],
+  'К-004': [253, 257],
+  'К-005': [263],
+  'К-006': [264],
+  'К-007': [18, 72],
+  'К-008': [286],
+  'К-009': [297],
+  'К-010': [296, 298],
+  'К-011': [301],
+  'К-012': [302],
+  'К-013': [299, 300, 304, 305],
+  // Unit 1.2
+  'К-014': [66, 256],
+  'К-015': [323],
+  'К-016': [325],
+  'К-017': [38, 93, 197],
+  'К-018': [270, 310],
+  'К-019': [313, 314, 315],
+  'К-020': [110, 135, 262],
+  'К-021': [309, 322, 324, 326],
+  // Unit 1.3
+  'К-022': [265, 374, 375, 376],
+  'К-218': [377, 378, 379, 380],
+  'К-023': [217, 266, 327, 328, 381],
+  'К-024': [162, 331, 367],
+  'К-217': [369, 370, 373],
+  // Unit 1.4
+  'К-025': [151, 245],
+  'К-026': [341],
+  'К-027': [343, 345],
+  'К-028': [9, 177, 290],
+  'К-029': [303, 317],
+  'К-030': [318, 344],
+  'К-031': [306, 307],
+  'К-032': [308, 316, 342]
+};
+
+function getMatchingDecksForNote(kId, sk){
+  if(!sk) return [];
+  const fIds = sk.fIds || [];
+  const kIds = sk.kIds || [];
+  const idx = kIds.indexOf(kId);
+  let matchingFids = [];
+  if(typeof CANONICAL_NOTE_DECKS_MAP !== 'undefined' && CANONICAL_NOTE_DECKS_MAP[kId]){
+    matchingFids = CANONICAL_NOTE_DECKS_MAP[kId].filter(fid => fIds.includes(fid));
+  }
+  if(matchingFids.length === 0){
+    if(kIds.length === fIds.length){
+      if(fIds[idx]) matchingFids.push(fIds[idx]);
+    } else if(kIds.length > 0 && fIds.length > 0){
+      fIds.forEach((fid, fIdx) => {
+        const ownerNoteIdx = Math.min(kIds.length - 1, Math.floor(fIdx * kIds.length / fIds.length));
+        if(ownerNoteIdx === idx) matchingFids.push(fid);
+      });
+    }
+  }
+  return matchingFids;
+}
+
+function getMatchingTasksForNote(kId, sk){
+  if(!sk) return [];
+  const tIds = (sk.taskIds && sk.taskIds.length) ? sk.taskIds : [20, 19, 39, 255, 258];
+  const kIds = sk.kIds || [];
+  const idx = kIds.indexOf(kId);
+  let noteTasks = [];
+  if(typeof CANONICAL_NOTE_TASKS_MAP !== 'undefined' && CANONICAL_NOTE_TASKS_MAP[kId]){
+    noteTasks = CANONICAL_NOTE_TASKS_MAP[kId].filter(tid => tIds.includes(tid));
+  }
+  if(noteTasks.length === 0){
+    if(kIds.length <= 1){
+      noteTasks = tIds.slice();
+    } else {
+      noteTasks = tIds.filter((tid, tIdx) => Math.min(kIds.length - 1, Math.floor(tIdx * kIds.length / tIds.length)) === idx);
+      if(noteTasks.length === 0 && tIds[idx]){
+        noteTasks.push(tIds[idx]);
+      }
+    }
+  }
+  return noteTasks;
+}
+
+function findOwnerNoteForDeck(fid, sk){
+  if(!sk || !sk.kIds) return null;
+  for(let i = 0; i < sk.kIds.length; i++){
+    const kId = sk.kIds[i];
+    const decks = getMatchingDecksForNote(kId, sk);
+    if(decks.includes(fid)) return kId;
+  }
+  return sk.kIds[0] || null;
+}
+
+function findOwnerNoteForTask(tid, sk){
+  if(!sk || !sk.kIds) return null;
+  for(let i = 0; i < sk.kIds.length; i++){
+    const kId = sk.kIds[i];
+    const tasks = getMatchingTasksForNote(kId, sk);
+    if(tasks.includes(tid)) return kId;
+  }
+  return sk.kIds[0] || null;
+}
+
 
 
 
@@ -43306,6 +43412,7 @@ function buildUnifiedZenIdeHTML(params){
         ${tObj.id ? `<span style="color:var(--ink-muted);font-size:0.75rem;">#${tObj.id}</span>` : ''}
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
+        ${params.ownerKid ? `<button type="button" class="btn btn-ghost btn-cheatsheet-pill" data-zen-open-cheatsheet="${escapeHtmlStr(params.ownerKid)}" style="padding:4px 10px;font-size:0.75rem;font-weight:700;border-radius:8px;border:1px solid rgba(16,185,129,0.3);background:rgba(16,185,129,0.08);color:#34d399;display:inline-flex;align-items:center;gap:4px;cursor:pointer;" title="Открыть конспект текущей темы в шторке">💡 Шпаргалка</button>` : ''}
         ${swiperHTML}
         ${isSolved ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
       </div>
@@ -43357,6 +43464,10 @@ function buildUnifiedZenIdeHTML(params){
     drawerTabContent = `<pre style="margin:0;font-family:var(--font-m, monospace);font-size:0.78rem;white-space:pre-wrap;color:#cbd5e1;">${escapeHtmlStr(runOutput || '[Python 3.12 Sandboxed Session]\n>>> Готов к запуску кода.')}</pre>`;
   } else if(drawerTab === 'socrates'){
     drawerTabContent = shownHints ? `<div>${shownHints}</div>` : `<div style="color:var(--ink-muted);font-size:0.8rem;">Наставник Сократ готов помочь. Нажмите кнопку «Получить наводку» в левой панели.</div>`;
+  } else if(drawerTab === 'cheatsheet'){
+    drawerTabContent = params.noteHtml
+      ? `<div class="lesson-theory zen-cheatsheet-content" style="font-size:0.86rem;line-height:1.55;color:#e2e8f0;padding:6px 2px;max-height:280px;overflow-y:auto;">${params.noteHtml}</div>`
+      : `<div style="color:var(--ink-muted);font-size:0.8rem;">Шпаргалка к конспекту загружается.</div>`;
   } else {
     if(runStatus === 'running'){
       drawerTabContent = `<div class="test-running-shimmer" style="color:var(--amber);font-size:0.82rem;">⚡ Выполняю pytest-проверки в браузере…</div>`;
@@ -43390,6 +43501,7 @@ function buildUnifiedZenIdeHTML(params){
           </button>
           <button type="button" class="drawer-tab-btn ${drawerTab === 'stdout' ? 'is-active' : ''}" data-zen-drawer-tab="stdout">Терминал (stdout)</button>
           <button type="button" class="drawer-tab-btn ${drawerTab === 'socrates' ? 'is-active' : ''}" data-zen-drawer-tab="socrates">Наставник Сократ (${hintLevel}/${socraticHints.length})</button>
+          ${params.ownerKid ? `<button type="button" class="drawer-tab-btn ${drawerTab === 'cheatsheet' ? 'is-active' : ''}" data-zen-drawer-tab="cheatsheet" style="color:${drawerTab === 'cheatsheet' ? '#34d399' : 'inherit'};">💡 Шпаргалка</button>` : ''}
         </div>
         <button type="button" class="drawer-toggle-btn" data-zen-toggle-drawer title="Свернуть / Развернуть консоль">${drawerCollapsed ? 'Развернуть ▴' : 'Свернуть ▾'}</button>
       </div>
@@ -43410,12 +43522,15 @@ function buildUnifiedZenIdeHTML(params){
   `;
 
   const actionButtonRowHTML = `
-    <div class="action-button-row" style="${runStatus === 'pass' ? 'display:none !important;' : 'display:flex;gap:10px;align-items:center;'}">
+    <div class="action-button-row" style="${runStatus === 'pass' ? 'display:none !important;' : 'display:flex;gap:10px;align-items:center;flex-wrap:wrap;'}">
       <button type="button" class="btn-reset-code btn btn-ghost" ${resetBtnAttr} style="padding:12px 14px;border-radius:14px;flex:none;opacity:0.8;" title="Сбросить код к исходному шаблону">↺</button>
       <button type="button" class="btn-check-solution" ${runBtnAttr}>
         <span>${ICONS.play || '▷'} Проверить решение</span>
         <span class="xp-tag">+15 XP</span>
         <span class="hide-on-mobile" style="font-size:0.75rem;opacity:0.85;font-weight:500;">(Ctrl+Enter)</span>
+      </button>
+      <button type="button" class="btn btn-ghost btn-skip-task" ${nextBtnAttr} style="padding:12px 16px;border-radius:14px;font-size:0.88rem;font-weight:600;color:var(--ink-muted);border:1px solid rgba(255,255,255,0.08);white-space:nowrap;margin-left:auto;display:inline-flex;align-items:center;gap:6px;" title="Перейти к следующему шагу без блокировки">
+        <span>${escapeHtmlStr(nextBtnLabel)}</span>
       </button>
     </div>
   `;
@@ -43616,98 +43731,37 @@ function viewPythonSkill(sid){
 
   kIds.forEach((kId, idx) => {
 
-    // 1. Конспект темы
-
+    // 1. Конспект темы (📖)
     const n = ALL_NOTES_COMBINED[kId] || { title: kId };
-
     const isDone = state.readNotes.includes(kId);
-
     const isActive = (pySkillViewState.tab === 'theory' && kId === activeK);
-
     const cleanNoteTitle = (n.title || kId).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-
     topicClusterDots.push(`<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="${escapeHtmlStr(cleanNoteTitle)}" data-py-select-k="${kId}" data-py-skill-id="${sk.id}"></span>`);
 
-
-
-    // 2. Карточки темы (строго одинаковая форма .dot-jewel)
-
-    let matchingFids = [];
-
-    if(typeof CANONICAL_NOTE_DECKS_MAP !== 'undefined' && CANONICAL_NOTE_DECKS_MAP[kId]){
-
-      matchingFids = CANONICAL_NOTE_DECKS_MAP[kId].filter(fid => fIds.includes(fid));
-
-    }
-
-    if(matchingFids.length === 0){
-
-      if(kIds.length === fIds.length){
-
-        if(fIds[idx]) matchingFids.push(fIds[idx]);
-
-      } else if(kIds.length > 0 && fIds.length > 0){
-
-        fIds.forEach((fid, fIdx) => {
-
-          const ownerNoteIdx = Math.min(kIds.length - 1, Math.floor(fIdx * kIds.length / fIds.length));
-
-          if(ownerNoteIdx === idx) matchingFids.push(fid);
-
-        });
-
-      }
-
-    }
+    // 2. Карточки темы (🗂 — строгий порядок микрообучения)
+    const matchingFids = (typeof getMatchingDecksForNote === 'function')
+      ? getMatchingDecksForNote(kId, sk)
+      : (typeof CANONICAL_NOTE_DECKS_MAP !== 'undefined' && CANONICAL_NOTE_DECKS_MAP[kId] ? CANONICAL_NOTE_DECKS_MAP[kId].filter(fid => fIds.includes(fid)) : []);
 
     matchingFids.forEach(fid => {
-
       const d = ALL_DECKS_COMBINED[fid] || {};
-
       const isCardDone = state.reviewedDecks.includes(fid);
-
       const isCardActive = (pySkillViewState.tab === 'cards' && (activeF === fid || (!activeF && idx === 0)));
-
       const cleanDeckTitle = (d.title || fid).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
-
       topicClusterDots.push(`<span class="dot-jewel dot-card ${isCardActive ? 'active' : (isCardDone ? 'done' : '')}" title="Карточки: ${escapeHtmlStr(cleanDeckTitle)}" data-py-select-f="${fid}"></span>`);
-
     });
 
-
-
-    // 3. Задачи темы (строго одинаковая форма .dot-jewel)
-
-    let noteTasks = [];
-
-    if(kIds.length <= 1){
-
-      noteTasks = tIds.slice();
-
-    } else {
-
-      noteTasks = tIds.filter((tid, tIdx) => Math.min(kIds.length - 1, Math.floor(tIdx * kIds.length / tIds.length)) === idx);
-
-      if(noteTasks.length === 0 && tIds[idx]){
-
-        noteTasks.push(tIds[idx]);
-
-      }
-
-    }
+    // 3. Задачи темы (⚡ — строгий порядок микрообучения)
+    const noteTasks = (typeof getMatchingTasksForNote === 'function')
+      ? getMatchingTasksForNote(kId, sk)
+      : tIds.filter((tid, tIdx) => Math.min(kIds.length - 1, Math.floor(tIdx * kIds.length / tIds.length)) === idx);
 
     noteTasks.forEach(tid => {
-
       const t = IDE_TASKS_BY_ID[tid] || {};
-
       const isTaskDone = (solvedMap[tid] === 'solved');
-
       const isTaskActive = (pySkillViewState.tab === 'code' && (activeTid === tid || (!activeTid && idx === 0)));
-
       const cleanTaskTitle = t.title || ('Задание ' + (tIds.indexOf(tid) + 1));
-
       topicClusterDots.push(`<span class="dot-jewel ${isTaskActive ? 'active' : (isTaskDone ? 'done' : '')}" title="Практика: ${escapeHtmlStr(cleanTaskTitle)}" data-py-select-task="${tid}"></span>`);
-
     });
 
   });
@@ -43837,9 +43891,29 @@ function viewPythonSkill(sid){
           <span>Следующая подтема ➔</span>
         </button>`;
     } else {
+      const noteDecks = (typeof getMatchingDecksForNote === 'function') ? getMatchingDecksForNote(activeK, sk) : [];
+      let finishBtnText = 'Закрепить в карточках ➔';
+      let finishBtnAttr = `data-py-finish-note="${activeK}"`;
+      if(noteDecks.length === 0){
+        const noteTasks = (typeof getMatchingTasksForNote === 'function') ? getMatchingTasksForNote(activeK, sk) : [];
+        if(noteTasks.length > 0){
+          finishBtnText = 'Перейти к практике в IDE ➔';
+          finishBtnAttr = `data-py-select-task="${noteTasks[0]}"`;
+        } else {
+          const curKidx = (sk.kIds || []).indexOf(activeK);
+          if(curKidx >= 0 && curKidx + 1 < (sk.kIds || []).length){
+            const nextKid = sk.kIds[curKidx + 1];
+            finishBtnText = 'К следующему конспекту ➔';
+            finishBtnAttr = `data-py-to-next-note="${nextKid}"`;
+          } else {
+            finishBtnText = 'Рубежный зачёт ➔';
+            finishBtnAttr = `data-py-to-exam="${sk.unitId}"`;
+          }
+        }
+      }
       primaryActionHTML = `
-        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" style="height:50px;border-radius:14px;font-size:0.96rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:1;max-width:440px;width:100%;" data-py-finish-note="${activeK}">
-          <span>Закрепить в карточках ➔</span>
+        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" style="height:50px;border-radius:14px;font-size:0.96rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:1;max-width:440px;width:100%;" ${finishBtnAttr}>
+          <span>${escapeHtmlStr(finishBtnText)}</span>
         </button>`;
     }
 
@@ -43909,33 +43983,56 @@ function viewPythonSkill(sid){
     }
 
     if(pySkillViewState.sessionDone || cards.length === 0){
-      const curFidx = (sk.fIds || []).indexOf(activeF);
-      const hasNextDeck = (curFidx >= 0 && curFidx + 1 < (sk.fIds || []).length);
-      let nextActionBtnText = 'Перейти к практике в IDE ➔';
-      if(hasNextDeck){
-        const nextFid = sk.fIds[curFidx + 1];
+      const ownerKid = (typeof findOwnerNoteForDeck === 'function')
+        ? (findOwnerNoteForDeck(activeF, sk) || pySkillViewState.kId || ((sk.kIds && sk.kIds[0]) || null))
+        : pySkillViewState.kId;
+      const noteDecks = (typeof getMatchingDecksForNote === 'function') ? getMatchingDecksForNote(ownerKid, sk) : [];
+      const curDeckInNoteIdx = noteDecks.indexOf(activeF);
+      const hasNextDeckInNote = (curDeckInNoteIdx >= 0 && curDeckInNoteIdx + 1 < noteDecks.length);
+
+      let nextActionBtnText = '';
+      let nextActionAttr = '';
+
+      if(hasNextDeckInNote){
+        const nextFid = noteDecks[curDeckInNoteIdx + 1];
         const nextDeckObj = ALL_DECKS_COMBINED[nextFid] || {};
         const cleanNextDeckTitle = (nextDeckObj.title || nextFid).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
         nextActionBtnText = `К следующей колоде: «${cleanNextDeckTitle}» ➔`;
+        nextActionAttr = `data-py-select-f="${nextFid}"`;
       } else {
-        const curKidx = (sk.kIds || []).indexOf(pySkillViewState.kId);
-        const topicIdx = (curFidx >= 0 && (sk.kIds || []).length === (sk.fIds || []).length) ? curFidx : Math.max(0, curKidx);
-        const hasNextTopic = (topicIdx + 1 < (sk.kIds || []).length);
-        if(hasNextTopic){
-          const nextKid = sk.kIds[topicIdx + 1];
-          const nextNoteObj = ALL_NOTES_COMBINED[nextKid] || {};
-          const cleanNextNoteTitle = (nextNoteObj.title || nextKid).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-          nextActionBtnText = `К следующей теме: «${cleanNextNoteTitle}» ➔`;
+        // Все карточки этого конспекта пройдены! Переходим к его задачам (Конспект 1 ➔ Карточки 1 ➔ Задачи 1)
+        const noteTasks = (typeof getMatchingTasksForNote === 'function') ? getMatchingTasksForNote(ownerKid, sk) : [];
+        if(noteTasks.length > 0){
+          const firstTid = noteTasks[0];
+          const tObj = IDE_TASKS_BY_ID[firstTid] || {};
+          const cleanTaskTitle = tObj.title || ('Задание ' + (tIds.indexOf(firstTid) + 1));
+          nextActionBtnText = `Перейти к практике: «${cleanTaskTitle}» ➔`;
+          nextActionAttr = `data-py-select-task="${firstTid}"`;
+        } else {
+          // Нет задач к этому конспекту: переход к следующему конспекту (Конспект 2)
+          const curKidx = (sk.kIds || []).indexOf(ownerKid);
+          if(curKidx >= 0 && curKidx + 1 < (sk.kIds || []).length){
+            const nextKid = sk.kIds[curKidx + 1];
+            const nextNoteObj = ALL_NOTES_COMBINED[nextKid] || {};
+            const cleanNextTitle = (nextNoteObj.title || nextKid).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+            nextActionBtnText = `К следующему конспекту: «${cleanNextTitle}» ➔`;
+            nextActionAttr = `data-py-to-next-note="${nextKid}"`;
+          } else {
+            nextActionBtnText = 'Рубежный зачёт ➔';
+            nextActionAttr = `data-py-to-exam="${sk.unitId}"`;
+          }
         }
       }
 
+      const emptyCardsNotice = (cards.length === 0)
+        ? `<div style="font-size:32px;margin-bottom:12px;">🗂</div><h2 style="font-size:1.35rem;font-weight:800;color:var(--ink);margin:0 0 6px;">Карточки в разработке</h2><p style="font-size:0.90rem;color:var(--ink-muted);line-height:1.5;margin:0 auto 20px;max-width:440px;">Колода для этой темы дополняется методистами. Вы можете сразу перейти к практическим задачам.</p>`
+        : `<div style="width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:rgba(16,185,129,0.18);color:#10b981;display:flex;align-items:center;justify-content:center;font-size:26px;border:1.5px solid rgba(16,185,129,0.45);box-shadow:0 0 20px rgba(16,185,129,0.25);">✓</div><h2 style="font-size:1.35rem;font-weight:800;color:var(--ink);margin:0 0 6px;">Колода освоена</h2><p style="font-size:0.90rem;color:var(--ink-muted);line-height:1.5;margin:0 auto 20px;max-width:440px;">Все карточки темы изучены. Материал перенесён в график интервальных повторений.</p>`;
+
       bodyHTML = `
         <div class="card srs-empty-glow-card srs-zen-rest-screen" style="margin-top:0;padding:36px 24px;text-align:center;border:1px solid rgba(255,255,255,0.14);border-radius:28px;background:linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(15,23,42,0.85) 50%, rgba(255,255,255,0.02) 100%);box-shadow:inset 0 1.5px 0 rgba(255,255,255,0.22),0 24px 64px -12px rgba(0,0,0,0.7),0 0 40px -10px rgba(16,185,129,0.25);backdrop-filter:blur(36px);position:relative;overflow:hidden;max-width:680px;margin-left:auto;margin-right:auto;">
-          <div style="width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:rgba(16,185,129,0.18);color:#10b981;display:flex;align-items:center;justify-content:center;font-size:26px;border:1.5px solid rgba(16,185,129,0.45);box-shadow:0 0 20px rgba(16,185,129,0.25);">✓</div>
-          <h2 style="font-size:1.35rem;font-weight:800;color:var(--ink);margin:0 0 6px;">Колода освоена</h2>
-          <p style="font-size:0.90rem;color:var(--ink-muted);line-height:1.5;margin:0 auto 20px;max-width:440px;">Все карточки темы изучены. Материал перенесён в график интервальных повторений.</p>
+          ${emptyCardsNotice}
           <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
-            <button type="button" class="btn btn-primary btn-cta-dominant btn-glass-emerald btn-sprint-cta" data-py-next-deck style="height:50px;border-radius:14px;font-size:0.96rem;font-weight:700;max-width:380px;width:100%;">
+            <button type="button" class="btn btn-primary btn-cta-dominant btn-glass-emerald btn-sprint-cta" ${nextActionAttr} style="height:50px;border-radius:14px;font-size:0.96rem;font-weight:700;max-width:420px;width:100%;">
               <span>${escapeHtmlStr(nextActionBtnText)}</span>
             </button>
           </div>
@@ -44004,60 +44101,76 @@ function viewPythonSkill(sid){
 
   } else if(pySkillViewState.tab === 'code'){
 
-    const tObj = IDE_TASKS_BY_ID[activeTid] || {id: activeTid, title: 'Задание ' + (tIds.indexOf(activeTid) + 1), desc: '', initialCode: ''};
+    const ownerKid = (typeof findOwnerNoteForTask === 'function')
+      ? (findOwnerNoteForTask(activeTid, sk) || pySkillViewState.kId || ((sk.kIds && sk.kIds[0]) || null))
+      : pySkillViewState.kId;
+    const noteTasks = (typeof getMatchingTasksForNote === 'function') ? getMatchingTasksForNote(ownerKid, sk) : [activeTid];
+    const curTaskIdxInNote = noteTasks.indexOf(activeTid);
+    const hasNextTaskInNote = (curTaskIdxInNote >= 0 && curTaskIdxInNote + 1 < noteTasks.length);
 
+    let nextBtnLabel = '';
+    let nextBtnAttr = '';
+
+    if(hasNextTaskInNote){
+      const nextTid = noteTasks[curTaskIdxInNote + 1];
+      const nextTObj = IDE_TASKS_BY_ID[nextTid] || {};
+      const cleanNextTaskTitle = nextTObj.title || ('Задание ' + (tIds.indexOf(nextTid) + 1));
+      nextBtnLabel = `Следующая задача: «${cleanNextTaskTitle}» ➔`;
+      nextBtnAttr = `data-py-next-task-btn="${nextTid}"`;
+    } else {
+      // Все задачи этого конспекта пройдены! Переходим к следующему конспекту (Конспект 2)
+      const curKidx = (sk.kIds || []).indexOf(ownerKid);
+      if(curKidx >= 0 && curKidx + 1 < (sk.kIds || []).length){
+        const nextKid = sk.kIds[curKidx + 1];
+        const nextNoteObj = ALL_NOTES_COMBINED[nextKid] || {};
+        const cleanNextTitle = (nextNoteObj.title || nextKid).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+        nextBtnLabel = `К следующему конспекту: «${cleanNextTitle}» ➔`;
+        nextBtnAttr = `data-py-to-next-note="${nextKid}"`;
+      } else {
+        nextBtnLabel = 'Рубежный зачёт ➔';
+        nextBtnAttr = `data-py-to-exam="${sk.unitId}"`;
+      }
+    }
+
+    const tObj = IDE_TASKS_BY_ID[activeTid] || {id: activeTid, title: 'Задание ' + (tIds.indexOf(activeTid) + 1), desc: '', initialCode: ''};
     const socraticHints = buildSocraticHintsForTask(tObj);
 
-    const taskIdx = tIds.indexOf(activeTid);
-
-    const isLastTask = (taskIdx >= tIds.length - 1);
-
-    const nextBtnLabel = isLastTask ? 'Рубежный зачёт ➔' : 'Следующая задача ➔';
-
-
+    // Шпаргалка: собираем html конспекта текущего кванта
+    let noteHtmlForDrawer = '';
+    if(ownerKid && ALL_NOTES_COMBINED[ownerKid]){
+      const nObj = ALL_NOTES_COMBINED[ownerKid];
+      const nSteps = nObj.steps || [];
+      noteHtmlForDrawer = nSteps.map((st, i) =>
+        `<div style="margin-bottom:14px;">
+          <h4 style="font-size:0.95rem;font-weight:700;color:#34d399;margin:0 0 6px;">${escapeHtmlStr(st.title || ('Шаг ' + (i+1)))}</h4>
+          <div>${st.html || ''}</div>
+        </div>`
+      ).join('');
+    }
 
     bodyHTML = buildUnifiedZenIdeHTML({
-
       task: tObj,
-
       editorId: 'py-skill-editor',
-
       codeDraft: pySkillViewState.codeDraft,
-
       runStatus: pySkillViewState.runStatus,
-
       runOutput: pySkillViewState.runOutput,
-
       socraticHints: socraticHints,
-
       hintLevel: pySkillViewState.hintLevel || 0,
-
       isSolved: solvedMap[tObj.id] === 'solved',
-
       mobTab: pySkillViewState.mobPracticeTab,
-
       context: 'sprint',
-
       nextBtnLabel: nextBtnLabel,
-
-      nextBtnAttr: `data-py-next-task-btn="${tObj.id}"`,
-
+      nextBtnAttr: nextBtnAttr,
       runBtnAttr: `data-py-run-task="${tObj.id}"`,
-
       resetBtnAttr: `data-py-reset-task="${tObj.id}"`,
-
       hintBtnAttr: `data-py-task-hint`,
-
       mobTabAttr: `data-py-practice-tab`,
-
       drawerTab: pySkillViewState.drawerTab || 'tests',
-
       drawerCollapsed: !!pySkillViewState.drawerCollapsed,
-
       accSliceOpen: !!pySkillViewState.accSliceOpen,
-
-      accSocratesOpen: !!pySkillViewState.accSocratesOpen
-
+      accSocratesOpen: !!pySkillViewState.accSocratesOpen,
+      ownerKid: ownerKid,
+      noteHtml: noteHtmlForDrawer
     });
 
   }
@@ -61142,9 +61255,21 @@ const psk = e.target.closest('[data-py-select-k]');
 
 
 
-    // Прямой переход к тематическим карточкам темы (Clean 3-Stage Pipeline: Конспект ➔ Карточки ➔ IDE)
-
-    pySkillViewState.tab = 'cards';
+    // Прямой переход: Конспект ➔ Карточки к нему (или в практику, если карточек нет)
+    const targetDecks = (typeof getMatchingDecksForNote === 'function') ? getMatchingDecksForNote(kid, sk) : [];
+    if(targetDecks.length > 0){
+      pySkillViewState.tab = 'cards';
+      pySkillViewState.fId = targetDecks[0];
+    } else {
+      const noteTasks = (typeof getMatchingTasksForNote === 'function') ? getMatchingTasksForNote(kid, sk) : [];
+      if(noteTasks.length > 0){
+        pySkillViewState.tab = 'code';
+        pySkillViewState.taskId = noteTasks[0];
+        saveReadingPosition();
+        render();
+        return;
+      }
+    }
 
     pySkillViewState.sessionFid = null;
 
@@ -61517,60 +61642,40 @@ window.animateCardFlip = animateCardFlip;
 
     if(action === 'repeat'){
 
-      // Карточка возвращается в конец очереди текущей сессии
-
-      curQueue.push(cIdx);
-
+      // Single-Pass: карточка оценивается и сразу уходит в SRS на повторение, без зацикливания внутри урока
       pySkillViewState.sessionRepeats = (pySkillViewState.sessionRepeats || 0) + 1;
-
+      ensureExtendedState();
+      if(fid){
+        const ck = fid + ':' + cIdx;
+        const rateVal = cardLoopBtn.getAttribute('data-rate') ? parseInt(cardLoopBtn.getAttribute('data-rate'), 10) : 1;
+        if(typeof applyRemNoteCardRating === 'function'){
+          applyRemNoteCardRating(ck, rateVal);
+        } else {
+          state.cardRatings[ck] = rateVal;
+        }
+      }
       pySkillViewState.sessionPos = qPos + 1;
-
-      const nextQPos = pySkillViewState.sessionPos;
-
-      const fidCards = (fid && ALL_DECKS_COMBINED[fid] && ALL_DECKS_COMBINED[fid].cards) || [];
-
-      const nextCIdx = curQueue[nextQPos] !== undefined
-
-        ? curQueue[nextQPos]
-
-        : Math.min(nextQPos, Math.max(0, fidCards.length - 1));
-
-      pySkillViewState.cardIdx = nextCIdx;
-
+      pySkillViewState.cardIdx = pySkillViewState.sessionPos;
       pySkillViewState.cardFlipped = false;
 
     } else if(action === 'pass'){
 
-      // Карточка первично освоена и регистрируется в долгосрочной базе FSRS
-
+      // Single-Pass: карточка первично освоена и регистрируется в базе интервального повторения SRS
       pySkillViewState.sessionLearned = (pySkillViewState.sessionLearned || 0) + 1;
-
       ensureExtendedState();
-
       if(fid){
-
         const ck = fid + ':' + cIdx;
-
+        const rateVal = cardLoopBtn.getAttribute('data-rate') ? parseInt(cardLoopBtn.getAttribute('data-rate'), 10) : 3;
         const wasStudied = (state.cardRatings[ck] !== undefined && state.cardRatings[ck] > 0);
-
         if(typeof applyRemNoteCardRating === 'function'){
-
-          applyRemNoteCardRating(ck, 3); // Режим "Хорошо" по умолчанию в FSRS
-
+          applyRemNoteCardRating(ck, rateVal);
         } else {
-
-          state.cardRatings[ck] = Math.max(Number(state.cardRatings[ck]) || 0, 3);
-
+          state.cardRatings[ck] = Math.max(Number(state.cardRatings[ck]) || 0, rateVal);
         }
-
         if(!wasStudied) awardXp(5);
-
       }
-
       pySkillViewState.sessionPos = qPos + 1;
-
       pySkillViewState.cardIdx = pySkillViewState.sessionPos;
-
       pySkillViewState.cardFlipped = false;
 
     }
@@ -62143,46 +62248,169 @@ window.animateCardFlip = animateCardFlip;
 
   if(pntask){
 
-    const tid = parseInt(pntask.getAttribute('data-py-next-task-btn'), 10);
-
+    const rawTid = pntask.getAttribute('data-py-next-task-btn');
+    const tid = parseInt(rawTid, 10);
     const sk = (typeof ensurePySkillState === 'function') ? ensurePySkillState(pySkillViewState.sid) : {};
-
     const tIds = (sk.taskIds && sk.taskIds.length) ? sk.taskIds : [20, 19, 39, 255, 258];
+    const kIds = sk.kIds || [];
 
-    const curIdx = tIds.indexOf(tid);
-
-    if(curIdx >= 0 && curIdx + 1 < tIds.length){
-
-      const nextTid = tIds[curIdx + 1];
-
-      const nextTObj = IDE_TASKS_BY_ID[nextTid];
-
-      pySkillViewState.taskId = nextTid;
-
-      pySkillViewState.codeDraft = nextTObj ? getIdeDraft(nextTid, nextTObj.initialCode) : '';
-
+    // Если кнопка явно указывает следующую задачу
+    if(!isNaN(tid) && IDE_TASKS_BY_ID[tid] && tid !== pySkillViewState.taskId){
+      const nextTObj = IDE_TASKS_BY_ID[tid];
+      pySkillViewState.tab = 'code';
+      pySkillViewState.taskId = tid;
+      pySkillViewState.codeDraft = nextTObj ? getIdeDraft(tid, nextTObj.initialCode) : '';
       pySkillViewState.hintLevel = 0;
-
       pySkillViewState.runStatus = null;
-
       pySkillViewState.runOutput = '';
-
       saveReadingPosition();
-
       render();
-
-    } else {
-
-      pySkillViewState.tab = 'exam';
-
-      saveReadingPosition();
-
-      render();
-
+      return;
     }
 
-    return;
+    // Иначе определяем по текущему кванту конспекта:
+    const ownerKid = (typeof findOwnerNoteForTask === 'function')
+      ? (findOwnerNoteForTask(pySkillViewState.taskId, sk) || pySkillViewState.kId)
+      : pySkillViewState.kId;
+    const noteTasks = (typeof getMatchingTasksForNote === 'function')
+      ? getMatchingTasksForNote(ownerKid, sk)
+      : tIds;
+    const curTaskIdxInNote = noteTasks.indexOf(pySkillViewState.taskId);
 
+    if(curTaskIdxInNote >= 0 && curTaskIdxInNote + 1 < noteTasks.length){
+      // Следующая задача в рамках того же кванта
+      const nextTid = noteTasks[curTaskIdxInNote + 1];
+      const nextTObj = IDE_TASKS_BY_ID[nextTid];
+      pySkillViewState.tab = 'code';
+      pySkillViewState.taskId = nextTid;
+      pySkillViewState.codeDraft = nextTObj ? getIdeDraft(nextTid, nextTObj.initialCode) : '';
+      pySkillViewState.hintLevel = 0;
+      pySkillViewState.runStatus = null;
+      pySkillViewState.runOutput = '';
+      saveReadingPosition();
+      render();
+      return;
+    } else {
+      // Все задачи текущего кванта завершены: переходим к следующему конспекту (Конспект 2)
+      const curKidx = kIds.indexOf(ownerKid);
+      if(curKidx >= 0 && curKidx + 1 < kIds.length){
+        const nextKid = kIds[curKidx + 1];
+        pySkillViewState.tab = 'theory';
+        pySkillViewState.kId = nextKid;
+        pySkillViewState.stepIdx = 0;
+        pySkillViewState.chunkIdx = 0;
+        pySkillViewState.sprintCelebration = null;
+        saveReadingPosition();
+        render();
+        return;
+      } else {
+        // Задачи последнего кванта завершены: рубежный зачёт
+        pySkillViewState.tab = 'exam';
+        pySkillViewState.sprintCelebration = null;
+        saveReadingPosition();
+        render();
+        return;
+      }
+    }
+
+  }
+
+  // Переход к следующему конспекту кванта (Конспект 2)
+  const toNextNoteBtn = e.target.closest('[data-py-to-next-note]');
+  if(toNextNoteBtn){
+    const nextKid = toNextNoteBtn.getAttribute('data-py-to-next-note');
+    pySkillViewState.tab = 'theory';
+    pySkillViewState.kId = nextKid;
+    pySkillViewState.stepIdx = 0;
+    pySkillViewState.chunkIdx = 0;
+    pySkillViewState.sprintCelebration = null;
+    saveReadingPosition();
+    render();
+    return;
+  }
+
+  // Переход к рубежному зачёту темы
+  const toExamBtn = e.target.closest('[data-py-to-exam]');
+  if(toExamBtn){
+    pySkillViewState.tab = 'exam';
+    pySkillViewState.sprintCelebration = null;
+    saveReadingPosition();
+    render();
+    return;
+  }
+
+  // Открытие шторки-шпаргалки к текущему конспекту
+  const openCheatsheetBtn = e.target.closest('[data-zen-open-cheatsheet]');
+  if(openCheatsheetBtn){
+    pySkillViewState.drawerTab = 'cheatsheet';
+    pySkillViewState.drawerCollapsed = false;
+    render();
+    return;
+  }
+
+  // Универсальный обработчик data-py-next-deck (экран завершения колоды карточек)
+  const pyNextDeckBtn = e.target.closest('[data-py-next-deck]');
+  if(pyNextDeckBtn){
+    const fid = pySkillViewState.fId;
+    const sk = PY_SKILLS_BY_ID[pySkillViewState.sid];
+    const ownerKid = (typeof findOwnerNoteForDeck === 'function')
+      ? (findOwnerNoteForDeck(fid, sk) || pySkillViewState.kId)
+      : pySkillViewState.kId;
+    const noteDecks = (typeof getMatchingDecksForNote === 'function')
+      ? getMatchingDecksForNote(ownerKid, sk)
+      : (sk ? (sk.fIds || []) : []);
+    const curDIdx = noteDecks.indexOf(fid);
+
+    if(curDIdx >= 0 && curDIdx + 1 < noteDecks.length){
+      const nextFid = noteDecks[curDIdx + 1];
+      pySkillViewState.tab = 'cards';
+      pySkillViewState.fId = nextFid;
+      pySkillViewState.sessionFid = null;
+      pySkillViewState.sessionQueue = null;
+      pySkillViewState.sessionPos = 0;
+      pySkillViewState.cardIdx = 0;
+      pySkillViewState.sessionDone = false;
+      pySkillViewState.cardFlipped = false;
+      saveReadingPosition();
+      render();
+      return;
+    } else {
+      // Карточки конспекта завершены ➔ Задачи конспекта!
+      const noteTasks = (typeof getMatchingTasksForNote === 'function')
+        ? getMatchingTasksForNote(ownerKid, sk)
+        : (sk ? (sk.taskIds || []) : []);
+      if(noteTasks.length > 0){
+        const firstTid = noteTasks[0];
+        const nextTObj = IDE_TASKS_BY_ID[firstTid];
+        pySkillViewState.tab = 'code';
+        pySkillViewState.taskId = firstTid;
+        pySkillViewState.codeDraft = nextTObj ? getIdeDraft(firstTid, nextTObj.initialCode) : '';
+        pySkillViewState.hintLevel = 0;
+        pySkillViewState.runStatus = null;
+        pySkillViewState.runOutput = '';
+        saveReadingPosition();
+        render();
+        return;
+      } else {
+        const kIds = (sk && sk.kIds) || [];
+        const curKidx = kIds.indexOf(ownerKid);
+        if(curKidx >= 0 && curKidx + 1 < kIds.length){
+          const nextKid = kIds[curKidx + 1];
+          pySkillViewState.tab = 'theory';
+          pySkillViewState.kId = nextKid;
+          pySkillViewState.stepIdx = 0;
+          pySkillViewState.chunkIdx = 0;
+          saveReadingPosition();
+          render();
+          return;
+        } else {
+          pySkillViewState.tab = 'exam';
+          saveReadingPosition();
+          render();
+          return;
+        }
+      }
+    }
   }
 
 
