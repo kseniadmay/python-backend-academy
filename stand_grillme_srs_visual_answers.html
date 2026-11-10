@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Стенд визуализации: Форматирование карточек и полировка SRS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Onest:wght@400;500;600;700;800&family=Unbounded:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1016;
+      --surface: rgba(22, 27, 36, 0.74);
+      --ink: #f8fafc;
+      --ink-soft: #cbd5e1;
+      --ink-muted: #94a3b8;
+      --emerald: #10b981;
+      --emerald-light: #34d399;
+      --font-d: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1.2px, transparent 1.2px);
+      background-size: 24px 24px;
+      color: var(--ink);
+      font-family: var(--font-d);
+      padding: 30px 20px 80px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #34d399 0%, #10b981 50%, #6ee7b7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.subtitle {
+      color: var(--ink-muted);
+      font-size: 0.95rem;
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin: 32px 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #e2e8f0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 8px;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 18px;
+      margin-bottom: 30px;
+    }
+
+    .preview-card {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0.03) 50%, rgba(18, 23, 33, 0.90) 100%), var(--surface);
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      border-radius: 20px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.65), 0 0 24px rgba(16, 185, 129, 0.14);
+      position: relative;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .preview-card:hover {
+      border-color: rgba(52, 211, 153, 0.85);
+      transform: translateY(-2px);
+    }
+
+    .badge-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-bottom: 12px;
+      width: fit-content;
+    }
+
+    .badge-current { background: rgba(244, 63, 94, 0.2); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.4); }
+    .badge-opt1 { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.5); }
+    .badge-opt2 { background: rgba(56, 189, 248, 0.2); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.5); }
+    .badge-opt3 { background: rgba(245, 158, 11, 0.2); color: #fde68a; border: 1px solid rgba(245, 158, 11, 0.5); }
+
+    .q-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #a7f3d0;
+      opacity: 0.9;
+      margin-bottom: 6px;
+      line-height: 1.35;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(52, 211, 153, 0.35), transparent);
+      margin: 8px 0 12px;
+    }
+
+    /* Fixed code tags */
+    code {
+      font-family: var(--font-m);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.16);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      border-radius: 6px;
+      padding: 2px 6px;
+      display: inline-block;
+      line-height: 1.25;
+      vertical-align: baseline;
+      margin: 1px 2px;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+
+    /* Variant: Current */
+    .answer-current {
+      font-size: 0.96rem;
+      line-height: 1.5;
+      color: #ffffff;
+    }
+
+    /* Variant 1: Em-Dash + Capitalize */
+    .answer-dash {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .dash-item {
+      display: flex;
+      align-items: baseline;
+      gap: 9px;
+      font-size: 0.98rem;
+      line-height: 1.55;
+      color: #ffffff;
+    }
+    .dash-bullet {
+      color: #34d399;
+      font-weight: 700;
+      font-size: 1rem;
+      flex-shrink: 0;
+      opacity: 0.85;
+    }
+
+    /* Variant 2: Luminous Bead Bullet */
+    .answer-bead {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .bead-item {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      font-size: 0.98rem;
+      line-height: 1.55;
+      color: #ffffff;
+    }
+    .dot-marker {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 8px #10b981;
+      display: inline-block;
+      flex-shrink: 0;
+      transform: translateY(-2px);
+    }
+
+    /* Variant 3: Smart Sentence Flow */
+    .answer-flow {
+      font-size: 1.02rem;
+      line-height: 1.6;
+      color: #ffffff;
+    }
+
+    .card-footer-note {
+      font-size: 0.76rem;
+      color: var(--ink-muted);
+      margin-top: 14px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.1);
+      padding-top: 8px;
+    }
+
+    /* Buttons showcase */
+    .btn-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .rate-btn {
+      height: 48px;
+      border-radius: 12px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-family: var(--font-d);
+    }
+    .btn-again {
+      background: linear-gradient(180deg, rgba(244, 63, 94, 0.22) 0%, rgba(244, 63, 94, 0.08) 100%);
+      border: 1px solid rgba(244, 63, 94, 0.65);
+      color: #fecdd3;
+      box-shadow: 0 4px 16px rgba(244, 63, 94, 0.35);
+    }
+    .btn-hard {
+      background: linear-gradient(180deg, rgba(245, 158, 11, 0.22) 0%, rgba(245, 158, 11, 0.08) 100%);
+      border: 1px solid rgba(245, 158, 11, 0.65);
+      color: #fde68a;
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.28);
+    }
+    .btn-good {
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.36) 0%, rgba(6, 78, 59, 0.35) 100%);
+      border: 1.5px solid rgba(52, 211, 153, 0.95);
+      color: #ffffff;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 6px 24px -2px rgba(16, 185, 129, 0.50);
+    }
+    .btn-easy {
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.24) 0%, rgba(14, 116, 144, 0.20) 100%);
+      border: 1px solid rgba(56, 189, 248, 0.70);
+      color: #e0f2fe;
+      box-shadow: 0 4px 18px rgba(56, 189, 248, 0.35);
+    }
+
+    /* Beads showcase */
+    .beads-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 20px;
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 14px;
+      margin-top: 10px;
+    }
+    .b-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+    .b-done {
+      background: radial-gradient(circle at 35% 35%, #a7f3d0 0%, #34d399 45%, #059669 100%);
+      border: 1px solid rgba(167, 243, 208, 0.90);
+      box-shadow: 0 0 6px 1px rgba(52, 211, 153, 0.75), 0 0 14px 2px rgba(16, 185, 129, 0.45);
+    }
+    .b-active {
+      width: 14px;
+      height: 14px;
+      background: #34d399;
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 12px #10b981, 0 0 24px rgba(52, 211, 153, 0.9);
+    }
+    .b-future-old {
+      background: rgba(5, 150, 105, 0.15);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      opacity: 0.45;
+    }
+    .b-future-new {
+      background: radial-gradient(circle at 35% 35%, rgba(167, 243, 208, 0.45) 0%, rgba(52, 211, 153, 0.25) 50%, rgba(16, 185, 129, 0.10) 100%);
+      border: 1.5px solid rgba(52, 211, 153, 0.70);
+      box-shadow: 0 0 6px rgba(52, 211, 153, 0.35);
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Стенд визуального выбора /grill-me</h1>
+      <p class="subtitle">Сравнение вариантов оформления ответов, подсветки мобильных кнопок и бусин</p>
+    </header>
+
+    <div class="section-title">
+      <span>1. Форматирование многострочного текста ответа (Пример: MIME-тип vnd)</span>
+    </div>
+
+    <div class="cards-grid">
+      <!-- CURRENT (AS ON SCREENSHOT) -->
+      <div class="preview-card" style="border-color: rgba(244, 63, 94, 0.5);">
+        <div>
+          <span class="badge-tag badge-current">Как сейчас (Скриншот 9)</span>
+          <div class="q-title">Что означает префикс vnd в MIME / медиа-типах?</div>
+          <div class="divider"></div>
+          <div class="answer-current">
+            <div>Вендорский (vendor) медиа-тип</div>
+            <div>нестандартный тип, специфичный для конкретного API</div>
+          </div>
+        </div>
+        <div class="card-footer-note">❌ Строка 2 с маленькой буквы, нет знаков препинания и отступа, выглядит как синтаксический обрыв фразы.</div>
+      </div>
+
+      <!-- VARIANT 1: EM-DASH + CAPITALIZE (RECOMMENDED) -->
+      <div class="preview-card" style="border-color: rgba(16, 185, 129, 0.8);">
+        <div>
+          <span class="badge-tag badge-opt1">Вариант 1 (Рекомендуемый) · Мягкое тире</span>
+          <div class="q-title">Что означает префикс vnd в MIME / медиа-типах?</div>
+          <div class="divider"></div>
+          <div class="answer-dash">
+            <div class="dash-item">
+              <span class="dash-bullet">—</span>
+              <span>Вендорский (vendor) медиа-тип</span>
+            </div>
+            <div class="dash-item">
+              <span class="dash-bullet">—</span>
+              <span>Нестандартный тип, специфичный для конкретного API</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer-note">✅ Автокапитализация каждой строки. Элегантное изумрудное тире с отступом — читается как чёткий список тезисов.</div>
+      </div>
+
+      <!-- VARIANT 2: LUMINOUS BEAD BULLET -->
+      <div class="preview-card" style="border-color: rgba(56, 189, 248, 0.7);">
+        <div>
+          <span class="badge-tag badge-opt2">Вариант 2 · Изумрудные микро-бусины</span>
+          <div class="q-title">Что означает префикс vnd в MIME / медиа-типах?</div>
+          <div class="divider"></div>
+          <div class="answer-bead">
+            <div class="bead-item">
+              <span class="dot-marker"></span>
+              <span>Вендорский (vendor) медиа-тип</span>
+            </div>
+            <div class="bead-item">
+              <span class="dot-marker"></span>
+              <span>Нестандартный тип, специфичный для конкретного API</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer-note">✅ Стильные круглые бусинки в едином языке с верхними бусинами прогресса.</div>
+      </div>
+
+      <!-- VARIANT 3: SMART SENTENCE FLOW -->
+      <div class="preview-card" style="border-color: rgba(245, 158, 11, 0.7);">
+        <div>
+          <span class="badge-tag badge-opt3">Вариант 3 · Связное предложение</span>
+          <div class="q-title">Что означает префикс vnd в MIME / медиа-типах?</div>
+          <div class="divider"></div>
+          <div class="answer-flow">
+            Вендорский (vendor) медиа-тип — нестандартный тип, специфичный для конкретного API
+          </div>
+        </div>
+        <div class="card-footer-note">✅ Две короткие строки объединяются в единое стройное предложение через длинное тире «—».</div>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <span>2. Пример на CORS: <code>GET / HEAD / POST</code></span>
+    </div>
+
+    <div class="cards-grid">
+      <!-- CORS CURRENT -->
+      <div class="preview-card" style="border-color: rgba(244, 63, 94, 0.5);">
+        <div>
+          <span class="badge-tag badge-current">Как сейчас (Скриншот 3)</span>
+          <div class="q-title">В чем разница между простым и сложным CORS-запросом?</div>
+          <div class="divider"></div>
+          <div class="answer-current">
+            <div>Простые: <code>GET</code> / <code>HEAD</code> / <code>POST</code> с ограниченными заголовками без preflight</div>
+            <div>сложные требуют preflight-проверки</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CORS VARIANT 1 -->
+      <div class="preview-card" style="border-color: rgba(16, 185, 129, 0.8);">
+        <div>
+          <span class="badge-tag badge-opt1">Вариант 1 (Мягкое тире + Заглавная)</span>
+          <div class="q-title">В чем разница между простым и сложным CORS-запросом?</div>
+          <div class="divider"></div>
+          <div class="answer-dash">
+            <div class="dash-item">
+              <span class="dash-bullet">—</span>
+              <span>Простые: <code>GET</code> / <code>HEAD</code> / <code>POST</code> с ограниченными заголовками без preflight</span>
+            </div>
+            <div class="dash-item">
+              <span class="dash-bullet">—</span>
+              <span>Сложные требуют обязательной preflight-проверки</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <span>3. Мобильное активное свечение кнопок оценок (как desktop hover)</span>
+    </div>
+
+    <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 18px; padding: 20px; max-width: 680px; margin: 0 auto 30px;">
+      <p style="font-size:0.86rem; color:var(--ink-muted); margin-bottom: 12px;">На мобильных экранах теперь все кнопки сразу обладают сочным неоновым свечением и градиентом:</p>
+      <div class="btn-row">
+        <button class="rate-btn btn-again">Не помню</button>
+        <button class="rate-btn btn-hard">Со скрипом</button>
+        <button class="rate-btn btn-good">Помню</button>
+        <button class="rate-btn btn-easy">На автомате</button>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <span>4. Цвет будущих бусин шагов</span>
+    </div>
+
+    <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 18px; padding: 20px; max-width: 680px; margin: 0 auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+        <span style="font-size:0.85rem; color:#fda4af;">Было (тусклые, почти невидимые):</span>
+        <div class="beads-row" style="padding: 6px 14px; margin:0;">
+          <span class="b-dot b-done"></span>
+          <span class="b-dot b-done"></span>
+          <span class="b-dot b-active"></span>
+          <span class="b-dot b-future-old"></span>
+          <span class="b-dot b-future-old"></span>
+          <span class="b-dot b-future-old"></span>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 14px;">
+        <span style="font-size:0.85rem; color:#6ee7b7;">Станет (чистые изумрудные жемчужины с видимым контуром и ядром):</span>
+        <div class="beads-row" style="padding: 6px 14px; margin:0;">
+          <span class="b-dot b-done"></span>
+          <span class="b-dot b-done"></span>
+          <span class="b-dot b-active"></span>
+          <span class="b-dot b-future-new"></span>
+          <span class="b-dot b-future-new"></span>
+          <span class="b-dot b-future-new"></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
