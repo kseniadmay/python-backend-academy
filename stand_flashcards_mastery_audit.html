@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Стенд вёрстки текста флеш-карточек — Python Backend Academy</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    :root {
+      --bg-obsidian: #090d16;
+      --sidebar-bg: rgba(11, 15, 24, 0.94);
+      --surface: rgba(18, 24, 34, 0.90);
+      --surface-2: rgba(26, 34, 48, 0.85);
+      --ink: #f8fafc;
+      --ink-soft: #cbd5e1;
+      --ink-muted: #64748b;
+      --border-subtle: rgba(255, 255, 255, 0.10);
+      --moss: #10b981;
+      --font-m: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+      /* Настраиваемые параметры вёрстки текста */
+      --q-font-size: 1.25rem;
+      --q-line-height: 1.55;
+      --a-font-size: 1.05rem;
+      --a-line-height: 1.6;
+      --code-bg: rgba(16, 185, 129, 0.14);
+      --code-border: rgba(16, 185, 129, 0.35);
+      --code-color: #34d399;
+      --capsule-bg: rgba(10, 16, 26, 0.85);
+      --capsule-border: rgba(16, 185, 129, 0.40);
+    }
+
+    [data-theme="light"] {
+      --bg-obsidian: #f8fafc;
+      --sidebar-bg: rgba(255, 255, 255, 0.95);
+      --surface: rgba(255, 255, 255, 0.96);
+      --surface-2: rgba(241, 245, 249, 0.95);
+      --ink: #0f172a;
+      --ink-soft: #334155;
+      --ink-muted: #64748b;
+      --border-subtle: rgba(0, 0, 0, 0.10);
+      --moss: #059669;
+      --code-bg: rgba(16, 185, 129, 0.12);
+      --code-border: rgba(16, 185, 129, 0.30);
+      --code-color: #047857;
+      --capsule-bg: #f1f5f9;
+      --capsule-border: rgba(0, 0, 0, 0.15);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg-obsidian);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    /* Плавающий HUD-пульт управления стендом */
+    .stand-hud {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.55);
+    }
+    [data-theme="light"] .stand-hud {
+      background: rgba(255, 255, 255, 0.94);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.10);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+    }
+    .hud-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #34d399;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: -0.01em;
+    }
+    .hud-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(0, 0, 0, 0.45);
+      padding: 3px 6px;
+      border-radius: 9px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    [data-theme="light"] .hud-group {
+      background: rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+    .hud-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink-muted);
+      padding: 0 4px;
+    }
+    .hud-btn {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: all 0.16s ease;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    [data-theme="light"] .hud-btn { color: #64748b; }
+    .hud-btn:hover { color: var(--ink); background: rgba(255, 255, 255, 0.08); }
+    .hud-btn.active {
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.28) 0%, rgba(6, 78, 59, 0.35) 100%);
+      border-color: rgba(52, 211, 153, 0.7);
+      color: #34d399;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.20);
+    }
+    [data-theme="light"] .hud-btn.active {
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.18) 0%, rgba(16, 185, 129, 0.08) 100%);
+      border-color: rgba(16, 185, 129, 0.6);
+      color: #059669;
+    }
+
+    /* Вторая строка пульта: параметры типографики */
+    .hud-subbar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      flex-wrap: wrap;
+      font-size: 11px;
+    }
+    [data-theme="light"] .hud-subbar {
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    /* Главная рабочая сцена */
+    .stand-workspace {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 26px 16px 60px;
+    }
+
+    /* Фрейм вьюпорта (десктоп / мобайл 390px) */
+    .viewport-frame {
+      width: 100%;
+      max-width: 700px;
+      transition: max-width 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+      position: relative;
+    }
+    .viewport-frame.mode-mobile {
+      max-width: 390px;
+      background: rgba(14, 20, 30, 0.90);
+      border: 3px solid rgba(255, 255, 255, 0.14);
+      border-radius: 40px;
+      padding: 16px 14px 28px;
+      box-shadow: 0 25px 70px -10px rgba(0, 0, 0, 0.85);
+    }
+    [data-theme="light"] .viewport-frame.mode-mobile {
+      background: #ffffff;
+      border: 3px solid rgba(0, 0, 0, 0.15);
+      box-shadow: 0 25px 70px -10px rgba(0, 0, 0, 0.15);
+    }
+    .mobile-notch {
+      display: none;
+      width: 110px;
+      height: 22px;
+      background: #000000;
+      border-radius: 20px;
+      margin: 0 auto 14px;
+    }
+    .viewport-frame.mode-mobile .mobile-notch { display: block; }
+
+    /* Ожерелье бусин прогресса сессии */
+    .srs-beads-necklace {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 0 auto 18px;
+      padding: 2px 0;
+    }
+    .dot-jewel {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.22);
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+    [data-theme="light"] .dot-jewel { background: rgba(0, 0, 0, 0.20); }
+    .dot-jewel.done { background: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
+    .dot-jewel.active {
+      width: 9px;
+      height: 9px;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.45), 0 0 16px #10b981;
+    }
+
+    /* Сцена переворота карточки */
+    .fc-stage {
+      perspective: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .fc-card {
+      position: relative;
+      width: 100%;
+      transform-style: preserve-3d;
+      -webkit-transform-style: preserve-3d;
+      transition: transform 0.42s cubic-bezier(0.2, 0.85, 0.35, 1.15);
+      cursor: pointer;
+    }
+    .fc-card.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    /* Развязка граней карточки */
+    .card-face {
+      border-radius: 20px;
+      box-sizing: border-box;
+      transition: border-color 0.22s ease, box-shadow 0.22s ease, background 0.25s ease;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      padding: 24px 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: stretch;
+      min-height: 230px;
+    }
+    .mode-mobile .card-face {
+      padding: 18px 16px;
+      min-height: 220px;
+    }
+
+    /* ЛИЦЕВАЯ ГРАНЬ (Вопрос) — Естественное выравнивание влево */
+    .fc-card:not(.is-flipped) .card-front {
+      position: relative !important;
+      width: 100% !important;
+      z-index: 2 !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+      transform: rotateY(0deg) translateZ(1px);
+    }
+    .fc-card:not(.is-flipped) .card-back {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      z-index: 1 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      transform: rotateY(180deg) translateZ(1px);
+    }
+    .fc-card.is-flipped .card-front {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      z-index: 1 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      transform: rotateY(0deg) translateZ(1px);
+    }
+    .fc-card.is-flipped .card-back {
+      position: relative !important;
+      width: 100% !important;
+      height: auto !important;
+      z-index: 2 !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+      transform: rotateY(180deg) translateZ(1px);
+    }
+
+    .card-front {
+      background: linear-gradient(155deg, rgba(255, 255, 255, 0.06) 0%, rgba(18, 24, 38, 0.46) 45%, rgba(8, 12, 18, 0.64) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-top: 1.2px solid rgba(255, 255, 255, 0.20);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 20px 48px -12px rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    [data-theme="light"] .card-front {
+      background: linear-gradient(155deg, #ffffff 0%, #f8fafc 100%);
+      border: 1px solid rgba(0, 0, 0, 0.09);
+      box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.08), inset 0 1px 0 #ffffff;
+    }
+
+    /* ОБОРОТНАЯ ГРАНЬ (Ответ) — Оригинальный дизайн платформы */
+    .card-back {
+      background: linear-gradient(165deg, rgba(16, 80, 60, 0.35) 0%, rgba(18, 26, 34, 0.88) 55%, rgba(13, 20, 26, 0.94) 100%);
+      border: 1.5px solid rgba(52, 211, 153, 0.45);
+      box-shadow: inset 0 1px 0 rgba(167, 243, 208, 0.22), 0 24px 56px -10px rgba(0, 0, 0, 0.65), 0 0 32px rgba(16, 185, 129, 0.16);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+    [data-theme="light"] .card-back {
+      background: linear-gradient(155deg, rgba(236, 253, 245, 0.95) 0%, #ffffff 50%, rgba(209, 250, 229, 0.85) 100%);
+      border: 1.5px solid rgba(16, 185, 129, 0.50);
+      box-shadow: 0 20px 48px -8px rgba(16, 185, 129, 0.15), inset 0 1px 0 #ffffff;
+    }
+
+    /* Шапка карточки (.fc-top-row) — БЕЗ лишних элементов, ровно как в оригинале */
+    .fc-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      margin-bottom: 12px;
+    }
+
+    .srs-card-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      height: 24px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, 0.16);
+      border: 1px solid rgba(245, 158, 11, 0.40);
+      color: #fbbf24;
+    }
+
+    .srs-card-otvet-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.20);
+      border: 1px solid rgba(16, 185, 129, 0.50);
+      padding: 0 10px;
+      height: 25px;
+      line-height: 23px;
+      border-radius: 999px;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.28);
+      white-space: nowrap;
+    }
+    [data-theme="light"] .srs-card-otvet-chip {
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid rgba(16, 185, 129, 0.55);
+      color: #047857;
+    }
+
+    .fc-flip-back-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--ink-soft);
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 25px;
+      line-height: 23px;
+      padding: 0 12px;
+      border-radius: 999px;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    [data-theme="light"] .fc-flip-back-btn {
+      background: rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(0, 0, 0, 0.10);
+      color: #475569;
+    }
+    .fc-flip-back-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+    }
+
+    /* ========================================================
+       ВЁРСТКА ТЕКСТА КАРТОЧЕК (ФОКУС СТЕНДА)
+       ======================================================== */
+    .fc-card-body {
+      margin: auto 0;
+      padding: 8px 0;
+      width: 100%;
+      text-align: left;
+    }
+
+    /* Текст вопроса (.fc-q-text) — СТРОГО ПО ЛЕВОМУ КРАЮ */
+    .fc-q-text {
+      font-size: var(--q-font-size);
+      line-height: var(--q-line-height);
+      font-weight: 600;
+      color: var(--ink);
+      text-align: left;
+      letter-spacing: -0.01em;
+    }
+
+    /* Инлайн-код внутри текста вопроса и ответа */
+    .fc-q-text code,
+    .fc-q-sub code,
+    .fc-a-mastery code,
+    .fc-answer-item code {
+      font-family: var(--font-m);
+      font-size: 0.88em;
+      font-weight: 700;
+      color: var(--code-color);
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 6px;
+      padding: 2px 7px;
+      display: inline-block;
+      vertical-align: baseline;
+    }
+
+    /* Суб-вопрос в шапке ответа (.fc-q-sub) */
+    .fc-q-sub {
+      font-size: 0.88rem;
+      font-weight: 600;
+      line-height: 1.4;
+      color: #a7f3d0;
+      opacity: 0.85;
+      margin-bottom: 6px;
+      text-align: left;
+    }
+    [data-theme="light"] .fc-q-sub {
+      color: #065f46;
+      opacity: 1;
+    }
+    .fc-divider {
+      height: 1px;
+      background: linear-gradient(90deg, rgba(52, 211, 153, 0.40), rgba(52, 211, 153, 0.15), transparent);
+      margin: 6px 0 10px;
+    }
+
+    /* Текст ответа (.fc-a-mastery) */
+    .fc-a-mastery {
+      font-size: var(--a-font-size);
+      line-height: var(--a-line-height);
+      color: #ffffff;
+      font-weight: 500;
+      text-align: left;
+    }
+    [data-theme="light"] .fc-a-mastery {
+      color: #0f172a;
+    }
+
+
+    /* ========================================================
+       БЛОКИ КОДА (Никаких "блоков кода в блоках кода"!)
+       ======================================================== */
+    /* Гарантированный сброс для code внутри любых pre и капсул кода */
+    pre code,
+    pre.quiz-question-code code,
+    .fc-code-block code,
+    .fc-code-capsule code,
+    .fc-code-capsule .fc-code-primary {
+      background: transparent !important;
+      border: none !important;
+      border-radius: 0 !important;
+      padding: 0 !important;
+      box-shadow: none !important;
+      display: inline !important;
+      color: inherit !important;
+      font-family: inherit !important;
+      font-size: inherit !important;
+      line-height: inherit !important;
+      vertical-align: baseline !important;
+    }
+
+    /* Блок кода в вопросе (<pre>) — идеальные отступы по бокам */
+    pre.quiz-question-code,
+    .fc-code-block {
+      background: rgba(0, 0, 0, 0.50);
+      border: 1px solid rgba(52, 211, 153, 0.32);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 10px 0 14px;
+      font-family: var(--font-m, 'JetBrains Mono', monospace);
+      font-size: 0.90rem;
+      line-height: 1.52;
+      overflow-x: auto;
+      text-align: left;
+      color: #e2e8f0;
+      box-sizing: border-box;
+      width: 100%;
+    }
+    [data-theme="light"] pre.quiz-question-code,
+    [data-theme="light"] .fc-code-block {
+      background: #f1f5f9;
+      border-color: rgba(16, 185, 129, 0.35);
+      color: #0f172a;
+    }
+
+    /* Капсула кода в ответе (.fc-code-capsule) — идеальные поля и отступы */
+    .fc-code-capsule {
+      background: var(--capsule-bg);
+      border: 1px solid var(--capsule-border);
+      border-radius: 12px;
+      padding: 11px 16px;
+      margin: 8px 0 12px;
+      display: flex;
+      align-items: center;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+      position: relative;
+      overflow-x: auto;
+      box-sizing: border-box;
+      width: 100%;
+    }
+    .fc-code-capsule .fc-code-primary {
+      font-family: var(--font-m, 'JetBrains Mono', monospace);
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: #fbbf24;
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+    [data-theme="light"] .fc-code-capsule .fc-code-primary {
+      color: #b45309;
+    }
+
+    /* Пояснение к коду (.fc-answer-explanation) */
+    .fc-answer-explanation {
+      font-size: 0.94rem;
+      line-height: 1.58;
+      color: #cbd5e1;
+      font-weight: 400;
+      margin-top: 6px;
+      text-align: left;
+    }
+    [data-theme="light"] .fc-answer-explanation {
+      color: #334155;
+    }
+    .fc-explanation-dash {
+      color: #10b981;
+      font-weight: 800;
+      margin-right: 4px;
+    }
+
+    /* Структурированный список пунктов (.fc-answer-item) */
+    .fc-answer-multiline {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 6px 0;
+      text-align: left;
+    }
+    .fc-answer-item {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      font-size: 0.94rem;
+      line-height: 1.52;
+      text-align: left;
+    }
+    .fc-answer-bullet {
+      color: #10b981;
+      font-weight: 800;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      user-select: none;
+    }
+    .fc-answer-text {
+      flex: 1 1 auto;
+      text-align: left;
+    }
+
+    /* Математические формулы KaTeX / O(n) */
+    .math-formula {
+      font-family: ui-monospace, KaTeX_Math, monospace;
+      font-size: 0.92em;
+      font-style: italic;
+      color: #a5f3fc;
+      background: rgba(6, 182, 212, 0.15);
+      border: 1px solid rgba(6, 182, 212, 0.35);
+      padding: 1px 5px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    [data-theme="light"] .math-formula {
+      color: #0891b2;
+      background: rgba(6, 182, 212, 0.10);
+      border-color: rgba(6, 182, 212, 0.30);
+    }
+
+
+
+    /* ========================================================
+       ДОК ДЕЙСТВИЙ (Action Dock) — 100% ОРИГИНАЛЬНЫЙ СТИЛЬ
+       ======================================================== */
+    .srs-action-dock {
+      margin-top: 14px;
+      width: 100%;
+    }
+
+    /* Фаза 1: Показать ответ */
+    .btn-show-answer {
+      width: 100%;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border: 1.5px solid rgba(52, 211, 153, 0.8);
+      color: #ffffff;
+      font-size: 0.96rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 18px rgba(16, 185, 129, 0.38);
+      transition: all 0.16s ease;
+    }
+    .btn-show-answer:hover {
+      background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+      transform: translateY(-1px);
+    }
+    .btn-show-answer:active { transform: scale(0.985); }
+
+    /* Фаза 2: Оригинальные кнопки SRS («Не помню», «Со скрипом», «Помню», «На автомате») */
+    .srs-rating-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      width: 100%;
+    }
+    .mode-mobile .srs-rating-grid,
+    @media (max-width: 640px) {
+      .srs-rating-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+      }
+    }
+
+    .fc-rate-btn {
+      height: 48px;
+      min-height: 48px;
+      border-radius: 13px;
+      padding: 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.16s ease;
+      user-select: none;
+      border: 1px solid transparent;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .fc-rate-btn:active { transform: scale(0.97); }
+    .srs-btn-title {
+      font-size: 0.86rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    /* Кнопка 1: Не помню (кармин) */
+    .fc-rate-btn--again {
+      background: linear-gradient(180deg, rgba(244, 63, 94, 0.14) 0%, rgba(244, 63, 94, 0.04) 100%);
+      border-color: rgba(244, 63, 94, 0.35);
+      color: #fda4af;
+    }
+    .fc-rate-btn--again:hover {
+      background: linear-gradient(180deg, rgba(244, 63, 94, 0.22) 0%, rgba(244, 63, 94, 0.08) 100%);
+      border-color: rgba(244, 63, 94, 0.65);
+    }
+
+    /* Кнопка 2: Со скрипом (янтарь) */
+    .fc-rate-btn--hard {
+      background: linear-gradient(180deg, rgba(245, 158, 11, 0.14) 0%, rgba(245, 158, 11, 0.04) 100%);
+      border-color: rgba(245, 158, 11, 0.35);
+      color: #fde68a;
+    }
+    .fc-rate-btn--hard:hover {
+      background: linear-gradient(180deg, rgba(245, 158, 11, 0.22) 0%, rgba(245, 158, 11, 0.08) 100%);
+      border-color: rgba(245, 158, 11, 0.65);
+    }
+
+    /* Кнопка 3: Помню (изумруд — акцент) */
+    .fc-rate-btn--good {
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.26) 0%, rgba(6, 78, 59, 0.25) 100%);
+      border-color: rgba(52, 211, 153, 0.65);
+      color: #ffffff;
+      font-weight: 700;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.30);
+    }
+    .fc-rate-btn--good:hover {
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.36) 0%, rgba(6, 78, 59, 0.35) 100%);
+      border-color: rgba(52, 211, 153, 0.95);
+    }
+
+    /* Кнопка 4: На автомате (циан) */
+    .fc-rate-btn--easy {
+      background: linear-gradient(180deg, rgba(6, 182, 212, 0.16) 0%, rgba(6, 182, 212, 0.04) 100%);
+      border-color: rgba(6, 182, 212, 0.40);
+      color: #a5f3fc;
+    }
+    .fc-rate-btn--easy:hover {
+      background: linear-gradient(180deg, rgba(6, 182, 212, 0.24) 0%, rgba(6, 182, 212, 0.08) 100%);
+      border-color: rgba(6, 182, 212, 0.70);
+    }
+
+    /* Информационный подвал стенда */
+    .text-workshop-info {
+      width: 100%;
+      max-width: 700px;
+      margin-top: 40px;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 18px 22px;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+    [data-theme="light"] .text-workshop-info {
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Плавающий HUD-пульт управления стендом -->
+  <header class="stand-hud">
+    <div class="hud-title">
+      <span>📖 СТЕНД ВЁРСТКИ ТЕКСТА КАРТОЧЕК</span>
+      <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Текст & Типографика</span>
+    </div>
+
+    <!-- Переключатель Вьюпорта -->
+    <div class="hud-group">
+      <span class="hud-label">Экран:</span>
+      <button class="hud-btn active" id="btn-mode-desktop" onclick="setViewport('desktop')">💻 Десктоп</button>
+      <button class="hud-btn" id="btn-mode-mobile" onclick="setViewport('mobile')">📱 Мобайл 390px</button>
+    </div>
+
+    <!-- Переключатель Темы -->
+    <div class="hud-group">
+      <span class="hud-label">Тема:</span>
+      <button class="hud-btn active" id="btn-theme-dark" onclick="setTheme('dark')">🌙 Обсидиан</button>
+      <button class="hud-btn" id="btn-theme-light" onclick="setTheme('light')">☀️ Светлая</button>
+    </div>
+
+    <!-- Переключатель Фазы -->
+    <div class="hud-group">
+      <span class="hud-label">Фаза:</span>
+      <button class="hud-btn active" id="btn-phase-q" onclick="setCardPhase('question')">Вопрос</button>
+      <button class="hud-btn" id="btn-phase-a" onclick="setCardPhase('answer')">Ответ</button>
+    </div>
+
+    <!-- Выбор реальной карточки из курса -->
+    <div class="hud-group">
+      <span class="hud-label">Пример:</span>
+      <select id="card-sample-select" onchange="onSampleChange(this.value)" class="bg-black/50 text-emerald-400 text-xs font-bold px-2 py-1 rounded border border-white/10 outline-none cursor-pointer">
+        <option value="0">1. Капсула кода: if ... else в list comprehension</option>
+        <option value="1">2. Формулы сложности: list O(n) vs generator O(1)</option>
+        <option value="2">3. Структурированный список: 401 Unauthorized vs 403 Forbidden</option>
+        <option value="3">4. Вопрос с кодом: Что вернёт [x % 2 == 0]?</option>
+        <option value="4">5. Вложенный list comprehension (матрица 3×3)</option>
+        <option value="5">6. Лаконичный концепт (преимущества list comprehension)</option>
+      </select>
+    </div>
+
+    <!-- Вторая строка: интерактивная подгонка параметров текста -->
+    <div class="hud-subbar">
+      <div class="flex items-center gap-2">
+        <span class="hud-label">Шрифт вопроса:</span>
+        <button class="hud-btn" onclick="adjustTextParam('--q-font-size', '1.15rem')">Мелкий</button>
+        <button class="hud-btn active" id="btn-q-std" onclick="adjustTextParam('--q-font-size', '1.25rem')">Стандарт (1.25rem)</button>
+        <button class="hud-btn" onclick="adjustTextParam('--q-font-size', '1.40rem')">Крупный</button>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="hud-label">Шрифт ответа:</span>
+        <button class="hud-btn" onclick="adjustTextParam('--a-font-size', '0.96rem')">Компактный</button>
+        <button class="hud-btn active" id="btn-a-std" onclick="adjustTextParam('--a-font-size', '1.05rem')">Стандарт (1.05rem)</button>
+        <button class="hud-btn" onclick="adjustTextParam('--a-font-size', '1.15rem')">Крупный</button>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="hud-label">Интервал строк:</span>
+        <button class="hud-btn" onclick="adjustTextParam('--a-line-height', '1.45')">1.45</button>
+        <button class="hud-btn active" id="btn-lh-std" onclick="adjustTextParam('--a-line-height', '1.60')">1.60 (Стандарт)</button>
+        <button class="hud-btn" onclick="adjustTextParam('--a-line-height', '1.75')">1.75</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Рабочая область -->
+  <main class="stand-workspace">
+
+    <div id="viewport-frame" class="viewport-frame">
+      <div class="mobile-notch"></div>
+
+      <!-- Ожерелье бусин -->
+      <div class="srs-beads-necklace">
+        <span class="dot-jewel done"></span>
+        <span class="dot-jewel done"></span>
+        <span class="dot-jewel active"></span>
+        <span class="dot-jewel"></span>
+        <span class="dot-jewel"></span>
+      </div>
+
+      <!-- Сцена карточки (Оригинальная структура) -->
+      <div class="fc-stage">
+        <div id="fc-card-elem" class="fc-card" onclick="onCardClick(event)">
+          
+          <!-- ЛИЦЕВАЯ ГРАНЬ (Вопрос) -->
+          <div class="card-face card-front">
+            <div class="fc-top-row">
+              <span class="srs-card-status-badge">⚡ Повторение</span>
+            </div>
+
+            <div class="fc-card-body">
+              <div id="q-content-box" class="fc-q-text">
+                <!-- Контент вопроса формируется динамически -->
+              </div>
+            </div>
+
+            <div class="text-xs text-slate-400/50 text-center pt-2">
+              <span>Нажмите на карточку или кнопку ниже, чтобы перевернуть</span>
+            </div>
+          </div>
+
+          <!-- ОБОРОТНАЯ ГРАНЬ (Ответ) — Ровно как было: «✓ Ответ» и «← К вопросу» -->
+          <div class="card-face card-back">
+            <div class="fc-top-row">
+              <span class="srs-card-otvet-chip">✓ Ответ</span>
+              <button type="button" class="fc-flip-back-btn" onclick="flipToQuestion(event)">
+                ← К вопросу
+              </button>
+            </div>
+
+            <div class="fc-card-body">
+              <div id="q-summary-box" class="fc-q-sub">
+                <!-- Вопрос в шапке ответа -->
+              </div>
+              <div class="fc-divider"></div>
+              <div id="a-content-box" class="fc-a-mastery">
+                <!-- Контент ответа формируется динамически -->
+              </div>
+            </div>
+
+            <div class="text-xs text-emerald-300/60 pt-2 border-t border-emerald-500/20 text-center">
+              <span>Оцените, насколько легко вспомнился ответ:</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ДОК ДЕЙСТВИЙ (Оригинальные кнопки: «Не помню», «Со скрипом», «Помню», «На автомате») -->
+      <footer class="srs-action-dock">
+        <!-- Фаза 1: Вопрос -->
+        <button id="dock-btn-show" type="button" class="btn-show-answer" onclick="flipToAnswer()">
+          <span>Показать ответ</span>
+        </button>
+
+        <!-- Фаза 2: Ответ (Канонические кнопки как были раньше) -->
+        <div id="dock-ratings" class="srs-rating-grid" style="display: none;">
+          <button type="button" class="fc-rate-btn fc-rate-btn--again" onclick="handleRate(1)">
+            <span class="srs-btn-title">Не помню</span>
+          </button>
+          <button type="button" class="fc-rate-btn fc-rate-btn--hard" onclick="handleRate(2)">
+            <span class="srs-btn-title">Со скрипом</span>
+          </button>
+          <button type="button" class="fc-rate-btn fc-rate-btn--good" onclick="handleRate(3)">
+            <span class="srs-btn-title">Помню</span>
+          </button>
+          <button type="button" class="fc-rate-btn fc-rate-btn--easy" onclick="handleRate(4)">
+            <span class="srs-btn-title">На автомате</span>
+          </button>
+        </div>
+      </footer>
+
+    </div>
+
+    <!-- Информационный блок -->
+    <section class="text-workshop-info">
+      <h3 class="font-bold text-white text-sm mb-1 flex items-center gap-2">
+        <span>✏️ Стенд точечной вёрстки текста карточек</span>
+      </h3>
+      <p class="text-xs text-slate-300">
+        Интерфейс карточки и кнопки (<em>«Не помню / Со скрипом / Помню / На автомате»</em>) приведены в 100% исходное состояние без изменения структуры экрана.
+      </p>
+      <p class="text-xs text-slate-400 mt-2">
+        <strong>Что вы можете проверить и скорректировать:</strong>
+      </p>
+      <ul class="text-xs text-slate-300 list-disc list-inside mt-1 space-y-1">
+        <li>Вёрстку инлайн-кода <code>`...`</code> и капсул кода (отступы, перенос строк, цвет).</li>
+        <li>Вёрстку списков с буллитами (расстояние от точки до текста, межстрочный интервал).</li>
+        <li>Вёрстку математических формул (например, <span class="math-formula">O(n)</span> и <span class="math-formula">O(1)</span>).</li>
+        <li>Отношение размера вопроса к размеру ответа (на десктопе и на мобильном 390px).</li>
+      </ul>
+      <p class="text-xs text-emerald-400 font-semibold mt-3">
+        💬 Напишите мне, если в каком-то примере текст ложится неидеально (например: «сделай отступ капсулы меньше», «выдели тире ярче», «увеличь шрифт вопроса») — я сразу применю точные параметры!
+      </p>
+    </section>
+
+  </main>
+
+  <script>
+    // Набор реальных карточек из курса Python Backend Academy
+    const SAMPLES = [
+      {
+        title: "Капсула кода: if ... else в list comprehension",
+        q: "Где пишется конструкция <code>if ... else</code> (выбор значения) внутри list comprehension, а где одиночный <code>if</code> (фильтр)?",
+        aHtml: `
+          <div class="fc-code-capsule">
+            <code class="fc-code-primary">[x if x &gt; 0 else 0 for x in lst]</code>
+          </div>
+          <div class="fc-answer-explanation">
+            <span class="fc-explanation-dash">—</span> тернарный выбор <code>A if условие else B</code> пишется <strong>ПЕРЕД</strong> <code>for</code> (меняет сам элемент), а фильтрующий <code>if условие</code> без <code>else</code> пишется <strong>ПОСЛЕ</strong> <code>for</code> (отсеивает элементы).
+          </div>
+        `
+      },
+      {
+        title: "Формулы сложности: list O(n) vs generator O(1)",
+        q: "В чём фундаментальное различие между списковым включением <code>[x**2 for x in seq]</code> и генераторным выражением <code>(x**2 for x in seq)</code>?",
+        aHtml: `
+          <p>Квадратные скобки <code>[...]</code> создают <code>list</code> — он сразу вычисляет и сохраняет все элементы в оперативной памяти (<span class="math-formula">O(n)</span> RAM).</p>
+          <p class="mt-2">Круглые скобки <code>(...)</code> создают <code>generator</code> — он вычисляет элементы лениво по одному по мере запроса через <code>next()</code> (<span class="math-formula">O(1)</span> RAM).</p>
+        `
+      },
+      {
+        title: "Структурированный список: 401 vs 403",
+        q: "В чём ключевое различие между HTTP-статусами <code>401 Unauthorized</code> и <code>403 Forbidden</code> в REST API?",
+        aHtml: `
+          <div class="fc-answer-multiline">
+            <div class="fc-answer-item">
+              <span class="fc-answer-bullet">•</span>
+              <span class="fc-answer-text"><code>401 Unauthorized</code> — клиент <strong>не аутентифицирован</strong> (не предъявил токен или срок JWT истёк). Сервер не знает, кто обращается.</span>
+            </div>
+            <div class="fc-answer-item">
+              <span class="fc-answer-bullet">•</span>
+              <span class="fc-answer-text"><code>403 Forbidden</code> — клиент <strong>успешно аутентифицирован</strong>, но у него <strong>нет прав</strong> (роли/scope) на запрошенный ресурс.</span>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Вопрос с кодом: Что вернёт [x % 2 == 0]?",
+        q: `Что вернёт следующее списковое включение?<br>
+            <pre class="quiz-question-code"><code>[x for x in range(10) if x % 2 == 0]</code></pre>`,
+        aHtml: `
+          <div class="fc-code-capsule">
+            <code class="fc-code-primary">[0, 2, 4, 6, 8]</code>
+          </div>
+          <div class="fc-answer-explanation">
+            <span class="fc-explanation-dash">—</span> список всех чётных чисел от <code>0</code> до <code>8</code> включительно. Число <code>10</code> не включается, так как <code>range(10)</code> генерирует последовательность строго до 9.
+          </div>
+        `
+      },
+      {
+        title: "Вложенный list comprehension (матрица 3×3)",
+        q: "Как создать матрицу (таблицу умножения) размером 3×3 с помощью вложенного list comprehension?",
+        aHtml: `
+          <div class="fc-code-capsule">
+            <code class="fc-code-primary">[[row * col for col in range(3)] for row in range(3)]</code>
+          </div>
+          <div class="fc-answer-explanation">
+            <span class="fc-explanation-dash">—</span> внешний цикл <code>for row in range(3)</code> перебирает строки матрицы, а внутренний <code>for col in range(3)</code> генерирует список элементов (столбцы) внутри каждой строки.
+          </div>
+        `
+      },
+      {
+        title: "Лаконичный концепт (преимущества list comprehension)",
+        q: "Каковы главные преимущества list comprehension перед классическим циклом <code>for</code> с <code>list.append()</code>?",
+        aHtml: `
+          <p>1. <strong>Компактность:</strong> создание и наполнение списка укладывается в одну выразительную строку.</p>
+          <p class="mt-2">2. <strong>Декларативная читаемость:</strong> код описывает, <em>что</em> мы хотим получить, а не шаги наполнения.</p>
+          <p class="mt-2">3. <strong>Скорость в CPython:</strong> создание списка через list comprehension происходит на уровне C-байткода (<code>LIST_APPEND</code>), без накладных расходов на поиск и вызов метода <code>.append()</code> в цикле.</p>
+        `
+      }
+    ];
+
+    let currentSampleIdx = 0;
+    let cardPhase = 'question';
+
+    function renderSample(idx) {
+      currentSampleIdx = idx;
+      const s = SAMPLES[idx];
+      document.getElementById('q-content-box').innerHTML = s.q;
+      document.getElementById('q-summary-box').innerHTML = s.q.replace(/<pre[\s\S]*?<\/pre>/gi, '').trim();
+      document.getElementById('a-content-box').innerHTML = s.aHtml;
+    }
+
+    function onSampleChange(val) {
+      renderSample(Number(val));
+    }
+
+    function setViewport(mode) {
+      document.getElementById('btn-mode-desktop').classList.toggle('active', mode === 'desktop');
+      document.getElementById('btn-mode-mobile').classList.toggle('active', mode === 'mobile');
+      document.getElementById('viewport-frame').classList.toggle('mode-mobile', mode === 'mobile');
+    }
+
+    function setTheme(th) {
+      document.documentElement.setAttribute('data-theme', th);
+      document.getElementById('btn-theme-dark').classList.toggle('active', th === 'dark');
+      document.getElementById('btn-theme-light').classList.toggle('active', th === 'light');
+    }
+
+    function setCardPhase(ph) {
+      const isQ = (ph === 'question' || ph === 'q');
+      cardPhase = isQ ? 'question' : 'answer';
+      document.getElementById('btn-phase-q').classList.toggle('active', isQ);
+      document.getElementById('btn-phase-a').classList.toggle('active', !isQ);
+
+      const card = document.getElementById('fc-card-elem');
+      const btnShow = document.getElementById('dock-btn-show');
+      const ratings = document.getElementById('dock-ratings');
+
+      if (isQ) {
+        card.classList.remove('is-flipped');
+        btnShow.style.display = 'flex';
+        ratings.style.display = 'none';
+      } else {
+        card.classList.add('is-flipped');
+        btnShow.style.display = 'none';
+        ratings.style.display = 'grid';
+      }
+    }
+
+    function flipToAnswer() {
+      setCardPhase('answer');
+    }
+
+    function flipToQuestion(e) {
+      if (e) e.stopPropagation();
+      setCardPhase('question');
+    }
+
+    function onCardClick(e) {
+      if (e.target.closest('.fc-flip-back-btn')) return;
+      setCardPhase(cardPhase === 'question' ? 'answer' : 'question');
+    }
+
+    function handleRate(rate) {
+      // Переход к следующему примеру
+      const nextIdx = (currentSampleIdx + 1) % SAMPLES.length;
+      document.getElementById('card-sample-select').value = nextIdx;
+      renderSample(nextIdx);
+      setCardPhase('question');
+    }
+
+    function adjustTextParam(paramName, value) {
+      document.documentElement.style.setProperty(paramName, value);
+    }
+
+    // Инициализация первого примера
+    renderSample(0);
+
+    // Поддержка параметров URL (для скриншотов и прямого перехода в состояние)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('sample')) {
+      const sVal = Number(urlParams.get('sample'));
+      renderSample(sVal);
+      const sel = document.getElementById('card-sample-select');
+      if (sel) sel.value = sVal;
+    }
+    if (urlParams.has('phase')) setCardPhase(urlParams.get('phase'));
+    if (urlParams.has('view')) setViewport(urlParams.get('view'));
+    if (urlParams.has('theme')) setTheme(urlParams.get('theme'));
+
+    // Поддержка горячих клавиш Space и Esc
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        setCardPhase(cardPhase === 'question' ? 'answer' : 'question');
+      } else if (e.code === 'Escape') {
+        if (cardPhase === 'answer') setCardPhase('question');
+      }
+    });
+  </script>
+</body>
+</html>

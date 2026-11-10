@@ -24386,6 +24386,25 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     box-shadow: 0 0 10px rgba(16, 185, 129, 0.12) !important;
   }
 
+  /* Гарантированный сброс для code внутри любых блоков кода pre и капсул (0 "блоков кода в блоках кода") */
+  pre code,
+  pre.quiz-question-code code,
+  .fc-code-block code,
+  .fc-code-capsule code,
+  .fc-code-capsule .fc-code-primary {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    display: inline !important;
+    vertical-align: baseline !important;
+    color: inherit !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+  }
+
 
 
   /* Внутренний контейнер ответа: 0 прокрутки колесиком, весь текст умещается целиком */
@@ -26965,6 +26984,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     font-size: clamp(1.12rem, 2.05vw, 1.28rem) !important;
     line-height: 1.6 !important;
     width: 100% !important;
+    text-align: left !important;
     box-sizing: border-box !important;
     overflow: visible !important;
   }
@@ -44061,8 +44081,8 @@ function viewPythonSkill(sid){
           <div class="fc-card demo-card ${pySkillViewState.cardFlipped ? 'is-flipped fc-card--flipped' : ''}" id="srs-active-card" data-flipped="${pySkillViewState.cardFlipped ? 'true' : 'false'}" data-py-flip-card style="width:100%;max-width:680px;box-sizing:border-box;cursor:pointer;">
             
             <!-- Лицевая грань: Вопрос (Чистый обсидиановый кристалл, 0 лексического шума) -->
-            <div class="card-face card-front fc-card-front" style="min-height:280px;padding:28px 32px;display:flex;flex-direction:column;justify-content:center;align-items:center;box-sizing:border-box;">
-              <div class="fc-card-body fc-q fc-q-clean" style="margin:auto 0;padding:0;font-size:clamp(1.2rem, 2.4vw, 1.45rem);line-height:1.55;font-weight:600;color:var(--ink);text-align:center;letter-spacing:-0.01em;">
+            <div class="card-face card-front fc-card-front" style="min-height:280px;padding:28px 32px;display:flex;flex-direction:column;justify-content:center;align-items:stretch;box-sizing:border-box;">
+              <div class="fc-card-body fc-q fc-q-clean" style="margin:auto 0;padding:0;font-size:clamp(1.2rem, 2.4vw, 1.45rem);line-height:1.55;font-weight:600;color:var(--ink);text-align:left;letter-spacing:-0.01em;">
                 ${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(curCard.q) : curCard.q}
               </div>
             </div>
