@@ -56141,14 +56141,14 @@ function getThermodynamicCooldownData(){
     };
   }
 
-  // Непрерывная термодинамическая шкала накала памяти (плавный lerp на каждый 1%)
+  // Непрерывная термодинамическая шкала накала памяти (плавный lerp на каждый 1% градусов и цвета)
   const THERMO_STOPS = [
-    { p: 0,   r: 45,  g: 24,  b: 32,  br: 244, bg: 63,  bb: 94,  tr: 203, tg: 213, tb: 225, name: 'Остывшая сталь (20°C)' },
-    { p: 25,  r: 120, g: 16,  b: 45,  br: 244, bg: 63,  bb: 94,  tr: 254, tg: 205, tb: 211, name: 'Тёмно-вишнёвый жар (600°C)' },
-    { p: 50,  r: 190, g: 22,  b: 60,  br: 251, bg: 113, bb: 133, tr: 254, tg: 226, tb: 226, name: 'Ярко-алый горн (850°C)' },
-    { p: 75,  r: 230, g: 90,  b: 18,  br: 253, bg: 186, bb: 116, tr: 255, tg: 237, tb: 213, name: 'Оранжевый накал (1050°C)' },
-    { p: 90,  r: 238, g: 150, b: 16,  br: 254, bg: 240, bb: 138, tr: 254, tg: 240, tb: 138, name: 'Янтарно-золотой кристалл (1200°C)' },
-    { p: 100, r: 255, g: 255, b: 255, br: 255, bg: 255, bb: 255, tr: 255, tg: 255, tb: 255, name: 'Белое каление (1350°C)' }
+    { p: 0,   temp: 20,   r: 45,  g: 24,  b: 32,  br: 244, bg: 63,  bb: 94,  tr: 203, tg: 213, tb: 225, name: 'Остывшая сталь' },
+    { p: 25,  temp: 600,  r: 120, g: 16,  b: 45,  br: 244, bg: 63,  bb: 94,  tr: 254, tg: 205, tb: 211, name: 'Тёмно-вишнёвый жар' },
+    { p: 50,  temp: 850,  r: 190, g: 22,  b: 60,  br: 251, bg: 113, bb: 133, tr: 254, tg: 226, tb: 226, name: 'Ярко-алый горн' },
+    { p: 75,  temp: 1050, r: 230, g: 90,  b: 18,  br: 253, bg: 186, bb: 116, tr: 255, tg: 237, tb: 213, name: 'Оранжевый накал' },
+    { p: 90,  temp: 1200, r: 238, g: 150, b: 16,  br: 254, bg: 240, bb: 138, tr: 254, tg: 240, tb: 138, name: 'Янтарно-золотой кристалл' },
+    { p: 100, temp: 1350, r: 255, g: 255, b: 255, br: 255, bg: 255, bb: 255, tr: 255, tg: 255, tb: 255, name: 'Белое каление' }
   ];
 
   let left = THERMO_STOPS[0], right = THERMO_STOPS[THERMO_STOPS.length - 1];
@@ -56163,6 +56163,21 @@ function getThermodynamicCooldownData(){
   const span = (right.p - left.p) || 1;
   const t = Math.max(0, Math.min(1, (pct - left.p) / span));
   const lerp = (a, b) => Math.round(a + (b - a) * t);
+
+  // Живая динамическая температура в градусах Цельсия на каждый 1%
+  const curTemp = Math.round(left.temp + (right.temp - left.temp) * t);
+
+  let phaseName = 'Белое каление';
+  if(pct < 25) phaseName = 'Остывшая сталь';
+  else if(pct < 50) phaseName = 'Тёмно-вишнёвый жар';
+  else if(pct < 75) phaseName = 'Ярко-алый горн';
+  else if(pct < 90) phaseName = 'Оранжевый накал';
+  else if(pct < 100) phaseName = 'Янтарно-золотой кристалл';
+
+  const tooltipTag = `${phaseName} (${curTemp}°C)`;
+  const tooltipDesc = (overdueCount > 0)
+    ? `Долг: ${overdueCount} · прогрев кузницы памяти`
+    : 'Все повторения закрыты · металл закалён';
 
   const r = lerp(left.r, right.r);
   const g = lerp(left.g, right.g);
@@ -56188,8 +56203,8 @@ function getThermodynamicCooldownData(){
     pct,
     cssClass: '',
     labelHtml,
-    tooltipTag: right.name,
-    tooltipDesc: '',
+    tooltipTag,
+    tooltipDesc,
     tagColor,
     bgGrad,
     borderCol,
