@@ -40202,6 +40202,14 @@ const ALL_UNIT_TESTS_COMBINED = Object.assign({}, PY_MASTERY.unitTests, WEB_MAST
 
 const ALL_UNITS_COMBINED = [].concat(PY_MASTERY.units, WEB_MASTERY.units, BACKEND_MASTERY.units, ALGO_MASTERY.units, DB_MASTERY.units, ARCH_MASTERY.units, INFRA_MASTERY.units);
 
+window.ALL_UNITS_COMBINED = ALL_UNITS_COMBINED;
+window.ALL_UNIT_TESTS_COMBINED = ALL_UNIT_TESTS_COMBINED;
+window.PY_SKILLS_BY_ID = PY_SKILLS_BY_ID;
+window.getTrackForUnit = getTrackForUnit;
+window.getTrackForSkill = getTrackForSkill;
+window.getSkillMP = getSkillMP;
+window.viewPythonSkill = viewPythonSkill;
+
 
 
 Object.values(MASTERY_TRACKS).forEach(tr => {
@@ -61362,6 +61370,8 @@ document.addEventListener('click', async function(e){
 
   if(pos){
 
+    if(typeof window.closeSilkSheet === 'function') window.closeSilkSheet();
+
     const sid = pos.getAttribute('data-py-open-skill');
 
     const tr = getTrackForSkill(sid);
@@ -66189,16 +66199,6 @@ document.addEventListener('keydown', function(e){
 
 
 
-render();
-
-
-
-
-
-})();
-
-
-
 // ==================== ZEN SILK SERPENTINE CONTROLLERS ====================
 let _currentSilkData = null;
 
@@ -66254,7 +66254,7 @@ window.openSilkSheet = function(uid, title, desc, status, customRoute, triggerEl
       if(uObj && uObj.skills && uObj.skills.length > 0){
         chipsEl.innerHTML = uObj.skills.map(s => {
           const sName = (s.title || s.name || s.id || '').replace(/^.*?:/,'').trim();
-          return `<span style="font-size:10px; font-family:'JetBrains Mono',monospace; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); padding:2px 7px; border-radius:6px; color:#a7f3d0;">${escapeHtmlStr(sName)}</span>`;
+          return `<button type="button" class="sheet-tech-chip" data-py-open-skill="${s.id}" style="font-size:10.5px; font-family:'JetBrains Mono',monospace; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); padding:3px 9px; border-radius:8px; color:#a7f3d0; cursor:pointer; transition:all 0.15s ease;" onmouseover="this.style.background='rgba(52,211,153,0.18)';this.style.borderColor='rgba(52,211,153,0.5)';" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(255,255,255,0.14)';">${escapeHtmlStr(sName)}</button>`;
         }).join('');
       }
     }
@@ -66442,6 +66442,14 @@ if (!window._zenBeaconBound) {
     }
   });
 }
+
+render();
+
+
+
+
+
+})();
 
 </script>
 
