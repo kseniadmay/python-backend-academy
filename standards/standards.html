@@ -36058,7 +36058,10 @@ document.getElementById('reset-btn-d').addEventListener('click', function(){
 
 });
 
-window.addEventListener('hashchange', function(){ render(); });
+window.addEventListener('hashchange', function(){
+  try { if(typeof closeMobileDrawer === 'function') closeMobileDrawer(true); } catch(_e){}
+  render();
+});
 
 
 
@@ -56605,12 +56608,16 @@ function openMobileDrawer(){
 }
 window.openMobileDrawer = openMobileDrawer;
 
-function closeMobileDrawer(){
+function closeMobileDrawer(immediate){
   document.body.classList.remove('mobile-drawer-open');
   document.documentElement.classList.remove('mobile-drawer-open');
 
   const m = document.getElementById('mobile-drawer-modal');
   if(!m) return;
+  if(immediate){
+    if(m && m.parentNode) m.remove();
+    return;
+  }
   if(m.classList.contains('is-closing')) return;
   m.classList.add('is-closing');
   setTimeout(() => {
