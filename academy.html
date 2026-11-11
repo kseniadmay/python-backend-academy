@@ -33838,6 +33838,8 @@ function saveState(s){
 
 }
 
+window.saveState = saveState;
+
 let state = loadState(); window.state = state;
 
 
@@ -36039,6 +36041,8 @@ function currentRoute(){
   return h;
 
 }
+
+window.currentRoute = currentRoute;
 
 function render(){
 
@@ -44377,7 +44381,7 @@ function viewPythonSkill(sid){
       }
     }
 
-    primaryActionHTML = `
+    const primaryActionHTML = `
       <div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:480px;margin:0 auto;">
         <div class="dock-quanta-beads-row" id="py-quanta-beads">
           ${chunks.map((_, ci) => `<div class="dock-quantum-bead ${ci <= curChunkIdx ? 'active' : ''}"></div>`).join('')}
@@ -52472,15 +52476,7 @@ function viewProPath(options){
 
 
 
-  const actCoord = (coords[activeUnitIndex] || coords[0] || { x: 340, y: 70 });
 
-  const placeBelow = actCoord.y < 240;
-
-  // Вариант 2: Вертикальный якорь (Elevated Anchor) — карточка поднята на безопасный зазор 70px над узлом
-
-  const initialPopoverTop = placeBelow ? (actCoord.y + 60) : (actCoord.y - 235);
-
-  const initialPopoverArrow = placeBelow ? 'path-popover-arrow--up' : 'path-popover-arrow--down';
 
 
 
@@ -57938,6 +57934,14 @@ function openHandoverModal(){
 // Override render() to handle all routes (#/python, #/web, #/backend, #/algorithms, #/databases, #/architecture, #/infra, #/<track>/boss, #/mock, #/cards, #/practice, #/docs, #/map, #/sandbox, #/diagnostic)
 
 render = function(){
+
+  window.render = render;
+  window.renderApp = render;
+
+  if(window.state && typeof window.state === 'object'){
+    Object.assign(state, window.state);
+  }
+  window.state = state;
 
   if(window.theoryAudioPlayer && window.theoryAudioPlayer.isPlaying){
 
