@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Academy SRS Visual Acceptance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+  <style>
+    :root {
+      --paper: #0d1016;
+      --surface: rgba(22, 27, 36, 0.74);
+      --ink: #f8fafc;
+      --ink-soft: #cbd5e1;
+      --ink-muted: #94a3b8;
+      --font-b: 'Onest', sans-serif;
+      --font-d: 'Onest', sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      margin: 0;
+      background-color: var(--paper);
+      background-image: radial-gradient(rgba(255, 255, 255, 0.055) 1.2px, transparent 1.2px);
+      background-size: 24px 24px;
+      color: var(--ink);
+      font-family: var(--font-b);
+      line-height: 1.55;
+      padding: 16px 14px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .mobile-frame {
+      width: 346px; /* Exact user viewport */
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Top bar */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 40px;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+    .srs-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 32px;
+      position: relative;
+    }
+    .mode-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--ink-soft);
+    }
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+    .sprint-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 10px;
+      height: 30px;
+      border-radius: 8px;
+      background: rgba(15, 21, 32, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .close-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: rgba(15, 21, 32, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: var(--ink-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+
+    /* Progress bar */
+    .prog-track {
+      height: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 99px;
+      position: relative;
+      margin: 8px 0 14px;
+    }
+    .prog-fill {
+      width: 25%;
+      height: 100%;
+      background: linear-gradient(90deg, #f43f5e, #fb7185);
+      border-radius: 99px;
+      box-shadow: 0 0 10px rgba(244, 63, 94, 0.7);
+    }
+
+    /* Beads */
+    .beads-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .dot-jewel {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, rgba(52, 211, 153, 0.28) 0%, rgba(16, 185, 129, 0.09) 60%, rgba(5, 150, 105, 0.02) 100%);
+      border: 1px solid rgba(52, 211, 153, 0.38);
+      opacity: 0.55;
+    }
+    .dot-jewel.done {
+      background: radial-gradient(circle at 35% 35%, #a7f3d0 0%, #34d399 45%, #059669 100%);
+      border: 1px solid rgba(167, 243, 208, 0.90);
+      box-shadow: 0 0 6px 1px rgba(52, 211, 153, 0.75), 0 0 14px 2px rgba(16, 185, 129, 0.45);
+      opacity: 1;
+    }
+    .dot-jewel.active {
+      width: 14px;
+      height: 14px;
+      background: #34d399;
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 12px #10b981, 0 0 24px rgba(52, 211, 153, 0.9);
+      opacity: 1;
+    }
+
+    /* Card face */
+    .fc-card {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0.03) 50%, rgba(18, 23, 33, 0.90) 100%), var(--surface);
+      border: 1px solid rgba(16, 185, 129, 0.48);
+      border-radius: 20px;
+      padding: 22px 20px;
+      min-height: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 20px 48px -8px rgba(0, 0, 0, 0.75), 0 0 32px rgba(16, 185, 129, 0.18);
+      backdrop-filter: blur(24px) saturate(140%);
+    }
+    .fc-top-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #fbbf24;
+      background: rgba(245, 158, 11, 0.18);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      padding: 0 10px;
+      height: 25px;
+      line-height: 23px;
+      border-radius: 999px;
+      width: fit-content;
+      margin-bottom: 12px;
+    }
+    .fc-card-body {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 6px 0 20px;
+    }
+    .q-statement {
+      font-size: clamp(1.05rem, 2.0vw, 1.20rem);
+      font-weight: 700;
+      line-height: 1.52;
+      color: #ffffff;
+      text-align: left;
+    }
+
+    /* HARMONIC PROPORTIONAL INLINE CODE */
+    code {
+      font-family: var(--font-m, 'JetBrains Mono', monospace) !important;
+      font-size: 0.88em !important;
+      font-weight: 700 !important;
+      color: #34d399 !important;
+      background: rgba(16, 185, 129, 0.16) !important;
+      border: 1px solid rgba(52, 211, 153, 0.45) !important;
+      border-radius: 5px !important;
+      padding: 0.10em 0.38em !important;
+      display: inline !important;
+      line-height: inherit !important;
+      vertical-align: 0.04em !important;
+      white-space: nowrap !important;
+      box-decoration-break: clone !important;
+      -webkit-box-decoration-break: clone !important;
+      margin: 0 0.1em !important;
+    }
+
+    /* Button */
+    .cta-btn {
+      height: 48px;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(5, 150, 105, 0.24) 100%);
+      border: 1.5px solid rgba(52, 211, 153, 0.85);
+      box-shadow: 0 6px 24px rgba(16, 185, 129, 0.38), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      margin-top: 14px;
+    }
+
+    .rating-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .rate-btn {
+      height: 46px;
+      border-radius: 12px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-family: var(--font-b);
+    }
+    .btn-again {
+      background: linear-gradient(180deg, rgba(244, 63, 94, 0.24) 0%, rgba(244, 63, 94, 0.10) 100%);
+      border: 1.5px solid rgba(244, 63, 94, 0.75);
+      color: #fecdd3;
+      box-shadow: 0 4px 18px rgba(244, 63, 94, 0.38);
+    }
+    .btn-hard {
+      background: linear-gradient(180deg, rgba(245, 158, 11, 0.24) 0%, rgba(245, 158, 11, 0.10) 100%);
+      border: 1.5px solid rgba(245, 158, 11, 0.75);
+      color: #fde68a;
+      box-shadow: 0 4px 18px rgba(245, 158, 11, 0.32);
+    }
+    .btn-good {
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.38) 0%, rgba(6, 78, 59, 0.35) 100%);
+      border: 1.5px solid rgba(52, 211, 153, 0.95);
+      color: #ffffff;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 6px 24px -2px rgba(16, 185, 129, 0.55);
+    }
+    .btn-easy {
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.26) 0%, rgba(14, 116, 144, 0.22) 100%);
+      border: 1.5px solid rgba(56, 189, 248, 0.80);
+      color: #e0f2fe;
+      box-shadow: 0 4px 20px rgba(56, 189, 248, 0.38);
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-frame">
+
+    <!-- SCREEN 1: git rebase -->
+    <div>
+      <div class="topbar">
+        <span>⚯ Academy</span>
+        <span style="font-size:0.80rem;opacity:0.8;">⏱ 15:00</span>
+      </div>
+      <div class="srs-header">
+        <span class="mode-pill"><span class="live-dot"></span> КАРТОЧКИ SRS</span>
+        <div style="display:flex;gap:6px;">
+          <span class="sprint-badge">⚡ Спринт 1 / 36</span>
+          <span class="close-btn">✕</span>
+        </div>
+      </div>
+      <div class="prog-track"><div class="prog-fill"></div></div>
+      <div class="beads-row">
+        <span class="dot-jewel done"></span>
+        <span class="dot-jewel active"></span>
+        <span class="dot-jewel"></span>
+        <span class="dot-jewel"></span>
+        <span class="dot-jewel"></span>
+        <span class="dot-jewel"></span>
+        <span class="dot-jewel"></span>
+        <span class="dot-jewel"></span>
+      </div>
+
+      <div class="fc-card">
+        <div class="fc-top-chip">⚡ Повторение</div>
+        <div class="fc-card-body">
+          <div class="q-statement">
+            Какое преимущество даёт <code>git rebase</code> при работе с историей?
+          </div>
+        </div>
+        <div style="height:10px;"></div>
+      </div>
+      <button class="cta-btn">Показать ответ</button>
+    </div>
+
+    <!-- SCREEN 2: GET, POST, PUT, DELETE, PATCH -->
+    <div style="margin-top:24px;">
+      <div class="fc-card">
+        <div class="fc-top-chip">⚡ Повторение</div>
+        <div class="fc-card-body">
+          <div class="q-statement">
+            Единственный метод из <code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>DELETE</code>, <code>PATCH</code> не являющийся ни безопасным, ни идемпотентным?
+          </div>
+        </div>
+        <div style="height:10px;"></div>
+      </div>
+      <button class="cta-btn">Показать ответ</button>
+    </div>
+
+    <!-- SCREEN 3: Answer with json.JSONEncoder and default() -->
+    <div style="margin-top:24px;">
+      <div class="fc-card" style="border-color: rgba(52, 211, 153, 0.7);">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.45);padding:0 10px;height:25px;line-height:23px;border-radius:999px;">✓ Ответ</span>
+          <span style="font-size:0.74rem;color:var(--ink-soft);background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);padding:0 10px;height:25px;line-height:23px;border-radius:999px;">← К вопросу</span>
+        </div>
+        <div class="fc-card-body" style="padding:14px 0 10px;">
+          <div style="font-size:0.86rem;font-weight:600;line-height:1.4;color:#a7f3d0;opacity:0.85;margin-bottom:6px;">
+            Что нужно для сериализации нестандартного объекта в <code>json</code>?
+          </div>
+          <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(52,211,153,0.35),transparent);margin:6px 0 10px;width:100%;"></div>
+          <div style="font-size:1.02rem;line-height:1.6;color:#ffffff;font-weight:500;">
+            Кастомный encoder: подкласс <code>json.JSONEncoder</code> с переопределённым <code>default()</code>
+          </div>
+        </div>
+      </div>
+      <div class="rating-grid">
+        <button class="rate-btn btn-again">Не помню</button>
+        <button class="rate-btn btn-hard">Со скрипом</button>
+        <button class="rate-btn btn-good">Помню</button>
+        <button class="rate-btn btn-easy">На автомате</button>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
