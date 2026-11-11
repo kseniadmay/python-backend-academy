@@ -2991,6 +2991,30 @@
 
   }
 
+  .dock-quanta-beads-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .dock-quantum-bead {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .dock-quantum-bead.active {
+    background: var(--emerald, #10b981);
+    border-color: #34d399;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.55), 0 0 4px var(--emerald, #10b981);
+    transform: scale(1.25);
+  }
+
   .topbar-audio-icon,
 
   .topbar-help-icon,
@@ -42755,20 +42779,18 @@ function splitStepHtmlIntoChunks(htmlStr, stepTitle){
     return false;
   }
 
-  // Сверх-атомарная подача: 1 мысль = 1 квант (Duolingo / Coddy / Active Microlearning)
+  // Сверх-атомарная подача: 1 мысль = 1 квант (Active Microlearning: раздельная нарезка мысли и кода)
   const atomicChunks = [];
   let pending = '';
 
   for(let i = 0; i < filteredBlocks.length; i++){
     const b = filteredBlocks[i];
-    const nextB = (i + 1 < filteredBlocks.length) ? filteredBlocks[i + 1] : null;
+    const nextB = filteredBlocks[i + 1];
 
-    if(isHeadingBlock(b)){
-      pending = pending ? (pending + '\n' + b) : b;
-    } else if(isLeadInBlock(b, nextB)){
+    if(isHeadingBlock(b) || isLeadInBlock(b, nextB)){
       pending = pending ? (pending + '\n' + b) : b;
     } else if(pending){
-      // Заголовок или подводка (pending) ОБЯЗАНЫ идти вместе со следующим содержательным блоком (никаких сирот!)
+      // Заголовок или подводка (pending) обязан идти вместе со следующим содержательным блоком (никаких сирот!)
       atomicChunks.push(pending + '\n' + b);
       pending = '';
     } else {
@@ -44331,43 +44353,39 @@ function viewPythonSkill(sid){
 
     const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
 
-    let primaryActionHTML = '';
+    let finishBtnAttr = '';
     if(hasMoreChunks){
-      primaryActionHTML = `
-        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" style="height:50px;border-radius:14px;font-size:0.96rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:1;max-width:440px;width:100%;" data-chunk-more="py">
-          <span>Понятно, дальше ➔</span>
-        </button>`;
+      finishBtnAttr = 'data-chunk-more="py"';
     } else if(stepIdx + 1 < steps.length){
-      primaryActionHTML = `
-        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" style="height:50px;border-radius:14px;font-size:0.96rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:1;max-width:440px;width:100%;" data-py-next-step="${stepIdx+1}">
-          <span>Следующая подтема ➔</span>
-        </button>`;
+      finishBtnAttr = `data-py-next-step="${stepIdx+1}"`;
     } else {
       const noteDecks = (typeof getMatchingDecksForNote === 'function') ? getMatchingDecksForNote(activeK, sk) : [];
-      let finishBtnText = 'Закрепить в карточках ➔';
-      let finishBtnAttr = `data-py-finish-note="${activeK}"`;
+      finishBtnAttr = `data-py-finish-note="${activeK}"`;
       if(noteDecks.length === 0){
         const noteTasks = (typeof getMatchingTasksForNote === 'function') ? getMatchingTasksForNote(activeK, sk) : [];
         if(noteTasks.length > 0){
-          finishBtnText = 'Перейти к практике в IDE ➔';
           finishBtnAttr = `data-py-select-task="${noteTasks[0]}"`;
         } else {
           const curKidx = (sk.kIds || []).indexOf(activeK);
           if(curKidx >= 0 && curKidx + 1 < (sk.kIds || []).length){
             const nextKid = sk.kIds[curKidx + 1];
-            finishBtnText = 'К следующему конспекту ➔';
             finishBtnAttr = `data-py-to-next-note="${nextKid}"`;
           } else {
-            finishBtnText = 'Рубежный зачёт ➔';
             finishBtnAttr = `data-py-to-exam="${sk.unitId}"`;
           }
         }
       }
-      primaryActionHTML = `
-        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta" style="height:50px;border-radius:14px;font-size:0.96rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:1;max-width:440px;width:100%;" ${finishBtnAttr}>
-          <span>${escapeHtmlStr(finishBtnText)}</span>
-        </button>`;
     }
+
+    primaryActionHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:480px;margin:0 auto;">
+        <div class="dock-quanta-beads-row" id="py-quanta-beads">
+          ${chunks.map((_, ci) => `<div class="dock-quantum-bead ${ci <= curChunkIdx ? 'active' : ''}"></div>`).join('')}
+        </div>
+        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta btn-dock-cta-single" style="height:50px;border-radius:14px;font-size:0.96rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;width:100%;letter-spacing:0.01em;" ${finishBtnAttr}>
+          <span>Дальше</span>
+        </button>
+      </div>`;
 
     const cleanNoteTitle = (noteObj && noteObj.title ? noteObj.title : activeK).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
 
@@ -60407,15 +60425,20 @@ document.addEventListener('click', async function(e){
 
         feedContainer.appendChild(newEl);
 
+        // Мягкий автоскролл к новому кванту
+        try { newEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch(err){}
 
+        // Обновляем круглые жемчужные бусины квантов над кнопкой «Дальше»
+        const beadsContainer = document.getElementById('py-quanta-beads');
+        if(beadsContainer){
+          const beads = beadsContainer.querySelectorAll('.dock-quantum-bead');
+          if(beads[nextCIdx]){
+            beads[nextCIdx].classList.add('active');
+          }
+        }
 
         // Обновляем кнопку действия in-place без пересоздания DOM-узла
-
         const hasMore = (nextCIdx + 1 < chunks.length);
-
-        const cardParent = feedContainer.closest('.interactive-step-card');
-
-        const isRead = state.readNotes && state.readNotes.includes(activeK);
 
         if(!hasMore){
 
@@ -60433,19 +60456,15 @@ document.addEventListener('click', async function(e){
 
           if(curSIdx + 1 < steps.length){
 
-            const stepKey = `${activeK}:${curSIdx+1}`;
-
-            const stepAlreadyDone = isRead || (state.completedNoteSteps && state.completedNoteSteps[stepKey]);
-
             chunkMoreBtn.setAttribute('data-py-next-step', curSIdx + 1);
 
-            chunkMoreBtn.textContent = `Понятно, дальше${stepAlreadyDone ? '' : ' (+5°C)'} ➔`;
+            chunkMoreBtn.innerHTML = '<span>Дальше</span>';
 
           } else {
 
             chunkMoreBtn.setAttribute('data-py-finish-note', activeK);
 
-            chunkMoreBtn.textContent = isRead ? '✓ Конспект усвоен' : '✓ Завершить конспект (+10 MP)';
+            chunkMoreBtn.innerHTML = '<span>Дальше</span>';
 
           }
 
@@ -61515,132 +61534,8 @@ const psk = e.target.closest('[data-py-select-k]');
 
     saveReadingPosition();
 
-
-
-    // Бесшовное переключение шага без перерисовки всей страницы и без прыжков кнопки
-
-    const feedContainer = document.getElementById('py-theory-text');
-
-    const noteObj = (typeof ALL_NOTES_COMBINED !== 'undefined' ? ALL_NOTES_COMBINED[activeK] : null) || {steps:[]};
-
-    const steps = noteObj.steps || [];
-
-    const curStep = steps[nextStepIdx] || {title:'', html:''};
-
-    const cleanStepTitle = (curStep.title || ('Шаг ' + (nextStepIdx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-
-    const pureStepTitle = cleanStepTitle.replace(/^\d+[\.\)\s\-·•]+\s*/, '').trim();
-
-    const chunks = (typeof getStepChunks === 'function')
-      ? getStepChunks(curStep, pureStepTitle)
-      : (typeof splitStepHtmlIntoChunks === 'function' ? splitStepHtmlIntoChunks(curStep.html, pureStepTitle) : [curStep.html || '']);
-
-
-
-    if(feedContainer && chunks.length > 0){
-
-      feedContainer.innerHTML = `<div class="feed-chunk feed-chunk-new lesson-theory" data-chunk-idx="0">${chunks[0]}</div>`;
-
-      const cardParent = feedContainer.closest('.interactive-step-card');
-
-      const isRead = state.readNotes && state.readNotes.includes(activeK);
-
-      const hasMoreChunks = (chunks.length > 1);
-
-      if(hasMoreChunks){
-
-        pns.removeAttribute('data-py-next-step');
-
-        pns.setAttribute('data-chunk-more', 'py');
-
-        pns.textContent = 'Понятно, дальше (+5°C) ➔';
-
-      } else if(nextStepIdx + 1 < steps.length){
-
-        const nextKey = `${activeK}:${nextStepIdx+1}`;
-
-        const stepAlreadyDone = isRead || (state.completedNoteSteps && state.completedNoteSteps[nextKey]);
-
-        pns.setAttribute('data-py-next-step', nextStepIdx + 1);
-
-        pns.textContent = `Понятно, дальше${stepAlreadyDone ? '' : ' (+5°C)'} ➔`;
-
-      } else {
-
-        pns.removeAttribute('data-py-next-step');
-
-        pns.setAttribute('data-py-finish-note', activeK);
-
-        pns.textContent = 'Закрепить в карточках (+10°C) ➔';
-
-      }
-
-
-
-      if(cardParent){
-
-        const backBtn = cardParent.querySelector('[data-chunk-prev]');
-
-        if(backBtn){
-
-          backBtn.style.display = 'inline-flex';
-
-          backBtn.style.visibility = 'visible';
-
-          backBtn.style.pointerEvents = 'auto';
-
-          backBtn.removeAttribute('disabled');
-
-          backBtn.removeAttribute('aria-hidden');
-
-        }
-
-
-
-        const footerStepper = cardParent.querySelector('.step-footer-stepper');
-
-        if(footerStepper){
-
-          const dots = footerStepper.querySelectorAll('.step-micro-dot');
-
-          dots.forEach((dot, dIdx) => {
-
-            dot.classList.remove('done', 'active');
-
-            if(dIdx < nextStepIdx) dot.classList.add('done');
-
-            else if(dIdx === nextStepIdx) dot.classList.add('active');
-
-          });
-
-        }
-
-      }
-
-
-
-      const xpPill = document.querySelector('.sprint-xp-pill');
-
-      if(xpPill && typeof todayXp === 'function'){
-
-        const dayXpVal = todayXp();
-
-        xpPill.textContent = `🔥 +${dayXpVal}°C за сутки`;
-
-        xpPill.title = `Заработано за сутки: ${dayXpVal} XP`;
-
-      }
-
-      return;
-
-    }
-
-
-
     render();
-
     return;
-
   }
 
   const pjc = e.target.closest('[data-py-jump-card]');

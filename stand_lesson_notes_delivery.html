@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Стенд отладки: Бусины квантов над кнопкой «Дальше» · Python Backend Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090e;
+      --paper: #0b0e14;
+      --surface: rgba(18, 24, 38, 0.78);
+      --surface-hover: rgba(26, 34, 52, 0.85);
+      --surface-border: rgba(255, 255, 255, 0.08);
+      --surface-border-strong: rgba(255, 255, 255, 0.16);
+      --ink: #f8fafc;
+      --ink-soft: #cbd5e1;
+      --ink-muted: #94a3b8;
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.28);
+      --emerald-bg: rgba(16, 185, 129, 0.12);
+      --emerald-border: rgba(16, 185, 129, 0.40);
+      --emerald-dark: #064e3b;
+      --amber: #f59e0b;
+      --amber-glow: rgba(245, 158, 11, 0.24);
+      --amber-bg: rgba(245, 158, 11, 0.12);
+      --amber-border: rgba(245, 158, 11, 0.38);
+      --rose: #f43f5e;
+      --rose-glow: rgba(244, 63, 94, 0.24);
+      --rose-bg: rgba(244, 63, 94, 0.12);
+      --rose-border: rgba(244, 63, 94, 0.38);
+      --cyan: #06b6d4;
+      --cyan-bg: rgba(6, 182, 212, 0.12);
+      --cyan-border: rgba(6, 182, 212, 0.38);
+      --font-d: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+      --font-t: 'Unbounded', sans-serif;
+      --card-radius: 24px;
+      --viewport-width: 760px;
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --paper: #f1f5f9;
+      --surface: rgba(255, 255, 255, 0.94);
+      --surface-hover: #ffffff;
+      --surface-border: rgba(15, 23, 42, 0.09);
+      --surface-border-strong: rgba(15, 23, 42, 0.18);
+      --ink: #0f172a;
+      --ink-soft: #334155;
+      --ink-muted: #64748b;
+      --emerald: #059669;
+      --emerald-glow: rgba(5, 150, 105, 0.18);
+      --emerald-bg: rgba(5, 150, 105, 0.08);
+      --emerald-border: rgba(5, 150, 105, 0.30);
+      --emerald-dark: #ecfdf5;
+      --amber: #d97706;
+      --amber-glow: rgba(217, 119, 6, 0.18);
+      --amber-bg: rgba(217, 119, 6, 0.08);
+      --amber-border: rgba(217, 119, 6, 0.30);
+      --rose: #e11d48;
+      --rose-glow: rgba(225, 29, 72, 0.18);
+      --rose-bg: rgba(225, 29, 72, 0.08);
+      --rose-border: rgba(225, 29, 72, 0.30);
+      --cyan: #0891b2;
+      --cyan-bg: rgba(8, 145, 178, 0.08);
+      --cyan-border: rgba(8, 145, 178, 0.30);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1.2px, transparent 1.2px);
+      background-size: 24px 24px;
+      color: var(--ink);
+      font-family: var(--font-d);
+      min-height: 100vh;
+      padding: 16px 12px 64px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ПАНЕЛЬ УПРАВЛЕНИЯ СТЕНДОМ (CONTROL HUD)
+       ══════════════════════════════════════════════════════════ */
+    .stand-header {
+      width: 100%;
+      max-width: 960px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .stand-header-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 18px;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 18px;
+      backdrop-filter: blur(16px);
+    }
+
+    .stand-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .stand-badge {
+      font-family: var(--font-m);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--emerald);
+      background: var(--emerald-bg);
+      border: 1px solid var(--emerald-border);
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .stand-title {
+      font-family: var(--font-t);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+
+    .stand-controls-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .stand-btn {
+      font-family: var(--font-d);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--surface-border);
+      padding: 7px 13px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .stand-btn:hover {
+      background: rgba(255, 255, 255, 0.09);
+      color: var(--ink);
+      border-color: var(--surface-border-strong);
+    }
+
+    .stand-btn.active {
+      background: var(--emerald-bg);
+      color: var(--emerald);
+      border-color: var(--emerald-border);
+      box-shadow: 0 0 12px var(--emerald-glow);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ПЕСОЧНИЦА ВЬЮПОРТА (VIEWPORT SANDBOX)
+       ══════════════════════════════════════════════════════════ */
+    .sandbox-container {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      justify-content: center;
+      position: relative;
+    }
+
+    .viewport-frame {
+      width: 100%;
+      max-width: var(--viewport-width);
+      min-height: 640px;
+      background: var(--paper);
+      border: 1px solid var(--surface-border);
+      border-radius: 28px;
+      padding: 22px 24px 20px;
+      box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      transition: max-width 0.3s cubic-bezier(0.16, 1, 0.3, 1), padding 0.3s ease;
+      overflow: hidden;
+    }
+
+    .viewport-frame.mobile-mode {
+      max-width: 393px;
+      padding: 16px 14px 18px;
+      border-radius: 38px;
+      box-shadow: 0 30px 80px -15px rgba(0, 0, 0, 0.7), 0 0 0 6px #1e293b;
+    }
+
+    .mobile-notch {
+      display: none;
+      width: 100px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 99px;
+      margin: 0 auto 12px;
+    }
+
+    .viewport-frame.mobile-mode .mobile-notch {
+      display: block;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ЭТАЛОННАЯ ШАПКА СПРИНТА (ACADEMY SPRINT HEADER)
+       ══════════════════════════════════════════════════════════ */
+    .lesson-unified-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 30px;
+      margin-bottom: 12px;
+    }
+
+    .lesson-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .live-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 8px var(--emerald);
+      animation: pulse 2s infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    .lesson-header-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink-soft);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .lesson-header-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .header-icon-chip {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--surface-border);
+      color: var(--ink-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    /* Сквозное ожерелье темы */
+    .module-dots-chain {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      margin-bottom: 16px;
+    }
+
+    .module-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .module-dot.active {
+      background: var(--emerald);
+      box-shadow: 0 0 10px var(--emerald-glow);
+      transform: scale(1.25);
+    }
+
+    .module-dot.dot-card {
+      background: rgba(6, 182, 212, 0.2);
+      border-color: var(--cyan-border);
+    }
+
+    .module-dot.dot-ide {
+      background: rgba(129, 140, 248, 0.2);
+      border-color: rgba(129, 140, 248, 0.4);
+    }
+
+    .module-dot.dot-exam {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: var(--amber-border);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ЭКСТЕРН-ШЛЮЗ (ИНВАРИАНТ 10: СДАТЬ ЭКСТЕРНОМ)
+       ══════════════════════════════════════════════════════════ */
+    .fast-track-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 12px;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.10) 0%, rgba(15, 23, 42, 0.5) 100%);
+      border: 1px solid var(--amber-border);
+      border-radius: 12px;
+      margin-bottom: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .fast-track-banner:hover {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(15, 23, 42, 0.7) 100%);
+      border-color: var(--amber);
+    }
+
+    .fast-track-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .fast-track-btn {
+      font-family: var(--font-m);
+      font-size: 10px;
+      font-weight: 700;
+      color: #fbbf24;
+      background: rgba(245, 158, 11, 0.18);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      padding: 3px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       РЯД БУСИН ШАГОВ ТЕКУЩЕГО КОНСПЕКТА (STEPPER: 1..3)
+       ══════════════════════════════════════════════════════════ */
+    .step-beads-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .step-bead {
+      height: 6px;
+      width: 24px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.12);
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .step-bead.active {
+      background: var(--emerald);
+      box-shadow: 0 0 10px var(--emerald-glow);
+      width: 44px;
+    }
+
+    .step-bead.done {
+      background: var(--emerald);
+      opacity: 0.55;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ОСНОВНАЯ КАРТОЧКА С НАКОПИТЕЛЬНОЙ ЛЕНТОЙ И ЛИПКИМ ДОКОМ
+       ══════════════════════════════════════════════════════════ */
+    .note-stage-card {
+      background: var(--surface);
+      border: 1.5px solid var(--surface-border);
+      border-radius: var(--card-radius);
+      padding: 22px 24px 0;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      position: relative;
+      box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.4);
+      min-height: 480px;
+      overflow: hidden;
+    }
+
+    .step-header-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink-muted);
+      letter-spacing: 0.02em;
+    }
+
+    .step-timer-badge {
+      font-family: var(--font-m);
+      font-size: 11px;
+      color: var(--cyan);
+      background: var(--cyan-bg);
+      border: 1px solid var(--cyan-border);
+      padding: 2px 7px;
+      border-radius: 999px;
+    }
+
+    .step-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--ink);
+      line-height: 1.35;
+      letter-spacing: -0.015em;
+      margin-bottom: 16px;
+    }
+
+    /* Скроллируемая область накопительной ленты квантов */
+    .quanta-scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 96px; /* Отступ под липкий док с бусинами */
+      padding-right: 4px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Квант: Стиль C (Равноправный стек: 100% контраст) */
+    .quantum-item {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.94rem;
+      line-height: 1.6;
+      color: var(--ink);
+      opacity: 1;
+      animation: quantumAppear 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes quantumAppear {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .quantum-code-box {
+      background: #040609;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-family: var(--font-m);
+      font-size: 0.84rem;
+      color: #e2e8f0;
+      line-height: 1.55;
+      overflow-x: auto;
+    }
+
+    .code-keyword { color: #f43f5e; font-weight: 600; }
+    .code-func { color: #38bdf8; }
+    .code-str { color: #34d399; }
+    .code-comment { color: #64748b; font-style: italic; }
+    .code-num { color: #fbbf24; }
+
+    .quantum-accent-box {
+      border-radius: 12px;
+      padding: 10px 13px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .quantum-accent--trap {
+      background: var(--rose-bg);
+      border: 1px solid var(--rose-border);
+      color: #ffe4e6;
+    }
+
+    .quantum-accent--insight {
+      background: var(--emerald-bg);
+      border: 1px solid var(--emerald-border);
+      color: #d1fae5;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ЛИПКИЙ ДОК ДЕЙСТВИЙ (ИМЕННО БУСИНЫ КВАНТОВ, А НЕ ТИРЕ!)
+       ══════════════════════════════════════════════════════════ */
+    .sticky-action-dock {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 10px 24px 14px;
+      background: linear-gradient(180deg, rgba(11, 14, 20, 0.88) 0%, rgba(11, 14, 20, 0.99) 100%);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 9px;
+      z-index: 20;
+    }
+
+    [data-theme="light"] .sticky-action-dock {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.90) 0%, rgba(255, 255, 255, 0.99) 100%);
+      border-top: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    /* РЯД КРУГЛЫХ ЖЕМЧУЖНЫХ БУСИН НАД КНОПКОЙ «ДАЛЬШЕ» */
+    .dock-quanta-beads-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .dock-quantum-bead {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .dock-quantum-bead.active {
+      background: var(--emerald);
+      border-color: #34d399;
+      box-shadow: 0 0 10px var(--emerald-glow), 0 0 4px var(--emerald);
+      transform: scale(1.25);
+    }
+
+    .btn-dock-cta-single {
+      width: 100%;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      font-family: var(--font-d);
+      font-size: 0.96rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 18px var(--emerald-glow);
+      transition: all 0.18s ease;
+      user-select: none;
+    }
+
+    .btn-dock-cta-single:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px var(--emerald-glow);
+      filter: brightness(1.06);
+    }
+
+    /* Модалка экстерн-шлюза */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal-card {
+      width: 100%;
+      max-width: 480px;
+      background: #0b0f19;
+      border: 1.5px solid var(--amber-border);
+      border-radius: 22px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px var(--amber-glow);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ПАНЕЛЬ УПРАВЛЕНИЯ СТЕНДОМ -->
+  <header class="stand-header">
+    <div class="stand-header-top">
+      <div class="stand-title-wrap">
+        <span class="stand-badge">Эталон эргономики</span>
+        <h1 class="stand-title">Круглые бусины квантов прямо над кнопкой «Дальше»</h1>
+      </div>
+
+      <div class="stand-controls-group">
+        <button type="button" class="stand-btn" id="btnThemeToggle" title="Сменить тему оформления">
+          <span id="themeIcon">🌙</span>
+          <span id="themeLabel">Тёмная</span>
+        </button>
+
+        <button type="button" class="stand-btn" id="btnViewportToggle" title="Переключить ширину экрана">
+          <span id="viewportIcon">📱</span>
+          <span id="viewportLabel">Мобильный вид (393px)</span>
+        </button>
+
+        <button type="button" class="stand-btn" id="btnResetAll" title="Сбросить шаг и кванты на старт">
+          <span>🔄</span>
+          <span>Сначала</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ПЕСОЧНИЦА ВЬЮПОРТА (ЭКРАН УРОКА) -->
+  <main class="sandbox-container">
+    <div class="viewport-frame" id="viewportFrame">
+      
+      <!-- Мобильный вырез -->
+      <div class="mobile-notch"></div>
+
+      <!-- ШАПКА СПРИНТА -->
+      <header class="lesson-unified-header">
+        <div class="lesson-header-left">
+          <div class="live-status-dot"></div>
+          <div class="lesson-header-title">Глава 1 · Python Core · Урок 2</div>
+        </div>
+
+        <div class="lesson-header-right">
+          <div class="header-icon-chip" title="Справка">📖</div>
+          <div class="header-icon-chip" title="Закрыть урок">✕</div>
+        </div>
+      </header>
+
+      <!-- СКВОЗНОЕ ОЖЕРЕЛЬЕ БУСИН ТЕМЫ (Глобальный путь: Теория ➔ Карточки ➔ Zen IDE) -->
+      <nav class="module-dots-chain" aria-label="Цепь шагов темы">
+        <span class="module-dot active" title="1. Конспект (Текущий)"></span>
+        <span class="module-dot dot-card" title="2. Флеш-карточки темы (5 шт.)"></span>
+        <span class="module-dot dot-ide" title="3. Задача в Zen IDE #1"></span>
+        <span class="module-dot dot-ide" title="4. Задача в Zen IDE #2"></span>
+        <span class="module-dot dot-exam" title="5. Рубежный зачёт главы"></span>
+      </nav>
+
+      <!-- ЭКСТЕРН-ШЛЮЗ (НА ПЕРВОМ ШАГЕ) -->
+      <div class="fast-track-banner" id="btnFastTrack" role="button" tabindex="0">
+        <div class="fast-track-left">
+          <span style="color:var(--amber); font-size:14px;">⚡</span>
+          <span>Знаете мутабельность? Сдайте экстерном!</span>
+        </div>
+        <div class="fast-track-btn">Блиц 2 вопроса ➔</div>
+      </div>
+
+      <!-- РЯД БУСИН ШАГОВ ТЕКУЩЕГО КОНСПЕКТА (STEPPER: 1..3) -->
+      <div class="step-beads-bar" id="stepBeadsBar">
+        <div class="step-bead active" data-step-idx="0" title="Шаг 1: Указатели и адресация"></div>
+        <div class="step-bead" data-step-idx="1" title="Шаг 2: is vs == и поверхностная копия"></div>
+        <div class="step-bead" data-step-idx="2" title="Шаг 3: Интернирование малых чисел"></div>
+      </div>
+
+      <!-- КАРТОЧКА КОНСПЕКТА С НАКОПИТЕЛЬНОЙ ЛЕНТОЙ КВАНТОВ -->
+      <article class="note-stage-card">
+        <div class="step-header-meta">
+          <span id="stepCounterLabel">ШАГ 1 ИЗ 3 · СУТЬ ЯВЛЕНИЯ</span>
+          <span class="step-timer-badge">⏱ ~40 сек</span>
+        </div>
+
+        <h2 class="step-title" id="stepTitle">Все переменные в Python — это указатели</h2>
+
+        <!-- Скроллируемая область накопительной ленты -->
+        <div class="quanta-scroll-area" id="quantaScrollArea">
+          <!-- Сюда динамически добавляются кванты текущего шага -->
+        </div>
+
+        <!-- ЛИПКИЙ ДОК ДЕЙСТВИЙ (КРУГЛЫЕ БУСИНЫ КВАНТОВ НАД КНОПКОЙ «ДАЛЬШЕ») -->
+        <footer class="sticky-action-dock">
+          <!-- Круглые бусины квантов прямо над кнопкой под большим пальцем! -->
+          <div class="dock-quanta-beads-row" id="dockQuantaBeads">
+            <!-- Генерируются динамически -->
+          </div>
+
+          <!-- Строго 1 доминантная кнопка во всю ширину -->
+          <button type="button" class="btn-dock-cta-single" id="btnNextAction">
+            Дальше
+          </button>
+        </footer>
+      </article>
+
+    </div>
+  </main>
+
+  <!-- МОДАЛКА ЭКСТЕРН-ШЛЮЗА -->
+  <div class="modal-overlay" id="fastTrackModal">
+    <div class="modal-card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="color:var(--amber); font-size:18px;">⚡</span>
+          <span style="font-weight:800; font-size:14px; color:var(--ink);">Экстерн-шлюз · Блиц</span>
+        </div>
+        <button type="button" class="stand-btn" id="btnCloseModal" style="padding:4px 8px;">✕</button>
+      </div>
+
+      <p style="font-size:0.88rem; color:var(--ink-soft); line-height:1.5;">
+        Ответьте правильно на вопрос. При успехе теория мгновенно засчитывается со 100% Mastery.
+      </p>
+
+      <div style="background:rgba(255,255,255,0.03); border:1px solid var(--surface-border); border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:8px;">
+        <div style="font-size:0.88rem; font-weight:700; color:var(--ink);">Что выведет <code>a = []; b = a; b.append(1); print(a)</code>?</div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <button type="button" class="stand-btn" onclick="alert('Верно! Оба имени указывают на один список в памяти. Экстерн сдан! ⚡')">[1] (список изменился)</button>
+          <button type="button" class="stand-btn" onclick="alert('Неверно! В Python переменные — это ссылки.')">[] (список a не изменился)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- СКРИПТ УПРАВЛЕНИЯ СТЕНДОМ -->
+  <script>
+    // База данных шагов (Правило 2: раздельная подача мысли и кода для максимального вчитывания)
+    const LESSON_STEPS = [
+      {
+        stepNum: 1,
+        eyebrow: 'ШАГ 1 ИЗ 3 · СУТЬ ЯВЛЕНИЯ',
+        title: 'Все переменные в Python — это указатели',
+        quanta: [
+          {
+            html: `В Python переменная не хранит значение сама. Она лишь держит <strong>ссылку (указатель в памяти)</strong> на объект в куче (heap). Оператор <code>=</code> никогда не копирует данные — он лишь связывает имя с адресом объекта.`
+          },
+          {
+            html: `Посмотрим наглядно в терминале. Когда мы пишем <code>b = a</code>, никакого второго списка не создаётся:`
+          },
+          {
+            code: `# Создаём список и привязываем второе имя\na = [1, 2, 3]\nb = a\nb.append(4)\n\nprint(a)  # [1, 2, 3, 4] — список один и тот же!\nprint(id(a) == id(b))  # True (один физический адрес)`
+          },
+          {
+            accent: {
+              type: 'trap',
+              icon: '⚠️',
+              title: 'Ловушка на собеседовании:',
+              text: 'Дефолтный аргумент <code>def fn(val=[])</code> вычисляется ровно <strong>один раз при компиляции функции</strong>! Все последующие вызовы делят один и тот же список.'
+            }
+          }
+        ]
+      },
+      {
+        stepNum: 2,
+        eyebrow: 'ШАГ 2 ИЗ 3 · СРАВНЕНИЕ И КОПИРОВАНИЕ',
+        title: 'Разница между is и == и поверхностная копия',
+        quanta: [
+          {
+            html: `Очень важно различать два оператора проверки равенства:<br>
+            • <code>==</code> вызывает метод <code>__eq__</code> и сравнивает <strong>значения</strong> внутри объектов.<br>
+            • <code>is</code> сравнивает <strong>физические адреса</strong> в памяти (<code>id(a) == id(b)</code>).`
+          },
+          {
+            html: `Чтобы получить независимый список с теми же значениями, используют метод <code>.copy()</code>:`
+          },
+          {
+            code: `a = [1, 2]\nb = a.copy()  # Поверхностная копия\n\nprint(a == b)  # True (содержимое одинаковое)\nprint(a is b)  # False (разные ячейки памяти!)`
+          },
+          {
+            accent: {
+              type: 'insight',
+              icon: '🌿',
+              title: 'Инженерный инсайт:',
+              text: 'Метод <code>.copy()</code> или срез <code>[:]</code> копирует только верхний уровень. Если внутри лежат другие списки, их адреса останутся общими. Для полной изоляции нужен <code>copy.deepcopy()</code>.'
+            }
+          }
+        ]
+      },
+      {
+        stepNum: 3,
+        eyebrow: 'ШАГ 3 ИЗ 3 · ОПТИМИЗАЦИИ CPYTHON',
+        title: 'Интернирование малых целых чисел (-5..256)',
+        quanta: [
+          {
+            html: `Для максимальной производительности CPython заранее выделяет массив синглтонов для малых целых чисел в диапазоне от <code>-5</code> до <code>256</code>.`
+          },
+          {
+            html: `Любое появление числа из этого диапазона всегда возвращает указатель на уже готовый системный объект:`
+          },
+          {
+            code: `x = 256\ny = 256\nprint(x is y)  # True (взяты из системного кэша CPython)\n\nx2 = 257\ny2 = 257\nprint(x2 is y2)  # False (созданы два разных объекта в куче)`
+          },
+          {
+            accent: {
+              type: 'trap',
+              icon: '⚡',
+              title: 'Железное правило:',
+              text: 'Никогда не используйте <code>is</code> для чисел и строк (только для синглтонов вроде <code>None, True, False</code>). Числа всегда сравнивают через <code>==</code>!'
+            }
+          }
+        ]
+      }
+    ];
+
+    // Состояние
+    const state = {
+      curStepIdx: 0,
+      revealedQuantaCount: 1,
+      isMobile: false,
+      theme: 'dark'
+    };
+
+    // Отрисовка
+    function render() {
+      const stepData = LESSON_STEPS[state.curStepIdx];
+      if (!stepData) return;
+
+      // Мета шага
+      document.getElementById('stepCounterLabel').textContent = stepData.eyebrow;
+      document.getElementById('stepTitle').textContent = stepData.title;
+
+      // Бусины шагов конспекта (вверху: 1..3)
+      document.querySelectorAll('.step-bead').forEach((b, idx) => {
+        b.className = 'step-bead';
+        if (idx === state.curStepIdx) b.classList.add('active');
+        else if (idx < state.curStepIdx) b.classList.add('done');
+      });
+
+      // КРУГЛЫЕ ЖЕМЧУЖНЫЕ БУСИНЫ КВАНТОВ НАД КНОПКОЙ «ДАЛЬШЕ»
+      const dockBeads = document.getElementById('dockQuantaBeads');
+      dockBeads.innerHTML = stepData.quanta.map((_, qIdx) => {
+        const isActive = (qIdx < state.revealedQuantaCount);
+        return `<div class="dock-quantum-bead ${isActive ? 'active' : ''}"></div>`;
+      }).join('');
+
+      // Скролл-контейнер квантов
+      const scrollArea = document.getElementById('quantaScrollArea');
+      scrollArea.innerHTML = '';
+
+      const visibleQuanta = stepData.quanta.slice(0, state.revealedQuantaCount);
+      visibleQuanta.forEach((q) => {
+        const item = document.createElement('div');
+        item.className = 'quantum-item';
+
+        let innerHTML = '';
+        if (q.html) innerHTML += `<div>${q.html}</div>`;
+
+        if (q.code) {
+          innerHTML += `
+            <div class="quantum-code-box">
+              <code>${escapeCode(q.code)}</code>
+            </div>`;
+        }
+
+        if (q.accent) {
+          innerHTML += `
+            <div class="quantum-accent-box quantum-accent--${q.accent.type}">
+              <span style="font-size:15px; flex-shrink:0;">${q.accent.icon}</span>
+              <div>
+                <strong>${q.accent.title}</strong> ${q.accent.text}
+              </div>
+            </div>`;
+        }
+
+        item.innerHTML = innerHTML;
+        scrollArea.appendChild(item);
+      });
+
+      // Мягкий автоскролл вниз к последнему кванту
+      setTimeout(() => {
+        scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' });
+      }, 50);
+
+      // Экстерн-шлюз виден только на 1-м шаге
+      document.getElementById('btnFastTrack').style.display = (state.curStepIdx === 0) ? 'flex' : 'none';
+    }
+
+    function escapeCode(code) {
+      return code
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/(#[^\n]*)/g, '<span class="code-comment">$1</span>')
+        .replace(/\b(def|return|import|from|class|if|else|for|in|is|not)\b/g, '<span class="code-keyword">$1</span>')
+        .replace(/\b(print|id|append|copy|deepcopy)\b/g, '<span class="code-func">$1</span>')
+        .replace(/\b(\d+)\b/g, '<span class="code-num">$1</span>');
+    }
+
+    // Обработчик кнопки «Дальше» в липком доке
+    document.getElementById('btnNextAction').addEventListener('click', () => {
+      const stepData = LESSON_STEPS[state.curStepIdx];
+      if (state.revealedQuantaCount < stepData.quanta.length) {
+        // Добавляем квант в текущем шаге
+        state.revealedQuantaCount++;
+        render();
+      } else if (state.curStepIdx < LESSON_STEPS.length - 1) {
+        // Переход на следующий шаг: экран очищается, лента с 1-го кванта
+        state.curStepIdx++;
+        state.revealedQuantaCount = 1;
+        render();
+      } else {
+        alert('🎉 Конспект полностью пройден! Бесшовный переход ко 2-й бусине темы: «Флеш-карточки интервального повторения»');
+      }
+    });
+
+    // Клик по бусинам шагов (возврат назад / переход)
+    document.querySelectorAll('.step-bead').forEach(b => {
+      b.addEventListener('click', () => {
+        const targetStep = parseInt(b.getAttribute('data-step-idx'), 10);
+        state.curStepIdx = targetStep;
+        state.revealedQuantaCount = 1;
+        render();
+      });
+    });
+
+    // Тумблер темы
+    document.getElementById('btnThemeToggle').addEventListener('click', () => {
+      const html = document.documentElement;
+      const cur = html.getAttribute('data-theme');
+      const next = cur === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      document.getElementById('themeIcon').textContent = next === 'dark' ? '🌙' : '☀️';
+      document.getElementById('themeLabel').textContent = next === 'dark' ? 'Тёмная' : 'Светлая';
+    });
+
+    // Тумблер мобильного вида
+    document.getElementById('btnViewportToggle').addEventListener('click', () => {
+      const frame = document.getElementById('viewportFrame');
+      const btn = document.getElementById('btnViewportToggle');
+      state.isMobile = !state.isMobile;
+
+      if (state.isMobile) {
+        frame.classList.add('mobile-mode');
+        btn.classList.add('active');
+        document.getElementById('viewportIcon').textContent = '💻';
+        document.getElementById('viewportLabel').textContent = 'Десктоп (760px)';
+      } else {
+        frame.classList.remove('mobile-mode');
+        btn.classList.remove('active');
+        document.getElementById('viewportIcon').textContent = '📱';
+        document.getElementById('viewportLabel').textContent = 'Мобильный вид (393px)';
+      }
+    });
+
+    // Сброс
+    document.getElementById('btnResetAll').addEventListener('click', () => {
+      state.curStepIdx = 0;
+      state.revealedQuantaCount = 1;
+      render();
+    });
+
+    // Экстерн-шлюз
+    const modal = document.getElementById('fastTrackModal');
+    document.getElementById('btnFastTrack').addEventListener('click', () => modal.classList.add('open'));
+    document.getElementById('btnCloseModal').addEventListener('click', () => modal.classList.remove('open'));
+
+    // Инициализация
+    render();
+  </script>
+</body>
+</html>
