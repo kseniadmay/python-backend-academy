@@ -6535,22 +6535,27 @@
   /* Synchronized Node Awakening & Triumph Glow */
   .hex-3d-node.hex-node--active {
     animation: activeNodeEnergyAwaken 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-    transform-box: fill-box;
-    transform-origin: center center;
   }
   @keyframes activeNodeEnergyAwaken {
     0%, 55% {
       filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.65));
-      transform: scale(1);
     }
     75% {
-      filter: drop-shadow(0 0 26px rgba(254, 240, 138, 0.95)) drop-shadow(0 0 16px rgba(52, 211, 153, 0.90));
-      transform: scale(1.05);
+      filter: drop-shadow(0 0 24px rgba(254, 240, 138, 0.95)) drop-shadow(0 0 16px rgba(52, 211, 153, 0.85));
     }
     100% {
       filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.65));
-      transform: scale(1);
     }
+  }
+  @keyframes quantumWaveRingPulse {
+    0% { r: 24; opacity: 0.9; stroke-width: 2.5; }
+    70% { r: 42; opacity: 0; stroke-width: 1; }
+    100% { r: 42; opacity: 0; }
+  }
+  .quantum-wave-ring {
+    animation: quantumWaveRingPulse 2.4s cubic-bezier(0.2, 0.8, 0.4, 1) infinite;
+    fill: none;
+    stroke: #f59e0b;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -6780,15 +6785,7 @@
     }
   }
 
-/* Variant 1: Magnetic Glow & Micro-Levitation for Nodes (Hover & Focus Dynamics) */
-  .hex-3d-node {
-    cursor: pointer;
-    outline: none;
-    transform-box: fill-box;
-    transform-origin: center center;
-    transition: transform 0.26s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.24s ease;
-  }
-  /* Silky Tactile Nodes (0 Twitching, Isolated Hit-target) */
+/* Silky Tactile Nodes (Zero Jitter, Absolute Rock-Solid Anchoring) */
   .hex-3d-node, .path-node {
     cursor: pointer;
     outline: none;
@@ -6808,9 +6805,6 @@
   }
   .hex-3d-node.hex-node--active:hover .bead-group, .path-node.active:hover .bead-group {
     filter: drop-shadow(0 0 22px rgba(245, 158, 11, 0.95)) brightness(1.15);
-  }
-  .hex-3d-node:active .bead-group, .path-node:active .bead-group {
-    transform: translateY(2.5px);
   }
 
   /* Specific Glowing Halos per status */
@@ -10023,7 +10017,7 @@
 
   
 
-  .coddy-path-layout {
+  .path-screen-layout {
 
     display: flex !important;
 
@@ -10083,7 +10077,7 @@
 
 
 
-  .coddy-path-layout {
+  .path-screen-layout {
 
     display: flex;
 
@@ -11255,7 +11249,7 @@
 
     .coddy-right-rail { display: none !important; }
 
-    .coddy-path-layout { display: block; padding: 0; }
+    .path-screen-layout { display: block; padding: 0; }
 
   }
 
@@ -21225,7 +21219,7 @@
 
   /* Balanced desktop layout: 3D Serpentine Path + Smart Right Rail companion */
 
-  .coddy-path-layout:has(.path-serpentine-wrap) {
+  .path-screen-layout:has(.path-serpentine-wrap) {
 
     max-width: 1040px;
 
@@ -21233,7 +21227,7 @@
 
   }
 
-  .coddy-path-layout:has(.path-serpentine-wrap) .path-serpentine-wrap {
+  .path-screen-layout:has(.path-serpentine-wrap) .path-serpentine-wrap {
 
     max-width: 680px;
 
@@ -21241,7 +21235,7 @@
 
   }
 
-  .coddy-path-layout:has(.path-serpentine-wrap) .path-serpentine {
+  .path-screen-layout:has(.path-serpentine-wrap) .path-serpentine {
 
     max-width: 640px;
 
@@ -21249,7 +21243,7 @@
 
   @media (max-width: 1040px) {
 
-    .coddy-path-layout:has(.path-serpentine-wrap) {
+    .path-screen-layout:has(.path-serpentine-wrap) {
 
       max-width: 760px;
 
@@ -21309,7 +21303,7 @@
 
     }
 
-    .coddy-path-layout:has(.path-serpentine-wrap) .path-serpentine-wrap {
+    .path-screen-layout:has(.path-serpentine-wrap) .path-serpentine-wrap {
 
       max-width: 100%;
 
@@ -51735,38 +51729,65 @@ function viewPathSerpentine(options){
   });
   if(activeUnitIndex === -1) activeUnitIndex = Math.max(0, allUnits.length - 1);
 
-  // Harmonic serpentine wave coordinates (±110px amplitude in 680px viewBox -> ±65px on 393px mobile)
-  const chapterStartSet = new Set(chapterBreakpoints.slice(1).map(cb => cb.startIdx));
+  // HARMONIC S-CURVE WAYPOINTS (ZERO DRIFT, ROCK-SOLID ANCHORS, STEP Y = 150px)
+  // Rhythm: Center (340) -> Right (450) -> Center (340) -> Left (230) -> Center (340)
+  // Chapter exams and milestone gates sit strictly on the centerline (340)
   let curY = 70;
-  const coords = allUnits.map((u, i) => {
-    if(i > 0){
-      curY += 120;
-      if(chapterStartSet.has(i)){
-        curY += 160; // Slender vertical gap for milestone pill
+  const unitCoords = [];
+  const examCoords = [];
+  const gateCoords = [];
+  const allWaypoints = [];
+
+  chapterBreakpoints.forEach((cb, ci) => {
+    cb.units.forEach((u, uIdx) => {
+      if(unitCoords.length > 0){
+        curY += 150;
       }
+      const x = Math.round(340 + 110 * Math.sin((uIdx * Math.PI) / 2));
+      const pt = { x, y: curY, type: 'unit', unit: u, globalIdx: allUnits.indexOf(u) };
+      unitCoords.push(pt);
+      allWaypoints.push(pt);
+    });
+
+    const endUnit = cb.units[cb.units.length - 1];
+    if(endUnit){
+      curY += 140;
+      const examPt = { x: 340, y: curY, type: 'exam', chapter: cb, endUnit };
+      examCoords.push(examPt);
+      allWaypoints.push(examPt);
     }
-    const x = Math.round(340 + 110 * Math.sin((i * Math.PI) / 2.2));
-    return { x, y: curY };
+
+    if(ci < chapterBreakpoints.length - 1){
+      curY += 120;
+      const nextCb = chapterBreakpoints[ci + 1];
+      const gatePt = { x: 340, y: curY, type: 'gate', chapter: nextCb };
+      gateCoords.push(gatePt);
+      allWaypoints.push(gatePt);
+    }
   });
 
-  const totalH = coords.length ? (coords[coords.length - 1].y + 190) : 600;
+  const totalH = allWaypoints.length ? (allWaypoints[allWaypoints.length - 1].y + 160) : 800;
 
-  // Build smooth Bezier path
-  let dPath = coords.length ? `M ${coords[0].x} ${coords[0].y}` : '';
-  for(let i = 0; i < coords.length - 1; i++){
-    const p1 = coords[i];
-    const p2 = coords[i+1];
+  // Build continuous Bezier path through ALL waypoints seamlessly
+  let dPath = allWaypoints.length ? `M ${allWaypoints[0].x} ${allWaypoints[0].y}` : '';
+  for(let i = 0; i < allWaypoints.length - 1; i++){
+    const p1 = allWaypoints[i];
+    const p2 = allWaypoints[i+1];
     const midY = (p1.y + p2.y) / 2;
     dPath += ` C ${p1.x} ${midY}, ${p2.x} ${midY}, ${p2.x} ${p2.y}`;
   }
 
+  // Active waypoint index
+  const activePt = unitCoords[activeUnitIndex] || unitCoords[0];
+  const activeWaypointIdx = allWaypoints.indexOf(activePt);
+
   // Build progress sub-path up to active unit
   let dProgress = '';
-  if(activeUnitIndex > 0 && coords.length > 0){
-    dProgress = `M ${coords[0].x} ${coords[0].y}`;
-    for(let i = 0; i < Math.min(activeUnitIndex, coords.length - 1); i++){
-      const p1 = coords[i];
-      const p2 = coords[i+1];
+  if(activeWaypointIdx > 0 && allWaypoints.length > 0){
+    dProgress = `M ${allWaypoints[0].x} ${allWaypoints[0].y}`;
+    for(let i = 0; i < Math.min(activeWaypointIdx, allWaypoints.length - 1); i++){
+      const p1 = allWaypoints[i];
+      const p2 = allWaypoints[i+1];
       const midY = (p1.y + p2.y) / 2;
       dProgress += ` C ${p1.x} ${midY}, ${p2.x} ${midY}, ${p2.x} ${p2.y}`;
     }
@@ -51774,46 +51795,40 @@ function viewPathSerpentine(options){
 
   // Dotted future track
   let dFuture = '';
-  if(activeUnitIndex < coords.length - 1 && coords.length > 0){
-    dFuture = `M ${coords[activeUnitIndex].x} ${coords[activeUnitIndex].y}`;
-    for(let i = activeUnitIndex; i < coords.length - 1; i++){
-      const p1 = coords[i];
-      const p2 = coords[i+1];
+  if(activeWaypointIdx < allWaypoints.length - 1 && allWaypoints.length > 0){
+    dFuture = `M ${allWaypoints[activeWaypointIdx].x} ${allWaypoints[activeWaypointIdx].y}`;
+    for(let i = activeWaypointIdx; i < allWaypoints.length - 1; i++){
+      const p1 = allWaypoints[i];
+      const p2 = allWaypoints[i+1];
       const midY = (p1.y + p2.y) / 2;
       dFuture += ` C ${p1.x} ${midY}, ${p2.x} ${midY}, ${p2.x} ${p2.y}`;
     }
   }
 
-  // Chapter milestones (slender glass pills on centerline)
+  // Milestone Gates SVG (Soft Advisory Open)
   let markersSVG = '';
-  chapterBreakpoints.forEach((cb, ci) => {
-    if(ci > 0 && coords[cb.startIdx]){
-      const prevCb = chapterBreakpoints[ci - 1];
-      const isPrevChapterDone = prevCb.units.length > 0 && prevCb.units.every(isUnitCompleted);
-      const curCompletedCount = cb.units.filter(isUnitCompleted).length;
-      const isCurChapterDone = cb.units.length > 0 && curCompletedCount === cb.units.length;
-      const gateStatus = !isPrevChapterDone ? 'locked' : (isCurChapterDone ? 'completed' : 'active');
-      const isLocked = (gateStatus === 'locked');
+  gateCoords.forEach((pt) => {
+    const cb = pt.chapter;
+    const curCompletedCount = cb.units.filter(isUnitCompleted).length;
+    const isCurChapterDone = cb.units.length > 0 && curCompletedCount === cb.units.length;
+    const cleanCurTitle = (cb.shortTitle || cb.title || '').replace(/^[^\wА-Яа-яЁё]+/, '').replace(/Матрица Мастерства\s*/i, '').trim();
 
-      const prevY = coords[cb.startIdx - 1].y;
-      const cy = Math.round((prevY + coords[cb.startIdx].y) / 2);
-      const cleanCurTitle = (cb.shortTitle || cb.title || '').replace(/^[^\wА-Яа-яЁё]+/, '').replace(/Матрица Мастерства\s*/i, '').trim();
-
-      markersSVG += `
-        <g class="chapter-milestone-pill" id="chapter-${cb.chapterNum}-pill" data-chapter-num="${cb.chapterNum}" data-chapter-title="${escapeHtmlStr(cleanCurTitle)}" data-done-count="${curCompletedCount}" data-total-count="${cb.unitsCount}" data-chapter-status="${gateStatus}" transform="translate(340, ${cy})">
-          <rect class="milestone-hit" x="-140" y="-18" width="280" height="36" rx="18" fill="transparent" pointer-events="all"/>
-          <rect class="milestone-rect" x="-130" y="-13" width="260" height="26" rx="13" fill="rgba(15, 23, 42, 0.92)" stroke="${isCurChapterDone ? 'rgba(52, 211, 153, 0.7)' : (isLocked ? 'rgba(148, 163, 184, 0.25)' : 'rgba(52, 211, 153, 0.45)')}" stroke-width="1.2" filter="drop-shadow(0 4px 12px rgba(0,0,0,0.5))"/>
-          <circle cx="-108" cy="0" r="3.5" fill="${isCurChapterDone ? '#10b981' : (isLocked ? '#64748b' : '#34d399')}"/>
-          <text x="-96" y="3.5" font-family="'Onest', sans-serif" font-size="10.5" font-weight="800" fill="${isCurChapterDone ? '#a7f3d0' : (isLocked ? '#94a3b8' : '#e2e8f0')}" letter-spacing="0.04em">ГЛАВА ${cb.chapterNum}: ${escapeHtmlStr(cleanCurTitle.toUpperCase())}</text>
-          <text x="108" y="3.5" text-anchor="end" font-family="'Onest', sans-serif" font-size="10" font-weight="700" fill="${isCurChapterDone ? '#34d399' : (isLocked ? '#64748b' : '#34d399')}">${curCompletedCount}/${cb.unitsCount} ✓</text>
-        </g>`;
-    }
+    markersSVG += `
+      <g class="chapter-milestone-pill" id="chapter-${cb.chapterNum}-pill" data-chapter-num="${cb.chapterNum}" data-chapter-title="${escapeHtmlStr(cleanCurTitle)}" data-done-count="${curCompletedCount}" data-total-count="${cb.unitsCount}" data-chapter-status="active" transform="translate(${pt.x}, ${pt.y})">
+        <rect class="milestone-hit" x="-140" y="-18" width="280" height="36" rx="18" fill="transparent" pointer-events="all"/>
+        <rect class="milestone-rect" x="-135" y="-14" width="270" height="28" rx="14" fill="rgba(15, 23, 42, 0.95)" stroke="${isCurChapterDone ? 'rgba(52, 211, 153, 0.7)' : 'rgba(52, 211, 153, 0.45)'}" stroke-width="1.3" filter="drop-shadow(0 4px 12px rgba(0,0,0,0.5))"/>
+        <circle cx="-112" cy="0" r="3.5" fill="${isCurChapterDone ? '#10b981' : '#34d399'}"/>
+        <text x="-100" y="4" font-family="'Onest', sans-serif" font-size="10.5" font-weight="800" fill="${isCurChapterDone ? '#a7f3d0' : '#e2e8f0'}" letter-spacing="0.04em">ГЛАВА ${cb.chapterNum}: ${escapeHtmlStr(cleanCurTitle.toUpperCase())}</text>
+        <text x="112" y="4" text-anchor="end" font-family="'Onest', sans-serif" font-size="10" font-weight="700" fill="#34d399">${isCurChapterDone ? `${curCompletedCount}/${cb.unitsCount} ✓` : 'Открыто ➔'}</text>
+      </g>`;
   });
 
   // Nodes SVG
   let nodesSVG = '';
-  allUnits.forEach((u, i) => {
-    const { x, y } = coords[i];
+  unitCoords.forEach((pt) => {
+    const u = pt.unit;
+    const i = pt.globalIdx;
+    const { x, y } = pt;
     let status = 'locked';
     if(i < activeUnitIndex || isUnitCompleted(u)){
       status = 'completed';
@@ -51822,9 +51837,7 @@ function viewPathSerpentine(options){
     }
     const isCompleted = (status === 'completed');
     const isActive = (status === 'active');
-    const isLocked = (status === 'locked');
 
-    // Icon based on track
     const trk = (typeof getTrackForUnit === 'function') ? getTrackForUnit(u.id) : { key: 'python' };
     let iconChar = '</>';
     if(trk.key === 'web') iconChar = '🌐';
@@ -51834,59 +51847,59 @@ function viewPathSerpentine(options){
     else if(trk.key === 'algorithms') iconChar = '</>';
 
     const underTitle = (typeof cleanUnitTitle === 'function') ? cleanUnitTitle(u.id, u.title) : (u.title || '');
+    const pillStroke = isCompleted ? 'rgba(16, 185, 129, 0.40)' : (isActive ? '#f59e0b' : 'rgba(255, 255, 255, 0.08)');
+    const pillTextFill = isCompleted ? '#e2e8f0' : (isActive ? '#fef3c7' : '#64748b');
+    const pillWeight = isActive ? '800' : '700';
 
     let innerContent = '';
     if(isCompleted){
       innerContent = `
-        <circle r="21" fill="#10b981" stroke="#6ee7b7" stroke-width="2"/>
-        <text y="4" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="800" fill="#ffffff">${iconChar}</text>
-        <circle cx="14" cy="-14" r="7" fill="#042f2e" stroke="#34d399" stroke-width="1.2"/>
-        <text x="14" y="-11.5" text-anchor="middle" font-size="8.5" font-weight="900" fill="#34d399">✓</text>`;
+        <circle class="node-circle" r="22" fill="#064e3b" stroke="#10b981" stroke-width="2.5" filter="drop-shadow(0 0 10px rgba(16,185,129,0.5))"/>
+        <text y="4" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11.5" font-weight="800" fill="#ffffff">${iconChar}</text>
+        <circle cx="15" cy="-15" r="7.5" fill="#042f2e" stroke="#34d399" stroke-width="1.2"/>
+        <text x="15" y="-12.5" text-anchor="middle" font-size="9" font-weight="900" fill="#34d399">✓</text>`;
     } else if(isActive){
       innerContent = `
-        <circle class="hex-pulse-halo" r="32" fill="none" stroke="rgba(245, 158, 11, 0.85)" stroke-width="1.8"/>
-        <circle r="23" fill="#f59e0b" stroke="#fef08a" stroke-width="2.5" filter="drop-shadow(0 0 18px rgba(245,158,11,0.9))"/>
-        <text y="5" text-anchor="middle" font-size="12" fill="#1f0902">${iconChar}</text>`;
+        <circle class="quantum-wave-ring" cx="0" cy="0" r="24"/>
+        <circle class="node-circle" r="24" fill="#78350f" stroke="#f59e0b" stroke-width="2.8" filter="drop-shadow(0 0 18px rgba(245,158,11,0.9))"/>
+        <text y="5" text-anchor="middle" font-size="13" font-weight="900" fill="#fef3c7">⚡</text>`;
     } else {
       innerContent = `
-        <circle r="19" fill="#1e293b" stroke="rgba(255,255,255,0.08)" stroke-width="1.2"/>
+        <circle class="node-circle" r="20" fill="#1e293b" stroke="rgba(255,255,255,0.12)" stroke-width="1.4"/>
         <text y="4" text-anchor="middle" font-size="11" fill="#64748b">${iconChar}</text>
-        <circle cx="13" cy="-13" r="6" fill="#0f172a" stroke="#64748b" stroke-width="1"/>
-        <text x="13" y="-10.5" text-anchor="middle" font-size="7" fill="#64748b">🔒</text>`;
+        <circle cx="14" cy="-14" r="6.5" fill="#0f172a" stroke="#64748b" stroke-width="1"/>
+        <text x="14" y="-11.5" text-anchor="middle" font-size="7.5" fill="#64748b">🔒</text>`;
     }
 
     nodesSVG += `
       <g class="hex-3d-node path-node hex-node--${status} ${isActive ? 'hex-node--active active' : ''}" ${isActive ? 'id="active-target-lesson"' : ''} data-unit-id="${u.id}" data-node-idx="${i}" data-title="${escapeHtmlStr(underTitle)}" data-status="${status}" data-desc="${escapeHtmlStr(u.desc || 'Флеш-карточки интервального повторения и практические задачи.')}" transform="translate(${x}, ${y})" role="button" tabindex="0">
-        <circle class="hit-target" r="34"/>
+        <circle class="hit-target" r="38"/>
         <g class="bead-group" pointer-events="none">
           ${innerContent}
         </g>
-        <text y="38" text-anchor="middle" font-family="'Onest', sans-serif" font-size="11.5" font-weight="${isActive ? '800' : '600'}" fill="${isActive ? '#fbbf24' : (isCompleted ? '#cbd5e1' : '#64748b')}" style="text-shadow:0 2px 6px rgba(0,0,0,0.95);">${escapeHtmlStr(underTitle)}</text>
+        <rect x="-70" y="34" width="140" height="24" rx="12" fill="rgba(15, 23, 42, 0.92)" stroke="${pillStroke}" stroke-width="1.2" pointer-events="none"/>
+        <text y="50" text-anchor="middle" font-family="'Onest', sans-serif" font-size="11" font-weight="${pillWeight}" fill="${pillTextFill}" pointer-events="none">${escapeHtmlStr(underTitle)}</text>
       </g>`;
   });
 
-  // Chapter Exam Branches (Noble Golden Mastery Beads)
+  // Chapter Exam Nodes strictly on path at center
   let branchesSVG = '';
-  chapterBreakpoints.forEach((cb, cIdx) => {
-    const endIdx = (cIdx < chapterBreakpoints.length - 1) ? (chapterBreakpoints[cIdx + 1].startIdx - 1) : (allUnits.length - 1);
-    const u = allUnits[endIdx];
-    if(!u || !coords[endIdx]) return;
-    const { x, y } = coords[endIdx];
+  examCoords.forEach((pt) => {
+    const cb = pt.chapter;
+    const u = pt.endUnit;
     const track = (typeof getTrackForUnit === 'function') ? getTrackForUnit(u.id) : { routePrefix: 'python' };
     const chDone = (state.passedUnitTests || []).includes(u.id);
-    const chUnlocked = endIdx <= activeUnitIndex;
-    const chStatus = chDone ? 'done' : (chUnlocked ? 'open' : 'locked');
-    const bx = 340;
-    const by = y + 70;
+    const chStatus = chDone ? 'done' : 'open';
 
     branchesSVG += `
-      <g class="hex-challenge-node hex-challenge-node--${chStatus}" data-challenge-route="#${track.routePrefix}/unittest/${u.id}" data-challenge-status="${chStatus}" data-challenge-title="Аттестация: ${escapeHtmlStr(cb.shortTitle || cb.title)}" transform="translate(${bx}, ${by})" role="button" tabindex="0">
-        <circle class="hit-target" r="34"/>
+      <g class="hex-challenge-node hex-challenge-node--${chStatus}" data-challenge-route="#${track.routePrefix}/unittest/${u.id}" data-challenge-status="${chStatus}" data-challenge-title="Аттестация: ${escapeHtmlStr(cb.shortTitle || cb.title)}" transform="translate(${pt.x}, ${pt.y})" role="button" tabindex="0">
+        <circle class="hit-target" r="38"/>
         <g class="bead-group" pointer-events="none">
-          <circle r="21" fill="${chDone ? '#059669' : (chUnlocked ? '#d97706' : '#1e293b')}" stroke="${chDone ? '#34d399' : (chUnlocked ? '#fef08a' : 'rgba(245, 158, 11, 0.45)')}" stroke-width="1.8" filter="${chUnlocked ? 'drop-shadow(0 0 16px rgba(245,158,11,0.85))' : ''}"/>
-          <text y="5" text-anchor="middle" font-size="13">🏆</text>
+          <circle r="23" fill="${chDone ? '#059669' : '#b45309'}" stroke="${chDone ? '#34d399' : '#fde047'}" stroke-width="2.2" filter="drop-shadow(0 0 16px rgba(245,158,11,0.75))"/>
+          <text y="5" text-anchor="middle" font-size="14">🏆</text>
         </g>
-        <text y="36" text-anchor="middle" font-family="'Onest', sans-serif" font-size="11" font-weight="700" fill="${chUnlocked ? '#fcd34d' : (chDone ? '#34d399' : '#64748b')}" style="text-shadow:0 2px 6px rgba(0,0,0,0.9);">${chDone ? '✓ Аттестация сдана' : (chUnlocked ? 'Аттестация Главы' : '🔒 Аттестация')}</text>
+        <rect x="-85" y="34" width="170" height="24" rx="12" fill="rgba(30, 41, 59, 0.95)" stroke="${chDone ? '#34d399' : '#fde047'}" stroke-width="1.2" pointer-events="none"/>
+        <text y="50" text-anchor="middle" font-family="'Onest', sans-serif" font-size="10.5" font-weight="800" fill="${chDone ? '#34d399' : '#fde047'}" pointer-events="none">${chDone ? '✓ Аттестация сдана' : 'Зачёт Главы (8 вопр.)'}</text>
       </g>`;
   });
 
@@ -51894,39 +51907,26 @@ function viewPathSerpentine(options){
   const curChapter = chapterBreakpoints.find(cb => cb.units.some(u => u.id === curActiveUnit.id)) || chapterBreakpoints[0] || { num: 1, chapterNum: 1, shortTitle: 'Python Core', units: allUnits };
   const activeChapterNum = curChapter.chapterNum || curChapter.num || 1;
   const activeChapterShortTitle = curChapter.shortTitle || (curChapter.title || '').replace(/^Глава\s+\d+:\s*/i, '') || 'Python Core';
-  const completedTotalCount = allUnits.filter(isUnitCompleted).length;
-  const streakText = (typeof pluralizeRu === 'function') ? pluralizeRu(state.streak || 0, 'день', 'дня', 'дней') : 'дн.';
-  const streakCount = Math.max(1, Number(state.streak) || 1);
-  const xpCount = Number(state.xp) || 0;
-  const formattedXp = xpCount >= 1000 ? (xpCount.toLocaleString('ru-RU') + ' XP') : (xpCount + ' XP');
+  const curChapterCompletedCount = curChapter.units ? curChapter.units.filter(isUnitCompleted).length : 0;
+  const curChapterTotalCount = curChapter.units ? curChapter.units.length : 1;
 
   return `
-    <div class="coddy-path-layout">
+    <div class="path-screen-layout">
       <div class="container path-serpentine-wrap">
 
         <!-- Ambient Spatial Orbs -->
         <div style="position:fixed; border-radius:50%; filter:blur(90px); pointer-events:none; z-index:0; opacity:0.25; width:440px; height:440px; background:radial-gradient(circle, #10b981 0%, transparent 70%); top:-120px; left:-100px;"></div>
         <div style="position:fixed; border-radius:50%; filter:blur(90px); pointer-events:none; z-index:0; opacity:0.25; width:480px; height:480px; background:radial-gradient(circle, #f59e0b 0%, transparent 70%); bottom:-150px; right:-120px;"></div>
 
-        <!-- Hero Header -->
-        <header class="trail-hero" style="width:100%; max-width:480px; margin: 0 auto 24px; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-radius: 20px; padding: 16px 18px; box-shadow: 0 16px 36px rgba(0,0,0,0.45);">
-          <div style="font-size: 11px; font-weight: 700; color: #10b981; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
-            ⚡ Сквозная траектория · Junior → Middle
+        <!-- Sleek Sticky Slim Capsule HUD (48px) -->
+        <header class="trail-slim-hud" style="position:sticky; top:10px; z-index:35; width:100%; max-width:540px; margin: 0 auto 16px; background:rgba(15,23,42,0.92); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border:1px solid rgba(255,255,255,0.12); border-radius:999px; padding:6px 14px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:10px; font-weight:800; background:rgba(16,185,129,0.18); color:#34d399; border:1px solid rgba(16,185,129,0.35); padding:3px 8px; border-radius:999px; letter-spacing:0.03em;">Junior Core</span>
+            <span style="font-size:11.5px; font-weight:700; color:#e2e8f0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px;">Глава ${activeChapterNum}: ${curChapterCompletedCount}/${curChapterTotalCount} ✓</span>
           </div>
-          <h1 style="font-size: 18px; font-weight: 800; color: #fff; line-height: 1.25; margin-bottom: 4px;">
-            Траектория: Python Backend Engineer
-          </h1>
-          <div style="font-size: 12.5px; color: #94a3b8; margin-bottom: 12px;">
-            Текущий раздел: Глава ${activeChapterNum} · ${escapeHtmlStr(activeChapterShortTitle)}
-          </div>
-          <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 12px; font-weight: 700; color: #cbd5e1;">
-            <div>🔥 ${streakCount} ${streakText}</div>
-            <div>⭐ ${formattedXp}</div>
-            <div style="color: #10b981;">${completedTotalCount} / ${allUnits.length} освоено</div>
-          </div>
-          <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; margin-top: 10px;">
-            <div style="height: 100%; width: ${Math.round((completedTotalCount / (allUnits.length || 1)) * 100)}%; background: linear-gradient(90deg, #10b981, #34d399); box-shadow: 0 0 10px rgba(16, 185, 129, 0.7);"></div>
-          </div>
+          <button type="button" class="trail-hud-beacon-btn" id="hudBeaconBtn" style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; background:linear-gradient(135deg, rgba(16,185,129,0.3), rgba(5,150,105,0.2)); border:1px solid rgba(16,185,129,0.55); color:#a7f3d0; font-size:10.5px; font-weight:800; cursor:pointer; box-shadow:0 0 12px rgba(16,185,129,0.25);">
+            ⚡ К текущему
+          </button>
         </header>
 
         <!-- SVG ENDLESS HARMONIC SERPENTINE -->
@@ -51934,7 +51934,7 @@ function viewPathSerpentine(options){
           <defs>
             <linearGradient id="zenPathProgressGrad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stop-color="#10b981"/>
-              <stop offset="100%" stop-color="#f59e0b"/>
+              <stop offset="100%" stop-color="#34d399"/>
             </linearGradient>
             <radialGradient id="biomeEmerald" cx="50%" cy="50%" r="50%">
               <stop offset="0%" stop-color="#10b981" stop-opacity="0.10"/>
@@ -51952,10 +51952,10 @@ function viewPathSerpentine(options){
             <ellipse cx="340" cy="780" rx="260" ry="180" fill="url(#biomeAmber)"/>
           </g>
 
-          <!-- Guide Tracks -->
+          <!-- Guide Tracks (Connecting ALL waypoints seamlessly) -->
           <path d="${dPath}" fill="none" stroke="rgba(148,163,184,0.12)" stroke-width="2.6" stroke-linecap="round"/>
-          ${dProgress ? `<path d="${dProgress}" fill="none" stroke="url(#zenPathProgressGrad)" stroke-width="4.8" stroke-linecap="round" style="filter:drop-shadow(0 0 10px rgba(16,185,129,0.75));"/>` : ''}
-          ${dFuture ? `<path d="${dFuture}" fill="none" stroke="rgba(245, 158, 11, 0.28)" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="6 6"/>` : ''}
+          ${dProgress ? `<path d="${dProgress}" fill="none" stroke="url(#zenPathProgressGrad)" stroke-width="5" stroke-linecap="round" style="filter:drop-shadow(0 0 10px rgba(16,185,129,0.75));"/>` : ''}
+          ${dFuture ? `<path d="${dFuture}" fill="none" stroke="rgba(245, 158, 11, 0.28)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="6 6"/>` : ''}
 
           <!-- Milestones, Nodes, Exams -->
           ${markersSVG}
@@ -51963,30 +51963,33 @@ function viewPathSerpentine(options){
           ${branchesSVG}
         </svg>
 
-        <!-- Stargate Finale -->
-        <div class="path-stargate-finale" id="finale-section">
-          <div class="stargate-icon">🎓</div>
-          <h3 class="stargate-title">Выпускник Академии: Python Backend Engineer</h3>
-          <p class="stargate-sub">Полное освоение всей программы подготовки Junior / Middle</p>
-          <div class="stargate-badges">
-            <div class="stargate-pill">🔒 7 глав программы</div>
-            <div class="stargate-pill">⚡ ${formattedXp}</div>
-          </div>
+        <!-- Finale Bridge to Next Echelons -->
+        <div class="next-echelons-bridge" id="finale-section" style="width:100%; max-width:480px; margin: 30px auto 20px; background:radial-gradient(circle at 50% 0%, rgba(245,158,11,0.15) 0%, rgba(15,23,42,0.85) 70%); border:1.5px solid rgba(245,158,11,0.45); border-radius:24px; padding:22px 18px; text-align:center; box-shadow:0 12px 36px rgba(0,0,0,0.6), 0 0 24px rgba(245,158,11,0.15);">
+          <div style="font-size:26px; margin-bottom:8px;">🚀</div>
+          <h3 style="font-size:16px; font-weight:800; color:#fff; margin-bottom:4px;">Горизонт Middle Backend</h3>
+          <p style="font-size:12px; color:#94a3b8; margin-bottom:14px; line-height:1.45;">Фундамент Junior Core освоен. Впереди асинхронный бэкенд, базы данных, репликация и Highload архитектура.</p>
+          <button type="button" class="btn-next-echelon" onclick="location.hash='#/backend';" style="width:100%; padding:12px; background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border:1px solid rgba(255,255,255,0.25); border-radius:12px; color:#fff; font-size:12.5px; font-weight:800; cursor:pointer; box-shadow:0 4px 16px rgba(245,158,11,0.4);">
+            ПЕРЕЙТИ К ЭШЕЛОНУ 2 (MIDDLE) ➔
+          </button>
         </div>
 
-        <!-- Floating Smart Horizon Beacon -->
-        <button type="button" class="horizon-beacon-btn" id="horizonBeacon" style="display:none;" title="К текущему уроку">
+        <!-- Floating Smart Horizon Beacon FAB -->
+        <button type="button" class="floating-beacon-fab" id="horizonBeacon" style="display:none; position:fixed; bottom:24px; right:18px; z-index:45; background:linear-gradient(135deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95)); border:1.5px solid #10b981; box-shadow:0 8px 24px rgba(0,0,0,0.6), 0 0 20px rgba(16,185,129,0.45); border-radius:999px; padding:8px 14px; align-items:center; gap:6px; color:#a7f3d0; font-size:11.5px; font-weight:800; cursor:pointer;" title="К текущему уроку">
           <span class="beacon-arrow" id="beaconArrow">↑</span>
-          <span>⚡ К текущему уроку</span>
+          <span>К уроку</span>
         </button>
 
-        <!-- Silk Bottom Sheet & Backdrop -->
+        <!-- Silk Bottom Sheet & Backdrop with Tech Brief Chips -->
         <div class="silk-backdrop" id="silkBackdrop"></div>
         <div class="silk-sheet" id="silkSheet">
           <div class="sheet-handle"></div>
           <button type="button" class="sheet-close-btn" id="silkCloseBtn" aria-label="Закрыть">✕</button>
           <div class="sheet-tag" id="sheetTag">В ФОКУСЕ</div>
           <h3 class="sheet-title" id="sheetTitle">Название урока</h3>
+          
+          <!-- Tech Brief Chips Container -->
+          <div id="sheetTechChips" style="display:flex; flex-wrap:wrap; gap:6px; margin: 8px 0 10px;"></div>
+
           <p class="sheet-desc" id="sheetDesc">Краткое описание дидактического шага.</p>
           <button type="button" class="sheet-action-btn sheet-action-btn--primary" id="silkBtn">
             НАЧАТЬ УРОК (2 МИН) ➔
@@ -52301,7 +52304,7 @@ function viewProPath(options){
 
   return `
 
-    <div class="coddy-path-layout">
+    <div class="path-screen-layout">
 
       <div class="container path-pro-wrap">
 
@@ -64771,7 +64774,14 @@ window.animateCardFlip = animateCardFlip;
 
   // Jump to active unit button (with haptics and smooth scroll)
 
-  if(e.target.closest('#path-jump-btn')){
+  if(e.target.closest('#path-jump-btn') || e.target.closest('#hudBeaconBtn') || e.target.closest('#horizonBeacon')){
+    const activeTarget = document.querySelector('.hex-node--active') || document.querySelector('#active-target-lesson') || document.querySelector('.hex-3d-node');
+    if(activeTarget){
+      activeTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return;
+  }
+  if(e.target.closest('#path-jump-btn-legacy')){
 
     if(typeof navigator !== 'undefined' && navigator.vibrate){
 
@@ -66151,6 +66161,20 @@ window.openSilkSheet = function(uid, title, desc, status, customRoute){
   const tagEl = document.getElementById('sheetTag');
   const descEl = document.getElementById('sheetDesc');
   const btn = document.getElementById('silkBtn');
+  const chipsEl = document.getElementById('sheetTechChips');
+
+  if(chipsEl){
+    chipsEl.innerHTML = '';
+    if(uid && typeof ALL_UNITS_COMBINED !== 'undefined'){
+      const uObj = ALL_UNITS_COMBINED.find(x => x.id === uid);
+      if(uObj && uObj.skills && uObj.skills.length > 0){
+        chipsEl.innerHTML = uObj.skills.map(s => {
+          const sName = (s.title || s.name || s.id || '').replace(/^.*?:/,'').trim();
+          return `<span style="font-size:10px; font-family:'JetBrains Mono',monospace; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); padding:2px 7px; border-radius:6px; color:#a7f3d0;">${escapeHtmlStr(sName)}</span>`;
+        }).join('');
+      }
+    }
+  }
 
   if(titleEl) titleEl.textContent = title;
   if(descEl) descEl.textContent = desc;
