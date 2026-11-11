@@ -29160,12 +29160,12 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   .silk-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    background: rgba(0, 0, 0, 0.30);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.24s ease;
+    transition: opacity 0.2s ease;
     z-index: 1090;
   }
   .silk-backdrop.open {
@@ -29173,25 +29173,61 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     pointer-events: all;
   }
   .silk-sheet {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%) translateY(105%);
-    width: 100%;
-    max-width: 440px;
-    background: linear-gradient(180deg, rgba(17, 24, 39, 0.98) 0%, rgba(10, 14, 22, 0.99) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-bottom: none;
-    border-radius: 22px 22px 0 0;
-    padding: 16px 18px max(20px, env(safe-area-inset-bottom, 20px));
-    box-shadow: 0 -12px 40px rgba(0,0,0,0.7), 0 0 32px rgba(16, 185, 129, 0.15);
-    backdrop-filter: blur(28px);
-    -webkit-backdrop-filter: blur(28px);
+    position: absolute;
+    width: min(320px, calc(100vw - 32px));
+    background: linear-gradient(160deg, rgba(15, 23, 42, 0.98) 0%, rgba(10, 15, 26, 0.99) 100%);
+    border: 1.5px solid rgba(52, 211, 153, 0.45);
+    border-radius: 18px;
+    padding: 14px 16px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.75), 0 0 24px rgba(52, 211, 153, 0.18);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     z-index: 1100;
-    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.94) translateY(4px);
+    transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .silk-sheet.open {
-    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: all;
+    transform: scale(1) translateY(0);
+  }
+  .silk-sheet .sheet-handle {
+    display: none;
+  }
+  .silk-sheet .popover-arrow {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #0f172a;
+    border-right: 1.5px solid rgba(52, 211, 153, 0.45);
+    border-bottom: 1.5px solid rgba(52, 211, 153, 0.45);
+    transform: rotate(45deg);
+    bottom: -7px;
+    left: calc(50% - 6px);
+    pointer-events: none;
+  }
+  .silk-sheet.popover-below .popover-arrow {
+    bottom: auto;
+    top: -7px;
+    border-right: none;
+    border-bottom: none;
+    border-left: 1.5px solid rgba(52, 211, 153, 0.45);
+    border-top: 1.5px solid rgba(52, 211, 153, 0.45);
+  }
+  .pro-icon-unlocked {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(52, 211, 153, 0.12);
+    border: 1px solid rgba(52, 211, 153, 0.35);
+    color: #34d399;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
   }
   .silk-sheet .sheet-handle {
     width: 36px;
@@ -51956,7 +51992,7 @@ function viewPathSerpentine(options){
     const u = pt.unit;
     const i = pt.globalIdx;
     const { x, y } = pt;
-    let status = 'locked';
+    let status = 'unlocked';
     if(i < activeUnitIndex || isUnitCompleted(u)){
       status = 'completed';
     } else if(i === activeUnitIndex){
@@ -51974,8 +52010,8 @@ function viewPathSerpentine(options){
     else if(trk.key === 'algorithms') iconChar = '</>';
 
     const underTitle = (typeof cleanUnitTitle === 'function') ? cleanUnitTitle(u.id, u.title) : (u.title || '');
-    const pillStroke = isCompleted ? 'rgba(16, 185, 129, 0.40)' : (isActive ? '#f59e0b' : 'rgba(255, 255, 255, 0.08)');
-    const pillTextFill = isCompleted ? '#e2e8f0' : (isActive ? '#fef3c7' : '#64748b');
+    const pillStroke = isCompleted ? 'rgba(16, 185, 129, 0.40)' : (isActive ? '#f59e0b' : 'rgba(52, 211, 153, 0.30)');
+    const pillTextFill = isCompleted ? '#e2e8f0' : (isActive ? '#fef3c7' : '#cbd5e1');
     const pillWeight = isActive ? '800' : '700';
 
     let innerContent = '';
@@ -51992,10 +52028,10 @@ function viewPathSerpentine(options){
         <text y="5" text-anchor="middle" font-size="13" font-weight="900" fill="#fef3c7">⚡</text>`;
     } else {
       innerContent = `
-        <circle class="node-circle" r="20" fill="#1e293b" stroke="rgba(255,255,255,0.12)" stroke-width="1.4"/>
-        <text y="4" text-anchor="middle" font-size="11" fill="#64748b">${iconChar}</text>
-        <circle cx="14" cy="-14" r="6.5" fill="#0f172a" stroke="#64748b" stroke-width="1"/>
-        <text x="14" y="-11.5" text-anchor="middle" font-size="7.5" fill="#64748b">🔒</text>`;
+        <circle class="node-circle" r="21" fill="#0f172a" stroke="rgba(52, 211, 153, 0.40)" stroke-width="1.8" filter="drop-shadow(0 4px 12px rgba(0,0,0,0.45))"/>
+        <text y="4" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#93c5fd">${iconChar}</text>
+        <circle cx="15" cy="-15" r="6.5" fill="#1e293b" stroke="#34d399" stroke-width="1.1"/>
+        <text x="15" y="-12" text-anchor="middle" font-size="8" font-weight="900" fill="#34d399">▶</text>`;
     }
 
     nodesSVG += `
@@ -52109,6 +52145,7 @@ function viewPathSerpentine(options){
         <!-- Silk Bottom Sheet & Backdrop with Tech Brief Chips -->
         <div class="silk-backdrop" id="silkBackdrop"></div>
         <div class="silk-sheet" id="silkSheet">
+          <div class="popover-arrow"></div>
           <div class="sheet-handle"></div>
           <button type="button" class="sheet-close-btn" id="silkCloseBtn" aria-label="Закрыть">✕</button>
           <div class="sheet-tag" id="sheetTag">В ФОКУСЕ</div>
@@ -52303,11 +52340,11 @@ function viewProPath(options){
 
       const isActive = (globalIdx === activeUnitIndex);
 
-      const isLocked = (globalIdx > activeUnitIndex && !isCompleted);
+      const isLocked = false;
 
 
 
-      let statusClass = isCompleted ? 'pro-lesson-row--completed' : (isActive ? 'pro-lesson-row--active' : 'pro-lesson-row--locked');
+      let statusClass = isCompleted ? 'pro-lesson-row--completed' : (isActive ? 'pro-lesson-row--active' : 'pro-lesson-row--unlocked');
 
       let iconHtml = '';
 
@@ -52321,7 +52358,7 @@ function viewProPath(options){
 
       } else {
 
-        iconHtml = '<div class="pro-icon-locked" aria-label="Заблокирован">🔒</div>';
+        iconHtml = '<div class="pro-icon-unlocked" aria-label="Доступен">▶</div>';
 
       }
 
@@ -52347,7 +52384,7 @@ function viewProPath(options){
 
       return `
 
-        <div class="pro-lesson-row ${statusClass}" data-unit-id="${u.id}" role="button" tabindex="${isLocked ? '-1' : '0'}">
+        <div class="pro-lesson-row ${statusClass}" data-unit-id="${u.id}" role="button" tabindex="0">
 
           <div class="pro-lesson-status-icon">${iconHtml}</div>
 
@@ -52371,7 +52408,7 @@ function viewProPath(options){
 
           <div class="pro-lesson-tail">
 
-            ${isActive ? '<span class="pro-focus-chip">В ФОКУСЕ</span>' : (isCompleted ? '<span class="pro-stat-chip" style="font-size:0.72rem;font-weight:700;color:var(--emerald,#34d399);">100% MP</span>' : (isLocked ? `<span style="font-size:0.75rem;color:var(--ink-muted);opacity:0.6;">${(u.skills && u.skills.length) || 1} ${pluralizeRu((u.skills && u.skills.length) || 1, 'тема', 'темы', 'тем')}</span>` : ''))}
+            ${isActive ? '<span class="pro-focus-chip">В ФОКУСЕ</span>' : (isCompleted ? '<span class="pro-stat-chip" style="font-size:0.72rem;font-weight:700;color:var(--emerald,#34d399);">100% MP</span>' : '<span class="pro-unlocked-chip" style="font-size:0.75rem;font-weight:600;color:var(--emerald,#34d399);background:rgba(52,211,153,0.1);padding:3px 8px;border-radius:6px;border:1px solid rgba(52,211,153,0.25);">Доступен ➔</span>')}
 
           </div>
 
@@ -59912,18 +59949,6 @@ document.addEventListener('click', async function(e){
 
   if(proRow){
 
-    if((proRow.className && proRow.className.includes('pro-lesson-row--locked')) || (proRow.classList && proRow.classList.contains('pro-lesson-row--locked'))){
-
-      if(typeof showTactileToast === 'function'){
-
-        showTactileToast('🔒 Завершите предыдущие уроки для открытия');
-
-      }
-
-      return;
-
-    }
-
     const uid = proRow.getAttribute('data-unit-id');
 
     const u = ALL_UNITS_COMBINED.find(x => x.id === uid);
@@ -64842,9 +64867,9 @@ window.animateCardFlip = animateCardFlip;
     const uid = hexNode.getAttribute('data-unit-id');
     const title = hexNode.getAttribute('data-title') || '';
     const desc = hexNode.getAttribute('data-desc') || '';
-    const status = hexNode.getAttribute('data-status') || 'locked';
+    const status = hexNode.getAttribute('data-status') || 'unlocked';
     if(typeof window.openSilkSheet === 'function'){
-      window.openSilkSheet(uid, title, desc, status);
+      window.openSilkSheet(uid, title, desc, status, null, hexNode);
     }
     return;
   }
@@ -64856,9 +64881,9 @@ window.animateCardFlip = animateCardFlip;
     const chapTitle = milestonePill.getAttribute('data-chapter-title') || '';
     const doneCount = milestonePill.getAttribute('data-done-count') || 0;
     const totalCount = milestonePill.getAttribute('data-total-count') || 0;
-    const chapStatus = milestonePill.getAttribute('data-chapter-status') || 'locked';
+    const chapStatus = milestonePill.getAttribute('data-chapter-status') || 'active';
     if(typeof window.openChapterSheet === 'function'){
-      window.openChapterSheet(chapNum, chapTitle, doneCount, totalCount, chapStatus);
+      window.openChapterSheet(chapNum, chapTitle, doneCount, totalCount, chapStatus, milestonePill);
     }
     return;
   }
@@ -64870,7 +64895,7 @@ window.animateCardFlip = animateCardFlip;
     const chRoute = challengeNode.getAttribute('data-challenge-route');
     const chTitle = challengeNode.getAttribute('data-challenge-title') || 'Аттестация Главы';
     if(typeof window.openSilkSheet === 'function'){
-      window.openSilkSheet(null, chTitle, 'Рубежная аттестация по темам главы. 8 контрольных вопросов для закрепления мастерства.', chStatus === 'done' ? 'completed' : (chStatus === 'locked' ? 'locked' : 'exam'), chRoute);
+      window.openSilkSheet(null, chTitle, 'Рубежная аттестация по темам главы. 8 контрольных вопросов для закрепления мастерства.', chStatus === 'done' ? 'completed' : 'exam', chRoute, challengeNode);
     }
     return;
   }
@@ -66278,7 +66303,40 @@ render();
 // ==================== ZEN SILK SERPENTINE CONTROLLERS ====================
 let _currentSilkData = null;
 
-window.openSilkSheet = function(uid, title, desc, status, customRoute){
+function positionSilkPopover(triggerEl){
+  const sheet = document.getElementById('silkSheet');
+  if(!sheet) return;
+  const wrap = document.querySelector('.path-serpentine-wrap');
+  if(triggerEl && wrap){
+    const wrapBox = wrap.getBoundingClientRect();
+    const nodeBox = triggerEl.getBoundingClientRect();
+    const popoverW = Math.min(320, window.innerWidth - 32);
+    
+    let left = (nodeBox.left + nodeBox.width / 2 - wrapBox.left) - (popoverW / 2);
+    left = Math.max(12, Math.min(left, wrapBox.width - popoverW - 12));
+    
+    const estH = sheet.offsetHeight || 200;
+    let top = (nodeBox.top - wrapBox.top) - estH - 14;
+    if(top < 10){
+      top = (nodeBox.bottom - wrapBox.top) + 14;
+      sheet.classList.add('popover-below');
+    } else {
+      sheet.classList.remove('popover-below');
+    }
+    
+    sheet.style.top = Math.round(top) + 'px';
+    sheet.style.left = Math.round(left) + 'px';
+
+    const arrow = sheet.querySelector('.popover-arrow');
+    if(arrow){
+      const beadCenterX = (nodeBox.left + nodeBox.width / 2 - wrapBox.left);
+      const arrowLeft = beadCenterX - left - 6;
+      arrow.style.left = Math.max(16, Math.min(popoverW - 24, arrowLeft)) + 'px';
+    }
+  }
+}
+
+window.openSilkSheet = function(uid, title, desc, status, customRoute, triggerEl){
   _currentSilkData = { uid, title, desc, status, customRoute };
   const sheet = document.getElementById('silkSheet');
   const backdrop = document.getElementById('silkBackdrop');
@@ -66341,22 +66399,23 @@ window.openSilkSheet = function(uid, title, desc, status, customRoute){
     }
   } else {
     if(tagEl) {
-      tagEl.textContent = '🔒 ЗАБЛОКИРОВАНО';
-      tagEl.style.color = '#94a3b8';
+      tagEl.textContent = '⚡ ДОСТУПЕН К ИЗУЧЕНИЮ';
+      tagEl.style.color = '#34d399';
     }
     if(btn) {
-      btn.className = 'sheet-action-btn sheet-action-btn--secondary';
-      btn.textContent = '🔒 ПЕРЕЙТИ К ТЕКУЩЕМУ УРОКУ ➔';
-      btn.style.background = 'rgba(255,255,255,0.06)';
-      btn.style.border = '1px solid rgba(255,255,255,0.12)';
+      btn.className = 'sheet-action-btn sheet-action-btn--primary';
+      btn.textContent = 'НАЧАТЬ УРОК (2 МИН) ➔';
+      btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+      btn.style.border = '1px solid rgba(255,255,255,0.25)';
     }
   }
 
+  positionSilkPopover(triggerEl);
   backdrop.classList.add('open');
   sheet.classList.add('open');
 };
 
-window.openChapterSheet = function(chapNum, chapTitle, doneCount, totalCount, chapStatus){
+window.openChapterSheet = function(chapNum, chapTitle, doneCount, totalCount, chapStatus, triggerEl){
   _currentSilkData = { type: 'chapter', chapNum, chapTitle, doneCount, totalCount, chapStatus };
   const sheet = document.getElementById('silkSheet');
   const backdrop = document.getElementById('silkBackdrop');
@@ -66368,7 +66427,7 @@ window.openChapterSheet = function(chapNum, chapTitle, doneCount, totalCount, ch
   const btn = document.getElementById('silkBtn');
 
   if(titleEl) titleEl.textContent = `Глава ${chapNum}: ${chapTitle}`;
-  if(descEl) descEl.textContent = `Освоено ${doneCount} из ${totalCount} уроков модуля. Завершите все темы для открытия рубежной аттестации.`;
+  if(descEl) descEl.textContent = `Освоено ${doneCount} из ${totalCount} уроков модуля. Все уроки открыты для прохождения.`;
 
   if(chapStatus === 'completed'){
     if(tagEl) {
@@ -66381,30 +66440,20 @@ window.openChapterSheet = function(chapNum, chapTitle, doneCount, totalCount, ch
       btn.style.background = 'linear-gradient(135deg, rgba(16,185,129,0.35), rgba(5,150,105,0.22))';
       btn.style.border = '1px solid rgba(16,185,129,0.6)';
     }
-  } else if(chapStatus === 'active'){
+  } else {
     if(tagEl) {
-      tagEl.textContent = `⚡ ТЕКУЩАЯ ГЛАВА · ${doneCount}/${totalCount} СДАНО`;
-      tagEl.style.color = '#fbbf24';
+      tagEl.textContent = `⚡ ГЛАВА ${chapNum} · ${doneCount}/${totalCount} СДАНО`;
+      tagEl.style.color = '#34d399';
     }
     if(btn) {
       btn.className = 'sheet-action-btn sheet-action-btn--primary';
-      btn.textContent = 'ПРОДОЛЖИТЬ ОБУЧЕНИЕ ➔';
+      btn.textContent = 'ПЕРЕЙТИ К ГЛАВЕ ➔';
       btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
       btn.style.border = '1px solid rgba(255,255,255,0.25)';
     }
-  } else {
-    if(tagEl) {
-      tagEl.textContent = '🔒 ГЛАВА ЗАБЛОКИРОВАНА';
-      tagEl.style.color = '#94a3b8';
-    }
-    if(btn) {
-      btn.className = 'sheet-action-btn sheet-action-btn--secondary';
-      btn.textContent = '🔒 ДОСТУПНО ПОСЛЕ ПРЕДЫДУЩИХ ГЛАВ';
-      btn.style.background = 'rgba(255,255,255,0.06)';
-      btn.style.border = '1px solid rgba(255,255,255,0.12)';
-    }
   }
 
+  positionSilkPopover(triggerEl);
   backdrop.classList.add('open');
   sheet.classList.add('open');
 };
@@ -66416,6 +66465,12 @@ window.closeSilkSheet = function(){
   if(backdrop) backdrop.classList.remove('open');
   _currentSilkData = null;
 };
+
+window.addEventListener('keydown', function(e){
+  if(e.key === 'Escape' && typeof window.closeSilkSheet === 'function'){
+    window.closeSilkSheet();
+  }
+});
 
 window.handleSilkActionClick = function(){
   if(!_currentSilkData) return;
@@ -66442,11 +66497,7 @@ window.handleSilkActionClick = function(){
     return;
   }
 
-  if(d.status === 'locked'){
-    const act = document.getElementById('active-target-lesson') || document.querySelector('.hex-node--active');
-    if(act) act.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    return;
-  }
+  // Unlocked: free direct navigation to any lesson
 
   if(d.uid && typeof ALL_UNITS_COMBINED !== 'undefined'){
     const unitObj = ALL_UNITS_COMBINED.find(x => x.id === d.uid);
