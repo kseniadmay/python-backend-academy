@@ -12093,7 +12093,7 @@
 
     font-size: 11px;
 
-    padding-left: 2px;
+    padding-left: 3px;
 
     box-shadow: 0 0 14px rgba(16, 185, 129, 0.6);
 
@@ -52529,6 +52529,8 @@ function viewProPath(options){
 
   const { units: allUnits, chapters } = getEchelonUnitsAndChapters(curEchelon, ALL_UNITS_COMBINED);
 
+  chapters.forEach((ch, idx) => { ch.displayNum = idx + 1; });
+
 
 
   // Find active unit
@@ -52591,7 +52593,15 @@ function viewProPath(options){
 
 
 
-  // Hero Card HTML (Compact Apple Balanced 134px + Tap-to-Cycle)
+  const isCurChallenge = curActiveUnit.id.endsWith('.9') || curActiveUnit.id.endsWith('.6') || curActiveUnit.id.endsWith('.8');
+
+  const heroTypeLabel = isCurChallenge ? '⚔️ Аттестация' : '💻 Практика IDE';
+
+  const heroXp = isCurChallenge ? '+100 XP' : '+50 XP';
+
+
+
+  // Hero Card HTML (Pure 100% DRY Apple HIG Standard)
 
   const heroCardHTML = `
 
@@ -52617,7 +52627,7 @@ function viewProPath(options){
 
         </button>
 
-        <div class="pro-chap-step-tag">ГЛАВА ${activeChap.chapterNum || activeChap.num || 1} · УРОК ${activeChap.units.findIndex(x => x.id === curActiveUnit.id) + 1} ИЗ ${activeChapTotal}</div>
+        <div class="pro-chap-step-tag">ГЛАВА ${activeChap.displayNum || 1} · УРОК ${activeChap.units.findIndex(x => x.id === curActiveUnit.id) + 1} ИЗ ${activeChapTotal}</div>
 
       </div>
 
@@ -52631,25 +52641,17 @@ function viewProPath(options){
 
           <div class="pro-hero-meta">
 
-            <span>⏱️ 2 мин</span>
+            <span>${heroTypeLabel}</span>
 
-            <span>•</span>
+            <span style="opacity:0.35;margin:0 4px;">•</span>
 
-            <span>💻 IDE</span>
-
-            <span>•</span>
-
-            <span style="color:#34d399;font-weight:700;">+50 XP</span>
-
-            <span>•</span>
-
-            <span>${activeChapSummary}</span>
+            <span style="color:#34d399;font-weight:700;">${heroXp}</span>
 
           </div>
 
         </div>
 
-        <button type="button" class="pro-hero-cta" data-pro-start="${curActiveUnit.id}">ПРОДОЛЖИТЬ ➔</button>
+        <button type="button" class="pro-hero-cta" data-pro-start="${curActiveUnit.id}">Продолжить</button>
 
       </div>
 
@@ -52727,17 +52729,41 @@ function viewProPath(options){
 
       
 
-      const unitSkills = (u.skills || []).map(s => s.title.split('(')[0].trim());
+      const unitTokens = [];
 
-      const previewPills = unitSkills.slice(0, 3).map(skillName => 
+      (u.skills || []).forEach(s => {
 
-        `<span class="pro-skill-pill">${escapeHtmlStr(skillName)}</span>`
+        const m = String(s.title || '').match(/\(([^)]+)\)/);
 
-      ).join(' ');
+        if(m && m[1]){
 
+          m[1].split(',').forEach(tok => {
 
+            const cleanTok = tok.trim();
 
-      const skillsSnippet = unitSkills.slice(0, 3).join(', ');
+            if(cleanTok && cleanTok.length < 24 && !unitTokens.includes(cleanTok)) {
+
+              unitTokens.push(cleanTok);
+
+            }
+
+          });
+
+        } else {
+
+          const cleanT = String(s.title || '').replace(/^[\d.]+\s*[:·•\-]\s*/, '').trim();
+
+          if(cleanT && cleanT.length < 20 && !unitTokens.includes(cleanT)) {
+
+            unitTokens.push(cleanT);
+
+          }
+
+        }
+
+      });
+
+      const skillsSnippet = unitTokens.slice(0, 4).join(', ');
 
       return `
 
@@ -52785,7 +52811,7 @@ function viewProPath(options){
 
           <div class="pro-chapter-header-left">
 
-            <div class="pro-chapter-num">ГЛАВА ${ch.chapterNum || ch.num}</div>
+            <div class="pro-chapter-num">ГЛАВА ${ch.displayNum || ch.chapterNum || ch.num}</div>
 
             <div class="pro-chapter-title">${escapeHtmlStr(cleanChTitle)}</div>
 

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apple Studio · Регистр кнопки и оптический баланс</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070a12;
+      --border-glass: rgba(255, 255, 255, 0.12);
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --emerald: #10b981;
+      --font-ui: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: #f8fafc;
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 80px;
+    }
+
+    .header-bar {
+      width: 100%;
+      max-width: 1260px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-glass);
+      border-radius: 18px;
+      padding: 16px 24px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.45);
+    }
+    .badge-apple {
+      font-family: var(--font-mono);
+      font-size: 0.70rem;
+      font-weight: 800;
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .grid-variants {
+      width: 100%;
+      max-width: 1260px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(370px, 1fr));
+      gap: 24px;
+      z-index: 10;
+    }
+
+    .variant-card {
+      background: rgba(11, 16, 28, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .variant-card.featured {
+      border-color: rgba(16, 185, 129, 0.55);
+      box-shadow: 0 0 32px rgba(16, 185, 129, 0.15), 0 20px 48px rgba(0,0,0,0.5);
+    }
+    .variant-card.featured::before {
+      content: '★ РЕКОМЕНДАЦИЯ APPLE HIG';
+      position: absolute;
+      top: -11px;
+      left: 24px;
+      background: #10b981;
+      color: #032e23;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      padding: 3px 10px;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .variant-head {
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .variant-name { font-size: 1.05rem; font-weight: 800; color: #fff; }
+    .variant-caption { font-size: 0.82rem; color: #94a3b8; margin-top: 6px; line-height: 1.45; }
+
+    .btn-demo-wrap {
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(14, 20, 34, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      margin-top: 10px;
+    }
+    .cta-sample {
+      font-family: var(--font-ui);
+      font-weight: 800;
+      padding: 11px 24px;
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      border: 1px solid rgba(52, 211, 153, 0.5);
+      border-radius: 12px;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header-bar">
+    <div class="header-title">
+      <span class="badge-apple">Typography & Tactility</span>
+      <h1>Регистр кнопки действия: Title Case против Плотного Капса</h1>
+    </div>
+  </header>
+
+  <main class="grid-variants">
+
+    <!-- ВАРИАНТ А: Title Case (Рекомендуемый) -->
+    <div class="variant-card featured">
+      <div class="variant-head">
+        <div class="variant-name">Вариант A: Title Case («Продолжить ➔»)</div>
+        <div class="variant-caption">
+          Стандарт Apple (iOS, macOS, visionOS): естественный регистр букв. Выглядит премиально, не кричит на пользователя, снижает визуальное давление.
+        </div>
+      </div>
+
+      <div class="btn-demo-wrap">
+        <button class="cta-sample" style="font-size:0.86rem; letter-spacing:0.01em;">Продолжить ➔</button>
+      </div>
+    </div>
+
+    <!-- ВАРИАНТ B: Плотный капс -->
+    <div class="variant-card">
+      <div class="variant-head">
+        <div class="variant-name">Вариант B: UPPERCASE («ПРОДОЛЖИТЬ ➔»)</div>
+        <div class="variant-caption">
+          Агрессивный призыв к действию (в стиле баннерной рекламы). Привлекает взгляд, но добавляет жесткости интерфейсу.
+        </div>
+      </div>
+
+      <div class="btn-demo-wrap">
+        <button class="cta-sample" style="font-size:0.80rem; letter-spacing:0.05em; text-transform:uppercase;">ПРОДОЛЖИТЬ ➔</button>
+      </div>
+    </div>
+
+  </main>
+
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apple Studio · DRY-расчёт реального времени</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070a12;
+      --border-glass: rgba(255, 255, 255, 0.12);
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --emerald: #10b981;
+      --font-ui: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: #f8fafc;
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 80px;
+    }
+
+    .header-bar {
+      width: 100%;
+      max-width: 1260px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-glass);
+      border-radius: 18px;
+      padding: 16px 24px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.45);
+    }
+    .badge-apple {
+      font-family: var(--font-mono);
+      font-size: 0.70rem;
+      font-weight: 800;
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .grid-variants {
+      width: 100%;
+      max-width: 1260px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(370px, 1fr));
+      gap: 24px;
+      z-index: 10;
+    }
+
+    .variant-card {
+      background: rgba(11, 16, 28, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .variant-card.featured {
+      border-color: rgba(16, 185, 129, 0.55);
+      box-shadow: 0 0 32px rgba(16, 185, 129, 0.15), 0 20px 48px rgba(0,0,0,0.5);
+    }
+    .variant-card.featured::before {
+      content: '★ РЕКОМЕНДУЕМЫЙ DRY SSOT';
+      position: absolute;
+      top: -11px;
+      left: 24px;
+      background: #10b981;
+      color: #032e23;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      padding: 3px 10px;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .variant-head {
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .variant-name { font-size: 1.05rem; font-weight: 800; color: #fff; }
+    .variant-caption { font-size: 0.82rem; color: #94a3b8; margin-top: 6px; line-height: 1.45; }
+
+    .hero-snippet {
+      background: rgba(14, 20, 34, 0.85);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-top: 10px;
+    }
+    .hero-meta-row {
+      font-size: 0.80rem;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header-bar">
+    <div class="header-title">
+      <span class="badge-apple">DRY & SSOT Studio</span>
+      <h1>Реальный расчёт времени вместо хардкодинга «2 мин»</h1>
+    </div>
+  </header>
+
+  <main class="grid-variants">
+
+    <!-- ВАРИАНТ А: Динамический честный расчёт из структуры юнита (Рекомендуемый) -->
+    <div class="variant-card featured">
+      <div class="variant-head">
+        <div class="variant-name">Вариант A: Честный динамический расчёт (SSOT)</div>
+        <div class="variant-caption">
+          Время считается налету из реального состава активного кванта: <code>(конспекты × 1.5 мин) + (задачи IDE × 2 мин)</code>, а для Рубежного зачёта — по числу вопросов аттестации.
+        </div>
+      </div>
+
+      <div class="hero-snippet">
+        <div style="font-size:0.70rem; color:#8b9bb4; font-family:var(--font-mono);">ДЛЯ ОБЫЧНОГО УРОКА (3 конспекта + 1 задача):</div>
+        <div class="hero-meta-row">
+          <span>⏱️ 5 мин</span>
+          <span>•</span>
+          <span>💻 IDE</span>
+          <span>•</span>
+          <span style="color:#34d399; font-weight:700;">+50 XP</span>
+        </div>
+        <div style="margin-top:10px; font-size:0.70rem; color:#fbbf24; font-family:var(--font-mono);">ДЛЯ РУБЕЖНОГО ЗАЧЁТА (8 вопросов):</div>
+        <div class="hero-meta-row">
+          <span style="color:#fbbf24; font-weight:700;">⚔️ Аттестация · ~8 мин</span>
+          <span>•</span>
+          <span style="color:#34d399; font-weight:700;">+100 XP</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ВАРИАНТ B: Точный подсчёт квантов вместо минут -->
+    <div class="variant-card">
+      <div class="variant-head">
+        <div class="variant-name">Вариант B: Объективный фактаж (Кванты + Задачи)</div>
+        <div class="variant-caption">
+          Вместо субъективных минут писать реальные факты из данных: сколько конкретно карточек/конспектов и задач входит в текущий шаг.
+        </div>
+      </div>
+
+      <div class="hero-snippet">
+        <div class="hero-meta-row">
+          <span>📚 3 кванта</span>
+          <span>•</span>
+          <span>💻 2 задачи IDE</span>
+          <span>•</span>
+          <span style="color:#34d399; font-weight:700;">+50 XP</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ВАРИАНТ C: Гибридный (Время + Количество задач) -->
+    <div class="variant-card">
+      <div class="variant-head">
+        <div class="variant-name">Вариант C: Гибрид (Динамическое время + тип)</div>
+        <div class="variant-caption">
+          Писать динамическое время и количество практических задач: <code>⏱️ ~4 мин • 2 задачи IDE • +50 XP</code>.
+        </div>
+      </div>
+
+      <div class="hero-snippet">
+        <div class="hero-meta-row">
+          <span>⏱️ ~4 мин</span>
+          <span>•</span>
+          <span>2 задачи в IDE</span>
+          <span>•</span>
+          <span style="color:#34d399; font-weight:700;">+50 XP</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+</body>
+</html>
