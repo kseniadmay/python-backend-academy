@@ -30904,29 +30904,40 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     -webkit-backdrop-filter: blur(24px) !important;
   }
 
-  /* 2. Полоса прогресса эшелона: исходная линия как была */
+  /* 2. Полоса прогресса эшелона: попиксельное постепенное заполнение + мягкое свечение */
   .srs-header-progress-track {
+    container-type: inline-size !important;
     position: absolute !important;
     bottom: -12px !important;
     left: 0 !important;
     right: 0 !important;
     height: 4px !important;
-    background: rgba(255, 255, 255, 0.07) !important;
-    border: none !important;
+    background: rgba(255, 255, 255, 0.06) !important;
     border-radius: 99px !important;
-    overflow: hidden !important;
-    box-shadow: none !important;
+    overflow: visible !important;
   }
   .srs-header-progress-glow {
-    display: none !important;
+    display: block !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100% !important;
+    border-radius: 99px !important;
+    background: linear-gradient(90deg, #881337 0%, #be123c 35%, #059669 80%, #10b981 100%) !important;
+    background-size: 100cqw 100% !important;
+    background-position: left top !important;
+    filter: blur(4px) !important;
+    opacity: 0.75 !important;
+    pointer-events: none !important;
   }
   .srs-header-progress-fill-echelon {
     position: relative !important;
     height: 100% !important;
     border-radius: 99px !important;
     background: linear-gradient(90deg, #881337 0%, #be123c 35%, #059669 80%, #10b981 100%) !important;
-    background-size: 100% 100% !important;
-    box-shadow: 0 0 8px rgba(16, 185, 129, 0.50) !important;
+    background-size: 100cqw 100% !important;
+    background-position: left top !important;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.35) !important;
     transition: width 0.4s ease !important;
   }
 
@@ -30935,7 +30946,12 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   #radar-dots-necklace,
   .topic-eyebrow-track,
   .topic-eyebrow-track > div,
-  .topic-eyebrow-track > div > div {
+  .topic-eyebrow-track > div > div,
+  .cards-hub-container .dots-necklace,
+  .cards-hub-container #radar-dots-necklace,
+  .cards-hub-container .topic-eyebrow-track,
+  .cards-hub-theory .dots-necklace,
+  .cards-hub-theory #radar-dots-necklace {
     background: transparent !important;
     background-color: transparent !important;
     background-image: none !important;
@@ -31036,13 +31052,29 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     transform: none !important;
   }
 
-  /* Категорически отключаем псевдоэлемент ::after со срезанными дугами */
-  .dots-necklace .dot-jewel::after,
-  #radar-dots-necklace .dot-jewel::after,
-  .dots-necklace .dot-jewel.active::after,
-  #radar-dots-necklace .dot-jewel.active::after,
+  /* 3.1. Категорически отключаем псевдоэлементы ::after и ::before со срезанными дугами и пингами */
+  .dot-jewel::after,
   .dot-jewel::before,
-  .dock-quantum-bead::after {
+  .dot-jewel.active::after,
+  .dot-jewel.active::before,
+  .dot-jewel.bead-active-leading::after,
+  .dot-jewel.bead-active-leading::before,
+  .cards-hub-container .dot-jewel::after,
+  .cards-hub-container .dot-jewel::before,
+  .cards-hub-container .dot-jewel.active::after,
+  .cards-hub-container .dot-jewel.active::before,
+  .cards-hub-container .dot-jewel.bead-active-leading::after,
+  .cards-hub-container .dot-jewel.bead-active-leading::before,
+  .dots-necklace .dot-jewel::after,
+  .dots-necklace .dot-jewel::before,
+  .dots-necklace .dot-jewel.active::after,
+  .dots-necklace .dot-jewel.active::before,
+  #radar-dots-necklace .dot-jewel::after,
+  #radar-dots-necklace .dot-jewel::before,
+  #radar-dots-necklace .dot-jewel.active::after,
+  #radar-dots-necklace .dot-jewel.active::before,
+  .dock-quantum-bead::after,
+  .dock-quantum-bead::before {
     display: none !important;
     content: none !important;
     animation: none !important;
@@ -45220,9 +45252,12 @@ function viewPythonSkill(sid){
         <a href="#${tr.routePrefix}" class="srs-header-close-btn" style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;font-size:0.80rem;text-decoration:none;box-sizing:border-box;transition:all 0.15s ease;" title="Закрыть (На Путь)">✕</a>
       </div>
 
-      <!-- Тонкая 4px бордово-изумрудная линия прогресса эшелона на дне шапки -->
-      <div class="srs-header-progress-track" style="position:absolute;bottom:-12px;left:0;right:0;height:4px;background:rgba(255,255,255,0.07);border:none;border-radius:99px;overflow:hidden;margin:0;padding:0;z-index:2;" title="Прогресс эшелона: ${displayEchPct}%">
-        <div class="srs-header-progress-fill-echelon" style="width:${displayEchPct}%;height:100%;border-radius:99px;background:linear-gradient(90deg, #881337 0%, #be123c 35%, #059669 80%, #10b981 100%);box-shadow:0 0 8px rgba(16,185,129,0.5);transition:width 0.4s ease;"></div>
+      <!-- Полоса прогресса эшелона: попиксельное постепенное заполнение (#881337 -> #10b981) + мягкое свечение -->
+      <div class="srs-header-progress-track" style="container-type:inline-size;position:absolute;bottom:-12px;left:0;right:0;height:4px;background:rgba(255,255,255,0.06);border:none;border-radius:99px;overflow:visible;margin:0;padding:0;z-index:2;" title="Прогресс эшелона: ${displayEchPct}%">
+        <!-- Мягкий диффузный слой свечения острия и луча -->
+        <div class="srs-header-progress-glow" style="position:absolute;top:0;left:0;height:100%;width:${displayEchPct}%;background:linear-gradient(90deg, #881337 0%, #be123c 35%, #059669 80%, #10b981 100%);background-size:100cqw 100%;background-position:left top;border-radius:99px;filter:blur(4px);opacity:0.75;pointer-events:none;"></div>
+        <!-- Основное тело полосы прогресса -->
+        <div class="srs-header-progress-fill-echelon" style="position:relative;width:${displayEchPct}%;height:100%;border-radius:99px;background:linear-gradient(90deg, #881337 0%, #be123c 35%, #059669 80%, #10b981 100%);background-size:100cqw 100%;background-position:left top;box-shadow:0 0 8px rgba(16,185,129,0.35);transition:width 0.4s ease;"></div>
       </div>
     </header>
   `;
