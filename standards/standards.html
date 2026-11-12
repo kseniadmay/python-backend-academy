@@ -52454,6 +52454,11 @@ function viewPathSerpentine(options){
 
   const curEchelon = (options.echelon !== undefined) ? options.echelon : ((state && state.selectedEchelon) || 'all');
   const { units: allUnits, chapters: chapterBreakpoints } = getEchelonUnitsAndChapters(curEchelon, ALL_UNITS_COMBINED);
+  const curTierNum = (curEchelon === 'all') ? 'all' : (Number(curEchelon) || 1);
+  let echelonLabel = '🛡️ Скрининг';
+  if (curTierNum === 2) echelonLabel = '⚡ Архитектура';
+  else if (curTierNum === 3) echelonLabel = '🔥 HighLoad';
+  else if (curTierNum === 'all') echelonLabel = '🌐 Все';
 
   // Find active unit index
   let activeUnitIndex = -1;
@@ -52466,6 +52471,13 @@ function viewPathSerpentine(options){
     }
   });
   if(activeUnitIndex === -1) activeUnitIndex = Math.max(0, allUnits.length - 1);
+
+  const curActiveUnit = allUnits[activeUnitIndex] || allUnits[0] || ALL_UNITS_COMBINED[0];
+  const curChapter = chapterBreakpoints.find(cb => cb.units.some(u => u.id === curActiveUnit.id)) || chapterBreakpoints[0] || { num: 1, chapterNum: 1, shortTitle: 'Python Core', units: allUnits };
+  const activeChapterNum = curChapter.chapterNum || curChapter.num || 1;
+  const activeChapterShortTitle = curChapter.shortTitle || (curChapter.title || '').replace(/^Глава\s+\d+:\s*/i, '') || 'Python Core';
+  const curChapterCompletedCount = curChapter.units ? curChapter.units.filter(isUnitCompleted).length : 0;
+  const curChapterTotalCount = curChapter.units ? curChapter.units.length : 1;
 
   // HARMONIC S-CURVE WAYPOINTS (ZERO DRIFT, ROCK-SOLID ANCHORS, STEP Y = 150px)
   // Rhythm: Center (340) -> Right (450) -> Center (340) -> Left (230) -> Center (340)
@@ -52662,12 +52674,7 @@ function viewPathSerpentine(options){
       </g>`;
   });
 
-  const curActiveUnit = allUnits[activeUnitIndex] || allUnits[0] || ALL_UNITS_COMBINED[0];
-  const curChapter = chapterBreakpoints.find(cb => cb.units.some(u => u.id === curActiveUnit.id)) || chapterBreakpoints[0] || { num: 1, chapterNum: 1, shortTitle: 'Python Core', units: allUnits };
-  const activeChapterNum = curChapter.chapterNum || curChapter.num || 1;
-  const activeChapterShortTitle = curChapter.shortTitle || (curChapter.title || '').replace(/^Глава\s+\d+:\s*/i, '') || 'Python Core';
-  const curChapterCompletedCount = curChapter.units ? curChapter.units.filter(isUnitCompleted).length : 0;
-  const curChapterTotalCount = curChapter.units ? curChapter.units.length : 1;
+// Active chapter & unit metadata computed in head of viewPathSerpentine
 
   return `
     <div class="path-screen-layout">
