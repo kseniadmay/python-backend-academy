@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Стенд: Стекло SRS, без капса и бордовый акцент — Python Backend Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090e;
+      --surface: rgba(15, 23, 42, 0.75);
+      --border: rgba(255, 255, 255, 0.10);
+      --border-subtle: rgba(255, 255, 255, 0.06);
+      --ink: #f8fafc;
+      --ink-muted: #94a3b8;
+      --ink-dim: #64748b;
+      --emerald: #10b981;
+      --emerald-soft: #34d399;
+      --bordeaux: #881337;
+      --bordeaux-soft: #fb7185;
+      --font-main: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 16px 80px;
+      background-image: 
+        radial-gradient(circle at 18% 12%, rgba(16, 185, 129, 0.09) 0%, transparent 45%),
+        radial-gradient(circle at 82% 88%, rgba(136, 19, 55, 0.12) 0%, transparent 50%);
+      line-height: 1.45;
+    }
+
+    .container {
+      max-width: 1240px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 26px;
+    }
+
+    .header {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+    }
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 14px;
+      border-radius: 999px;
+      background: rgba(136, 19, 55, 0.18);
+      border: 1px solid rgba(244, 63, 94, 0.35);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #fda4af;
+    }
+    .header h1 {
+      font-size: 1.85rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+    .header p {
+      font-size: 0.92rem;
+      color: var(--ink-muted);
+      max-width: 740px;
+    }
+
+    /* Comparison Grid */
+    .showcase-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 24px;
+      align-items: start;
+    }
+
+    .variant-card {
+      background: rgba(15, 23, 42, 0.45);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px 20px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+    }
+    .variant-card.highlight {
+      border-color: rgba(52, 211, 153, 0.45);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), 0 0 28px rgba(16, 185, 129, 0.10);
+    }
+
+    .variant-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 10px;
+    }
+    .variant-tag {
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: var(--emerald-soft);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .variant-tag.bordeaux {
+      color: #f43f5e;
+    }
+    .variant-badge-score {
+      font-size: 0.70rem;
+      font-family: var(--font-mono);
+      color: var(--ink-dim);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .variant-desc {
+      font-size: 0.82rem;
+      color: var(--ink-muted);
+      line-height: 1.45;
+    }
+
+    /* Live Canvas simulating Path under popover */
+    .trail-canvas-bg {
+      position: relative;
+      background: #080c14;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 30px 16px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 480px;
+      overflow: hidden;
+    }
+    .trail-line-decor {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.4), rgba(255, 255, 255, 0.15));
+      z-index: 1;
+    }
+    .trail-circle-decor {
+      position: absolute;
+      bottom: 20px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: var(--ink-dim);
+      z-index: 1;
+    }
+
+    .mock-anchor {
+      position: relative;
+      z-index: 5;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.25);
+      border: 2px solid var(--emerald-soft);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    /* =========================================================================
+       SRS TRANSLUCENT GLASS POPOVER
+       ========================================================================= */
+    .srs-glass-popover {
+      width: 100%;
+      max-width: 410px;
+      border-radius: 20px;
+      position: relative;
+      z-index: 10;
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 18px 20px 20px;
+      /* Glass from .fc-card-front */
+      background: linear-gradient(155deg, rgba(255, 255, 255, 0.06) 0%, rgba(18, 24, 38, 0.55) 45%, rgba(8, 12, 18, 0.72) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-top: 1.2px solid rgba(255, 255, 255, 0.20);
+      box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        0 24px 60px -12px rgba(0, 0, 0, 0.70),
+        0 0 24px rgba(16, 185, 129, 0.08);
+      backdrop-filter: blur(18px) saturate(125%);
+      -webkit-backdrop-filter: blur(18px) saturate(125%);
+    }
+
+    /* Variant 1: Subtle Velvet Wine Aura in bottom corner */
+    .srs-glass-popover.with-bordeaux-glow {
+      background-image: 
+        radial-gradient(circle at 92% 92%, rgba(136, 19, 55, 0.22) 0%, transparent 55%),
+        linear-gradient(155deg, rgba(255, 255, 255, 0.06) 0%, rgba(18, 24, 38, 0.55) 45%, rgba(8, 12, 18, 0.72) 100%);
+      border-color: rgba(255, 255, 255, 0.08);
+      box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        0 24px 60px -12px rgba(0, 0, 0, 0.75),
+        0 0 28px rgba(136, 19, 55, 0.18);
+    }
+
+    .popover-arrow-up {
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 12px;
+      height: 12px;
+      background: rgba(18, 24, 38, 0.85);
+      border-top: 1.2px solid rgba(255, 255, 255, 0.20);
+      border-left: 1.2px solid rgba(255, 255, 255, 0.20);
+      z-index: 2;
+    }
+
+    .pop-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Calmer Natural-Case Badges (No screaming all-caps) */
+    .badge-calm-emerald {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--emerald-soft);
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 3.5px 11px;
+      border-radius: 999px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+    }
+    .badge-calm-bordeaux {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #fda4af;
+      background: rgba(136, 19, 55, 0.24);
+      border: 1px solid rgba(244, 63, 94, 0.35);
+      padding: 3.5px 11px;
+      border-radius: 999px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+
+    .pop-close-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--ink-dim);
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .pop-close-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+
+    .pop-title {
+      font-size: 1.22rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.015em;
+    }
+
+    /* Rows */
+    .cl-row-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 11px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      cursor: pointer;
+      font-family: var(--font-main);
+      text-align: left;
+      transition: all 0.18s ease;
+      width: 100%;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    }
+    .cl-row-item:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(52, 211, 153, 0.35);
+      transform: translateX(2px);
+    }
+    .cl-left-side {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      min-width: 0;
+      flex: 1;
+    }
+    .cl-dot-check {
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(5, 150, 105, 0.20) 100%);
+      border: 1px solid rgba(52, 211, 153, 0.55);
+      color: var(--emerald-soft);
+      font-size: 9.5px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .cl-text {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      line-height: 1.35;
+      white-space: normal;
+    }
+    .cl-code-tag {
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      color: #6ee7b7;
+      background: rgba(16, 185, 129, 0.10);
+      border: 1px solid rgba(16, 185, 129, 0.22);
+      padding: 2.5px 7.5px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      white-space: nowrap;
+      align-self: center;
+    }
+
+    /* Clean Sidebar-Match Button without Screaming CAPS */
+    .dominant-btn-calm {
+      width: 100%;
+      height: 42px;
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.26) 0%, rgba(6, 78, 59, 0.25) 100%);
+      border: 1.5px solid rgba(52, 211, 153, 0.65);
+      color: #ffffff !important;
+      padding: 9px 12px;
+      border-radius: 12px;
+      font-family: var(--font-main);
+      font-size: 0.84rem;
+      font-weight: 700; /* Спокойный уверенный шрифт */
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 4px 16px -2px rgba(0, 0, 0, 0.35);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .dominant-btn-calm:hover {
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.36) 0%, rgba(6, 78, 59, 0.35) 100%) !important;
+      border-color: rgba(52, 211, 153, 0.95) !important;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 6px 24px -2px rgba(16, 185, 129, 0.50) !important;
+      transform: translateY(-1px);
+    }
+
+    .live-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--emerald-soft);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.6), 0 0 20px rgba(16, 185, 129, 0.3);
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      transform: translateY(15px);
+      pointer-events: none;
+      transition: all 0.25s ease;
+    }
+    .live-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="live-toast" id="liveToast">
+    <span>⚡</span>
+    <span id="toastMsg">Действие выполнено</span>
+  </div>
+
+  <div class="container">
+
+    <header class="header">
+      <div class="header-badge">
+        <span>🍷 ВИННЫЙ БОРДО + ИЗУМРУДНОЕ СТЕКЛО SRS</span>
+      </div>
+      <h1>Стекло из карточек интервалок, спокойный регистр и бордовый акцент</h1>
+      <p>1. Текстура стекла взята из эталона <code>.fc-card-front</code> интервального повторения. 2. Убран кричащий капс (естественный регистр «Повторить конспект» и «3 из 3 сдано»). 3. Добавлен благородный винный отсвет Velvet Bordeaux.</p>
+    </header>
+
+    <div class="showcase-grid">
+
+      <!-- ===================================================================
+           ВАРИАНТ 1: ПОЛУПРОЗРАЧНОЕ СТЕКЛО SRS + ВИННАЯ АУРА БОРДО
+           =================================================================== -->
+      <div class="variant-card highlight">
+        <div class="variant-meta">
+          <div class="variant-tag">
+            <span>★</span>
+            <span>Вариант 1: Стекло SRS + Винный отсвет (Рекомендуемый)</span>
+          </div>
+          <div class="variant-badge-score">БОРДО + ИЗУМРУД</div>
+        </div>
+        <div class="variant-desc">
+          Градиент стекла <code>.fc-card-front</code> с мягкой аурой благородного бордо (<code>#881337</code>) в правом углу. Кнопка и бейдж — спокойный естественный регистр.
+        </div>
+
+        <div class="trail-canvas-bg">
+          <div class="trail-line-decor"></div>
+          <div class="trail-circle-decor">3</div>
+
+          <div class="mock-anchor" onclick="showToast('Узел на карте: Итераторы')">✓</div>
+
+          <div class="srs-glass-popover with-bordeaux-glow">
+            <div class="popover-arrow-up"></div>
+
+            <div class="pop-top-row">
+              <div class="badge-calm-emerald">
+                <span>✓</span>
+                <span>3 из 3 сдано · 100%</span>
+              </div>
+              <button type="button" class="pop-close-btn" onclick="showToast('Закрыть')">✕</button>
+            </div>
+
+            <div class="pop-title">Итераторы и генераторы</div>
+
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <button type="button" class="cl-row-item" onclick="showToast('Открыть: Протокол итератора и генераторы')">
+                <div class="cl-left-side">
+                  <span class="cl-dot-check">✓</span>
+                  <span class="cl-text">Протокол итератора и генераторы</span>
+                </div>
+                <span class="cl-code-tag">iter, next</span>
+              </button>
+
+              <button type="button" class="cl-row-item" onclick="showToast('Открыть: Ключевое слово yield и генераторные выражения')">
+                <div class="cl-left-side">
+                  <span class="cl-dot-check">✓</span>
+                  <span class="cl-text">Ключевое слово yield и генераторные выражения</span>
+                </div>
+                <span class="cl-code-tag">yield</span>
+              </button>
+
+              <button type="button" class="cl-row-item" onclick="showToast('Открыть: Менеджеры контекста')">
+                <div class="cl-left-side">
+                  <span class="cl-dot-check">✓</span>
+                  <span class="cl-text">Менеджеры контекста</span>
+                </div>
+                <span class="cl-code-tag">__enter__, __exit__</span>
+              </button>
+            </div>
+
+            <!-- Calm button without ALL-CAPS -->
+            <button type="button" class="dominant-btn-calm" onclick="showToast('Повторить конспект')">
+              Повторить конспект
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           ВАРИАНТ 2: ЧИСТОЕ СТЕКЛО SRS + БОРДОВЫЙ БЭЙДЖ СТАТУСА
+           =================================================================== -->
+      <div class="variant-card">
+        <div class="variant-meta">
+          <div class="variant-tag bordeaux">
+            <span>●</span>
+            <span>Вариант 2: Стекло SRS + Бордовый бейдж статуса</span>
+          </div>
+          <div class="variant-badge-score">АКЦЕНТНЫЙ БЕЙДЖ</div>
+        </div>
+        <div class="variant-desc">
+          Чистое стекло карточки интервалок, верхний статус оформлен в бархатном бордовом тоне (Velvet Carmine), кнопка — изумруд в нормальном регистре.
+        </div>
+
+        <div class="trail-canvas-bg">
+          <div class="trail-line-decor"></div>
+          <div class="trail-circle-decor">3</div>
+
+          <div class="mock-anchor" onclick="showToast('Узел на карте: Итераторы')">✓</div>
+
+          <div class="srs-glass-popover">
+            <div class="popover-arrow-up"></div>
+
+            <div class="pop-top-row">
+              <div class="badge-calm-bordeaux">
+                <span>🏆</span>
+                <span>3 из 3 сдано · 100%</span>
+              </div>
+              <button type="button" class="pop-close-btn" onclick="showToast('Закрыть')">✕</button>
+            </div>
+
+            <div class="pop-title">Итераторы и генераторы</div>
+
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <button type="button" class="cl-row-item" onclick="showToast('Открыть: Протокол итератора и генераторы')">
+                <div class="cl-left-side">
+                  <span class="cl-dot-check">✓</span>
+                  <span class="cl-text">Протокол итератора и генераторы</span>
+                </div>
+                <span class="cl-code-tag">iter, next</span>
+              </button>
+
+              <button type="button" class="cl-row-item" onclick="showToast('Открыть: Ключевое слово yield и генераторные выражения')">
+                <div class="cl-left-side">
+                  <span class="cl-dot-check">✓</span>
+                  <span class="cl-text">Ключевое слово yield и генераторные выражения</span>
+                </div>
+                <span class="cl-code-tag">yield</span>
+              </button>
+
+              <button type="button" class="cl-row-item" onclick="showToast('Открыть: Менеджеры контекста')">
+                <div class="cl-left-side">
+                  <span class="cl-dot-check">✓</span>
+                  <span class="cl-text">Менеджеры контекста</span>
+                </div>
+                <span class="cl-code-tag">__enter__, __exit__</span>
+              </button>
+            </div>
+
+            <button type="button" class="dominant-btn-calm" onclick="showToast('Повторить конспект')">
+              Повторить конспект
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    let toastTimer = null;
+    function showToast(msg) {
+      const toast = document.getElementById('liveToast');
+      const text = document.getElementById('toastMsg');
+      text.textContent = msg;
+      toast.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
