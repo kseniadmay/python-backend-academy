@@ -52543,21 +52543,42 @@ function viewPathSerpentine(options){
     }
   }
 
-  // Milestone Gates SVG (Soft Advisory Open)
+  // Milestone Gates SVG (Семантическая триада: Изумруд 100% · Янтарь в фокусе · Титановый графит)
   let markersSVG = '';
   gateCoords.forEach((pt) => {
     const cb = pt.chapter;
     const curCompletedCount = cb.units.filter(isUnitCompleted).length;
     const isCurChapterDone = cb.units.length > 0 && curCompletedCount === cb.units.length;
+    const isCurChapterActive = (cb.chapterNum === activeChapterNum);
     const cleanCurTitle = (cb.shortTitle || cb.title || '').replace(/^[^\wА-Яа-яЁё]+/, '').replace(/Матрица Мастерства\s*/i, '').trim();
 
+    let rectStroke = 'rgba(51, 65, 85, 0.65)';
+    let dotFill = '#475569';
+    let titleFill = '#94a3b8';
+    let statusFill = '#64748b';
+    let statusText = `Впереди (${cb.unitsCount} ур.)`;
+
+    if (isCurChapterDone) {
+      rectStroke = 'rgba(16, 185, 129, 0.70)';
+      dotFill = '#10b981';
+      titleFill = '#a7f3d0';
+      statusFill = '#34d399';
+      statusText = `${curCompletedCount}/${cb.unitsCount} · 100% ✓`;
+    } else if (isCurChapterActive) {
+      rectStroke = 'rgba(245, 158, 11, 0.70)';
+      dotFill = '#f59e0b';
+      titleFill = '#fef3c7';
+      statusFill = '#fbbf24';
+      statusText = `${curCompletedCount}/${cb.unitsCount} · В процессе`;
+    }
+
     markersSVG += `
-      <g class="chapter-milestone-pill" id="chapter-${cb.chapterNum}-pill" data-chapter-num="${cb.chapterNum}" data-chapter-title="${escapeHtmlStr(cleanCurTitle)}" data-done-count="${curCompletedCount}" data-total-count="${cb.unitsCount}" data-chapter-status="active" transform="translate(${pt.x}, ${pt.y})">
+      <g class="chapter-milestone-pill ${isCurChapterDone ? 'milestone--done' : (isCurChapterActive ? 'milestone--active' : 'milestone--future')}" id="chapter-${cb.chapterNum}-pill" data-chapter-num="${cb.chapterNum}" data-chapter-title="${escapeHtmlStr(cleanCurTitle)}" data-done-count="${curCompletedCount}" data-total-count="${cb.unitsCount}" data-chapter-status="${isCurChapterDone ? 'done' : (isCurChapterActive ? 'active' : 'future')}" transform="translate(${pt.x}, ${pt.y})">
         <rect class="milestone-hit" x="-140" y="-18" width="280" height="36" rx="18" fill="transparent" pointer-events="all"/>
-        <rect class="milestone-rect" x="-135" y="-14" width="270" height="28" rx="14" fill="rgba(15, 23, 42, 0.95)" stroke="${isCurChapterDone ? 'rgba(52, 211, 153, 0.7)' : 'rgba(52, 211, 153, 0.45)'}" stroke-width="1.3" filter="drop-shadow(0 4px 12px rgba(0,0,0,0.5))"/>
-        <circle cx="-112" cy="0" r="3.5" fill="${isCurChapterDone ? '#10b981' : '#34d399'}"/>
-        <text x="-100" y="4" font-family="'Onest', sans-serif" font-size="10.5" font-weight="800" fill="${isCurChapterDone ? '#a7f3d0' : '#e2e8f0'}" letter-spacing="0.04em">ГЛАВА ${cb.chapterNum}: ${escapeHtmlStr(cleanCurTitle.toUpperCase())}</text>
-        <text x="112" y="4" text-anchor="end" font-family="'Onest', sans-serif" font-size="10" font-weight="700" fill="#34d399">${isCurChapterDone ? `${curCompletedCount}/${cb.unitsCount} ✓` : 'Открыто ➔'}</text>
+        <rect class="milestone-rect" x="-135" y="-14" width="270" height="28" rx="14" fill="rgba(15, 23, 42, 0.95)" stroke="${rectStroke}" stroke-width="1.3" filter="drop-shadow(0 4px 12px rgba(0,0,0,0.5))"/>
+        <circle cx="-112" cy="0" r="3.5" fill="${dotFill}"/>
+        <text x="-100" y="4" font-family="'Onest', sans-serif" font-size="10.5" font-weight="800" fill="${titleFill}" letter-spacing="0.04em">ГЛАВА ${cb.chapterNum}: ${escapeHtmlStr(cleanCurTitle.toUpperCase())}</text>
+        <text x="112" y="4" text-anchor="end" font-family="'Onest', sans-serif" font-size="10" font-weight="700" fill="${statusFill}">${statusText}</text>
       </g>`;
   });
 
@@ -52585,9 +52606,9 @@ function viewPathSerpentine(options){
     else if(trk.key === 'algorithms') iconChar = '</>';
 
     const underTitle = (typeof cleanUnitTitle === 'function') ? cleanUnitTitle(u.id, u.title) : (u.title || '');
-    const pillStroke = isCompleted ? 'rgba(16, 185, 129, 0.40)' : (isActive ? '#f59e0b' : 'rgba(52, 211, 153, 0.30)');
-    const pillTextFill = isCompleted ? '#e2e8f0' : (isActive ? '#fef3c7' : '#cbd5e1');
-    const pillWeight = isActive ? '800' : '700';
+    const pillStroke = isCompleted ? 'rgba(16, 185, 129, 0.40)' : (isActive ? '#f59e0b' : 'rgba(51, 65, 85, 0.50)');
+    const pillTextFill = isCompleted ? '#e2e8f0' : (isActive ? '#fef3c7' : '#94a3b8');
+    const pillWeight = isActive ? '800' : '600';
 
     let innerContent = '';
     if(isCompleted){
@@ -52603,10 +52624,10 @@ function viewPathSerpentine(options){
         <text y="5" text-anchor="middle" font-size="13" font-weight="900" fill="#fef3c7">⚡</text>`;
     } else {
       innerContent = `
-        <circle class="node-circle" r="21" fill="#0f172a" stroke="rgba(52, 211, 153, 0.40)" stroke-width="1.8" filter="drop-shadow(0 4px 12px rgba(0,0,0,0.45))"/>
-        <text y="4" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#93c5fd">${iconChar}</text>
-        <circle cx="15" cy="-15" r="6.5" fill="#1e293b" stroke="#34d399" stroke-width="1.1"/>
-        <text x="15" y="-12" text-anchor="middle" font-size="8" font-weight="900" fill="#34d399">▶</text>`;
+        <circle class="node-circle" r="21" fill="#0f172a" stroke="#334155" stroke-width="1.8" filter="drop-shadow(0 4px 12px rgba(0,0,0,0.45))"/>
+        <text y="4" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#64748b">${iconChar}</text>
+        <circle cx="15" cy="-15" r="6.5" fill="#1e293b" stroke="#475569" stroke-width="1.1"/>
+        <text x="15" y="-12" text-anchor="middle" font-size="8" font-weight="900" fill="#64748b">▶</text>`;
     }
 
     nodesSVG += `
@@ -52656,14 +52677,17 @@ function viewPathSerpentine(options){
         <div style="position:fixed; border-radius:50%; filter:blur(90px); pointer-events:none; z-index:0; opacity:0.25; width:440px; height:440px; background:radial-gradient(circle, #10b981 0%, transparent 70%); top:-120px; left:-100px;"></div>
         <div style="position:fixed; border-radius:50%; filter:blur(90px); pointer-events:none; z-index:0; opacity:0.25; width:480px; height:480px; background:radial-gradient(circle, #f59e0b 0%, transparent 70%); bottom:-150px; right:-120px;"></div>
 
-        <!-- Sleek Sticky Slim Capsule HUD (48px) -->
-        <header class="trail-slim-hud" style="position:sticky; top:10px; z-index:35; width:100%; max-width:540px; margin: 0 auto 16px; background:rgba(15,23,42,0.92); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border:1px solid rgba(255,255,255,0.12); border-radius:999px; padding:6px 14px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+        <!-- Sleek Sticky Slim Capsule HUD (48px) с интерактивным эшелоном и свитчером -->
+        <header class="trail-slim-hud" style="position:sticky; top:10px; z-index:35; width:100%; max-width:540px; margin: 0 auto 16px; background:rgba(15,23,42,0.92); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border:1px solid rgba(255,255,255,0.12); border-radius:999px; padding:5px 12px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 8px 24px rgba(0,0,0,0.5);">
           <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:10px; font-weight:800; background:rgba(16,185,129,0.18); color:#34d399; border:1px solid rgba(16,185,129,0.35); padding:3px 8px; border-radius:999px; letter-spacing:0.03em;">Junior Core</span>
+            <span class="echelon-interactive-pill" data-open-echelon-modal="1" title="Нажмите, чтобы сменить программу/эшелон" style="cursor:pointer;">
+              <span>${echelonLabel}</span>
+              <span style="font-size:0.6rem;opacity:0.8;margin-left:2px;">▼</span>
+            </span>
             <span style="font-size:11.5px; font-weight:700; color:#e2e8f0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px;">Глава ${activeChapterNum}: ${curChapterCompletedCount}/${curChapterTotalCount} ✓</span>
           </div>
-          <button type="button" class="trail-hud-beacon-btn" id="hudBeaconBtn" style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; background:linear-gradient(135deg, rgba(16,185,129,0.3), rgba(5,150,105,0.2)); border:1px solid rgba(16,185,129,0.55); color:#a7f3d0; font-size:10.5px; font-weight:800; cursor:pointer; box-shadow:0 0 12px rgba(16,185,129,0.25);">
-            ⚡ К текущему
+          <button type="button" class="path-mode-btn" data-set-path-mode="pro" style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); color:#cbd5e1; font-size:10.5px; font-weight:800; cursor:pointer; transition:all 0.18s ease;" title="Переключиться в Профессиональный режим">
+            <span>💼 Про</span>
           </button>
         </header>
 
@@ -52693,7 +52717,7 @@ function viewPathSerpentine(options){
           <!-- Guide Tracks (Connecting ALL waypoints seamlessly) -->
           <path d="${dPath}" fill="none" stroke="rgba(148,163,184,0.12)" stroke-width="2.6" stroke-linecap="round"/>
           ${dProgress ? `<path d="${dProgress}" fill="none" stroke="url(#zenPathProgressGrad)" stroke-width="5" stroke-linecap="round" style="filter:drop-shadow(0 0 10px rgba(16,185,129,0.75));"/>` : ''}
-          ${dFuture ? `<path d="${dFuture}" fill="none" stroke="rgba(245, 158, 11, 0.28)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="6 6"/>` : ''}
+          ${dFuture ? `<path d="${dFuture}" fill="none" stroke="#334155" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="6 6"/>` : ''}
 
           <!-- Milestones, Nodes, Exams -->
           ${markersSVG}
@@ -52711,9 +52735,9 @@ function viewPathSerpentine(options){
           </button>
         </div>
 
-        <!-- Floating Smart Horizon Beacon FAB -->
-        <button type="button" class="floating-beacon-fab" id="horizonBeacon" style="display:none; position:fixed; bottom:24px; right:18px; z-index:45; background:linear-gradient(135deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95)); border:1.5px solid #10b981; box-shadow:0 8px 24px rgba(0,0,0,0.6), 0 0 20px rgba(16,185,129,0.45); border-radius:999px; padding:8px 14px; align-items:center; gap:6px; color:#a7f3d0; font-size:11.5px; font-weight:800; cursor:pointer;" title="К текущему уроку">
-          <span class="beacon-arrow" id="beaconArrow">↑</span>
+        <!-- Floating Smart Horizon Beacon FAB (Янтарный пульсар фокуса) -->
+        <button type="button" class="floating-beacon-fab is-pulsing" id="horizonBeacon" style="display:none; position:fixed; bottom:24px; right:28px; z-index:45; background:linear-gradient(135deg, rgba(30,41,59,0.96), rgba(15,23,42,0.98)); border:1.5px solid #f59e0b; box-shadow:0 8px 24px rgba(0,0,0,0.6), 0 0 20px rgba(245,158,11,0.45); border-radius:999px; padding:8px 15px; align-items:center; gap:6px; color:#fef3c7; font-size:11.5px; font-weight:800; cursor:pointer;" title="К текущему уроку">
+          <span class="beacon-arrow" id="beaconArrow" style="color:#f59e0b;font-weight:900;">↑</span>
           <span>К уроку</span>
         </button>
 
@@ -53285,19 +53309,15 @@ viewOldStagesMap = function(){
 
   if(mode === 'path'){
 
-    return `
+    return (state.pathViewMode === 'pro') ? `
 
       <div class="container" style="padding-bottom:10px;">
-
-        <h1 style="margin-bottom:6px;">Карта навыков: Интерактивный Путь обучения</h1>
-
-        <p class="meta" style="margin-bottom:14px;">Математическая извилистая S-трасса соединяет все 45 уроков курса в единое непрерывное приключение.</p>
 
         ${modeSwitcherHTML}
 
       </div>
 
-      ${(state.pathViewMode === 'pro') ? viewProPath() : viewPathSerpentine()}`;
+      ${viewProPath()}` : viewPathSerpentine();
 
   }
 
@@ -67031,6 +67051,21 @@ window.openSilkSheet = function(uid, title, desc, status, customRoute, triggerEl
     }
   }
 
+  if(sheet) {
+    if(status === 'completed') {
+      sheet.style.borderColor = 'rgba(52, 211, 153, 0.65)';
+      sheet.style.boxShadow = '0 16px 40px rgba(0,0,0,0.75), 0 0 24px rgba(16, 185, 129, 0.20)';
+    } else if(status === 'active') {
+      sheet.style.borderColor = 'rgba(245, 158, 11, 0.65)';
+      sheet.style.boxShadow = '0 16px 40px rgba(0,0,0,0.75), 0 0 24px rgba(245, 158, 11, 0.25)';
+    } else if(status === 'exam') {
+      sheet.style.borderColor = 'rgba(251, 191, 36, 0.70)';
+      sheet.style.boxShadow = '0 16px 40px rgba(0,0,0,0.75), 0 0 24px rgba(245, 158, 11, 0.30)';
+    } else {
+      sheet.style.borderColor = 'rgba(71, 85, 105, 0.55)';
+      sheet.style.boxShadow = '0 16px 40px rgba(0,0,0,0.75)';
+    }
+  }
   positionSilkPopover(triggerEl);
   backdrop.classList.add('open');
   sheet.classList.add('open');
@@ -67074,6 +67109,21 @@ window.openChapterSheet = function(chapNum, chapTitle, doneCount, totalCount, ch
     }
   }
 
+  if(sheet) {
+    if(status === 'completed') {
+      sheet.style.borderColor = 'rgba(52, 211, 153, 0.65)';
+      sheet.style.boxShadow = '0 16px 40px rgba(0,0,0,0.75), 0 0 24px rgba(16, 185, 129, 0.20)';
+    } else if(status === 'active') {
+      sheet.style.borderColor = 'rgba(245, 158, 11, 0.65)';
+      sheet.style.boxShadow = '0 16px 40px rgba(0,0,0,0.75), 0 0 24px rgba(245, 158, 11, 0.25)';
+    } else if(status === 'exam') {
+      sheet.style.borderColor = 'rgba(251, 191, 36, 0.70)';
+      sheet.style.boxShadow = '0 16px 40px rgba(0,0,0,0.75), 0 0 24px rgba(245, 158, 11, 0.30)';
+    } else {
+      sheet.style.borderColor = 'rgba(71, 85, 105, 0.55)';
+      sheet.style.boxShadow = '0 16px 40px rgba(0,0,0,0.75)';
+    }
+  }
   positionSilkPopover(triggerEl);
   backdrop.classList.add('open');
   sheet.classList.add('open');
