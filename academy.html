@@ -5728,17 +5728,22 @@
   }
 
   .dot-jewel.milestone {
-
-    border-color: rgba(251, 191, 36, 0.4);
-
-    background: rgba(251, 191, 36, 0.06);
-
+    border-color: #fde047 !important;
+    background: radial-gradient(circle at 35% 35%, #fef08a 0%, #f59e0b 60%, #b45309 100%) !important;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.70) !important;
   }
-
+  .dot-jewel.milestone.active {
+    background: #ffffff !important;
+    border-color: #f59e0b !important;
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.95), 0 0 24px rgba(245, 158, 11, 0.55) !important;
+  }
+  .dot-jewel.milestone.done {
+    background: #f59e0b !important;
+    border-color: #fbbf24 !important;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.65) !important;
+  }
   .dot-jewel.dot-card {
-
-    border-radius: 2.5px !important;
-
+    border-radius: 50% !important;
   }
 
   .step-micro-dot {
@@ -28453,12 +28458,12 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   .fc-progress-header .dot-jewel.rating-again,
   .dots-necklace .dot-jewel.done,
   #radar-dots-necklace .dot-jewel.done {
-    width: 8px !important;
-    height: 8px !important;
-    min-width: 8px !important;
-    min-height: 8px !important;
-    max-width: 8px !important;
-    max-height: 8px !important;
+    width: 10px !important;
+    height: 10px !important;
+    min-width: 10px !important;
+    min-height: 10px !important;
+    max-width: 10px !important;
+    max-height: 10px !important;
     border-radius: 50% !important;
     background: radial-gradient(circle at 35% 35%, #a7f3d0 0%, #34d399 45%, #059669 100%) !important;
     border: 1px solid rgba(167, 243, 208, 0.90) !important;
@@ -44702,16 +44707,11 @@ function viewPythonSkill(sid){
 
 
 
-  // Ожерелье бусин: все разделительные полосы убраны
-
+  // Ожерелье бусин: все разделительные полосы убраны, единый ряд без скролла
   const dotsNecklaceHTML = `
-
-    <div class="dots-necklace" id="radar-dots-necklace">
-
+    <div class="dots-necklace" id="radar-dots-necklace" style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:nowrap;margin:0 auto;padding:4px 0;">
       ${topicClusterDots.join('')}
-
       ${examDot}
-
     </div>`;
 
 
@@ -44843,19 +44843,6 @@ function viewPythonSkill(sid){
     const cleanNoteTitle = (noteObj && noteObj.title ? noteObj.title : activeK).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
 
     bodyHTML = `
-      <!-- Уровень 2: Единственный ряд чистых парящих бусин шагов конспекта (Zero Lexical Clutter) -->
-      <div class="srs-deck-beads-bar srs-beads-pure-floating" style="display:flex;align-items:center;justify-content:center;margin:14px auto 26px;padding:0;background:transparent;border:none;box-shadow:none;width:100%;">
-        <div class="srs-beads-necklace fc-beads-necklace" style="display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto;padding:2px 0;background:transparent;border:none;box-shadow:none;">
-          ${steps.map((st, idx) => {
-            let cls = 'dot-jewel';
-            if(idx < stepIdx) cls += ' done bead-done';
-            else if(idx === stepIdx) cls += ' active bead-active-leading';
-            else cls += ' future bead-future';
-            return `<span class="${cls}" data-py-jump-step="${idx}" role="button" tabindex="0"></span>`;
-          }).join('')}
-        </div>
-      </div>
-
       <!-- Уровень 3: Лаконичный конспект без визуального мусора -->
       <main class="srs-card-stage" style="margin-top:0;perspective:none;margin-bottom:0;width:100%;max-width:680px;margin-left:auto;margin-right:auto;">
         <div class="card srs-note-card srs-note-card-clean" style="border-radius:24px;padding:28px 30px;">
@@ -44966,19 +44953,6 @@ function viewPythonSkill(sid){
       const curCard = cards[curCardRealIdx] || {q: 'Карточка не найдена', a: ''};
 
       bodyHTML = `
-        <!-- Уровень 2: Единственный ряд чистых парящих бусин карточек (0 лексического шума) -->
-        <div class="srs-deck-beads-bar srs-beads-pure-floating" style="display:flex;align-items:center;justify-content:center;margin:14px auto 26px;padding:0;background:transparent;border:none;box-shadow:none;width:100%;">
-          <div class="srs-beads-necklace fc-beads-necklace" style="display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto;padding:2px 0;background:transparent;border:none;box-shadow:none;">
-            ${cards.map((_, idx) => {
-              let cls = 'dot-jewel';
-              if(idx < qPos) cls += ' done bead-done';
-              else if(idx === qPos) cls += ' active bead-active-leading';
-              else cls += ' future bead-future';
-              return `<span class="${cls}" data-py-jump-card="${idx}" role="button" tabindex="0"></span>`;
-            }).join('')}
-          </div>
-        </div>
-
         <!-- Уровень 3: Каноническая 3D Карточка (Лицо: Чистый вопрос / Оборот: Чистый ответ) -->
         <main class="srs-card-stage fc-stage" style="width:100%;max-width:680px;margin:0 auto;padding:0;perspective:1200px;box-sizing:border-box;">
           <div class="fc-card demo-card ${pySkillViewState.cardFlipped ? 'is-flipped fc-card--flipped' : ''}" id="srs-active-card" data-flipped="${pySkillViewState.cardFlipped ? 'true' : 'false'}" data-py-flip-card style="width:100%;max-width:680px;box-sizing:border-box;cursor:pointer;">
@@ -45104,6 +45078,7 @@ function viewPythonSkill(sid){
     return `
       <div class="container cards-hub-container ${pySkillViewState.tab === 'theory' ? 'cards-hub-theory' : ''}" style="max-width:680px;padding:32px 16px 60px;margin:0 auto;">
         ${srsHeaderHTML}
+        ${eyebrowDotsHTML}
         ${bodyHTML}
         ${celebrationBanner}
       </div>`;

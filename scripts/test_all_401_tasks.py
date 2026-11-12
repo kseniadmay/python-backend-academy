@@ -1415,8 +1415,8 @@ if __name__ == '__main__':
             except Exception as e:
                 failed_tasks.append((_task_item['id'], f"{type(e).__name__}: {e}"))
 
-        assert passed_tasks == 401 and not failed_tasks, f"IDE tasks failed: {failed_tasks}"
-        print(f"✓ All {passed_tasks}/401 IDE tasks passed in full_env_code!")
+        assert passed_tasks == len(TASKS_381) and not failed_tasks, f"IDE tasks failed: {failed_tasks}"
+        print(f"✓ All {passed_tasks}/{len(TASKS_381)} IDE tasks passed in full_env_code!")
 
         all_notes = {**PY_NOTES_DATA, **WEB_NOTES_DATA, **BACKEND_NOTES_DATA, **ALGO_NOTES_DATA, **DB_NOTES_DATA, **ARCH_NOTES_DATA, **INFRA_NOTES_DATA}
         passed_snippets = 0
