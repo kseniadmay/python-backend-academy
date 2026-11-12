@@ -6266,7 +6266,7 @@
 
     position: relative;
 
-    max-width: 680px;
+    max-width: 760px;
 
     margin: 0 auto;
 
@@ -6497,7 +6497,7 @@
 
   .path-serpentine {
 
-    max-width: 560px;
+    max-width: 760px;
 
     margin: 0 auto;
 
@@ -6538,6 +6538,19 @@
 
 
   /* Variant 1: Continuous Golden Ribbon with Energy Pulse Wave (Энергетический световой импульс) */
+  
+  @keyframes nodeLaserAura {
+    0%, 100% {
+      filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5)) drop-shadow(0 0 25px rgba(245, 158, 11, 0.25));
+    }
+    50% {
+      filter: drop-shadow(0 0 24px rgba(254, 240, 138, 0.95)) drop-shadow(0 0 45px rgba(245, 158, 11, 0.65));
+    }
+  }
+  .node-active-laser {
+    animation: nodeLaserAura 2.8s ease-in-out infinite;
+  }
+
   .path-energy-ripple-beam {
     stroke-dasharray: 52 340;
     animation: pathEnergyRipplePulse 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
@@ -10096,7 +10109,7 @@
 
     width: 100% !important;
 
-    max-width: 680px !important;
+    max-width: 760px !important;
 
     height: auto !important;
 
@@ -21431,7 +21444,7 @@
 
   .path-screen-layout:has(.path-serpentine-wrap) .path-serpentine-wrap {
 
-    max-width: 680px;
+    max-width: 760px;
 
     width: 100%;
 
@@ -52468,7 +52481,7 @@ function viewPathSerpentine(options){
       if(unitCoords.length > 0){
         curY += 150;
       }
-      const x = Math.round(340 + 110 * Math.sin((uIdx * Math.PI) / 2));
+      const x = Math.round(380 + 170 * Math.sin((uIdx * Math.PI) / 2));
       const pt = { x, y: curY, type: 'unit', unit: u, globalIdx: allUnits.indexOf(u) };
       unitCoords.push(pt);
       allWaypoints.push(pt);
@@ -52477,15 +52490,15 @@ function viewPathSerpentine(options){
     const endUnit = cb.units[cb.units.length - 1];
     if(endUnit){
       curY += 140;
-      const examPt = { x: 340, y: curY, type: 'exam', chapter: cb, endUnit };
+      const examPt = { x: 380, y: curY, type: 'exam', chapter: cb, endUnit };
       examCoords.push(examPt);
       allWaypoints.push(examPt);
     }
 
     if(ci < chapterBreakpoints.length - 1){
-      curY += 120;
+      curY += 130;
       const nextCb = chapterBreakpoints[ci + 1];
-      const gatePt = { x: 340, y: curY, type: 'gate', chapter: nextCb };
+      const gatePt = { x: 380, y: curY, type: 'gate', chapter: nextCb };
       gateCoords.push(gatePt);
       allWaypoints.push(gatePt);
     }
@@ -52561,11 +52574,13 @@ function viewPathSerpentine(options){
 
     markersSVG += `
       <g class="chapter-milestone-pill ${isCurChapterDone ? 'milestone--done' : (isCurChapterActive ? 'milestone--active' : 'milestone--future')}" id="chapter-${cb.chapterNum}-pill" data-chapter-num="${cb.chapterNum}" data-chapter-title="${escapeHtmlStr(cleanCurTitle)}" data-done-count="${curCompletedCount}" data-total-count="${cb.unitsCount}" data-chapter-status="${isCurChapterDone ? 'done' : (isCurChapterActive ? 'active' : 'future')}" transform="translate(${pt.x}, ${pt.y})">
-        <rect class="milestone-hit" x="-140" y="-18" width="280" height="36" rx="18" fill="transparent" pointer-events="all"/>
-        <rect class="milestone-rect" x="-135" y="-14" width="270" height="28" rx="14" fill="rgba(15, 23, 42, 0.95)" stroke="${rectStroke}" stroke-width="1.3" filter="drop-shadow(0 4px 12px rgba(0,0,0,0.5))"/>
-        <circle cx="-112" cy="0" r="3.5" fill="${dotFill}"/>
-        <text x="-100" y="4" font-family="'Onest', sans-serif" font-size="10.5" font-weight="800" fill="${titleFill}" letter-spacing="0.04em">ГЛАВА ${cb.chapterNum}: ${escapeHtmlStr(cleanCurTitle.toUpperCase())}</text>
-        <text x="112" y="4" text-anchor="end" font-family="'Onest', sans-serif" font-size="10" font-weight="700" fill="${statusFill}">${statusText}</text>
+        <rect class="milestone-hit" x="-160" y="-22" width="320" height="44" rx="22" fill="transparent" pointer-events="all"/>
+        <rect x="-160" y="-22" width="320" height="44" rx="22" fill="url(#portalGrad)" filter="blur(8px)" pointer-events="none"/>
+        <rect class="milestone-rect" x="-150" y="-20" width="300" height="40" rx="20" fill="rgba(13, 20, 34, 0.96)" stroke="${rectStroke}" stroke-width="1.5" filter="drop-shadow(0 8px 24px rgba(0,0,0,0.7))"/>
+        <circle cx="-130" cy="0" r="5" fill="${dotFill}" filter="drop-shadow(0 0 8px ${dotFill})"/>
+        <circle cx="130" cy="0" r="5" fill="${dotFill}" filter="drop-shadow(0 0 8px ${dotFill})"/>
+        <text x="-114" y="4" font-family="'JetBrains Mono', monospace" font-size="10.5" font-weight="800" fill="${titleFill}" letter-spacing="0.05em">ГЛАВА ${cb.chapterNum}: ${escapeHtmlStr(cleanCurTitle.toUpperCase())}</text>
+        <text x="114" y="4" text-anchor="end" font-family="'Onest', sans-serif" font-size="10" font-weight="800" fill="${statusFill}">${statusText}</text>
       </g>`;
   });
 
@@ -52600,22 +52615,30 @@ function viewPathSerpentine(options){
     let innerContent = '';
     if(isCompleted){
       innerContent = `
-        <circle class="node-circle" r="22" fill="#064e3b" stroke="#10b981" stroke-width="2.5" filter="drop-shadow(0 0 10px rgba(16,185,129,0.5))"/>
-        <text y="4" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11.5" font-weight="800" fill="#ffffff">${iconChar}</text>
-        <circle cx="15" cy="-15" r="7.5" fill="#042f2e" stroke="#34d399" stroke-width="1.2"/>
+        <circle class="node-circle" r="22" fill="#061c14" stroke="#10b981" stroke-width="2.2" filter="drop-shadow(0 0 12px rgba(16,185,129,0.5))"/>
+        <text y="4" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="800" fill="#34d399">✓</text>
+        <circle cx="15" cy="-15" r="7.5" fill="#022c22" stroke="#34d399" stroke-width="1.2"/>
         <text x="15" y="-12.5" text-anchor="middle" font-size="9" font-weight="900" fill="#34d399">✓</text>`;
     } else if(isActive){
       innerContent = `
-        <circle class="quantum-wave-ring" cx="0" cy="0" r="24"/>
-        <circle class="node-circle" r="24" fill="#78350f" stroke="#f59e0b" stroke-width="2.8" filter="drop-shadow(0 0 18px rgba(245,158,11,0.9))"/>
-        <text y="5" text-anchor="middle" font-size="13" font-weight="900" fill="#fef3c7">⚡</text>`;
+        <circle r="36" fill="none" stroke="#f59e0b" stroke-width="1" opacity="0.4" stroke-dasharray="4 6"/>
+        <circle class="node-circle node-active-laser" r="26" fill="#201404" stroke="#fbbf24" stroke-width="2.8" filter="drop-shadow(0 0 20px rgba(245,158,11,0.9))"/>
+        <text y="5" text-anchor="middle" font-size="14" font-weight="900" fill="#ffffff">⚡</text>`;
     } else {
       innerContent = `
-        <circle class="node-circle" r="21" fill="#0f172a" stroke="#334155" stroke-width="1.8" filter="drop-shadow(0 4px 12px rgba(0,0,0,0.45))"/>
+        <circle class="node-circle" r="20" fill="#0c1220" stroke="#334155" stroke-width="1.8"/>
         <text y="4" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#64748b">${iconChar}</text>
         <circle cx="15" cy="-15" r="6.5" fill="#1e293b" stroke="#475569" stroke-width="1.1"/>
         <text x="15" y="-12" text-anchor="middle" font-size="8" font-weight="900" fill="#64748b">▶</text>`;
     }
+
+    const pillFill = isActive ? 'rgba(30, 19, 4, 0.96)' : (isCompleted ? 'rgba(15, 23, 42, 0.92)' : 'rgba(15, 23, 42, 0.8)');
+    const pillW = isActive ? 160 : 130;
+    const pillH = isActive ? 26 : 22;
+    const pillRx = isActive ? 13 : 11;
+    const pillY = isActive ? 34 : 28;
+    const textY = isActive ? 51 : 43;
+    const textSz = isActive ? 11 : 10.5;
 
     nodesSVG += `
       <g class="hex-3d-node path-node hex-node--${status} ${isActive ? 'hex-node--active active' : ''}" ${isActive ? 'id="active-target-lesson"' : ''} data-unit-id="${u.id}" data-node-idx="${i}" data-title="${escapeHtmlStr(underTitle)}" data-status="${status}" data-desc="${escapeHtmlStr(u.desc || 'Флеш-карточки интервального повторения и практические задачи.')}" transform="translate(${x}, ${y})" role="button" tabindex="0">
@@ -52623,8 +52646,8 @@ function viewPathSerpentine(options){
         <g class="bead-group" pointer-events="none">
           ${innerContent}
         </g>
-        <rect x="-70" y="34" width="140" height="24" rx="12" fill="rgba(15, 23, 42, 0.92)" stroke="${pillStroke}" stroke-width="1.2" pointer-events="none"/>
-        <text y="50" text-anchor="middle" font-family="'Onest', sans-serif" font-size="11" font-weight="${pillWeight}" fill="${pillTextFill}" pointer-events="none">${escapeHtmlStr(underTitle)}</text>
+        <rect x="${-pillW/2}" y="${pillY}" width="${pillW}" height="${pillH}" rx="${pillRx}" fill="${pillFill}" stroke="${pillStroke}" stroke-width="${isActive ? 1.4 : 1}" ${isActive ? 'filter="drop-shadow(0 0 12px rgba(245,158,11,0.45))"' : ''} pointer-events="none"/>
+        <text y="${textY}" text-anchor="middle" font-family="'Onest', sans-serif" font-size="${textSz}" font-weight="${pillWeight}" fill="${pillTextFill}" pointer-events="none">${escapeHtmlStr(underTitle)}</text>
       </g>`;
   });
 
@@ -52655,30 +52678,36 @@ function viewPathSerpentine(options){
     <div class="path-screen-layout">
       <div class="container path-serpentine-wrap">
 
-        <!-- Ambient Spatial Orbs -->
-        <div style="position:fixed; border-radius:50%; filter:blur(90px); pointer-events:none; z-index:0; opacity:0.25; width:440px; height:440px; background:radial-gradient(circle, #10b981 0%, transparent 70%); top:-120px; left:-100px;"></div>
-        <div style="position:fixed; border-radius:50%; filter:blur(90px); pointer-events:none; z-index:0; opacity:0.25; width:480px; height:480px; background:radial-gradient(circle, #f59e0b 0%, transparent 70%); bottom:-150px; right:-120px;"></div>
+        <!-- Ambient Spatial Orbs (Canonical Burgundy & Emerald) -->
+        <div style="position:fixed; border-radius:50%; filter:blur(110px); pointer-events:none; z-index:0; opacity:0.22; width:520px; height:520px; background:radial-gradient(circle, #10b981 0%, transparent 70%); top:-100px; left:-100px;"></div>
+        <div style="position:fixed; border-radius:50%; filter:blur(120px); pointer-events:none; z-index:0; opacity:0.25; width:560px; height:560px; background:radial-gradient(circle, #881337 0%, transparent 70%); top:40%; right:-120px;"></div>
+        <div style="position:fixed; border-radius:50%; filter:blur(100px); pointer-events:none; z-index:0; opacity:0.18; width:480px; height:480px; background:radial-gradient(circle, #f59e0b 0%, transparent 70%); bottom:-120px; left:30%;"></div>
 
-        <!-- Sleek Sticky Slim Capsule HUD (48px) с интерактивным эшелоном и свитчером -->
-        <header class="trail-slim-hud" style="position:sticky; top:10px; z-index:35; width:100%; max-width:540px; margin: 0 auto 16px; background:rgba(15,23,42,0.92); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border:1px solid rgba(255,255,255,0.12); border-radius:999px; padding:5px 12px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+        <!-- Sleek Sticky Slim Capsule HUD (44px) с интерактивным эшелоном и свитчером -->
+        <header class="trail-slim-hud" style="position:sticky; top:10px; z-index:35; width:100%; max-width:580px; margin: 0 auto 16px; background:rgba(13,20,34,0.94); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.12); border-radius:999px; padding:6px 14px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 8px 24px rgba(0,0,0,0.5);">
           <div style="display:flex; align-items:center; gap:8px;">
             <span class="echelon-interactive-pill" data-open-echelon-modal="1" title="Нажмите, чтобы сменить программу/эшелон" style="cursor:pointer;">
               <span>${echelonLabel}</span>
               <span style="font-size:0.6rem;opacity:0.8;margin-left:2px;">▼</span>
             </span>
-            <span style="font-size:11.5px; font-weight:700; color:#e2e8f0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px;">Глава ${activeChapterNum}: ${curChapterCompletedCount}/${curChapterTotalCount} ✓</span>
+            <span style="font-size:11.5px; font-weight:700; color:#e2e8f0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:200px;">Глава ${activeChapterNum}: ${curChapterCompletedCount}/${curChapterTotalCount} ✓</span>
           </div>
           <button type="button" class="path-mode-btn" data-set-path-mode="pro" style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); color:#cbd5e1; font-size:10.5px; font-weight:800; cursor:pointer; transition:all 0.18s ease;" title="Переключиться в Профессиональный режим">
             <span>💼 Про</span>
           </button>
         </header>
 
-        <!-- SVG ENDLESS HARMONIC SERPENTINE -->
-        <svg class="path-serpentine-svg trail-svg-canvas" viewBox="0 0 680 ${totalH}" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:680px; display:block; margin: 0 auto; overflow:visible;">
+        <!-- SVG ENDLESS HARMONIC SERPENTINE (760px Wide River of Knowledge) -->
+        <svg class="path-serpentine-svg trail-svg-canvas" viewBox="0 0 760 ${totalH}" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:760px; display:block; margin: 0 auto; overflow:visible;">
           <defs>
             <linearGradient id="zenPathProgressGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#10b981"/>
-              <stop offset="100%" stop-color="#34d399"/>
+              <stop offset="0%" stop-color="#34d399"/>
+              <stop offset="100%" stop-color="#10b981"/>
+            </linearGradient>
+            <linearGradient id="portalGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="rgba(16,185,129,0.3)"/>
+              <stop offset="50%" stop-color="rgba(16,185,129,0.05)"/>
+              <stop offset="100%" stop-color="rgba(16,185,129,0.3)"/>
             </linearGradient>
             <radialGradient id="biomeEmerald" cx="50%" cy="50%" r="50%">
               <stop offset="0%" stop-color="#10b981" stop-opacity="0.10"/>
@@ -52692,14 +52721,15 @@ function viewPathSerpentine(options){
 
           <!-- Ambient Spatial Biomes -->
           <g pointer-events="none">
-            <ellipse cx="340" cy="180" rx="260" ry="170" fill="url(#biomeEmerald)"/>
-            <ellipse cx="340" cy="780" rx="260" ry="180" fill="url(#biomeAmber)"/>
+            <ellipse cx="380" cy="180" rx="300" ry="180" fill="url(#biomeEmerald)"/>
+            <ellipse cx="380" cy="780" rx="300" ry="190" fill="url(#biomeAmber)"/>
           </g>
 
           <!-- Guide Tracks (Connecting ALL waypoints seamlessly) -->
-          <path d="${dPath}" fill="none" stroke="rgba(148,163,184,0.12)" stroke-width="2.6" stroke-linecap="round"/>
-          ${dProgress ? `<path d="${dProgress}" fill="none" stroke="url(#zenPathProgressGrad)" stroke-width="5" stroke-linecap="round" style="filter:drop-shadow(0 0 10px rgba(16,185,129,0.75));"/>` : ''}
-          ${dFuture ? `<path d="${dFuture}" fill="none" stroke="#334155" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="6 6"/>` : ''}
+          <path d="${dPath}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="3" stroke-dasharray="6 8" stroke-linecap="round"/>
+          ${dProgress ? `<path d="${dProgress}" fill="none" stroke="url(#zenPathProgressGrad)" stroke-width="5" stroke-linecap="round" style="filter:drop-shadow(0 0 12px rgba(16,185,129,0.75));"/>` : ''}
+          ${dProgress ? `<path d="${dProgress}" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" class="path-energy-ripple-beam" opacity="0.9"/>` : ''}
+          ${dFuture ? `<path d="${dFuture}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 8"/>` : ''}
 
           <!-- Milestones, Nodes, Exams -->
           ${markersSVG}
