@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apple Studio · Отказ от неона: Приглушенные кнопки</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070a12;
+      --border-glass: rgba(255, 255, 255, 0.12);
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --emerald: #10b981;
+      --font-ui: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: #f8fafc;
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 80px;
+    }
+
+    .header-bar {
+      width: 100%;
+      max-width: 1260px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-glass);
+      border-radius: 18px;
+      padding: 16px 24px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.45);
+    }
+    .badge-apple {
+      font-family: var(--font-mono);
+      font-size: 0.70rem;
+      font-weight: 800;
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .grid-variants {
+      width: 100%;
+      max-width: 1260px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(370px, 1fr));
+      gap: 24px;
+      z-index: 10;
+    }
+
+    .variant-card {
+      background: rgba(11, 16, 28, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .variant-card.featured {
+      border-color: rgba(16, 185, 129, 0.55);
+      box-shadow: 0 0 32px rgba(16, 185, 129, 0.15), 0 20px 48px rgba(0,0,0,0.5);
+    }
+    .variant-card.featured::before {
+      content: '★ РЕКОМЕНДУЕМЫЙ КАНОН: СТИЛЬ БЭЙДЖА';
+      position: absolute;
+      top: -11px;
+      left: 24px;
+      background: #10b981;
+      color: #032e23;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      padding: 3px 10px;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .variant-head {
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .variant-name { font-size: 1.05rem; font-weight: 800; color: #fff; }
+    .variant-caption { font-size: 0.82rem; color: #94a3b8; margin-top: 6px; line-height: 1.45; }
+
+    .hero-demo-box {
+      background: linear-gradient(135deg, rgba(20, 28, 48, 0.85) 0%, rgba(13, 19, 33, 0.90) 100%);
+      border: 1px solid rgba(52, 211, 153, 0.28);
+      border-radius: 20px;
+      padding: 18px 22px;
+      margin-top: 10px;
+    }
+    .hero-demo-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .hero-demo-title { font-size: 1.2rem; font-weight: 800; color: #fff; }
+    .hero-demo-meta { font-size: 0.78rem; color: #94a3b8; margin-top: 4px; }
+
+    /* ВАРИАНТ А: Приглушенный стиль бэйджа (Рекомендуемый) */
+    .btn-badge-style {
+      font-family: var(--font-ui);
+      font-size: 0.84rem;
+      font-weight: 700;
+      padding: 9px 20px;
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.40);
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: none;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn-badge-style:hover {
+      background: rgba(16, 185, 129, 0.25);
+      border-color: rgba(16, 185, 129, 0.60);
+      color: #ffffff;
+    }
+
+    /* ВАРИАНТ B: Было (Кислотный ядовитый неон) */
+    .btn-acid-neon {
+      font-family: var(--font-ui);
+      font-size: 0.84rem;
+      font-weight: 800;
+      padding: 10px 22px;
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      border: 1px solid rgba(52, 211, 153, 0.5);
+      border-radius: 12px;
+      color: #ffffff;
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.55), inset 0 1px 1px rgba(255,255,255,0.4);
+      white-space: nowrap;
+    }
+
+    /* ВАРИАНТ C: Приглушенный Glass с акцентным изумрудным текстом */
+    .btn-glass-subtle {
+      font-family: var(--font-ui);
+      font-size: 0.84rem;
+      font-weight: 700;
+      padding: 9px 20px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .btn-glass-subtle:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header-bar">
+    <div class="header-title">
+      <span class="badge-apple">Apple Studio · De-Neoning</span>
+      <h1>Калибровка CTA-кнопки: стиль приглушённого бэйджа против неона</h1>
+    </div>
+  </header>
+
+  <main class="grid-variants">
+
+    <!-- ВАРИАНТ А: Приглушенный стиль бэйджа (Рекомендуемый) -->
+    <div class="variant-card featured">
+      <div class="variant-head">
+        <div class="variant-name">Вариант A: Стиль бэйджа (Полупрозрачный Нео-Гласс)</div>
+        <div class="variant-caption">
+          <strong>Точно как в бэйдже:</strong> фон <code>rgba(16, 185, 129, 0.16)</code>, мягкий текст <code>#34d399</code>, тонкая рамка <code>1px rgba(16, 185, 129, 0.4)</code>. <strong>Ноль едкого свечения, ноль кислотности!</strong> Глаза отдыхают.
+        </div>
+      </div>
+
+      <div class="hero-demo-box">
+        <div class="hero-demo-row">
+          <div>
+            <div class="hero-demo-title">Конкурентность</div>
+            <div class="hero-demo-meta">💻 Практика IDE • +50 XP</div>
+          </div>
+          <button class="btn-badge-style">Продолжить</button>
+        </div>
+      </div>
+      <div style="margin-top:14px; font-size:0.75rem; color:#34d399; font-weight:700;">
+        ✓ Идеальная гармония со статус-бейждами эшелона и глав.
+      </div>
+    </div>
+
+    <!-- ВАРИАНТ B: Было (Кислотный плотный неон) -->
+    <div class="variant-card">
+      <div class="variant-head">
+        <div class="variant-name">Вариант B: Было (Кислотный плотный неон)</div>
+        <div class="variant-caption">
+          Сплошная плотная заливка <code>#10b981</code> с тяжелым неоновым свечением <code>box-shadow: 0 6px 20px</code>. Бьет по глазам, выбивается из спокойной стеклянной гаммы.
+        </div>
+      </div>
+
+      <div class="hero-demo-box">
+        <div class="hero-demo-row">
+          <div>
+            <div class="hero-demo-title">Конкурентность</div>
+            <div class="hero-demo-meta">💻 Практика IDE • +50 XP</div>
+          </div>
+          <button class="btn-acid-neon">Продолжить</button>
+        </div>
+      </div>
+      <div style="margin-top:14px; font-size:0.75rem; color:#fb7185; font-weight:700;">
+        ⚠️ Слишком токсично и тяжело для темной темы.
+      </div>
+    </div>
+
+    <!-- ВАРИАНТ C: Монохромный матовый Glass -->
+    <div class="variant-card">
+      <div class="variant-head">
+        <div class="variant-name">Вариант C: Матовый Glass (Светло-серый)</div>
+        <div class="variant-caption">
+          Нейтральная полупрозрачная плашка <code>rgba(255,255,255,0.06)</code> с белым текстом. Полное отсутствие цвета.
+        </div>
+      </div>
+
+      <div class="hero-demo-box">
+        <div class="hero-demo-row">
+          <div>
+            <div class="hero-demo-title">Конкурентность</div>
+            <div class="hero-demo-meta">💻 Практика IDE • +50 XP</div>
+          </div>
+          <button class="btn-glass-subtle">Продолжить</button>
+        </div>
+      </div>
+      <div style="margin-top:14px; font-size:0.75rem; color:#94a3b8; font-weight:700;">
+        Нейтрально, но теряет связь с изумрудным языком интерфейса.
+      </div>
+    </div>
+
+  </main>
+
+</body>
+</html>
