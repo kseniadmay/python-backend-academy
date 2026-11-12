@@ -39082,7 +39082,7 @@ function playSound(kind, opt){
 
 
 
-function showToast(msg, type = 'info'){
+function showToast(msg, type = 'info', action = null){
 
   try {
 
@@ -39104,13 +39104,34 @@ function showToast(msg, type = 'info'){
 
     const safeMsg = typeof escapeHtmlStr === 'function' ? escapeHtmlStr(msg) : String(msg).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-    toast.innerHTML = `<span>${icon}</span> <span>${safeMsg}</span>`;
+    if(action && action.text){
+      toast.style.pointerEvents = 'auto';
+      const actionText = typeof escapeHtmlStr === 'function' ? escapeHtmlStr(action.text) : action.text;
+      toast.innerHTML = `<span>${icon}</span> <span>${safeMsg}</span> <button type="button" id="academy-toast-action-btn" style="margin-left:6px;padding:3px 10px;border-radius:8px;background:rgba(52,211,153,0.2);border:1px solid rgba(52,211,153,0.4);color:#34d399;font-weight:700;font-size:0.75rem;cursor:pointer;white-space:nowrap;transition:background .15s ease;">${actionText}</button>`;
+      const actionBtn = document.getElementById('academy-toast-action-btn');
+      if(actionBtn){
+        actionBtn.onclick = function(e){
+          e.stopPropagation();
+          if(toast){
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(-50%) translateY(12px)';
+            toast.style.pointerEvents = 'none';
+          }
+          if(typeof action.onClick === 'function') action.onClick();
+        };
+      }
+    } else {
+      toast.style.pointerEvents = 'none';
+      toast.innerHTML = `<span>${icon}</span> <span>${safeMsg}</span>`;
+    }
 
     toast.style.opacity = '1';
 
     toast.style.transform = 'translateX(-50%) translateY(0)';
 
     if(window._toastTimeout) clearTimeout(window._toastTimeout);
+
+    const toastDuration = (action && action.text) ? 4500 : 2800;
 
     window._toastTimeout = setTimeout(() => {
 
@@ -39120,9 +39141,11 @@ function showToast(msg, type = 'info'){
 
         toast.style.transform = 'translateX(-50%) translateY(12px)';
 
+        toast.style.pointerEvents = 'none';
+
       }
 
-    }, 2800);
+    }, toastDuration);
 
   } catch(e){}
 
@@ -59905,7 +59928,31 @@ document.addEventListener('click', async function(e){
 
       if(typeof isSettingsModalOpen !== 'undefined' && isSettingsModalOpen && typeof showTactileToast === 'function'){
 
-        showTactileToast(targetMode === 'pro' ? '💼 Включён профессиональный режим' : '🎮 Включён игровой режим Пути');
+        const toastMsg = targetMode === 'pro' ? '💼 Включён профессиональный режим' : '🎮 Включён игровой режим Пути';
+
+        const curR = (typeof currentRoute === 'function' ? currentRoute() : location.hash.replace(/^#/, '')) || '/';
+
+        if(curR !== '/path'){
+
+          showTactileToast(toastMsg, 'info', {
+
+            text: 'К Пути ➔',
+
+            onClick: function(){
+
+              if(typeof closeSettingsModal === 'function') closeSettingsModal();
+
+              location.hash = '#/path';
+
+            }
+
+          });
+
+        } else {
+
+          showTactileToast(toastMsg);
+
+        }
 
       }
 
