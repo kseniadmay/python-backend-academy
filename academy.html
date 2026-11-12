@@ -3006,13 +3006,61 @@
     background: rgba(255, 255, 255, 0.14);
     border: 1px solid rgba(255, 255, 255, 0.22);
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    box-sizing: border-box;
+  }
+
+  .dock-quantum-bead.done {
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle at 35% 35%, #a7f3d0 0%, #34d399 45%, #059669 100%) !important;
+    border: 1px solid rgba(167, 243, 208, 0.90) !important;
+    box-shadow: 0 0 6px 1px rgba(52, 211, 153, 0.75), 0 0 14px 2px rgba(16, 185, 129, 0.45) !important;
+    animation: bead-done-glow-surge 2.8s infinite ease-in-out !important;
   }
 
   .dock-quantum-bead.active {
-    background: var(--emerald, #10b981);
-    border-color: #34d399;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.55), 0 0 4px var(--emerald, #10b981);
-    transform: scale(1.25);
+    width: 8px;
+    height: 8px;
+    background: #ffffff !important;
+    border: 1.5px solid #10b981 !important;
+    border-radius: 50% !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+    box-shadow: 0 0 4px 1px rgba(167, 243, 208, 0.65), 0 0 9px 1.5px rgba(52, 211, 153, 0.50), 0 0 18px 2px rgba(16, 185, 129, 0.30) !important;
+    animation: bead-pulse-emerald 2.8s infinite ease-in-out !important;
+    transform: translateZ(0) !important;
+  }
+
+  .dock-quantum-bead.active::after {
+    content: '' !important;
+    display: block !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    width: 12px !important;
+    height: 12px !important;
+    margin-top: -6px !important;
+    margin-left: -6px !important;
+    border-radius: 50% !important;
+    border: 1.2px solid rgba(52, 211, 153, 0.90) !important;
+    box-sizing: border-box !important;
+    pointer-events: none !important;
+    transform-origin: center center !important;
+    animation: bead-ping-wave 2.8s cubic-bezier(0.2, 0.8, 0.4, 1) infinite !important;
+    z-index: 1 !important;
+  }
+
+  /* Устранение внутренней плашки под конспектом на десктопе и мобильных */
+  .srs-note-card-clean,
+  .cards-hub-theory .srs-note-card,
+  .cards-hub-container:has(#py-theory-text) .srs-note-card,
+  .srs-stage-seamless .srs-note-content-area {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
   }
 
   .topbar-audio-icon,
@@ -44790,7 +44838,7 @@ function viewPythonSkill(sid){
     const isDone = state.readNotes.includes(kId);
     const isActive = (pySkillViewState.tab === 'theory' && kId === activeK);
     const cleanNoteTitle = (n.title || kId).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
-    topicClusterDots.push(`<span class="dot-jewel ${isActive ? 'active' : (isDone ? 'done' : '')}" title="${escapeHtmlStr(cleanNoteTitle)}" data-py-select-k="${kId}" data-py-skill-id="${sk.id}"></span>`);
+    topicClusterDots.push(`<span class="dot-jewel ${isActive ? 'active bead-active-leading' : (isDone ? 'done bead-done' : 'future bead-future')}" title="${escapeHtmlStr(cleanNoteTitle)}" data-py-select-k="${kId}" data-py-skill-id="${sk.id}"></span>`);
 
     // 2. Карточки темы (🗂 — строгий порядок микрообучения)
     const matchingFids = (typeof getMatchingDecksForNote === 'function')
@@ -44802,7 +44850,7 @@ function viewPythonSkill(sid){
       const isCardDone = state.reviewedDecks.includes(fid);
       const isCardActive = (pySkillViewState.tab === 'cards' && (activeF === fid || (!activeF && idx === 0)));
       const cleanDeckTitle = (d.title || fid).replace(/^Ф-\d+\s*[:·•\-]\s*/i, '').trim();
-      topicClusterDots.push(`<span class="dot-jewel dot-card ${isCardActive ? 'active' : (isCardDone ? 'done' : '')}" title="Карточки: ${escapeHtmlStr(cleanDeckTitle)}" data-py-select-f="${fid}"></span>`);
+      topicClusterDots.push(`<span class="dot-jewel dot-card ${isCardActive ? 'active bead-active-leading' : (isCardDone ? 'done bead-done' : 'future bead-future')}" title="Карточки: ${escapeHtmlStr(cleanDeckTitle)}" data-py-select-f="${fid}"></span>`);
     });
 
     // 3. Задачи темы (⚡ — строгий порядок микрообучения)
@@ -44815,7 +44863,7 @@ function viewPythonSkill(sid){
       const isTaskDone = (solvedMap[tid] === 'solved');
       const isTaskActive = (pySkillViewState.tab === 'code' && (activeTid === tid || (!activeTid && idx === 0)));
       const cleanTaskTitle = t.title || ('Задание ' + (tIds.indexOf(tid) + 1));
-      topicClusterDots.push(`<span class="dot-jewel ${isTaskActive ? 'active' : (isTaskDone ? 'done' : '')}" title="Практика: ${escapeHtmlStr(cleanTaskTitle)}" data-py-select-task="${tid}"></span>`);
+      topicClusterDots.push(`<span class="dot-jewel ${isTaskActive ? 'active bead-active-leading' : (isTaskDone ? 'done bead-done' : 'future bead-future')}" title="Практика: ${escapeHtmlStr(cleanTaskTitle)}" data-py-select-task="${tid}"></span>`);
     });
 
   });
@@ -44956,7 +45004,13 @@ function viewPythonSkill(sid){
     const primaryActionHTML = `
       <div class="srs-dock-action-wrapper" style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:480px;margin:0 auto;">
         <div class="dock-quanta-beads-row" id="py-quanta-beads">
-          ${chunks.map((_, ci) => `<div class="dock-quantum-bead ${ci <= curChunkIdx ? 'active' : ''}"></div>`).join('')}
+          ${chunks.map((_, ci) => {
+            let qCls = 'dock-quantum-bead';
+            if(ci < curChunkIdx) qCls += ' done';
+            else if(ci === curChunkIdx) qCls += ' active bead-active-leading';
+            else qCls += ' future';
+            return `<div class="${qCls}"></div>`;
+          }).join('')}
         </div>
         <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta btn-dock-cta-single" style="height:50px;border-radius:14px;font-size:0.96rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;width:100%;letter-spacing:0.01em;" ${finishBtnAttr}>
           <span>Дальше</span>
@@ -44966,16 +45020,16 @@ function viewPythonSkill(sid){
     const cleanNoteTitle = (noteObj && noteObj.title ? noteObj.title : activeK).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
 
     bodyHTML = `
-      <!-- Уровень 3: Лаконичный конспект без визуального мусора -->
-      <main class="srs-card-stage" style="margin-top:0;perspective:none;margin-bottom:0;width:100%;max-width:680px;margin-left:auto;margin-right:auto;">
-        <div class="card srs-note-card srs-note-card-clean" style="border-radius:24px;padding:28px 30px;">
+      <!-- Уровень 3: Лаконичный конспект без внутренней плашки (Book Mode) -->
+      <main class="srs-card-stage srs-stage-seamless" style="margin-top:0;perspective:none;margin-bottom:0;width:100%;max-width:680px;margin-left:auto;margin-right:auto;">
+        <div class="srs-note-content-area srs-note-card-clean" style="width:100%;background:transparent;border:none;box-shadow:none;padding:0;">
           <h2 style="font-size:1.30rem;font-weight:800;color:var(--ink);letter-spacing:-0.015em;margin:0 0 16px;line-height:1.35;text-align:left;">
             ${escapeHtmlStr(cleanStepTitle || cleanNoteTitle)}
           </h2>
 
           ${feedHTML}
 
-          <div class="srs-action-dock-container" style="margin-top:24px;display:flex;justify-content:center;width:100%;">
+          <div class="srs-action-dock-container" style="margin-top:28px;display:flex;justify-content:center;width:100%;">
             ${primaryActionHTML}
           </div>
         </div>
@@ -61284,9 +61338,12 @@ document.addEventListener('click', async function(e){
         const beadsContainer = document.getElementById('py-quanta-beads');
         if(beadsContainer){
           const beads = beadsContainer.querySelectorAll('.dock-quantum-bead');
-          if(beads[nextCIdx]){
-            beads[nextCIdx].classList.add('active');
-          }
+          beads.forEach((b, idx) => {
+            b.classList.remove('active', 'done', 'future', 'bead-active-leading');
+            if(idx < nextCIdx) b.classList.add('done');
+            else if(idx === nextCIdx) b.classList.add('active', 'bead-active-leading');
+            else b.classList.add('future');
+          });
         }
 
         // Обновляем кнопку действия in-place без пересоздания DOM-узла
