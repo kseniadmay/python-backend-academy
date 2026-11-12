@@ -3063,6 +3063,158 @@
     padding: 0 !important;
   }
 
+  /* ══════════════════════════════════════════════════════════
+     ГАРМОНИЗАЦИЯ ЭКРАНА КОНСПЕКТА (БОРДО + ИЗУМРУД + СИНХРОННЫЕ БУСИНЫ)
+     ══════════════════════════════════════════════════════════ */
+
+  /* 1. Бархатно-бордовый амбиентный отсвет (Velvet Wine) в правом углу окна конспекта */
+  .cards-hub-theory {
+    position: relative;
+  }
+  .cards-hub-theory::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(136, 19, 55, 0.22) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* 2. Ликвидация паразитной рамки и слепящего ореола вокруг ожерелья бусин */
+  .dots-necklace,
+  #radar-dots-necklace {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+  .dots-necklace .dot-jewel {
+    animation-delay: 0s !important;
+  }
+
+  /* Сданные бусины: спокойный ювелирный изумруд без раздутого 14px-свечения */
+  .dots-necklace .dot-jewel.done,
+  #radar-dots-necklace .dot-jewel.done {
+    width: 9px !important;
+    height: 9px !important;
+    min-width: 9px !important;
+    min-height: 9px !important;
+    max-width: 9px !important;
+    max-height: 9px !important;
+    border-radius: 50% !important;
+    background: radial-gradient(circle at 35% 35%, #a7f3d0 0%, #34d399 45%, #059669 100%) !important;
+    border: 1px solid rgba(167, 243, 208, 0.85) !important;
+    box-shadow: 0 0 3px rgba(16, 185, 129, 0.30) !important;
+    animation: none !important;
+  }
+
+  /* 3. Маяк ТОЛЬКО на верхней активной бусине темы */
+  #radar-dots-necklace .dot-jewel.active,
+  .dots-necklace .dot-jewel.active {
+    width: 8.5px !important;
+    height: 8.5px !important;
+    background: #ffffff !important;
+    border: 1.5px solid #10b981 !important;
+    box-shadow: 0 0 4px 1px rgba(167, 243, 208, 0.65), 0 0 9px 1.5px rgba(52, 211, 153, 0.50), 0 0 16px 2px rgba(16, 185, 129, 0.35) !important;
+    animation: unified-live-breathe 2.8s infinite ease-in-out !important;
+  }
+
+  /* 4. Единое синхронное дыхание всех живых индикаторов на экране (2.8s Zen-темп) */
+  @keyframes unified-live-breathe {
+    0%, 100% {
+      box-shadow: 0 0 3px rgba(16, 185, 129, 0.40), 0 0 6px rgba(16, 185, 129, 0.20);
+      opacity: 0.90;
+    }
+    50% {
+      box-shadow: 0 0 7px rgba(52, 211, 153, 0.80), 0 0 14px rgba(16, 185, 129, 0.45);
+      opacity: 1;
+    }
+  }
+
+  .srs-live-status-dot,
+  .activity-dot,
+  .nav-sub-breath-dot {
+    animation: unified-live-breathe 2.8s infinite ease-in-out !important;
+  }
+
+  /* Нижние бусины квантов — спокойные, чистые индикаторы прогресса (без отдельного маяка) */
+  .dock-quantum-bead.active {
+    width: 8px !important;
+    height: 8px !important;
+    background: #ffffff !important;
+    border: 1.5px solid #10b981 !important;
+    border-radius: 50% !important;
+    box-shadow: 0 0 4px 1px rgba(167, 243, 208, 0.65), 0 0 7px rgba(16, 185, 129, 0.35) !important;
+    animation: unified-live-breathe 2.8s infinite ease-in-out !important;
+    transform: scale(1.12) !important;
+  }
+  .dock-quantum-bead.active::after {
+    display: none !important;
+  }
+
+  .dock-quantum-bead.done {
+    width: 8px !important;
+    height: 8px !important;
+    background: radial-gradient(circle at 35% 35%, #a7f3d0 0%, #34d399 45%, #059669 100%) !important;
+    border: 1px solid rgba(167, 243, 208, 0.85) !important;
+    box-shadow: 0 0 3px rgba(16, 185, 129, 0.25) !important;
+    animation: none !important;
+  }
+
+  /* 5. Анимация появления текста: каскадная для каждого поступающего кванта (без layout shift) */
+  .feed-chunk.feed-chunk-new {
+    animation: zenChunkReveal 0.36s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  }
+  .feed-chunk.feed-chunk-new > p:nth-child(1),
+  .feed-chunk.feed-chunk-new > h4:nth-child(1) {
+    animation: zenChunkReveal 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.00s forwards !important;
+    opacity: 0;
+  }
+  .feed-chunk.feed-chunk-new > p:nth-child(2),
+  .feed-chunk.feed-chunk-new > ul:nth-child(2),
+  .feed-chunk.feed-chunk-new > pre:nth-child(2) {
+    animation: zenChunkReveal 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.07s forwards !important;
+    opacity: 0;
+  }
+  .feed-chunk.feed-chunk-new > p:nth-child(3),
+  .feed-chunk.feed-chunk-new > ul:nth-child(3),
+  .feed-chunk.feed-chunk-new > pre:nth-child(3) {
+    animation: zenChunkReveal 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.14s forwards !important;
+    opacity: 0;
+  }
+  .feed-chunk.feed-chunk-new > p:nth-child(n+4),
+  .feed-chunk.feed-chunk-new > ul:nth-child(n+4),
+  .feed-chunk.feed-chunk-new > pre:nth-child(n+4) {
+    animation: zenChunkReveal 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.20s forwards !important;
+    opacity: 0;
+  }
+
+  .feed-chunk.feed-chunk-prev {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  .feed-chunk.feed-chunk-prev > * {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+
+  @keyframes zenChunkReveal {
+    0% {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   .topbar-audio-icon,
 
   .topbar-help-icon,
@@ -44922,10 +45074,13 @@ function viewPythonSkill(sid){
     <header class="srs-unified-header-bar" style="position:relative;display:flex;justify-content:space-between;align-items:center;height:30px;min-height:30px;gap:12px;margin-bottom:28px;padding:0 2px;background:transparent !important;border:none !important;box-shadow:none !important;box-sizing:border-box;">
       <div class="srs-header-left-spacer" style="width:28px;height:28px;display:none;flex-shrink:0;"></div>
 
-      <div class="srs-header-title-wrap" style="min-width:0;flex:1;display:flex;align-items:center;height:30px;justify-content:flex-start;">
+      <div class="srs-header-title-wrap" style="min-width:0;flex:1;display:flex;align-items:center;gap:10px;height:30px;justify-content:flex-start;">
         <span class="srs-header-mode-title" style="display:inline-flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:700;color:var(--ink-soft);letter-spacing:0.03em;text-transform:uppercase;box-sizing:border-box;">
           <span class="srs-live-status-dot"></span>
           <span>${escapeHtmlStr(activeItemTitle || cleanUnitTitleVal)}</span>
+        </span>
+        <span class="echelon-bordeaux-pill" style="font-size:0.70rem;font-weight:700;padding:2px 8px;border-radius:999px;background:rgba(136,19,55,0.22);border:1px solid rgba(244,63,94,0.35);color:#fda4af;letter-spacing:0.02em;display:inline-flex;align-items:center;white-space:nowrap;">
+          Эшелон ${curEchTier} · ${escapeHtmlStr(echMeta.targetLabel || 'База')}
         </span>
       </div>
 
@@ -45002,17 +45157,20 @@ function viewPythonSkill(sid){
     }
 
     const primaryActionHTML = `
-      <div class="srs-dock-action-wrapper" style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:480px;margin:0 auto;">
-        <div class="dock-quanta-beads-row" id="py-quanta-beads">
-          ${chunks.map((_, ci) => {
-            let qCls = 'dock-quantum-bead';
-            if(ci < curChunkIdx) qCls += ' done';
-            else if(ci === curChunkIdx) qCls += ' active bead-active-leading';
-            else qCls += ' future';
-            return `<div class="${qCls}"></div>`;
-          }).join('')}
+      <div class="srs-dock-action-wrapper" style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:480px;margin:0 auto;">
+        <!-- Выверенная оптическая центровка бусин квантов по высоте (равные отступы сверху и снизу) -->
+        <div class="dock-quanta-spacer" style="height:36px;display:flex;align-items:center;justify-content:center;width:100%;">
+          <div class="dock-quanta-beads-row" id="py-quanta-beads" style="display:flex;align-items:center;justify-content:center;gap:8px;margin:0;padding:0;">
+            ${chunks.map((_, ci) => {
+              let qCls = 'dock-quantum-bead';
+              if(ci < curChunkIdx) qCls += ' done';
+              else if(ci === curChunkIdx) qCls += ' active';
+              else qCls += ' future';
+              return `<div class="${qCls}"></div>`;
+            }).join('')}
+          </div>
         </div>
-        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta btn-dock-cta-single" style="height:50px;border-radius:14px;font-size:0.96rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;width:100%;letter-spacing:0.01em;" ${finishBtnAttr}>
+        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta btn-dock-cta-single" style="height:48px;border-radius:14px;font-size:0.96rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;width:100%;letter-spacing:0.01em;" ${finishBtnAttr}>
           <span>Дальше</span>
         </button>
       </div>`;
