@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Стенд: Интерактивная визуализация стилей бусин (Единый канон)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090e;
+      --surface: rgba(15, 23, 42, 0.72);
+      --surface-card: rgba(17, 24, 39, 0.88);
+      --border: rgba(255, 255, 255, 0.10);
+      --border-subtle: rgba(255, 255, 255, 0.06);
+      --ink: #f8fafc;
+      --ink-muted: #94a3b8;
+      --ink-dim: #64748b;
+      --emerald: #10b981;
+      --emerald-bright: #34d399;
+      --emerald-glow: rgba(16, 185, 129, 0.50);
+      --gold: #f59e0b;
+      --gold-bright: #fbbf24;
+      --gold-glow: rgba(245, 158, 11, 0.55);
+      --font-main: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 32px 16px 80px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-image: 
+        radial-gradient(circle at 15% 10%, rgba(16, 185, 129, 0.10) 0%, transparent 45%),
+        radial-gradient(circle at 85% 90%, rgba(136, 19, 55, 0.12) 0%, transparent 50%);
+    }
+
+    .container {
+      max-width: 1040px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .header {
+      text-align: center;
+      padding: 0 12px;
+    }
+    .header h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0 0 10px;
+      background: linear-gradient(135deg, #ffffff 30%, #34d399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .header p {
+      font-size: 0.92rem;
+      color: var(--ink-muted);
+      margin: 0 auto;
+      max-width: 680px;
+      line-height: 1.55;
+    }
+
+    /* Controls bar */
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      background: var(--surface);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      padding: 10px 16px;
+      border-radius: 999px;
+      align-self: center;
+    }
+    .btn-toggle {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--ink-muted);
+      padding: 7px 16px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-toggle:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.10);
+    }
+    .btn-toggle.active {
+      background: rgba(16, 185, 129, 0.20);
+      border-color: var(--emerald);
+      color: #34d399;
+      box-shadow: 0 0 14px var(--emerald-glow);
+    }
+
+    /* Comparison Section */
+    .section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 10px 0 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-desc {
+      font-size: 0.84rem;
+      color: var(--ink-muted);
+      margin: 0 0 16px;
+    }
+
+    .grid-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .beacon-card {
+      background: var(--surface-card);
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 22px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+    .beacon-card:hover {
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+    }
+    .beacon-card.selected {
+      border-color: var(--emerald);
+      background: linear-gradient(165deg, rgba(16, 185, 129, 0.12) 0%, rgba(17, 24, 39, 0.95) 100%);
+      box-shadow: 0 0 24px rgba(16, 185, 129, 0.25);
+    }
+    .beacon-badge {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--ink-dim);
+    }
+    .beacon-badge.rec {
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+    .beacon-title {
+      font-size: 0.98rem;
+      font-weight: 700;
+      margin: 0;
+    }
+    .beacon-desc {
+      font-size: 0.80rem;
+      color: var(--ink-muted);
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    .beacon-preview-box {
+      width: 100%;
+      height: 72px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* ============================================================
+       СТИЛИ АКТИВНОЙ БУСИНЫ (4 ВАРИАНТА)
+       ============================================================ */
+
+    /* ВАРИАНТ А: Безопасный квантовый маяк (Box-Shadow Pure Glow) */
+    .beacon-dot-vA {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 1.5px solid #10b981;
+      position: relative;
+      animation: beaconPulseA 2.6s ease-in-out infinite;
+      transform: translateZ(0);
+    }
+    @keyframes beaconPulseA {
+      0%, 100% {
+        transform: scale(1.0);
+        box-shadow: 0 0 8px 1px rgba(16, 185, 129, 0.70), 0 0 16px 2px rgba(16, 185, 129, 0.35);
+      }
+      50% {
+        transform: scale(1.18);
+        box-shadow: 0 0 12px 2px rgba(16, 185, 129, 0.95), 0 0 24px 4px rgba(52, 211, 153, 0.55);
+      }
+    }
+
+    /* ВАРИАНТ Б: Квантовый маяк с кольцевой волной (::after ping-wave) */
+    .beacon-dot-vB {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 1.5px solid #10b981;
+      position: relative;
+      animation: beaconPulseB 2.6s ease-in-out infinite;
+      transform: translateZ(0);
+    }
+    .beacon-dot-vB::after {
+      content: "";
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(16, 185, 129, 0.75);
+      animation: beaconPingWaveB 2.6s cubic-bezier(0.2, 0.8, 0.4, 1) infinite;
+      pointer-events: none;
+    }
+    @keyframes beaconPulseB {
+      0%, 100% {
+        transform: scale(1.0);
+        box-shadow: 0 0 8px rgba(16, 185, 129, 0.75);
+      }
+      50% {
+        transform: scale(1.12);
+        box-shadow: 0 0 16px rgba(16, 185, 129, 1);
+      }
+    }
+    @keyframes beaconPingWaveB {
+      0% { transform: scale(0.85); opacity: 0.95; }
+      75% { transform: scale(2.2); opacity: 0; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    /* ВАРИАНТ В: Ювелирный изумруд (Solid Emerald Jewel) */
+    .beacon-dot-vC {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #34d399;
+      border: 2px solid #ffffff;
+      position: relative;
+      animation: beaconPulseC 2.6s ease-in-out infinite;
+      transform: translateZ(0);
+    }
+    @keyframes beaconPulseC {
+      0%, 100% {
+        transform: scale(1.0);
+        box-shadow: 0 0 8px #10b981, 0 0 16px rgba(16, 185, 129, 0.45);
+      }
+      50% {
+        transform: scale(1.15);
+        box-shadow: 0 0 14px #10b981, 0 0 28px rgba(52, 211, 153, 0.75);
+      }
+    }
+
+    /* ВАРИАНТ Г: Статичное дзен-сияние (Calm Static Spark) */
+    .beacon-dot-vD {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 1.5px solid #10b981;
+      position: relative;
+      box-shadow: 0 0 10px 1.5px rgba(16, 185, 129, 0.85), 0 0 20px 3px rgba(16, 185, 129, 0.45);
+    }
+
+    /* ============================================================
+       ПОЛНОЕ ОЖЕРЕЛЬЕ ЦЕПОЧКИ ТЕМЫ (13 БУСИН)
+       ============================================================ */
+    .necklace-showcase-box {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 26px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5);
+    }
+
+    .necklace-viewport {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 18px;
+      padding: 24px 16px;
+      border: 1px dashed rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      transition: max-width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      margin: 0 auto;
+    }
+    .is-phone .necklace-viewport {
+      max-width: 393px;
+      border-left: 1px solid rgba(255, 255, 255, 0.15);
+      border-right: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(11, 15, 23, 0.60);
+    }
+
+    .hud-meta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+    }
+    .hud-meta-type {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--ink-dim);
+      font-weight: 700;
+    }
+
+    /* Ожерелье бусин */
+    .dots-necklace-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      position: relative;
+    }
+    .dots-necklace {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 4px;
+      position: relative;
+    }
+    .is-phone .dots-necklace {
+      gap: 6px;
+    }
+
+    /* Базовые бусины ожерелья */
+    .dot-item {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+      flex-shrink: 0;
+      outline: none;
+    }
+    .is-phone .dot-item:not(.is-gold) {
+      width: 10px;
+      height: 10px;
+    }
+    .dot-item:hover {
+      transform: scale(1.35);
+      border-color: #ffffff;
+      background: rgba(255, 255, 255, 0.45);
+    }
+
+    /* Пройденная бусина */
+    .dot-item.is-done {
+      background: radial-gradient(circle at 35% 35%, #ffffff 0%, #a7f3d0 30%, #34d399 65%, #059669 100%) !important;
+      border: 0.8px solid #6ee7b7 !important;
+      box-shadow: 0 0 2px 0.5px rgba(52, 211, 153, 0.45), 0 0 5px 1px rgba(16, 185, 129, 0.25) !important;
+      opacity: 0.95;
+    }
+
+    /* ЗОЛОТАЯ ФИНАЛЬНАЯ БУСИНА (Рубежный юнит-тест) */
+    .dot-item.is-gold {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #b45309 100%);
+      border: 1.5px solid #fef08a;
+      box-shadow: 0 0 12px var(--gold-glow);
+    }
+    .dot-item.is-gold:hover {
+      transform: scale(1.35);
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.85);
+    }
+    .dot-item.is-gold.is-active {
+      width: 16px;
+      height: 16px;
+      background: #ffffff;
+      border-color: #f59e0b;
+      box-shadow: 0 0 18px rgba(245, 158, 11, 0.95), 0 0 30px rgba(245, 158, 11, 0.6);
+      animation: goldActivePulse 2.4s ease-in-out infinite;
+    }
+    @keyframes goldActivePulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 14px rgba(245, 158, 11, 0.85); }
+      50% { transform: scale(1.18); box-shadow: 0 0 26px rgba(245, 158, 11, 1); }
+    }
+
+    /* Stepper navigation bar */
+    .stepper-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0 6px;
+    }
+    .btn-step {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--ink);
+      font-size: 0.80rem;
+      font-weight: 600;
+      padding: 7px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+    }
+    .btn-step:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .btn-step:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+    .step-counter {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--ink-dim);
+    }
+
+    /* ============================================================
+       МИКРО-УРОВЕНЬ: СТЕППЕР ВНУТРИ КОНСПЕКТА / ZEN IDE (7 ТОЧЕК)
+       ============================================================ */
+    .micro-stepper-box {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .micro-frame {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 12px 18px;
+    }
+    .sub-step-dots-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .sub-dot {
+      width: 6.5px;
+      height: 6.5px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.20);
+      transition: all 0.2s ease;
+    }
+    .sub-dot.is-done {
+      background: #10b981;
+      box-shadow: 0 0 5px rgba(16, 185, 129, 0.50);
+    }
+    .sub-dot.is-active {
+      width: 7.5px;
+      height: 7.5px;
+      background: #ffffff;
+      border: 1px solid #10b981;
+      box-shadow: 0 0 7px #34d399, 0 0 12px rgba(52, 211, 153, 0.7);
+    }
+
+    .recommendation-callout {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.28);
+      border-radius: 16px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      font-size: 0.88rem;
+      line-height: 1.55;
+    }
+    .recommendation-callout strong {
+      color: #34d399;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h1>Визуализация единого канона бусин</h1>
+    <p>Интерактивное сравнение стилей активной бусины, полного макро-ожерелья (13 шагов) и микро-степпера (6–8px). Выберите вариант активного маяка для мгновенной примерки во всех контекстах.</p>
+  </div>
+
+  <div class="controls-bar">
+    <button class="btn-toggle active" id="btn-phone">📱 Смартфон (Xiaomi 393px / iPhone 390px)</button>
+    <button class="btn-toggle" id="btn-desktop">💻 Десктоп (Широкий экран 760px+)</button>
+  </div>
+
+  <!-- РАЗДЕЛ 1: СРАВНЕНИЕ АКТИВНОГО МАЯКА -->
+  <div>
+    <div class="section-title">✨ Выберите визуальный стиль активной бусины:</div>
+    <div class="section-desc">Кликните на карточку варианта, чтобы применить его к ожерелью темы ниже:</div>
+
+    <div class="grid-cards">
+      <!-- Вариант А -->
+      <div class="beacon-card selected" data-style="vA">
+        <span class="beacon-badge rec">РЕКОМЕНДУЕМЫЙ</span>
+        <div class="beacon-preview-box">
+          <div class="beacon-dot-vA"></div>
+        </div>
+        <div class="beacon-title">Вариант А: Чистый Box-Shadow</div>
+        <div class="beacon-desc">Белое ядро + изумрудный контур + многослойная неоновая аура. <strong>0 срезанных дуг</strong> в любых фреймах, 0 артефактов.</div>
+      </div>
+
+      <!-- Вариант Б -->
+      <div class="beacon-card" data-style="vB">
+        <span class="beacon-badge">КОЛЬЦЕВОЙ ПИНГ</span>
+        <div class="beacon-preview-box">
+          <div class="beacon-dot-vB"></div>
+        </div>
+        <div class="beacon-title">Вариант Б: Кольцевая волна</div>
+        <div class="beacon-desc">Расходящееся кольцо <code>::after</code>. Требует принудительного <code>overflow: visible</code>, иначе срезаются дуги.</div>
+      </div>
+
+      <!-- Вариант В -->
+      <div class="beacon-card" data-style="vC">
+        <span class="beacon-badge">СОЧНЫЙ ИЗУМРУД</span>
+        <div class="beacon-preview-box">
+          <div class="beacon-dot-vC"></div>
+        </div>
+        <div class="beacon-title">Вариант В: Изумрудное ядро</div>
+        <div class="beacon-desc">Ярко-изумрудное ядро (#34d399) с белой обводкой и мягким оптическим дыханием.</div>
+      </div>
+
+      <!-- Вариант Г -->
+      <div class="beacon-card" data-style="vD">
+        <span class="beacon-badge">ДЗЕН-СТАТИКА</span>
+        <div class="beacon-preview-box">
+          <div class="beacon-dot-vD"></div>
+        </div>
+        <div class="beacon-title">Вариант Г: Статичное сияние</div>
+        <div class="beacon-desc">Белое ядро + постоянный насыщенный ореол без движения. 100% стабильность, 0 расхода GPU.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- РАЗДЕЛ 2: ПРИМЕРКА В МАКРО-ОЖЕРЕЛЬЕ (13 ШАГОВ) -->
+  <div class="necklace-showcase-box" id="necklace-container">
+    <div class="section-title">📿 Макро-ожерелье темы (13 бусин темы: Конспекты ➔ Карточки ➔ Задачи ➔ Золотой тест)</div>
+    <div class="section-desc">Единый центрированный ряд без переносов на смартфонах (393px) и десктопе. Кликайте по бусинам или кнопкам навигации:</div>
+
+    <div class="necklace-viewport is-phone" id="necklace-viewport">
+      <div class="hud-meta-pill" id="hud-meta">
+        <span class="hud-meta-type" id="hud-type">📖 Конспект</span> · <span id="hud-title">Базовые коллекции (list, tuple)</span>
+      </div>
+
+      <div class="dots-necklace-wrap">
+        <div class="dots-necklace" id="dots-row"></div>
+      </div>
+
+      <div class="stepper-nav">
+        <button class="btn-step" id="btn-prev">← Предыдущая бусина</button>
+        <span class="step-counter" id="step-counter-text">Бусина 1 из 13</span>
+        <button class="btn-step" id="btn-next">Следующая бусина ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- РАЗДЕЛ 3: МИКРО-УРОВЕНЬ (СТЕППЕР ШАГОВ) -->
+  <div class="micro-stepper-box">
+    <div class="section-title">🔹 Микро-уровень: Степпер квантов внутри конспекта и Zen IDE (6–8px)</div>
+    <div class="section-desc">Согласованная компактная версия для внутренней навигации в футере карточки:</div>
+
+    <div class="micro-frame">
+      <div class="sub-step-dots-row">
+        <div class="sub-dot is-done"></div>
+        <div class="sub-dot is-done"></div>
+        <div class="sub-dot is-done"></div>
+        <div class="sub-dot is-active"></div>
+        <div class="sub-dot"></div>
+        <div class="sub-dot"></div>
+        <div class="sub-dot"></div>
+      </div>
+      <div style="font-family:var(--font-mono);font-size:0.76rem;color:var(--ink-muted);">Шаг 4 из 7</div>
+      <div style="font-size:0.80rem;font-weight:600;color:var(--emerald-bright);">➔ Дальше</div>
+    </div>
+  </div>
+
+  <!-- ВЫВОДЫ И РЕКОМЕНДАЦИЯ -->
+  <div class="recommendation-callout">
+    <span style="font-size:1.4rem;line-height:1;">🎯</span>
+    <div>
+      <strong>Инженерное резюме и канон:</strong><br>
+      • <strong>Вариант А (Чистый Box-Shadow)</strong> даёт непревзойдённую надёжность: эффект свечения Квантового маяка создаётся через диффузные слои тени без выхода псевдоэлементов за физические границы бусины, что на 100% устраняет баг со «срезанными дугами».<br>
+      • Все рядовые бусины имеют диаметр 10–11px и шаг 6–8px, что гарантирует идеальную посадку ожерелья из 13–16 бусин в строку на 390–393px без обрезки и скролла.
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const STEPS_DATA = [
+    { type: '📖 Конспект 1', title: 'Базовые коллекции (list, tuple, slice)' },
+    { type: '🗂 Карточки 1', title: 'Колода 1: Срезы и индексация списков' },
+    { type: '🗂 Карточки 2', title: 'Колода 2: Мутабельность и методы list' },
+    { type: '⚡ Задача IDE 1', title: 'Задача 1: Реверс срезом [::-1]' },
+    { type: '⚡ Задача IDE 2', title: 'Задача 2: Извлечение подсписков' },
+    { type: '📖 Конспект 2', title: 'Множества и аргументы функций (*args, **kwargs)' },
+    { type: '🗂 Карточки 3', title: 'Колода 3: Хэш-таблицы и frozenset' },
+    { type: '⚡ Задача IDE 3', title: 'Задача 3: Проверка вхождения list vs set' },
+    { type: '📖 Конспект 3', title: 'Методы списков и collections (deque, Counter)' },
+    { type: '🗂 Карточки 4', title: 'Колода 4: Модуль collections в деле' },
+    { type: '⚡ Задача IDE 4', title: 'Задача 4: Частотный словарь Counter' },
+    { type: '⚡ Задача IDE 5', title: 'Задача 5: Скользящее среднее через deque' },
+    { type: '🏆 Золотой тест', title: 'Рубежный зачёт юнита (8–12 глубоких вопросов)', isGold: true }
+  ];
+
+  let currentStepIdx = 0;
+  let activeStyle = 'vA';
+
+  const dotsRow = document.getElementById('dots-row');
+  const hudType = document.getElementById('hud-type');
+  const hudTitle = document.getElementById('hud-title');
+  const stepCounterText = document.getElementById('step-counter-text');
+  const btnPrev = document.getElementById('btn-prev');
+  const btnNext = document.getElementById('btn-next');
+  const viewport = document.getElementById('necklace-viewport');
+
+  function renderNecklace() {
+    dotsRow.innerHTML = '';
+    STEPS_DATA.forEach((step, idx) => {
+      const dot = document.createElement('div');
+      dot.className = 'dot-item';
+      if (step.isGold) dot.classList.add('is-gold');
+
+      if (idx < currentStepIdx) {
+        dot.classList.add('is-done');
+      } else if (idx === currentStepIdx) {
+        dot.classList.add('is-active');
+        if (!step.isGold) {
+          // Apply chosen active style
+          dot.classList.add('beacon-dot-' + activeStyle);
+        }
+      }
+
+      dot.title = `${step.type}: ${step.title}`;
+      dot.addEventListener('click', () => {
+        currentStepIdx = idx;
+        renderNecklace();
+        updateHud();
+      });
+      dotsRow.appendChild(dot);
+    });
+
+    updateHud();
+  }
+
+  function updateHud() {
+    const cur = STEPS_DATA[currentStepIdx];
+    hudType.textContent = cur.type;
+    hudTitle.textContent = cur.title;
+    stepCounterText.textContent = `Бусина ${currentStepIdx + 1} из ${STEPS_DATA.length}`;
+    btnPrev.disabled = currentStepIdx === 0;
+    btnNext.disabled = currentStepIdx === STEPS_DATA.length - 1;
+  }
+
+  btnPrev.addEventListener('click', () => {
+    if (currentStepIdx > 0) {
+      currentStepIdx--;
+      renderNecklace();
+    }
+  });
+
+  btnNext.addEventListener('click', () => {
+    if (currentStepIdx < STEPS_DATA.length - 1) {
+      currentStepIdx++;
+      renderNecklace();
+    }
+  });
+
+  // Switcher between styles
+  document.querySelectorAll('.beacon-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.beacon-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      activeStyle = card.getAttribute('data-style');
+      renderNecklace();
+    });
+  });
+
+  // Viewport toggle
+  const btnPhone = document.getElementById('btn-phone');
+  const btnDesktop = document.getElementById('btn-desktop');
+
+  btnPhone.addEventListener('click', () => {
+    btnPhone.classList.add('active');
+    btnDesktop.classList.remove('active');
+    viewport.classList.add('is-phone');
+  });
+
+  btnDesktop.addEventListener('click', () => {
+    btnDesktop.classList.add('active');
+    btnPhone.classList.remove('active');
+    viewport.classList.remove('is-phone');
+  });
+
+  // Initial render
+  renderNecklace();
+</script>
+
+</body>
+</html>

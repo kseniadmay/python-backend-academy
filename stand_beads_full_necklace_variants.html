@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Стенд: Варианты цепочки бусин (Конспекты ➔ Карточки ➔ Задачи ➔ Золотой тест)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090e;
+      --surface: rgba(15, 23, 42, 0.72);
+      --surface-card: rgba(17, 24, 39, 0.85);
+      --border: rgba(255, 255, 255, 0.10);
+      --border-subtle: rgba(255, 255, 255, 0.06);
+      --ink: #f8fafc;
+      --ink-muted: #94a3b8;
+      --ink-dim: #64748b;
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.45);
+      --gold: #f59e0b;
+      --gold-glow: rgba(245, 158, 11, 0.50);
+      --font-main: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 30px 16px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-image: 
+        radial-gradient(circle at 18% 12%, rgba(16, 185, 129, 0.10) 0%, transparent 45%),
+        radial-gradient(circle at 82% 88%, rgba(136, 19, 55, 0.12) 0%, transparent 50%);
+    }
+
+    .container {
+      max-width: 980px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .header {
+      text-align: center;
+      padding: 0 10px;
+    }
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0 0 8px;
+    }
+    .header p {
+      font-size: 0.90rem;
+      color: var(--ink-muted);
+      margin: 0 auto;
+      max-width: 640px;
+      line-height: 1.5;
+    }
+
+    /* Controls bar */
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      background: var(--surface);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      padding: 12px 18px;
+      border-radius: 999px;
+      align-self: center;
+    }
+
+    .btn-toggle {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--ink-muted);
+      padding: 7px 16px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-toggle:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.10);
+    }
+    .btn-toggle.active {
+      background: rgba(16, 185, 129, 0.20);
+      border-color: var(--emerald);
+      color: #34d399;
+      box-shadow: 0 0 14px var(--emerald-glow);
+    }
+
+    /* Comparison Area */
+    .showcase-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .variant-card {
+      background: var(--surface-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px 28px;
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      transition: border-color 0.2s ease;
+    }
+    .variant-card:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .variant-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 14px;
+    }
+    .variant-title-wrap h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin: 0 0 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .variant-title-wrap p {
+      font-size: 0.82rem;
+      color: var(--ink-muted);
+      margin: 0;
+      line-height: 1.4;
+    }
+    .variant-badge {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 3px 9px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--ink-dim);
+      white-space: nowrap;
+    }
+    .variant-badge.rec {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+    }
+
+    /* Frame container */
+    .frame-container {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 18px;
+      padding: 24px 16px;
+      border: 1px dashed rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .viewport-box {
+      width: 100%;
+      max-width: 760px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      transition: max-width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .is-phone .viewport-box {
+      max-width: 393px;
+      border-left: 1px solid rgba(255, 255, 255, 0.12);
+      border-right: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 0 12px;
+      background: rgba(11, 15, 23, 0.50);
+      border-radius: 20px;
+    }
+
+    /* Info HUD for active bead */
+    .hud-active-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: var(--ink);
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      width: fit-content;
+      text-align: center;
+    }
+    .hud-active-meta .meta-type {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--ink-dim);
+      font-weight: 700;
+    }
+
+    /* ============================================================
+       BEADS STYLES (ЕДИНЫЙ ЭТАЛОН: ВСЕ ОДИНАКОВЫЕ, ФИНАЛЬНАЯ ЗОЛОТАЯ)
+       ============================================================ */
+    .dots-necklace-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 100%;
+    }
+
+    .dots-necklace {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 4px;
+      position: relative;
+    }
+
+    /* Базовая бусина — ювелирный круг */
+    .bead {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
+      flex-shrink: 0;
+      outline: none;
+    }
+    .bead:hover {
+      transform: scale(1.35);
+      border-color: #fff;
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Пройденная бусина */
+    .bead.done {
+      background: #10b981;
+      border-color: #34d399;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    }
+
+    /* Активная бусина (Квантовый маяк) */
+    .bead.active {
+      width: 13px;
+      height: 13px;
+      background: #ffffff;
+      border-color: #10b981;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.9), 0 0 24px rgba(16, 185, 129, 0.45);
+      animation: beadActivePulse 2.4s ease-in-out infinite;
+    }
+    .bead.active::after {
+      content: "";
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(16, 185, 129, 0.7);
+      animation: beadPingWave 2.4s cubic-bezier(0.2, 0.8, 0.4, 1) infinite;
+      pointer-events: none;
+    }
+
+    /* ЗОЛОТАЯ ФИНАЛЬНАЯ БУСИНА (Рубежный юнит-тест) */
+    .bead.milestone-gold {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #b45309 100%);
+      border: 1.5px solid #fef08a;
+      box-shadow: 0 0 12px var(--gold-glow);
+    }
+    .bead.milestone-gold:hover {
+      transform: scale(1.35);
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.85);
+    }
+    .bead.milestone-gold.active {
+      width: 16px;
+      height: 16px;
+      background: #ffffff;
+      border-color: #f59e0b;
+      box-shadow: 0 0 18px rgba(245, 158, 11, 0.95), 0 0 30px rgba(245, 158, 11, 0.6);
+      animation: goldActivePulse 2.4s ease-in-out infinite;
+    }
+    .bead.milestone-gold.active::after {
+      content: "";
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 2px solid rgba(245, 158, 11, 0.8);
+      animation: beadPingWave 2.4s cubic-bezier(0.2, 0.8, 0.4, 1) infinite;
+    }
+    .bead.milestone-gold.done {
+      background: #f59e0b;
+      border-color: #fbbf24;
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.65);
+    }
+
+    @keyframes beadActivePulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 14px rgba(16, 185, 129, 0.8); }
+      50% { transform: scale(1.15); box-shadow: 0 0 22px rgba(16, 185, 129, 1); }
+    }
+    @keyframes goldActivePulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 16px rgba(245, 158, 11, 0.85); }
+      50% { transform: scale(1.18); box-shadow: 0 0 26px rgba(245, 158, 11, 1); }
+    }
+    @keyframes beadPingWave {
+      0% { transform: scale(0.85); opacity: 0.9; }
+      80% { transform: scale(2.0); opacity: 0; }
+      100% { transform: scale(2.0); opacity: 0; }
+    }
+
+    /* ------------------------------------------------------------
+       ВАРИАНТ 1: СКОЛЬЗЯЩЕЕ ОКНО ФОКУСА (Sliding Window Focus)
+       ------------------------------------------------------------ */
+    .v1-mask {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      max-width: 100%;
+      padding: 0 24px;
+    }
+    .v1-mask::before, .v1-mask::after {
+      content: "";
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 32px;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .v1-mask::before {
+      left: 0;
+      background: linear-gradient(90deg, rgba(11, 15, 23, 0.95), transparent);
+    }
+    .v1-mask::after {
+      right: 0;
+      background: linear-gradient(-90deg, rgba(11, 15, 23, 0.95), transparent);
+    }
+
+    /* ------------------------------------------------------------
+       ВАРИАНТ 2: АДАПТИВНОЕ СЖАТИЕ (Adaptive Density)
+       ------------------------------------------------------------ */
+    .v2-necklace {
+      gap: 5px;
+      flex-wrap: nowrap;
+      justify-content: center;
+    }
+    .is-phone .v2-necklace .bead:not(.milestone-gold) {
+      width: 9px;
+      height: 9px;
+    }
+    .is-phone .v2-necklace .bead.active {
+      width: 11px;
+      height: 11px;
+    }
+    .is-phone .v2-necklace .bead.milestone-gold {
+      width: 12px;
+      height: 12px;
+    }
+
+    /* ------------------------------------------------------------
+       ВАРИАНТ 3: ИНЕРЦИОННЫЙ СВАЙП-ТРЕК (Silky Scroll Track)
+       ------------------------------------------------------------ */
+    .v3-scroll-wrap {
+      width: 100%;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 10px 16px;
+      scroll-behavior: smooth;
+    }
+    .v3-scroll-wrap::-webkit-scrollbar { display: none; }
+    .v3-scroll-wrap .dots-necklace {
+      margin: 0 auto;
+      gap: 10px;
+    }
+
+    /* Stepper buttons */
+    .stepper-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0 4px;
+      margin-top: 6px;
+    }
+    .btn-step {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--ink);
+      font-size: 0.80rem;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+    }
+    .btn-step:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .btn-step:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+    .step-counter {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--ink-dim);
+    }
+
+    .recommendation-banner {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 16px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 0.86rem;
+      line-height: 1.5;
+    }
+    .recommendation-banner strong {
+      color: #34d399;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h1>Визуализация подачи цепочки: Конспект ➔ Карточки ➔ Задачи ➔ Золотой тест</h1>
+    <p>Все обычные бусины одинаковы (минимализм). Единственная золотая бусина в финале — рубежный зачёт. Ниже интерактивное сравнение трёх вариантов компоновки на мобильных (393px) и десктопе.</p>
+  </div>
+
+  <div class="controls-bar">
+    <button class="btn-toggle active" id="btn-view-phone">📱 Смартфон (Xiaomi 393px / iPhone)</button>
+    <button class="btn-toggle" id="btn-view-desktop">💻 Десктоп (Широкий экран 760px)</button>
+  </div>
+
+  <div class="recommendation-banner">
+    <span style="font-size:1.2rem;line-height:1;">💡</span>
+    <div>
+      <strong>Реальная цепочка навыка (13 бусин):</strong><br>
+      [📖 Конспект 1] ➔ [🗂 Колода 1.1] ➔ [🗂 Колода 1.2] ➔ [⚡ Задача 1] ➔ [⚡ Задача 2] ➔ [📖 Конспект 2] ➔ [🗂 Колода 2.1] ➔ [⚡ Задача 3] ➔ [📖 Конспект 3] ➔ [🗂 Колода 3.1] ➔ [⚡ Задача 4] ➔ [⚡ Задача 5] ➔ [🏆 Золотой тест].
+    </div>
+  </div>
+
+  <div class="showcase-grid is-phone" id="showcase-grid">
+
+    <!-- ВАРИАНТ 1 -->
+    <div class="variant-card">
+      <div class="variant-header">
+        <div class="variant-title-wrap">
+          <h3>Вариант 1: Скользящее окно фокуса (Sliding 7-9 Window)</h3>
+          <p>В центре внимания всегда активная бусина + 3 соседа с каждой стороны. Края плавно угасают градиентом, а золотой тест прикреплён маяком на финише. 100% защита от переноса строк и растяжения.</p>
+        </div>
+        <span class="variant-badge rec">РЕКОМЕНДУЕМЫЙ</span>
+      </div>
+
+      <div class="frame-container">
+        <div class="viewport-box">
+          <div class="hud-active-meta" id="v1-meta">
+            <span class="meta-type">📖 Конспект 1</span> · Базовые коллекции (list, tuple)
+          </div>
+
+          <div class="v1-mask">
+            <div class="dots-necklace" id="v1-necklace"></div>
+          </div>
+
+          <div class="stepper-nav">
+            <button class="btn-step" id="v1-prev">← Предыдущая</button>
+            <span class="step-counter" id="v1-count">Бусина 1 из 13</span>
+            <button class="btn-step" id="v1-next">Следующая бусина ➔</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ВАРИАНТ 2 -->
+    <div class="variant-card">
+      <div class="variant-header">
+        <div class="variant-title-wrap">
+          <h3>Вариант 2: Адаптивное микро-масштабирование (Все в одну строку)</h3>
+          <p>Все 13 бусин выводятся одновременно, но на узком экране 393px их диаметр деликатно уменьшается (с 12px до 9px), а зазор с 8px до 5px. Студент видит всю карту целиком сразу.</p>
+        </div>
+        <span class="variant-badge">КОМПАКТНЫЙ</span>
+      </div>
+
+      <div class="frame-container">
+        <div class="viewport-box">
+          <div class="hud-active-meta" id="v2-meta">
+            <span class="meta-type">📖 Конспект 1</span> · Базовые коллекции (list, tuple)
+          </div>
+
+          <div class="dots-necklace-wrap">
+            <div class="dots-necklace v2-necklace" id="v2-necklace"></div>
+          </div>
+
+          <div class="stepper-nav">
+            <button class="btn-step" id="v2-prev">← Предыдущая</button>
+            <span class="step-counter" id="v2-count">Бусина 1 из 13</span>
+            <button class="btn-step" id="v2-next">Следующая бусина ➔</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ВАРИАНТ 3 -->
+    <div class="variant-card">
+      <div class="variant-header">
+        <div class="variant-title-wrap">
+          <h3>Вариант 3: Горизонтальный свайп-трек (Silky Swipe)</h3>
+          <p>Бусины сохраняют полный комфортный размер (12px). При переходе активная бусина плавно автоскроллится в центр экрана со свайп-прокруткой без полос скроллбара.</p>
+        </div>
+        <span class="variant-badge">СВАЙП-ТРЕК</span>
+      </div>
+
+      <div class="frame-container">
+        <div class="viewport-box">
+          <div class="hud-active-meta" id="v3-meta">
+            <span class="meta-type">📖 Конспект 1</span> · Базовые коллекции (list, tuple)
+          </div>
+
+          <div class="v3-scroll-wrap" id="v3-scroll">
+            <div class="dots-necklace" id="v3-necklace"></div>
+          </div>
+
+          <div class="stepper-nav">
+            <button class="btn-step" id="v3-prev">← Предыдущая</button>
+            <span class="step-counter" id="v3-count">Бусина 1 из 13</span>
+            <button class="btn-step" id="v3-next">Следующая бусина ➔</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  // Реальная структура данных микро-шагов Unit 1.1
+  const BEAD_DATA = [
+    { type: '📖 Конспект', title: 'Базовые коллекции (list, tuple, slice)', step: 'К-001' },
+    { type: '🗂 Карточки', title: 'Колода 1: Срезы и индексация списков', step: 'Ф-001' },
+    { type: '🗂 Карточки', title: 'Колода 2: Мутабельность и методы list', step: 'Ф-002' },
+    { type: '⚡ Задача IDE', title: 'Задача 1: Реверс срезом [::-1]', step: 'IDE #20' },
+    { type: '⚡ Задача IDE', title: 'Задача 2: Извлечение подсписков', step: 'IDE #19' },
+    { type: '📖 Конспект', title: 'Множества и аргументы функций (*args, **kwargs)', step: 'К-004' },
+    { type: '🗂 Карточки', title: 'Колода 3: Хэш-таблицы и frozenset', step: 'Ф-010' },
+    { type: '⚡ Задача IDE', title: 'Задача 3: Проверка вхождения list vs set', step: 'IDE #253' },
+    { type: '📖 Конспект', title: 'Методы списков и collections (deque, Counter)', step: 'К-007' },
+    { type: '🗂 Карточки', title: 'Колода 4: Модуль collections в деле', step: 'Ф-016' },
+    { type: '⚡ Задача IDE', title: 'Задача 4: Частотный словарь Counter', step: 'IDE #18' },
+    { type: '⚡ Задача IDE', title: 'Задача 5: Скользящее среднее через deque', step: 'IDE #72' },
+    { type: '🏆 Золотой тест', title: 'Рубежный зачёт юнита (8–12 вопросов)', step: 'Зачёт', isGold: true }
+  ];
+
+  let activeIdx = 0;
+
+  // View mode switcher
+  const gridEl = document.getElementById('showcase-grid');
+  const btnPhone = document.getElementById('btn-view-phone');
+  const btnDesktop = document.getElementById('btn-view-desktop');
+
+  btnPhone.addEventListener('click', () => {
+    btnPhone.classList.add('active');
+    btnDesktop.classList.remove('active');
+    gridEl.classList.add('is-phone');
+    renderAll();
+  });
+  btnDesktop.addEventListener('click', () => {
+    btnDesktop.classList.add('active');
+    btnPhone.classList.remove('active');
+    gridEl.classList.remove('is-phone');
+    renderAll();
+  });
+
+  function selectBead(idx) {
+    activeIdx = Math.max(0, Math.min(BEAD_DATA.length - 1, idx));
+    renderAll();
+  }
+
+  function renderAll() {
+    renderVariant1();
+    renderVariant2();
+    renderVariant3();
+  }
+
+  /* --- Variant 1: Sliding Window --- */
+  function renderVariant1() {
+    const cur = BEAD_DATA[activeIdx];
+    document.getElementById('v1-meta').innerHTML = `<span class="meta-type">${cur.type}</span> · ${cur.title}`;
+    document.getElementById('v1-count').textContent = `Бусина ${activeIdx + 1} из ${BEAD_DATA.length}`;
+    document.getElementById('v1-prev').disabled = (activeIdx === 0);
+    document.getElementById('v1-next').disabled = (activeIdx === BEAD_DATA.length - 1);
+
+    const neck = document.getElementById('v1-necklace');
+    neck.innerHTML = '';
+
+    // Окно: 7 бусин вокруг активной + всегда золотая бусина на конце
+    const total = BEAD_DATA.length;
+    const windowSize = gridEl.classList.contains('is-phone') ? 7 : 11;
+    let start = Math.max(0, activeIdx - Math.floor(windowSize / 2));
+    let end = Math.min(total, start + windowSize);
+    if (end - start < windowSize) {
+      start = Math.max(0, end - windowSize);
+    }
+
+    for (let i = start; i < end; i++) {
+      const bData = BEAD_DATA[i];
+      const el = document.createElement('span');
+      el.className = 'bead';
+      if (bData.isGold) el.classList.add('milestone-gold');
+      if (i < activeIdx) el.classList.add('done');
+      else if (i === activeIdx) el.classList.add('active');
+
+      // Мягкое угасание краев окна
+      const distFromCenter = Math.abs(i - activeIdx);
+      if (distFromCenter >= 3 && !bData.isGold) {
+        el.style.opacity = '0.45';
+        el.style.transform = 'scale(0.85)';
+      }
+
+      el.title = `${bData.type}: ${bData.title}`;
+      el.addEventListener('click', () => selectBead(i));
+      neck.appendChild(el);
+    }
+
+    // Если золотая бусина осталась за границей окна — крепим ее деликатным разделителем
+    if (end < total) {
+      const sep = document.createElement('span');
+      sep.style.cssText = 'color:rgba(255,255,255,0.25);font-size:10px;padding:0 2px;';
+      sep.textContent = '···';
+      neck.appendChild(sep);
+
+      const goldIdx = total - 1;
+      const goldData = BEAD_DATA[goldIdx];
+      const goldEl = document.createElement('span');
+      goldEl.className = 'bead milestone-gold';
+      if (goldIdx === activeIdx) goldEl.classList.add('active');
+      else if (goldIdx < activeIdx) goldEl.classList.add('done');
+      goldEl.title = `${goldData.type}: ${goldData.title}`;
+      goldEl.addEventListener('click', () => selectBead(goldIdx));
+      neck.appendChild(goldEl);
+    }
+  }
+
+  /* --- Variant 2: Adaptive Density --- */
+  function renderVariant2() {
+    const cur = BEAD_DATA[activeIdx];
+    document.getElementById('v2-meta').innerHTML = `<span class="meta-type">${cur.type}</span> · ${cur.title}`;
+    document.getElementById('v2-count').textContent = `Бусина ${activeIdx + 1} из ${BEAD_DATA.length}`;
+    document.getElementById('v2-prev').disabled = (activeIdx === 0);
+    document.getElementById('v2-next').disabled = (activeIdx === BEAD_DATA.length - 1);
+
+    const neck = document.getElementById('v2-necklace');
+    neck.innerHTML = '';
+
+    BEAD_DATA.forEach((bData, i) => {
+      const el = document.createElement('span');
+      el.className = 'bead';
+      if (bData.isGold) el.classList.add('milestone-gold');
+      if (i < activeIdx) el.classList.add('done');
+      else if (i === activeIdx) el.classList.add('active');
+
+      el.title = `${bData.type}: ${bData.title}`;
+      el.addEventListener('click', () => selectBead(i));
+      neck.appendChild(el);
+    });
+  }
+
+  /* --- Variant 3: Scroll Track --- */
+  function renderVariant3() {
+    const cur = BEAD_DATA[activeIdx];
+    document.getElementById('v3-meta').innerHTML = `<span class="meta-type">${cur.type}</span> · ${cur.title}`;
+    document.getElementById('v3-count').textContent = `Бусина ${activeIdx + 1} из ${BEAD_DATA.length}`;
+    document.getElementById('v3-prev').disabled = (activeIdx === 0);
+    document.getElementById('v3-next').disabled = (activeIdx === BEAD_DATA.length - 1);
+
+    const neck = document.getElementById('v3-necklace');
+    neck.innerHTML = '';
+
+    BEAD_DATA.forEach((bData, i) => {
+      const el = document.createElement('span');
+      el.className = 'bead';
+      if (bData.isGold) el.classList.add('milestone-gold');
+      if (i < activeIdx) el.classList.add('done');
+      else if (i === activeIdx) el.classList.add('active');
+
+      el.title = `${bData.type}: ${bData.title}`;
+      el.addEventListener('click', () => {
+        selectBead(i);
+        el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      });
+      neck.appendChild(el);
+    });
+
+    const activeEl = neck.children[activeIdx];
+    if (activeEl) {
+      activeEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }
+
+  // Steppers wiring
+  ['v1', 'v2', 'v3'].forEach(prefix => {
+    document.getElementById(`${prefix}-prev`).addEventListener('click', () => selectBead(activeIdx - 1));
+    document.getElementById(`${prefix}-next`).addEventListener('click', () => selectBead(activeIdx + 1));
+  });
+
+  renderAll();
+</script>
+
+</body>
+</html>
