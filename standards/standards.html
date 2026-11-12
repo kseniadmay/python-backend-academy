@@ -52927,6 +52927,9 @@ function viewProPath(options){
           <span style="opacity:0.35;">•</span>
           <span>Урок ${activeChap.units.findIndex(x => x.id === curActiveUnit.id) + 1} / ${activeChapTotal}</span>
         </div>
+        <button type="button" class="path-mode-btn" data-set-path-mode="game" style="display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); color:#cbd5e1; font-size:10.5px; font-weight:800; cursor:pointer; transition:all 0.18s ease;" title="Переключиться в игровой режим (Змейка)">
+          <span>🎮 Змейка</span>
+        </button>
       </div>
 
 
@@ -60566,66 +60569,39 @@ document.addEventListener('click', async function(e){
 
 
 
-  // Path Mode Switcher ('game' | 'pro')
-
+  // Path Mode Switcher ('game' | 'pro') SSOT
   const modeBtn = e.target.closest('[data-set-path-mode]');
-
   if(modeBtn){
-
     const targetMode = modeBtn.getAttribute('data-set-path-mode');
-
     if(targetMode === 'game' || targetMode === 'pro'){
-
       ensureExtendedState();
-
       state.pathViewMode = targetMode;
-
+      if(window.state && typeof window.state === 'object'){
+        window.state.pathViewMode = targetMode;
+      }
       saveState(state);
 
-      if(typeof isSettingsModalOpen !== 'undefined' && isSettingsModalOpen){
+      const fromSettings = (typeof isSettingsModalOpen !== 'undefined' && isSettingsModalOpen) || !!e.target.closest('#settings-modal, .settings-modal-card');
 
-        openSettingsModal();
-
-      }
-
-      window.scrollTo({ top: 0, behavior: 'instant' });
-
-      render();
-
-      if(typeof isSettingsModalOpen !== 'undefined' && isSettingsModalOpen && typeof showTactileToast === 'function'){
-
-        const toastMsg = targetMode === 'pro' ? '💼 Включён профессиональный режим' : '🎮 Включён игровой режим Пути';
-
-        const curR = (typeof currentRoute === 'function' ? currentRoute() : location.hash.replace(/^#/, '')) || '/';
-
-        if(curR !== '/path'){
-
-          showTactileToast(toastMsg, 'info', {
-
-            text: 'К Пути ➔',
-
-            onClick: function(){
-
-              if(typeof closeSettingsModal === 'function') closeSettingsModal();
-
-              location.hash = '#/path';
-
-            }
-
-          });
-
+      if(fromSettings){
+        if(typeof closeSettingsModal === 'function') closeSettingsModal();
+        if(location.hash !== '#/path'){
+          location.hash = '#/path';
         } else {
-
-          showTactileToast(toastMsg);
-
+          window.scrollTo({ top: 0, behavior: 'instant' });
+          render();
         }
-
+      } else {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        render();
       }
 
+      const toastMsg = targetMode === 'pro' ? '💼 Включён профессиональный режим' : '🎮 Включён игровой режим Пути';
+      if(typeof showTactileToast === 'function'){
+        showTactileToast(toastMsg, 'info');
+      }
     }
-
     return;
-
   }
 
 
