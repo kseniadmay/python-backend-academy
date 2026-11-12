@@ -3063,158 +3063,6 @@
     padding: 0 !important;
   }
 
-  /* ══════════════════════════════════════════════════════════
-     ГАРМОНИЗАЦИЯ ЭКРАНА КОНСПЕКТА (БОРДО + ИЗУМРУД + СИНХРОННЫЕ БУСИНЫ)
-     ══════════════════════════════════════════════════════════ */
-
-  /* 1. Бархатно-бордовый амбиентный отсвет (Velvet Wine) в правом углу окна конспекта */
-  .cards-hub-theory {
-    position: relative;
-  }
-  .cards-hub-theory::before {
-    content: '';
-    position: absolute;
-    top: -20px;
-    right: -20px;
-    width: 260px;
-    height: 260px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(136, 19, 55, 0.22) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* 2. Ликвидация паразитной рамки и слепящего ореола вокруг ожерелья бусин */
-  .dots-necklace,
-  #radar-dots-necklace {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
-  }
-  .dots-necklace .dot-jewel {
-    animation-delay: 0s !important;
-  }
-
-  /* Сданные бусины: спокойный ювелирный изумруд без раздутого 14px-свечения */
-  .dots-necklace .dot-jewel.done,
-  #radar-dots-necklace .dot-jewel.done {
-    width: 9px !important;
-    height: 9px !important;
-    min-width: 9px !important;
-    min-height: 9px !important;
-    max-width: 9px !important;
-    max-height: 9px !important;
-    border-radius: 50% !important;
-    background: radial-gradient(circle at 35% 35%, #a7f3d0 0%, #34d399 45%, #059669 100%) !important;
-    border: 1px solid rgba(167, 243, 208, 0.85) !important;
-    box-shadow: 0 0 3px rgba(16, 185, 129, 0.30) !important;
-    animation: none !important;
-  }
-
-  /* 3. Маяк ТОЛЬКО на верхней активной бусине темы */
-  #radar-dots-necklace .dot-jewel.active,
-  .dots-necklace .dot-jewel.active {
-    width: 8.5px !important;
-    height: 8.5px !important;
-    background: #ffffff !important;
-    border: 1.5px solid #10b981 !important;
-    box-shadow: 0 0 4px 1px rgba(167, 243, 208, 0.65), 0 0 9px 1.5px rgba(52, 211, 153, 0.50), 0 0 16px 2px rgba(16, 185, 129, 0.35) !important;
-    animation: unified-live-breathe 2.8s infinite ease-in-out !important;
-  }
-
-  /* 4. Единое синхронное дыхание всех живых индикаторов на экране (2.8s Zen-темп) */
-  @keyframes unified-live-breathe {
-    0%, 100% {
-      box-shadow: 0 0 3px rgba(16, 185, 129, 0.40), 0 0 6px rgba(16, 185, 129, 0.20);
-      opacity: 0.90;
-    }
-    50% {
-      box-shadow: 0 0 7px rgba(52, 211, 153, 0.80), 0 0 14px rgba(16, 185, 129, 0.45);
-      opacity: 1;
-    }
-  }
-
-  .srs-live-status-dot,
-  .activity-dot,
-  .nav-sub-breath-dot {
-    animation: unified-live-breathe 2.8s infinite ease-in-out !important;
-  }
-
-  /* Нижние бусины квантов — спокойные, чистые индикаторы прогресса (без отдельного маяка) */
-  .dock-quantum-bead.active {
-    width: 8px !important;
-    height: 8px !important;
-    background: #ffffff !important;
-    border: 1.5px solid #10b981 !important;
-    border-radius: 50% !important;
-    box-shadow: 0 0 4px 1px rgba(167, 243, 208, 0.65), 0 0 7px rgba(16, 185, 129, 0.35) !important;
-    animation: unified-live-breathe 2.8s infinite ease-in-out !important;
-    transform: scale(1.12) !important;
-  }
-  .dock-quantum-bead.active::after {
-    display: none !important;
-  }
-
-  .dock-quantum-bead.done {
-    width: 8px !important;
-    height: 8px !important;
-    background: radial-gradient(circle at 35% 35%, #a7f3d0 0%, #34d399 45%, #059669 100%) !important;
-    border: 1px solid rgba(167, 243, 208, 0.85) !important;
-    box-shadow: 0 0 3px rgba(16, 185, 129, 0.25) !important;
-    animation: none !important;
-  }
-
-  /* 5. Анимация появления текста: каскадная для каждого поступающего кванта (без layout shift) */
-  .feed-chunk.feed-chunk-new {
-    animation: zenChunkReveal 0.36s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-  }
-  .feed-chunk.feed-chunk-new > p:nth-child(1),
-  .feed-chunk.feed-chunk-new > h4:nth-child(1) {
-    animation: zenChunkReveal 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.00s forwards !important;
-    opacity: 0;
-  }
-  .feed-chunk.feed-chunk-new > p:nth-child(2),
-  .feed-chunk.feed-chunk-new > ul:nth-child(2),
-  .feed-chunk.feed-chunk-new > pre:nth-child(2) {
-    animation: zenChunkReveal 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.07s forwards !important;
-    opacity: 0;
-  }
-  .feed-chunk.feed-chunk-new > p:nth-child(3),
-  .feed-chunk.feed-chunk-new > ul:nth-child(3),
-  .feed-chunk.feed-chunk-new > pre:nth-child(3) {
-    animation: zenChunkReveal 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.14s forwards !important;
-    opacity: 0;
-  }
-  .feed-chunk.feed-chunk-new > p:nth-child(n+4),
-  .feed-chunk.feed-chunk-new > ul:nth-child(n+4),
-  .feed-chunk.feed-chunk-new > pre:nth-child(n+4) {
-    animation: zenChunkReveal 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.20s forwards !important;
-    opacity: 0;
-  }
-
-  .feed-chunk.feed-chunk-prev {
-    opacity: 1 !important;
-    transform: none !important;
-    animation: none !important;
-  }
-  .feed-chunk.feed-chunk-prev > * {
-    opacity: 1 !important;
-    transform: none !important;
-    animation: none !important;
-  }
-
-  @keyframes zenChunkReveal {
-    0% {
-      opacity: 0;
-      transform: translateY(6px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
   .topbar-audio-icon,
 
   .topbar-help-icon,
@@ -31031,6 +30879,236 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     letter-spacing: 0.04em;
   }
 
+
+
+  /* ══════════════════════════════════════════════════════════════════════
+     SSOT: ФИНАЛЬНАЯ ГАРМОНИЗАЦИЯ ЭКРАНА КОНСПЕКТА (ВЫСШИЙ ПРИОРИТЕТ)
+     Бордо Velvet Wine + Центровка бусин квантов + Спокойная анимация
+     ══════════════════════════════════════════════════════════════════════ */
+
+  /* 1. Богатый бархатно-бордовый амбиентный фон Velvet Wine окна конспекта */
+  .cards-hub-theory,
+  .cards-hub-container.cards-hub-theory,
+  .cards-hub-container:has(#py-theory-text),
+  .cards-hub-container:has(.lesson-theory) {
+    position: relative !important;
+    background-color: #0c0f17 !important;
+    background-image: 
+      radial-gradient(circle at 92% 10%, rgba(190, 18, 60, 0.40) 0%, transparent 55%),
+      radial-gradient(circle at 8% 90%, rgba(136, 19, 55, 0.28) 0%, transparent 50%),
+      linear-gradient(165deg, rgba(255, 255, 255, 0.04) 0%, rgba(18, 14, 24, 0.88) 35%, rgba(10, 12, 18, 0.96) 100%) !important;
+    border: 1px solid rgba(244, 63, 94, 0.35) !important;
+    border-top: 1.5px solid rgba(251, 113, 133, 0.65) !important;
+    border-radius: 28px !important;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.85), 0 0 50px rgba(190, 18, 60, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+    backdrop-filter: blur(28px) !important;
+    -webkit-backdrop-filter: blur(28px) !important;
+  }
+
+  /* 2. Полная бесшовность: ликвидация любых внутренних рамок, плашек и паразитных границ */
+  .cards-hub-theory .srs-card-stage,
+  .cards-hub-theory .srs-note-content-area,
+  .cards-hub-theory .srs-note-card,
+  .cards-hub-theory .scroll-feed,
+  .cards-hub-theory .lesson-theory,
+  .cards-hub-theory .topic-eyebrow-track,
+  .cards-hub-theory .srs-action-dock-container,
+  .cards-hub-container:has(#py-theory-text) .srs-card-stage,
+  .cards-hub-container:has(#py-theory-text) .srs-note-content-area,
+  .cards-hub-container:has(#py-theory-text) .srs-note-card,
+  .cards-hub-container:has(#py-theory-text) .scroll-feed,
+  .cards-hub-container:has(#py-theory-text) .lesson-theory,
+  .cards-hub-container:has(#py-theory-text) .topic-eyebrow-track {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* 3. Верхнее ожерелье бусин темы: спокойная ювелирная эстетика БЕЗ размытого ореола */
+  .cards-hub-container .dots-necklace,
+  .cards-hub-theory .dots-necklace,
+  #radar-dots-necklace {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  /* Сброс разнобойной бегущей волны: синхронность */
+  .cards-hub-container .dots-necklace .dot-jewel,
+  .cards-hub-theory .dot-jewel,
+  #radar-dots-necklace .dot-jewel {
+    animation-delay: 0s !important;
+  }
+
+  /* Сданные бусины: благородный ювелирный изумруд 8px БЕЗ слепящего 14px-ореола */
+  .cards-hub-container .dots-necklace .dot-jewel.done,
+  .cards-hub-theory .dot-jewel.done,
+  #radar-dots-necklace .dot-jewel.done {
+    width: 8px !important;
+    height: 8px !important;
+    min-width: 8px !important;
+    min-height: 8px !important;
+    max-width: 8px !important;
+    max-height: 8px !important;
+    background: #10b981 !important;
+    border: 1px solid rgba(52, 211, 153, 0.70) !important;
+    border-radius: 50% !important;
+    box-shadow: 0 0 4px rgba(16, 185, 129, 0.45) !important;
+    opacity: 0.88 !important;
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* Будущие бусины: спокойный полупрозрачный графит */
+  .cards-hub-container .dots-necklace .dot-jewel.future,
+  .cards-hub-theory .dot-jewel.future,
+  #radar-dots-necklace .dot-jewel.future {
+    width: 7px !important;
+    height: 7px !important;
+    min-width: 7px !important;
+    min-height: 7px !important;
+    max-width: 7px !important;
+    max-height: 7px !important;
+    background: rgba(255, 255, 255, 0.16) !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+    border-radius: 50% !important;
+    box-shadow: none !important;
+    opacity: 0.55 !important;
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* Маяк ТОЛЬКО на верхней активной бусине темы: благородное мягкое дыхание 2.8s */
+  .cards-hub-container .dots-necklace .dot-jewel.active,
+  .cards-hub-theory .dot-jewel.active,
+  #radar-dots-necklace .dot-jewel.active {
+    width: 9px !important;
+    height: 9px !important;
+    min-width: 9px !important;
+    min-height: 9px !important;
+    max-width: 9px !important;
+    max-height: 9px !important;
+    background: #ffffff !important;
+    border: 1.5px solid #10b981 !important;
+    border-radius: 50% !important;
+    box-shadow: 0 0 5px 1px rgba(167, 243, 208, 0.75), 0 0 11px 2px rgba(52, 211, 153, 0.55), 0 0 18px 3px rgba(16, 185, 129, 0.35) !important;
+    animation: zen-soft-breathe 2.8s infinite ease-in-out !important;
+    opacity: 1 !important;
+  }
+
+  /* Полное отключение всех шумных колец ::after */
+  .cards-hub-container .dot-jewel::after,
+  .cards-hub-theory .dot-jewel::after,
+  #radar-dots-necklace .dot-jewel::after,
+  .dots-necklace .dot-jewel::after,
+  .dot-jewel.active::after,
+  .bead-active-leading::after,
+  .dock-quantum-bead::after {
+    display: none !important;
+    content: none !important;
+    animation: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+  }
+
+  @keyframes zen-soft-breathe {
+    0%, 100% {
+      box-shadow: 0 0 4px 1px rgba(167, 243, 208, 0.50), 0 0 8px 1px rgba(52, 211, 153, 0.40);
+      transform: scale(1);
+    }
+    50% {
+      box-shadow: 0 0 7px 2px rgba(167, 243, 208, 0.90), 0 0 14px 3px rgba(52, 211, 153, 0.75), 0 0 22px 4px rgba(16, 185, 129, 0.45);
+      transform: scale(1.18);
+    }
+  }
+
+  /* 4. Нижние бусины квантов конспекта: идеальная геометрическая центровка по высоте */
+  .lesson-theory,
+  .lesson-theory > *:last-child,
+  .lesson-theory > *:last-child > *:last-child,
+  .feed-chunk:last-child,
+  .feed-chunk:last-child > *:last-child {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .dock-quanta-spacer {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 20px !important;
+    margin: 22px 0 22px 0 !important; /* Ровно 22px сверху от текста и 22px снизу до кнопки */
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  .dock-quanta-beads-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .dock-quantum-bead {
+    width: 7px !important;
+    height: 7px !important;
+    border-radius: 50% !important;
+    transition: all 0.25s ease !important;
+  }
+  .dock-quantum-bead.done {
+    background: #10b981 !important;
+    box-shadow: 0 0 4px rgba(16, 185, 129, 0.5) !important;
+  }
+  .dock-quantum-bead.active {
+    width: 8px !important;
+    height: 8px !important;
+    background: #ffffff !important;
+    border: 1.5px solid #10b981 !important;
+    box-shadow: 0 0 6px rgba(52, 211, 153, 0.8) !important;
+  }
+  .dock-quantum-bead.future {
+    background: rgba(255, 255, 255, 0.20) !important;
+  }
+
+  /* 5. Каскадная анимация проявления текста для новых квантов */
+  .feed-chunk.feed-chunk-new {
+    animation: none !important;
+  }
+  .feed-chunk.feed-chunk-new > p,
+  .feed-chunk.feed-chunk-new > ul,
+  .feed-chunk.feed-chunk-new > h3,
+  .feed-chunk.feed-chunk-new > h4,
+  .feed-chunk.feed-chunk-new > pre,
+  .feed-chunk.feed-chunk-new > div {
+    animation: zenChunkReveal 0.45s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+  }
+  .feed-chunk.feed-chunk-new > *:nth-child(1) { animation-delay: 0s !important; }
+  .feed-chunk.feed-chunk-new > *:nth-child(2) { animation-delay: 0.07s !important; }
+  .feed-chunk.feed-chunk-new > *:nth-child(3) { animation-delay: 0.14s !important; }
+  .feed-chunk.feed-chunk-new > *:nth-child(n+4) { animation-delay: 0.21s !important; }
+
+  .feed-chunk.feed-chunk-prev > * {
+    animation: none !important;
+  }
+
+  @keyframes zenChunkReveal {
+    0% {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
 </style>
 
 <link rel="manifest" href="manifest.json">
@@ -45158,8 +45236,8 @@ function viewPythonSkill(sid){
 
     const primaryActionHTML = `
       <div class="srs-dock-action-wrapper" style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:480px;margin:0 auto;">
-        <!-- Выверенная оптическая центровка бусин квантов по высоте (равные отступы сверху и снизу) -->
-        <div class="dock-quanta-spacer" style="height:36px;display:flex;align-items:center;justify-content:center;width:100%;">
+        <!-- Идеальная оптическая центровка бусин квантов по высоте (строго 20px сверху и 20px снизу) -->
+        <div class="dock-quanta-spacer" style="height:22px;margin:20px 0 20px;display:flex;align-items:center;justify-content:center;width:100%;">
           <div class="dock-quanta-beads-row" id="py-quanta-beads" style="display:flex;align-items:center;justify-content:center;gap:8px;margin:0;padding:0;">
             ${chunks.map((_, ci) => {
               let qCls = 'dock-quantum-bead';
@@ -45187,7 +45265,7 @@ function viewPythonSkill(sid){
 
           ${feedHTML}
 
-          <div class="srs-action-dock-container" style="margin-top:28px;display:flex;justify-content:center;width:100%;">
+          <div class="srs-action-dock-container" style="margin-top:0;display:flex;justify-content:center;width:100%;">
             ${primaryActionHTML}
           </div>
         </div>
