@@ -47650,8 +47650,12 @@ function buildSrsDeckContextBarHTML(deckTitle, total, currentIdx, getRatingOrIte
 
 
 
-  // Ожерелье строго из 15 шагов текущего спринта (Инвариант спринта 15 карточек)
+  // Инвариант спринта: ожерелье строго из 15 шагов текущего спринта (1..15)
   const SPRINT_SIZE = 15;
+  const sprintStep = (typeof cardsHubState !== 'undefined' && typeof cardsHubState.sprintStep === 'number')
+    ? Math.max(0, Math.min(SPRINT_SIZE - 1, cardsHubState.sprintStep))
+    : (cur % SPRINT_SIZE);
+
   let startIdx = 0;
   let endIdx = count;
 
@@ -47720,9 +47724,13 @@ function buildSrsDeckContextBarHTML(deckTitle, total, currentIdx, getRatingOrIte
 
     let cls = 'dot-jewel';
 
-    if(i === cur){
+    const stepInSprint = i - startIdx;
+    const isSprintCurrent = (attrName === 'data-hub-goto-due') ? (stepInSprint === sprintStep) : (i === cur);
+    const isSprintDone = (attrName === 'data-hub-goto-due') ? (stepInSprint < sprintStep) : (i < cur);
+
+    if(isSprintCurrent){
       cls += ' active bead-active-leading';
-    } else if(i < cur){
+    } else if(isSprintDone){
       cls += ' done bead-done rating-easy';
     } else {
       cls += ' future bead-future';
@@ -47730,7 +47738,8 @@ function buildSrsDeckContextBarHTML(deckTitle, total, currentIdx, getRatingOrIte
 
 
 
-    const titleAttr = `Карточка ${i + 1}${previewText ? escapeHtmlStr(previewText) : ''}`;
+    const sprintStepDisplay = (attrName === 'data-hub-goto-due') ? (stepInSprint + 1) : (i + 1);
+    const titleAttr = `Шаг ${sprintStepDisplay} из ${endIdx - startIdx} (Карточка ${i + 1})${previewText ? escapeHtmlStr(previewText) : ''}`;
 
     const gotoAttr = attrName === 'data-hub-goto-due' ? `data-hub-goto-due="${i}"` : `data-hub-goto-card="${i}"`;
 
