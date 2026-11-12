@@ -29552,7 +29552,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   }
   .silk-sheet {
     position: absolute;
-    width: min(320px, calc(100vw - 32px));
+    width: min(375px, calc(100vw - 24px));
     background: linear-gradient(160deg, rgba(15, 23, 42, 0.98) 0%, rgba(10, 15, 26, 0.99) 100%);
     border: 1.5px solid rgba(52, 211, 153, 0.45);
     border-radius: 18px;
@@ -29684,6 +29684,72 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.12);
     color: #cbd5e1;
+  }
+  .silk-sheet .sheet-cl-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 8px 0 12px;
+  }
+  .silk-sheet .cl-row-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 7px 10px;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.028);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    cursor: pointer;
+    font-family: 'Onest', -apple-system, sans-serif;
+    text-align: left;
+    transition: all 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+    width: 100%;
+  }
+  .silk-sheet .cl-row-btn:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(52, 211, 153, 0.35);
+    transform: translateX(2px);
+  }
+  .silk-sheet .cl-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+  }
+  .silk-sheet .cl-check {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.18);
+    border: 1px solid rgba(16, 185, 129, 0.45);
+    color: #34d399;
+    font-size: 9px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .silk-sheet .cl-name {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #f1f5f9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .silk-sheet .cl-tag-code {
+    font-size: 0.67rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.18);
+    padding: 2px 7px;
+    border-radius: 5px;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
   /* Chapter Milestone Pill (0 Transforms on hover) */
   .chapter-milestone-pill {
@@ -66928,7 +66994,7 @@ function positionSilkPopover(triggerEl){
   if(triggerEl && wrap){
     const wrapBox = wrap.getBoundingClientRect();
     const nodeBox = triggerEl.getBoundingClientRect();
-    const popoverW = Math.min(320, window.innerWidth - 32);
+    const popoverW = Math.min(375, window.innerWidth - 24);
     
     let left = (nodeBox.left + nodeBox.width / 2 - wrapBox.left) - (popoverW / 2);
     left = Math.max(12, Math.min(left, wrapBox.width - popoverW - 12));
@@ -66971,9 +67037,17 @@ window.openSilkSheet = function(uid, title, desc, status, customRoute, triggerEl
     if(uid && typeof ALL_UNITS_COMBINED !== 'undefined'){
       const uObj = ALL_UNITS_COMBINED.find(x => x.id === uid);
       if(uObj && uObj.skills && uObj.skills.length > 0){
+        chipsEl.className = 'sheet-cl-list';
         chipsEl.innerHTML = uObj.skills.map(s => {
-          const sName = (s.title || s.name || s.id || '').replace(/^.*?:/,'').trim();
-          return `<button type="button" class="sheet-tech-chip" data-py-open-skill="${s.id}" style="font-size:10.5px; font-family:'JetBrains Mono',monospace; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); padding:3px 9px; border-radius:8px; color:#a7f3d0; cursor:pointer; transition:all 0.15s ease;" onmouseover="this.style.background='rgba(52,211,153,0.18)';this.style.borderColor='rgba(52,211,153,0.5)';" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(255,255,255,0.14)';">${escapeHtmlStr(sName)}</button>`;
+          const sRaw = (s.title || s.name || s.id || '').replace(/^.*?:/,'').trim();
+          let mainTitle = sRaw;
+          let codeTokens = '';
+          const m = sRaw.match(/^(.*?)\s*\((.*?)\)$/);
+          if(m){
+            mainTitle = m[1].trim();
+            codeTokens = m[2].trim();
+          }
+          return `<button type="button" class="cl-row-btn" data-py-open-skill="${s.id}" title="${escapeHtmlStr(sRaw)}"><div class="cl-left"><span class="cl-check">✓</span><span class="cl-name">${escapeHtmlStr(mainTitle)}</span></div>${codeTokens ? `<span class="cl-tag-code">${escapeHtmlStr(codeTokens)}</span>` : ''}</button>`;
         }).join('');
       }
     }
@@ -66984,14 +67058,18 @@ window.openSilkSheet = function(uid, title, desc, status, customRoute, triggerEl
 
   if (status === 'completed') {
     if(tagEl) {
-      tagEl.textContent = '✓ ПРОЙДЕНО · 100%';
+      const uObj = (uid && typeof ALL_UNITS_COMBINED !== 'undefined') ? ALL_UNITS_COMBINED.find(x => x.id === uid) : null;
+      const c = (uObj && uObj.skills) ? uObj.skills.length : 5;
+      tagEl.textContent = `✓ ${c} ИЗ ${c} СДАНО`;
       tagEl.style.color = '#34d399';
     }
+    if(descEl) descEl.style.display = 'none';
     if(btn) {
       btn.className = 'sheet-action-btn sheet-action-btn--primary';
       btn.textContent = '📖 ПОВТОРИТЬ КОНСПЕКТ ➔';
-      btn.style.background = 'linear-gradient(135deg, rgba(16,185,129,0.35), rgba(5,150,105,0.22))';
-      btn.style.border = '1px solid rgba(16,185,129,0.6)';
+      btn.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.90) 0%, rgba(5, 150, 105, 0.95) 100%)';
+      btn.style.border = '1px solid rgba(255,255,255,0.22)';
+      btn.style.boxShadow = '0 6px 20px rgba(16, 185, 129, 0.4)';
     }
   } else if (status === 'active') {
     if(tagEl) {
@@ -67060,7 +67138,11 @@ window.openChapterSheet = function(chapNum, chapTitle, doneCount, totalCount, ch
   const btn = document.getElementById('silkBtn');
 
   if(titleEl) titleEl.textContent = `Глава ${chapNum}: ${chapTitle}`;
-  if(descEl) descEl.textContent = `Освоено ${doneCount} из ${totalCount} уроков модуля. Все уроки открыты для прохождения.`;
+  if(descEl) {
+    descEl.style.display = 'block';
+    descEl.textContent = `Освоено ${doneCount} из ${totalCount} уроков модуля. Все уроки открыты для прохождения.`;
+  }
+  if(chipsEl) chipsEl.className = '';
 
   if(chapStatus === 'completed'){
     if(tagEl) {

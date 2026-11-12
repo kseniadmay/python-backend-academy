@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Стенд: Интерактивный симулятор поповера и переходов — Python Backend Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090e;
+      --surface: rgba(15, 23, 42, 0.75);
+      --surface-card: rgba(17, 24, 39, 0.90);
+      --border: rgba(255, 255, 255, 0.10);
+      --border-subtle: rgba(255, 255, 255, 0.06);
+      --ink: #f8fafc;
+      --ink-muted: #94a3b8;
+      --ink-dim: #64748b;
+      --emerald: #10b981;
+      --emerald-soft: #34d399;
+      --emerald-glow: rgba(16, 185, 129, 0.40);
+      --gold: #f59e0b;
+      --gold-soft: #fbbf24;
+      --font-main: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 16px 80px;
+      background-image: 
+        radial-gradient(circle at 18% 12%, rgba(16, 185, 129, 0.09) 0%, transparent 45%),
+        radial-gradient(circle at 82% 88%, rgba(14, 165, 233, 0.06) 0%, transparent 50%);
+      line-height: 1.45;
+    }
+
+    .container {
+      max-width: 1200px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 26px;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+    }
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 14px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--emerald-soft);
+      letter-spacing: 0.02em;
+    }
+    .header h1 {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+    .header p {
+      font-size: 0.92rem;
+      color: var(--ink-muted);
+      max-width: 740px;
+    }
+
+    /* Simulator Workspace Layout */
+    .sim-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .sim-layout { grid-template-columns: 1fr; }
+    }
+
+    /* Left Card: Interactive Map with Popover */
+    .sim-panel {
+      background: rgba(15, 23, 42, 0.60);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+    }
+    .sim-panel-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--emerald-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Serpentine Trail Section */
+    .trail-viewport {
+      position: relative;
+      background: rgba(8, 12, 20, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 30px 20px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 480px;
+      overflow: hidden;
+    }
+
+    /* Trail Beads */
+    .trail-track {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 36px;
+      width: 100%;
+      position: relative;
+    }
+    .trail-line {
+      position: absolute;
+      top: 24px;
+      bottom: 24px;
+      width: 2px;
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.4), rgba(255, 255, 255, 0.1));
+      z-index: 1;
+    }
+
+    .trail-bead-btn {
+      position: relative;
+      z-index: 2;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.20);
+      border: 2px solid var(--emerald-soft);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.45);
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .trail-bead-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 28px rgba(16, 185, 129, 0.65);
+    }
+    .trail-bead-caption {
+      position: absolute;
+      left: calc(50% + 36px);
+      white-space: nowrap;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* THE APPROVED POPOVER (Вариант 3: Bead Journey & Tech Chips) */
+    .popover-container {
+      position: absolute;
+      top: 96px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 370px;
+      z-index: 10;
+      background: rgba(13, 20, 36, 0.96);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(16, 185, 129, 0.40);
+      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.85), 0 0 24px rgba(16, 185, 129, 0.15);
+      border-radius: 16px;
+      padding: 16px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      animation: popoverFadeIn 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    @keyframes popoverFadeIn {
+      from { opacity: 0; transform: translate(-50%, -8px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    .popover-arrow-up {
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 12px;
+      height: 12px;
+      background: rgba(13, 20, 36, 0.96);
+      border-top: 1px solid rgba(16, 185, 129, 0.40);
+      border-left: 1px solid rgba(16, 185, 129, 0.40);
+      z-index: 2;
+    }
+
+    .pop-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .pop-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.70rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: var(--emerald-soft);
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 3px 9px;
+      border-radius: 999px;
+    }
+    .pop-close {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--ink-dim);
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+    .pop-close:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+    .pop-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+
+    /* Step Beads inside Popover */
+    .pop-stepper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+    }
+    .pop-step-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--emerald-soft);
+      background: transparent;
+      border: none;
+      font-family: var(--font-main);
+      cursor: pointer;
+      padding: 4px 7px;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+    .pop-step-btn:hover {
+      background: rgba(52, 211, 153, 0.15);
+      color: #fff;
+    }
+    .pop-step-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+    }
+    .pop-step-arrow {
+      font-size: 10px;
+      color: var(--ink-dim);
+      opacity: 0.4;
+    }
+
+    /* Mono Chips */
+    .pop-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .pop-mono-chip {
+      font-family: var(--font-mono);
+      font-size: 0.70rem;
+      font-weight: 500;
+      color: #a7f3d0;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      padding: 3px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .pop-mono-chip:hover {
+      background: rgba(52, 211, 153, 0.18);
+      border-color: rgba(52, 211, 153, 0.45);
+      color: #fff;
+    }
+
+    /* Popover CTA */
+    .pop-cta {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.90) 0%, rgba(5, 150, 105, 0.95) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.20);
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35);
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .pop-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(16, 185, 129, 0.50);
+    }
+
+    /* Right Panel: Live Destination Screen Simulator */
+    .dest-screen {
+      background: rgba(8, 12, 20, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 480px;
+    }
+    .url-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--emerald-soft);
+    }
+    .url-bar-label {
+      color: var(--ink-dim);
+      font-size: 0.70rem;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .dest-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 16px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-subtle);
+    }
+    .dest-header-tag {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--emerald-soft);
+    }
+    .dest-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #fff;
+    }
+    .dest-body {
+      font-size: 0.84rem;
+      color: var(--ink-muted);
+      line-height: 1.5;
+    }
+    .dest-code-preview {
+      background: #04060a;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 12px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: #93c5fd;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-badge">
+        <span>⚡ ЖИВОЙ СИМУЛЯТОР ПЕРЕХОДОВ</span>
+        <span>·</span>
+        <span>ACADEMY.HTML INTERACTION</span>
+      </div>
+      <h1>Симулятор поповера и кликабельной цепочки</h1>
+      <p>Протестируйте реальные переходы по хэш-маршрутам платформы: кликайте на бусину на тропе, затем на шаги <em>(Теория, Карточки, IDE, Тест)</em>, чипы ключевых слов или кнопку действия.</p>
+    </header>
+
+    <!-- Simulator Layout -->
+    <div class="sim-layout">
+
+      <!-- LEFT: Serpentine Trail with Floating Popover -->
+      <div class="sim-panel">
+        <div class="sim-panel-title">
+          <span>1. Интерактивная тропа обучения</span>
+          <span style="font-size:0.75rem; font-family:var(--font-mono); color:var(--ink-dim);">Кликните на бусину для переключения</span>
+        </div>
+
+        <div class="trail-viewport">
+          <div class="trail-track">
+            <div class="trail-line"></div>
+
+            <!-- Node 1: Mastered Active Popover Anchor -->
+            <div style="position:relative; display:flex; align-items:center; justify-content:center; width:100%;">
+              <button type="button" class="trail-bead-btn" id="mainBeadBtn" onclick="togglePopover()">
+                <span>✓</span>
+              </button>
+              <div class="trail-bead-caption">
+                <div>Урок 1 · Базовый синтаксис</div>
+                <div style="font-size:0.72rem; color:var(--emerald-soft); font-weight:600;">Пройдено · 100%</div>
+              </div>
+            </div>
+
+            <!-- Popover Card (Variant 3: Approved) -->
+            <div class="popover-container" id="simPopover">
+              <div class="popover-arrow-up"></div>
+
+              <div class="pop-header">
+                <span class="pop-badge">✓ ВСЕ ЭТАПЫ ПРОЙДЕНЫ</span>
+                <button type="button" class="pop-close" onclick="closePopover()">✕</button>
+              </div>
+
+              <div class="pop-title">Базовый синтаксис</div>
+
+              <!-- Clickable Step Beads (Bead Stepper) -->
+              <div class="pop-stepper">
+                <button type="button" class="pop-step-btn" onclick="goToRoute('#python/skill/s-py-01?tab=theory', 'Теория конспекта', 'Конспект урока 1: Базовый синтаксис и срезы', 'Срезы, память CPython, передача по ссылке (pass by assignment).')">
+                  <span class="pop-step-dot"></span>
+                  <span>Теория</span>
+                </button>
+                <span class="pop-step-arrow">➔</span>
+                <button type="button" class="pop-step-btn" onclick="goToRoute('#python/skill/s-py-01?tab=cards', 'Интервальное повторение SRS', 'Колода карточек: Базовый синтаксис (26 карт)', 'Активное вспоминание синтаксических конструкций и граничных случаев.')">
+                  <span class="pop-step-dot"></span>
+                  <span>Карточки</span>
+                </button>
+                <span class="pop-step-arrow">➔</span>
+                <button type="button" class="pop-step-btn" onclick="goToRoute('#python/skill/s-py-01?tab=practice', 'Тренажёр кода Zen IDE', 'Задача: Инвертирование словаря со срезами списков', 'Напишите функцию transform_data(payload), соблюдая инварианты $O(n)$ памяти.')">
+                  <span class="pop-step-dot"></span>
+                  <span>IDE</span>
+                </button>
+                <span class="pop-step-arrow">➔</span>
+                <button type="button" class="pop-step-btn" onclick="goToRoute('#python/skill/s-py-01?tab=quiz', 'Рубежная аттестация', 'Золотой рубежный юнит-тест', 'Проверка усвоения ключевых понятий без подсказок (Mastery Exam).')">
+                  <span class="pop-step-dot" style="background:var(--gold); box-shadow:0 0 8px rgba(245,158,11,0.6);"></span>
+                  <span style="color:var(--gold-soft);">Тест</span>
+                </button>
+              </div>
+
+              <!-- Clickable JetBrains Mono Tech Chips -->
+              <div class="pop-chips">
+                <button type="button" class="pop-mono-chip" onclick="goToRoute('#python/skill/s-py-01#list', 'Тематический токен', 'Коллекции list & tuple', 'Индексация, мутабельность и стоимость операций O(1) vs O(n).')">list</button>
+                <button type="button" class="pop-mono-chip" onclick="goToRoute('#python/skill/s-py-01#slice', 'Тематический токен', 'Срезы [start:stop:step]', 'Правила создания поверхностных копий и поведение шага -1.')">slice</button>
+                <button type="button" class="pop-mono-chip" onclick="goToRoute('#python/skill/s-py-01#frozenset', 'Тематический токен', 'Хэшируемые множества frozenset', 'Требования к хэшируемости ключей и внутреннее устройство хэш-таблиц.')">frozenset</button>
+                <button type="button" class="pop-mono-chip" onclick="goToRoute('#python/skill/s-py-01#args', 'Тематический токен', '*args & **kwargs', 'Упаковка и распаковка позиционных и именованных аргументов.')">*args</button>
+                <button type="button" class="pop-mono-chip" onclick="goToRoute('#python/skill/s-py-01#namedtuple', 'Тематический токен', 'collections.namedtuple', 'Именованные кортежи с доступом по полям и минимальным оверхедом по памяти.')">namedtuple</button>
+                <button type="button" class="pop-mono-chip" onclick="goToRoute('#python/skill/s-py-01#deque', 'Тематический токен', 'collections.deque', 'Двусторонняя очередь с гарантией O(1) добавления и извлечения с обоих концов.')">deque</button>
+                <button type="button" class="pop-mono-chip" onclick="goToRoute('#python/skill/s-py-01#zip', 'Тематический токен', 'Встроенная функция zip()', 'Параллельная итерация по коллекциям с ленивым вычислением.')">zip()</button>
+                <button type="button" class="pop-mono-chip" onclick="goToRoute('#python/skill/s-py-01#id', 'Тематический токен', 'Идентификатор id() и ссылки в памяти', 'Как CPython хранит адреса объектов в куче и механизм счетчика ссылок.')">id()</button>
+              </div>
+
+              <!-- Bottom Primary CTA -->
+              <button type="button" class="pop-cta" onclick="goToRoute('#python/skill/s-py-01?tab=theory', 'Основное действие', 'Конспект урока: Базовый синтаксис', 'Переход к повторению опорного инженерного конспекта темы.')">
+                <span>📖</span>
+                <span>ПОВТОРИТЬ КОНСПЕКТ ➔</span>
+              </button>
+            </div>
+
+            <!-- Node 2 (Context) -->
+            <div style="position:relative; display:flex; align-items:center; justify-content:center; width:100%; opacity:0.4;">
+              <div style="width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; font-weight:700;">2</div>
+              <div class="trail-bead-caption" style="color:var(--ink-muted);">Урок 2 · Итераторы и генераторы</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Live Destination Monitor -->
+      <div class="sim-panel">
+        <div class="sim-panel-title">
+          <span>2. Эмулятор перехода платформы</span>
+          <span style="font-size:0.75rem; color:var(--emerald-soft); font-weight:800;">LIVE HASH MONITOR</span>
+        </div>
+
+        <div class="dest-screen">
+          <div class="url-bar">
+            <span class="url-bar-label">Хэш-маршрут:</span>
+            <span id="urlHash">#python/skill/s-py-01?tab=theory</span>
+          </div>
+
+          <div class="dest-content">
+            <div class="dest-header-tag" id="destTag">ТЕОРИЯ КОНСПЕКТА</div>
+            <div class="dest-title" id="destTitle">Конспект урока 1: Базовый синтаксис и срезы</div>
+            <p class="dest-body" id="destBody">
+              Срезы, память CPython, передача аргументов по ссылке (pass by assignment). Обучающийся изучает лаконичные карточки понятий с возможностью перехода к карточкам и IDE тренажёру.
+            </p>
+
+            <div class="dest-code-preview" id="destCode">
+# Пример из конспекта урока:
+a = [1, 2, 3]
+b = a[:]       # Поверхностная копия через срез
+print(id(a) == id(b))  # False — разные объекты в куче
+            </div>
+          </div>
+
+          <div style="padding:12px; border-radius:10px; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); font-size:0.80rem; color:var(--emerald-soft);">
+            ✓ <strong>Инвариант соблюдён:</strong> Клик на бусину переключает раздел урока (Теория, Карточки, IDE, Тест), а клик на синтаксический чип скроллит к соответствующей заметке темы.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    function togglePopover() {
+      const pop = document.getElementById('simPopover');
+      pop.style.display = (pop.style.display === 'none') ? 'flex' : 'none';
+    }
+    function closePopover() {
+      document.getElementById('simPopover').style.display = 'none';
+    }
+
+    function goToRoute(hash, tag, title, body) {
+      document.getElementById('urlHash').textContent = hash;
+      document.getElementById('destTag').textContent = tag;
+      document.getElementById('destTitle').textContent = title;
+      document.getElementById('destBody').textContent = body;
+
+      // Update code preview dynamically
+      const codeEl = document.getElementById('destCode');
+      if (hash.includes('tab=cards')) {
+        codeEl.innerHTML = `# Режим флеш-карточек (SRS SM-2):\n# Вопрос: В чём разница между append() и extend()?\n# Интервал повторения: 3 дня · Коэффициент EF: 2.5`;
+      } else if (hash.includes('tab=practice')) {
+        codeEl.innerHTML = `def transform_data(payload: list[dict]) -> dict:\n    # Реализуйте алгоритм с O(n) по времени\n    ...\n    return result`;
+      } else if (hash.includes('tab=quiz')) {
+        codeEl.innerHTML = `// Рубежный тест главы\nassert test_slice_mutation() == True\nassert test_kwargs_unpacking() == True`;
+      } else {
+        codeEl.innerHTML = `# Опорный инженерный конспект:\na = [1, 2, 3]\nb = a[:]\nprint(id(a) == id(b))  # False`;
+      }
+    }
+  </script>
+</body>
+</html>
