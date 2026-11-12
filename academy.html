@@ -35808,10 +35808,12 @@ function viewMap(){
           else if(mp >= 50){ badgeCls = 'km-circle-badge--f'; badgeText = '50%'; actionText = 'Практика →'; btnCls = 'btn-primary'; }
 
           const cleanT = String(s.title || '').replace(/^[\d.]+\s*[:·•\-]\s*/i, '').trim();
+          const trk = (typeof getTrackForSkill === 'function') ? getTrackForSkill(s.id) : null;
+          const sRoute = trk ? `#${trk.routePrefix}/skill/${s.id}` : `#/lesson/${s.id}`;
 
           return `
             <div class="km-skill-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;background:var(--surface-2);border-radius:10px;margin-bottom:6px;border:1px solid var(--line-soft);">
-              <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;">
+              <a href="${sRoute}" style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;text-decoration:none;color:inherit;">
                 <span class="km-circle-badge ${badgeCls}">${badgeText}</span>
                 <div style="min-width:0;">
                   <div style="font-size:.84rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
@@ -35819,10 +35821,13 @@ function viewMap(){
                   </div>
                   <div style="font-size:.7rem;color:var(--ink-muted);">${mpLabel(mp)} · ${mp} MP</div>
                 </div>
+              </a>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <button type="button" onclick="window.openKhanSkillModal('${s.id}')" class="btn btn-ghost" style="padding:4px 8px;font-size:.72rem;" title="Подробнее">ℹ️</button>
+                <a href="${sRoute}" class="btn ${btnCls}" style="padding:4px 10px;font-size:.76rem;flex-shrink:0;text-decoration:none;">
+                  ${actionText}
+                </a>
               </div>
-              <button onclick="window.openKhanSkillModal('${s.id}')" class="btn ${btnCls}" style="padding:4px 10px;font-size:.76rem;flex-shrink:0;">
-                ${actionText}
-              </button>
             </div>
           `;
         }).join('');
@@ -35831,12 +35836,17 @@ function viewMap(){
           <div class="km-card" style="margin-bottom:14px;padding:16px;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
               <div>
-                <span class="topic-badge" style="font-family:var(--font-m);font-size:.70rem;">Модуль ${u.info.id}</span>
-                <h4 style="font-size:.96rem;font-weight:700;margin:2px 0 0 0;">${escapeHtmlStr(u.info.title || '')}</h4>
+                <span class="topic-badge" style="font-family:var(--font-m);font-size:.70rem;">Урок ${u.info.id}</span>
+                <h4 style="font-size:.96rem;font-weight:700;margin:2px 0 0 0;">
+                  <a href="#/lesson/${u.info.id}" style="color:inherit;text-decoration:none;">${escapeHtmlStr(u.info.title || '')}</a>
+                </h4>
               </div>
-              <div style="text-align:right;">
-                <span style="font-size:0.86rem;font-weight:800;color:var(--emerald);font-family:var(--font-m);">${uPct}%</span>
-                <div style="font-size:0.68rem;color:var(--ink-muted);">${uMastered} из ${uTotal} освоено</div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <a href="#/lesson/${u.info.id}" class="btn btn-ghost" style="padding:4px 10px;font-size:.74rem;text-decoration:none;">Открыть урок ➔</a>
+                <div style="text-align:right;">
+                  <span style="font-size:0.86rem;font-weight:800;color:var(--emerald);font-family:var(--font-m);">${uPct}%</span>
+                  <div style="font-size:0.68rem;color:var(--ink-muted);">${uMastered} из ${uTotal} освоено</div>
+                </div>
               </div>
             </div>
             <div>${skillsRows}</div>
@@ -35960,9 +35970,11 @@ window.searchKhanSkills = function(q){
 
 // Skill Modal Detail
 window.openKhanSkillModal = function(sid){
-  const s = PY_SKILLS_BY_ID[sid];
+  const s = (typeof resolveSkillOrUnit === 'function' ? resolveSkillOrUnit(sid) : null) || (typeof PY_SKILLS_BY_ID !== 'undefined' && PY_SKILLS_BY_ID[sid]);
   if(!s) return;
-  const mp = getSkillMP(sid);
+  const mp = getSkillMP(s.id);
+  const trk = (typeof getTrackForSkill === 'function') ? getTrackForSkill(s.id) : null;
+  const routePfx = (s.routePrefix) || (trk && trk.routePrefix) || '/python';
   const existing = document.getElementById('km-modal-root');
   if(existing) existing.remove();
 
@@ -35995,9 +36007,14 @@ window.openKhanSkillModal = function(sid){
         ${s.kIds && s.kIds.length > 0 ? `
           <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface-2);padding:8px 12px;border-radius:10px;">
             <span style="font-size:.8rem;">📖 Конспекты темы (${s.kIds.length})</span>
-            <button onclick="window.closeKhanSkillModal();location.hash='#/python/skill/${s.id}';" class="btn btn-ghost" style="padding:4px 8px;font-size:.74rem;">Читать →</button>
+            <button onclick="window.closeKhanSkillModal();location.hash='#${routePfx}/skill/${s.id}';" class="btn btn-ghost" style="padding:4px 8px;font-size:.74rem;">Читать →</button>
           </div>
-        ` : ''}
+        ` : `
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface-2);padding:8px 12px;border-radius:10px;">
+            <span style="font-size:.8rem;">📖 Урок и теория темы</span>
+            <button onclick="window.closeKhanSkillModal();location.hash='#${routePfx}/skill/${s.id}';" class="btn btn-ghost" style="padding:4px 8px;font-size:.74rem;">Открыть →</button>
+          </div>
+        `}
         ${s.fIds && s.fIds.length > 0 ? `
           <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface-2);padding:8px 12px;border-radius:10px;">
             <span style="font-size:.8rem;">🗂️ Карточки темы (${s.fIds.length})</span>
@@ -36631,8 +36648,28 @@ function diagResultsHTML(){
 
 function viewLesson(id){
 
-  if(!LESSONS[id]) return `<div class="container"><p>Урок не найден.</p><a href="#/map" class="btn btn-ghost">К карте</a></div>`;
+  if(typeof LESSONS !== 'undefined' && LESSONS[id]){
+    ensureLessonState(id);
+    const stage = lessonState.stage;
+    if(stage==='theory') return lessonTheoryHTML();
+    if(stage==='check') return lessonCheckHTML();
+    if(stage==='practice') return lessonStageHTML('practice');
+    if(stage==='task') return lessonStageHTML('task');
+    if(stage==='practice2') return lessonStageHTML('practice2');
+    if(stage==='task2') return lessonStageHTML('task2');
+    if(stage==='debug') return lessonStageHTML('debug');
+    return lessonDoneHTML();
+  }
 
+  const resolved = (typeof resolveSkillOrUnit === 'function') ? resolveSkillOrUnit(id) : null;
+  if(resolved && typeof viewPythonSkill === 'function'){
+    return viewPythonSkill(resolved.id);
+  }
+
+  return `<div class="container"><p>Урок не найден.</p><a href="#/map" class="btn btn-ghost">К карте</a></div>`;
+}
+
+function _legacyViewLessonInner(id){
   ensureLessonState(id);
 
   const stage = lessonState.stage;
@@ -41180,12 +41217,34 @@ Object.values(MASTERY_TRACKS).forEach(tr => {
 
 
 
+function resolveSkillOrUnit(idOrSid){
+  if(!idOrSid) return null;
+  const raw = String(idOrSid).trim();
+  const clean = raw.replace(/^#\/?/, '').replace(/^(?:lesson|unit|skill)[\/-]/i, '');
+  if(typeof PY_SKILLS_BY_ID !== 'undefined' && PY_SKILLS_BY_ID[clean]) return PY_SKILLS_BY_ID[clean];
+  if(typeof PY_SKILLS_BY_ID !== 'undefined' && PY_SKILLS_BY_ID[raw]) return PY_SKILLS_BY_ID[raw];
+  const u = (typeof ALL_UNITS_COMBINED !== 'undefined' && Array.isArray(ALL_UNITS_COMBINED))
+    ? ALL_UNITS_COMBINED.find(x => x.id === clean || x.id === raw || x.id === clean.replace(/^u-?/i, ''))
+    : null;
+  if(u && u.skills && u.skills.length > 0){
+    const activeSk = u.skills.find(s => (typeof getSkillMP === 'function' ? getSkillMP(s.id) : 0) < 80) || u.skills[0];
+    return activeSk || u.skills[0];
+  }
+  if(/^\d+$/.test(clean)){
+    const uByNum = (typeof ALL_UNITS_COMBINED !== 'undefined' && Array.isArray(ALL_UNITS_COMBINED))
+      ? ALL_UNITS_COMBINED.find(x => x.id === (clean + '.1') || x.id === clean)
+      : null;
+    if(uByNum && uByNum.skills && uByNum.skills.length > 0){
+      return uByNum.skills.find(s => (typeof getSkillMP === 'function' ? getSkillMP(s.id) : 0) < 80) || uByNum.skills[0];
+    }
+  }
+  return null;
+}
+window.resolveSkillOrUnit = resolveSkillOrUnit;
+
 function getTrackForSkill(sid){
-
-  const s = PY_SKILLS_BY_ID[sid];
-
+  const s = resolveSkillOrUnit(sid) || (typeof PY_SKILLS_BY_ID !== 'undefined' && PY_SKILLS_BY_ID[sid]);
   return (s && MASTERY_TRACKS[s.trackKey]) || MASTERY_TRACKS.python;
-
 }
 
 function getTrackForUnit(unitId, fallbackTrackKey){
@@ -42402,7 +42461,8 @@ function ensurePySkillState(sid){
 
   ensureExtendedState();
 
-  const sk = PY_SKILLS_BY_ID[sid] || ALL_PY_SKILLS[0];
+  const resolved = (typeof resolveSkillOrUnit === 'function') ? resolveSkillOrUnit(sid) : null;
+  const sk = resolved || (typeof PY_SKILLS_BY_ID !== 'undefined' && PY_SKILLS_BY_ID[sid]) || ALL_PY_SKILLS[0];
 
   if(pySkillViewState.sid !== sk.id){
 
@@ -57308,7 +57368,15 @@ function getDominantHeroCardData(){
     collectedDueLen
   );
 
-  let href = '#/path';
+  const focusTargetSk = (typeof ALL_PY_SKILLS !== 'undefined' && Array.isArray(ALL_PY_SKILLS))
+    ? ALL_PY_SKILLS.find(s => !state.mastered || !state.mastered.includes(s.id))
+    : null;
+  const focusTargetTrk = focusTargetSk ? (typeof getTrackForSkill === 'function' ? getTrackForSkill(focusTargetSk.id) : null) : null;
+  const lessonDirectRoute = focusTargetSk
+    ? (focusTargetTrk ? `#${focusTargetTrk.routePrefix}/skill/${focusTargetSk.id}` : `#/lesson/${focusTargetSk.id}`)
+    : '#/path';
+
+  let href = lessonDirectRoute;
   let title = focusTitle;
   let eta = '⏱ ~12 мин';
   let btnText = 'Продолжить';
@@ -57325,6 +57393,7 @@ function getDominantHeroCardData(){
 
   return { href, title, eta, btnText, tip, srsDue };
 }
+window.getDominantHeroCardData = getDominantHeroCardData;
 
 function renderDominantHeroCard(isMobile){
   const d = getDominantHeroCardData();
@@ -58548,24 +58617,80 @@ function ensureQuickSearchModal(){
   const res = modal.querySelector('#sidebar-search-results');
 
   const renderResults = function(query){
-    if(typeof NODES === 'undefined' || !Array.isArray(NODES)){
-      res.innerHTML = '<div style="padding:14px;color:var(--ink-muted);font-size:0.85rem;text-align:center;">Темы загружаются...</div>';
-      return;
-    }
     const q = (query || '').trim().toLowerCase();
     let matches = [];
+
+    // Search in modern units and skills
+    const allUnits = (typeof ALL_UNITS_COMBINED !== 'undefined' && Array.isArray(ALL_UNITS_COMBINED)) ? ALL_UNITS_COMBINED : [];
+    const allSkills = (typeof ALL_PY_SKILLS !== 'undefined' && Array.isArray(ALL_PY_SKILLS)) ? ALL_PY_SKILLS : [];
+
     if(!q){
-      matches = NODES.slice(0, 7);
+      // Default: show first units and active lessons
+      allUnits.slice(0, 6).forEach(function(u){
+        const trk = (typeof getTrackForUnit === 'function') ? getTrackForUnit(u.id) : null;
+        const rPfx = trk ? trk.routePrefix : '/python';
+        const actSk = (u.skills && u.skills.find(s => (typeof getSkillMP === 'function' ? getSkillMP(s.id) : 0) < 80)) || (u.skills && u.skills[0]);
+        matches.push({
+          href: actSk ? `#${rPfx}/skill/${actSk.id}` : `#/lesson/${u.id}`,
+          title: (typeof cleanUnitTitle === 'function') ? cleanUnitTitle(u.id, u.title) : u.title,
+          summary: u.desc || 'Урок курса с интерактивной теорией и практикой',
+          badge: 'Урок ' + u.id
+        });
+      });
     } else {
-      matches = NODES.filter(function(n){
-        return (n.title && n.title.toLowerCase().indexOf(q) !== -1) ||
-               (n.summary && n.summary.toLowerCase().indexOf(q) !== -1) ||
-               (Array.isArray(n.outline) && n.outline.some(function(o){
-                 const t = typeof o === 'string' ? o : (o && o.title);
-                 return t && t.toLowerCase().indexOf(q) !== -1;
-               }));
-      }).slice(0, 10);
+      // 1. Search in units
+      allUnits.forEach(function(u){
+        const uTitle = (u.title || '').toLowerCase();
+        const uDesc = (u.desc || '').toLowerCase();
+        const uId = String(u.id || '').toLowerCase();
+        if(uTitle.includes(q) || uDesc.includes(q) || uId === q || ('урок ' + uId).includes(q)){
+          const trk = (typeof getTrackForUnit === 'function') ? getTrackForUnit(u.id) : null;
+          const rPfx = trk ? trk.routePrefix : '/python';
+          const actSk = (u.skills && u.skills.find(s => (typeof getSkillMP === 'function' ? getSkillMP(s.id) : 0) < 80)) || (u.skills && u.skills[0]);
+          matches.push({
+            href: actSk ? `#${rPfx}/skill/${actSk.id}` : `#/lesson/${u.id}`,
+            title: (typeof cleanUnitTitle === 'function') ? cleanUnitTitle(u.id, u.title) : u.title,
+            summary: u.desc || 'Урок курса с интерактивной теорией и практикой',
+            badge: 'Урок ' + u.id
+          });
+        }
+      });
+
+      // 2. Search in skills
+      allSkills.forEach(function(s){
+        const sTitle = (s.title || '').toLowerCase();
+        const sDesc = (s.practiceDesc || '').toLowerCase();
+        const sId = String(s.id || '').toLowerCase();
+        if(sTitle.includes(q) || sDesc.includes(q) || sId.includes(q)){
+          const trk = (typeof getTrackForSkill === 'function') ? getTrackForSkill(s.id) : null;
+          const rPfx = (s.routePrefix) || (trk && trk.routePrefix) || '/python';
+          matches.push({
+            href: `#${rPfx}/skill/${s.id}`,
+            title: s.title,
+            summary: s.practiceDesc || 'Тема интервального повторения и практики в IDE',
+            badge: 'Тема ' + s.id
+          });
+        }
+      });
+
+      // 3. Fallback to NODES if sparse
+      if(matches.length < 5 && typeof NODES !== 'undefined' && Array.isArray(NODES)){
+        NODES.forEach(function(n){
+          const nTitle = (n.title || '').toLowerCase();
+          const nSummary = (n.summary || '').toLowerCase();
+          if(nTitle.includes(q) || nSummary.includes(q)){
+            matches.push({
+              href: '#/topic/' + encodeURIComponent(n.id),
+              title: n.title,
+              summary: n.summary || '',
+              badge: 'Раздел'
+            });
+          }
+        });
+      }
     }
+
+    matches = matches.slice(0, 10);
 
     if(matches.length === 0){
       const safeQuery = typeof escapeHtml === 'function' ? escapeHtml(q) : q;
@@ -58573,16 +58698,15 @@ function ensureQuickSearchModal(){
       return;
     }
 
-    res.innerHTML = matches.map(function(n, idx){
-      const stageLabel = n.stage !== undefined ? ('Модуль ' + n.stage) : 'Курс';
-      const safeTitle = typeof escapeHtml === 'function' ? escapeHtml(n.title || '') : (n.title || '');
-      const safeSummary = typeof escapeHtml === 'function' ? escapeHtml(n.summary || '') : (n.summary || '');
-      return '<a href="#/topic/' + encodeURIComponent(n.id) + '" class="search-result-item" data-search-idx="' + idx + '">' +
+    res.innerHTML = matches.map(function(m, idx){
+      const safeTitle = typeof escapeHtml === 'function' ? escapeHtml(m.title || '') : (m.title || '');
+      const safeSummary = typeof escapeHtml === 'function' ? escapeHtml(m.summary || '') : (m.summary || '');
+      return '<a href="' + m.href + '" class="search-result-item" data-search-idx="' + idx + '">' +
         '<div style="display:flex;flex-direction:column;gap:3px;overflow:hidden;">' +
           '<strong style="font-size:0.9rem;color:var(--ink);">' + safeTitle + '</strong>' +
           '<span style="font-size:0.75rem;color:var(--ink-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + safeSummary + '</span>' +
         '</div>' +
-        '<span style="font-size:0.7rem;color:var(--ink-soft);font-family:var(--font-m);flex-shrink:0;margin-left:12px;">' + stageLabel + '</span>' +
+        '<span style="font-size:0.7rem;color:var(--ink-soft);font-family:var(--font-m);flex-shrink:0;margin-left:12px;">' + m.badge + '</span>' +
       '</a>';
     }).join('');
 
@@ -59630,6 +59754,30 @@ render = function(){
 
     navRoute = '/';
 
+  } else if(route.indexOf('/skill/') === 0){
+
+    const sid = route.slice(7);
+    const resolved = (typeof resolveSkillOrUnit === 'function') ? resolveSkillOrUnit(sid) : null;
+    if(resolved){
+      root.innerHTML = viewPythonSkill(resolved.id);
+      navRoute = (typeof getTrackForSkill === 'function' && getTrackForSkill(resolved.id)) ? getTrackForSkill(resolved.id).routePrefix : '/map';
+    } else {
+      root.innerHTML = viewDashboard();
+      navRoute = '/';
+    }
+
+  } else if(route.indexOf('/unit/') === 0){
+
+    const uid = route.slice(6);
+    const resolved = (typeof resolveSkillOrUnit === 'function') ? resolveSkillOrUnit(uid) : null;
+    if(resolved){
+      root.innerHTML = viewPythonSkill(resolved.id);
+      navRoute = (typeof getTrackForSkill === 'function' && getTrackForSkill(resolved.id)) ? getTrackForSkill(resolved.id).routePrefix : '/map';
+    } else {
+      root.innerHTML = viewDashboard();
+      navRoute = '/';
+    }
+
   } else if(route.indexOf('/topic/') === 0){
 
     root.innerHTML = viewTopic(route.slice(7));
@@ -59638,9 +59786,32 @@ render = function(){
 
   } else if(route.indexOf('/lesson/') === 0){
 
-    root.innerHTML = viewLesson(route.slice(8));
+    const lid = route.slice(8);
+    if(typeof LESSONS !== 'undefined' && LESSONS[lid]){
+      root.innerHTML = viewLesson(lid);
+      navRoute = '/map';
+    } else {
+      const resolved = (typeof resolveSkillOrUnit === 'function') ? resolveSkillOrUnit(lid) : null;
+      if(resolved){
+        root.innerHTML = viewPythonSkill(resolved.id);
+        navRoute = (typeof getTrackForSkill === 'function' && getTrackForSkill(resolved.id)) ? getTrackForSkill(resolved.id).routePrefix : '/map';
+      } else {
+        root.innerHTML = viewLesson(lid);
+        navRoute = '/';
+      }
+    }
 
-    navRoute = '/';
+  } else if(/^\/(?:python|web|backend|algorithms|databases|architecture|infra|infrastructure)\/(?:lesson|unit)\/(.+)$/.test(route)){
+
+    const m = route.match(/^\/(?:python|web|backend|algorithms|databases|architecture|infra|infrastructure)\/(?:lesson|unit)\/(.+)$/);
+    const resolved = (typeof resolveSkillOrUnit === 'function') ? resolveSkillOrUnit(m[1]) : null;
+    if(resolved){
+      root.innerHTML = viewPythonSkill(resolved.id);
+      navRoute = (typeof getTrackForSkill === 'function' && getTrackForSkill(resolved.id)) ? getTrackForSkill(resolved.id).routePrefix : '/map';
+    } else {
+      root.innerHTML = viewDashboard();
+      navRoute = '/';
+    }
 
   } else {
 
@@ -67529,7 +67700,7 @@ window.openSilkSheet = function(uid, title, desc, status, customRoute, triggerEl
     }
     if(btn) {
       btn.className = 'sheet-action-btn sheet-action-btn--primary';
-      btn.textContent = 'НАЧАТЬ УРОК (2 МИН) ➔';
+      btn.textContent = 'НАЧАТЬ УРОК ➔';
       btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
       btn.style.border = '1px solid rgba(255,255,255,0.25)';
     }
