@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apple Design Studio · Сравнение выбора эшелона</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070a12;
+      --border-glass: rgba(255, 255, 255, 0.12);
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --emerald: #10b981;
+      --font-ui: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: #f8fafc;
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 80px;
+    }
+
+    .header-bar {
+      width: 100%;
+      max-width: 1260px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-glass);
+      border-radius: 18px;
+      padding: 16px 24px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.45);
+    }
+    .header-title h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge-apple {
+      font-family: var(--font-mono);
+      font-size: 0.70rem;
+      font-weight: 800;
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .grid-variants {
+      width: 100%;
+      max-width: 1260px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(370px, 1fr));
+      gap: 24px;
+      z-index: 10;
+    }
+
+    .variant-card {
+      background: rgba(11, 16, 28, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .variant-card.featured {
+      border-color: rgba(16, 185, 129, 0.55);
+      box-shadow: 0 0 32px rgba(16, 185, 129, 0.15), 0 20px 48px rgba(0,0,0,0.5);
+    }
+    .variant-card.featured::before {
+      content: '★ РЕКОМЕНДАЦИЯ APPLE HIG';
+      position: absolute;
+      top: -11px;
+      left: 24px;
+      background: #10b981;
+      color: #032e23;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      padding: 3px 10px;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .variant-head {
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .variant-name { font-size: 1.05rem; font-weight: 800; color: #fff; }
+    .variant-caption { font-size: 0.82rem; color: #94a3b8; margin-top: 6px; line-height: 1.45; }
+
+    .phone-mockup {
+      width: 100%;
+      background: #080c14;
+      border: 1.5px solid rgba(255, 255, 255, 0.14);
+      border-radius: 28px;
+      padding: 16px 12px 24px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      min-height: 380px;
+      overflow: hidden;
+    }
+
+    /* ВАРИАНТ А: Silk Bottom Sheet */
+    .mock-sheet {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(180deg, rgba(17, 24, 39, 0.98) 0%, rgba(10, 14, 22, 0.99) 100%);
+      border-top: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 22px 22px 0 0;
+      padding: 14px 16px 20px;
+      box-shadow: 0 -12px 40px rgba(0,0,0,0.7);
+    }
+    .sheet-handle {
+      width: 36px;
+      height: 4px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 999px;
+      margin: 0 auto 12px;
+    }
+    .sheet-title {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+    }
+    .sheet-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      margin-bottom: 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    .sheet-item.active {
+      border-color: rgba(16, 185, 129, 0.4);
+      background: rgba(16, 185, 129, 0.12);
+      color: #34d399;
+    }
+
+    /* ВАРИАНТ B: Dropdown Popover */
+    .mock-popover {
+      position: absolute;
+      top: 60px;
+      left: 20px;
+      width: 240px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      padding: 8px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+      backdrop-filter: blur(20px);
+    }
+    .pop-item {
+      padding: 8px 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border-radius: 8px;
+      color: #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+    }
+    .pop-item.active { background: rgba(16, 185, 129, 0.16); color: #34d399; }
+
+    /* ВАРИАНТ C: Segmented Bar */
+    .seg-bar {
+      display: flex;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 10px;
+      padding: 3px;
+      gap: 3px;
+    }
+    .seg-btn {
+      flex: 1;
+      text-align: center;
+      padding: 6px 4px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #94a3b8;
+      border-radius: 7px;
+    }
+    .seg-btn.active {
+      background: #10b981;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header-bar">
+    <div class="header-title">
+      <span class="badge-apple">Apple HIG Studio</span>
+      <h1>Переключение эшелона (Echelon Selector & Modal Flow)</h1>
+    </div>
+  </header>
+
+  <main class="grid-variants">
+
+    <!-- ВАРИАНТ А: Silk Action Sheet (Рекомендуемый) -->
+    <div class="variant-card featured">
+      <div class="variant-head">
+        <div class="variant-name">Вариант A: Silk Action Sheet</div>
+        <div class="variant-caption">
+          Канон iOS: клик на чип плавно поднимает снизу шелковую шторку с тактильной пружиной (Spring Physics), полным обзором целей эшелонов и статусом освоения. Не перекрывает верхний контент и доступна одной рукой (Thumb Zone).
+        </div>
+      </div>
+
+      <div class="phone-mockup">
+        <div style="font-size:0.75rem; color:#64748b; padding:10px;">Фоновый экран Про-тропы затемняется...</div>
+
+        <!-- Sheet Modal -->
+        <div class="mock-sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-title">Целевой эшелон подготовки</div>
+          <div class="sheet-item active">
+            <span>🛡️ Эшелон 1: Скрининг</span>
+            <span style="color:#34d399;">3/14 ✓</span>
+          </div>
+          <div class="sheet-item">
+            <span>⚔️ Эшелон 2: Твердый Джун</span>
+            <span style="color:#64748b;">0/18</span>
+          </div>
+          <div class="sheet-item">
+            <span>🏆 Эшелон 3: Продакшн</span>
+            <span style="color:#64748b;">0/12</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ВАРИАНТ B: Dropdown Popover -->
+    <div class="variant-card">
+      <div class="variant-head">
+        <div class="variant-name">Вариант B: Dropdown Popover (Меню)</div>
+        <div class="variant-caption">
+          Классическое десктопное меню, выпадающее вниз от чипа. На мобильном вьюпорте может обрезаться или перекрывать заголовок активного урока.
+        </div>
+      </div>
+
+      <div class="phone-mockup">
+        <div style="padding:10px;">
+          <div style="display:inline-block; font-size:0.70rem; padding:4px 8px; border:1px solid rgba(16,185,129,0.4); border-radius:6px; color:#34d399;">🛡️ Эшелон 1 ▾</div>
+        </div>
+        <div class="mock-popover">
+          <div class="pop-item active"><span>🛡️ Эшелон 1: Скрининг</span><span>✓</span></div>
+          <div class="pop-item"><span>⚔️ Эшелон 2: Джун</span></div>
+          <div class="pop-item"><span>🏆 Эшелон 3: Прод</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ВАРИАНТ C: Встроенный Segmented Control -->
+    <div class="variant-card">
+      <div class="variant-head">
+        <div class="variant-name">Вариант C: Встроенный Segmented Bar</div>
+        <div class="variant-caption">
+          Горизонтальный переключатель в три вкладки внутри шапки. Постоянно на виду, но отнимает 36px вертикальной высоты карточки на каждом экране.
+        </div>
+      </div>
+
+      <div class="phone-mockup">
+        <div class="seg-bar">
+          <div class="seg-btn active">Эшелон 1</div>
+          <div class="seg-btn">Эшелон 2</div>
+          <div class="seg-btn">Эшелон 3</div>
+        </div>
+        <div style="margin-top:16px; font-size:0.80rem; color:#cbd5e1; padding:10px;">Содержимое эшелона 1...</div>
+      </div>
+    </div>
+
+  </main>
+
+</body>
+</html>

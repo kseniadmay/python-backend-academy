@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apple Design Studio · Сравнение строк уроков</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070a12;
+      --border-glass: rgba(255, 255, 255, 0.12);
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --emerald: #10b981;
+      --font-ui: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: #f8fafc;
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 80px;
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.18;
+    }
+    .orb-1 {
+      width: 450px; height: 450px;
+      background: radial-gradient(circle, #10b981 0%, transparent 70%);
+      top: -100px; left: -80px;
+    }
+
+    .header-bar {
+      width: 100%;
+      max-width: 1260px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-glass);
+      border-radius: 18px;
+      padding: 16px 24px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.45);
+    }
+    .header-title h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge-apple {
+      font-family: var(--font-mono);
+      font-size: 0.70rem;
+      font-weight: 800;
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .grid-variants {
+      width: 100%;
+      max-width: 1260px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(370px, 1fr));
+      gap: 24px;
+      z-index: 10;
+    }
+
+    .variant-card {
+      background: rgba(11, 16, 28, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .variant-card.featured {
+      border-color: rgba(16, 185, 129, 0.55);
+      box-shadow: 0 0 32px rgba(16, 185, 129, 0.15), 0 20px 48px rgba(0,0,0,0.5);
+    }
+    .variant-card.featured::before {
+      content: '★ РЕКОМЕНДАЦИЯ APPLE HIG';
+      position: absolute;
+      top: -11px;
+      left: 24px;
+      background: #10b981;
+      color: #032e23;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      padding: 3px 10px;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .variant-head {
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .variant-name {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #fff;
+    }
+    .variant-caption {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      margin-top: 6px;
+      line-height: 1.45;
+    }
+
+    .phone-mockup {
+      width: 100%;
+      background: #080c14;
+      border: 1.5px solid rgba(255, 255, 255, 0.14);
+      border-radius: 28px;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* ВАРИАНТ А: Apple HIG Clean Row */
+    .row-apple {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      gap: 12px;
+      border-radius: 12px;
+      transition: background 0.15s ease;
+    }
+    .row-apple.active {
+      background: rgba(16, 185, 129, 0.12);
+      border-left: 3px solid #10b981;
+    }
+    .row-apple-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .icon-apple {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.74rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .icon-apple.done { background: rgba(16, 185, 129, 0.18); color: #34d399; }
+    .icon-apple.act { background: #10b981; color: #fff; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+    .icon-apple.open { background: rgba(255, 255, 255, 0.05); color: #64748b; }
+    
+    .apple-meta-col { min-width: 0; }
+    .apple-row-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .row-apple.active .apple-row-title { color: #fff; font-weight: 800; }
+    .apple-row-sub {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .apple-tail {
+      flex-shrink: 0;
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #64748b;
+    }
+    .apple-tail.done { color: #34d399; }
+    .apple-tail.act {
+      color: #34d399;
+      font-size: 0.82rem;
+    }
+
+    /* ВАРИАНТ B: Изолированные карточки-плитки */
+    .row-card-tile {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .row-card-tile.active {
+      border-color: rgba(16, 185, 129, 0.5);
+      background: rgba(16, 185, 129, 0.10);
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.15);
+    }
+
+    /* ВАРИАНТ C: Технический Xcode Mode */
+    .row-xcode {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+    }
+    .row-xcode.active {
+      background: rgba(16, 185, 129, 0.15);
+      color: #a7f3d0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="orb orb-1"></div>
+
+  <header class="header-bar">
+    <div class="header-title">
+      <span class="badge-apple">Apple HIG Studio</span>
+      <h1>Визуальная плотность и типографика строк уроков</h1>
+    </div>
+  </header>
+
+  <main class="grid-variants">
+
+    <!-- ВАРИАНТ А: Чистая типографическая иерархия Apple HIG (Рекомендуемый) -->
+    <div class="variant-card featured">
+      <div class="variant-head">
+        <div class="variant-name">Вариант A: Чистый Apple HIG (Слитный список)</div>
+        <div class="variant-caption">
+          Эстетика Apple Settings / Apple Music: единый органичный стеклянный контейнер, четкая двухстрочная типографика, приглушенная суб-строка без визуального шума разноцветных плашек.
+        </div>
+      </div>
+
+      <div class="phone-mockup">
+        <!-- Урок 1 -->
+        <div class="row-apple">
+          <div class="row-apple-left">
+            <div class="icon-apple done">✓</div>
+            <div class="apple-meta-col">
+              <div class="apple-row-title">Модель памяти: id, is, mutability</div>
+              <div class="apple-row-sub">Теория + Практика • id(), hex()</div>
+            </div>
+          </div>
+          <div class="apple-tail done">100%</div>
+        </div>
+
+        <!-- Урок 4: В фокусе -->
+        <div class="row-apple active">
+          <div class="row-apple-left">
+            <div class="icon-apple act">▶</div>
+            <div class="apple-meta-col">
+              <div class="apple-row-title">Функции, *args, **kwargs и LEGB</div>
+              <div class="apple-row-sub" style="color:#a7f3d0;">Теория + Практика • scope, closure</div>
+            </div>
+          </div>
+          <div class="apple-tail act">➔</div>
+        </div>
+
+        <!-- Урок 5: Доступен -->
+        <div class="row-apple">
+          <div class="row-apple-left">
+            <div class="icon-apple open">▶</div>
+            <div class="apple-meta-col">
+              <div class="apple-row-title">Декораторы и wraps: замыкания в проде</div>
+              <div class="apple-row-sub">Теория + Практика • functools.wraps</div>
+            </div>
+          </div>
+          <div class="apple-tail">Доступен ➔</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ВАРИАНТ B: Изолированные карточки-плитки -->
+    <div class="variant-card">
+      <div class="variant-head">
+        <div class="variant-name">Вариант B: Карточки-острова (Gap Tiles)</div>
+        <div class="variant-caption">
+          Каждый урок — независимый скругленный блок с зазорами 8px. Увеличивает высоту списка на 20%, но создает отчетливые физические границы.
+        </div>
+      </div>
+
+      <div class="phone-mockup">
+        <div class="row-card-tile">
+          <div style="font-size:0.84rem; font-weight:700;">✓ Модель памяти: id, is</div>
+          <span style="color:#34d399; font-size:0.75rem; font-weight:800;">100%</span>
+        </div>
+        <div class="row-card-tile active">
+          <div style="font-size:0.84rem; font-weight:800; color:#fff;">▶ Функции, *args и LEGB</div>
+          <span style="color:#34d399; font-size:0.75rem; font-weight:800;">ФОКУС ➔</span>
+        </div>
+        <div class="row-card-tile">
+          <div style="font-size:0.84rem; font-weight:600; color:#94a3b8;">▶ Декораторы и wraps</div>
+          <span style="color:#64748b; font-size:0.75rem;">Открыть</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ВАРИАНТ C: Xcode Pro Dense -->
+    <div class="variant-card">
+      <div class="variant-head">
+        <div class="variant-name">Вариант C: Xcode Pro Dense (Моноширинный)</div>
+        <div class="variant-caption">
+          Сверхплотный инженерный вид: компактная строка 34px, фиксированная ширина, максимум информации на квадратный сантиметр для опытных бэкендеров.
+        </div>
+      </div>
+
+      <div class="phone-mockup">
+        <div class="row-xcode">
+          <span>[01] memory_model.py [✓]</span>
+          <span style="color:#34d399;">100%</span>
+        </div>
+        <div class="row-xcode active">
+          <span>[04] functions_legb.py [ACTIVE]</span>
+          <span style="color:#34d399; font-weight:800;">RUN ➔</span>
+        </div>
+        <div class="row-xcode">
+          <span>[05] decorators_wraps.py [READY]</span>
+          <span style="color:#64748b;">OPEN</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+</body>
+</html>

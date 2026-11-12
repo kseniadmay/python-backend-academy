@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apple Design Studio · Сравнение вариантов Hero-карточки</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070a12;
+      --surface: rgba(14, 20, 34, 0.78);
+      --border-glass: rgba(255, 255, 255, 0.12);
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.4);
+      --amber: #f59e0b;
+      --font-ui: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: #f8fafc;
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 80px;
+    }
+
+    /* Ambient Spatial Orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.18;
+    }
+    .orb-1 {
+      width: 450px; height: 450px;
+      background: radial-gradient(circle, #10b981 0%, transparent 70%);
+      top: -100px; left: -80px;
+    }
+    .orb-2 {
+      width: 480px; height: 480px;
+      background: radial-gradient(circle, #f59e0b 0%, transparent 70%);
+      bottom: -120px; right: -80px;
+    }
+
+    .header-bar {
+      width: 100%;
+      max-width: 1260px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-glass);
+      border-radius: 18px;
+      padding: 16px 24px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.45);
+    }
+    .header-title h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge-apple {
+      font-family: var(--font-mono);
+      font-size: 0.70rem;
+      font-weight: 800;
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .header-desc {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    .grid-variants {
+      width: 100%;
+      max-width: 1260px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(370px, 1fr));
+      gap: 24px;
+      z-index: 10;
+    }
+
+    .variant-card {
+      background: rgba(11, 16, 28, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .variant-card.featured {
+      border-color: rgba(16, 185, 129, 0.55);
+      box-shadow: 0 0 32px rgba(16, 185, 129, 0.15), 0 20px 48px rgba(0,0,0,0.5);
+    }
+    .variant-card.featured::before {
+      content: '★ РЕКОМЕНДАЦИЯ APPLE HIG';
+      position: absolute;
+      top: -11px;
+      left: 24px;
+      background: #10b981;
+      color: #032e23;
+      font-family: var(--font-ui);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      padding: 3px 10px;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .variant-head {
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .variant-name {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .variant-height-tag {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #34d399;
+    }
+    .variant-caption {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      margin-top: 6px;
+      line-height: 1.45;
+    }
+
+    /* Мобильный фрейм 393px */
+    .phone-mockup {
+      width: 100%;
+      background: #080c14;
+      border: 1.5px solid rgba(255, 255, 255, 0.14);
+      border-radius: 32px;
+      padding: 14px 12px 24px;
+      box-shadow: 0 24px 50px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 480px;
+    }
+    .phone-island {
+      width: 100px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 999px;
+      margin: 0 auto 8px;
+    }
+
+    /* ВАРИАНТ А: Компактный эргономичный Hero (~130px) */
+    .hero-v1 {
+      background: linear-gradient(135deg, rgba(20, 28, 48, 0.88) 0%, rgba(13, 19, 33, 0.92) 100%);
+      border: 1px solid rgba(52, 211, 153, 0.32);
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(20px);
+    }
+    .hero-v1-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .echelon-mini-chip {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 800;
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .hero-v1-step {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: #8b9bb4;
+      font-weight: 700;
+    }
+    .hero-v1-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.35;
+      margin-bottom: 8px;
+    }
+    .hero-v1-action-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .hero-v1-meta {
+      font-size: 0.74rem;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cta-v1 {
+      font-family: var(--font-ui);
+      font-weight: 800;
+      font-size: 0.78rem;
+      padding: 8px 16px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45);
+      white-space: nowrap;
+    }
+    .hero-v1-progress {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .hero-v1-fill {
+      width: 44%;
+      height: 100%;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+    }
+
+    /* ВАРИАНТ B: Ультра-лаконичный Quick Action Bar (~72px) */
+    .hero-v2 {
+      background: linear-gradient(135deg, rgba(16, 24, 42, 0.9) 0%, rgba(10, 15, 28, 0.95) 100%);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      border-radius: 16px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.18);
+    }
+    .hero-v2-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .play-beacon-circle {
+      width: 32px;
+      height: 32px;
+      background: #10b981;
+      border-radius: 10px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.82rem;
+      font-weight: 900;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.6);
+      flex-shrink: 0;
+    }
+    .hero-v2-info {
+      min-width: 0;
+    }
+    .hero-v2-tag {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      font-weight: 800;
+      color: #34d399;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .hero-v2-title {
+      font-size: 0.84rem;
+      font-weight: 800;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+    .cta-v2 {
+      font-family: var(--font-ui);
+      font-weight: 800;
+      font-size: 0.74rem;
+      padding: 7px 14px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 9px;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    /* ВАРИАНТ C: Развернутый карточный Hero (~210px) */
+    .hero-v3 {
+      background: linear-gradient(135deg, rgba(20, 28, 48, 0.85) 0%, rgba(13, 19, 33, 0.9) 100%);
+      border: 1px solid rgba(52, 211, 153, 0.28);
+      border-radius: 20px;
+      padding: 16px 18px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+    }
+    .hero-v3-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .hero-v3-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 6px;
+      line-height: 1.35;
+    }
+    .hero-v3-desc {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      line-height: 1.45;
+      margin-bottom: 10px;
+    }
+    .hero-v3-chips {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .chip-item {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      background: rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+      padding: 2px 7px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .cta-v3 {
+      width: 100%;
+      padding: 11px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.85rem;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45);
+      text-align: center;
+    }
+
+    /* Фоновые списки уроков для демонстрации видимости первого экрана */
+    .mock-chapter {
+      background: rgba(14, 20, 34, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      overflow: hidden;
+      flex: 1;
+    }
+    .mock-ch-head {
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.80rem;
+      font-weight: 800;
+    }
+    .mock-row {
+      padding: 9px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      font-size: 0.74rem;
+      color: #cbd5e1;
+    }
+    .mock-row.active {
+      background: rgba(16, 185, 129, 0.12);
+      border-left: 3px solid #10b981;
+      color: #fff;
+      font-weight: 700;
+    }
+    .fold-line {
+      margin-top: auto;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(245, 158, 11, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: #fbbf24;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <header class="header-bar">
+    <div class="header-title">
+      <span class="badge-apple">Apple HIG Studio</span>
+      <h1>Калибровка высоты Hero-карточки фокусного урока</h1>
+    </div>
+    <div class="header-desc">
+      Сравнение вертикальной эргономики на мобильном экране iPhone (393px). Задача: обеспечить мгновенный фокус на уроке и не вытолкнуть список глав за пределы первого экрана.
+    </div>
+  </header>
+
+  <main class="grid-variants">
+
+    <!-- ВАРИАНТ А: Компактный эргономичный Hero (Рекомендуемый) -->
+    <div class="variant-card featured">
+      <div class="variant-head">
+        <div class="variant-name">
+          <span>Вариант A: Компактный баланс</span>
+          <span class="variant-height-tag">134px</span>
+        </div>
+        <div class="variant-caption">
+          Золотое сечение Apple: четкая иерархия, крупный заголовок, точное время (2 мин), Single Dominant CTA и тонкая нить прогресса спринта. <strong>На первом экране сразу видны 3-4 урока главы!</strong>
+        </div>
+      </div>
+
+      <div class="phone-mockup">
+        <div class="phone-island"></div>
+
+        <!-- Hero A -->
+        <div class="hero-v1">
+          <div class="hero-v1-top">
+            <span class="echelon-mini-chip">🛡️ Эшелон 1 ▾</span>
+            <span class="hero-v1-step">УРОК 4 ИЗ 9</span>
+          </div>
+          <div class="hero-v1-title">Функции, *args, **kwargs и LEGB</div>
+          <div class="hero-v1-action-row">
+            <div class="hero-v1-meta">
+              <span>⏱️ 2 мин</span>
+              <span>•</span>
+              <span style="color:#34d399;">+50 XP</span>
+            </div>
+            <button class="cta-v1">ПРОДОЛЖИТЬ ➔</button>
+          </div>
+          <div class="hero-v1-progress"><div class="hero-v1-fill"></div></div>
+        </div>
+
+        <!-- Уроки главы -->
+        <div class="mock-chapter">
+          <div class="mock-ch-head">
+            <span>ГЛАВА 1 · Модель памяти</span>
+            <span style="color:#34d399; font-size:0.72rem;">33% ✓</span>
+          </div>
+          <div class="mock-row"><span>✓ Урок 1 · id, is, mutability</span><span style="color:#34d399;">100%</span></div>
+          <div class="mock-row active"><span>▶ Урок 4 · Функции и LEGB</span><span style="color:#34d399; font-weight:800;">ФОКУС</span></div>
+          <div class="mock-row"><span>▶ Урок 5 · Декораторы и wraps</span><span style="color:#64748b;">Доступен</span></div>
+          <div class="mock-row"><span>🏆 Урок 6 · Рубежная аттестация</span><span style="color:#fbbf24;">Зачёт</span></div>
+        </div>
+
+        <div class="fold-line">↑ ВЫШЕ ЛИНИИ СГИБА (VISIBLE ABOVE THE FOLD)</div>
+      </div>
+    </div>
+
+    <!-- ВАРИАНТ B: Ультра-лаконичный Quick Action Bar -->
+    <div class="variant-card">
+      <div class="variant-head">
+        <div class="variant-name">
+          <span>Вариант B: Quick Action Bar</span>
+          <span class="variant-height-tag" style="color:#94a3b8;">68px</span>
+        </div>
+        <div class="variant-caption">
+          Экстремальный минимализм: одна горизонтальная полоса в духе Dynamic Island. Мгновенный клик, максимум места под структуру курса (до 6 уроков на первом экране).
+        </div>
+      </div>
+
+      <div class="phone-mockup">
+        <div class="phone-island"></div>
+
+        <!-- Hero B -->
+        <div class="hero-v2">
+          <div class="hero-v2-left">
+            <div class="play-beacon-circle">▶</div>
+            <div class="hero-v2-info">
+              <div class="hero-v2-tag">Фокус · Урок 4/9</div>
+              <div class="hero-v2-title">Функции, *args, kwargs</div>
+            </div>
+          </div>
+          <button class="cta-v2">В бой ➔</button>
+        </div>
+
+        <!-- Уроки главы -->
+        <div class="mock-chapter">
+          <div class="mock-ch-head">
+            <span>ГЛАВА 1 · Модель памяти</span>
+            <span style="color:#34d399; font-size:0.72rem;">33% ✓</span>
+          </div>
+          <div class="mock-row"><span>✓ Урок 1 · id, is, mutability</span><span style="color:#34d399;">100%</span></div>
+          <div class="mock-row active"><span>▶ Урок 4 · Функции и LEGB</span><span style="color:#34d399; font-weight:800;">ФОКУС</span></div>
+          <div class="mock-row"><span>▶ Урок 5 · Декораторы и wraps</span><span style="color:#64748b;">Доступен</span></div>
+          <div class="mock-row"><span>🏆 Урок 6 · Рубежная аттестация</span><span style="color:#fbbf24;">Зачёт</span></div>
+          <div class="mock-row"><span>🔒 Урок 7 · Генераторы и yield</span><span style="color:#64748b;">Блок</span></div>
+        </div>
+
+        <div class="fold-line">↑ ВЫШЕ ЛИНИИ СГИБА (ЕЩЕ БОЛЬШЕ МЕСТА)</div>
+      </div>
+    </div>
+
+    <!-- ВАРИАНТ C: Развернутый карточный Hero -->
+    <div class="variant-card">
+      <div class="variant-head">
+        <div class="variant-name">
+          <span>Вариант C: Развернутый Hero</span>
+          <span class="variant-height-tag" style="color:#f59e0b;">210px</span>
+        </div>
+        <div class="variant-caption">
+          Классический дашборд: полное текстовое описание темы, теги навыков, крупная CTA-кнопка во всю ширину. Список уроков сдвигается за пределы экрана и требует скролла.
+        </div>
+      </div>
+
+      <div class="phone-mockup">
+        <div class="phone-island"></div>
+
+        <!-- Hero C -->
+        <div class="hero-v3">
+          <div class="hero-v3-header">
+            <span class="echelon-mini-chip">🛡️ Эшелон 1</span>
+            <span style="font-family:var(--font-mono); font-size:0.65rem; color:#8b9bb4;">УРОК 4 ИЗ 9</span>
+          </div>
+          <div class="hero-v3-title">Функции, *args, **kwargs и области видимости LEGB</div>
+          <div class="hero-v3-desc">Изучите передачу параметров по ссылке, позиционные и именованные аргументы, замыкания и порядок разрешения имен.</div>
+          <div class="hero-v3-chips">
+            <span class="chip-item">scope</span>
+            <span class="chip-item">closure</span>
+            <span class="chip-item">+50 XP</span>
+          </div>
+          <button class="cta-v3">ПРОДОЛЖИТЬ УРОК ➔</button>
+        </div>
+
+        <!-- Уроки главы -->
+        <div class="mock-chapter" style="max-height: 110px; overflow: hidden;">
+          <div class="mock-ch-head">
+            <span>ГЛАВА 1 · Модель памяти</span>
+            <span style="color:#34d399; font-size:0.72rem;">33% ✓</span>
+          </div>
+          <div class="mock-row"><span>✓ Урок 1 · id, is, mutability</span><span style="color:#34d399;">100%</span></div>
+        </div>
+
+        <div class="fold-line" style="color:#f43f5e; border-color:#f43f5e;">⚠️ СПИСОК ГЛАВЫ ВЫТАЛКИВАЕТСЯ ВНИЗ</div>
+      </div>
+    </div>
+
+  </main>
+
+</body>
+</html>

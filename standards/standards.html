@@ -11499,17 +11499,17 @@
 
   .pro-hero-card {
 
-    background: linear-gradient(135deg, rgba(20, 28, 48, 0.82) 0%, rgba(13, 19, 33, 0.88) 100%);
+    background: linear-gradient(135deg, rgba(20, 28, 48, 0.85) 0%, rgba(13, 19, 33, 0.90) 100%);
 
-    border: 1px solid rgba(52, 211, 153, 0.28);
+    border: 1px solid rgba(52, 211, 153, 0.32);
 
-    border-radius: 22px;
+    border-radius: 20px;
 
-    padding: 20px 24px;
+    padding: 16px 22px;
 
-    margin-bottom: 22px;
+    margin-bottom: 18px;
 
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px 0 rgba(255, 255, 255, 0.18), 0 0 28px rgba(16, 185, 129, 0.10);
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.48), inset 0 1px 1px 0 rgba(255, 255, 255, 0.18), 0 0 24px rgba(16, 185, 129, 0.10);
 
     backdrop-filter: blur(24px) saturate(180%);
 
@@ -11518,6 +11518,64 @@
     position: relative;
 
     overflow: hidden;
+
+  }
+
+  .pro-floating-beacon {
+
+    position: fixed;
+
+    bottom: max(24px, env(safe-area-inset-bottom, 24px));
+
+    right: 24px;
+
+    z-index: 1050;
+
+    background: rgba(14, 20, 34, 0.92);
+
+    backdrop-filter: blur(18px);
+
+    -webkit-backdrop-filter: blur(18px);
+
+    border: 1px solid rgba(16, 185, 129, 0.5);
+
+    border-radius: 999px;
+
+    padding: 8px 16px;
+
+    color: #34d399;
+
+    font-family: var(--font-d, 'Unbounded', sans-serif);
+
+    font-size: 0.74rem;
+
+    font-weight: 700;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    box-shadow: 0 10px 28px rgba(0,0,0,0.55), 0 0 16px rgba(16, 185, 129, 0.25);
+
+    cursor: pointer;
+
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+
+  }
+
+  .pro-floating-beacon:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 14px 32px rgba(0,0,0,0.65), 0 0 22px rgba(16, 185, 129, 0.4);
+
+  }
+
+  .pro-floating-beacon:active {
+
+    transform: translateY(1px);
 
   }
 
@@ -52533,7 +52591,7 @@ function viewProPath(options){
 
 
 
-  // Hero Card HTML
+  // Hero Card HTML (Compact Apple Balanced 134px + Tap-to-Cycle)
 
   const heroCardHTML = `
 
@@ -52541,11 +52599,21 @@ function viewProPath(options){
 
       <div class="pro-hero-top">
 
-        <button type="button" class="path-echelon-pill path-echelon-pill-btn echelon-pill--t${curTierNum}" data-open-echelon-modal="1" title="Нажмите, чтобы сменить программу / эшелон" aria-haspopup="dialog" style="padding:4px 10px;font-size:0.70rem;display:inline-flex;align-items:center;gap:6px;">
+        <button type="button" class="path-echelon-pill path-echelon-pill-btn echelon-pill--t${curTierNum}" data-cycle-echelon="1" title="Нажмите для циклического переключения эшелона (1 ➔ 2 ➔ 3)" style="padding:4px 10px;font-size:0.70rem;display:inline-flex;align-items:center;gap:6px;cursor:pointer;">
 
           <span>${echelonFull}</span>
 
-          <span class="pep-chevron">▾</span>
+          <span class="echelon-cycle-dots" style="display:inline-flex;gap:3px;margin-left:2px;">
+
+            <span style="width:4px;height:4px;border-radius:50%;background:${curTierNum===1?'#34d399':'rgba(255,255,255,0.25)'};"></span>
+
+            <span style="width:4px;height:4px;border-radius:50%;background:${curTierNum===2?'#34d399':'rgba(255,255,255,0.25)'};"></span>
+
+            <span style="width:4px;height:4px;border-radius:50%;background:${curTierNum===3?'#34d399':'rgba(255,255,255,0.25)'};"></span>
+
+          </span>
+
+          <span style="font-size:0.65rem;opacity:0.6;">↻</span>
 
         </button>
 
@@ -52563,11 +52631,11 @@ function viewProPath(options){
 
           <div class="pro-hero-meta">
 
-            <span>📚 Теория 2 мин</span>
+            <span>⏱️ 2 мин</span>
 
             <span>•</span>
 
-            <span>💻 Практика IDE</span>
+            <span>💻 IDE</span>
 
             <span>•</span>
 
@@ -52669,25 +52737,27 @@ function viewProPath(options){
 
 
 
+      const skillsSnippet = unitSkills.slice(0, 3).join(', ');
+
       return `
 
         <div class="pro-lesson-row ${statusClass}" data-unit-id="${u.id}" role="button" tabindex="0">
 
           <div class="pro-lesson-status-icon">${iconHtml}</div>
 
-          <div class="pro-lesson-info" style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1;">
+          <div class="pro-lesson-info" style="display:flex;flex-direction:column;gap:3px;min-width:0;flex:1;">
 
-            <div class="pro-lesson-title" style="font-weight:${isActive ? '800' : '600'}; color:${isActive ? '#f8fafc' : (isCompleted ? 'var(--ink)' : 'var(--ink-muted)')};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            <div class="pro-lesson-title" style="font-weight:${isActive ? '800' : '700'}; color:${isActive ? '#ffffff' : (isCompleted ? 'var(--ink)' : 'var(--ink-muted)')};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
 
               Урок ${ch.units.findIndex(x => x.id === u.id) + 1} · ${escapeHtmlStr(cleanUnitTitle(u.id, u.title))}
 
             </div>
 
-            <div class="pro-lesson-tags" style="display:flex;flex-wrap:wrap;gap:5px;align-items:center;">
+            <div class="pro-lesson-meta-sub" style="font-size:0.74rem;color:#8b9bb4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
 
-              <span class="${badgeClass}">${badgeText}</span>
+              <span>${badgeText}</span>
 
-              ${previewPills}
+              ${skillsSnippet ? `<span style="opacity:0.35;margin:0 5px;">•</span><span style="font-family:var(--font-m,monospace);font-size:0.70rem;color:#718096;">${escapeHtmlStr(skillsSnippet)}</span>` : ''}
 
             </div>
 
@@ -52695,7 +52765,7 @@ function viewProPath(options){
 
           <div class="pro-lesson-tail">
 
-            ${isActive ? '<span class="pro-focus-chip">В ФОКУСЕ</span>' : (isCompleted ? '<span class="pro-stat-chip" style="font-size:0.72rem;font-weight:700;color:var(--emerald,#34d399);">100% MP</span>' : (isChallenge ? '<span class="pro-unlocked-chip" style="font-size:0.75rem;font-weight:700;color:#fbbf24;background:rgba(245,158,11,0.12);padding:3px 9px;border-radius:6px;border:1px solid rgba(245,158,11,0.3);">Зачёт ➔</span>' : '<span class="pro-unlocked-chip" style="font-size:0.75rem;font-weight:600;color:var(--emerald,#34d399);background:rgba(52,211,153,0.1);padding:3px 8px;border-radius:6px;border:1px solid rgba(52,211,153,0.25);">Доступен ➔</span>'))}
+            ${isActive ? '<span class="pro-focus-chevron" style="font-size:0.90rem;font-weight:900;color:#34d399;text-shadow:0 0 10px rgba(16,185,129,0.5);">➔</span>' : (isCompleted ? '<span class="pro-stat-chip" style="font-family:var(--font-m,monospace);font-size:0.72rem;font-weight:700;color:var(--emerald,#34d399);">100%</span>' : (isChallenge ? '<span class="pro-unlocked-chip" style="font-size:0.74rem;font-weight:700;color:#fbbf24;background:rgba(245,158,11,0.12);padding:2px 8px;border-radius:6px;border:1px solid rgba(245,158,11,0.3);">Зачёт ➔</span>' : '<span class="pro-unlocked-chip" style="font-size:0.74rem;font-weight:600;color:#64748b;">Доступен ➔</span>'))}
 
           </div>
 
@@ -52745,6 +52815,22 @@ function viewProPath(options){
 
 
 
+  // Auto-init Floating Beacon IntersectionObserver
+  setTimeout(() => {
+    try {
+      const heroEl = document.querySelector('.pro-hero-card');
+      const beaconEl = document.getElementById('pro-floating-beacon');
+      if(heroEl && beaconEl && typeof IntersectionObserver !== 'undefined'){
+        const obs = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            beaconEl.style.display = entry.isIntersecting ? 'none' : 'inline-flex';
+          });
+        }, { threshold: 0.1 });
+        obs.observe(heroEl);
+      }
+    } catch(err){}
+  }, 60);
+
   return `
 
     <div class="path-screen-layout pro-path-screen-layout">
@@ -52768,6 +52854,16 @@ function viewProPath(options){
         <!-- Structured Chapters List -->
 
         ${chaptersHTML}
+
+
+
+        <!-- Floating Navigation Beacon (Apple HIG Return to Focus) -->
+
+        <button type="button" id="pro-floating-beacon" class="pro-floating-beacon" style="display:none;" data-pro-jump-active="${curActiveUnit.id}" title="Вернуться к текущему фокусному уроку">
+
+          <span>⚡</span> <span>К уроку ${activeChap.units.findIndex(x => x.id === curActiveUnit.id) + 1}</span>
+
+        </button>
 
 
 
@@ -60219,6 +60315,30 @@ document.addEventListener('click', async function(e){
   }
 
 
+
+  // Pro Mode Tap-to-Cycle echelon
+  const proCycleBtn = e.target.closest('[data-cycle-echelon]');
+  if(proCycleBtn){
+    const curNum = (state && state.selectedEchelon) || 1;
+    const nextNum = (Number(curNum) % 3) + 1;
+    state.selectedEchelon = nextNum;
+    if(typeof saveState === 'function') saveState();
+    if(typeof render === 'function') render();
+    return;
+  }
+
+  // Pro Mode jump to active lesson via Floating Beacon
+  const proJumpBtn = e.target.closest('[data-pro-jump-active]');
+  if(proJumpBtn){
+    const activeRow = document.querySelector('.pro-lesson-row--active') || document.querySelector('.pro-hero-card');
+    if(activeRow){
+      activeRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      activeRow.style.transition = 'box-shadow 0.25s ease';
+      activeRow.style.boxShadow = '0 0 28px rgba(16, 185, 129, 0.7)';
+      setTimeout(() => { activeRow.style.boxShadow = ''; }, 1400);
+    }
+    return;
+  }
 
   // Pro Mode CTA start
   const proStartBtn = e.target.closest('[data-pro-start]');

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apple Design Studio · Сравнение механики аккордеона глав</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070a12;
+      --border-glass: rgba(255, 255, 255, 0.12);
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --emerald: #10b981;
+      --font-ui: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: #f8fafc;
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 80px;
+    }
+
+    .header-bar {
+      width: 100%;
+      max-width: 1260px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-glass);
+      border-radius: 18px;
+      padding: 16px 24px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.45);
+    }
+    .header-title h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge-apple {
+      font-family: var(--font-mono);
+      font-size: 0.70rem;
+      font-weight: 800;
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .grid-variants {
+      width: 100%;
+      max-width: 1260px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(370px, 1fr));
+      gap: 24px;
+      z-index: 10;
+    }
+
+    .variant-card {
+      background: rgba(11, 16, 28, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .variant-card.featured {
+      border-color: rgba(16, 185, 129, 0.55);
+      box-shadow: 0 0 32px rgba(16, 185, 129, 0.15), 0 20px 48px rgba(0,0,0,0.5);
+    }
+    .variant-card.featured::before {
+      content: '★ РЕКОМЕНДАЦИЯ APPLE HIG';
+      position: absolute;
+      top: -11px;
+      left: 24px;
+      background: #10b981;
+      color: #032e23;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      padding: 3px 10px;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .variant-head {
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .variant-name { font-size: 1.05rem; font-weight: 800; color: #fff; }
+    .variant-caption { font-size: 0.82rem; color: #94a3b8; margin-top: 6px; line-height: 1.45; }
+
+    .phone-mockup {
+      width: 100%;
+      background: #080c14;
+      border: 1.5px solid rgba(255, 255, 255, 0.14);
+      border-radius: 28px;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .box-chap {
+      background: rgba(14, 20, 34, 0.74);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 16px;
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .box-chap.active {
+      border-color: rgba(16, 185, 129, 0.45);
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.12);
+    }
+    .box-head {
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    .box-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge-num {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 5px;
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .badge-num.locked {
+      background: rgba(255, 255, 255, 0.05);
+      color: #64748b;
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+    .box-progress {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #8b9bb4;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .arrow-icon {
+      font-size: 0.65rem;
+      color: #64748b;
+      transition: transform 0.2s ease;
+    }
+    .box-chap.open .arrow-icon { transform: rotate(180deg); }
+
+    .box-body {
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 6px 12px;
+      background: rgba(0,0,0,0.15);
+    }
+    .mini-row {
+      padding: 8px 6px;
+      font-size: 0.76rem;
+      color: #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .mini-row:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+
+  <header class="header-bar">
+    <div class="header-title">
+      <span class="badge-apple">Apple HIG Studio</span>
+      <h1>Поведение глав (Progressive Disclosure & Accordion)</h1>
+    </div>
+  </header>
+
+  <main class="grid-variants">
+
+    <!-- ВАРИАНТ А: Умный свободный аккордеон (Рекомендуемый) -->
+    <div class="variant-card featured">
+      <div class="variant-head">
+        <div class="variant-name">Вариант A: Smart Focus Accordion</div>
+        <div class="variant-caption">
+          При входе открыта строго актуальная активная глава. Пользователь может свободно раскрывать другие главы для просмотра и сравнения тем, не закрывая текущую. Идеально для планирования обучения.
+        </div>
+      </div>
+
+      <div class="phone-mockup">
+        <!-- Глава 1: Открыта -->
+        <div class="box-chap active open">
+          <div class="box-head">
+            <div class="box-title"><span class="badge-num">ГЛ 1</span> Python Core</div>
+            <div class="box-progress"><span style="color:#34d399;">3/9 ✓</span> <span class="arrow-icon">▼</span></div>
+          </div>
+          <div class="box-body">
+            <div class="mini-row"><span>✓ id, is, mutability</span><span style="color:#34d399;">100%</span></div>
+            <div class="mini-row" style="color:#fff; font-weight:700;"><span>▶ Функции и LEGB</span><span style="color:#34d399;">ФОКУС</span></div>
+            <div class="mini-row"><span>▶ Декораторы и wraps</span><span>Доступен</span></div>
+          </div>
+        </div>
+
+        <!-- Глава 2: Свернута -->
+        <div class="box-chap">
+          <div class="box-head">
+            <div class="box-title"><span class="badge-num locked">ГЛ 2</span> Web & HTTP: Сокеты, ASGI</div>
+            <div class="box-progress"><span>0/4</span> <span class="arrow-icon">▼</span></div>
+          </div>
+        </div>
+
+        <!-- Глава 3: Свернута -->
+        <div class="box-chap">
+          <div class="box-head">
+            <div class="box-title"><span class="badge-num locked">ГЛ 3</span> Базы данных: PostgreSQL, WAL</div>
+            <div class="box-progress"><span>0/6</span> <span class="arrow-icon">▼</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ВАРИАНТ B: Строгий одиночный аккордеон -->
+    <div class="variant-card">
+      <div class="variant-head">
+        <div class="variant-name">Вариант B: Strict Solo (Только 1 глава)</div>
+        <div class="variant-caption">
+          В любой момент времени открыта максимум одна глава. Клик на другую главу автоматически сворачивает открытую. Фиксированная высота экрана, но сложнее сравнивать соседние темы.
+        </div>
+      </div>
+
+      <div class="phone-mockup">
+        <div class="box-chap active open">
+          <div class="box-head">
+            <div class="box-title"><span class="badge-num">ГЛ 1</span> Python Core</div>
+            <div class="box-progress"><span style="color:#34d399;">3/9 ✓</span> <span class="arrow-icon">▼</span></div>
+          </div>
+          <div class="box-body">
+            <div class="mini-row"><span>✓ Урок 1</span><span>100%</span></div>
+            <div class="mini-row"><span>▶ Урок 4</span><span>ФОКУС</span></div>
+          </div>
+        </div>
+        <div class="box-chap">
+          <div class="box-head">
+            <div class="box-title"><span class="badge-num locked">ГЛ 2</span> Web & HTTP (Клик свернет ГЛ 1)</div>
+            <div class="box-progress"><span>0/4</span> <span class="arrow-icon">▼</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ВАРИАНТ C: Все главы развернуты (Infinite Stream) -->
+    <div class="variant-card">
+      <div class="variant-head">
+        <div class="variant-name">Вариант C: Все главы открыты (Stream)</div>
+        <div class="variant-caption">
+          Полный разворот всего дерева курса. Очень длинный вертикальный скролл (несколько экранов), требует регулярного использования кнопки «К текущему уроку».
+        </div>
+      </div>
+
+      <div class="phone-mockup">
+        <div class="box-chap active open" style="margin-bottom:6px;">
+          <div class="box-head"><div class="box-title"><span class="badge-num">ГЛ 1</span> Core</div><span style="color:#34d399;font-size:0.75rem;">3/9 ✓</span></div>
+          <div class="box-body"><div class="mini-row"><span>Урок 1</span><span>100%</span></div></div>
+        </div>
+        <div class="box-chap open">
+          <div class="box-head"><div class="box-title"><span class="badge-num">ГЛ 2</span> Web & ASGI</div><span style="font-size:0.75rem;">0/4</span></div>
+          <div class="box-body"><div class="mini-row"><span>Урок 1: Sockets</span><span>Открыт</span></div></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apple Studio · Революционные альтернативы переключения эшелонов</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070a12;
+      --border-glass: rgba(255, 255, 255, 0.12);
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --font-ui: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: #f8fafc;
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 80px;
+    }
+
+    .header-bar {
+      width: 100%;
+      max-width: 1260px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-glass);
+      border-radius: 18px;
+      padding: 16px 24px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.45);
+    }
+    .badge-apple {
+      font-family: var(--font-mono);
+      font-size: 0.70rem;
+      font-weight: 800;
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .grid-variants {
+      width: 100%;
+      max-width: 1260px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(370px, 1fr));
+      gap: 24px;
+      z-index: 10;
+    }
+
+    .variant-card {
+      background: rgba(11, 16, 28, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .variant-card.featured {
+      border-color: rgba(16, 185, 129, 0.55);
+      box-shadow: 0 0 32px rgba(16, 185, 129, 0.15), 0 20px 48px rgba(0,0,0,0.5);
+    }
+    .variant-card.featured::before {
+      content: '★ ЧИСТЫЙ ДЗЕН APPLE';
+      position: absolute;
+      top: -11px;
+      left: 24px;
+      background: #10b981;
+      color: #032e23;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      padding: 3px 10px;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .variant-head {
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .variant-name { font-size: 1.05rem; font-weight: 800; color: #fff; }
+    .variant-caption { font-size: 0.82rem; color: #94a3b8; margin-top: 6px; line-height: 1.45; }
+
+    .phone-mockup {
+      width: 100%;
+      background: #080c14;
+      border: 1.5px solid rgba(255, 255, 255, 0.14);
+      border-radius: 28px;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-height: 380px;
+    }
+
+    /* АЛЬТЕРНАТИВА 1: Естественный сквозной поток (Continuous Milestone Flow) */
+    .flow-gate-banner {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(14, 20, 34, 0.8) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .flow-gate-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .gate-emblem {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: #10b981;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 900;
+    }
+
+    .gate-divider {
+      margin: 14px 0;
+      border: none;
+      height: 1px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.5) 0%, transparent 80%);
+      position: relative;
+    }
+    .gate-divider-label {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: #fbbf24;
+      background: #080c14;
+      padding: 2px 10px;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 999px;
+      width: fit-content;
+      margin: -10px auto 0;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* АЛЬТЕРНАТИВА 2: Haptic Tap-to-Cycle Pill */
+    .cycle-pill-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cycle-pill {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.18) 0%, rgba(14, 20, 34, 0.7) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #34d399;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .cycle-pill:active { transform: scale(0.95); }
+    .cycle-dots {
+      display: flex;
+      gap: 4px;
+    }
+    .cycle-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+    }
+    .cycle-dot.active {
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+    }
+
+    /* АЛЬТЕРНАТИВА 3: Swipeable Card Header */
+    .swipe-header-deck {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 6px;
+    }
+    .swipe-item {
+      flex: 0 0 85%;
+      scroll-snap-align: start;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 12px 14px;
+    }
+    .swipe-item.active {
+      border-color: rgba(16, 185, 129, 0.45);
+      background: rgba(16, 185, 129, 0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header-bar">
+    <div class="header-title">
+      <span class="badge-apple">Apple Design Lab</span>
+      <h1>Революционные альтернативы: Ноль попапов, ноль шторок</h1>
+    </div>
+  </header>
+
+  <main class="grid-variants">
+
+    <!-- АЛЬТЕРНАТИВА 1: Естественный сквозной поток без ручного переключения (Канон Apple) -->
+    <div class="variant-card featured">
+      <div class="variant-head">
+        <div class="variant-name">Альтернатива 1: Единая сквозная тропа (Milestone Flow)</div>
+        <div class="variant-caption">
+          <strong>В духе Apple Health и Duolingo:</strong> Никаких переключателей! Все эшелоны выстроены в единый непрерывный вертикальный путь. Главы Эшелона 1 плавно переходят в рубежные Врата Аттестации (Milestone Gate), за которыми начинаются главы Эшелона 2. Фокус автоматически стоит на вашем рубеже. Никаких меню, 100% честный визуальный прогресс пути!
+        </div>
+      </div>
+
+      <div class="phone-mockup">
+        <!-- Секция Эшелона 1 -->
+        <div style="font-size:0.70rem; font-family:var(--font-mono); color:#34d399; font-weight:800;">● ЭШЕЛОН 1 · СКРИНИНГ (В ПРОЦЕССЕ)</div>
+        <div class="flow-gate-banner">
+          <div class="flow-gate-left">
+            <div class="gate-emblem">1</div>
+            <div>
+              <div style="font-size:0.82rem; font-weight:800; color:#fff;">Глава 1 · Python Core</div>
+              <div style="font-size:0.70rem; color:#94a3b8;">3 из 9 уроков сдано</div>
+            </div>
+          </div>
+          <span style="font-size:0.75rem; color:#34d399; font-weight:800;">33%</span>
+        </div>
+
+        <!-- Разделитель: Рубежные врата аттестации -->
+        <div>
+          <div class="gate-divider"></div>
+          <div class="gate-divider-label">⚔️ РУБЕЖНЫЕ ВРАТА: ЭКЗАМЕН СКРИНИНГА</div>
+        </div>
+
+        <!-- Секция Эшелона 2 (Заблокирована или доступна ниже) -->
+        <div style="font-size:0.70rem; font-family:var(--font-mono); color:#64748b; font-weight:700;">● ЭШЕЛОН 2 · ТВЕРДЫЙ ДЖУН</div>
+        <div class="flow-gate-banner" style="border-color:rgba(255,255,255,0.06); background:rgba(255,255,255,0.02);">
+          <div class="flow-gate-left">
+            <div class="gate-emblem" style="background:#1e293b; color:#64748b;">🔒</div>
+            <div>
+              <div style="font-size:0.82rem; font-weight:700; color:#64748b;">Глава 3 · Базы данных & ORM</div>
+              <div style="font-size:0.70rem; color:#475569;">Откроется после сдачи Эшелона 1</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- АЛЬТЕРНАТИВА 2: Haptic Tap-to-Cycle (Микро-тап без окон) -->
+    <div class="variant-card">
+      <div class="variant-head">
+        <div class="variant-name">Альтернатива 2: Тактильный клик-цикл (Tap-to-Cycle)</div>
+        <div class="variant-caption">
+          Один клик прямо по бейджу мгновенно переключает уровень: <code>Эшелон 1</code> ➔ <code>Эшелон 2</code> ➔ <code>Эшелон 3</code> со spring-анимацией цифры и тремя аккуратными точками <code>••○</code>. Никаких всплывающих окон и шторок, 0 миллисекунд задержки.
+        </div>
+      </div>
+
+      <div class="phone-mockup">
+        <div style="padding:10px 0;">
+          <div class="cycle-pill-wrap">
+            <div class="cycle-pill" onclick="alert('Переключение: Эшелон 1 ➔ Эшелон 2')">
+              <span>🛡️ Эшелон 1: Скрининг</span>
+              <span style="font-size:0.75rem; color:#fff; opacity:0.6;">↻</span>
+            </div>
+            <div class="cycle-dots">
+              <span class="cycle-dot active"></span>
+              <span class="cycle-dot"></span>
+              <span class="cycle-dot"></span>
+            </div>
+          </div>
+          <div style="font-size:0.72rem; color:#64748b; margin-top:8px;">Нажмите на пилл для мгновенного циклического переключения</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03); border-radius:14px; padding:12px; font-size:0.80rem; color:#cbd5e1;">
+          Главы мгновенно обновляются на месте без перекрытия экрана.
+        </div>
+      </div>
+    </div>
+
+    <!-- АЛЬТЕРНАТИВА 3: Горизонтальный swipe-карман -->
+    <div class="variant-card">
+      <div class="variant-head">
+        <div class="variant-name">Альтернатива 3: Горизонтальный свайп-карман</div>
+        <div class="variant-caption">
+          Карточки эшелонов листаются мягким горизонтальным жестом (scroll-snap) в самом верху, как карточки Wallet в iOS.
+        </div>
+      </div>
+
+      <div class="phone-mockup">
+        <div class="swipe-header-deck">
+          <div class="swipe-item active">
+            <div style="font-size:0.70rem; color:#34d399; font-weight:800;">ЭШЕЛОН 1 (ТЕКУЩИЙ)</div>
+            <div style="font-size:0.85rem; font-weight:800; color:#fff;">Скрининг · 3/14 уроков</div>
+          </div>
+          <div class="swipe-item">
+            <div style="font-size:0.70rem; color:#94a3b8; font-weight:800;">ЭШЕЛОН 2</div>
+            <div style="font-size:0.85rem; font-weight:800; color:#cbd5e1;">Твердый Джун · 0/18</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+</body>
+</html>
