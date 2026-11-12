@@ -30882,75 +30882,101 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
 
 
+
   /* ══════════════════════════════════════════════════════════════════════
-     SSOT: ГАРМОНИЗАЦИЯ ЭКРАНА КОНСПЕКТА (КАНОНИЧЕСКИЙ SRS ДИЗАЙН)
-     Спокойный темный обсидиан (БЕЗ красного) + Анимация бусин из интервалок + 20px центровка
+     SSOT: ГАРМОНИЗАЦИЯ ЭКРАНА КОНСПЕКТА (ПОПАП-АМБИЕНТ + ЧИСТЫЙ ZEN БУСИН)
+     Деликатный винный кант + Спектральный прогресс + 0 плашек вокруг бусин
      ══════════════════════════════════════════════════════════════════════ */
 
-  /* 1. Чистое модальное окно: благородный темный обсидиан БЕЗ ядовитого красного */
+  /* 1. Модальное окно: глубокий темный обсидиан + тонкий винный кант и 14% амбиент Velvet Wine */
   .cards-hub-theory,
   .cards-hub-container.cards-hub-theory,
   .cards-hub-container:has(#py-theory-text),
   .cards-hub-container:has(.lesson-theory) {
     position: relative !important;
-    background: rgba(13, 17, 24, 0.94) !important;
-    background-image: none !important;
-    border: 1px solid rgba(255, 255, 255, 0.09) !important;
-    border-top: 1.2px solid rgba(255, 255, 255, 0.16) !important;
+    background-color: #0c0f17 !important;
+    background-image: radial-gradient(circle at 94% 6%, rgba(190, 18, 60, 0.14) 0%, transparent 45%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-top: 1.5px solid rgba(244, 63, 94, 0.45) !important;
     border-radius: 28px !important;
-    box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.8), 0 0 30px rgba(16, 185, 129, 0.05) !important;
+    box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.8), 0 0 35px rgba(190, 18, 60, 0.10) !important;
     backdrop-filter: blur(24px) !important;
     -webkit-backdrop-filter: blur(24px) !important;
   }
 
-  /* 2. Полная бесшовность: 0 рамок, 0 плашек, 0 паразитных границ внутри конспекта */
-  .cards-hub-theory .srs-card-stage,
-  .cards-hub-theory .srs-note-content-area,
-  .cards-hub-theory .srs-note-card,
-  .cards-hub-theory .scroll-feed,
-  .cards-hub-theory .lesson-theory,
-  .cards-hub-theory .topic-eyebrow-track,
-  .cards-hub-theory .srs-action-dock-container,
-  .cards-hub-container:has(#py-theory-text) .srs-card-stage,
-  .cards-hub-container:has(#py-theory-text) .srs-note-content-area,
-  .cards-hub-container:has(#py-theory-text) .srs-note-card,
-  .cards-hub-container:has(#py-theory-text) .scroll-feed,
-  .cards-hub-container:has(#py-theory-text) .lesson-theory,
-  .cards-hub-container:has(#py-theory-text) .topic-eyebrow-track {
+  /* 2. Спектральная полоска прогресса: цвета постепенно заполняются от бордо через янтарь к изумруду */
+  .srs-header-progress-track {
+    container-type: inline-size !important;
+    position: absolute !important;
+    bottom: -12px !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 4px !important;
+    background: rgba(255, 255, 255, 0.07) !important;
+    border-radius: 99px !important;
+    overflow: hidden !important;
+  }
+  .srs-header-progress-fill-echelon {
+    height: 100% !important;
+    border-radius: 99px !important;
+    background: linear-gradient(90deg, #9f1239 0%, #be123c 28%, #f59e0b 65%, #10b981 100%) !important;
+    background-size: 100cqw 100% !important;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.45) !important;
+    transition: width 0.4s ease !important;
+  }
+
+  /* 3. Полная ликвидация плашки, рамок и фона вокруг ожерелья бусин темы */
+  .dots-necklace,
+  #radar-dots-necklace,
+  .topic-eyebrow-track,
+  .topic-eyebrow-track > div,
+  .topic-eyebrow-track > div > div {
     background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
     border: none !important;
     box-shadow: none !important;
     outline: none !important;
+    overflow: visible !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
   }
 
-  /* 3. Верхнее ожерелье бусин темы: точная копия интервалок (SRS) */
-  .cards-hub-container .dots-necklace,
-  .cards-hub-theory .dots-necklace,
+  .dots-necklace,
   #radar-dots-necklace {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     gap: 8px !important;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
     padding: 2px 0 !important;
     margin: 14px auto 22px !important;
   }
 
-  /* Сброс бегущей волны: синхронность */
-  .cards-hub-container .dots-necklace .dot-jewel,
-  .cards-hub-theory .dot-jewel,
+  /* Полное отключение разделителей, проводов и фоновых псевдоэлементов */
+  .dots-necklace::before,
+  .dots-necklace::after,
+  #radar-dots-necklace::before,
+  #radar-dots-necklace::after,
+  .dots-necklace-wire,
+  .dots-necklace-wire-active,
+  .dots-stage-divider {
+    display: none !important;
+    content: none !important;
+    border: none !important;
+    background: none !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  /* Синхронизация: сброс бегущей волны */
+  .dots-necklace .dot-jewel,
   #radar-dots-necklace .dot-jewel {
     animation-delay: 0s !important;
   }
 
-  /* Пройденные бусины (100% как в интервалках): 8px изумруд со спокойным бликом */
-  .cards-hub-container .dots-necklace .dot-jewel.done,
-  .cards-hub-theory .dot-jewel.done,
+  /* Пройденные бусины: спокойный ювелирный изумруд 8px без слепящего 14px облака */
+  .dots-necklace .dot-jewel.done,
   #radar-dots-necklace .dot-jewel.done {
     width: 8px !important;
     height: 8px !important;
@@ -30961,15 +30987,14 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     background: #10b981 !important;
     border: 1.5px solid #34d399 !important;
     border-radius: 50% !important;
-    box-shadow: 0 0 6px rgba(16, 185, 129, 0.65) !important;
+    box-shadow: 0 0 5px rgba(16, 185, 129, 0.60) !important;
     opacity: 0.90 !important;
     animation: none !important;
     transform: none !important;
   }
 
-  /* Будущие бусины (100% как в интервалках): 7px графит */
-  .cards-hub-container .dots-necklace .dot-jewel.future,
-  .cards-hub-theory .dot-jewel.future,
+  /* Будущие бусины: чистый деликатный полупрозрачный графит 7px */
+  .dots-necklace .dot-jewel.future,
   #radar-dots-necklace .dot-jewel.future {
     width: 7px !important;
     height: 7px !important;
@@ -30986,9 +31011,8 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     transform: none !important;
   }
 
-  /* Активная бусина (канонический живой маячок SRS): 8px белый центр + пульс 2s */
-  .cards-hub-container .dots-necklace .dot-jewel.active,
-  .cards-hub-theory .dot-jewel.active,
+  /* Активная бусина темы: белый центр 8px + мягкое ровное живое дыхание БЕЗ срезанных дуг */
+  .dots-necklace .dot-jewel.active,
   #radar-dots-necklace .dot-jewel.active {
     width: 8px !important;
     height: 8px !important;
@@ -31001,57 +31025,40 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     border-radius: 50% !important;
     position: relative !important;
     z-index: 5 !important;
-    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.4), 0 0 8px rgba(52, 211, 153, 0.8) !important;
-    animation: srsLeadingBeadPulse 2s infinite ease-in-out !important;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.40), 0 0 8px rgba(52, 211, 153, 0.80) !important;
+    animation: srsBeadPureBreathe 2s infinite ease-in-out !important;
     opacity: 1 !important;
     transform: none !important;
   }
 
-  /* Волна-маяк активной бусины (как в эталоне интервалок) */
-  .cards-hub-container .dots-necklace .dot-jewel.active::after,
-  .cards-hub-theory .dot-jewel.active::after,
-  #radar-dots-necklace .dot-jewel.active::after {
-    content: '' !important;
-    position: absolute !important;
-    inset: -3px !important;
-    border-radius: 50% !important;
-    border: 1.5px solid rgba(52, 211, 153, 0.85) !important;
-    pointer-events: none !important;
-    animation: srsPingWaveAnim 2s cubic-bezier(0.2, 0.8, 0.4, 1) infinite !important;
-    z-index: 1 !important;
-    display: block !important;
-  }
-
-  /* Отключение псевдоэлементов у неактивных бусин */
-  .dots-necklace .dot-jewel:not(.active)::after,
-  #radar-dots-necklace .dot-jewel:not(.active)::after,
+  /* Категорически отключаем псевдоэлемент ::after со срезанными дугами */
+  .dots-necklace .dot-jewel::after,
+  #radar-dots-necklace .dot-jewel::after,
+  .dots-necklace .dot-jewel.active::after,
+  #radar-dots-necklace .dot-jewel.active::after,
+  .dot-jewel::before,
   .dock-quantum-bead::after {
     display: none !important;
     content: none !important;
     animation: none !important;
+    border: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
   }
 
-  @keyframes srsLeadingBeadPulse {
+  @keyframes srsBeadPureBreathe {
     0%, 100% {
-      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.4), 0 0 6px rgba(52, 211, 153, 0.7);
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.40), 0 0 6px rgba(52, 211, 153, 0.70);
+      transform: scale(1);
     }
     50% {
-      box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.5), 0 0 16px rgba(16, 185, 129, 0.95), 0 0 22px rgba(52, 211, 153, 0.6);
+      box-shadow: 0 0 0 3.5px rgba(52, 211, 153, 0.55), 0 0 14px rgba(16, 185, 129, 0.95);
+      transform: scale(1.18);
     }
   }
 
-  @keyframes srsPingWaveAnim {
-    0% {
-      transform: scale(1);
-      opacity: 0.9;
-    }
-    75%, 100% {
-      transform: scale(2.6);
-      opacity: 0;
-    }
-  }
-
-  /* 4. Нижние бусины квантов конспекта: идеальная геометрическая центровка (строго 20px / 20px) */
+  /* 4. Нижние бусины квантов конспекта: идеальная центровка по высоте (строго 20px / 20px) */
   .lesson-theory,
   .lesson-theory > *:last-child,
   .lesson-theory > *:last-child > *:last-child,
@@ -31066,7 +31073,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     align-items: center !important;
     justify-content: center !important;
     height: 18px !important;
-    margin: 20px 0 20px 0 !important; /* Ровно 20px сверху и 20px снизу */
+    margin: 20px 0 20px 0 !important; /* Ровно 20px сверху от текста и 20px снизу до кнопки */
     padding: 0 !important;
     width: 100% !important;
   }
@@ -31101,7 +31108,27 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     background: rgba(255, 255, 255, 0.20) !important;
   }
 
-  /* 5. Каскадная анимация проявления текста для новых квантов */
+  /* 5. Бесшовный контент конспекта */
+  .cards-hub-theory .srs-card-stage,
+  .cards-hub-theory .srs-note-content-area,
+  .cards-hub-theory .srs-note-card,
+  .cards-hub-theory .scroll-feed,
+  .cards-hub-theory .lesson-theory,
+  .cards-hub-theory .srs-action-dock-container,
+  .cards-hub-container:has(#py-theory-text) .srs-card-stage,
+  .cards-hub-container:has(#py-theory-text) .srs-note-content-area,
+  .cards-hub-container:has(#py-theory-text) .srs-note-card,
+  .cards-hub-container:has(#py-theory-text) .scroll-feed,
+  .cards-hub-container:has(#py-theory-text) .lesson-theory {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* 6. Каскадная анимация проявления текста для новых квантов */
   .feed-chunk.feed-chunk-new {
     animation: none !important;
   }
@@ -45188,9 +45215,9 @@ function viewPythonSkill(sid){
         <a href="#${tr.routePrefix}" class="srs-header-close-btn" style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;font-size:0.80rem;text-decoration:none;box-sizing:border-box;transition:all 0.15s ease;" title="Закрыть (На Путь)">✕</a>
       </div>
 
-      <!-- Тонкая 4px бордово-изумрудная линия прогресса эшелона на дне шапки -->
-      <div class="srs-header-progress-track" style="position:absolute;bottom:-12px;left:0;right:0;height:4px;background:rgba(255,255,255,0.07);border:none;border-radius:99px;overflow:hidden;margin:0;padding:0;z-index:2;" title="Прогресс эшелона: ${displayEchPct}%">
-        <div class="srs-header-progress-fill-echelon" style="width:${displayEchPct}%;height:100%;border-radius:99px;background:linear-gradient(90deg, #881337 0%, #be123c 35%, #059669 80%, #10b981 100%);box-shadow:0 0 8px rgba(16,185,129,0.5);transition:width 0.4s ease;"></div>
+      <!-- Тонкая спектральная линия прогресса эшелона (постепенное раскрытие спектра) -->
+      <div class="srs-header-progress-track" style="container-type:inline-size;position:absolute;bottom:-12px;left:0;right:0;height:4px;background:rgba(255,255,255,0.07);border:none;border-radius:99px;overflow:hidden;margin:0;padding:0;z-index:2;" title="Прогресс эшелона: ${displayEchPct}%">
+        <div class="srs-header-progress-fill-echelon" style="width:${displayEchPct}%;height:100%;border-radius:99px;background:linear-gradient(90deg, #9f1239 0%, #be123c 28%, #f59e0b 65%, #10b981 100%);background-size:100cqw 100%;box-shadow:0 0 8px rgba(16,185,129,0.45);transition:width 0.4s ease;"></div>
       </div>
     </header>
   `;
