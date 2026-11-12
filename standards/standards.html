@@ -30959,7 +30959,9 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   }
 
   /* ============================================================
-     📿 ЕДИНЫЙ КАНОН БУСИН (Сайдбар-ювелир + Квантовый маяк)
+     📿 КАНОН БУСИН В УРОКАХ (100% ИДЕНТИЧНОСТЬ ИНТЕРВАЛКЕ SRS)
+     Квантовый маяк + Кольцевая волна bead-ping-wave 2.8s +
+     Сквозная каскадная волна Staggered Wave (0.16s шаг)
      ============================================================ */
   .dots-necklace,
   #radar-dots-necklace,
@@ -30970,11 +30972,12 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     align-items: center !important;
     justify-content: center !important;
     gap: 8px !important;
-    padding: 4px 0 !important;
+    padding: 2px 0 !important;
     margin: 12px auto 20px !important;
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
+    overflow: visible !important;
   }
 
   @media (max-width: 640px) {
@@ -30985,6 +30988,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     .srs-deck-beads-bar {
       gap: 6px !important;
       margin: 8px auto 16px !important;
+      padding: 2px 0 !important;
     }
   }
 
@@ -31005,56 +31009,59 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     height: 0 !important;
   }
 
-  /* Синхронизация: сброс бегущей волны */
+  /* 1. Будущие/нераскрытые бусины шагов — деликатный кристалл ожидания со сквозной искрой (как в интервалке) */
   .dots-necklace .dot-jewel,
   #radar-dots-necklace .dot-jewel,
-  .srs-beads-necklace .dot-jewel,
-  .fc-beads-necklace .dot-jewel,
-  .srs-deck-beads-bar .dot-jewel {
-    animation-delay: 0s !important;
-  }
-
-  /* Базовая бусина (10px на десктопе, 9.5px на смартфонах) */
-  .dots-necklace .dot-jewel,
-  #radar-dots-necklace .dot-jewel,
-  .srs-beads-necklace .dot-jewel,
-  .fc-beads-necklace .dot-jewel,
   .srs-deck-beads-bar .dot-jewel,
+  .srs-beads-necklace .dot-jewel,
+  .fc-beads-necklace .dot-jewel,
+  .fc-progress-header .dot-jewel,
   .cards-hub-container .dot-jewel,
-  .cards-hub-theory .dot-jewel {
-    width: 10px !important;
-    height: 10px !important;
-    min-width: 10px !important;
-    min-height: 10px !important;
-    max-width: 10px !important;
-    max-height: 10px !important;
+  .cards-hub-theory .dot-jewel,
+  .dot-jewel.future,
+  .dot-jewel.bead-future,
+  .dots-necklace .dot-jewel:not(.done):not(.active):not(.milestone),
+  #radar-dots-necklace .dot-jewel:not(.done):not(.active):not(.milestone) {
+    width: 8px !important;
+    height: 8px !important;
+    min-width: 8px !important;
+    min-height: 8px !important;
+    max-width: 8px !important;
+    max-height: 8px !important;
     border-radius: 50% !important;
+    background: radial-gradient(circle at 35% 35%, rgba(52, 211, 153, 0.28) 0%, rgba(16, 185, 129, 0.09) 60%, rgba(5, 150, 105, 0.02) 100%) !important;
+    border: 1px solid rgba(52, 211, 153, 0.38) !important;
+    box-shadow: inset 0 0 3px 0 rgba(52, 211, 153, 0.35);
+    opacity: 0.55 !important;
+    cursor: pointer !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
     box-sizing: border-box !important;
     flex-shrink: 0 !important;
     position: relative !important;
-    cursor: pointer !important;
     outline: none !important;
+    overflow: visible !important;
+    transform: translateZ(0) !important;
+    contain: layout style !important;
+    animation: bead-future-glow-blink 2.8s infinite ease-in-out !important;
     transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s ease !important;
   }
 
-  @media (max-width: 640px) {
-    .dots-necklace .dot-jewel:not(.milestone),
-    #radar-dots-necklace .dot-jewel:not(.milestone),
-    .srs-beads-necklace .dot-jewel:not(.milestone),
-    .fc-beads-necklace .dot-jewel:not(.milestone),
-    .srs-deck-beads-bar .dot-jewel:not(.milestone),
-    .cards-hub-container .dot-jewel:not(.milestone),
-    .cards-hub-theory .dot-jewel:not(.milestone) {
-      width: 9.5px !important;
-      height: 9.5px !important;
-      min-width: 9.5px !important;
-      min-height: 9.5px !important;
-      max-width: 9.5px !important;
-      max-height: 9.5px !important;
-    }
+  .dots-necklace .dot-jewel:not(.active):hover,
+  #radar-dots-necklace .dot-jewel:not(.active):hover,
+  .srs-deck-beads-bar .dot-jewel:hover,
+  .srs-beads-necklace .dot-jewel:hover,
+  .fc-beads-necklace .dot-jewel:hover,
+  .cards-hub-container .dot-jewel:hover,
+  .cards-hub-theory .dot-jewel:hover {
+    background: rgba(16, 185, 129, 0.50) !important;
+    border-color: #34d399 !important;
+    box-shadow: 0 0 10px 0 rgba(52, 211, 153, 0.8) !important;
+    transform: scale(1.3) !important;
+    opacity: 1 !important;
   }
 
-  /* Пройденные бусины: эталонная ювелирная оптика сайдбара */
+  /* 2. Пройденные бусины шагов — драгоценный светящийся изумруд с живым дыханием (как в интервалке) */
   .dots-necklace .dot-jewel.done,
   #radar-dots-necklace .dot-jewel.done,
   .srs-beads-necklace .dot-jewel.done,
@@ -31062,43 +31069,32 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   .srs-deck-beads-bar .dot-jewel.done,
   .cards-hub-container .dot-jewel.done,
   .cards-hub-theory .dot-jewel.done,
-  .dot-jewel.done {
+  .dot-jewel.done,
+  .dot-jewel.bead-done {
+    width: 10px !important;
+    height: 10px !important;
+    min-width: 10px !important;
+    min-height: 10px !important;
+    max-width: 10px !important;
+    max-height: 10px !important;
+    border-radius: 50% !important;
     background: radial-gradient(circle at 35% 35%, #ffffff 0%, #a7f3d0 30%, #34d399 65%, #059669 100%) !important;
     border: 0.8px solid #6ee7b7 !important;
-    box-shadow: 0 0 2px 0.5px rgba(52, 211, 153, 0.45), 0 0 5px 1px rgba(16, 185, 129, 0.25) !important;
+    box-shadow: 0 0 3px 0.5px rgba(52, 211, 153, 0.40), 0 0 6px 1px rgba(16, 185, 129, 0.20) !important;
     opacity: 0.95 !important;
-    animation: none !important;
-    transform: none !important;
+    cursor: pointer !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+    box-sizing: border-box !important;
+    flex-shrink: 0 !important;
+    position: relative !important;
+    overflow: visible !important;
+    transform: translateZ(0) !important;
+    contain: layout style !important;
+    animation: bead-done-glow-surge 2.8s infinite ease-in-out !important;
   }
 
-  /* Будущие бусины: чистый деликатный полупрозрачный графит */
-  .dots-necklace .dot-jewel.future,
-  #radar-dots-necklace .dot-jewel.future,
-  .srs-beads-necklace .dot-jewel.future,
-  .fc-beads-necklace .dot-jewel.future,
-  .srs-deck-beads-bar .dot-jewel.future,
-  .cards-hub-container .dot-jewel.future,
-  .cards-hub-theory .dot-jewel.future,
-  .dots-necklace .dot-jewel:not(.done):not(.active):not(.milestone),
-  #radar-dots-necklace .dot-jewel:not(.done):not(.active):not(.milestone) {
-    background: rgba(255, 255, 255, 0.14) !important;
-    border: 1px solid rgba(255, 255, 255, 0.22) !important;
-    box-shadow: none !important;
-    opacity: 0.60 !important;
-    animation: none !important;
-    transform: none !important;
-  }
-  .dots-necklace .dot-jewel:not(.active):hover,
-  #radar-dots-necklace .dot-jewel:not(.active):hover,
-  .srs-beads-necklace .dot-jewel:not(.active):hover,
-  .fc-beads-necklace .dot-jewel:not(.active):hover,
-  .srs-deck-beads-bar .dot-jewel:not(.active):hover {
-    transform: scale(1.3) !important;
-    border-color: #ffffff !important;
-    opacity: 1 !important;
-  }
-
-  /* Активная бусина темы: Квантовый маяк (белое ядро 11px + неоновая аура без срезанных дуг) */
+  /* 3. Активная бусина шага — Квантовый маяк: белое контрастное ядро 8px + кольцевая волна bead-ping-wave 2.8s */
   .dots-necklace .dot-jewel.active,
   #radar-dots-necklace .dot-jewel.active,
   .srs-beads-necklace .dot-jewel.active,
@@ -31108,41 +31104,72 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   .cards-hub-theory .dot-jewel.active,
   .dot-jewel.active,
   .dot-jewel.bead-active-leading {
-    width: 11px !important;
-    height: 11px !important;
-    min-width: 11px !important;
-    min-height: 11px !important;
-    max-width: 11px !important;
-    max-height: 11px !important;
+    width: 8px !important;
+    height: 8px !important;
+    min-width: 8px !important;
+    min-height: 8px !important;
+    max-width: 8px !important;
+    max-height: 8px !important;
     background: #ffffff !important;
     border: 1.5px solid #10b981 !important;
     border-radius: 50% !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
     position: relative !important;
     z-index: 5 !important;
-    box-shadow: 0 0 3px 1px rgba(167, 243, 208, 0.75), 0 0 8px 1.5px rgba(52, 211, 153, 0.55), 0 0 16px 2.5px rgba(16, 185, 129, 0.35) !important;
-    animation: beadQuantumBeaconPulse 2.6s infinite ease-in-out !important;
-    opacity: 1 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+    flex-shrink: 0 !important;
     transform: translateZ(0) !important;
+    box-shadow: 0 0 4px 1px rgba(167, 243, 208, 0.65), 0 0 9px 1.5px rgba(52, 211, 153, 0.50), 0 0 18px 2px rgba(16, 185, 129, 0.30) !important;
+    animation: bead-pulse-emerald 2.8s infinite ease-in-out !important;
+    will-change: transform, box-shadow !important;
+    opacity: 1 !important;
   }
 
-  @media (max-width: 640px) {
-    .dots-necklace .dot-jewel.active:not(.milestone),
-    #radar-dots-necklace .dot-jewel.active:not(.milestone),
-    .srs-beads-necklace .dot-jewel.active:not(.milestone),
-    .fc-beads-necklace .dot-jewel.active:not(.milestone),
-    .srs-deck-beads-bar .dot-jewel.active:not(.milestone),
-    .cards-hub-container .dot-jewel.active:not(.milestone),
-    .cards-hub-theory .dot-jewel.active:not(.milestone) {
-      width: 10.5px !important;
-      height: 10.5px !important;
-      min-width: 10.5px !important;
-      min-height: 10.5px !important;
-      max-width: 10.5px !important;
-      max-height: 10.5px !important;
-    }
+  /* Расходящаяся кольцевая волна маяка через абсолютно позиционированный псевдоэлемент ::after */
+  .dots-necklace .dot-jewel.active::after,
+  #radar-dots-necklace .dot-jewel.active::after,
+  .srs-beads-necklace .dot-jewel.active::after,
+  .fc-beads-necklace .dot-jewel.active::after,
+  .srs-deck-beads-bar .dot-jewel.active::after,
+  .cards-hub-container .dot-jewel.active::after,
+  .cards-hub-theory .dot-jewel.active::after,
+  .dot-jewel.active::after,
+  .dot-jewel.bead-active-leading::after {
+    content: '' !important;
+    display: block !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    width: 12px !important;
+    height: 12px !important;
+    margin-top: -6px !important;
+    margin-left: -6px !important;
+    border-radius: 50% !important;
+    border: 1.2px solid rgba(52, 211, 153, 0.90) !important;
+    box-sizing: border-box !important;
+    pointer-events: none !important;
+    transform-origin: center center !important;
+    animation: bead-ping-wave 2.8s cubic-bezier(0.2, 0.8, 0.4, 1) infinite !important;
+    z-index: 1 !important;
+    will-change: transform, opacity !important;
   }
 
-  /* Финальный рубежный зачёт: золотая бусина (14px) */
+  /* Отключение псевдоэлементов у неактивных бусин */
+  .dot-jewel:not(.active):not(.bead-active-leading)::after,
+  .dot-jewel:not(.active):not(.bead-active-leading)::before,
+  .dots-necklace .dot-jewel:not(.active)::after,
+  .dots-necklace .dot-jewel:not(.active)::before,
+  #radar-dots-necklace .dot-jewel:not(.active)::after,
+  #radar-dots-necklace .dot-jewel:not(.active)::before {
+    display: none !important;
+    animation: none !important;
+    content: none !important;
+  }
+
+  /* Финальный рубежный зачёт темы: золотая бусина (14px) с тёплым сиянием */
   .dots-necklace .dot-jewel.milestone,
   #radar-dots-necklace .dot-jewel.milestone,
   .dot-jewel.milestone {
@@ -31157,6 +31184,11 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     border: 1.2px solid #fde047 !important;
     box-shadow: 0 0 3px 1px rgba(254, 240, 138, 0.60), 0 0 8px 1.5px rgba(245, 158, 11, 0.50), 0 0 16px 2px rgba(217, 119, 6, 0.25) !important;
     opacity: 1 !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+    box-sizing: border-box !important;
+    flex-shrink: 0 !important;
+    position: relative !important;
   }
   .dots-necklace .dot-jewel.milestone.done,
   #radar-dots-necklace .dot-jewel.milestone.done,
@@ -31205,61 +31237,83 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     }
   }
 
-  /* 3.1. Категорически отключаем псевдоэлементы со срезанными дугами и пингами */
-  .dot-jewel::after,
-  .dot-jewel::before,
-  .dot-jewel.active::after,
-  .dot-jewel.active::before,
-  .dot-jewel.bead-active-leading::after,
-  .dot-jewel.bead-active-leading::before,
-  .cards-hub-container .dot-jewel::after,
-  .cards-hub-container .dot-jewel::before,
-  .cards-hub-container .dot-jewel.active::after,
-  .cards-hub-container .dot-jewel.active::before,
-  .cards-hub-container .dot-jewel.bead-active-leading::after,
-  .cards-hub-container .dot-jewel.bead-active-leading::before,
-  .dots-necklace .dot-jewel::after,
-  .dots-necklace .dot-jewel::before,
-  .dots-necklace .dot-jewel.active::after,
-  .dots-necklace .dot-jewel.active::before,
-  #radar-dots-necklace .dot-jewel::after,
-  #radar-dots-necklace .dot-jewel::before,
-  #radar-dots-necklace .dot-jewel.active::after,
-  #radar-dots-necklace .dot-jewel.active::before,
-  .dock-quantum-bead::after,
-  .dock-quantum-bead::before {
-    display: none !important;
-    content: none !important;
-    animation: none !important;
-    border: none !important;
-    width: 0 !important;
-    height: 0 !important;
-    opacity: 0 !important;
-  }
+  /* 4. Сквозная каскадная волна (Staggered Wave, 0.16s шаг между бусинами ожерелья темы) */
+  .dots-necklace .dot-jewel:nth-child(1),
+  #radar-dots-necklace .dot-jewel:nth-child(1) { animation-delay: 0s !important; }
+  .dots-necklace .dot-jewel:nth-child(1)::after,
+  #radar-dots-necklace .dot-jewel:nth-child(1)::after { animation-delay: 0s !important; }
 
-  @keyframes beadQuantumBeaconPulse {
-    0%, 100% {
-      box-shadow: 0 0 3px 1px rgba(167, 243, 208, 0.70), 0 0 8px 1.5px rgba(52, 211, 153, 0.50), 0 0 14px 2px rgba(16, 185, 129, 0.25);
-      transform: scale(1);
-    }
-    50% {
-      box-shadow: 0 0 5px 1.5px rgba(167, 243, 208, 0.95), 0 0 12px 2.5px rgba(52, 211, 153, 0.80), 0 0 22px 4px rgba(16, 185, 129, 0.45);
-      transform: scale(1.16);
-    }
-  }
+  .dots-necklace .dot-jewel:nth-child(2),
+  #radar-dots-necklace .dot-jewel:nth-child(2) { animation-delay: 0.16s !important; }
+  .dots-necklace .dot-jewel:nth-child(2)::after,
+  #radar-dots-necklace .dot-jewel:nth-child(2)::after { animation-delay: 0.16s !important; }
 
-  @keyframes goldQuantumBeaconPulse {
-    0%, 100% {
-      box-shadow: 0 0 4px 1px rgba(254, 240, 138, 0.80), 0 0 10px 2px rgba(245, 158, 11, 0.65), 0 0 20px 3px rgba(217, 119, 6, 0.35);
-      transform: scale(1);
-    }
-    50% {
-      box-shadow: 0 0 6px 1.8px rgba(254, 240, 138, 1), 0 0 16px 3.5px rgba(245, 158, 11, 0.90), 0 0 30px 5px rgba(217, 119, 6, 0.55);
-      transform: scale(1.18);
-    }
-  }
+  .dots-necklace .dot-jewel:nth-child(3),
+  #radar-dots-necklace .dot-jewel:nth-child(3) { animation-delay: 0.32s !important; }
+  .dots-necklace .dot-jewel:nth-child(3)::after,
+  #radar-dots-necklace .dot-jewel:nth-child(3)::after { animation-delay: 0.32s !important; }
 
-  /* 4. Нижние бусины квантов конспекта: идеальная центровка по высоте */
+  .dots-necklace .dot-jewel:nth-child(4),
+  #radar-dots-necklace .dot-jewel:nth-child(4) { animation-delay: 0.48s !important; }
+  .dots-necklace .dot-jewel:nth-child(4)::after,
+  #radar-dots-necklace .dot-jewel:nth-child(4)::after { animation-delay: 0.48s !important; }
+
+  .dots-necklace .dot-jewel:nth-child(5),
+  #radar-dots-necklace .dot-jewel:nth-child(5) { animation-delay: 0.64s !important; }
+  .dots-necklace .dot-jewel:nth-child(5)::after,
+  #radar-dots-necklace .dot-jewel:nth-child(5)::after { animation-delay: 0.64s !important; }
+
+  .dots-necklace .dot-jewel:nth-child(6),
+  #radar-dots-necklace .dot-jewel:nth-child(6) { animation-delay: 0.80s !important; }
+  .dots-necklace .dot-jewel:nth-child(6)::after,
+  #radar-dots-necklace .dot-jewel:nth-child(6)::after { animation-delay: 0.80s !important; }
+
+  .dots-necklace .dot-jewel:nth-child(7),
+  #radar-dots-necklace .dot-jewel:nth-child(7) { animation-delay: 0.96s !important; }
+  .dots-necklace .dot-jewel:nth-child(7)::after,
+  #radar-dots-necklace .dot-jewel:nth-child(7)::after { animation-delay: 0.96s !important; }
+
+  .dots-necklace .dot-jewel:nth-child(8),
+  #radar-dots-necklace .dot-jewel:nth-child(8) { animation-delay: 1.12s !important; }
+  .dots-necklace .dot-jewel:nth-child(8)::after,
+  #radar-dots-necklace .dot-jewel:nth-child(8)::after { animation-delay: 1.12s !important; }
+
+  .dots-necklace .dot-jewel:nth-child(9),
+  #radar-dots-necklace .dot-jewel:nth-child(9) { animation-delay: 1.28s !important; }
+  .dots-necklace .dot-jewel:nth-child(9)::after,
+  #radar-dots-necklace .dot-jewel:nth-child(9)::after { animation-delay: 1.28s !important; }
+
+  .dots-necklace .dot-jewel:nth-child(10),
+  #radar-dots-necklace .dot-jewel:nth-child(10) { animation-delay: 1.44s !important; }
+  .dots-necklace .dot-jewel:nth-child(10)::after,
+  #radar-dots-necklace .dot-jewel:nth-child(10)::after { animation-delay: 1.44s !important; }
+
+  .dots-necklace .dot-jewel:nth-child(11),
+  #radar-dots-necklace .dot-jewel:nth-child(11) { animation-delay: 1.60s !important; }
+  .dots-necklace .dot-jewel:nth-child(11)::after,
+  #radar-dots-necklace .dot-jewel:nth-child(11)::after { animation-delay: 1.60s !important; }
+
+  .dots-necklace .dot-jewel:nth-child(12),
+  #radar-dots-necklace .dot-jewel:nth-child(12) { animation-delay: 1.76s !important; }
+  .dots-necklace .dot-jewel:nth-child(12)::after,
+  #radar-dots-necklace .dot-jewel:nth-child(12)::after { animation-delay: 1.76s !important; }
+
+  .dots-necklace .dot-jewel:nth-child(13),
+  #radar-dots-necklace .dot-jewel:nth-child(13) { animation-delay: 1.92s !important; }
+  .dots-necklace .dot-jewel:nth-child(13)::after,
+  #radar-dots-necklace .dot-jewel:nth-child(13)::after { animation-delay: 1.92s !important; }
+
+  .dots-necklace .dot-jewel:nth-child(14),
+  #radar-dots-necklace .dot-jewel:nth-child(14) { animation-delay: 2.08s !important; }
+  .dots-necklace .dot-jewel:nth-child(14)::after,
+  #radar-dots-necklace .dot-jewel:nth-child(14)::after { animation-delay: 2.08s !important; }
+
+  .dots-necklace .dot-jewel:nth-child(15),
+  #radar-dots-necklace .dot-jewel:nth-child(15) { animation-delay: 2.24s !important; }
+  .dots-necklace .dot-jewel:nth-child(15)::after,
+  #radar-dots-necklace .dot-jewel:nth-child(15)::after { animation-delay: 2.24s !important; }
+
+  /* 5. Нижние бусины квантов конспекта: идеальная центровка по высоте и стиль интервалки */
   .lesson-theory,
   .lesson-theory > *:last-child,
   .lesson-theory > *:last-child > *:last-child,
@@ -31289,21 +31343,24 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   }
 
   .dock-quantum-bead {
-    width: 7px !important;
-    height: 7px !important;
-    min-width: 7px !important;
-    min-height: 7px !important;
-    max-width: 7px !important;
-    max-height: 7px !important;
+    width: 8px !important;
+    height: 8px !important;
+    min-width: 8px !important;
+    min-height: 8px !important;
+    max-width: 8px !important;
+    max-height: 8px !important;
     border-radius: 50% !important;
     box-sizing: border-box !important;
+    position: relative !important;
     transition: all 0.2s ease !important;
+    overflow: visible !important;
   }
   .dock-quantum-bead.done {
     background: radial-gradient(circle at 35% 35%, #ffffff 0%, #a7f3d0 30%, #34d399 65%, #059669 100%) !important;
     border: 0.8px solid #6ee7b7 !important;
-    box-shadow: 0 0 2px 0.5px rgba(52, 211, 153, 0.45), 0 0 4px 1px rgba(16, 185, 129, 0.2) !important;
+    box-shadow: 0 0 3px 0.5px rgba(52, 211, 153, 0.40), 0 0 6px 1px rgba(16, 185, 129, 0.20) !important;
     opacity: 0.95 !important;
+    animation: bead-done-glow-surge 2.8s infinite ease-in-out !important;
   }
   .dock-quantum-bead.active {
     width: 8px !important;
@@ -31313,15 +31370,39 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     max-width: 8px !important;
     max-height: 8px !important;
     background: #ffffff !important;
-    border: 1.2px solid #10b981 !important;
-    box-shadow: 0 0 3px 1px rgba(167, 243, 208, 0.75), 0 0 8px 1.5px rgba(52, 211, 153, 0.55), 0 0 14px 2px rgba(16, 185, 129, 0.3) !important;
-    animation: beadQuantumBeaconPulse 2.6s infinite ease-in-out !important;
+    border: 1.5px solid #10b981 !important;
+    border-radius: 50% !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+    box-shadow: 0 0 4px 1px rgba(167, 243, 208, 0.65), 0 0 9px 1.5px rgba(52, 211, 153, 0.50), 0 0 18px 2px rgba(16, 185, 129, 0.30) !important;
+    animation: bead-pulse-emerald 2.8s infinite ease-in-out !important;
+    transform: translateZ(0) !important;
     opacity: 1 !important;
   }
+  .dock-quantum-bead.active::after {
+    content: '' !important;
+    display: block !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    width: 12px !important;
+    height: 12px !important;
+    margin-top: -6px !important;
+    margin-left: -6px !important;
+    border-radius: 50% !important;
+    border: 1.2px solid rgba(52, 211, 153, 0.90) !important;
+    box-sizing: border-box !important;
+    pointer-events: none !important;
+    transform-origin: center center !important;
+    animation: bead-ping-wave 2.8s cubic-bezier(0.2, 0.8, 0.4, 1) infinite !important;
+    z-index: 1 !important;
+  }
   .dock-quantum-bead.future {
-    background: rgba(255, 255, 255, 0.14) !important;
-    border: 1px solid rgba(255, 255, 255, 0.22) !important;
-    opacity: 0.60 !important;
+    background: radial-gradient(circle at 35% 35%, rgba(52, 211, 153, 0.28) 0%, rgba(16, 185, 129, 0.09) 60%, rgba(5, 150, 105, 0.02) 100%) !important;
+    border: 1px solid rgba(52, 211, 153, 0.38) !important;
+    box-shadow: inset 0 0 3px 0 rgba(52, 211, 153, 0.35);
+    opacity: 0.55 !important;
+    animation: bead-future-glow-blink 2.8s infinite ease-in-out !important;
   }
 
   /* 5. Бесшовный контент конспекта */
@@ -45375,9 +45456,9 @@ function viewPythonSkill(sid){
 
 
 
-  // Ожерелье бусин: все разделительные полосы убраны, единый ряд без скролла
+  // Ожерелье бусин: канонический ряд в стиле интервалки (SRS), без скролла и без подложек
   const dotsNecklaceHTML = `
-    <div class="dots-necklace" id="radar-dots-necklace" style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:nowrap;margin:0 auto;padding:4px 0;">
+    <div class="dots-necklace" id="radar-dots-necklace" style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:nowrap;margin:0 auto;padding:2px 0;background:transparent;border:none;box-shadow:none;">
       ${topicClusterDots.join('')}
       ${examDot}
     </div>`;
