@@ -30904,7 +30904,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     -webkit-backdrop-filter: blur(24px) !important;
   }
 
-  /* 2. Спектральная полоска прогресса: цвета постепенно заполняются от бордо через янтарь к изумруду */
+  /* 2. Полоса прогресса эшелона: попиксельное постепенное заполнение + мягкое свечение */
   .srs-header-progress-track {
     container-type: inline-size !important;
     position: absolute !important;
@@ -30912,16 +30912,31 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     left: 0 !important;
     right: 0 !important;
     height: 4px !important;
-    background: rgba(255, 255, 255, 0.07) !important;
+    background: rgba(255, 255, 255, 0.06) !important;
     border-radius: 99px !important;
-    overflow: hidden !important;
+    overflow: visible !important;
   }
-  .srs-header-progress-fill-echelon {
+  .srs-header-progress-glow {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
     height: 100% !important;
     border-radius: 99px !important;
-    background: linear-gradient(90deg, #9f1239 0%, #be123c 28%, #f59e0b 65%, #10b981 100%) !important;
+    background: linear-gradient(90deg, #881337 0%, #be123c 35%, #059669 80%, #10b981 100%) !important;
     background-size: 100cqw 100% !important;
-    box-shadow: 0 0 8px rgba(16, 185, 129, 0.45) !important;
+    background-position: left top !important;
+    filter: blur(4px) !important;
+    opacity: 0.75 !important;
+    pointer-events: none !important;
+  }
+  .srs-header-progress-fill-echelon {
+    position: relative !important;
+    height: 100% !important;
+    border-radius: 99px !important;
+    background: linear-gradient(90deg, #881337 0%, #be123c 35%, #059669 80%, #10b981 100%) !important;
+    background-size: 100cqw 100% !important;
+    background-position: left top !important;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.35) !important;
     transition: width 0.4s ease !important;
   }
 
@@ -45215,9 +45230,12 @@ function viewPythonSkill(sid){
         <a href="#${tr.routePrefix}" class="srs-header-close-btn" style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;font-size:0.80rem;text-decoration:none;box-sizing:border-box;transition:all 0.15s ease;" title="Закрыть (На Путь)">✕</a>
       </div>
 
-      <!-- Тонкая спектральная линия прогресса эшелона (постепенное раскрытие спектра) -->
-      <div class="srs-header-progress-track" style="container-type:inline-size;position:absolute;bottom:-12px;left:0;right:0;height:4px;background:rgba(255,255,255,0.07);border:none;border-radius:99px;overflow:hidden;margin:0;padding:0;z-index:2;" title="Прогресс эшелона: ${displayEchPct}%">
-        <div class="srs-header-progress-fill-echelon" style="width:${displayEchPct}%;height:100%;border-radius:99px;background:linear-gradient(90deg, #9f1239 0%, #be123c 28%, #f59e0b 65%, #10b981 100%);background-size:100cqw 100%;box-shadow:0 0 8px rgba(16,185,129,0.45);transition:width 0.4s ease;"></div>
+      <!-- Полоса прогресса эшелона: попиксельное постепенное заполнение (#881337 -> #10b981) + мягкое свечение -->
+      <div class="srs-header-progress-track" style="container-type:inline-size;position:absolute;bottom:-12px;left:0;right:0;height:4px;background:rgba(255,255,255,0.06);border:none;border-radius:99px;overflow:visible;margin:0;padding:0;z-index:2;" title="Прогресс эшелона: ${displayEchPct}%">
+        <!-- Мягкий диффузный слой свечения острия и луча -->
+        <div class="srs-header-progress-glow" style="position:absolute;top:0;left:0;height:100%;width:${displayEchPct}%;background:linear-gradient(90deg, #881337 0%, #be123c 35%, #059669 80%, #10b981 100%);background-size:100cqw 100%;background-position:left top;border-radius:99px;filter:blur(4px);opacity:0.75;pointer-events:none;"></div>
+        <!-- Основное тело полосы прогресса -->
+        <div class="srs-header-progress-fill-echelon" style="position:relative;width:${displayEchPct}%;height:100%;border-radius:99px;background:linear-gradient(90deg, #881337 0%, #be123c 35%, #059669 80%, #10b981 100%);background-size:100cqw 100%;background-position:left top;box-shadow:0 0 8px rgba(16,185,129,0.35);transition:width 0.4s ease;"></div>
       </div>
     </header>
   `;
