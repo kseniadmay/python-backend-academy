@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Стенд премиальной лаконичности: Профессиональный Путь</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070a12;
+      --surface: #0e1422;
+      --surface-glass: rgba(14, 20, 34, 0.76);
+      --ink: #f8fafc;
+      --ink-muted: #8b9bb4;
+      --line: rgba(255, 255, 255, 0.08);
+      --line-bright: rgba(255, 255, 255, 0.16);
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.4);
+      --amber: #f59e0b;
+      --font-main: 'Onest', sans-serif;
+      --font-code: 'JetBrains Mono', monospace;
+      --font-heading: 'Unbounded', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: #f8fafc;
+      font-family: var(--font-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Верхняя контрольная панель стенда */
+    .stand-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(8, 12, 22, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+      padding: 12px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .stand-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .stand-badge {
+      font-family: var(--font-code);
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .stand-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .stand-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Переключатель наличия правого рейла */
+    .rail-toggle-group {
+      display: flex;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 3px;
+      gap: 4px;
+    }
+    .rt-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-family: var(--font-main);
+      font-size: 0.80rem;
+      font-weight: 700;
+      padding: 6px 13px;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .rt-btn.active {
+      background: #10b981;
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
+    }
+
+    .viewport-toggle-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+      font-family: var(--font-main);
+      font-size: 0.80rem;
+      font-weight: 700;
+      padding: 7px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Рабочая область просмотра */
+    .stand-viewport {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 24px 20px 80px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Основной flex-лейаут экрана */
+    .screen-layout-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 28px;
+      width: 100%;
+      max-width: 1240px;
+      position: relative;
+      z-index: 1;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .main-stream-area {
+      flex: 1;
+      max-width: 860px;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    /* Режим без рейла: идеальное центрирование */
+    .no-rail .screen-layout-wrap {
+      max-width: 860px;
+    }
+    .no-rail .side-rail-deck {
+      display: none !important;
+    }
+
+    /* Мобильный фрейм */
+    .stand-viewport.is-mobile .screen-layout-wrap {
+      max-width: 393px;
+    }
+    .stand-viewport.is-mobile .main-stream-area {
+      max-width: 393px;
+      border: 3px solid rgba(255, 255, 255, 0.15);
+      border-radius: 36px;
+      padding: 20px 14px 40px;
+      background: var(--bg);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+    }
+    .stand-viewport.is-mobile .main-stream-area::before {
+      content: '';
+      display: block;
+      width: 110px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 999px;
+      margin: 0 auto 16px;
+    }
+    .stand-viewport.is-mobile .side-rail-deck {
+      display: none !important;
+    }
+
+    /* Атмосферные пространственные орбы */
+    .ambient-orbs {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .orb-1 {
+      position: absolute;
+      top: -120px;
+      left: 15%;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, transparent 70%);
+      filter: blur(100px);
+    }
+    .orb-2 {
+      position: absolute;
+      top: 450px;
+      right: 10%;
+      width: 440px;
+      height: 440px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%);
+      filter: blur(100px);
+    }
+
+    /* HERO CARD: ПРЕМИУМ НЕО-ГЛАСС */
+    .pro-hero-card {
+      background: linear-gradient(135deg, rgba(20, 28, 48, 0.82) 0%, rgba(13, 19, 33, 0.88) 100%);
+      border: 1px solid rgba(52, 211, 153, 0.28);
+      border-radius: 22px;
+      padding: 20px 24px;
+      margin-bottom: 22px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.18), 0 0 28px rgba(16, 185, 129, 0.10);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+
+    .pro-hero-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .pro-echelon-pill {
+      font-family: var(--font-code);
+      font-size: 0.70rem;
+      font-weight: 800;
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 4px 10px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .pro-echelon-pill:hover { background: rgba(16, 185, 129, 0.25); }
+
+    .pro-chap-step-tag {
+      font-family: var(--font-code);
+      font-size: 0.70rem;
+      color: #8b9bb4;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .pro-hero-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .stand-viewport.is-mobile .pro-hero-main {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+    }
+
+    .pro-hero-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.35;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+    .pro-hero-meta {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-dominant-cta {
+      font-family: var(--font-main);
+      font-weight: 800;
+      font-size: 0.88rem;
+      letter-spacing: 0.02em;
+      padding: 13px 26px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+      white-space: nowrap;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .btn-dominant-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(16, 185, 129, 0.6);
+      filter: brightness(1.06);
+    }
+    .stand-viewport.is-mobile .btn-dominant-cta {
+      width: 100%;
+      text-align: center;
+      padding: 14px;
+    }
+
+    .pro-hero-track {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 18px;
+    }
+    .pro-hero-fill {
+      height: 100%;
+      width: 44%;
+      background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+      border-radius: 999px;
+    }
+
+    /* КАРТОЧКА ГЛАВЫ */
+    .pro-chapter-box {
+      background: rgba(14, 20, 34, 0.74);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 18px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .pro-chapter-box.active-chap {
+      border-color: rgba(16, 185, 129, 0.45);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 0 24px rgba(16, 185, 129, 0.12);
+    }
+
+    .pro-ch-header {
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      background: rgba(255, 255, 255, 0.02);
+      transition: background 0.15s ease;
+    }
+    .pro-ch-header:hover { background: rgba(255, 255, 255, 0.04); }
+
+    .pro-ch-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .ch-badge-num {
+      font-family: var(--font-code);
+      font-size: 0.68rem;
+      font-weight: 800;
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.04em;
+    }
+    .ch-title-text {
+      font-size: 0.96rem;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+
+    .pro-ch-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .ch-progress-indicator {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #8b9bb4;
+    }
+    .ch-chevron-arrow {
+      font-size: 0.70rem;
+      color: #8b9bb4;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .pro-chapter-box.is-open .ch-chevron-arrow {
+      transform: rotate(180deg);
+    }
+
+    /* УРОКИ */
+    .pro-lesson-list {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .pro-lesson-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      gap: 14px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .pro-lesson-row:hover { background: rgba(255, 255, 255, 0.04); }
+    .pro-lesson-row:last-child { border-bottom: none; }
+
+    .pro-lesson-row.row-active {
+      background: linear-gradient(90deg, rgba(16, 185, 129, 0.14) 0%, rgba(14, 20, 34, 0.4) 100%);
+      border-left: 3px solid #10b981;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .row-left-content {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+      flex: 1;
+    }
+    .lesson-icon-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+    .icon-done {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .icon-active {
+      background: #10b981;
+      color: #fff;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 8px rgba(16, 185, 129, 0.5); }
+      50% { box-shadow: 0 0 18px rgba(16, 185, 129, 0.85); }
+    }
+    .icon-open {
+      background: rgba(255, 255, 255, 0.05);
+      color: #64748b;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .lesson-meta-wrap {
+      min-width: 0;
+    }
+    .lesson-name {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .row-active .lesson-name { color: #ffffff; font-weight: 800; }
+
+    .lesson-tag-chips {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+    .tag-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #8b9bb4;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .tag-badge.challenge {
+      background: rgba(245, 158, 11, 0.16);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+    .tag-skill-preview {
+      font-family: var(--font-code);
+      font-size: 0.66rem;
+      color: #64748b;
+    }
+
+    .lesson-status-tail {
+      flex-shrink: 0;
+    }
+    .status-focus-chip {
+      font-family: var(--font-code);
+      font-size: 0.68rem;
+      font-weight: 800;
+      background: rgba(16, 185, 129, 0.22);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      padding: 3px 9px;
+      border-radius: 7px;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+    }
+    .status-done-chip {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #34d399;
+    }
+    .status-open-chip {
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: #64748b;
+    }
+
+    /* БОКОВОЙ ПРАВЫЙ РЕЙЛ (ДЛЯ ВАРИАНТА СО СПУТНИКОМ) */
+    .side-rail-deck {
+      width: 320px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .rail-card {
+      background: rgba(14, 20, 34, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 18px;
+      padding: 18px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    }
+    .rail-card-head {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #34d399;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .rail-card-body {
+      font-size: 0.82rem;
+      color: #e2e8f0;
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Верхняя панель переключения стенда -->
+  <header class="stand-header">
+    <div class="stand-title-wrap">
+      <span class="stand-badge">Design Studio</span>
+      <h1 class="stand-title">Сравнение: Центрированный холст VS Правый рейл</h1>
+    </div>
+
+    <div class="stand-controls">
+      <!-- Переключатель наличия рейла -->
+      <div class="rail-toggle-group">
+        <button class="rt-btn active" id="btn-no-rail" onclick="setRailMode(false)">🎯 Центрированный (Без рейла)</button>
+        <button class="rt-btn" id="btn-with-rail" onclick="setRailMode(true)">📑 С правым рейлом (320px)</button>
+      </div>
+
+      <button class="viewport-toggle-btn" id="toggleViewportBtn" onclick="toggleViewport()">
+        <span id="vpIcon">📱</span> <span id="vpText">В мобильный (393px)</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Рабочая область -->
+  <main class="stand-viewport no-rail" id="viewportArea">
+    
+    <!-- Атмосферные пространственные орбы -->
+    <div class="ambient-orbs">
+      <div class="orb-1"></div>
+      <div class="orb-2"></div>
+    </div>
+
+    <div class="screen-layout-wrap">
+
+      <!-- ОСНОВНОЙ ПОТОК (HERO + ГЛАВЫ) -->
+      <div class="main-stream-area">
+
+        <!-- HERO КАРТОЧКА ТЕКУЩЕГО ФОКУСА -->
+        <section class="pro-hero-card">
+          <div class="pro-hero-top">
+            <div class="pro-echelon-pill" title="Нажмите для смены целевого эшелона программы">
+              <span>🛡️ Эшелон 1: Скрининг</span>
+              <span style="font-size:0.65rem; opacity:0.7;">▾</span>
+            </div>
+            <div class="pro-chap-step-tag">ГЛАВА 1 · УРОК 4 ИЗ 9</div>
+          </div>
+
+          <div class="pro-hero-main">
+            <div>
+              <h2 class="pro-hero-title">Функции, *args, **kwargs и области видимости LEGB</h2>
+              <div class="pro-hero-meta">
+                <span>📚 Теория 2 мин</span>
+                <span>•</span>
+                <span>💻 Практика IDE</span>
+                <span>•</span>
+                <span style="color:#34d399;">+50 XP</span>
+              </div>
+            </div>
+
+            <button type="button" class="btn-dominant-cta" onclick="alert('⚡ Запуск урока в 1 клик')">ПРОДОЛЖИТЬ ➔</button>
+          </div>
+
+          <!-- Полоса прогресса главы -->
+          <div class="pro-hero-track">
+            <div class="pro-hero-fill"></div>
+          </div>
+        </section>
+
+        <!-- АКТИВНАЯ ГЛАВА 1 -->
+        <section class="pro-chapter-box active-chap is-open" id="ch1">
+          <div class="pro-ch-header" onclick="toggleChapter('ch1')">
+            <div class="pro-ch-left">
+              <span class="ch-badge-num">ГЛАВА 1</span>
+              <span class="ch-title-text">Python Core: Модель памяти и коллекции</span>
+            </div>
+            <div class="pro-ch-right">
+              <span class="ch-progress-indicator">3/9 уроков · 33%</span>
+              <span class="ch-chevron-arrow">▼</span>
+            </div>
+          </div>
+
+          <div class="pro-lesson-list">
+            <!-- Урок 1 -->
+            <div class="pro-lesson-row" onclick="alert('Переход к Уроку 1')">
+              <div class="row-left-content">
+                <div class="lesson-icon-circle icon-done">✓</div>
+                <div class="lesson-meta-wrap">
+                  <div class="lesson-name">Урок 1 · Модель памяти: id, is, mutability</div>
+                  <div class="lesson-tag-chips">
+                    <span class="tag-badge">Теория + Практика</span>
+                    <span class="tag-skill-preview">id(), hex(), sys.getrefcount</span>
+                  </div>
+                </div>
+              </div>
+              <div class="lesson-status-tail"><span class="status-done-chip">100% MP</span></div>
+            </div>
+
+            <!-- Урок 4: В ФОКУСЕ -->
+            <div class="pro-lesson-row row-active" onclick="alert('Переход к фокусному Уроку 4')">
+              <div class="row-left-content">
+                <div class="lesson-icon-circle icon-active">▶</div>
+                <div class="lesson-meta-wrap">
+                  <div class="lesson-name">Урок 4 · Функции, *args, **kwargs и LEGB</div>
+                  <div class="lesson-tag-chips">
+                    <span class="tag-badge">Теория + Практика</span>
+                    <span class="tag-skill-preview">scope, nonlocal, closure</span>
+                  </div>
+                </div>
+              </div>
+              <div class="lesson-status-tail"><span class="status-focus-chip">В ФОКУСЕ</span></div>
+            </div>
+
+            <!-- Урок 5: Доступен -->
+            <div class="pro-lesson-row" onclick="alert('Переход к Уроку 5')">
+              <div class="row-left-content">
+                <div class="lesson-icon-circle icon-open">▶</div>
+                <div class="lesson-meta-wrap">
+                  <div class="lesson-name">Урок 5 · Декораторы и wraps: замыкания в проде</div>
+                  <div class="lesson-tag-chips">
+                    <span class="tag-badge">Теория + Практика</span>
+                    <span class="tag-skill-preview">functools.wraps, signature</span>
+                  </div>
+                </div>
+              </div>
+              <div class="lesson-status-tail"><span class="status-open-chip">Доступен ➔</span></div>
+            </div>
+
+            <!-- Урок 6: Рубежный зачёт главы -->
+            <div class="pro-lesson-row" onclick="alert('⚡ Запуск аттестации главы из 8 вопросов')">
+              <div class="row-left-content">
+                <div class="lesson-icon-circle icon-open" style="color:#fbbf24;">🏆</div>
+                <div class="lesson-meta-wrap">
+                  <div class="lesson-name">Урок 6 · Рубежная аттестация: Python Core</div>
+                  <div class="lesson-tag-chips">
+                    <span class="tag-badge challenge">Испытание (8 вопросов)</span>
+                    <span class="tag-skill-preview">Рубежный тест главы</span>
+                  </div>
+                </div>
+              </div>
+              <div class="lesson-status-tail"><span class="status-open-chip" style="color:#fbbf24;">Зачёт ➔</span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ГЛАВА 2: СВЁРНУТА -->
+        <section class="pro-chapter-box" id="ch2">
+          <div class="pro-ch-header" onclick="toggleChapter('ch2')">
+            <div class="pro-ch-left">
+              <span class="ch-badge-num">ГЛАВА 2</span>
+              <span class="ch-title-text">Web & HTTP: Протоколы, сокеты, ASGI</span>
+            </div>
+            <div class="pro-ch-right">
+              <span class="ch-progress-indicator">0/4 уроков · 0%</span>
+              <span class="ch-chevron-arrow">▼</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- БОКОВОЙ ПРАВЫЙ РЕЙЛ (320px) -->
+      <aside class="side-rail-deck">
+        <div class="rail-card">
+          <div class="rail-card-head">
+            <span>🛡️</span> <span>Цель эшелона 1</span>
+          </div>
+          <div class="rail-card-body">
+            Пройдите 14 фундаментальных уроков по ядру языка для успешного прохождения первого технического скрининга в компанию.
+          </div>
+        </div>
+
+        <div class="rail-card">
+          <div class="rail-card-head">
+            <span>⚡</span> <span>Статистика спринта</span>
+          </div>
+          <div class="rail-card-body" style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;">
+              <span style="color:#8b9bb4;">Сдано уроков:</span>
+              <span style="color:#34d399;font-weight:700;">3 из 14</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;">
+              <span style="color:#8b9bb4;">Освоено тем:</span>
+              <span style="color:#f8fafc;font-weight:700;">21%</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;">
+              <span style="color:#8b9bb4;">Ударный режим:</span>
+              <span style="color:#fbbf24;font-weight:700;">🔥 1 день</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <script>
+    let isMobile = false;
+
+    function setRailMode(withRail){
+      const vp = document.getElementById('viewportArea');
+      vp.classList.toggle('no-rail', !withRail);
+
+      document.getElementById('btn-no-rail').classList.toggle('active', !withRail);
+      document.getElementById('btn-with-rail').classList.toggle('active', withRail);
+    }
+
+    function toggleViewport() {
+      isMobile = !isMobile;
+      const vp = document.getElementById('viewportArea');
+      const icon = document.getElementById('vpIcon');
+      const text = document.getElementById('vpText');
+
+      if(isMobile){
+        vp.classList.add('is-mobile');
+        icon.textContent = '💻';
+        text.textContent = 'В десктоп (Full)';
+      } else {
+        vp.classList.remove('is-mobile');
+        icon.textContent = '📱';
+        text.textContent = 'В мобильный (393px)';
+      }
+    }
+
+    function toggleChapter(id) {
+      const card = document.getElementById(id);
+      if(!card) return;
+      card.classList.toggle('is-open');
+    }
+  </script>
+</body>
+</html>
