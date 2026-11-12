@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Стенд: Решение проблемы длинного текста и кнопки-бэйджа — Python Backend Academy</title>
+  <title>Стенд: Поповер с кнопкой как в сайдбаре — Python Backend Academy</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -42,14 +42,13 @@
     }
 
     .container {
-      max-width: 1220px;
+      max-width: 900px;
       width: 100%;
       display: flex;
       flex-direction: column;
       gap: 26px;
     }
 
-    /* Header */
     .header {
       text-align: center;
       display: flex;
@@ -78,77 +77,98 @@
     .header p {
       font-size: 0.92rem;
       color: var(--ink-muted);
-      max-width: 740px;
+      max-width: 680px;
     }
 
-    /* Showcase Grid */
-    .showcase-grid {
+    /* Comparison Studio: Sidebar vs Popover Button */
+    .compare-deck {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      grid-template-columns: 280px 1fr;
       gap: 24px;
       align-items: start;
     }
+    @media (max-width: 760px) {
+      .compare-deck { grid-template-columns: 1fr; }
+    }
 
-    .variant-card {
-      background: rgba(15, 23, 42, 0.50);
+    /* Reference Sidebar Card */
+    .sidebar-ref-panel {
+      background: #0d131f;
       border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 22px 20px 26px;
+      border-radius: 18px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      position: relative;
+      gap: 12px;
     }
-    .variant-card.highlight {
-      border-color: rgba(16, 185, 129, 0.45);
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), 0 0 28px rgba(16, 185, 129, 0.12);
-    }
-
-    .variant-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border-subtle);
-      padding-bottom: 10px;
-    }
-    .variant-tag {
-      font-size: 0.74rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--emerald-soft);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .variant-badge-score {
+    .ref-tag {
       font-size: 0.70rem;
-      font-family: var(--font-mono);
+      font-weight: 800;
       color: var(--ink-dim);
-      background: rgba(255, 255, 255, 0.04);
-      padding: 3px 8px;
-      border-radius: 6px;
-    }
-    .variant-desc {
-      font-size: 0.82rem;
-      color: var(--ink-muted);
-      line-height: 1.45;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
-    /* Clear Canvas with NO BLUR on backdrop */
+    /* Card Laser in Sidebar */
+    .card-laser {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .card-mission-title {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* THE EXACT DOMINANT-BTN FROM SIDEBAR */
+    .dominant-btn {
+      width: 100%;
+      height: 42px;
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.26) 0%, rgba(6, 78, 59, 0.25) 100%);
+      border: 1.5px solid rgba(52, 211, 153, 0.65);
+      color: #ffffff !important;
+      padding: 9px 12px;
+      border-radius: 12px;
+      font-family: var(--font-main);
+      font-size: 0.84rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 4px 16px -2px rgba(0, 0, 0, 0.35);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      text-decoration: none;
+    }
+    .dominant-btn:hover {
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.36) 0%, rgba(6, 78, 59, 0.35) 100%) !important;
+      border-color: rgba(52, 211, 153, 0.95) !important;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 6px 24px -2px rgba(16, 185, 129, 0.50) !important;
+      transform: translateY(-1px);
+    }
+    .dominant-btn:active {
+      transform: scale(0.985) !important;
+    }
+
+    /* Popover on Clear Canvas */
     .clear-trail-canvas {
       position: relative;
       background: #090e18;
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 18px;
-      padding: 34px 16px 24px;
+      padding: 24px 18px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-height: 460px;
+      min-height: 480px;
       overflow: hidden;
     }
-    /* Simulated Trail elements behind the popover */
     .trail-line-bg {
       position: absolute;
       top: 0;
@@ -157,22 +177,6 @@
       background: linear-gradient(180deg, rgba(16, 185, 129, 0.5), rgba(255, 255, 255, 0.15));
       z-index: 1;
     }
-    .trail-node-bg {
-      position: absolute;
-      bottom: 24px;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      color: var(--ink-dim);
-      z-index: 1;
-    }
-
     .mock-node-anchor {
       position: relative;
       z-index: 5;
@@ -191,7 +195,6 @@
       cursor: pointer;
     }
 
-    /* Popover Box (No backdrop blur that dims the background) */
     .flawless-popover {
       width: 100%;
       max-width: 410px;
@@ -205,7 +208,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      padding: 16px 18px 18px;
+      padding: 18px 20px 20px;
     }
     .popover-arrow-up {
       position: absolute;
@@ -252,15 +255,12 @@
       justify-content: center;
     }
     .fl-title {
-      font-size: 1.20rem;
+      font-size: 1.22rem;
       font-weight: 800;
       color: #fff;
       letter-spacing: -0.01em;
     }
 
-    /* =========================================================================
-       ВАРИАНТ А: УМНЫЙ ПЕРЕНОС (WRAPPED 2-LINE WITH SIDE CODE BADGE)
-       ========================================================================= */
     .row-wrap-btn {
       display: flex;
       align-items: center;
@@ -284,120 +284,46 @@
     .rw-left {
       display: flex;
       align-items: flex-start;
-      gap: 8px;
+      gap: 9px;
       min-width: 0;
       flex: 1;
     }
     .rw-check {
-      width: 16px;
-      height: 16px;
+      width: 17px;
+      height: 17px;
       border-radius: 50%;
-      background: rgba(16, 185, 129, 0.18);
-      border: 1px solid rgba(16, 185, 129, 0.45);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(5, 150, 105, 0.20) 100%);
+      border: 1px solid rgba(52, 211, 153, 0.55);
       color: var(--emerald-soft);
-      font-size: 9px;
+      font-size: 9.5px;
       font-weight: 900;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      margin-top: 2px;
+      margin-top: 1px;
     }
     .rw-title {
-      font-size: 0.77rem;
+      font-size: 0.78rem;
       font-weight: 600;
       color: #f1f5f9;
       line-height: 1.35;
-      white-space: normal; /* Позволяет естественно переноситься */
+      white-space: normal;
     }
     .rw-code {
-      font-size: 0.67rem;
+      font-size: 0.68rem;
       font-family: var(--font-mono);
-      color: var(--emerald-soft);
+      font-weight: 500;
+      color: #6ee7b7;
       background: rgba(16, 185, 129, 0.10);
       border: 1px solid rgba(16, 185, 129, 0.22);
-      padding: 2.5px 7px;
-      border-radius: 5px;
+      padding: 2.5px 7.5px;
+      border-radius: 6px;
       flex-shrink: 0;
       align-self: center;
       white-space: nowrap;
     }
 
-    /* =========================================================================
-       ВАРИАНТ Б: ДВУХЭТАЖНЫЙ ЛЕЙАУТ (STACKED: TITLE ON TOP, CODE ON BOTTOM)
-       ========================================================================= */
-    .row-stacked-btn {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      padding: 8px 11px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-subtle);
-      cursor: pointer;
-      font-family: var(--font-main);
-      text-align: left;
-      transition: all 0.18s ease;
-      width: 100%;
-    }
-    .row-stacked-btn:hover {
-      background: rgba(255, 255, 255, 0.07);
-      border-color: rgba(52, 211, 153, 0.35);
-      transform: translateX(2px);
-    }
-    .st-content {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      min-width: 0;
-      flex: 1;
-    }
-    .st-title {
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: #f1f5f9;
-      line-height: 1.3;
-    }
-    .st-code {
-      font-size: 0.67rem;
-      font-family: var(--font-mono);
-      color: #6ee7b7;
-      opacity: 0.85;
-    }
-
-    /* =========================================================================
-       КНОПКА КАК В БЭЙДЖЕ САЙДБАРА (SIDEBAR BADGE PILL CTA)
-       ========================================================================= */
-    .cta-sidebar-badge {
-      width: 100%;
-      height: 44px;
-      border-radius: 999px; /* Канонический бейдж-пилюля */
-      background: rgba(16, 185, 129, 0.14); /* Полупрозрачный фон как в navlink__badge-due */
-      border: 1.5px solid rgba(52, 211, 153, 0.45);
-      color: #34d399;
-      font-size: 0.82rem;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 0 16px rgba(16, 185, 129, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .cta-sidebar-badge:hover {
-      background: rgba(16, 185, 129, 0.26);
-      border-color: rgba(52, 211, 153, 0.80);
-      color: #ffffff;
-      box-shadow: 0 0 24px rgba(16, 185, 129, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.30);
-      transform: translateY(-1px);
-    }
-    .cta-sidebar-badge:active {
-      transform: scale(0.97);
-    }
-
-    /* Live Toast */
     .live-toast {
       position: fixed;
       bottom: 24px;
@@ -436,143 +362,75 @@
 
     <header class="header">
       <div class="header-badge">
-        <span>🔬 GRILL-ME / РЕШЕНИЕ 3 ЗАДАЧ</span>
+        <span>✓ 100% СООТВЕТСТВИЕ САЙДБАРУ</span>
       </div>
-      <h1>Устранение обрезки текста, кнопка-бейдж и чистый фон</h1>
-      <p>1. Длинный текст помещается целиком без троеточий. 2. Кнопка оформлена в стиле полупрозрачного бейджа сайдбара (999px pill). 3. Фон за поповером остаётся кристально чистым без блюра.</p>
+      <h1>Синхронизация стиля кнопки с сайдбаром</h1>
+      <p>1. Убраны эмодзи (📖) и стрелка (➔). 2. Кнопка поповера теперь попиксельно идентична доминирующей кнопке сайдбара (.dominant-btn). 3. Фон без блюра.</p>
     </header>
 
-    <div class="showcase-grid">
+    <div class="compare-deck">
 
-      <!-- ===================================================================
-           ВАРИАНТ А: АДАПТИВНЫЙ ПЕРЕНОС С КОДОВЫМ БЭЙДЖЕМ СПРАВА
-           =================================================================== -->
-      <div class="variant-card highlight">
-        <div class="variant-meta">
-          <div class="variant-tag">
-            <span>★</span>
-            <span>Вариант А: Естественный перенос (Рекомендуемый)</span>
-          </div>
-          <div class="variant-badge-score">100% ТЕКСТА</div>
+      <!-- LEFT: Sidebar Button Reference -->
+      <div class="sidebar-ref-panel">
+        <div class="ref-tag">Эталон из сайдбара (.dominant-btn)</div>
+        <div class="card-laser">
+          <div style="font-size:0.72rem; color:var(--emerald-soft); font-weight:800;">ФОКУС ДНЯ · 15 МИН</div>
+          <div class="card-mission-title">Итераторы и yield</div>
+          <button type="button" class="dominant-btn" onclick="showToast('Клик по кнопке в сайдбаре')">
+            ПОВТОРИТЬ КОНСПЕКТ
+          </button>
         </div>
-        <div class="variant-desc">
-          Текст темы переносится на 2 строки при необходимости, код остаётся справа в теге. Троеточий нет. Кнопка — полупрозрачная пилюля в стиле сайдбара.
-        </div>
-
-        <div class="clear-trail-canvas">
-          <div class="trail-line-bg"></div>
-          <div class="trail-node-bg">3</div>
-
-          <div class="mock-node-anchor" onclick="showToast('Узел 2: Итераторы и генераторы')">✓</div>
-
-          <div class="flawless-popover">
-            <div class="popover-arrow-up"></div>
-
-            <div class="fl-top-row">
-              <span class="fl-badge">✓ 3 ИЗ 3 СДАНО</span>
-              <button type="button" class="fl-close" onclick="showToast('Закрыть')">✕</button>
-            </div>
-
-            <div class="fl-title">Итераторы и генераторы</div>
-
-            <div style="display:flex; flex-direction:column; gap:6px;">
-              <button type="button" class="row-wrap-btn" onclick="showToast('Открыть: Протокол итератора и генераторы')">
-                <div class="rw-left">
-                  <span class="rw-check">✓</span>
-                  <span class="rw-title">Протокол итератора и генераторы</span>
-                </div>
-                <span class="rw-code">iter, next</span>
-              </button>
-
-              <button type="button" class="row-wrap-btn" onclick="showToast('Открыть: Ключевое слово yield и генераторные выражения')">
-                <div class="rw-left">
-                  <span class="rw-check">✓</span>
-                  <span class="rw-title">Ключевое слово yield и генераторные выражения</span>
-                </div>
-                <span class="rw-code">yield</span>
-              </button>
-
-              <button type="button" class="row-wrap-btn" onclick="showToast('Открыть: Менеджеры контекста')">
-                <div class="rw-left">
-                  <span class="rw-check">✓</span>
-                  <span class="rw-title">Менеджеры контекста</span>
-                </div>
-                <span class="rw-code">__enter__, __exit__</span>
-              </button>
-            </div>
-
-            <!-- Sidebar Badge Style CTA Button -->
-            <button type="button" class="cta-sidebar-badge" onclick="showToast('Повторить конспект (Стиль бейджа сайдбара)')">
-              <span>📖</span>
-              <span>ПОВТОРИТЬ КОНСПЕКТ ➔</span>
-            </button>
-          </div>
+        <div style="font-size:0.75rem; color:var(--ink-muted); line-height:1.4;">
+          Параметры: <code>border-radius: 12px</code>, <code>linear-gradient(180deg, rgba(16,185,129,0.26), rgba(6,78,59,0.25))</code>, <code>border: 1.5px solid rgba(52,211,153,0.65)</code>.
         </div>
       </div>
 
-      <!-- ===================================================================
-           ВАРИАНТ Б: ДВУХЭТАЖНЫЙ ЛЕЙАУТ СТРОК
-           =================================================================== -->
-      <div class="variant-card">
-        <div class="variant-meta">
-          <div class="variant-tag">
-            <span>●</span>
-            <span>Вариант Б: Двухэтажные строки (Код под темой)</span>
+      <!-- RIGHT: Popover with identical button -->
+      <div class="clear-trail-canvas">
+        <div class="trail-line-bg"></div>
+
+        <div class="mock-node-anchor" onclick="showToast('Бусина 2: Итераторы и генераторы')">✓</div>
+
+        <div class="flawless-popover">
+          <div class="popover-arrow-up"></div>
+
+          <div class="fl-top-row">
+            <span class="fl-badge">✓ 3 ИЗ 3 СДАНО</span>
+            <button type="button" class="fl-close" onclick="showToast('Закрыть')">✕</button>
           </div>
-          <div class="variant-badge-score">ВОЗДУШНО</div>
-        </div>
-        <div class="variant-desc">
-          Заголовок темы выводится сверху, а технические токены (iter, next, yield) аккуратно под ним. Максимум ширины под длинные названия.
-        </div>
 
-        <div class="clear-trail-canvas">
-          <div class="trail-line-bg"></div>
-          <div class="trail-node-bg">3</div>
+          <div class="fl-title">Итераторы и генераторы</div>
 
-          <div class="mock-node-anchor" onclick="showToast('Узел 2: Итераторы и генераторы')">✓</div>
-
-          <div class="flawless-popover">
-            <div class="popover-arrow-up"></div>
-
-            <div class="fl-top-row">
-              <span class="fl-badge">✓ 3 ИЗ 3 СДАНО</span>
-              <button type="button" class="fl-close" onclick="showToast('Закрыть')">✕</button>
-            </div>
-
-            <div class="fl-title">Итераторы и генераторы</div>
-
-            <div style="display:flex; flex-direction:column; gap:6px;">
-              <button type="button" class="row-stacked-btn" onclick="showToast('Открыть: Протокол итератора и генераторы')">
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <button type="button" class="row-wrap-btn" onclick="showToast('Открыть: Протокол итератора и генераторы')">
+              <div class="rw-left">
                 <span class="rw-check">✓</span>
-                <div class="st-content">
-                  <span class="st-title">Протокол итератора и генераторы</span>
-                  <span class="st-code">iter, next</span>
-                </div>
-              </button>
+                <span class="rw-title">Протокол итератора и генераторы</span>
+              </div>
+              <span class="rw-code">iter, next</span>
+            </button>
 
-              <button type="button" class="row-stacked-btn" onclick="showToast('Открыть: Ключевое слово yield и генераторные выражения')">
+            <button type="button" class="row-wrap-btn" onclick="showToast('Открыть: Ключевое слово yield и генераторные выражения')">
+              <div class="rw-left">
                 <span class="rw-check">✓</span>
-                <div class="st-content">
-                  <span class="st-title">Ключевое слово yield и генераторные выражения</span>
-                  <span class="st-code">yield, generator expressions</span>
-                </div>
-              </button>
+                <span class="rw-title">Ключевое слово yield и генераторные выражения</span>
+              </div>
+              <span class="rw-code">yield</span>
+            </button>
 
-              <button type="button" class="row-stacked-btn" onclick="showToast('Открыть: Менеджеры контекста')">
+            <button type="button" class="row-wrap-btn" onclick="showToast('Открыть: Менеджеры контекста')">
+              <div class="rw-left">
                 <span class="rw-check">✓</span>
-                <div class="st-content">
-                  <span class="st-title">Менеджеры контекста</span>
-                  <span class="st-code">__enter__, __exit__</span>
-                </div>
-              </button>
-            </div>
-
-            <!-- Sidebar Badge Style CTA Button -->
-            <button type="button" class="cta-sidebar-badge" onclick="showToast('Повторить конспект (Стиль бейджа сайдбара)')">
-              <span>📖</span>
-              <span>ПОВТОРИТЬ КОНСПЕКТ ➔</span>
+                <span class="rw-title">Менеджеры контекста</span>
+              </div>
+              <span class="rw-code">__enter__, __exit__</span>
             </button>
           </div>
+
+          <!-- Exact Match with Sidebar Button: Clean Text without emoji or arrows -->
+          <button type="button" class="dominant-btn" onclick="showToast('Клик по кнопке в поповере')">
+            ПОВТОРИТЬ КОНСПЕКТ
+          </button>
         </div>
       </div>
 
