@@ -27967,7 +27967,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   }
 
   @media (max-width: 600px) {
-    .srs-note-card {
+    .srs-note-card:not(.srs-note-card-clean) {
       padding: 18px 16px !important;
       border-radius: 20px !important;
     }
@@ -27988,6 +27988,175 @@ html:not([data-theme="dark"]) .fc-card--Answer,
       align-items: center !important;
       justify-content: center !important;
       text-align: center !important;
+    }
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     МОБИЛЬНАЯ ЭРГОНОМИКА: BOOK MODE ДЛЯ КОНСПЕКТОВ УРОКОВ
+     ══════════════════════════════════════════════════════════ */
+  @media (max-width: 640px) {
+    /* 1. Контейнер страницы: освобождаем всю ширину и добавляем отступ снизу под липкий док */
+    .cards-hub-theory,
+    .cards-hub-container:has(#py-theory-text),
+    .cards-hub-container:has(.srs-note-card-clean) {
+      padding: 10px 0 calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+    }
+
+    /* 2. Шапка: центрирование названия урока, крестик справа, балансир слева */
+    .cards-hub-theory .srs-unified-header-bar,
+    .cards-hub-container:has(#py-theory-text) .srs-unified-header-bar,
+    .cards-hub-container:has(.srs-note-card-clean) .srs-unified-header-bar {
+      height: 42px !important;
+      min-height: 42px !important;
+      margin-bottom: 6px !important;
+      padding: 0 16px !important;
+    }
+    .cards-hub-theory .srs-header-left-spacer,
+    .cards-hub-container:has(#py-theory-text) .srs-header-left-spacer,
+    .cards-hub-container:has(.srs-note-card-clean) .srs-header-left-spacer {
+      display: block !important;
+      width: 28px !important;
+      flex-shrink: 0 !important;
+    }
+    .cards-hub-theory .srs-header-title-wrap,
+    .cards-hub-container:has(#py-theory-text) .srs-header-title-wrap,
+    .cards-hub-container:has(.srs-note-card-clean) .srs-header-title-wrap {
+      justify-content: center !important;
+      text-align: center !important;
+    }
+    .cards-hub-theory .srs-header-mode-title,
+    .cards-hub-container:has(#py-theory-text) .srs-header-mode-title,
+    .cards-hub-container:has(.srs-note-card-clean) .srs-header-mode-title {
+      font-size: 0.84rem !important;
+      font-weight: 700 !important;
+      color: var(--ink) !important;
+      text-transform: none !important;
+      letter-spacing: -0.01em !important;
+      justify-content: center !important;
+    }
+    .cards-hub-theory .srs-live-status-dot,
+    .cards-hub-container:has(#py-theory-text) .srs-live-status-dot,
+    .cards-hub-container:has(.srs-note-card-clean) .srs-live-status-dot {
+      display: none !important;
+    }
+    .cards-hub-theory .srs-header-progress-track,
+    .cards-hub-container:has(#py-theory-text) .srs-header-progress-track,
+    .cards-hub-container:has(.srs-note-card-clean) .srs-header-progress-track {
+      bottom: -6px !important;
+      height: 2.5px !important;
+    }
+
+    /* 3. Парящие бусины шагов урока */
+    .cards-hub-theory .srs-deck-beads-bar,
+    .cards-hub-container:has(#py-theory-text) .srs-deck-beads-bar,
+    .cards-hub-container:has(.srs-note-card-clean) .srs-deck-beads-bar {
+      margin: 8px auto 14px !important;
+      padding: 0 !important;
+    }
+
+    /* 4. Чистый Book Mode: никаких фонов карточки и тяжелых рамок */
+    .cards-hub-theory .srs-card-stage,
+    .srs-card-stage:has(.srs-note-card-clean) {
+      max-width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .cards-hub-theory .srs-note-card.srs-note-card-clean,
+    .srs-note-card.srs-note-card-clean {
+      background: transparent !important;
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      padding: 2px 16px 20px !important;
+    }
+    [data-theme="light"] .cards-hub-theory .srs-note-card.srs-note-card-clean,
+    [data-theme="light"] .srs-note-card.srs-note-card-clean {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    /* 5. Заголовок и типографика конспекта */
+    .cards-hub-theory .srs-note-card.srs-note-card-clean h2,
+    .srs-note-card.srs-note-card-clean h2 {
+      font-size: 1.25rem !important;
+      font-weight: 800 !important;
+      line-height: 1.34 !important;
+      letter-spacing: -0.015em !important;
+      margin: 0 0 14px !important;
+      color: var(--ink) !important;
+    }
+    .cards-hub-theory .srs-note-card.srs-note-card-clean p,
+    .cards-hub-theory .lesson-theory p,
+    .cards-hub-theory .feed-chunk p {
+      font-size: 1.00rem !important;
+      line-height: 1.68 !important;
+      color: var(--ink-soft) !important;
+      margin: 0 0 14px !important;
+    }
+
+    /* 6. PEP 8 Scroll блоки кода: моно-шрифт 0.82rem, фиксированная строка, горизонтальный скролл */
+    .cards-hub-theory .srs-note-card.srs-note-card-clean .snippet-wrap,
+    .cards-hub-theory .srs-note-card.srs-note-card-clean .code-snippet-wrap {
+      margin: 14px 0 16px !important;
+      border-radius: 14px !important;
+      background: rgba(11, 15, 25, 0.95) !important;
+      border: 1px solid rgba(52, 211, 153, 0.25) !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
+      overflow: hidden !important;
+    }
+    [data-theme="light"] .cards-hub-theory .srs-note-card.srs-note-card-clean .snippet-wrap,
+    [data-theme="light"] .cards-hub-theory .srs-note-card.srs-note-card-clean .code-snippet-wrap {
+      background: #f1f5f9 !important;
+      border-color: rgba(16, 185, 129, 0.35) !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+    }
+    .cards-hub-theory .srs-note-card.srs-note-card-clean .snippet-wrap pre,
+    .cards-hub-theory .srs-note-card.srs-note-card-clean .code-snippet-wrap pre,
+    .cards-hub-theory .srs-note-card.srs-note-card-clean pre {
+      font-size: 0.82rem !important;
+      line-height: 1.55 !important;
+      padding: 12px 14px !important;
+      white-space: pre !important;
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      scrollbar-width: thin !important;
+      scrollbar-color: rgba(52, 211, 153, 0.45) transparent !important;
+    }
+
+    /* 7. Липкий нижний док с бусинами квантов над кнопкой «Дальше» */
+    .cards-hub-theory .srs-action-dock-container {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 9999 !important;
+      margin: 0 !important;
+      padding: 10px 16px calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+      background: linear-gradient(180deg, rgba(7, 9, 14, 0.1) 0%, rgba(7, 9, 14, 0.95) 28%, #07090e 100%) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+      display: flex !important;
+      justify-content: center !important;
+    }
+    [data-theme="light"] .cards-hub-theory .srs-action-dock-container {
+      background: linear-gradient(180deg, rgba(248, 250, 252, 0.1) 0%, rgba(248, 250, 252, 0.95) 28%, #f8fafc 100%) !important;
+      border-top-color: rgba(0, 0, 0, 0.06) !important;
+    }
+    .cards-hub-theory .srs-dock-action-wrapper {
+      max-width: 480px !important;
+      width: 100% !important;
+      gap: 8px !important;
+    }
+    .cards-hub-theory .btn-dock-cta-single {
+      height: 48px !important;
+      border-radius: 14px !important;
+      font-size: 0.95rem !important;
+      font-weight: 700 !important;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35) !important;
     }
   }
 
@@ -44330,13 +44499,14 @@ function viewPythonSkill(sid){
 
 
   // Деликатный заголовок: название юнита приглушено (Refined Eyebrow), активная тема и ожерелье точек
-
   const srsHeaderHTML = `
     <header class="srs-unified-header-bar" style="position:relative;display:flex;justify-content:space-between;align-items:center;height:30px;min-height:30px;gap:12px;margin-bottom:28px;padding:0 2px;background:transparent !important;border:none !important;box-shadow:none !important;box-sizing:border-box;">
-      <div style="min-width:0;flex-shrink:0;display:flex;align-items:center;height:30px;">
+      <div class="srs-header-left-spacer" style="width:28px;height:28px;display:none;flex-shrink:0;"></div>
+
+      <div class="srs-header-title-wrap" style="min-width:0;flex:1;display:flex;align-items:center;height:30px;justify-content:flex-start;">
         <span class="srs-header-mode-title" style="display:inline-flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:700;color:var(--ink-soft);letter-spacing:0.03em;text-transform:uppercase;box-sizing:border-box;">
           <span class="srs-live-status-dot"></span>
-          <span>${escapeHtmlStr(cleanUnitTitleVal)}</span>
+          <span>${escapeHtmlStr(activeItemTitle || cleanUnitTitleVal)}</span>
         </span>
       </div>
 
@@ -44413,7 +44583,7 @@ function viewPythonSkill(sid){
     }
 
     const primaryActionHTML = `
-      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:480px;margin:0 auto;">
+      <div class="srs-dock-action-wrapper" style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:480px;margin:0 auto;">
         <div class="dock-quanta-beads-row" id="py-quanta-beads">
           ${chunks.map((_, ci) => `<div class="dock-quantum-bead ${ci <= curChunkIdx ? 'active' : ''}"></div>`).join('')}
         </div>
@@ -44447,7 +44617,7 @@ function viewPythonSkill(sid){
 
           ${feedHTML}
 
-          <div style="margin-top:24px;display:flex;justify-content:center;width:100%;">
+          <div class="srs-action-dock-container" style="margin-top:24px;display:flex;justify-content:center;width:100%;">
             ${primaryActionHTML}
           </div>
         </div>
@@ -44684,7 +44854,7 @@ function viewPythonSkill(sid){
 
   if(pySkillViewState.tab === 'cards' || pySkillViewState.tab === 'theory'){
     return `
-      <div class="container cards-hub-container" style="max-width:680px;padding:32px 16px 60px;margin:0 auto;">
+      <div class="container cards-hub-container ${pySkillViewState.tab === 'theory' ? 'cards-hub-theory' : ''}" style="max-width:680px;padding:32px 16px 60px;margin:0 auto;">
         ${srsHeaderHTML}
         ${bodyHTML}
         ${celebrationBanner}

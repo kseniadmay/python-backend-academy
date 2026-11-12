@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Финальный утверждённый экран чтения конспектов на телефоне · Python Backend Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090e;
+      --paper: #0b0e14;
+      --surface: rgba(18, 24, 38, 0.78);
+      --surface-border: rgba(255, 255, 255, 0.08);
+      --ink: #f8fafc;
+      --ink-soft: #cbd5e1;
+      --ink-muted: #94a3b8;
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.28);
+      --emerald-bg: rgba(16, 185, 129, 0.12);
+      --emerald-border: rgba(16, 185, 129, 0.40);
+      --amber: #f59e0b;
+      --amber-bg: rgba(245, 158, 11, 0.12);
+      --amber-border: rgba(245, 158, 11, 0.38);
+      --font-d: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+      --font-t: 'Unbounded', sans-serif;
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --paper: #f1f5f9;
+      --surface: rgba(255, 255, 255, 0.94);
+      --surface-border: rgba(15, 23, 42, 0.09);
+      --ink: #0f172a;
+      --ink-soft: #334155;
+      --ink-muted: #64748b;
+      --emerald: #059669;
+      --emerald-glow: rgba(5, 150, 105, 0.18);
+      --emerald-bg: rgba(5, 150, 105, 0.08);
+      --emerald-border: rgba(5, 150, 105, 0.30);
+      --amber: #d97706;
+      --amber-bg: rgba(217, 119, 6, 0.08);
+      --amber-border: rgba(217, 119, 6, 0.30);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1.2px, transparent 1.2px);
+      background-size: 24px 24px;
+      color: var(--ink);
+      font-family: var(--font-d);
+      min-height: 100vh;
+      padding: 16px 12px 64px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* ХЕДЕР СТЕНДА */
+    .stand-hud {
+      width: 100%;
+      max-width: 960px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: var(--surface);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--surface-border);
+      border-radius: 20px;
+      padding: 18px 22px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+    }
+
+    .hud-row-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .hud-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .hud-title {
+      font-family: var(--font-t);
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .hud-badge {
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--emerald-bg);
+      border: 1px solid var(--emerald-border);
+      color: var(--emerald);
+    }
+
+    .hud-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hud-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--surface-border);
+      color: var(--ink-soft);
+      font-family: var(--font-d);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .hud-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--ink);
+    }
+
+    /* ОСНОВНАЯ ЗОНА С МОКАПАМИ ТЕЛЕФОНОВ */
+    .phones-arena {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 32px;
+      width: 100%;
+      max-width: 960px;
+      flex-wrap: wrap;
+    }
+
+    /* ТЕЛЕФОН-МОКАП IPHONE 15/16 PRO */
+    .phone-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .phone-tag {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--ink-soft);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .phone-mockup {
+      width: 393px;
+      height: 820px;
+      background: #000000;
+      border: 3.5px solid rgba(255, 255, 255, 0.20);
+      border-radius: 48px;
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.88), 0 0 0 1px rgba(255, 255, 255, 0.06);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    [data-theme="light"] .phone-mockup {
+      background: #ffffff;
+      border-color: rgba(0, 0, 0, 0.18);
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.16);
+    }
+
+    /* STATUS BAR & DYNAMIC ISLAND */
+    .phone-status-bar {
+      height: 44px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--ink);
+      position: relative;
+      flex-shrink: 0;
+      z-index: 25;
+    }
+    .phone-island {
+      position: absolute;
+      left: 50%;
+      top: 10px;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 25px;
+      background: #000;
+      border-radius: 20px;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+    [data-theme="light"] .phone-island { background: #111; }
+
+    /* ЭКРАН ВНУТРИ ТЕЛЕФОНА */
+    .phone-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      background: var(--bg);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ОЧИЩЕННАЯ ОТ ШУМА ШАПКА ВАРИАНТА 3 (ZERO CLUTTER)
+       ══════════════════════════════════════════════════════════ */
+    .clean-header-top {
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      position: relative;
+      flex-shrink: 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(7, 9, 14, 0.6);
+    }
+    [data-theme="light"] .clean-header-top {
+      background: rgba(248, 250, 252, 0.7);
+      border-bottom-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .clean-close-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--ink-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .clean-close-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--ink);
+    }
+
+    .clean-header-meta {
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--ink-muted);
+      letter-spacing: 0.02em;
+    }
+
+    /* Тончайшая 2.5px линия прогресса эшелона на дне шапки */
+    .clean-progress-line {
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2.5px;
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .clean-progress-fill {
+      width: 65%;
+      height: 100%;
+      background: linear-gradient(90deg, #be123c, #10b981);
+      box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+    }
+
+    /* ЯРУС 2: ЛАКОНИЧНАЯ СТРОКА ТЕМЫ */
+    .clean-topic-track {
+      padding: 10px 16px 2px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+    .topic-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--emerald);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ЯРУС 3: ЧИСТЫЕ ПАРЯЩИЕ БУСИНЫ ШАГОВ (ZERO CLUTTER) */
+    .clean-steps-necklace {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 6px 0 10px;
+      flex-shrink: 0;
+    }
+    .clean-step-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.16);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .clean-step-dot.done {
+      background: rgba(16, 185, 129, 0.45);
+    }
+    .clean-step-dot.active {
+      background: var(--emerald);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.7);
+      transform: scale(1.3);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ЧИСТЫЙ РЕЖИМ ЧИТАЛКИ (BOOK MODE BODY)
+       ══════════════════════════════════════════════════════════ */
+    .book-content-scroll {
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+      padding: 4px 16px 110px; /* отступ снизу 110px для плавающего дока */
+    }
+
+    .book-title {
+      font-size: 1.28rem;
+      font-weight: 800;
+      letter-spacing: -0.015em;
+      line-height: 1.34;
+      color: var(--ink);
+      margin: 0 0 14px;
+    }
+
+    .book-text {
+      font-size: 1.00rem;
+      line-height: 1.68;
+      color: var(--ink-soft);
+      margin: 0 0 14px;
+    }
+
+    .book-text strong {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .book-text code {
+      font-family: var(--font-m);
+      font-size: 0.88rem;
+      background: rgba(52, 211, 153, 0.12);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      color: #34d399;
+      padding: 1px 6px;
+      border-radius: 6px;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       PEP 8 SCROLL БЛОК КОДА
+       ══════════════════════════════════════════════════════════ */
+    .book-code-wrap {
+      position: relative;
+      margin: 14px 0 16px;
+      border-radius: 14px;
+      background: rgba(11, 15, 25, 0.95);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      overflow: hidden;
+    }
+    [data-theme="light"] .book-code-wrap {
+      background: #f1f5f9;
+      border-color: rgba(16, 185, 129, 0.35);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    .book-code-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      font-family: var(--font-m);
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: rgba(148, 163, 184, 0.9);
+      letter-spacing: 0.04em;
+    }
+
+    .book-code-pre {
+      margin: 0;
+      padding: 12px 14px;
+      font-family: var(--font-m);
+      font-size: 0.82rem;
+      line-height: 1.55;
+      color: #e2e8f0;
+      white-space: pre !important;
+      overflow-x: auto !important;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(52, 211, 153, 0.45) transparent;
+    }
+    [data-theme="light"] .book-code-pre {
+      color: #0f172a;
+    }
+    .book-code-pre::-webkit-scrollbar {
+      height: 4px;
+    }
+    .book-code-pre::-webkit-scrollbar-thumb {
+      background: rgba(52, 211, 153, 0.45);
+      border-radius: 4px;
+    }
+
+    /* ПОДСВЕТКА СИНТАКСИСА PYTHON */
+    .tok-kw { color: #f472b6; font-weight: 700; }
+    .tok-str { color: #34d399; }
+    .tok-com { color: #72849a; font-style: italic; }
+    .tok-num { color: #fbbf24; font-weight: 600; }
+    .tok-fn { color: #60a5fa; font-weight: 600; }
+    .tok-b { color: #38bdf8; font-weight: 600; }
+
+    /* БЛОК ИНСАЙТА */
+    .book-callout {
+      margin: 14px 0;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(245, 158, 11, 0.08);
+      border-left: 3px solid var(--amber);
+      font-size: 0.90rem;
+      line-height: 1.55;
+      color: var(--ink-soft);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ЛИПКИЙ ПЛАВАЮЩИЙ НИЖНИЙ ДОК (STICKY BOTTOM DOCK)
+       ══════════════════════════════════════════════════════════ */
+    .book-sticky-dock {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(180deg, rgba(7, 9, 14, 0.1) 0%, rgba(7, 9, 14, 0.94) 28%, #07090e 100%);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 10px 16px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      z-index: 30;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    [data-theme="light"] .book-sticky-dock {
+      background: linear-gradient(180deg, rgba(248, 250, 252, 0.1) 0%, rgba(248, 250, 252, 0.94) 28%, #f8fafc 100%);
+      border-top-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .dock-quanta-necklace {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      width: 100%;
+    }
+    .dock-quantum-bead {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    [data-theme="light"] .dock-quantum-bead {
+      background: rgba(0, 0, 0, 0.12);
+      border-color: rgba(0, 0, 0, 0.18);
+    }
+    .dock-quantum-bead.active {
+      background: var(--emerald);
+      border-color: #34d399;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+      transform: scale(1.25);
+    }
+
+    .btn-dominant-cta {
+      width: 100%;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff;
+      border: 1px solid rgba(52, 211, 153, 0.4);
+      font-family: var(--font-d);
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .btn-dominant-cta:active {
+      transform: scale(0.98);
+    }
+
+    /* ФИЧА-БЕЙДЖИ ПО БОКАМ */
+    .specs-panel {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 20px;
+      padding: 20px;
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .spec-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .spec-icon {
+      font-size: 1.15rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .spec-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .spec-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .spec-desc {
+      font-size: 0.80rem;
+      line-height: 1.45;
+      color: var(--ink-soft);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ХЕДЕР СТЕНДА -->
+  <header class="stand-hud">
+    <div class="hud-row-top">
+      <div class="hud-title-group">
+        <h1 class="hud-title">Финальный утверждённый экран конспекта</h1>
+        <span class="hud-badge">Mastery · Book Mode</span>
+      </div>
+      <div class="hud-controls">
+        <button type="button" class="hud-btn" id="toggleTheme">☀️/🌙 Тема</button>
+        <button type="button" class="hud-btn" id="btnScale">🔍 Масштаб: 100%</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- АРЕНА: МОКАП ТЕЛЕФОНА И СПИСОК ПАРАМЕТРОВ -->
+  <main class="phones-arena">
+
+    <!-- ИНТЕРАКТИВНЫЙ IPHONE С ЭКРАНОМ -->
+    <div class="phone-wrapper">
+      <div class="phone-tag">
+        <span>📱 iPhone 16 Pro (393 × 820)</span>
+      </div>
+      <div class="phone-mockup">
+        <div class="phone-status-bar">
+          <span>9:41</span>
+          <div class="phone-island"></div>
+          <span>100% 🔋</span>
+        </div>
+
+        <div class="phone-screen">
+
+          <!-- 1. ОЧИЩЕННАЯ ШАПКА: НАЗВАНИЕ ПО ЦЕНТРУ, КРЕСТИК СПРАВА (БЕЗ ШУМА) -->
+          <div class="clean-header-top">
+            <div style="width:26px;"></div> <!-- балансир ширины для центрирования названия -->
+            <span class="clean-header-meta" style="font-weight:700; color:var(--ink); font-size:0.84rem; flex:1; text-align:center; padding:0 8px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Модель памяти CPython</span>
+            <button type="button" class="clean-close-btn" title="Закрыть">✕</button>
+            <!-- Тонкая полоска прогресса -->
+            <div class="clean-progress-line">
+              <div class="clean-progress-fill"></div>
+            </div>
+          </div>
+
+          <!-- 2. ПАРЯЩИЕ БУСИНЫ ШАГОВ УРОКА (1..3) -->
+          <div class="clean-steps-necklace" style="padding-top:10px;">
+            <span class="clean-step-dot done" title="Шаг 1 пройден"></span>
+            <span class="clean-step-dot active" title="Текущий шаг 2"></span>
+            <span class="clean-step-dot" title="Шаг 3"></span>
+          </div>
+
+          <!-- 4. ЧИСТЫЙ КОНТЕНТ BOOK MODE (БЕЗ КАРТОЧНЫХ РАМОК И ДВОЙНЫХ ОТСТУПОВ) -->
+          <div class="book-content-scroll" id="quantaFeed">
+            <h2 class="book-title">Все переменные в Python — это указатели</h2>
+
+            <p class="book-text">
+              В Python переменная не хранит значение сама. Она лишь держит <strong>ссылку (указатель в памяти)</strong> на объект в куче (heap). Оператор <code>=</code> никогда не копирует данные — он лишь связывает имя с адресом объекта.
+            </p>
+
+            <p class="book-text">
+              Посмотрим на реальном примере в терминале. Когда мы пишем <code>b = a</code>, никакого второго списка не создаётся:
+            </p>
+
+            <!-- 5. PEP 8 SCROLL БЛОК КОДА -->
+            <div class="book-code-wrap">
+              <div class="book-code-head">
+                <span style="color:#34d399;">PYTHON 3.13</span>
+                <span style="color:var(--emerald);">⟷ SCROLL (PEP 8)</span>
+              </div>
+              <pre class="book-code-pre"><code><span class="tok-kw">def</span> <span class="tok-fn">check_transaction</span>(conn, account_id: <span class="tok-b">int</span>):
+    <span class="tok-com"># Проверяем уровень изоляции перед блокировкой записи</span>
+    <span class="tok-kw">with</span> conn.cursor() <span class="tok-kw">as</span> cur:
+        cur.execute(<span class="tok-str">"SELECT balance, status FROM accounts WHERE id = %s FOR UPDATE"</span>, (account_id,))
+        acc = cur.fetchone()
+        <span class="tok-kw">if not</span> acc <span class="tok-kw">or</span> acc[<span class="tok-str">'status'</span>] != <span class="tok-str">'active'</span>:
+            <span class="tok-kw">raise</span> AccountBlockedError(<span class="tok-str">f"Счёт {account_id} заблокирован"</span>)
+    <span class="tok-kw">return</span> acc</code></pre>
+            </div>
+
+            <div class="book-callout">
+              <strong>⚠️ Ловушка на собеседовании:</strong> Дефолтный аргумент <code>def fn(val=[])</code> вычисляется ровно один раз при загрузке модуля! Все последующие вызовы делят один и тот же список.
+            </div>
+          </div>
+
+          <!-- 6. ЛИПКИЙ НИЖНИЙ ДОК (БУСИНЫ КВАНТОВ + КНОПКА «ДАЛЬШЕ») ПОД БОЛЬШИМ ПАЛЬЦЕМ -->
+          <footer class="book-sticky-dock">
+            <div class="dock-quanta-necklace" id="dockBeads">
+              <span class="dock-quantum-bead active"></span>
+              <span class="dock-quantum-bead"></span>
+              <span class="dock-quantum-bead"></span>
+            </div>
+            <button type="button" class="btn-dominant-cta" id="btnNextAction">
+              <span>Дальше</span>
+              <span>➔</span>
+            </button>
+          </footer>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- СПИСОК ПАРАМЕТРОВ СБОЙКИ ДЛЯ ПРОВЕРКИ -->
+    <div class="specs-panel">
+      <div style="font-size:1.05rem; font-weight:800; color:var(--ink); margin-bottom:4px;">
+        Параметры согласованной вёрстки:
+      </div>
+
+      <div class="spec-item">
+        <span class="spec-icon">📖</span>
+        <div class="spec-content">
+          <span class="spec-title">Чистый Book Mode (Zero-Card)</span>
+          <span class="spec-desc">Убраны тяжелая рамка карточки и двойные боковые поля. Текст лежит прямо на глубоком фоне с отступами 16px. Экран используется на 100%.</span>
+        </div>
+      </div>
+
+      <div class="spec-item">
+        <span class="spec-icon">🧹</span>
+        <div class="spec-content">
+          <span class="spec-title">Чистая шапка (Крестик справа)</span>
+          <span class="spec-desc">Убраны упоминания эшелонов, модулей и таймер. В шапке — отцентрованное название урока, лаконичный крестик ✕ справа под пальцем и тонкая линия прогресса снизу.</span>
+        </div>
+      </div>
+
+      <div class="spec-item">
+        <span class="spec-icon">💻</span>
+        <div class="spec-content">
+          <span class="spec-title">Код PEP 8 Scroll</span>
+          <span class="spec-desc">Моно-шрифт 0.82rem (13px), строгие отступы в 4 пробела без переносов (white-space: pre), плавный горизонтальный скролл с изумрудным бегунком.</span>
+        </div>
+      </div>
+
+      <div class="spec-item">
+        <span class="spec-icon">👇</span>
+        <div class="spec-content">
+          <span class="spec-title">Липкий док под пальцем</span>
+          <span class="spec-desc">Кнопка «Дальше» и бусины квантов всегда прижаты к низу со стеклянным размытием. Не нужно скроллить вниз, чтобы продвинуться по конспекту.</span>
+        </div>
+      </div>
+
+      <div style="margin-top:8px; padding-top:12px; border-top:1px solid var(--surface-border); font-size:0.80rem; color:var(--emerald);">
+        💡 В телефоне можно нажимать «Дальше», чтобы протестировать переключение квантов и скролл кода!
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // ТЕМА
+    const themeBtn = document.getElementById('toggleTheme');
+    themeBtn.addEventListener('click', () => {
+      const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+    });
+
+    // МАСШТАБ
+    const scaleBtn = document.getElementById('btnScale');
+    let scaleVal = 100;
+    scaleBtn.addEventListener('click', () => {
+      scaleVal = (scaleVal === 100) ? 90 : (scaleVal === 90 ? 80 : 100);
+      scaleBtn.textContent = `🔍 Масштаб: ${scaleVal}%`;
+      const mockup = document.querySelector('.phone-mockup');
+      if(mockup){
+        mockup.style.transform = scaleVal === 100 ? 'none' : `scale(${scaleVal / 100})`;
+        mockup.style.transformOrigin = 'top center';
+      }
+    });
+
+    // ИНТЕРАКТИВНОСТЬ КНОПКИ «ДАЛЬШЕ» И КВАНТОВ
+    const btnNext = document.getElementById('btnNextAction');
+    const beads = document.querySelectorAll('.dock-quantum-bead');
+    let curIdx = 0;
+
+    btnNext.addEventListener('click', () => {
+      curIdx = (curIdx + 1) % beads.length;
+      beads.forEach((b, i) => {
+        b.classList.toggle('active', i <= curIdx);
+      });
+    });
+  </script>
+</body>
+</html>
