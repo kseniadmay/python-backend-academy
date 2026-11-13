@@ -57659,7 +57659,7 @@ function renderUnifiedNavLinks(isMobile, curRoute){
 
       let dotHtml = '';
       if(it.route === '/cards'){
-        dotHtml = `<span class="activity-dot" style="${isMobile ? 'margin-left:auto;' : ''}" title="${hasDueCards ? 'Есть темы для повторения' : 'Интервальные повторения доступны'}"></span>`;
+        dotHtml = hasDueCards ? `<span class="activity-dot" style="${isMobile ? 'margin-left:auto;' : ''}" title="Есть темы для повторения"></span>` : '';
       }
 
       let subListHtml = '';
@@ -57675,7 +57675,7 @@ function renderUnifiedNavLinks(isMobile, curRoute){
         const dueCards = Number(cardSrsStats.dueTodayCardsCount) || 0;
         const dueNotes = Number(noteSrsStats.dueCount) || 0;
 
-        const cardsDotHtml = `<span class="nav-sub-breath-dot" title="${dueCards > 0 ? 'Карточек на повторение: ' + dueCards : 'Интервальные карточки активны'}"></span>`;
+        const cardsDotHtml = dueCards > 0 ? `<span class="nav-sub-breath-dot" title="Карточек на повторение: ${dueCards}"></span>` : '';
         const notesDotHtml = dueNotes > 0 ? `<span class="nav-sub-breath-dot" title="Тем на повторение: ${dueNotes}"></span>` : '';
 
         const subItemClsCards = `nav-sub-item ${isCardsActive ? 'active' : ''}`;
@@ -57815,14 +57815,17 @@ renderNav = function(){
   }
 
   const mobItems = NAV_ITEMS.filter(it => it.mobileTab);
-  const cardSrsStats = (typeof getSpacedRepetitionStats === 'function') ? getSpacedRepetitionStats() : { dueTodayCardsCount: 0 };
-  const cardsDueCount = Number(cardSrsStats.dueTodayCardsCount) || 0;
+  const cardSrsStatsMob = (typeof getSpacedRepetitionStats === 'function') ? getSpacedRepetitionStats() : { dueTodayCardsCount: 0 };
+  const noteSrsStatsMob = (typeof getNoteSpacedRepetitionStats === 'function') ? getNoteSpacedRepetitionStats() : { dueCount: 0 };
+  const cardsDueCountMob = Number(cardSrsStatsMob.dueTodayCardsCount) || 0;
+  const notesDueCountMob = Number(noteSrsStatsMob.dueCount) || 0;
+  const hasDueMob = cardsDueCountMob > 0 || notesDueCountMob > 0;
 
   document.querySelectorAll('.tabbar').forEach(tb => {
     tb.innerHTML = mobItems.map(it => {
       const lbl = it.shortLabel || it.label;
       const act = (it.route === '/' && (!location.hash || location.hash === '#/')) || (it.route !== '/' && location.hash.startsWith('#' + it.route));
-      const dotHtml = (it.hasDueDot && cardsDueCount > 0) ? '<span class="tabbar__due-dot" title="Есть темы для повторения"></span>' : '';
+      const dotHtml = (it.hasDueDot && hasDueMob) ? '<span class="tabbar__due-dot" title="Есть темы для повторения"></span>' : '';
       return `<a href="#${it.route}" class="tabbar__item ${act ? 'active' : ''}" data-route="${it.route}">
         <span class="tabbar__icon-wrap">${ICONS[it.icon] || ICONS.dot}${dotHtml}</span>
         <span>${lbl}</span>
