@@ -290,8 +290,8 @@ function test05_CoddyActiveMicrolearningCanon() {
             && !(/[→➔]|==>/.test(rawCode));
 
           if (isRunnablePython) {
-            if (!chunk.includes('data-run-snippet') && !chunk.includes('data-run-inline')) {
-              missingRunButtonViolations.push(`${kId}:${sIdx}:${cIdx} Python snippet missing run button: "${rawCode.slice(0, 50)}"`);
+            if (!chunk.includes('data-copy-code') && !chunk.includes('btn-copy-code')) {
+              missingRunButtonViolations.push(`${kId}:${sIdx}:${cIdx} Python snippet missing copy button: "${rawCode.slice(0, 50)}"`);
             }
           }
         });

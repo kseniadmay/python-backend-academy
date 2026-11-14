@@ -324,9 +324,9 @@ function testBug120_InteractiveRunnableCodeBenchmark(){
       const key = `${kid}:${sidx}`;
       const shtml = step.html || '';
       const codeMatches = shtml.match(/<pre><code>/gi) || [];
-      const runBtns = shtml.match(/data-run-snippet="1"|data-run-inline/gi) || [];
-      if (codeMatches.length > runBtns.length) {
-        violations.push(`${key}: ${codeMatches.length} code blocks but only ${runBtns.length} run buttons`);
+      const copyBtns = shtml.match(/data-copy-code="1"|btn-copy-code/gi) || [];
+      if (codeMatches.length > copyBtns.length) {
+        violations.push(`${key}: ${codeMatches.length} code blocks but only ${copyBtns.length} copy buttons`);
       }
     });
   }

@@ -1423,9 +1423,9 @@ if __name__ == '__main__':
         failed_snippets = []
         for kid, note in sorted(all_notes.items()):
             for si, st in enumerate(note['steps']):
-                for m in _re.finditer(r'<button[^>]*data-run-snippet="1"(?:\s+data-ctx="([^"]*)")?[^>]*>.*?</button></div><pre><code>([\s\S]*?)</code></pre>', st['html']):
-                    ctx_code = _html.unescape(m.group(1) or '')
-                    raw_code = _html.unescape(m.group(2))
+                for m in _re.finditer(r'<div class="code-run-bar">[\s\S]*?</div><pre><code>([\s\S]*?)</code></pre>', st['html']):
+                    ctx_code = ''
+                    raw_code = _html.unescape(m.group(1))
                     _m_main = _types.ModuleType('__main__')
                     _sys.modules['__main__'] = _m_main
                     ns = _m_main.__dict__
@@ -1474,8 +1474,8 @@ if __name__ == '__main__':
                     fb_failed.append((f"Task #{_task_item['id']}", f"{type(e).__name__}: {e}"))
         for kid, note in sorted(DB_NOTES_DATA.items()):
             for si, st in enumerate(note['steps']):
-                for m in _re.finditer(r'<button[^>]*data-run-snippet="1"(?:\s+data-ctx="([^"]*)")?[^>]*>.*?</button></div><pre><code>([\s\S]*?)</code></pre>', st['html']):
-                    raw_code = _html.unescape(m.group(2))
+                for m in _re.finditer(r'<div class="code-run-bar">[\s\S]*?</div><pre><code>([\s\S]*?)</code></pre>', st['html']):
+                    raw_code = _html.unescape(m.group(1))
                     if 'sqlite3' in raw_code:
                         _sys.modules.pop('sqlite3', None)
                         _m_main = _types.ModuleType('__main__')

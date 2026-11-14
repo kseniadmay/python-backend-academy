@@ -1153,14 +1153,8 @@ def md_chunk_to_html(md_chunk, ctx_blocks=None):
                 if is_py or code_lang in ('python', 'py', ''):
                     raw_code = _align_python_inline_comments(raw_code)
                 esc_code = html.escape(raw_code)
-                if is_py:
-                    ctx_str = '\n'.join(ctx_blocks)
-                    ctx_attr = f' data-ctx="{html.escape(ctx_str, quote=True)}"' if ctx_str else ''
-                    run_btn = f'<div class="code-run-bar"><span class="mono meta">{code_lang or "python"}</span><button type="button" class="btn-inline-run" data-run-snippet="1"{ctx_attr}>▶ Запустить код</button></div>'
-                    indented_ctx = '\n'.join('    ' + l for l in raw_code.splitlines())
-                    ctx_blocks.append(f"try:\n{indented_ctx}\n    pass\nexcept Exception:\n    pass")
-                else:
-                    run_btn = ''
+                lang_label = code_lang or ('python' if is_py else 'code')
+                header_bar = f'<div class="code-run-bar"><span class="code-lang-tag">{lang_label}</span><button type="button" class="btn-copy-code" data-copy-code="1" title="Скопировать код">Копировать</button></div>'
                 is_diagram = not is_py and (
                     code_lang in ('diagram', 'ascii') or
                     any(ch in raw_code for ch in '┌┐└┘├┤│►◄▲▼├──└──')
@@ -1169,7 +1163,7 @@ def md_chunk_to_html(md_chunk, ctx_blocks=None):
                     diag_svg = ascii_to_vector_svg(raw_code)
                     out.append(f'<div class="diagram-vector-card" style="margin:14px 0;max-width:100%;overflow-x:auto;">{diag_svg}</div>')
                 else:
-                    out.append(f'<div class="snippet-wrap">{run_btn}<pre><code>{esc_code}</code></pre><div class="snippet-out hidden"></div></div>')
+                    out.append(f'<div class="snippet-wrap">{header_bar}<pre><code>{esc_code}</code></pre></div>')
             continue
 
         if in_code:
