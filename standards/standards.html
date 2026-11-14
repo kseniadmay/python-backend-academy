@@ -542,8 +542,9 @@
     font-size: 0.72rem;
     font-weight: 700;
     cursor: default;
-    transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
+    transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, color 0.35s ease, transform 0.2s ease;
     user-select: none;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
   }
 
   /* Subtle Glass HUD Tooltip (Фазы каления металла и прогресс консолидации памяти) */
@@ -739,8 +740,7 @@
   .optics-heat-glow,
   .progress-tier-100 {
     border-radius: 10px !important;
-    background: linear-gradient(135deg, #ffffff 0%, #fef9c3 22%, #fde047 55%, #eab308 100%) !important;
-    border: 1.5px solid #ffffff !important;
+    text-shadow: none !important;
     position: relative;
     overflow: hidden;
     color: #ffffff !important;
@@ -57526,19 +57526,11 @@ function updateThermodynamicPills(){
     const cdLabel = document.getElementById(`${pfx}-cooldown-label`);
     const cdPill = document.getElementById(`${pfx}-cooldown-pill`);
     if(cdLabel && cdPill){
-      if(cdData.pct >= 100){
-        cdPill.className = 'cooldown-pill sidebar-deck-cell optics-dazzling-triumph';
-        cdPill.style.background = '';
-        cdPill.style.borderColor = '';
-        cdPill.style.color = '';
-        cdPill.style.boxShadow = '';
-      } else {
-        cdPill.className = 'cooldown-pill sidebar-deck-cell';
-        cdPill.style.background = cdData.bgGrad;
-        cdPill.style.borderColor = cdData.borderCol;
-        cdPill.style.boxShadow = cdData.shadowGlow;
-        cdPill.style.color = cdData.textCol;
-      }
+      cdPill.className = cdData.cssClass ? `cooldown-pill sidebar-deck-cell ${cdData.cssClass}` : 'cooldown-pill sidebar-deck-cell';
+      cdPill.style.background = cdData.bgGrad;
+      cdPill.style.borderColor = cdData.borderCol;
+      cdPill.style.boxShadow = cdData.shadowGlow;
+      cdPill.style.color = cdData.textCol;
       cdPill.style.opacity = '1';
       cdPill.style.cursor = 'default';
       cdLabel.innerHTML = cdData.labelHtml;
@@ -57626,47 +57618,97 @@ function getThermodynamicCooldownData(){
     pct = 99;
   }
 
-  if(pct >= 100){
-    return {
-      pct: 100,
-      cssClass: 'optics-dazzling-triumph',
-      labelHtml: '<span class="dazzling-gold-text">✨ 100%</span>',
-      tooltipTag: 'Белое каление (1350°C)',
-      tooltipDesc: '',
-      tagColor: '#fef08a',
-      bgGrad: '',
-      borderCol: '',
-      shadowGlow: '',
-      textCol: '#ffffff',
-      pillStyle: ''
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Непрерывная физическая шкала накала памяти и прогрева горна (PCHIP Spline)
+  // Абсолютно непрерывный гладкий переход каждого 1% без ступенек между этапами
+  // ═══════════════════════════════════════════════════════════════════════════
+  function createPchip(xs, ys){
+    const n = xs.length;
+    const del = [];
+    for(let i = 0; i < n - 1; i++){
+      del.push((ys[i + 1] - ys[i]) / (xs[i + 1] - xs[i]));
+    }
+    const d = new Array(n).fill(0);
+    for(let i = 1; i < n - 1; i++){
+      if(del[i - 1] * del[i] <= 0){
+        d[i] = 0;
+      } else {
+        const w1 = 2 * (xs[i + 1] - xs[i]) + (xs[i] - xs[i - 1]);
+        const w2 = (xs[i + 1] - xs[i]) + 2 * (xs[i] - xs[i - 1]);
+        d[i] = (w1 + w2) / (w1 / del[i - 1] + w2 / del[i]);
+      }
+    }
+    d[0] = ((2 * (xs[1] - xs[0]) + (xs[2] - xs[1])) * del[0] - (xs[1] - xs[0]) * del[1]) / (xs[2] - xs[0]);
+    if(d[0] * del[0] <= 0) d[0] = 0;
+    else if(del[0] * del[1] < 0 && Math.abs(d[0]) > Math.abs(3 * del[0])) d[0] = 3 * del[0];
+
+    d[n - 1] = ((2 * (xs[n - 1] - xs[n - 2]) + (xs[n - 2] - xs[n - 3])) * del[n - 2] - (xs[n - 1] - xs[n - 2]) * del[n - 3]) / (xs[n - 1] - xs[n - 3]);
+    if(d[n - 1] * del[n - 2] <= 0) d[n - 1] = 0;
+    else if(del[n - 2] * del[n - 3] < 0 && Math.abs(d[n - 1]) > Math.abs(3 * del[n - 2])) d[n - 1] = 3 * del[n - 2];
+
+    return function(x){
+      if(x <= xs[0]) return ys[0];
+      if(x >= xs[n - 1]) return ys[n - 1];
+      let idx = 0;
+      for(let i = 0; i < n - 1; i++){
+        if(xs[i] <= x && x <= xs[i + 1]){
+          idx = i;
+          break;
+        }
+      }
+      const h = xs[idx + 1] - xs[idx];
+      const t = (x - xs[idx]) / h;
+      const t2 = t * t;
+      const t3 = t2 * t;
+      const h00 = 2 * t3 - 3 * t2 + 1;
+      const h10 = t3 - 2 * t2 + t;
+      const h01 = -2 * t3 + 3 * t2;
+      const h11 = t3 - t2;
+      return h00 * ys[idx] + h10 * h * d[idx] + h01 * ys[idx + 1] + h11 * h * d[idx + 1];
     };
   }
 
-  // Непрерывная термодинамическая шкала накала памяти (плавный lerp на каждый 1% градусов и цвета)
-  const THERMO_STOPS = [
-    { p: 0,   temp: 20,   r: 45,  g: 24,  b: 32,  br: 244, bg: 63,  bb: 94,  tr: 203, tg: 213, tb: 225, name: 'Остывшая сталь' },
-    { p: 25,  temp: 600,  r: 120, g: 16,  b: 45,  br: 244, bg: 63,  bb: 94,  tr: 254, tg: 205, tb: 211, name: 'Тёмно-вишнёвый жар' },
-    { p: 50,  temp: 850,  r: 190, g: 22,  b: 60,  br: 251, bg: 113, bb: 133, tr: 254, tg: 226, tb: 226, name: 'Ярко-алый горн' },
-    { p: 75,  temp: 1050, r: 230, g: 90,  b: 18,  br: 253, bg: 186, bb: 116, tr: 255, tg: 237, tb: 213, name: 'Оранжевый накал' },
-    { p: 90,  temp: 1200, r: 238, g: 150, b: 16,  br: 254, bg: 240, bb: 138, tr: 254, tg: 240, tb: 138, name: 'Янтарно-золотой кристалл' },
-    { p: 100, temp: 1350, r: 255, g: 255, b: 255, br: 255, bg: 255, bb: 255, tr: 255, tg: 255, tb: 255, name: 'Белое каление' }
-  ];
+  const XS = [0, 25, 50, 75, 90, 100];
 
-  let left = THERMO_STOPS[0], right = THERMO_STOPS[THERMO_STOPS.length - 1];
-  for(let i = 0; i < THERMO_STOPS.length - 1; i++){
-    if(pct >= THERMO_STOPS[i].p && pct <= THERMO_STOPS[i+1].p){
-      left = THERMO_STOPS[i];
-      right = THERMO_STOPS[i+1];
-      break;
-    }
-  }
+  // Верхний сияющий блик c1
+  const c1_r = createPchip(XS, [55,   145,  220,  248,  254,  255]);
+  const c1_g = createPchip(XS, [65,   20,   32,   115,  215,  255]);
+  const c1_b = createPchip(XS, [85,   38,   28,   20,   95,   255]);
+  const c1_a = createPchip(XS, [0.70, 0.78, 0.85, 0.88, 0.94, 1.00]);
 
-  const span = (right.p - left.p) || 1;
-  const t = Math.max(0, Math.min(1, (pct - left.p) / span));
-  const lerp = (a, b) => Math.round(a + (b - a) * t);
+  // Сердцевина градиента c2
+  const c2_r = createPchip(XS, [30,   95,   180,  230,  245,  254]);
+  const c2_g = createPchip(XS, [40,   14,   20,   80,   160,  248]);
+  const c2_b = createPchip(XS, [55,   24,   18,   12,   30,   195]);
+  const c2_a = createPchip(XS, [0.85, 0.88, 0.90, 0.92, 0.95, 0.98]);
 
-  // Живая динамическая температура в градусах Цельсия на каждый 1%
-  const curTemp = Math.round(left.temp + (right.temp - left.temp) * t);
+  // Глубокая база градиента c3
+  const c3_r = createPchip(XS, [15,   28,   55,   95,   160,  234]);
+  const c3_g = createPchip(XS, [20,   10,   12,   28,   65,   179]);
+  const c3_b = createPchip(XS, [30,   15,   12,   8,    12,   8]);
+  const c3_a = createPchip(XS, [0.95, 0.96, 0.96, 0.96, 0.96, 0.95]);
+
+  // Контурная рамка border
+  const br_r = createPchip(XS, [148,  244,  251,  253,  254,  255]);
+  const br_g = createPchip(XS, [163,  63,   113,  186,  240,  255]);
+  const br_b = createPchip(XS, [184,  94,   133,  116,  138,  255]);
+  const br_a = createPchip(XS, [0.38, 0.65, 0.78, 0.85, 0.90, 0.98]);
+
+  // Неоновое свечение glow
+  const gl_r = createPchip(XS, [148,  244,  239,  249,  245,  251]);
+  const gl_g = createPchip(XS, [163,  63,   68,   115,  158,  191]);
+  const gl_b = createPchip(XS, [184,  94,   68,   22,   11,   36]);
+  const gl_a = createPchip(XS, [0.18, 0.35, 0.45, 0.55, 0.65, 0.70]);
+
+  // Физическая температура в градусах Цельсия
+  const temp_fn = createPchip(XS, [20, 600, 850, 1050, 1200, 1350]);
+
+  const c1 = [Math.round(c1_r(pct)), Math.round(c1_g(pct)), Math.round(c1_b(pct)), +c1_a(pct).toFixed(2)];
+  const c2 = [Math.round(c2_r(pct)), Math.round(c2_g(pct)), Math.round(c2_b(pct)), +c2_a(pct).toFixed(2)];
+  const c3 = [Math.round(c3_r(pct)), Math.round(c3_g(pct)), Math.round(c3_b(pct)), +c3_a(pct).toFixed(2)];
+  const border = [Math.round(br_r(pct)), Math.round(br_g(pct)), Math.round(br_b(pct)), +br_a(pct).toFixed(2)];
+  const glow = [Math.round(gl_r(pct)), Math.round(gl_g(pct)), Math.round(gl_b(pct)), +gl_a(pct).toFixed(2)];
+  const curTemp = Math.round(temp_fn(pct));
 
   let phaseName = 'Белое каление';
   if(pct < 25) phaseName = 'Остывшая сталь';
@@ -57675,32 +57717,47 @@ function getThermodynamicCooldownData(){
   else if(pct < 90) phaseName = 'Оранжевый накал';
   else if(pct < 100) phaseName = 'Янтарно-золотой кристалл';
 
-  const tooltipTag = `${phaseName} (${curTemp}°C)`;
-  const tooltipDesc = '';
+  const c1Str = `rgba(${c1[0]}, ${c1[1]}, ${c1[2]}, ${c1[3]})`;
+  const c2Str = `rgba(${c2[0]}, ${c2[1]}, ${c2[2]}, ${c2[3]})`;
+  const c3Str = `rgba(${c3[0]}, ${c3[1]}, ${c3[2]}, ${c3[3]})`;
 
-  const r = lerp(left.r, right.r);
-  const g = lerp(left.g, right.g);
-  const b = lerp(left.b, right.b);
-  const br = lerp(left.br, right.br);
-  const bg = lerp(left.bg, right.bg);
-  const bb = lerp(left.bb, right.bb);
-  const tr = lerp(left.tr, right.tr);
-  const tg = lerp(left.tg, right.tg);
-  const tb = lerp(left.tb, right.tb);
+  const bgGrad = `linear-gradient(145deg, ${c1Str} 0%, ${c2Str} 50%, ${c3Str} 100%)`;
+  const borderCol = `rgba(${border[0]}, ${border[1]}, ${border[2]}, ${border[3]})`;
+  const tagColor = borderCol;
 
-  const bgGrad = `linear-gradient(145deg, rgba(${r}, ${g}, ${b}, 0.85) 0%, rgba(${Math.round(r * 0.6)}, ${Math.round(g * 0.6)}, ${Math.round(b * 0.6)}, 0.92) 50%, rgba(15, 11, 14, 0.98) 100%)`;
-  const borderCol = `rgba(${br}, ${bg}, ${bb}, 0.75)`;
-  const shadowGlow = `inset 0 1px 1.5px rgba(255,255,255,0.30), 0 0 12px rgba(${br}, ${bg}, ${bb}, 0.35)`;
-  const textCol = `rgb(${tr}, ${tg}, ${tb})`;
-  const tagColor = `rgb(${br}, ${bg}, ${bb})`;
+  // Абсолютно непрерывное многослойное свечение без ступеньки на 100%
+  const topHighlightAlpha = +(0.18 + 0.77 * (pct / 100)).toFixed(2);
+  const glowRadius = Math.round(8 + 14 * (pct / 100));
+  const innerCoreAlpha = (pct >= 75) ? +((pct - 75) / 25 * 0.50).toFixed(2) : 0;
+  const coronaAlpha = (pct >= 85) ? +((pct - 85) / 15 * 0.45).toFixed(2) : 0;
+
+  let shadowGlow = `inset 0 1px 1.5px rgba(255, 255, 255, ${topHighlightAlpha}), 0 0 ${glowRadius}px rgba(${glow[0]}, ${glow[1]}, ${glow[2]}, ${glow[3]})`;
+  if(innerCoreAlpha > 0){
+    shadowGlow += `, inset 0 0 10px rgba(255, 255, 255, ${innerCoreAlpha})`;
+  }
+  if(coronaAlpha > 0){
+    shadowGlow += `, 0 0 ${Math.round(20 + 8 * (pct / 100))}px rgba(251, 191, 36, ${coronaAlpha})`;
+  }
+
+  // Единая кристальная типографика с деликатным контурным ореолом для 0 скачков
+  const textCol = '#ffffff';
+  const textShadow = (pct >= 90)
+    ? '0 1px 2px rgba(0, 0, 0, 0.75), 0 0 8px rgba(251, 191, 36, 0.65)'
+    : '0 1px 2px rgba(0, 0, 0, 0.70)';
 
   const iconStr = (pct < 25) ? '🥀' : (pct < 50 ? '🌱' : (pct < 75 ? '🌹' : (pct < 90 ? '🌺' : '✨')));
-  const labelHtml = `<span style="color:${textCol};font-weight:800;">${iconStr} ${pct}%</span>`;
+  const isTriumph = (pct >= 100);
+  const cssClass = isTriumph ? 'optics-dazzling-triumph' : '';
+  const labelHtml = isTriumph
+    ? '<span class="dazzling-gold-text">✨ 100%</span>'
+    : `<span style="color:${textCol};font-weight:800;text-shadow:${textShadow};">${iconStr} ${pct}%</span>`;
+  const tooltipTag = `${phaseName} (${curTemp}°C)`;
+  const tooltipDesc = '';
   const pillStyle = `background:${bgGrad} !important;border-color:${borderCol} !important;box-shadow:${shadowGlow} !important;color:${textCol} !important;`;
 
   return {
     pct,
-    cssClass: '',
+    cssClass,
     labelHtml,
     tooltipTag,
     tooltipDesc,
@@ -57709,7 +57766,10 @@ function getThermodynamicCooldownData(){
     borderCol,
     shadowGlow,
     textCol,
-    pillStyle
+    pillStyle,
+    c1Str,
+    c2Str,
+    c3Str
   };
 }
 
@@ -57882,37 +57942,9 @@ renderNav = function(){
     }
 
     // Cooldown pill SSOT (Плавная термодинамическая интерполяция каждого 1%)
-    ['sidebar', 'drawer'].forEach(pfx => {
-      const cdLabel = document.getElementById(`${pfx}-cooldown-label`);
-      const cdPill = document.getElementById(`${pfx}-cooldown-pill`);
-      if(cdLabel && cdPill){
-        const cdData = getThermodynamicCooldownData();
-        if(cdData.pct >= 100){
-          cdPill.className = `cooldown-pill sidebar-deck-cell optics-dazzling-triumph`;
-          cdPill.style.background = '';
-          cdPill.style.borderColor = '';
-          cdPill.style.color = '';
-          cdPill.style.boxShadow = '';
-        } else {
-          cdPill.className = `cooldown-pill sidebar-deck-cell`;
-          cdPill.style.background = cdData.bgGrad;
-          cdPill.style.borderColor = cdData.borderCol;
-          cdPill.style.boxShadow = cdData.shadowGlow;
-          cdPill.style.color = cdData.textCol;
-        }
-        cdPill.style.opacity = '1';
-        cdPill.style.cursor = 'default';
-        cdLabel.innerHTML = cdData.labelHtml;
-
-        let tipEl = cdPill.querySelector('.glass-hud-tooltip');
-        if(!tipEl){
-          tipEl = document.createElement('div');
-          tipEl.className = 'glass-hud-tooltip';
-          cdPill.appendChild(tipEl);
-        }
-        tipEl.innerHTML = `<div class="tooltip-tag" style="color:${cdData.tagColor};">${cdData.tooltipTag}</div>` + (cdData.tooltipDesc ? `<div class="tooltip-body">${cdData.tooltipDesc}</div>` : '');
-      }
-    });
+    if(typeof updateThermodynamicPills === 'function'){
+      updateThermodynamicPills();
+    }
   }
 
   const mobItems = NAV_ITEMS.filter(it => it.mobileTab);
