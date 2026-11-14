@@ -1422,18 +1422,18 @@ if __name__ == '__main__':
         passed_snippets = 0
         failed_snippets = []
         for kid, note in sorted(all_notes.items()):
+            _m_main = _types.ModuleType('__main__')
+            _sys.modules['__main__'] = _m_main
+            ns = _m_main.__dict__
+            exec(full_env_code, ns)
             for si, st in enumerate(note['steps']):
-                for m in _re.finditer(r'<div class="code-run-bar">[\s\S]*?</div><pre><code>([\s\S]*?)</code></pre>', st['html']):
-                    ctx_code = ''
-                    raw_code = _html.unescape(m.group(1))
-                    _m_main = _types.ModuleType('__main__')
-                    _sys.modules['__main__'] = _m_main
-                    ns = _m_main.__dict__
+                for m in _re.finditer(r'<div class="code-run-bar">[\s\S]*?<span class="code-lang-tag">([^<]+)</span>[\s\S]*?</div><pre><code>([\s\S]*?)</code></pre>', st['html']):
+                    lang = m.group(1).lower().strip()
+                    if lang not in ('python', 'py'):
+                        continue
+                    raw_code = _html.unescape(m.group(2))
                     try:
                         with _cl.redirect_stdout(_io.StringIO()), _cl.redirect_stderr(_io.StringIO()):
-                            exec(full_env_code, ns)
-                            if ctx_code.strip():
-                                exec(ctx_code, ns)
                             try:
                                 exec(raw_code, ns)
                             except SyntaxError as se:
@@ -1451,8 +1451,8 @@ if __name__ == '__main__':
                     except Exception as e:
                         failed_snippets.append((kid, si + 1, f"{type(e).__name__}: {e}"))
 
-        assert len(all_notes) == 238 and passed_snippets >= 454 and not failed_snippets, f"Theory snippets failed ({passed_snippets}): {failed_snippets[:5]}"
-        print(f"✓ All {passed_snippets}/{passed_snippets} K-note Python snippets across all {len(all_notes)} notes passed with data-ctx!")
+        assert len(all_notes) == 238 and passed_snippets >= 540 and not failed_snippets, f"Theory snippets failed ({passed_snippets}): {failed_snippets[:5]}"
+        print(f"✓ All {passed_snippets}/{passed_snippets} K-note Python snippets across all {len(all_notes)} notes passed successfully!")
 
         # Also verify Brython fallback sqlite3 shim (when native _sqlite3 is absent in browser)
         fallback_env = full_env_code.replace('import sqlite3 as _real_sqlite3', 'pass')

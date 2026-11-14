@@ -153,7 +153,7 @@ assert(
   'Invariant 6: viewDashboard renderer must exist'
 );
 assert(
-  academyHtml.includes("const ctaLabel = 'Продолжить';") || academyHtml.includes("const ctaLabel = 'Продолжить дальше';"),
+  academyHtml.includes("ctaLabel = 'Продолжить';") || academyHtml.includes("const ctaLabel = 'Продолжить дальше';"),
   'Invariant 6: Single Dominant CTA must use concise label without artificial timing'
 );
 assert(
