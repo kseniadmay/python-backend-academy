@@ -4,7 +4,7 @@
  * для ВСЕХ 238 конспектов платформы (Python Backend Academy).
  *
  * Проверяет:
- *  1. 100% покрытие: Все 238 тем (1129 микро-шагов) по всем 7 направлениям подготовки.
+ *  1. 100% покрытие: Все 238 тем (1175 микро-шагов) по всем 7 направлениям подготовки.
  *  2. Запрет пустых квантов (Zero Empty Chunks).
  *  3. Строгую сбалансированность и валидность HTML-тегов в каждом кванте (No DOM leakage).
  *  4. Запрет «сиротливых заголовков» и оборванных подводок (No Orphan Headings / Lead-ins).
@@ -139,8 +139,8 @@ function test01_FullCoverage() {
     });
   }
 
-  assert.strictEqual(totalSteps, 1129, `Expected exactly 1129 total steps, found ${totalSteps}`);
-  console.log(`✓ Test 1 Passed: 100% coverage verified (238 notes, 1129 steps across all 7 tracks)`);
+  assert.strictEqual(totalSteps, 1175, `Expected exactly 1175 total steps, found ${totalSteps}`);
+  console.log(`✓ Test 1 Passed: 100% coverage verified (238 notes, 1175 steps across all 7 tracks)`);
 }
 
 // ============================================================================

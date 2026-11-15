@@ -1,4 +1,4 @@
-import os, re, json, zipfile, io
+import os, re, json, zipfile, io, shutil, subprocess
 from extract_remnote_data import BASE_REMNOTE, IDE_HTML_PATH, TASKS_381, k_files_map, f_files_map, parse_k_note
 from build_python_mastery import (
     PY_UNITS, PY_NOTES_DATA, PY_DECKS_DATA,
@@ -15390,20 +15390,50 @@ if os.path.isfile(CANONICAL_STANDARDS_PATH):
         canonical_disk_html = f_canonical.read()
     if 'dot-jewel' in canonical_disk_html and 'toggleDashAccordion' in canonical_disk_html:
         canonical_disk_html = re.sub(
-            r'const IDE_TASKS\s*=\s*\[[\s\S]*?\];\s*(const IDE_TASKS_BY_ID)',
-            lambda m: f'const IDE_TASKS = {ide_tasks_json};\n{m.group(1)}',
+            r'const PY_MASTERY\s*=\s*\{[\s\S]*?\};\s*(const WEB_MASTERY)',
+            lambda m: f'const PY_MASTERY = {py_mastery_json};\n\n{m.group(1)}',
             canonical_disk_html,
             count=1
         )
         canonical_disk_html = re.sub(
             r'const WEB_MASTERY\s*=\s*\{[\s\S]*?\};\s*(const BACKEND_MASTERY)',
-            lambda m: f'const WEB_MASTERY = {web_mastery_json};\n{m.group(1)}',
+            lambda m: f'const WEB_MASTERY = {web_mastery_json};\n\n{m.group(1)}',
+            canonical_disk_html,
+            count=1
+        )
+        canonical_disk_html = re.sub(
+            r'const BACKEND_MASTERY\s*=\s*\{[\s\S]*?\};\s*(const ALGO_MASTERY)',
+            lambda m: f'const BACKEND_MASTERY = {backend_mastery_json};\n\n{m.group(1)}',
             canonical_disk_html,
             count=1
         )
         canonical_disk_html = re.sub(
             r'const ALGO_MASTERY\s*=\s*\{[\s\S]*?\};\s*(const DB_MASTERY)',
-            lambda m: f'const ALGO_MASTERY = {algo_mastery_json};\n{m.group(1)}',
+            lambda m: f'const ALGO_MASTERY = {algo_mastery_json};\n\n{m.group(1)}',
+            canonical_disk_html,
+            count=1
+        )
+        canonical_disk_html = re.sub(
+            r'const DB_MASTERY\s*=\s*\{[\s\S]*?\};\s*(const ARCH_MASTERY)',
+            lambda m: f'const DB_MASTERY = {db_mastery_json};\n\n{m.group(1)}',
+            canonical_disk_html,
+            count=1
+        )
+        canonical_disk_html = re.sub(
+            r'const ARCH_MASTERY\s*=\s*\{[\s\S]*?\};\s*(const INFRA_MASTERY)',
+            lambda m: f'const ARCH_MASTERY = {arch_mastery_json};\n\n{m.group(1)}',
+            canonical_disk_html,
+            count=1
+        )
+        canonical_disk_html = re.sub(
+            r'const INFRA_MASTERY\s*=\s*\{[\s\S]*?\};\s*(const IDE_TASKS)',
+            lambda m: f'const INFRA_MASTERY = {infra_mastery_json};\n\n{m.group(1)}',
+            canonical_disk_html,
+            count=1
+        )
+        canonical_disk_html = re.sub(
+            r'const IDE_TASKS\s*=\s*\[[\s\S]*?\];\s*(const IDE_TASKS_BY_ID)',
+            lambda m: f'const IDE_TASKS = {ide_tasks_json};\n{m.group(1)}',
             canonical_disk_html,
             count=1
         )
