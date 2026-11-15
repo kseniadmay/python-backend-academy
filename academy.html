@@ -23525,7 +23525,9 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 /* Desktop SRS Whisper Mist Glass Island: адаптивная подложка-остров под контент (не полотно) */
 @media (min-width: 641px) {
   #view-root:has(.cards-hub-container),
-  main:has(.cards-hub-container) {
+  #view-root:has(.srs-notes-container),
+  main:has(.cards-hub-container),
+  main:has(.srs-notes-container) {
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
@@ -23557,7 +23559,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     flex-direction: column !important;
     justify-content: space-between !important;
   }
-  .cards-hub-container {
+  .cards-hub-container:not(.srs-notes-container):not(:has(.srs-note-card)) {
     width: 100% !important;
     max-width: 740px !important;
     min-height: auto !important;
@@ -26188,7 +26190,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
 
 
-  /* Карточка конспекта в едином стиле Liquid Obsidian & Mastery Glass (статичная) */
+  /* Внутренний контейнер конспекта: бесшовный внутри внешней плашки */
 
   .srs-note-card {
 
@@ -26198,27 +26200,33 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
     touch-action: pan-y !important;
 
-    min-height: 380px !important;
+    min-height: auto !important;
 
-    background: linear-gradient(165deg, rgba(15, 23, 42, 0.85) 0%, rgba(10, 15, 26, 0.96) 60%, rgba(6, 78, 59, 0.20) 100%) !important;
+    height: auto !important;
 
-    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+    background: transparent !important;
 
-    box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+    background-color: transparent !important;
 
-    border-radius: 24px !important;
+    background-image: none !important;
 
-    padding: 22px 26px !important;
+    border: none !important;
 
-    backdrop-filter: blur(24px) !important;
+    box-shadow: none !important;
 
-    -webkit-backdrop-filter: blur(24px) !important;
+    border-radius: 0 !important;
+
+    padding: 0 !important;
+
+    backdrop-filter: none !important;
+
+    -webkit-backdrop-filter: none !important;
 
     cursor: default !important;
 
     transform: none !important;
 
-    transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
+    transition: none !important;
 
     user-select: text !important;
 
@@ -26230,13 +26238,11 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
   .srs-note-card:focus {
 
-    border-color: rgba(52, 211, 153, 0.40) !important;
+    border-color: transparent !important;
 
-    box-shadow: 0 28px 64px -10px rgba(0, 0, 0, 0.85), 0 0 24px rgba(16, 185, 129, 0.18) !important;
+    box-shadow: none !important;
 
     transform: none !important;
-
-    cursor: default !important;
 
   }
 
@@ -26402,13 +26408,13 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
     font-size: 0.84em !important;
 
-    padding: 2px 7px !important;
+    padding: 1.5px 6px !important;
 
-    margin: 0 2px !important;
+    margin: 0 !important;
 
     border-radius: 6px !important;
 
-    background: rgba(16, 185, 129, 0.10) !important;
+    background: rgba(16, 185, 129, 0.12) !important;
 
     border: 1px solid rgba(52, 211, 153, 0.28) !important;
 
@@ -26420,9 +26426,41 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 
     white-space: nowrap !important;
 
+    display: inline-block !important;
+
     vertical-align: baseline !important;
 
     transition: all 0.15s ease !important;
+
+  }
+
+  .srs-note-card .math-formula {
+
+    font-family: var(--font-m, monospace) !important;
+
+    font-size: 0.84em !important;
+
+    padding: 1.5px 6px !important;
+
+    margin: 0 !important;
+
+    border-radius: 6px !important;
+
+    background: rgba(6, 182, 212, 0.12) !important;
+
+    border: 1px solid rgba(6, 182, 212, 0.32) !important;
+
+    color: #22d3ee !important;
+
+    font-weight: 700 !important;
+
+    letter-spacing: -0.01em !important;
+
+    white-space: nowrap !important;
+
+    display: inline-block !important;
+
+    vertical-align: baseline !important;
 
   }
 
@@ -28027,32 +28065,156 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     perspective: none !important;
   }
 
-  .srs-note-card {
-    padding: 26px 30px !important;
-    border-radius: 24px !important;
+  /* SSOT: Монолитная единая внешняя премиум-плашка конспекта (Option C / Unified Obsidian Glass) */
+  .srs-notes-container {
+    position: relative !important;
+    overflow: hidden !important;
+    padding: 24px 28px !important;
+    border-radius: 28px !important;
+    min-height: auto !important;
+    height: auto !important;
     transform: translateZ(0) !important;
     backface-visibility: hidden !important;
     isolation: isolate !important;
     -webkit-font-smoothing: antialiased !important;
     -moz-osx-font-smoothing: grayscale !important;
     text-rendering: geometricPrecision !important;
-    backdrop-filter: blur(24px) !important;
-    -webkit-backdrop-filter: blur(24px) !important;
-    background: linear-gradient(155deg, rgba(255, 255, 255, 0.06) 0%, rgba(18, 24, 38, 0.46) 45%, rgba(8, 12, 18, 0.64) 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.10) !important;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(32px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(32px) saturate(140%) !important;
+    background: rgba(7, 9, 14, 0.72) !important;
+    border: 1px solid rgba(255, 255, 255, 0.09) !important;
+    border-top: 1.5px solid rgba(255, 255, 255, 0.18) !important;
+    box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.15), inset 0 0 35px -10px rgba(255, 255, 255, 0.02), 0 28px 68px -12px rgba(0, 0, 0, 0.90) !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 680px !important;
+    box-sizing: border-box !important;
     transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
   }
 
-  [data-theme="light"] .srs-note-card {
+  /* Естественные мягкие каустики / рассеянные рефлексы от шкалы накала и CTA */
+  :root:not([data-theme="light"]):not(.theme-light) .srs-notes-container::before {
+    content: '' !important;
+    position: absolute !important;
+    top: -40px !important;
+    left: -40px !important;
+    width: 260px !important;
+    height: 180px !important;
+    border-radius: 50% !important;
+    background: rgba(244, 63, 94, 0.08) !important;
+    filter: blur(54px) !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+  }
+
+  :root:not([data-theme="light"]):not(.theme-light) .srs-notes-container::after {
+    content: '' !important;
+    position: absolute !important;
+    bottom: -40px !important;
+    right: 20% !important;
+    width: 300px !important;
+    height: 180px !important;
+    border-radius: 50% !important;
+    background: rgba(16, 185, 129, 0.07) !important;
+    filter: blur(56px) !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+  }
+
+  .srs-notes-container > * {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  /* Устранение внутренней плашки: контент бесшовно живёт внутри единой внешней плашки */
+  .srs-note-card,
+  .srs-card-stage .srs-note-card,
+  .srs-notes-container .srs-note-card {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: auto !important;
+    height: auto !important;
+  }
+
+  .srs-note-card::before,
+  .srs-note-card::after {
+    display: none !important;
+  }
+
+  .srs-notes-container .note-util-btn {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.22) !important;
+    color: #cbd5e1 !important;
+    transition: all .15s ease !important;
+  }
+  .srs-notes-container .note-util-btn:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+  }
+
+  .srs-notes-container h2,
+  .srs-note-card h2 {
+    font-size: 1.36rem !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.34 !important;
+    margin: 0 0 16px !important;
+  }
+
+  [data-theme="light"] .srs-notes-container {
     background: linear-gradient(155deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.92) 50%, rgba(241, 245, 249, 0.88) 100%) !important;
     border-color: rgba(15, 23, 42, 0.09) !important;
     box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.8) !important;
     color: #0f172a !important;
   }
 
-  [data-theme="light"] .srs-note-card h2 {
+  [data-theme="light"] .srs-notes-container h2,
+  [data-theme="light"] .srs-notes-container h2 span {
     color: #0f172a !important;
+  }
+
+  [data-theme="light"] .srs-note-breadcrumbs span:first-child {
+    color: #64748b !important;
+  }
+
+  [data-theme="light"] .srs-note-breadcrumbs span:last-child {
+    color: #059669 !important;
+  }
+
+  [data-theme="light"] .srs-header-goal-status {
+    background: rgba(0, 0, 0, 0.04) !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
+    color: #1e293b !important;
+  }
+
+  [data-theme="light"] .srs-header-goal-status span:nth-child(3) {
+    color: #0f172a !important;
+  }
+
+  [data-theme="light"] .srs-header-close-btn {
+    background: rgba(0, 0, 0, 0.04) !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
+    color: #64748b !important;
   }
 
   [data-theme="light"] .srs-note-card .step-counter-chip {
@@ -28077,10 +28239,24 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     color: #334155 !important;
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 640px) {
+    /* 100% Бесшовный Дзен-холст на мобильных (0 рамок, 0 карточки, максимальный воздух) */
+    .srs-note-card {
+      background: transparent !important;
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      padding: 0 !important;
+    }
+    .srs-note-card::before,
+    .srs-note-card::after {
+      display: none !important;
+    }
     .srs-note-card:not(.srs-note-card-clean) {
-      padding: 18px 16px !important;
-      border-radius: 20px !important;
+      padding: 0 !important;
+      border-radius: 0 !important;
     }
     .note-rate-row,
     .rating-buttons-grid {
@@ -30880,7 +31056,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   .cards-hub-theory,
   .cards-hub-container.cards-hub-theory,
   .cards-hub-container:has(#py-theory-text),
-  .cards-hub-container:has(.lesson-theory) {
+  .cards-hub-container:has(.lesson-theory):not(.srs-notes-container):not(:has(.srs-note-card)) {
     position: relative !important;
     background: rgba(13, 17, 24, 0.94) !important;
     background-image: none !important;
@@ -47339,6 +47515,10 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
   let goalTitle = '';
 
+  let noteStep = 1;
+
+  let noteTotal = 1;
+
 
 
   // 1. Прогресс интервального повторения по непрерывной температурной шкале накала памяти
@@ -47380,13 +47560,13 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
 
 
-    const noteStep = noteProgress ? Math.min(noteProgress.total || 1, (noteProgress.current || 0) + 1) : 1;
+    noteStep = noteProgress ? Math.min(noteProgress.total || 1, (noteProgress.current || 0) + 1) : 1;
 
-    const noteTotal = noteProgress ? (noteProgress.total || 1) : Math.max(1, totalNotesToday);
+    noteTotal = noteProgress ? (noteProgress.total || 1) : Math.max(1, totalNotesToday);
 
 
 
-    goalLabel = `Конспект ${noteStep} / ${noteTotal}`;
+    goalLabel = `Конспект ${noteStep} из ${noteTotal}`;
 
     goalTitle = `Конспект ${noteStep} из ${noteTotal} · Сдано за день: ${notesDoneToday} из ${totalNotesToday}`;
 
@@ -47456,11 +47636,18 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
       <div class="srs-header-right-cluster" style="display:flex;align-items:center;gap:6px;height:30px;flex-shrink:0;">
 
-        <div class="srs-header-goal-status" style="display:inline-flex;align-items:center;gap:6px;padding:0 10px;height:30px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);font-size:0.78rem;font-weight:600;color:var(--ink-soft);box-sizing:border-box;line-height:1;" title="${goalTitle}">
+        <div class="srs-header-goal-status" style="display:inline-flex;align-items:center;gap:6px;padding:0 12px;height:30px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-top:1px solid rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.12),0 4px 16px -2px rgba(0,0,0,0.40);font-size:0.78rem;font-weight:600;color:var(--ink-soft);box-sizing:border-box;line-height:1;" title="${goalTitle}">
 
-          <span style="color:${isNotes ? '#34d399' : '#f59e0b'};font-size:0.88rem;">${iconStr}</span>
-
-          <b style="color:#fff;font-family:var(--font-m);font-weight:700;">${goalLabel}</b>
+          ${isNotes ? `
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+            <span style="color:var(--ink-muted);font-weight:600;font-size:0.75rem;">Конспект</span>
+            <span style="font-family:var(--font-m);font-size:0.80rem;font-weight:700;color:#ffffff;">${noteStep}</span>
+            <span style="color:rgba(255,255,255,0.25);font-size:0.72rem;margin:0 -1px;">/</span>
+            <span style="font-family:var(--font-m);font-size:0.78rem;font-weight:600;color:var(--ink-soft);">${noteTotal}</span>
+          ` : `
+            <span style="color:#f59e0b;font-size:0.88rem;">${iconStr}</span>
+            <b style="color:#fff;font-family:var(--font-m);font-weight:700;">${goalLabel}</b>
+          `}
 
         </div>
 
@@ -47470,7 +47657,7 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
 
 
-        <a href="#/path" class="srs-header-close-btn" style="width:30px;height:30px;min-width:30px;min-height:30px;padding:0;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;font-size:0.78rem;text-decoration:none;box-sizing:border-box;" title="Закрыть (На Путь)">✕</a>
+        <a href="#/path" class="srs-header-close-btn" style="width:30px;height:30px;min-width:30px;min-height:30px;padding:0;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-top:1px solid rgba(255,255,255,0.20);color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;font-size:0.78rem;text-decoration:none;box-sizing:border-box;transition:all .15s ease;" title="Закрыть (На Путь)">✕</a>
 
       </div>
 
@@ -55733,9 +55920,13 @@ function viewNotesSrsHub(noteSrsStats){
 
     let title = `Ступень ${idx + 1}: интервал ${days} дн`;
 
+    let textStyle = 'color:rgba(251,191,36,0.40);font-size:0.71rem;font-weight:500;font-family:var(--font-m);line-height:1;';
+
     if(idx < curItem.step) {
 
       cls += ' done';
+
+      textStyle = 'color:#34d399;font-size:0.71rem;font-weight:600;font-family:var(--font-m);line-height:1;';
 
     } else if(idx === curItem.step) {
 
@@ -55743,11 +55934,13 @@ function viewNotesSrsHub(noteSrsStats){
 
       title += ' (текущая ступень)';
 
+      textStyle = 'color:#fbbf24;font-size:0.74rem;font-weight:800;font-family:var(--font-m);line-height:1;text-shadow:0 0 10px rgba(245,158,11,0.6);';
+
     }
 
-    return `<span class="${cls}" title="${title}">${days}д</span>`;
+    return `<span class="${cls}" style="${textStyle}" title="${title}">${days}д</span>`;
 
-  }).join('<span class="m-bead-sep" style="color:rgba(251,191,36,0.35);font-size:0.65rem;margin:0 1px;">—</span>');
+  }).join('<span class="m-bead-sep" style="color:rgba(251,191,36,0.22);font-size:0.65rem;margin:0 2px;">→</span>');
 
 
 
@@ -55758,6 +55951,26 @@ function viewNotesSrsHub(noteSrsStats){
   const linkedDeckId = linkedInfo.deckId;
 
   const linkedTrack = linkedSkill ? getTrackForSkill(linkedSkill.id) : null;
+
+  const rawTrackTitle = (linkedTrack && (linkedTrack.title || linkedTrack.name)) || 'Python Core';
+
+  let cleanTrackTitle = rawTrackTitle
+    .replace(/^[^\wА-Яа-яЁё]+/g, '')
+    .replace(/^(?:Матрица|Карта)\s+(?:Мастерства\s+)?/i, '')
+    .replace(/^Мастерства\s+/i, '')
+    .replace(/^Матрица\s*/i, '')
+    .trim();
+  if(!cleanTrackTitle || cleanTrackTitle.toLowerCase() === 'python'){
+    cleanTrackTitle = 'Python Core';
+  }
+
+  const rawTopicTitle = (linkedSkill && linkedSkill.title) || (cleanTitle.split(/[:·•\-]/)[0] || cleanTitle);
+
+  const topicTitle = rawTopicTitle
+    .replace(/^К-\d+\s*[:·•\-]\s*/i, '')
+    .replace(/^[🗺️🐍🚀⚙️🌐📊]+\s*/, '')
+    .replace(/\s*\([^)]*\)\s*$/, '')
+    .trim();
 
 
 
@@ -55800,17 +56013,14 @@ function viewNotesSrsHub(noteSrsStats){
           <span style="font-size:0.76rem;color:var(--ink-muted);">Оцените память по Эббингаузу:</span>
         </div>
         <div class="fc-rate-row note-rate-row rating-buttons-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;">
-          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again rate-btn rate-btn-again" data-srs-note-reset="${curItem.noteId}" style="min-height:52px;border-radius:12px;padding:8px 10px;">
-            <span class="srs-btn-title rate-label" style="font-size:0.88rem;font-weight:700;line-height:1;display:flex;align-items:center;gap:6px;"><span>🔴</span> <span>Не знаю</span></span>
-            <span class="srs-btn-sub rate-sub" style="font-family:var(--font-m);font-size:0.70rem;font-weight:600;opacity:0.85;line-height:1;">+1 день · [1]</span>
+          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again rate-btn rate-btn-again" data-srs-note-reset="${curItem.noteId}" style="min-height:50px;border-radius:14px;padding:8px 12px;display:flex;align-items:center;justify-content:center;">
+            <span class="srs-btn-title rate-label" style="font-size:0.92rem;font-weight:700;line-height:1;">Не помню</span>
           </button>
-          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent rate-btn rate-btn-good" data-srs-note-pass="${curItem.noteId}" style="min-height:52px;border-radius:12px;padding:8px 10px;">
-            <span class="srs-btn-title rate-label" style="font-size:0.88rem;font-weight:700;line-height:1;display:flex;align-items:center;gap:6px;"><span>🟢</span> <span>Хорошо</span></span>
-            <span class="srs-btn-sub rate-sub" style="font-family:var(--font-m);font-size:0.70rem;font-weight:600;opacity:0.85;line-height:1;">+3 дня · [2]</span>
+          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent rate-btn rate-btn-good" data-srs-note-pass="${curItem.noteId}" style="min-height:50px;border-radius:14px;padding:8px 12px;display:flex;align-items:center;justify-content:center;">
+            <span class="srs-btn-title rate-label" style="font-size:0.92rem;font-weight:700;line-height:1;">Помню</span>
           </button>
-          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy rate-btn rate-btn-easy" data-srs-note-easy="${curItem.noteId}" style="min-height:52px;border-radius:12px;padding:8px 10px;">
-            <span class="srs-btn-title rate-label" style="font-size:0.88rem;font-weight:700;line-height:1;display:flex;align-items:center;gap:6px;"><span>⚡</span> <span>На автомате</span></span>
-            <span class="srs-btn-sub rate-sub" style="font-family:var(--font-m);font-size:0.70rem;font-weight:600;opacity:0.85;line-height:1;">+7 дней · [3]</span>
+          <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--easy fc-rate-btn--easy rate-btn rate-btn-easy" data-srs-note-easy="${curItem.noteId}" style="min-height:50px;border-radius:14px;padding:8px 12px;display:flex;align-items:center;justify-content:center;">
+            <span class="srs-btn-title rate-label" style="font-size:0.92rem;font-weight:700;line-height:1;">На автомате</span>
           </button>
         </div>
       </div>
@@ -55823,11 +56033,13 @@ function viewNotesSrsHub(noteSrsStats){
     actionAreaHTML = `
       <div class="step-actions-row" style="display:flex;align-items:center;gap:12px;max-width:540px;margin:0 auto;width:100%;">
         ${canGoBack ? `
-          <button type="button" class="btn-step-prev" data-srs-note-chunk-prev="1" style="display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 16px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-weight:600;font-size:0.88rem;cursor:pointer;transition:all 0.15s ease;font-family:var(--font-d);">↶ Назад</button>
+          <button type="button" class="btn-step-prev" data-srs-note-chunk-prev="1" style="display:inline-flex;align-items:center;gap:7px;height:44px;padding:0 18px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-weight:600;font-size:0.88rem;cursor:pointer;transition:all 0.15s ease;font-family:var(--font-d);">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <span>Назад</span>
+          </button>
         ` : ''}
         <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta btn-step-next" ${hasMoreChunks ? 'data-srs-note-chunk-more="1"' : `data-srs-note-next-step="${sIdx + 1}"`} style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:10px;height:44px;padding:0 20px;border-radius:12px;background:linear-gradient(135deg, #10b981 0%, #059669 100%);border:1px solid rgba(255,255,255,0.20);color:#ffffff;font-weight:700;font-size:0.94rem;cursor:pointer;box-shadow:inset 0 1px 1px rgba(255,255,255,0.25), 0 4px 20px -2px rgba(16,185,129,0.38);font-family:var(--font-d);">
-          <span>${hasMoreChunks ? 'Понятно, дальше ➔' : 'Следующая подтема ➔'}</span>
-          <span class="key-badge" style="font-family:var(--font-m);font-size:0.72rem;font-weight:700;background:rgba(0,0,0,0.25);padding:2px 6px;border-radius:5px;border:1px solid rgba(255,255,255,0.25);">Space</span>
+          <span>${hasMoreChunks ? 'Понятно, дальше' : 'Следующая подтема'}</span>
         </button>
       </div>
     `;
@@ -55838,11 +56050,15 @@ function viewNotesSrsHub(noteSrsStats){
 
   const canGoBackInCard = (!cardsHubState.noteCompleted && (curChunkIdx > 0 || sIdx > 0));
 
+  const titleRawText = (!isFullMode ? (pureStepTitle || cleanTitle) : cleanTitle).trim();
+
+  const titleFormattedHTML = `<span style="color:#ffffff;font-weight:800;letter-spacing:-0.02em;">${escapeHtmlStr(titleRawText)}</span>`;
+
 
 
   return `
 
-  <div class="container cards-hub-container" style="padding-bottom:60px;max-width:780px;margin:0 auto;">
+  <div class="container srs-notes-container" style="max-width:680px;margin:0 auto;width:100%;box-sizing:border-box;">
 
     ${headerBarHTML}
 
@@ -55850,7 +56066,7 @@ function viewNotesSrsHub(noteSrsStats){
 
     <!-- Уровень 2: Чистые центрированные парящие бусины шагов конспекта (как в карточках) -->
 
-    <div class="srs-deck-beads-bar srs-beads-pure-floating" style="display:flex;align-items:center;justify-content:center;margin:18px auto 28px;padding:0;background:transparent;border:none;box-shadow:none;width:100%;">
+    <div class="srs-deck-beads-bar srs-beads-pure-floating" style="display:flex;align-items:center;justify-content:center;margin:14px auto 20px;padding:0;background:transparent;border:none;box-shadow:none;width:100%;">
 
       <div class="srs-beads-necklace fc-beads-necklace" style="display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto;padding:2px 0;background:transparent;border:none;box-shadow:none;">
 
@@ -55876,35 +56092,35 @@ function viewNotesSrsHub(noteSrsStats){
 
 
 
-    <!-- Уровень 3: Карточка конспекта в стиле Liquid Obsidian & Mastery Glass -->
+    <!-- Уровень 3: Контент конспекта (бесшовный внутри внешней плашки) -->
 
-    <main class="srs-card-stage" style="margin-top:0;perspective:none;margin-bottom:0;width:100%;max-width:780px;margin-left:auto;margin-right:auto;">
+    <main class="srs-card-stage" style="margin-top:0;perspective:none;margin-bottom:0;width:100%;max-width:680px;margin-left:auto;margin-right:auto;">
 
-      <div class="card srs-note-card">
+      <div class="srs-note-card">
 
         
 
-        <!-- Верхняя строка карточки: статус интервала слева, график повторений Эббингауза и кнопки [↶]/[📖] справа -->
+        <!-- Верхняя строка: статус интервала слева, график повторений Эббингауза и кнопка [ 📖 ] справа -->
 
-        <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:0;border-bottom:none;flex-wrap:wrap;">
+        <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:0;border-bottom:none;flex-wrap:nowrap;width:100%;">
 
-          <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex-shrink:0;">
+          <div class="fc-badge-group srs-note-breadcrumbs" style="display:inline-flex;align-items:center;gap:6px;min-width:0;flex:1 1 auto;overflow:hidden;font-family:var(--font-m);font-size:0.75rem;white-space:nowrap;">
 
-            <span style="font-size:0.76rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#94a3b8;display:inline-flex;align-items:center;">
+            <span style="color:var(--ink-muted);font-weight:600;overflow:hidden;text-overflow:ellipsis;max-width:140px;">${escapeHtmlStr(cleanTrackTitle)}</span>
 
-              ${escapeHtmlStr((cleanTitle.split(/[:·•\-]/)[0] || cleanTitle).trim())}
+            <span style="color:rgba(255,255,255,0.25);font-size:0.70rem;flex-shrink:0;">/</span>
 
-            </span>
+            <span style="color:#34d399;font-weight:700;letter-spacing:0.02em;overflow:hidden;text-overflow:ellipsis;">${escapeHtmlStr(topicTitle)}</span>
 
           </div>
 
 
 
-          <div class="srs-top-right-group" style="display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap;">
+          <div class="srs-top-right-group" style="display:inline-flex;align-items:center;gap:8px;flex-shrink:0;">
 
-            <!-- График количества повторов Эббингауза (1д — 3д — 7д — 21д — 30д) -->
+            <!-- Премиальная капсула повторов Эббингауза -->
 
-            <div class="note-memory-chain" style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:8px;background:rgba(245,158,11,0.06);border:1px solid rgba(251,191,36,0.22);" title="График повторений Эббингауза: 1д ➔ 3д ➔ 7д ➔ 21д ➔ 30д">
+            <div class="note-memory-chain" style="display:inline-flex;align-items:center;gap:3px;height:28px;padding:0 9px;border-radius:999px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.22);border-top:1px solid rgba(251,191,36,0.38);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);" title="График повторений Эббингауза: 1д ➔ 3д ➔ 7д ➔ 21д ➔ 30д">
 
               ${ladderHTML}
 
@@ -55912,27 +56128,13 @@ function viewNotesSrsHub(noteSrsStats){
 
 
 
-            <!-- Стеклянная капсула утилит: только [ ↶ ] и [ 📖 ] -->
+            <!-- Кнопка полного обзора конспекта [ 📖 ] (дубликат «назад» убран) -->
 
-            <div style="display:inline-flex;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.10);">
+            <button type="button" class="btn btn-ghost note-util-btn" data-srs-note-toggle-full style="width:28px;height:28px;min-width:28px;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-top:1px solid rgba(255,255,255,0.22);color:#cbd5e1;padding:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .15s ease;" title="${isFullMode ? 'Свернуть в пошаговый режим' : 'Развернуть весь конспект'}">
 
-              ${canGoBackInCard ? `
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
 
-                <button type="button" class="btn btn-ghost fc-hint-chip" data-srs-note-chunk-prev="1" style="background:transparent;border:none;border-right:1px solid rgba(255,255,255,0.08);color:#cbd5e1;padding:5px 10px;font-size:0.85rem;cursor:pointer;line-height:1;display:inline-flex;align-items:center;">
-
-                  ↶
-
-                </button>
-
-              ` : ''}
-
-              <button type="button" class="btn btn-ghost fc-hint-chip" data-srs-note-toggle-full style="background:transparent;border:none;color:#cbd5e1;padding:5px 10px;font-size:0.85rem;cursor:pointer;line-height:1;display:inline-flex;align-items:center;">
-
-                📖
-
-              </button>
-
-            </div>
+            </button>
 
           </div>
 
@@ -55940,15 +56142,11 @@ function viewNotesSrsHub(noteSrsStats){
 
 
 
-        ${!isFullMode ? `
-          <h2 style="font-size:1.35rem;font-weight:800;color:var(--ink);letter-spacing:-0.015em;margin:0 0 16px;line-height:1.35;text-align:left;">
-            ${escapeHtmlStr(pureStepTitle || cleanTitle)}
-          </h2>
-        ` : `
-          <h2 style="font-size:1.35rem;font-weight:800;color:var(--ink);letter-spacing:-0.015em;margin:0 0 16px;line-height:1.35;text-align:left;">
-            ${escapeHtmlStr(cleanTitle)}
-          </h2>
-        `}
+        <h2 style="font-size:1.36rem;font-weight:800;color:#ffffff;letter-spacing:-0.02em;margin:0 0 16px;line-height:1.34;text-align:left;">
+
+          ${titleFormattedHTML}
+
+        </h2>
 
 
 
@@ -55982,7 +56180,7 @@ function viewNotesSrsHub(noteSrsStats){
 
           ` : `
 
-            <div class="scroll-feed feed-container" id="srs-note-feed" style="min-height:120px;display:flex;flex-direction:column;justify-content:flex-start;overflow:visible;">
+            <div class="scroll-feed feed-container" id="srs-note-feed" style="min-height:auto;display:flex;flex-direction:column;justify-content:flex-start;overflow:visible;">
 
               ${chunks.slice(0, curChunkIdx + 1).map((ch, ci) => `
 
@@ -56004,7 +56202,7 @@ function viewNotesSrsHub(noteSrsStats){
 
     <!-- Уровень 4: Зона действий (снаружи карточки, строго по центру) -->
 
-    <footer class="srs-action-dock note-action-dock" style="margin-top:24px;width:100%;max-width:680px;margin-left:auto;margin-right:auto;text-align:center;">
+    <footer class="srs-action-dock note-action-dock" style="margin-top:16px;width:100%;max-width:680px;margin-left:auto;margin-right:auto;text-align:center;">
 
       ${actionAreaHTML}
 
