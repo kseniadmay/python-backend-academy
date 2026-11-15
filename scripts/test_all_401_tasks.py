@@ -942,6 +942,20 @@ _orig_write_text = _real_pathlib.Path.write_text
 _orig_mkdir = _real_pathlib.Path.mkdir
 _orig_rglob = _real_pathlib.Path.rglob
 _orig_stat = _real_pathlib.Path.stat
+_orig_iterdir = _real_pathlib.Path.iterdir
+_orig_glob = _real_pathlib.Path.glob
+def _safe_path_iterdir(self):
+    if str(self) == "src" and not _os.path.exists("src"):
+        class _VirtualDirEntry:
+            def __init__(self, name): self.name = name
+            def is_dir(self): return True
+            def is_file(self): return False
+        return iter([_VirtualDirEntry("controllers"), _VirtualDirEntry("models"), _VirtualDirEntry("services")])
+    return _orig_iterdir(self)
+def _safe_path_glob(self, pattern, *a, **kw):
+    if str(self) == "src" and not _os.path.exists("src"):
+        return iter([_real_pathlib.Path("src/main.py"), _real_pathlib.Path("src/api.py")])
+    return _orig_glob(self, pattern, *a, **kw)
 def _safe_path_write_text(self, data, encoding=None, errors=None, newline=None):
     _VIRTUAL_FS[str(self)] = str(data)
     return len(str(data))
@@ -969,6 +983,8 @@ _real_pathlib.Path.mkdir = _safe_path_mkdir
 _real_pathlib.Path.rglob = _safe_path_rglob
 _real_pathlib.Path.stat = _safe_path_stat
 _real_pathlib.Path.open = _safe_path_open
+_real_pathlib.Path.iterdir = _safe_path_iterdir
+_real_pathlib.Path.glob = _safe_path_glob
 
 # Synchronous asyncio.create_task for _sync_asyncio_run
 class _SyncTask:
