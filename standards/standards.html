@@ -29159,8 +29159,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   #radar-dots-necklace .dot-jewel.active::after,
   .cards-hub-container .srs-deck-beads-bar .dot-jewel.active::after,
   .cards-hub-container .dot-jewel.bead-active-leading::after,
-  .cards-hub-theory .dot-jewel.active::after,
-  .dock-quantum-bead.active::after {
+  .cards-hub-theory .dot-jewel.active::after {
     content: '' !important;
     display: block !important;
     position: absolute !important;
@@ -31640,11 +31639,11 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     flex-shrink: 0 !important;
     position: relative !important;
     outline: none !important;
-    border: none !important;
+    border: 1px solid transparent !important;
     animation: none !important;
     animation-delay: 0s !important;
     transform: none !important;
-    transition: all 0.2s ease !important;
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease !important;
   }
 
   /* Полное отключение маяка и кольцевой волны в нижнем ряду */
@@ -31664,7 +31663,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   /* Пройденные бусины нижнего ряда: яркий чистый изумруд (как бусина активности, без волн) */
   .dock-quantum-bead.done {
     background: radial-gradient(circle at 35% 35%, #ffffff 0%, #a7f3d0 30%, #34d399 65%, #059669 100%) !important;
-    border: 0.8px solid #6ee7b7 !important;
+    border: 1px solid #6ee7b7 !important;
     box-shadow: 0 0 2px 0.5px rgba(52, 211, 153, 0.45), 0 0 4px 1px rgba(16, 185, 129, 0.2) !important;
     opacity: 0.95 !important;
     animation: none !important;
@@ -31680,7 +31679,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     max-width: 7px !important;
     max-height: 7px !important;
     background: #ffffff !important;
-    border: 1.2px solid #10b981 !important;
+    border: 1px solid #10b981 !important;
     box-shadow: 0 0 3px 1px rgba(167, 243, 208, 0.75), 0 0 7px 1px rgba(52, 211, 153, 0.50) !important;
     animation: none !important;
     transform: none !important;
@@ -31717,35 +31716,38 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     padding-right: 0 !important;
   }
 
-  /* 6. Каскадная анимация проявления текста для новых квантов */
-  .feed-chunk.feed-chunk-new {
+  /* 6. Плавное проявление новых квантов без подскакивания и без сдвигов вёрстки (Zero-Jitter Invariant) */
+  .feed-chunk.feed-chunk-new,
+  .note-canvas-body .feed-chunk.feed-chunk-new,
+  .scroll-feed .feed-chunk.feed-chunk-new {
+    animation: zenChunkReveal 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+    transform: none !important;
+  }
+  .feed-chunk.feed-chunk-new > *,
+  .note-canvas-body .feed-chunk.feed-chunk-new > * {
     animation: none !important;
+    transform: none !important;
   }
-  .feed-chunk.feed-chunk-new > p,
-  .feed-chunk.feed-chunk-new > ul,
-  .feed-chunk.feed-chunk-new > h3,
-  .feed-chunk.feed-chunk-new > h4,
-  .feed-chunk.feed-chunk-new > pre,
-  .feed-chunk.feed-chunk-new > div {
-    animation: zenChunkReveal 0.45s cubic-bezier(0.16, 1, 0.3, 1) both !important;
-  }
-  .feed-chunk.feed-chunk-new > *:nth-child(1) { animation-delay: 0s !important; }
-  .feed-chunk.feed-chunk-new > *:nth-child(2) { animation-delay: 0.07s !important; }
-  .feed-chunk.feed-chunk-new > *:nth-child(3) { animation-delay: 0.14s !important; }
-  .feed-chunk.feed-chunk-new > *:nth-child(n+4) { animation-delay: 0.21s !important; }
 
-  .feed-chunk.feed-chunk-prev > * {
+  .feed-chunk.feed-chunk-prev,
+  .feed-chunk.feed-chunk-prev > *,
+  .note-canvas-body .feed-chunk.feed-chunk-prev {
     animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+    filter: none !important;
   }
 
   @keyframes zenChunkReveal {
     0% {
       opacity: 0;
-      transform: translateY(8px);
+      filter: blur(4px);
+      transform: none;
     }
     100% {
       opacity: 1;
-      transform: translateY(0);
+      filter: blur(0);
+      transform: none;
     }
   }
 
@@ -62583,15 +62585,15 @@ document.addEventListener('click', async function(e){
         // Мягкий автоскролл к новому кванту
         try { newEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch(err){}
 
-        // Обновляем круглые жемчужные бусины квантов над кнопкой «Дальше»
+        // Обновляем круглые жемчужные бусины квантов над кнопкой «Дальше» (без паразитного сброса классов и маяков)
         const beadsContainer = document.getElementById('py-quanta-beads');
         if(beadsContainer){
           const beads = beadsContainer.querySelectorAll('.dock-quantum-bead');
           beads.forEach((b, idx) => {
-            b.classList.remove('active', 'done', 'future', 'bead-active-leading');
-            if(idx < nextCIdx) b.classList.add('done');
-            else if(idx === nextCIdx) b.classList.add('active', 'bead-active-leading');
-            else b.classList.add('future');
+            const targetClass = idx < nextCIdx ? 'dock-quantum-bead done' : (idx === nextCIdx ? 'dock-quantum-bead active' : 'dock-quantum-bead future');
+            if(b.className !== targetClass){
+              b.className = targetClass;
+            }
           });
         }
 
@@ -62834,7 +62836,17 @@ document.addEventListener('click', async function(e){
 
         }
 
-
+        // Синхронизируем нижние бусины квантов при откате назад
+        const beadsContainer = document.getElementById('py-quanta-beads');
+        if(beadsContainer){
+          const beads = beadsContainer.querySelectorAll('.dock-quantum-bead');
+          beads.forEach((b, idx) => {
+            const targetClass = idx < pySkillViewState.chunkIdx ? 'dock-quantum-bead done' : (idx === pySkillViewState.chunkIdx ? 'dock-quantum-bead active' : 'dock-quantum-bead future');
+            if(b.className !== targetClass){
+              b.className = targetClass;
+            }
+          });
+        }
 
         const cardParent = feedContainer.closest('.interactive-step-card');
 

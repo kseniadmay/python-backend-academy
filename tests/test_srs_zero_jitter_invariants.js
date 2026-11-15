@@ -148,7 +148,17 @@ assert(content.includes('.activity-dot{\n    width:7px !important;\n    height:7
        content.includes('.nav-sub-breath-dot {\n    width: 7px !important;\n    height: 7px !important;') &&
        content.includes('.srs-live-status-dot {\n    width: 7px !important;\n    height: 7px !important;'),
   '❌ NAV DOTS VIOLATION: Точки активности в сайдбаре и хэдере обязаны иметь унифицированные габариты 7px и оптическое дыхание.');
-console.log('✓ [14/14] [Zero-Jitter] Бусины активности сайдбара и хэдера надёжно зафиксированы.');
+console.log('✓ [14/15] [Zero-Jitter] Бусины активности сайдбара и хэдера надёжно зафиксированы.');
 
-console.log('\n>>> ВСЕ 14 ИНВАРИАНТОВ ZERO-JITTER, КВАНТОВОГО МАЯКА И МОНОЛИТНОСТИ SRS УСПЕШНО ПРОЙДЕНЫ (100%) <<<\n');
+// 15. Инвариант Zero-Jitter и запрета подскакивания квантов конспекта
+const zenChunkMatch = content.match(/@keyframes zenChunkReveal\s*\{([\s\S]*?)\}/);
+assert(zenChunkMatch, '@keyframes zenChunkReveal обязан быть определён в CSS');
+assert(!zenChunkMatch[1].includes('translateY'),
+  '❌ ZERO-JITTER VIOLATION: В @keyframes zenChunkReveal категорически запрещён translateY! Появление квантов обязательно должно быть 0px layout shift (transform: none).');
+assert(content.includes('zenChunkReveal 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;') &&
+       content.includes('filter: blur(4px);'),
+  '❌ ZERO-JITTER VIOLATION: .feed-chunk.feed-chunk-new обязан иметь кинематографичную анимацию zenChunkReveal без сдвигов верстки.');
+console.log('✓ [15/15] [Zero-Jitter] Отсутствие подскакивания и сдвигов при появлении квантов конспекта (0 translateY) аппаратно зафиксировано.');
+
+console.log('\n>>> ВСЕ 15 ИНВАРИАНТОВ ZERO-JITTER, КВАНТОВОГО МАЯКА И МОНОЛИТНОСТИ SRS УСПЕШНО ПРОЙДЕНЫ (100%) <<<\n');
 process.exit(0);
