@@ -158,7 +158,12 @@ assert(!zenChunkMatch[1].includes('translateY'),
 assert(content.includes('zenChunkReveal 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;') &&
        content.includes('filter: blur(4px);'),
   '❌ ZERO-JITTER VIOLATION: .feed-chunk.feed-chunk-new обязан иметь кинематографичную анимацию zenChunkReveal без сдвигов верстки.');
-console.log('✓ [15/15] [Zero-Jitter] Отсутствие подскакивания и сдвигов при появлении квантов конспекта (0 translateY) аппаратно зафиксировано.');
+console.log('✓ [15/16] [Zero-Jitter] Отсутствие подскакивания и сдвигов при появлении квантов конспекта (0 translateY) аппаратно зафиксировано.');
 
-console.log('\n>>> ВСЕ 15 ИНВАРИАНТОВ ZERO-JITTER, КВАНТОВОГО МАЯКА И МОНОЛИТНОСТИ SRS УСПЕШНО ПРОЙДЕНЫ (100%) <<<\n');
+// 16. Инвариант стабильного слота кнопки «Назад» (0px Layout Shift при появлении кнопки Назад)
+assert(content.includes('data-chunk-prev="lesson"') && !content.includes('${canGoBack ? \'display:inline-flex;\' : \'display:none;\'}'),
+  '❌ ZERO-JITTER VIOLATION: Кнопка «Назад» в уроке обязана иметь стабильный зарезервированный слот (visibility/opacity вместо display:none), предотвращая сдвиг и сжатие соседнего CTA.');
+console.log('✓ [16/16] [Zero-Jitter] Стабильный зарезервированный слот кнопки «Назад» (0px layout shift) аппаратно зафиксирован.');
+
+console.log('\n>>> ВСЕ 16 ИНВАРИАНТОВ ZERO-JITTER, КВАНТОВОГО МАЯКА И МОНОЛИТНОСТИ SRS УСПЕШНО ПРОЙДЕНЫ (100%) <<<\n');
 process.exit(0);
