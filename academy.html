@@ -28216,12 +28216,22 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     -webkit-font-smoothing: antialiased !important;
     -moz-osx-font-smoothing: grayscale !important;
     text-rendering: geometricPrecision !important;
-    backdrop-filter: blur(32px) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(32px) saturate(140%) !important;
-    background: rgba(7, 9, 14, 0.72) !important;
+    backdrop-filter: blur(28px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(160%) !important;
+    background-color: rgba(13, 16, 24, 0.48) !important;
+    background-image: 
+      radial-gradient(ellipse 420px 180px at 50% 100%, rgba(16, 185, 129, 0.16) 0%, transparent 70%),
+      radial-gradient(ellipse 260px 140px at 15% 0%, rgba(136, 19, 55, 0.18) 0%, transparent 65%),
+      radial-gradient(ellipse 240px 130px at 85% 0%, rgba(16, 185, 129, 0.10) 0%, transparent 65%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 32%, transparent 60%) !important;
     border: 1px solid rgba(255, 255, 255, 0.09) !important;
-    border-top: 1.5px solid rgba(255, 255, 255, 0.18) !important;
-    box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.15), inset 0 0 35px -10px rgba(255, 255, 255, 0.02), 0 28px 68px -12px rgba(0, 0, 0, 0.90) !important;
+    border-top: 1.5px solid rgba(255, 255, 255, 0.32) !important;
+    border-left: 1.2px solid rgba(255, 255, 255, 0.18) !important;
+    box-shadow: 
+      inset 0 1.5px 1px rgba(255, 255, 255, 0.22),
+      inset 1px 0 1px rgba(255, 255, 255, 0.10),
+      0 28px 72px -12px rgba(0, 0, 0, 0.70),
+      0 0 32px -8px rgba(16, 185, 129, 0.12) !important;
     margin: 0 auto !important;
     width: 100% !important;
     max-width: 760px !important;
@@ -28230,9 +28240,147 @@ html:not([data-theme="dark"]) .fc-card--Answer,
   }
 
   @media (max-width: 640px) {
+    /* 1. Полноэкранный бесшовный Book-режим (Full-Bleed Zen): ликвидация внешней подложки */
+    .container.srs-notes-container,
     .srs-notes-container {
-      padding: 20px 18px !important;
-      border-radius: 22px !important;
+      background: transparent !important;
+      background-color: transparent !important;
+      background-image: none !important;
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      padding: 6px 16px calc(92px + env(safe-area-inset-bottom, 0px)) !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+      width: 100% !important;
+    }
+
+    .srs-notes-container::before,
+    .srs-notes-container::after {
+      display: none !important;
+    }
+
+    [data-theme="light"] .srs-notes-container {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    /* 2. Снятие ограничений полей с главного контейнера страницы на мобильных */
+    #view-root:has(.srs-notes-container),
+    main:has(.srs-notes-container) {
+      display: block !important;
+      min-height: auto !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      padding-top: 4px !important;
+      padding-bottom: 0 !important;
+      max-width: 100% !important;
+      width: 100% !important;
+    }
+
+    /* 3. Дзен-минимализм мета-строки: скрытие шкалы повторений и полная тема без обрезки */
+    .srs-notes-container .note-memory-chain {
+      display: none !important;
+    }
+
+    .srs-notes-container .srs-note-breadcrumbs {
+      white-space: normal !important;
+      overflow: visible !important;
+      flex-wrap: wrap !important;
+      max-width: calc(100% - 38px) !important;
+      line-height: 1.35 !important;
+    }
+
+    .srs-notes-container .srs-breadcrumb-track {
+      max-width: none !important;
+      overflow: visible !important;
+      text-overflow: clip !important;
+      white-space: normal !important;
+      font-size: 0.74rem !important;
+    }
+
+    .srs-notes-container .srs-breadcrumb-topic {
+      max-width: none !important;
+      overflow: visible !important;
+      text-overflow: clip !important;
+      white-space: normal !important;
+      font-size: 0.88rem !important;
+    }
+
+    /* 4. Липкий нижний док (Sticky Dock) с безопасными отступами */
+    .srs-notes-container .note-action-dock,
+    .srs-notes-container .srs-action-dock {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 9999 !important;
+      margin: 0 !important;
+      padding: 10px 16px calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+      background: linear-gradient(180deg, rgba(7, 9, 14, 0.1) 0%, rgba(7, 9, 14, 0.95) 28%, #07090e 100%) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+      display: flex !important;
+      justify-content: center !important;
+      box-sizing: border-box !important;
+    }
+
+    [data-theme="light"] .srs-notes-container .note-action-dock,
+    [data-theme="light"] .srs-notes-container .srs-action-dock {
+      background: linear-gradient(180deg, rgba(248, 250, 252, 0.1) 0%, rgba(248, 250, 252, 0.95) 28%, #f8fafc 100%) !important;
+      border-top-color: rgba(0, 0, 0, 0.06) !important;
+    }
+
+    .srs-notes-container .step-actions-row {
+      max-width: 480px !important;
+      width: 100% !important;
+      gap: 8px !important;
+    }
+
+    .srs-notes-container .btn-step-prev {
+      height: 44px !important;
+      padding: 0 14px !important;
+      font-size: 0.85rem !important;
+      flex-shrink: 0 !important;
+    }
+
+    .srs-notes-container .btn-cta-dominant {
+      height: 44px !important;
+      font-size: 0.92rem !important;
+    }
+
+    /* 5. Финишные кнопки оценки памяти: 1x3 компактный эргономичный ряд */
+    .srs-notes-container .note-rate-row,
+    .srs-notes-container .finish-rating-panel .note-rate-row,
+    .srs-notes-container .finish-rating-panel .rating-buttons-grid {
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 8px !important;
+      width: 100% !important;
+      max-width: 480px !important;
+    }
+
+    .srs-notes-container .note-rate-row .fc-rate-btn,
+    .srs-notes-container .finish-rating-panel .fc-rate-btn {
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 6px !important;
+      min-height: 44px !important;
+      height: 44px !important;
+      box-sizing: border-box !important;
+    }
+
+    .srs-notes-container .note-rate-row .fc-rate-btn .srs-btn-title,
+    .srs-notes-container .finish-rating-panel .fc-rate-btn .srs-btn-title {
+      font-size: 0.80rem !important;
+      font-weight: 700 !important;
+      white-space: nowrap !important;
+      line-height: 1 !important;
     }
   }
 
@@ -28404,13 +28552,16 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     }
     .note-rate-row,
     .rating-buttons-grid {
-      grid-template-columns: 1fr !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 8px !important;
     }
     .note-rate-row .fc-rate-btn {
-      flex-direction: row !important;
-      justify-content: space-between !important;
-      padding: 10px 14px !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      align-items: center !important;
+      padding: 0 6px !important;
       min-height: 44px !important;
+      height: 44px !important;
     }
     .card-rating-btn,
     .card-rating-grid .fc-rate-btn,
@@ -28426,60 +28577,143 @@ html:not([data-theme="dark"]) .fc-card--Answer,
      МОБИЛЬНАЯ ЭРГОНОМИКА: BOOK MODE ДЛЯ КОНСПЕКТОВ УРОКОВ
      ══════════════════════════════════════════════════════════ */
   @media (max-width: 640px) {
-    /* 1. Контейнер страницы: освобождаем всю ширину и добавляем отступ снизу под липкий док */
+    /* 1. Полноэкранный бесшовный Book-режим: ликвидация внешней подложки */
     .cards-hub-theory,
+    .cards-hub-container.cards-hub-theory,
     .cards-hub-container:has(#py-theory-text),
     .cards-hub-container:has(.srs-note-card-clean) {
-      padding: 10px 0 calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+      background: transparent !important;
+      background-color: transparent !important;
+      background-image: none !important;
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      padding: 6px 16px calc(92px + env(safe-area-inset-bottom, 0px)) !important;
       max-width: 100% !important;
       margin: 0 !important;
+      width: 100% !important;
+    }
+    .cards-hub-theory::before,
+    .cards-hub-theory::after,
+    .cards-hub-container:has(#py-theory-text)::before,
+    .cards-hub-container:has(#py-theory-text)::after {
+      display: none !important;
+    }
+    [data-theme="light"] .cards-hub-theory,
+    [data-theme="light"] .cards-hub-container.cards-hub-theory,
+    [data-theme="light"] .cards-hub-container:has(#py-theory-text) {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
     }
 
-    /* 2. Шапка: центрирование названия урока, крестик справа, балансир слева */
+    /* 2. Снятие ограничений полей с главного контейнера страницы на мобильных */
+    #view-root:has(.cards-hub-theory),
+    #view-root:has(#py-theory-text),
+    main:has(.cards-hub-theory),
+    main:has(#py-theory-text) {
+      display: block !important;
+      min-height: auto !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      padding-top: 4px !important;
+      padding-bottom: 0 !important;
+      max-width: 100% !important;
+      width: 100% !important;
+    }
+
+    /* 3. Шапка: режим «• Урок курса» слева, крестик справа, шкала прогресса без обрезки */
     .cards-hub-theory .srs-unified-header-bar,
     .cards-hub-container:has(#py-theory-text) .srs-unified-header-bar,
     .cards-hub-container:has(.srs-note-card-clean) .srs-unified-header-bar {
-      height: 42px !important;
-      min-height: 42px !important;
-      margin-bottom: 6px !important;
-      padding: 0 16px !important;
+      height: 30px !important;
+      min-height: 30px !important;
+      margin-bottom: 16px !important;
+      padding: 0 !important;
+    }
+    .cards-hub-theory .srs-header-mode-label,
+    .cards-hub-container:has(#py-theory-text) .srs-header-mode-label {
+      display: inline !important;
+    }
+    .cards-hub-theory .srs-header-title-full,
+    .cards-hub-container:has(#py-theory-text) .srs-header-title-full {
+      display: none !important;
     }
     .cards-hub-theory .srs-header-left-spacer,
     .cards-hub-container:has(#py-theory-text) .srs-header-left-spacer,
     .cards-hub-container:has(.srs-note-card-clean) .srs-header-left-spacer {
-      display: block !important;
-      width: 28px !important;
-      flex-shrink: 0 !important;
+      display: none !important;
     }
     .cards-hub-theory .srs-header-title-wrap,
     .cards-hub-container:has(#py-theory-text) .srs-header-title-wrap,
     .cards-hub-container:has(.srs-note-card-clean) .srs-header-title-wrap {
-      justify-content: center !important;
-      text-align: center !important;
+      justify-content: flex-start !important;
+      text-align: left !important;
     }
     .cards-hub-theory .srs-header-mode-title,
     .cards-hub-container:has(#py-theory-text) .srs-header-mode-title,
     .cards-hub-container:has(.srs-note-card-clean) .srs-header-mode-title {
-      font-size: 0.84rem !important;
+      font-size: 0.76rem !important;
       font-weight: 700 !important;
-      color: var(--ink) !important;
-      text-transform: none !important;
-      letter-spacing: -0.01em !important;
-      justify-content: center !important;
+      color: var(--ink-soft) !important;
+      letter-spacing: 0.04em !important;
+      text-transform: uppercase !important;
+      justify-content: flex-start !important;
     }
     .cards-hub-theory .srs-live-status-dot,
     .cards-hub-container:has(#py-theory-text) .srs-live-status-dot,
     .cards-hub-container:has(.srs-note-card-clean) .srs-live-status-dot {
-      display: none !important;
+      display: inline-block !important;
     }
     .cards-hub-theory .srs-header-progress-track,
     .cards-hub-container:has(#py-theory-text) .srs-header-progress-track,
     .cards-hub-container:has(.srs-note-card-clean) .srs-header-progress-track {
-      bottom: -6px !important;
-      height: 2.5px !important;
+      bottom: -8px !important;
+      height: 3px !important;
     }
 
-    /* 3. Парящие бусины шагов урока */
+    /* 4. Хлебные крошки темы (без дублирования и обрезки) */
+    .cards-hub-theory .topic-eyebrow-track,
+    .cards-hub-container:has(#py-theory-text) .topic-eyebrow-track {
+      margin: 12px 0 16px !important;
+      padding: 0 !important;
+    }
+    .cards-hub-theory .topic-eyebrow-labels,
+    .cards-hub-container:has(#py-theory-text) .topic-eyebrow-labels {
+      flex-direction: row !important;
+      align-items: center !important;
+      gap: 6px !important;
+      flex-wrap: wrap !important;
+      line-height: 1.35 !important;
+      margin-bottom: 6px !important;
+    }
+    .cards-hub-theory .topic-eyebrow-unit,
+    .cards-hub-container:has(#py-theory-text) .topic-eyebrow-unit {
+      font-size: 0.74rem !important;
+      color: var(--ink-muted) !important;
+      font-weight: 600 !important;
+      line-height: 1.35 !important;
+    }
+    .cards-hub-theory .topic-eyebrow-sep,
+    .cards-hub-container:has(#py-theory-text) .topic-eyebrow-sep {
+      display: inline !important;
+      color: rgba(255, 255, 255, 0.25) !important;
+      font-size: 0.74rem !important;
+    }
+    .cards-hub-theory .topic-eyebrow-item,
+    .cards-hub-container:has(#py-theory-text) .topic-eyebrow-item {
+      font-size: 0.88rem !important;
+      color: #34d399 !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.01em !important;
+      line-height: 1.35 !important;
+    }
+
+    /* 5. Парящие бусины шагов урока */
+    .cards-hub-theory .dots-necklace,
+    .cards-hub-container:has(#py-theory-text) .dots-necklace,
     .cards-hub-theory .srs-deck-beads-bar,
     .cards-hub-container:has(#py-theory-text) .srs-deck-beads-bar,
     .cards-hub-container:has(.srs-note-card-clean) .srs-deck-beads-bar {
@@ -28487,7 +28721,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
       padding: 0 !important;
     }
 
-    /* 4. Чистый Book Mode: никаких фонов карточки и тяжелых рамок */
+    /* 6. Чистый Book Mode: никаких фонов карточки и тяжелых рамок */
     .cards-hub-theory .srs-card-stage,
     .srs-card-stage:has(.srs-note-card-clean) {
       max-width: 100% !important;
@@ -28500,7 +28734,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
       border: none !important;
       border-radius: 0 !important;
       box-shadow: none !important;
-      padding: 2px 16px 20px !important;
+      padding: 2px 0 20px !important;
     }
     [data-theme="light"] .cards-hub-theory .srs-note-card.srs-note-card-clean,
     [data-theme="light"] .srs-note-card.srs-note-card-clean {
@@ -28509,9 +28743,11 @@ html:not([data-theme="dark"]) .fc-card--Answer,
       box-shadow: none !important;
     }
 
-    /* 5. Заголовок и типографика конспекта */
+    /* 7. Заголовок и типографика урока */
     .cards-hub-theory .srs-note-card.srs-note-card-clean h2,
-    .srs-note-card.srs-note-card-clean h2 {
+    .srs-note-card.srs-note-card-clean h2,
+    .cards-hub-theory h2,
+    .cards-hub-container:has(#py-theory-text) h2 {
       font-size: 1.25rem !important;
       font-weight: 800 !important;
       line-height: 1.34 !important;
@@ -28521,16 +28757,19 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     }
     .cards-hub-theory .srs-note-card.srs-note-card-clean p,
     .cards-hub-theory .lesson-theory p,
-    .cards-hub-theory .feed-chunk p {
-      font-size: 1.00rem !important;
+    .cards-hub-theory .feed-chunk p,
+    .cards-hub-container:has(#py-theory-text) p {
+      font-size: 0.98rem !important;
       line-height: 1.68 !important;
       color: var(--ink-soft) !important;
       margin: 0 0 14px !important;
     }
 
-    /* 6. PEP 8 Scroll блоки кода: моно-шрифт 0.82rem, фиксированная строка, горизонтальный скролл */
-    .cards-hub-theory .srs-note-card.srs-note-card-clean .snippet-wrap,
-    .cards-hub-theory .srs-note-card.srs-note-card-clean .code-snippet-wrap {
+    /* 8. PEP 8 Scroll блоки кода: моно-шрифт 0.82rem, фиксированная строка, горизонтальный скролл */
+    .cards-hub-theory .snippet-wrap,
+    .cards-hub-theory .code-snippet-wrap,
+    .cards-hub-container:has(#py-theory-text) .snippet-wrap,
+    .cards-hub-container:has(#py-theory-text) .code-snippet-wrap {
       margin: 14px 0 16px !important;
       border-radius: 14px !important;
       background: rgba(11, 15, 25, 0.95) !important;
@@ -28538,15 +28777,16 @@ html:not([data-theme="dark"]) .fc-card--Answer,
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
       overflow: hidden !important;
     }
-    [data-theme="light"] .cards-hub-theory .srs-note-card.srs-note-card-clean .snippet-wrap,
-    [data-theme="light"] .cards-hub-theory .srs-note-card.srs-note-card-clean .code-snippet-wrap {
+    [data-theme="light"] .cards-hub-theory .snippet-wrap,
+    [data-theme="light"] .cards-hub-theory .code-snippet-wrap,
+    [data-theme="light"] .cards-hub-container:has(#py-theory-text) .snippet-wrap,
+    [data-theme="light"] .cards-hub-container:has(#py-theory-text) .code-snippet-wrap {
       background: #f1f5f9 !important;
       border-color: rgba(16, 185, 129, 0.35) !important;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
     }
-    .cards-hub-theory .srs-note-card.srs-note-card-clean .snippet-wrap pre,
-    .cards-hub-theory .srs-note-card.srs-note-card-clean .code-snippet-wrap pre,
-    .cards-hub-theory .srs-note-card.srs-note-card-clean pre {
+    .cards-hub-theory pre,
+    .cards-hub-container:has(#py-theory-text) pre {
       font-size: 0.82rem !important;
       line-height: 1.55 !important;
       padding: 12px 14px !important;
@@ -28557,37 +28797,48 @@ html:not([data-theme="dark"]) .fc-card--Answer,
       scrollbar-color: rgba(52, 211, 153, 0.45) transparent !important;
     }
 
-    /* 7. Липкий нижний док с бусинами квантов над кнопкой «Дальше» */
-    .cards-hub-theory .srs-action-dock-container {
+    /* 9. Компактный липкий нижний док с микро-точками квантов над кнопкой */
+    .cards-hub-theory .srs-action-dock-container,
+    .cards-hub-container:has(#py-theory-text) .srs-action-dock-container {
       position: fixed !important;
       bottom: 0 !important;
       left: 0 !important;
       right: 0 !important;
       z-index: 9999 !important;
       margin: 0 !important;
-      padding: 10px 16px calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+      padding: 8px 16px calc(12px + env(safe-area-inset-bottom, 0px)) !important;
       background: linear-gradient(180deg, rgba(7, 9, 14, 0.1) 0%, rgba(7, 9, 14, 0.95) 28%, #07090e 100%) !important;
       backdrop-filter: blur(14px) !important;
       -webkit-backdrop-filter: blur(14px) !important;
       border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
       display: flex !important;
       justify-content: center !important;
+      box-sizing: border-box !important;
     }
-    [data-theme="light"] .cards-hub-theory .srs-action-dock-container {
+    [data-theme="light"] .cards-hub-theory .srs-action-dock-container,
+    [data-theme="light"] .cards-hub-container:has(#py-theory-text) .srs-action-dock-container {
       background: linear-gradient(180deg, rgba(248, 250, 252, 0.1) 0%, rgba(248, 250, 252, 0.95) 28%, #f8fafc 100%) !important;
       border-top-color: rgba(0, 0, 0, 0.06) !important;
     }
-    .cards-hub-theory .srs-dock-action-wrapper {
+    .cards-hub-theory .dock-quanta-spacer,
+    .cards-hub-container:has(#py-theory-text) .dock-quanta-spacer {
+      height: 14px !important;
+      margin: 0 0 6px !important;
+    }
+    .cards-hub-theory .srs-dock-action-wrapper,
+    .cards-hub-container:has(#py-theory-text) .srs-dock-action-wrapper {
       max-width: 480px !important;
       width: 100% !important;
-      gap: 8px !important;
+      gap: 0 !important;
     }
-    .cards-hub-theory .btn-dock-cta-single {
-      height: 48px !important;
+    .cards-hub-theory .btn-dock-cta-single,
+    .cards-hub-container:has(#py-theory-text) .btn-dock-cta-single {
+      height: 46px !important;
       border-radius: 14px !important;
-      font-size: 0.95rem !important;
+      font-size: 0.94rem !important;
       font-weight: 700 !important;
       box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35) !important;
+      width: 100% !important;
     }
   }
 
@@ -31216,20 +31467,77 @@ html:not([data-theme="dark"]) .fc-card--Answer,
      Деликатный винный кант + Спектральный прогресс + 0 плашек вокруг бусин
      ══════════════════════════════════════════════════════════════════════ */
 
-  /* 1. Модальное окно: чистый спокойный обсидиан (кант и бордовый фон убраны) */
+  /* 1. Модальное окно урока на десктопе: Monolithic Obsidian Glass (1:1 стиль srs-notes-container из stand_note_screen_harmony.html) */
   .cards-hub-theory,
   .cards-hub-container.cards-hub-theory,
   .cards-hub-container:has(#py-theory-text),
   .cards-hub-container:has(.lesson-theory):not(.srs-notes-container):not(:has(.srs-note-card)) {
     position: relative !important;
-    background: rgba(13, 17, 24, 0.94) !important;
-    background-image: none !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.14) !important;
+    overflow: hidden !important;
+    padding: 32px 36px 40px !important;
     border-radius: 28px !important;
-    box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.4) !important;
-    backdrop-filter: blur(24px) !important;
-    -webkit-backdrop-filter: blur(24px) !important;
+    min-height: auto !important;
+    height: auto !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    isolation: isolate !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    text-rendering: geometricPrecision !important;
+    backdrop-filter: blur(28px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(160%) !important;
+    background-color: rgba(13, 16, 24, 0.48) !important;
+    background-image: 
+      radial-gradient(ellipse 420px 180px at 50% 100%, rgba(16, 185, 129, 0.16) 0%, transparent 70%),
+      radial-gradient(ellipse 260px 140px at 15% 0%, rgba(136, 19, 55, 0.18) 0%, transparent 65%),
+      radial-gradient(ellipse 240px 130px at 85% 0%, rgba(16, 185, 129, 0.10) 0%, transparent 65%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 32%, transparent 60%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.09) !important;
+    border-top: 1.5px solid rgba(255, 255, 255, 0.32) !important;
+    border-left: 1.2px solid rgba(255, 255, 255, 0.18) !important;
+    box-shadow: 
+      inset 0 1.5px 1px rgba(255, 255, 255, 0.22),
+      inset 1px 0 1px rgba(255, 255, 255, 0.10),
+      0 28px 72px -12px rgba(0, 0, 0, 0.70),
+      0 0 32px -8px rgba(16, 185, 129, 0.12) !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 760px !important;
+    box-sizing: border-box !important;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
+  }
+
+  :root:not([data-theme="light"]):not(.theme-light) .cards-hub-theory::before,
+  :root:not([data-theme="light"]):not(.theme-light) .cards-hub-container:has(#py-theory-text)::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    left: 20%;
+    width: 320px;
+    height: 120px;
+    background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.09) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  :root:not([data-theme="light"]):not(.theme-light) .cards-hub-theory::after,
+  :root:not([data-theme="light"]):not(.theme-light) .cards-hub-container:has(#py-theory-text)::after {
+    content: '';
+    position: absolute;
+    bottom: -60px;
+    right: 15%;
+    width: 280px;
+    height: 100px;
+    background: radial-gradient(ellipse at center, rgba(6, 182, 212, 0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  [data-theme="light"] .cards-hub-theory,
+  [data-theme="light"] .cards-hub-container.cards-hub-theory,
+  [data-theme="light"] .cards-hub-container:has(#py-theory-text) {
+    background: rgba(255, 255, 255, 0.88) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-top: 1.5px solid rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 20px 48px -10px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
   }
 
   /* 2. Полоса прогресса эшелона: попиксельное постепенное заполнение + мягкое свечение */
@@ -45571,21 +45879,20 @@ function viewPythonSkill(sid){
 
 
 
-  // Деликатный заголовок: название юнита приглушено (Refined Eyebrow), активная тема и ожерелье точек
+  // Деликатный заголовок: верхний статус «Урок курса» + 30px кнопка + шкала эшелона
   const srsHeaderHTML = `
     <header class="srs-unified-header-bar" style="position:relative;display:flex;justify-content:space-between;align-items:center;height:30px;min-height:30px;gap:12px;margin-bottom:28px;padding:0 2px;background:transparent !important;border:none !important;box-shadow:none !important;box-sizing:border-box;">
       <div class="srs-header-left-spacer" style="width:28px;height:28px;display:none;flex-shrink:0;"></div>
 
       <div class="srs-header-title-wrap" style="min-width:0;flex:1;display:flex;align-items:center;gap:10px;height:30px;justify-content:flex-start;">
-        <span class="srs-header-mode-title" style="display:inline-flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:700;color:var(--ink-soft);letter-spacing:0.03em;text-transform:uppercase;box-sizing:border-box;">
+        <span class="srs-header-mode-title" style="display:inline-flex;align-items:center;gap:8px;font-size:0.76rem;font-weight:700;color:var(--ink-soft);letter-spacing:0.04em;text-transform:uppercase;box-sizing:border-box;">
           <span class="srs-live-status-dot"></span>
-          <span>${escapeHtmlStr(activeItemTitle || cleanUnitTitleVal)}</span>
+          <span class="srs-header-mode-label">Урок курса</span>
         </span>
-
       </div>
 
       <div class="srs-header-right-cluster" style="display:flex;align-items:center;gap:6px;height:30px;flex-shrink:0;">
-        <a href="#${tr.routePrefix}" class="srs-header-close-btn" style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;font-size:0.80rem;text-decoration:none;box-sizing:border-box;transition:all 0.15s ease;" title="Закрыть (На Путь)">✕</a>
+        <a href="#${tr.routePrefix}" class="srs-header-close-btn" style="width:30px;height:30px;min-width:30px;min-height:30px;padding:0;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-top:1px solid rgba(255,255,255,0.20);color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;font-size:0.78rem;text-decoration:none;box-sizing:border-box;transition:all .15s ease;" title="Закрыть (На Путь)">✕</a>
       </div>
 
       <!-- Полоса прогресса эшелона: попиксельное постепенное заполнение (#881337 -> #10b981) + мягкое свечение -->
@@ -45598,28 +45905,19 @@ function viewPythonSkill(sid){
     </header>
   `;
 
+  // Хлебные крошки и ожерелье бусин (1:1 стиль srs-notes-container, 0 дублирования названия темы)
   const eyebrowDotsHTML = `
-
     <div class="topic-eyebrow-track" style="max-width:100%;margin:16px 0 22px;padding:0 2px;">
-
-      <div style="display:flex;flex-direction:column;gap:12px;width:100%;">
-
-        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;max-width:760px;margin:0 auto;width:100%;">
-
-          <div style="font-family:var(--font-b);font-size:0.80rem;font-weight:500;color:var(--ink-muted);letter-spacing:0.01em;line-height:1.2;">${escapeHtmlStr(cleanUnitTitleVal)}</div>
-
-          ${activeItemTitle ? `<div style="font-family:var(--font-b);font-size:1.06rem;font-weight:600;color:var(--ink);line-height:1.35;letter-spacing:-0.01em;">${escapeHtmlStr(activeItemTitle)}</div>` : ''}
-
+      <div style="display:flex;flex-direction:column;gap:14px;width:100%;">
+        <div class="fc-badge-group srs-note-breadcrumbs" style="display:inline-flex;align-items:center;gap:6px;min-width:0;width:100%;overflow:hidden;font-family:var(--font-m);font-size:0.82rem;white-space:nowrap;">
+          <span class="srs-breadcrumb-track" style="color:var(--ink-muted);font-weight:600;overflow:hidden;text-overflow:ellipsis;max-width:140px;font-size:0.78rem;">${escapeHtmlStr(cleanUnitTitleVal)}</span>
+          <span class="srs-breadcrumb-sep" style="color:rgba(255,255,255,0.25);font-size:0.74rem;flex-shrink:0;">/</span>
+          <span class="srs-breadcrumb-topic" style="color:#34d399;font-weight:700;letter-spacing:-0.01em;font-size:0.88rem;overflow:hidden;text-overflow:ellipsis;">${escapeHtmlStr(activeItemTitle)}</span>
         </div>
-
         <div style="display:flex;justify-content:center;width:100%;">
-
           ${dotsNecklaceHTML}
-
         </div>
-
       </div>
-
     </div>`;
 
 
@@ -45636,31 +45934,31 @@ function viewPythonSkill(sid){
     const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
 
     let finishBtnAttr = '';
-    let finishBtnText = 'Дальше ➔';
+    let finishBtnText = 'Дальше';
     if(hasMoreChunks){
       finishBtnAttr = 'data-chunk-more="py"';
-      finishBtnText = 'Дальше ➔';
+      finishBtnText = 'Дальше';
     } else if(stepIdx + 1 < steps.length){
       finishBtnAttr = `data-py-next-step="${stepIdx+1}"`;
-      finishBtnText = 'Следующий шаг ➔';
+      finishBtnText = 'Следующий шаг';
     } else {
       const noteDecks = (typeof getMatchingDecksForNote === 'function') ? getMatchingDecksForNote(activeK, sk) : [];
       finishBtnAttr = `data-py-finish-note="${activeK}"`;
-      finishBtnText = 'Закрепить в карточках (+10 XP) ➔';
+      finishBtnText = 'Закрепить в карточках (+10 XP)';
       if(noteDecks.length === 0){
         const noteTasks = (typeof getMatchingTasksForNote === 'function') ? getMatchingTasksForNote(activeK, sk) : [];
         if(noteTasks.length > 0){
           finishBtnAttr = `data-py-select-task="${noteTasks[0]}"`;
-          finishBtnText = 'Перейти к практике ➔';
+          finishBtnText = 'Перейти к практике';
         } else {
           const curKidx = (sk.kIds || []).indexOf(activeK);
           if(curKidx >= 0 && curKidx + 1 < (sk.kIds || []).length){
             const nextKid = sk.kIds[curKidx + 1];
             finishBtnAttr = `data-py-to-next-note="${nextKid}"`;
-            finishBtnText = 'К следующему конспекту ➔';
+            finishBtnText = 'К следующему конспекту';
           } else {
             finishBtnAttr = `data-py-to-exam="${sk.unitId}"`;
-            finishBtnText = 'Рубежный зачёт ➔';
+            finishBtnText = 'Рубежный зачёт';
           }
         }
       }
@@ -45680,7 +45978,7 @@ function viewPythonSkill(sid){
             }).join('')}
           </div>
         </div>
-        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta btn-dock-cta-single" style="height:48px;border-radius:14px;font-size:0.96rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;width:100%;letter-spacing:0.01em;" ${finishBtnAttr}>
+        <button type="button" class="btn-cta-dominant btn-sprint-cta btn-dock-cta-single" style="height:48px;border-radius:14px;font-size:0.96rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;width:100%;letter-spacing:0.01em;background:linear-gradient(135deg, #10b981 0%, #059669 100%);border:1px solid rgba(255,255,255,0.22);box-shadow:inset 0 1px 1px rgba(255,255,255,0.30), 0 4px 22px -2px rgba(16,185,129,0.42);color:#ffffff;" ${finishBtnAttr}>
           <span>${finishBtnText}</span>
         </button>
       </div>`;
@@ -45691,8 +45989,8 @@ function viewPythonSkill(sid){
       <!-- Уровень 3: Лаконичный конспект без внутренней плашки (Book Mode) -->
       <main class="srs-card-stage srs-stage-seamless" style="margin-top:0;perspective:none;margin-bottom:0;width:100%;max-width:760px;margin-left:auto;margin-right:auto;">
         <div class="srs-note-content-area srs-note-card-clean" style="width:100%;background:transparent;border:none;box-shadow:none;padding:0;">
-          <h2 style="font-size:1.28rem;font-weight:800;color:var(--ink);letter-spacing:-0.015em;margin:0 0 16px;line-height:1.35;text-align:left;">
-            ${escapeHtmlStr(cleanStepTitle || cleanNoteTitle)}
+          <h2 style="font-size:1.42rem;font-weight:800;color:var(--ink);letter-spacing:-0.02em;margin:0 0 16px;line-height:1.35;text-align:left;">
+            <span style="color:#ffffff;font-weight:800;letter-spacing:-0.02em;">${escapeHtmlStr(pureStepTitle || cleanStepTitle || cleanNoteTitle)}</span>
           </h2>
 
           ${feedHTML}
@@ -45919,9 +46217,19 @@ function viewPythonSkill(sid){
 
 
 
-  if(pySkillViewState.tab === 'cards' || pySkillViewState.tab === 'theory'){
+  if(pySkillViewState.tab === 'theory'){
     return `
-      <div class="container cards-hub-container ${pySkillViewState.tab === 'theory' ? 'cards-hub-theory' : ''}" style="max-width:680px;padding:32px 16px 60px;margin:0 auto;">
+      <div class="container cards-hub-container cards-hub-theory" style="max-width:760px;margin:0 auto;width:100%;box-sizing:border-box;">
+        ${srsHeaderHTML}
+        ${eyebrowDotsHTML}
+        ${bodyHTML}
+        ${celebrationBanner}
+      </div>`;
+  }
+
+  if(pySkillViewState.tab === 'cards'){
+    return `
+      <div class="container cards-hub-container" style="max-width:680px;padding:32px 16px 60px;margin:0 auto;">
         ${srsHeaderHTML}
         ${eyebrowDotsHTML}
         ${bodyHTML}
@@ -54605,7 +54913,7 @@ lessonTheoryHTML = function(){
 
   } else if(sIdx + 1 < steps.length){
 
-    primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-lstep-jump="${sIdx+1}">Следующий шаг (${sIdx+2}/${steps.length}) (+5°C) ➔</button>`;
+    primaryActionHTML = `<button type="button" class="btn-glass-emerald btn-sprint-cta" style="flex:1;" data-lstep-jump="${sIdx+1}">Следующий шаг (${sIdx+2}/${steps.length}) (+5°C)</button>`;
 
   } else {
 
@@ -56353,11 +56661,11 @@ function viewNotesSrsHub(noteSrsStats){
 
           <div class="fc-badge-group srs-note-breadcrumbs" style="display:inline-flex;align-items:center;gap:6px;min-width:0;flex:1 1 auto;overflow:hidden;font-family:var(--font-m);font-size:0.82rem;white-space:nowrap;">
 
-            <span style="color:var(--ink-muted);font-weight:600;overflow:hidden;text-overflow:ellipsis;max-width:140px;font-size:0.78rem;">${escapeHtmlStr(cleanTrackTitle)}</span>
+            <span class="srs-breadcrumb-track" style="color:var(--ink-muted);font-weight:600;overflow:hidden;text-overflow:ellipsis;max-width:140px;font-size:0.78rem;">${escapeHtmlStr(cleanTrackTitle)}</span>
 
-            <span style="color:rgba(255,255,255,0.25);font-size:0.74rem;flex-shrink:0;">/</span>
+            <span class="srs-breadcrumb-sep" style="color:rgba(255,255,255,0.25);font-size:0.74rem;flex-shrink:0;">/</span>
 
-            <span style="color:#34d399;font-weight:700;letter-spacing:-0.01em;font-size:0.88rem;overflow:hidden;text-overflow:ellipsis;">${escapeHtmlStr(topicTitle)}</span>
+            <span class="srs-breadcrumb-topic" style="color:#34d399;font-weight:700;letter-spacing:-0.01em;font-size:0.88rem;overflow:hidden;text-overflow:ellipsis;">${escapeHtmlStr(topicTitle)}</span>
 
           </div>
 
@@ -62128,7 +62436,7 @@ document.addEventListener('click', async function(e){
 
             chunkMoreBtn.setAttribute('data-lstep-jump', curSIdx + 1);
 
-            chunkMoreBtn.textContent = `Следующий шаг (${curSIdx+2}/${steps.length}) (+5°C) ➔`;
+            chunkMoreBtn.textContent = `Следующий шаг (${curSIdx+2}/${steps.length}) (+5°C)`;
 
           } else {
 
@@ -62308,7 +62616,7 @@ document.addEventListener('click', async function(e){
 
             chunkMoreBtn.setAttribute('data-py-next-step', curSIdx + 1);
 
-            chunkMoreBtn.innerHTML = '<span>Дальше</span>';
+            chunkMoreBtn.innerHTML = '<span>Следующий шаг</span>';
 
           } else {
 
