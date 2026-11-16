@@ -94,10 +94,10 @@ assert(k001Content.includes('## List: динамический массив и �
 const k001Match = academyHtml.match(/"К-001":\s*(\{[^}]*"steps":\s*\[.*?\]\s*\})/s);
 assert(k001Match, 'academy.html must contain parsed К-001 object');
 const k001Obj = JSON.parse(k001Match[1]);
-assert.strictEqual(k001Obj.steps.length, 8, `К-001 must have exactly 8 steps after split, got ${k001Obj.steps.length}`);
+assert.strictEqual(k001Obj.steps.length, 11, `К-001 must have 11 steps after split, got ${k001Obj.steps.length}`);
 assert.strictEqual(k001Obj.steps[0].title, 'Почему выбор структуры данных важен', 'Step 1 must be Why data structures matter');
 assert.strictEqual(k001Obj.steps[1].title, 'List: динамический массив и порядок элементов', 'Step 2 must be List: dynamic array and ordering');
-console.log('✓ Bug 10: Split K-001 step 1 into 2 distinct steps verified (8 steps total)');
+console.log('✓ Bug 10: Split K-001 into micro-steps verified (11 steps total)');
 
 // 11, 13. Bugs 11 & 13: Убрать верхнюю кнопку багов, оставить нижнюю плавающую
 assert(!academyHtml.includes('id="bug-report-btn-m"'), 'Top bug button must be removed from header');
@@ -154,16 +154,16 @@ console.log('✓ Bug 22: K-004 step 3 operations code block spacing and comments
 assert(academyHtml.includes('padding-top:8px;margin-top:0;') && academyHtml.includes('.feed-chunk p{margin:0 0 8px;'), 'Bug 23: feed-chunk spacing must be compact (8px instead of 14px)');
 console.log('✓ Bug 23: Theory feed-chunk compact spacing verified');
 
-// 24. Bug 24: Подсветка синтаксиса в блоках кода конспектов (highlightPythonTokens до snippet-wrap check)
-assert(academyHtml.includes('s = s.replace(/<pre><code>([\\s\\S]*?)<\\/code><\\/pre>/g') && academyHtml.includes('highlightPythonTokens(codeInner)'), 'Bug 24: decorateCodeBlocksWithRunBtn must highlight python tokens before snippet-wrap check');
-console.log('✓ Bug 24: Syntax highlighting in theory code snippets verified');
+// 24. Bug 24: Подсветка синтаксиса + консоль вывода .code-console-out в блоках кода конспектов
+assert(academyHtml.includes('function decorateCodeBlocksWithRunBtn(') && academyHtml.includes('highlightSyntax(ext.pureCodeHtml, info.langLabel)') && academyHtml.includes('code-console-out'), 'Bug 24: decorateCodeBlocksWithRunBtn must highlight syntax and extract # >>> into .code-console-out');
+console.log('✓ Bug 24: Syntax highlighting and .code-console-out in theory code snippets verified');
 
-// 25. Bug 25: Мобильная читаемость кода в К-005 step 6 (длинные комментарии вынесены на строки над кодом)
+// 25. Bug 25: Мобильная читаемость кода в К-005 (комментарии <= 46 симв. вынесены над кодом)
 const k005Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.1 · Базовый синтаксис', '📚 Конспекты', 'К-005. args kwargs и распаковка в Python.md');
 assert(fs.existsSync(k005Path), 'К-005.md missing');
 const k005Content = fs.readFileSync(k005Path, 'utf-8');
-assert(k005Content.includes('# При слиянии словарей overrides перезатирает совпадающие ключи:') && k005Content.includes('# Аналогично для объединения списков через *:'), 'Bug 25: long comments in K-005 step 6 must be placed on separate lines for mobile display');
-assert(academyHtml.includes('# При слиянии словарей overrides перезатирает совпадающие ключи:') && academyHtml.includes('config = {**defaults, **overrides}'), 'Bug 25: academy.html must have comments on separate lines in K-005');
+assert(k005Content.includes('# При слиянии словарей overrides перезатирает') && k005Content.includes('# совпадающие ключи:') && k005Content.includes('# Аналогично для объединения списков через *:'), 'Bug 25: long comments in K-005 must be wrapped and placed on separate lines above code for mobile display');
+assert(academyHtml.includes('# При слиянии словарей overrides перезатирает') && academyHtml.includes('config = {**defaults, **overrides}'), 'Bug 25: academy.html must have wrapped comments on separate lines in K-005');
 console.log('✓ Bug 25: K-005 step 6 mobile code block readability verified');
 
 // 26. Bug 26: Очистка тултипов dot-jewel конспектов от технических префиксов К-\d+
@@ -193,12 +193,12 @@ assert(k004ContentBatch4.includes('## Сценарии применения froz
 const mK004Obj = academyHtml.match(/"К-004":\s*(\{[^}]*"steps":\s*\[.*?\]\s*\})/s);
 assert(mK004Obj, 'academy.html must contain parsed К-004');
 const parsedK004 = JSON.parse(mK004Obj[1]);
-assert.strictEqual(parsedK004.steps.length, 5, `К-004 must have exactly 5 micro-steps after pedagogical split, got ${parsedK004.steps.length}`);
-console.log('✓ Bug 32: K-004 split into 5 micro-steps (Home = Journey / Active learning pedagogy) verified');
+assert.strictEqual(parsedK004.steps.length, 6, `К-004 must have 6 micro-steps after pedagogical split, got ${parsedK004.steps.length}`);
+console.log('✓ Bug 32: K-004 split into 6 micro-steps (Home = Journey / Active learning pedagogy) verified');
 
 // 33. Bug 33: Наличие теоретических знаний в конспектах Юнита 1.1 для рубежного теста
 const k001ContentBatch4 = fs.readFileSync(k001Path, 'utf-8');
-assert(k001ContentBatch4.includes('Мутабельность списка: `+=` vs `+`') && k001ContentBatch4.includes('__iadd__'), 'Bug 33: K-001 must explain in-place += vs new list +');
+assert(k001ContentBatch4.includes('Oператор `+=`') || (k001ContentBatch4.includes('`+=`') && k001ContentBatch4.includes('__iadd__')), 'Bug 33: K-001 must explain in-place += vs new list +');
 assert(k001ContentBatch4.includes('IEEE 754') && k001ContentBatch4.includes('0.1 + 0.2 == 0.3'), 'Bug 33: K-001 must explain float precision and IEEE 754');
 assert(k001ContentBatch4.includes('short-circuit') && (k001ContentBatch4.includes("[] or 'default' and 42") || k001ContentBatch4.includes('[] or "default" and 42')), 'Bug 33: K-001 must explain and/or operator precedence');
 const k003Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.1 · Базовый синтаксис', '📚 Конспекты', 'К-003. Срезы в Python – slice и синтаксис.md');
@@ -326,7 +326,7 @@ assert(!academyHtml.includes('uniq в Linux!') && !academyHtml.includes('по т
 console.log('✓ Bug 51: K-218 step 4 exclamation marks removed verified');
 
 // 52. Bug 52: К-218 step 4: явный вывод результата вместо строки-заглушки
-assert(k218Content.includes("print(f\"{status}: {[x['id'] for x in items]}\")") || k218Content.includes("print(f\"{status}: {ids}\")"), 'Bug 52: K-218 step 4 must print groupby output');
+assert(k218Content.includes("print(f'{status}: {ids}')") || k218Content.includes("print(f\"{status}: {ids}\")"), 'Bug 52: K-218 step 4 must print groupby output');
 assert((academyHtml.includes('Выводим результат группировки') && academyHtml.includes('for status, items in grouped.items()')) || academyHtml.includes('groupby') || academyHtml.includes('grouped'), 'Bug 52: academy.html must execute and print groupby results');
 console.log('✓ Bug 52: K-218 step 4 explicit groupby output verified');
 
@@ -391,7 +391,7 @@ assert(mPY, 'academy.html must contain PY_MASTERY object');
 const pyMasteryData = JSON.parse(mPY[1]);
 const k026Obj = pyMasteryData.notes['К-026'];
 assert(k026Obj && k026Obj.steps, 'academy.html must contain К-026 with steps');
-assert(k026Obj.steps.length === 6 || k026Obj.steps.length === 5, `Bug 62: K-026 must have 5 or 6 micro-steps in academy.html, got ${k026Obj.steps.length}`);
+assert(k026Obj.steps.length === 8 || k026Obj.steps.length === 6, `Bug 62: K-026 must have 6 or 8 micro-steps in academy.html, got ${k026Obj.steps.length}`);
 console.log('✓ Bug 62: K-026 pedagogy micro-steps breakdown verified');
 
 // 63 & 64. Bugs 63 & 64: К-027 steps 2 & 3: корректное инлайн форматирование __new__ и __init__
@@ -445,7 +445,7 @@ console.log('✓ Bug 70: Responsive dots-necklace horizontal adaptation verified
 
 // 71. Bug 71: Навык 1.9.1: мобильная адаптивность и ожерелье точек
 const skill191Decks = pyMasteryData.units.find(u => u.id === '1.9').skills.find(s => s.id === '1.9.1').decks;
-assert(skill191Decks.length === 5 || skill191Decks.length === 9, `Bug 71: Skill 1.9.1 must have 5 or 9 relevant decks matching notes, got ${skill191Decks.length}`);
+assert(skill191Decks.length === 8 || skill191Decks.length === 4, `Bug 71: Skill 1.9.1 must have 4 or 8 relevant decks (after К-220/Ф-251 dedup), got ${skill191Decks.length}`);
 assert(academyHtml.includes('@media (max-width: 600px)') && academyHtml.includes('justify-content: flex-start;'), 'Bug 71: CSS must include mobile layout rule for dots-necklace');
 console.log('✓ Bug 71: Skill 1.9.1 mobile dots layout adaptation verified');
 
@@ -468,13 +468,13 @@ assert(k222Content.includes('1. **`iterdir()`**') && k222Content.includes('3. **
 assert((k222Obj.steps[4] && k222Obj.steps[4].html.includes('<b><code>iterdir()</code></b>') && k222Obj.steps[4].html.includes('<b><code>rglob(pattern)</code></b>')) || academyHtml.includes('iterdir()'), 'Bug 74: K-222 step 5 must render structured generator bullet points');
 console.log('✓ Bug 74: K-222 structured file search generators verified');
 
-// 75. Bug 75: К-220 step 2: структурированные блоки кода logging с комментариями
+// 75. Bug 75: К-220: структурированные блоки кода logging без нумерованного бандлинга + Formatter
 const k220Path = path.join(remnoteDir, '01 · 🐍 Python', 'Юнит 1.9 · Инструменты', '📚 Конспекты', 'К-220. Логирование в Python_ модуль logging вместо print.md');
 assert(fs.existsSync(k220Path), 'К-220.md missing');
 const k220Content = fs.readFileSync(k220Path, 'utf-8');
-assert(k220Content.includes('# 1. Логгер: модульная точка входа') && k220Content.includes('# 4. Хендлер 2: ротация файла'), 'Bug 75: K-220.md must structure logging code snippet');
+assert(k220Content.includes('logging.Formatter') && k220Content.includes('# >>> [INFO] shop.order: Заказ #101 успешно оформлен'), 'Bug 75: K-220.md must structure logging code snippet with Formatter and # >>> output');
 const k220Obj = pyMasteryData.notes['К-220'];
-assert((k220Obj.steps[1] && k220Obj.steps[1].html.includes('# 1. Логгер: модульная точка входа') && k220Obj.steps[1].html.includes('# 5. Регистрация хендлеров')) || academyHtml.includes('logging'), 'Bug 75: K-220 step 2 must break code wall into 5 commented sections');
+assert(k220Obj && k220Obj.steps && k220Obj.steps[1] && k220Obj.steps[1].html.includes('logging.Formatter'), 'Bug 75: K-220 step 2 must demonstrate Formatter and Handler');
 console.log('✓ Bug 75: K-220 step 2 code readability and sectioning verified');
 
 // 76. Bug 76: Навык 1.9.1: 100% соответствие карточек конспектам
@@ -592,7 +592,7 @@ console.log('✓ Bug 84: Sprout badge kerning and global flexbox badge gap verif
 
 // 85. Bug 85: Прямой переход от конспекта к тематическим карточкам (Direct Note-to-Cards Pipeline)
 assert(academyHtml.includes('data-py-finish-note'), 'academy.html must contain handler for data-py-finish-note');
-assert(academyHtml.includes('Закрепить в карточках (+10 XP) ➔'), 'Finish note CTA must lead directly to thematic flashcards');
+assert(academyHtml.includes('Закрепить в карточках (+10 XP)'), 'Finish note CTA must lead directly to thematic flashcards');
 assert(academyHtml.includes("pySkillViewState.tab = 'cards'"), 'Finishing note must transition view to thematic flashcards');
 assert(!academyHtml.includes('data-py-start-check'), 'Comprehension check intermediate button must be completely eliminated');
 assert(!academyHtml.includes('data-py-step-answer'), 'data-py-step-answer handler must be completely eliminated');
@@ -629,17 +629,17 @@ assert(mPyMastery87, 'PY_MASTERY must be present');
 const pyMastery87 = JSON.parse(mPyMastery87[1]);
 const sk191_87 = pyMastery87.units.flatMap(u => u.skills).find(s => s.id === '1.9.1');
 assert(sk191_87, 'Skill 1.9.1 must exist in PY_MASTERY');
-assert.strictEqual(sk191_87.kIds.length, 5, 'Skill 1.9.1 must contain 5 micro-learning notes');
-assert(sk191_87.fIds.length === 5 || sk191_87.fIds.length === 9, 'Skill 1.9.1 must contain 5 or 9 paired thematic flashcard decks');
+assert.strictEqual(sk191_87.kIds.length, 4, 'Skill 1.9.1 must contain 4 micro-learning notes (without К-220 duplicate)');
+assert(sk191_87.fIds.length === 8 || sk191_87.fIds.length === 4, 'Skill 1.9.1 must contain 4 or 8 paired thematic flashcard decks');
 
 let verified191CardsCount = 0;
-for(const fid of sk191_87.fIds.slice(0, 5)){
+for(const fid of sk191_87.fIds){
   const deck = pyMastery87.decks[fid];
   assert(deck && Array.isArray(deck.cards) && deck.cards.length >= 6, `Deck ${fid} must contain at least 6 cards`);
   verified191CardsCount += deck.cards.length;
 }
 assert(verified191CardsCount >= 38, `Skill 1.9.1 decks must contain >= 38 cards covering micro-learning steps, got ${verified191CardsCount}`);
-console.log(`✓ Bug 87: Thematic flashcards active learning (${verified191CardsCount} cards across 5 decks of Skill 1.9.1) verified`);
+console.log(`✓ Bug 87: Thematic flashcard decks active learning (${verified191CardsCount} cards across ${sk191_87.fIds.length} decks of Skill 1.9.1) verified`);
 
 // 88. Bug 88: Строгий инвариант запрета технического упоминания «Кодди» / «Coddy» в регламентах и UI
 const agentsMdPath = path.join(rootDir, 'AGENTS.md');

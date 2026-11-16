@@ -305,11 +305,21 @@ class _FakeCelery:
 
 _mod_celery = _types.ModuleType("celery")
 _mod_celery.Celery = _FakeCelery
+_mod_celery.shared_task = _FakeCelery().task
 _mod_celery.chain = lambda *sigs: _CelerySig("chain", sigs)
 _mod_celery.group = lambda sigs: _CelerySig("group", tuple(sigs))
 _mod_celery.chord = lambda header: (lambda body: _CelerySig("chord", (header, body)))
 _sys.modules["celery"] = _mod_celery
 celery_app = _FakeCelery("worker")
+
+_mod_sentry = _types.ModuleType("sentry_sdk")
+_mod_sentry.init = lambda *a, **kw: None
+_mod_sentry.capture_exception = lambda *a, **kw: None
+_mod_sentry.add_breadcrumb = lambda *a, **kw: None
+_mod_sentry.set_user = lambda *a, **kw: None
+_mod_sentry.set_tag = lambda *a, **kw: None
+_sys.modules["sentry_sdk"] = _mod_sentry
+sentry_sdk = _mod_sentry
 download_data = _CeleryTask(lambda *a: "data")
 process_csv = _CeleryTask(lambda *a: "csv")
 generate_report = _CeleryTask(lambda *a: "report")
@@ -937,54 +947,60 @@ _real_pickle.dumps = _safe_dumps2
 import pathlib as _real_pathlib
 _VIRTUAL_FS["data/reports/2026.txt"] = "Отчёт за 2026 год\nВсе системы в норме"
 _VIRTUAL_FS["data\\reports\\2026.txt"] = "Отчёт за 2026 год\nВсе системы в норме"
-_orig_read_text = _real_pathlib.Path.read_text
-_orig_write_text = _real_pathlib.Path.write_text
-_orig_mkdir = _real_pathlib.Path.mkdir
-_orig_rglob = _real_pathlib.Path.rglob
-_orig_stat = _real_pathlib.Path.stat
-_orig_iterdir = _real_pathlib.Path.iterdir
-_orig_glob = _real_pathlib.Path.glob
-def _safe_path_iterdir(self):
-    if str(self) == "src" and not _os.path.exists("src"):
-        class _VirtualDirEntry:
-            def __init__(self, name): self.name = name
-            def is_dir(self): return True
-            def is_file(self): return False
-        return iter([_VirtualDirEntry("controllers"), _VirtualDirEntry("models"), _VirtualDirEntry("services")])
-    return _orig_iterdir(self)
-def _safe_path_glob(self, pattern, *a, **kw):
-    if str(self) == "src" and not _os.path.exists("src"):
-        return iter([_real_pathlib.Path("src/main.py"), _real_pathlib.Path("src/api.py")])
-    return _orig_glob(self, pattern, *a, **kw)
-def _safe_path_write_text(self, data, encoding=None, errors=None, newline=None):
-    _VIRTUAL_FS[str(self)] = str(data)
-    return len(str(data))
-def _safe_path_read_text(self, encoding=None, errors=None):
-    if str(self) in _VIRTUAL_FS: return _VIRTUAL_FS[str(self)]
-    try: return _orig_read_text(self, encoding=encoding, errors=errors)
-    except Exception: return "Содержимое файла"
-def _safe_path_mkdir(self, mode=0o777, parents=False, exist_ok=False):
-    return None
-def _safe_path_rglob(self, pattern, *a, **kw):
-    if str(self) == "src" and not _os.path.exists("src"):
-        return iter([_real_pathlib.Path("src/main.py"), _real_pathlib.Path("src/test_api.py")])
-    return _orig_rglob(self, pattern, *a, **kw)
-def _safe_path_stat(self, *a, **kw):
-    try: return _orig_stat(self, *a, **kw)
-    except Exception: return _types.SimpleNamespace(st_size=128, st_mode=0o100644, st_mtime=1700000000.0)
-_orig_path_open = _real_pathlib.Path.open
-def _safe_path_open(self, mode="r", *a, **kw):
-    if _os.path.exists(str(self)) and "r" in mode and str(self) not in _VIRTUAL_FS:
-        return _orig_path_open(self, mode, *a, **kw)
-    return _patched_open(str(self), mode, *a, **kw)
-_real_pathlib.Path.write_text = _safe_path_write_text
-_real_pathlib.Path.read_text = _safe_path_read_text
-_real_pathlib.Path.mkdir = _safe_path_mkdir
-_real_pathlib.Path.rglob = _safe_path_rglob
-_real_pathlib.Path.stat = _safe_path_stat
-_real_pathlib.Path.open = _safe_path_open
-_real_pathlib.Path.iterdir = _safe_path_iterdir
-_real_pathlib.Path.glob = _safe_path_glob
+if not getattr(_real_pathlib.Path.read_text, "_pba_patched", False):
+    _orig_read_text = _real_pathlib.Path.read_text
+    _orig_write_text = _real_pathlib.Path.write_text
+    _orig_mkdir = _real_pathlib.Path.mkdir
+    _orig_rglob = _real_pathlib.Path.rglob
+    _orig_stat = _real_pathlib.Path.stat
+    _orig_iterdir = _real_pathlib.Path.iterdir
+    _orig_glob = _real_pathlib.Path.glob
+    _orig_path_open = _real_pathlib.Path.open
+    def _safe_path_iterdir(self):
+        if str(self) == "src" and not _os.path.exists("src"):
+            class _VirtualDirEntry:
+                def __init__(self, name): self.name = name
+                def is_dir(self): return True
+                def is_file(self): return False
+            return iter([_VirtualDirEntry("controllers"), _VirtualDirEntry("models"), _VirtualDirEntry("services")])
+        return _orig_iterdir(self)
+    def _safe_path_glob(self, pattern, *a, **kw):
+        if str(self) == "src" and not _os.path.exists("src"):
+            return iter([_real_pathlib.Path("src/main.py"), _real_pathlib.Path("src/api.py")])
+        return _orig_glob(self, pattern, *a, **kw)
+    def _safe_path_write_text(self, data, encoding=None, errors=None, newline=None):
+        _VIRTUAL_FS[str(self)] = str(data)
+        return len(str(data))
+    def _safe_path_read_text(self, encoding=None, errors=None):
+        if str(self) in _VIRTUAL_FS: return _VIRTUAL_FS[str(self)]
+        try: return _orig_read_text(self, encoding=encoding, errors=errors)
+        except Exception: return "Содержимое файла"
+    def _safe_path_mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        import tempfile as _tf
+        if str(self).startswith(_tf.gettempdir()):
+            return _orig_mkdir(self, mode=mode, parents=parents, exist_ok=exist_ok)
+        return None
+    def _safe_path_rglob(self, pattern, *a, **kw):
+        if str(self) == "src" and not _os.path.exists("src"):
+            return iter([_real_pathlib.Path("src/main.py"), _real_pathlib.Path("src/test_api.py")])
+        return _orig_rglob(self, pattern, *a, **kw)
+    def _safe_path_stat(self, *a, **kw):
+        try: return _orig_stat(self, *a, **kw)
+        except Exception: return _types.SimpleNamespace(st_size=128, st_mode=0o100644, st_mtime=1700000000.0)
+    def _safe_path_open(self, mode="r", *a, **kw):
+        if _os.path.exists(str(self)) and "r" in mode and str(self) not in _VIRTUAL_FS:
+            return _orig_path_open(self, mode, *a, **kw)
+        return _patched_open(str(self), mode, *a, **kw)
+    for _fn in (_safe_path_write_text, _safe_path_read_text, _safe_path_mkdir, _safe_path_rglob, _safe_path_stat, _safe_path_open, _safe_path_iterdir, _safe_path_glob):
+        _fn._pba_patched = True
+    _real_pathlib.Path.write_text = _safe_path_write_text
+    _real_pathlib.Path.read_text = _safe_path_read_text
+    _real_pathlib.Path.mkdir = _safe_path_mkdir
+    _real_pathlib.Path.rglob = _safe_path_rglob
+    _real_pathlib.Path.stat = _safe_path_stat
+    _real_pathlib.Path.open = _safe_path_open
+    _real_pathlib.Path.iterdir = _safe_path_iterdir
+    _real_pathlib.Path.glob = _safe_path_glob
 
 # Synchronous asyncio.create_task for _sync_asyncio_run
 class _SyncTask:
@@ -1129,18 +1145,21 @@ def _sync_exec_map(self, fn, *iterables):
     return out
 _SyncExecutor.map = _sync_exec_map
 
-_orig_iterdir = _real_pathlib.Path.iterdir
-_orig_glob = _real_pathlib.Path.glob
-def _safe_path_iterdir(self):
-    if str(self) == "src" and not _os.path.exists("src"):
-        return iter([_real_pathlib.Path("src/main.py"), _real_pathlib.Path("src/utils.py")])
-    return _orig_iterdir(self)
-def _safe_path_glob(self, pattern, *a, **kw):
-    if str(self) == "src" and not _os.path.exists("src"):
-        return iter([_real_pathlib.Path("src/main.py"), _real_pathlib.Path("src/utils.py")])
-    return _orig_glob(self, pattern, *a, **kw)
-_real_pathlib.Path.iterdir = _safe_path_iterdir
-_real_pathlib.Path.glob = _safe_path_glob
+if not getattr(_real_pathlib.Path.iterdir, "_pba_patched", False):
+    _orig_iterdir = _real_pathlib.Path.iterdir
+    _orig_glob = _real_pathlib.Path.glob
+    def _safe_path_iterdir(self):
+        if str(self) == "src" and not _os.path.exists("src"):
+            return iter([_real_pathlib.Path("src/main.py"), _real_pathlib.Path("src/utils.py")])
+        return _orig_iterdir(self)
+    def _safe_path_glob(self, pattern, *a, **kw):
+        if str(self) == "src" and not _os.path.exists("src"):
+            return iter([_real_pathlib.Path("src/main.py"), _real_pathlib.Path("src/utils.py")])
+        return _orig_glob(self, pattern, *a, **kw)
+    _safe_path_iterdir._pba_patched = True
+    _safe_path_glob._pba_patched = True
+    _real_pathlib.Path.iterdir = _safe_path_iterdir
+    _real_pathlib.Path.glob = _safe_path_glob
 
 # Dummy tutorial modules & relative import support
 for _pkg_name in ("math_utils", "utils", "models", "views", "blueprints", "blueprints.users", "blueprints.orders", "my_package", "my_package._internal_helper", "my_package.utils", "my_package.helpers", "my_package.helpers.string_helper", "my_package.payment", "my_package.notification", "my_package.user", "my_package.order", "my_package.models", "my_package.views", "myapp", "myapp.models", "myapp.services", "myapp.services.payment", "app", "app.models", "app.models.user", "app.models.order"):

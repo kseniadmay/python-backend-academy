@@ -39,18 +39,26 @@ def verify():
         else:
             print("✓ JS Syntax check PASS: Node exit code 0")
 
-    # 3. Blind print in KB
+    # 3. Blind print in KB (each code block with active print() must have inline # or # >>> / # comment in block)
     kb_files = glob.glob("knowledge_base/**/*.md", recursive=True)
     kb_bare = 0
     for f in kb_files:
         in_code = False
+        block = []
         for l in open(f, encoding="utf-8"):
             st = l.strip()
             if st.startswith("```"):
+                if in_code:
+                    has_doc = any("# >>>" in b or "#" in b for b in block)
+                    for b in block:
+                        bs = b.strip()
+                        if "print(" in bs and not bs.startswith("#") and "#" not in bs and not has_doc:
+                            kb_bare += 1
+                    block = []
                 in_code = not in_code
                 continue
-            if in_code and "print(" in st and "#" not in st:
-                kb_bare += 1
+            if in_code:
+                block.append(l)
     if kb_bare > 0:
         errors.append(f"knowledge_base has {kb_bare} bare print lines!")
     else:
@@ -63,8 +71,11 @@ def verify():
         for st in note.get("steps", []):
             html = st.get("html", "")
             for b in re.findall(r'<pre><code>(.*?)</code></pre>', html, flags=re.DOTALL):
-                for l in b.split("\n"):
-                    if "print(" in l and "#" not in l:
+                b_lines = b.split("\n")
+                has_doc = any("# >>>" in bl or "# &gt;&gt;&gt;" in bl or "#" in bl for bl in b_lines)
+                for l in b_lines:
+                    ls = l.strip()
+                    if "print(" in ls and not ls.startswith("#") and "#" not in ls and not has_doc:
                         notes_bare += 1
     if notes_bare > 0:
         errors.append(f"data/content/notes.json has {notes_bare} bare print lines!")

@@ -17,9 +17,9 @@ EXTRA_K_BY_SKILL = {
     '1.3.1': ['К-218'], # itertools
     '1.3.3': ['К-217'], # contextlib
     '1.6.1': ['К-219'], # enum
-    '1.9.1': ['К-220', 'К-222'], # logging, pathlib
+    '1.9.1': ['К-222'], # pathlib
     '1.9.2': ['К-221'], # imports, __all__
-    '1.9.3': ['К-223'], # pytest, fixtures, mock
+    '1.9.3': ['К-220', 'К-223'], # logging, pytest, fixtures, mock
 }
 
 EXTRA_F_BY_SKILL = {

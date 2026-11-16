@@ -4,11 +4,11 @@
  * для ВСЕХ 238 конспектов платформы (Python Backend Academy).
  *
  * Проверяет:
- *  1. 100% покрытие: Все 238 тем (1175 микро-шагов) по всем 7 направлениям подготовки.
+ *  1. 100% покрытие: Все 238 тем (1177 микро-шагов) по всем 7 направлениям подготовки.
  *  2. Запрет пустых квантов (Zero Empty Chunks).
  *  3. Строгую сбалансированность и валидность HTML-тегов в каждом кванте (No DOM leakage).
  *  4. Запрет «сиротливых заголовков» и оборванных подводок (No Orphan Headings / Lead-ins).
- *  5. Канон педагогики Кодди (Active Microlearning):
+ *  5. Канон методологии активного микрообучения (Active Microlearning):
  *     - Текст кванта: <= 350 знаков чистого текста, <= 3 предложений (для текста);
  *     - Сниппеты кода: <= 12 строк (за исключением неделимых функций), 100% имеют кнопку запуска;
  *     - Запрет хвостовых комментариев в коде (подъем комментариев НАД кодом);
@@ -99,9 +99,9 @@ function extractAllNotes(srcHtml) {
 
 // --- 1. Извлечение движка квантования splitStepHtmlIntoChunks & getStepChunks ---
 function extractChunkingEngine(srcHtml) {
-  const normStart = srcHtml.indexOf('function normalizeCodeSnippets(');
+  const normStart = srcHtml.indexOf('function _escCodeHtml(');
   const normEnd = srcHtml.indexOf('window.splitStepHtmlIntoChunks = splitStepHtmlIntoChunks;', normStart);
-  assert(normStart !== -1, 'normalizeCodeSnippets must exist');
+  assert(normStart !== -1, 'highlightSyntax/_escCodeHtml must exist');
   const codeBlock1 = srcHtml.slice(normStart, normEnd);
 
   const gfnStart = srcHtml.indexOf('function getStepChunks(');
@@ -112,7 +112,7 @@ function extractChunkingEngine(srcHtml) {
   const evalCode = `
     ${codeBlock1}
     ${codeBlock2}
-    return { normalizeCodeSnippets, splitLongParagraphs, splitLongCodeSnippets, decorateCodeBlocksWithRunBtn, splitStepHtmlIntoChunks, getStepChunks };
+    return { highlightPythonTokens, highlightSyntax, normalizeCodeSnippets, extractConsoleOutputs, renderConsoleOutputHtml, splitLongParagraphs, splitLongCodeSnippets, decorateCodeBlocksWithRunBtn, splitStepHtmlIntoChunks, getStepChunks };
   `;
   return new Function(evalCode)();
 }
@@ -122,7 +122,7 @@ const engine = extractChunkingEngine(standardsHtml);
 const { splitStepHtmlIntoChunks, getStepChunks } = engine;
 
 // ============================================================================
-// TEST 1: 100% Coverage of All 238 Notes & 1127 Steps
+// TEST 1: 100% Coverage of All 238 Notes & 1177 Steps
 // ============================================================================
 function test01_FullCoverage() {
   const noteIds = Object.keys(allNotes);
@@ -139,8 +139,8 @@ function test01_FullCoverage() {
     });
   }
 
-  assert.strictEqual(totalSteps, 1175, `Expected exactly 1175 total steps, found ${totalSteps}`);
-  console.log(`✓ Test 1 Passed: 100% coverage verified (238 notes, 1175 steps across all 7 tracks)`);
+  assert.strictEqual(totalSteps, 1177, `Expected exactly 1177 total steps, found ${totalSteps}`);
+  console.log(`✓ Test 1 Passed: 100% coverage verified (238 notes, 1177 steps across all 7 tracks)`);
 }
 
 // ============================================================================
@@ -261,9 +261,9 @@ function test04_NoOrphanHeadings() {
 }
 
 // ============================================================================
-// TEST 5: Coddy Canon Microlearning Ergonomics (Text Length & Code Discipline)
+// TEST 5: Active Microlearning Canon Ergonomics (Text Length & Code Discipline)
 // ============================================================================
-function test05_CoddyActiveMicrolearningCanon() {
+function test05_ActiveMicrolearningCanon() {
   let totalChunks = 0;
   let totalSteps = 0;
   const trailingCommentViolations = [];
@@ -330,7 +330,7 @@ function test05_CoddyActiveMicrolearningCanon() {
     `Found code snippets missing run button:\n  - ${missingRunButtonViolations.slice(0, 10).join('\n  - ')}`
   );
 
-  console.log(`✓ Test 5 Passed: Coddy active microlearning canon verified (avg ${avgChunksPerStep.toFixed(2)} chunks/step, 0 trailing comments, 100% runnable code buttons)`);
+  console.log(`✓ Test 5 Passed: Active microlearning canon verified (avg ${avgChunksPerStep.toFixed(2)} chunks/step, 0 trailing comments, 100% runnable code buttons)`);
 }
 
 // ============================================================================
@@ -429,7 +429,7 @@ function test08_CanonicalStandardsSync() {
     standardsHtml.includes('function splitLongParagraphs('),
     'standards.html must contain splitLongParagraphs engine'
   );
-  console.log(`✓ Test 8 Passed: standards.html and academy.html are byte-for-byte synchronized with unified Coddy engine`);
+  console.log(`✓ Test 8 Passed: standards.html and academy.html are byte-for-byte synchronized with unified Active Microlearning engine`);
 }
 
 // ============================================================================
@@ -440,7 +440,7 @@ try {
   test02_ZeroEmptyChunks();
   test03_StrictHtmlTagBalance();
   test04_NoOrphanHeadings();
-  test05_CoddyActiveMicrolearningCanon();
+  test05_ActiveMicrolearningCanon();
   test06_SafeDomInjectionAndCodeSnippets();
   test07_StateTransitionSimulation();
   test08_CanonicalStandardsSync();
@@ -462,7 +462,7 @@ module.exports = {
   test02_ZeroEmptyChunks,
   test03_StrictHtmlTagBalance,
   test04_NoOrphanHeadings,
-  test05_CoddyActiveMicrolearningCanon,
+  test05_ActiveMicrolearningCanon,
   test06_SafeDomInjectionAndCodeSnippets,
   test07_StateTransitionSimulation,
   test08_CanonicalStandardsSync

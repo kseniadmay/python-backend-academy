@@ -1,4 +1,4 @@
-import os, re, glob, json, html, ast, copy, textwrap, itertools
+import os, re, glob, json, html, ast, copy, textwrap, itertools, hashlib
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _CLOUD_ROOT = r'C:\Users\fury6\OneDrive\Python_Backend_Academy'
@@ -987,10 +987,10 @@ def md_inline(text):
     # Convert $$...$$ and $...$ math expressions into clean readable text
     text = re.sub(r'\$\$([^\$]+)\$\$', lambda m: _format_latex_expr(m.group(1)), text)
     text = re.sub(r'\$([^$\n]+)\$', lambda m: _format_latex_expr(m.group(1)), text)
-    # Bold **...**
-    text = re.sub(r'\*\*([^\*\n]+)\*\*', r'<strong>\1</strong>', text)
-    # Italic *...*
-    text = re.sub(r'(?<!\*)\*([^\*\n]+)\*(?!\*)', r'<em>\1</em>', text)
+    # Bold **...** (supports nested *...* inside bold)
+    text = re.sub(r'\*\*((?:(?!\*\*).)+?)\*\*', r'<strong>\1</strong>', text)
+    # Italic *...* (ignores standalone (*) / (*?) and requires non-space inner bounds)
+    text = re.sub(r'(?<![\w*\\])\*([^\s*\n)][^\*\n]*?[^\s*\n(]|[^\s*\n()])\*(?![\w*])', r'<em>\1</em>', text)
     # Restore inline code
     for idx, c_html in enumerate(code_stash):
         text = text.replace(f'\x00CODE{idx}\x00', c_html)
@@ -1004,13 +1004,11 @@ _NON_PY_PREFIX_RE = re.compile(
     r'^(SELECT|FROM|INSERT|UPDATE|DELETE|CREATE|ALTER|GET |POST |PUT |PATCH |HEAD |OPTIONS |HTTP/|pip |poetry |uvicorn |gunicorn |django-admin |pytest |python |curl |git |docker |alembic )'
 )
 
-_diag_id_counter = itertools.count(1)
-
 def ascii_to_vector_svg(raw_text: str, title: str = "СХЕМА АРХИТЕКТУРЫ") -> str:
     raw_lines = raw_text.splitlines()
     if not raw_lines:
         return ""
-    uid = f"d{next(_diag_id_counter)}"
+    uid = f"d{hashlib.md5(raw_text.encode('utf-8')).hexdigest()[:8]}"
     max_cols = max(len(l) for l in raw_lines)
     num_rows = len(raw_lines)
     char_w = 8.2
@@ -1020,9 +1018,15 @@ def ascii_to_vector_svg(raw_text: str, title: str = "СХЕМА АРХИТЕКТ
     pad_bottom = 16
     svg_w = int(max(max_cols * char_w + pad_x * 2, 320))
     svg_h = int(top_header_h + num_rows * row_h + pad_bottom)
-    
+    min_w = min(svg_w, 540) if svg_w > 540 else svg_w
+    svg_style = (
+        f"width:100%;min-width:{min_w}px;max-width:{svg_w}px;height:auto;display:block;margin:0 auto;border-radius:12px;"
+        if svg_w > 540
+        else f"max-width:{svg_w}px;height:auto;display:block;margin:0 auto;border-radius:12px;"
+    )
+
     svg_lines = []
-    svg_lines.append(f'<svg class="arch-vector-svg" viewBox="0 0 {svg_w} {svg_h}" width="100%" height="{svg_h}" style="max-width:{svg_w}px;display:block;margin:0 auto;border-radius:12px;" xmlns="http://www.w3.org/2000/svg">')
+    svg_lines.append(f'<svg class="arch-vector-svg" viewBox="0 0 {svg_w} {svg_h}" width="100%" style="{svg_style}" xmlns="http://www.w3.org/2000/svg">')
     svg_lines.append('  <defs>')
     svg_lines.append(f'    <linearGradient id="bgGrad_{uid}" x1="0%" y1="0%" x2="100%" y2="100%">')
     svg_lines.append('      <stop offset="0%" stop-color="#12151d"/>')
@@ -1092,12 +1096,40 @@ def md_chunk_to_html(md_chunk, ctx_blocks=None):
             out.append('</ul>')
             in_ul = False
 
+    def _split_md_table_row(row):
+        s = row.strip()
+        if s.startswith('|'):
+            s = s[1:]
+        if s.endswith('|') and not s.endswith('\\|'):
+            s = s[:-1]
+        cells = []
+        cur = []
+        in_bt = False
+        i = 0
+        while i < len(s):
+            ch = s[i]
+            if ch == '\\' and i + 1 < len(s) and s[i + 1] == '|':
+                cur.append('|')
+                i += 2
+                continue
+            if ch == '`':
+                in_bt = not in_bt
+                cur.append(ch)
+            elif ch == '|' and not in_bt:
+                cells.append(''.join(cur).strip())
+                cur = []
+            else:
+                cur.append(ch)
+            i += 1
+        cells.append(''.join(cur).strip())
+        return cells
+
     def flush_table():
         nonlocal in_table, table_rows
         if in_table and table_rows:
             out.append('<table>')
             for r_idx, row in enumerate(table_rows):
-                cells = [c.strip() for c in row.strip('|').split('|')]
+                cells = _split_md_table_row(row)
                 if all(re.match(r'^[-:\s]+$', c) for c in cells if c):
                     continue
                 tag = 'th' if r_idx == 0 else 'td'
@@ -1131,7 +1163,20 @@ def md_chunk_to_html(md_chunk, ctx_blocks=None):
                     f'</div>'
                 )
             else:
-                out.append('<div class="notice">' + '<br>'.join(md_inline(x) for x in bq_lines) + '</div>')
+                notice_parts = []
+                li_buf = []
+                def _flush_bq_li():
+                    if li_buf:
+                        notice_parts.append('<ul>' + ''.join(f'<li>{md_inline(x)}</li>' for x in li_buf) + '</ul>')
+                        li_buf.clear()
+                for bl in bq_lines:
+                    if bl.startswith('- ') or bl.startswith('* '):
+                        li_buf.append(bl[2:].strip())
+                    else:
+                        _flush_bq_li()
+                        notice_parts.append(f'<p>{md_inline(bl)}</p>')
+                _flush_bq_li()
+                out.append('<div class="notice">' + ''.join(notice_parts) + '</div>')
             bq_lines = []
             in_bq = False
 
@@ -1161,7 +1206,7 @@ def md_chunk_to_html(md_chunk, ctx_blocks=None):
                 )
                 if is_diagram:
                     diag_svg = ascii_to_vector_svg(raw_code)
-                    out.append(f'<div class="diagram-vector-card" style="margin:14px 0;max-width:100%;overflow-x:auto;">{diag_svg}</div>')
+                    out.append(f'<div class="diagram-vector-card" style="margin:14px 0;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;">{diag_svg}</div>')
                 else:
                     out.append(f'<div class="snippet-wrap">{header_bar}<pre><code>{esc_code}</code></pre></div>')
             continue
@@ -1237,7 +1282,11 @@ def md_chunk_to_html(md_chunk, ctx_blocks=None):
         if raw_tail:
             out.append(f'<pre><code>{html.escape(raw_tail)}</code></pre>')
 
-    return chunk_title or 'Ключевая концепция', '\n'.join(out)
+    final_title = chunk_title or 'Ключевая концепция'
+    if out and not re.match(r'^<h[1-6]\b', out[0].strip(), re.I):
+        out.insert(0, f'<h4>{md_inline(final_title)}</h4>')
+
+    return final_title, '\n'.join(out)
 
 def parse_k_note(cid):
     info = k_files_map[cid]
