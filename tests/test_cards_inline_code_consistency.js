@@ -9,9 +9,9 @@
  *    - Скрытие мобильного таббара на экранах > 880px
  *    - Отсутствие троеточия доп. настроек в десктопном хедере
  *    - Наличие переключателя дзен-паузы в сайдбаре
- *    - Отсутствие кнопки-шпаргалки (💡) в карточке
+ *    - Опциональная кнопка «💡 Зацепка» в верхнем ряду карточки .fc-top-row (вместо старой круглой #srs-hint-btn)
  *    - Пульсация активной бусины прогресса
- *    - Бейдж "0 XP" вместо "Сброс" на кнопке "Не знаю"
+ *    - Чистая однострочная кнопка «Не знаю» (без «Сброс»)
  */
 
 const fs = require('fs');
@@ -42,16 +42,17 @@ console.log('--- Запуск теста консистентности инла
   assert(content.includes('sidebar-srs-settings'), `${fileName}: настройки SRS должны присутствовать в сайдбаре`);
   assert(content.includes('data-action="toggle-srs-finish-mode"'), `${fileName}: тумблер переключения дзен-паузы должен быть в сайдбаре`);
 
-  // Г) Кнопка-шпаргалка 💡 убрана из карточек
-  assert(!content.includes('id="srs-hint-btn" title="Шпаргалка (H)">💡</button>'), `${fileName}: кнопка-шпаргалка 💡 должна быть убрана из карточки`);
+  // Г) Старая круглая кнопка #srs-hint-btn убрана, в .fc-top-row доступна кнопка «💡 Зацепка»
+  assert(!content.includes('id="srs-hint-btn" title="Шпаргалка (H)">💡</button>'), `${fileName}: старая кнопка #srs-hint-btn должна быть убрана из карточки`);
+  assert(content.includes('fc-top-rescue-btn') && content.includes('💡 Зацепка'), `${fileName}: в .fc-top-row должна присутствовать опциональная кнопка 💡 Зацепка`);
 
   // Д) Пульсация активной ведущей бусины
   assert(content.includes('srs-active-bead-pulse'), `${fileName}: активная бусина должна анимироваться через srs-active-bead-pulse`);
   assert(!content.includes('box-shadow: 0 0 12px #10b981, 0 0 22px rgba(52, 211, 153, 0.85) !important;\n\n    animation: none !important;'), `${fileName}: анимация активной бусины не должна блокироваться animation: none`);
 
-  // Е) Кнопка "Не помню" чистая от визуального шума градусов и без "Сброс"
+  // Е) Кнопка "Не знаю" чистая от визуального шума градусов и без "Сброс"
   assert(!content.includes('xp-gem-again">Сброс</span>'), `${fileName}: подпись на кнопке Не знаю не должна быть 'Сброс'`);
-  assert(content.includes('Не помню</span>') || content.includes('xp-gem-again">0°C</span>') || content.includes('xp-gem-again">0 XP</span>'), `${fileName}: кнопка Не помню должна быть переименована и чистой от шума`);
+  assert(content.includes('>Не знаю<'), `${fileName}: первая кнопка оценки должна называться "Не знаю"`);
 
   // Ж) Функция formatCardAnswerHTML и структурирование ответов с точкой с запятой
   assert(content.includes("if(s.includes(';') && !s.includes('```'))"), `${fileName}: formatCardAnswerHTML должна разбивать ответы с ';'`);
@@ -82,12 +83,24 @@ function formatCardAnswerHTMLMock(rawAnswer) {
     }
   }
 
-  const codeMatch = s.match(/^(?:<code>([\s\S]*?)<\/code>|`([^`\n]+)`|<pre class="[^"]*"><code>([\s\S]*?)<\/code><\/pre>)\s*(?:—|–|-|:)\s*([\s\S]*)$/i);
+  const codeMatch = s.match(/^(?:<code>((?:(?!<\/code>)[\s\S])*)<\/code>|`([^`\n]+)`|<pre class="[^"]*"><code>((?:(?!<\/code>)[\s\S])*)<\/code><\/pre>)\s*(?:—|–|-|:)\s*([\s\S]*)$/i);
   if(codeMatch){
     const rawCode = codeMatch[1] || codeMatch[2] || codeMatch[3];
     const explanation = codeMatch[4];
-    if(!explanation.includes('`') && !explanation.includes('<code>') && !explanation.includes(';')){
-      return `<div class="fc-code-capsule"><code>${rawCode}</code></div><div class="fc-answer-explanation">${explanation}</div>`;
+    const expNoEntities = explanation.replace(/&[a-zA-Z0-9#]+;/g, '').replace(/<code>[\s\S]*?<\/code>/gi, '');
+    if(!expNoEntities.includes(';')){
+      const trimmedCode = rawCode.trim();
+      const isSimpleToken = /^[A-Za-z_@.$][A-Za-z0-9_.\-]*(\(\))?$/.test(trimmedCode)
+        || /^\d+$/.test(trimmedCode)
+        || /^O\([^)]+\)$/.test(trimmedCode)
+        || /^[<>&|=+\-*\/:~!]+$/.test(trimmedCode);
+      const isCapsuleCode = !isSimpleToken && (
+        trimmedCode.includes(' ') ||
+        (/[(\[{=+\-*\/<>|&~:%]/.test(trimmedCode) && trimmedCode.length >= 4)
+      );
+      if(isCapsuleCode){
+        return `<div class="fc-code-capsule"><code>${rawCode}</code></div><div class="fc-answer-explanation">${explanation}</div>`;
+      }
     }
   }
   return s;
@@ -102,6 +115,14 @@ assert(!outputHtml.includes('fc-code-capsule'), 'Сравнение кодов 4
 assert(outputHtml.includes('class="fc-answer-multiline"'), 'Ответ должен быть оформлен в multiline контейнер');
 assert(outputHtml.includes('`401` — нет аутентификации'), 'Пункт 401 должен быть на своей строке с аккуратным тире');
 assert(outputHtml.includes('`403` — нет авторизации'), 'Пункт 403 должен быть на своей строке с аккуратным тире');
+
+// Проверяем Умную капсулу (Вариант А) и нежадный захват <code>
+const multiCodeHtml = formatCardAnswerHTMLMock('<code>a</code>, <code>b</code> — две переменные');
+assert(!multiCodeHtml.includes('fc-code-capsule'), 'Два смежных тега <code> не должны склеиваться в капсулу');
+const singleWordHtml = formatCardAnswerHTMLMock('<code>list</code> — изменяемая коллекция');
+assert(!singleWordHtml.includes('fc-code-capsule'), 'Одиночное слово типа list не выносится в большую капсулу');
+const exprCapsuleHtml = formatCardAnswerHTMLMock('<code>from collections import deque</code> — импорт двусторонней очереди');
+assert(exprCapsuleHtml.includes('fc-code-capsule'), 'Много-токенное выражение/команда выносится в умную капсулу');
 
 console.log('✓ Имитационный тест formatCardAnswerHTML (401 vs 403) успешно пройден.');
 console.log('Все проверки консистентности карточек SRS выполнены успешно (100%).');

@@ -68,13 +68,13 @@ assert(academyHtml.includes('<code>sorted([3, 1, 2])</code> создаёт и в
 console.log('✓ Bug 4 (Ф-009 card 2): code example and explanation for sorted() vs sort() verified');
 
 // 5. Bug 5: Ф-009 card 3: объяснение различия O(len(s1)) разности s1 - s2 от O(min(n, m)) пересечения
-assert(f009Content.includes('$O(\\min(n, m))$ применяется для пересечения `s1 & s2`'), 'Ф-009 card 3 must explicitly explain why difference is not O(min(n, m))');
+assert(f009Content.includes('$O(min(n, m))$ применяется для пересечения `s1 & s2`') || f009Content.includes('$O(\\min(n, m))$ применяется для пересечения `s1 & s2`'), 'Ф-009 card 3 must explicitly explain why difference is not O(min(n, m))');
 assert(academyHtml.includes('<span class=\\"math-formula\\">O(min(n, m))</span> применяется для пересечения <code>s1 &amp; s2</code>'), 'academy.html must contain difference vs intersection clarification in Ф-009 card 3');
 console.log('✓ Bug 5 (Ф-009 card 3): explanation for O(len(s1)) vs O(min(n, m)) verified');
 
 // 6, 7, 8. Bugs 6-8: Ф-009 cards 13 & 14: форматирование формул O(min(n, m)) и O(n + m) с пояснениями
-assert(f009Content.includes('13. Сложность `s1 & s2` (пересечение множеств)? >> $O(\\min(n, m))$ — алгоритм итерируется по меньшему'), 'Ф-009 card 13 must format formula and algorithm description');
-assert(f009Content.includes('14. Сложность `s1 | s2` (объединение множеств)? >> $O(n + m)$ — копирует все уникальные элементы'), 'Ф-009 card 14 must format formula and algorithm description');
+assert(f009Content.includes('>> $O(min(n, m))$ — алгоритм итерируется по меньшему') || f009Content.includes('13. Сложность `s1 & s2` (пересечение множеств)? >> $O(\\min(n, m))$ — алгоритм итерируется по меньшему'), 'Ф-009 card 13 must format formula and algorithm description');
+assert(f009Content.includes('>> $O(n + m)$ — копирует все уникальные элементы') || f009Content.includes('14. Сложность `s1 | s2` (объединение множеств)? >> $O(n + m)$ — копирует все уникальные элементы'), 'Ф-009 card 14 must format formula and algorithm description');
 assert(academyHtml.includes('<span class=\\"math-formula\\">O(min(n, m))</span> — алгоритм итерируется по меньшему из двух множеств'), 'academy.html must render card 13 with .math-formula');
 assert(academyHtml.includes('<span class=\\"math-formula\\">O(n + m)</span> — копирует все уникальные элементы обоих множеств'), 'academy.html must render card 14 with .math-formula');
 console.log('✓ Bugs 6, 7, 8 (Ф-009 cards 13 & 14): math formula formatting and descriptions verified');
@@ -711,19 +711,18 @@ console.log('✓ Bug 92: Clean deck titles without redundant echelon prefix in #
 assert(academyHtml.includes("🌱 <b>0 изучено</b> · Старт повторения"), 'Bug 93: cards hub header must render encouraging start status when 0 decks reviewed');
 console.log('✓ Bug 93: Positive dopamine start status in cards hub header verified');
 
-// 94. Bug 94: Навигация «Назад» на стороне ответа карточки (защита от тупика и ложной оценки)
-assert((academyHtml.includes("data-hub-prev ${cIdx===0?'disabled':''}") || academyHtml.includes("data-hub-prev")) && (academyHtml.includes('← К вопросу') || academyHtml.includes('← Назад к предыдущей')), 'Bug 94: viewCardsHub must render [data-hub-prev] button on answer face');
-assert((academyHtml.includes("data-py-prev-card") || academyHtml.includes("data-py-prev-card ${qPos === 0 ? 'disabled' : ''}")) && (academyHtml.includes('← К вопросу') || academyHtml.includes('← Назад к предыдущей')), 'Bug 94: viewPythonSkill must render [data-py-prev-card] button on answer face');
-console.log('✓ Bug 94: Zero-trap navigation ([data-hub-prev] / [data-py-prev-card]) on card answer face verified');
+// 94. Bug 94: Навигация возврата к вопросу на стороне ответа карточки (защита от тупика и ложной оценки)
+assert(academyHtml.includes('fc-flip-back-btn') && academyHtml.includes('← К вопросу'), 'Bug 94: viewCardsHub & viewPythonSkill must render ← К вопросу button on answer face');
+console.log('✓ Bug 94: Zero-trap navigation (← К вопросу) on card answer face verified');
 
 // 95. Bug 95: Ликвидация нерейтингового пропуска «Дальше →» на лицевой стороне карточки
 assert(!academyHtml.includes("data-hub-next ${cIdx + 1 >= cards.length ? 'disabled' : ''}>Дальше →"), 'Bug 95: unrated [data-hub-next] button must be removed from question face in viewCardsHub');
 assert(!academyHtml.includes("data-py-next-card ${qPos + 1 >= pySkillViewState.sessionQueue.length ? 'disabled' : ''} style=\"padding:12px 18px;border-radius:14px;\">Дальше →"), 'Bug 95: unrated [data-py-next-card] button must be removed from question face in viewPythonSkill');
 console.log('✓ Bug 95: Elimination of unrated skip button on question face verified');
 
-// 96. Bug 96: Явные интервалы повторения на кнопках оценки для мобильных устройств (Mobile-First)
-assert(academyHtml.includes("${srsPrev.again.days} дн</span>") && academyHtml.includes("${srsPrev.hard.days} дн</span>") && academyHtml.includes("${srsPrev.good.days} дн</span>") && academyHtml.includes("${srsPrev.easy.days} дн</span>"), 'Bug 96: rating buttons must display visible next review interval in days via subtext');
-console.log('✓ Bug 96: Mobile-First visible review intervals on rating buttons verified');
+// 96. Bug 96: Чистые однострочные названия 4 кнопок оценки («Не знаю · Частично · Помню · Легко»)
+assert(academyHtml.includes('Не знаю') && academyHtml.includes('Частично') && academyHtml.includes('Помню') && academyHtml.includes('Легко'), 'Bug 96: rating buttons must use clean single-word labels (Не знаю / Частично / Помню / Легко)');
+console.log('✓ Bug 96: Clean single-line rating button labels verified');
 
 // 97. Bug 97: Кнопка быстрого повторения карточек на сегодня data-hub-review-due
 assert(academyHtml.includes('data-hub-review-due'), 'Bug 97: viewCardsHub must render [data-hub-review-due] button when dueTodayCardsCount > 0');

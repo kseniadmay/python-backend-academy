@@ -52,10 +52,10 @@ assert(academyHtml.includes('Интервальное повторение'), 'C
 assert(academyHtml.includes('Шпаргалка'), 'Cards header must include cheat sheet chip');
 assert(academyHtml.includes('Показать ответ (Пробел)') || academyHtml.includes('Показать ответ'), 'Cards must include spacebar flip CTA');
 assert(academyHtml.includes('Не знаю'), 'Cards must include SRS button 1: Не знаю');
-assert(academyHtml.includes('Трудно (+2 XP)'), 'Cards must include SRS button 2: Трудно (+2 XP)');
-assert(academyHtml.includes('Хорошо (+5 XP)'), 'Cards must include SRS button 3: Хорошо (+5 XP)');
-assert(academyHtml.includes('Легко (+10 XP)'), 'Cards must include SRS button 4: Легко (+10 XP)');
-console.log('✓ 2. Flashcards SRS Benchmark: 4 кнопки повторения (+2/+5/+10 XP), шпаргалка и переворот подтверждены');
+assert(academyHtml.includes('Частично'), 'Cards must include SRS button 2: Частично');
+assert(academyHtml.includes('Помню'), 'Cards must include SRS button 3: Помню');
+assert(academyHtml.includes('Легко'), 'Cards must include SRS button 4: Легко');
+console.log('✓ 2. Flashcards SRS Benchmark: 4 чистые кнопки повторения (Не знаю / Частично / Помню / Легко), зацепка и переворот подтверждены');
 
 // 3. Экран задачи и практики (эталон_практика_задача.png)
 assert(academyHtml.includes('practice-atomic-split'), 'Practice must feature desktop Split-View (.practice-atomic-split)');

@@ -21,7 +21,9 @@ const cbStart = academyHtml.indexOf('function buildSrsDeckContextBarHTML(');
 const cbEnd = academyHtml.indexOf('window.buildSrsDeckContextBarHTML = buildSrsDeckContextBarHTML;', cbStart);
 const buildSrsDeckContextBarCode = (cbStart !== -1 && cbEnd !== -1) ? academyHtml.slice(cbStart, cbEnd) : '';
 
-const startIdx = academyHtml.indexOf('function viewCardsHub(){');
+const startIdx = academyHtml.indexOf('function buildFlashcardTopFrontHTML(') !== -1
+  ? academyHtml.indexOf('function buildFlashcardTopFrontHTML(')
+  : academyHtml.indexOf('function viewCardsHub(){');
 const endIdx = academyHtml.indexOf('/* ================= 401-TASK CODING TRAINER HUB', startIdx);
 assert(startIdx !== -1 && endIdx !== -1, 'viewCardsHub function boundary found');
 const viewCardsHubCode = academyHtml.slice(startIdx, endIdx);

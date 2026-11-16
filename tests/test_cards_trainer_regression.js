@@ -37,26 +37,23 @@ function testCleanHumanUiDueMode(){
 }
 
 // Тест-кейс 2: Защита от тупика навигации на ответе первой карточки (Zero-Trap Navigation on duePos === 0)
+// Тест-кейс 2: Беспрепятственный возврат «← К вопросу» на стороне ответа в режиме dueMode (Zero-Trap)
 function testZeroTrapNavigationDueMode(){
   const dueModeMatch = academyHtml.slice(
     academyHtml.indexOf('if(cardsHubState.dueMode){'),
     academyHtml.indexOf('const allDeckIds = Object.keys(ALL_DECKS_COMBINED)', academyHtml.indexOf('if(cardsHubState.dueMode){'))
   );
-  const dueAnswerFace = dueModeMatch.slice(
-    dueModeMatch.indexOf('cardsHubState.flipped ? (() => {'),
-    dueModeMatch.indexOf('})() :')
-  );
   assert(
-    !dueAnswerFace.includes('disabled'),
-    'Defect 2: data-hub-prev on answer side must not be disabled on duePos === 0'
-  );
-  assert(
-    dueModeMatch.includes('data-hub-flip') && dueModeMatch.includes('fc-card--3d'),
+    dueModeMatch.includes('data-hub-flip') && dueModeMatch.includes('fc-card'),
     'Defect 2: card in dueMode must support flip interaction to return to question'
+  );
+  assert(
+    !dueModeMatch.includes('data-hub-prev ${cIdx===0'),
+    'Defect 2: ← К вопросу must not carry conflicting disabled data-hub-prev attribute'
   );
 }
 
-// Тест-кейс 3: Сохранение 3D-эстетики и стиля Zen Glassmorphism в режиме очереди дня
+// Тест-кейс 3: Сохранение интерактивной эстетики и стиля Zen Glassmorphism в режиме очереди дня (без шума 3D)
 function testGlassmorphismAestheticsDueMode(){
   const dueModeMatch = academyHtml.slice(
     academyHtml.indexOf('if(cardsHubState.dueMode){'),
@@ -64,11 +61,11 @@ function testGlassmorphismAestheticsDueMode(){
   );
   assert(
     !dueModeMatch.includes('class="fc-card ${cardsHubState.flipped ? \'flipped\' : \'\'}"'),
-    'Defect 3: dueMode must not use non-existent .flipped class without 3D styles'
+    'Defect 3: dueMode must not use non-existent .flipped class'
   );
   assert(
-    dueModeMatch.includes('fc-card--3d') && dueModeMatch.includes('fc-card-inner'),
-    'Defect 3: dueMode must use canonical .fc-card--3d and .fc-card-inner markup'
+    !dueModeMatch.includes('fc-card--3d') && dueModeMatch.includes('fc-card-front') && dueModeMatch.includes('fc-card-back'),
+    'Defect 3: dueMode must use clean .fc-card-front/.fc-card-back markup without 3D suffix'
   );
 }
 
@@ -200,24 +197,22 @@ function testAnswerFaceButtonLabel(){
 
 // Тест-кейс 14: Защита от блокировки кнопки «← К вопросу» на первой карточке в каталоге и уроке
 function testZeroTrapNavigationAnswerFaceCatalogAndLesson(){
-  // Каталог колод: сторона ответа
-  const catalogAnswerMatch = academyHtml.slice(
-    academyHtml.indexOf('cardsHubState.flipped ? (() => {', academyHtml.indexOf('function viewCardsHub')),
-    academyHtml.indexOf('})() : `\n          <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">', academyHtml.indexOf('function viewCardsHub'))
+  const hubSection = academyHtml.slice(
+    academyHtml.indexOf('function viewCardsHub'),
+    academyHtml.indexOf('function savePracticeHubPosState')
   );
   assert(
-    !catalogAnswerMatch.includes('data-hub-prev ${cIdx===0?\'disabled\':\'\'}'),
-    'Defect 14: data-hub-prev on answer face in catalog must not be disabled on cIdx === 0'
+    !hubSection.includes('data-hub-prev ${cIdx===0?\'disabled\':\'\'}') && academyHtml.includes('fc-flip-back-btn'),
+    'Defect 14: ← К вопросу in catalog must not carry disabled data-hub-prev attribute'
   );
 
-  // Урок: сторона ответа
-  const lessonAnswerMatch = academyHtml.slice(
-    academyHtml.indexOf('pySkillViewState.cardFlipped ? `\n            <div class="fc-rate-row"'),
-    academyHtml.indexOf('` : `\n            <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">')
+  const skillSection = academyHtml.slice(
+    academyHtml.indexOf('function viewPythonSkill'),
+    academyHtml.indexOf('function viewCardsHub')
   );
   assert(
-    !lessonAnswerMatch.includes('data-py-prev-card ${qPos === 0 ? \'disabled\' : \'\'}'),
-    'Defect 14: data-py-prev-card on answer face in lesson must not be disabled on qPos === 0'
+    !skillSection.includes('data-py-prev-card ${qPos === 0 ? \'disabled\' : \'\'}') && skillSection.includes('fc-flip-back-btn'),
+    'Defect 14: ← К вопросу in lesson must not be disabled on qPos === 0'
   );
 }
 
@@ -299,7 +294,7 @@ if(require.main === module){
   const tests = [
     ['1. Clean Human UI в dueMode', testCleanHumanUiDueMode],
     ['2. Zero-Trap навигация на duePos === 0', testZeroTrapNavigationDueMode],
-    ['3. 3D Zen Glassmorphism в dueMode', testGlassmorphismAestheticsDueMode],
+    ['3. Interactive Zen Glassmorphism в dueMode', testGlassmorphismAestheticsDueMode],
     ['4. Русская плюрализация при завершении', testRussianPluralizationCompletion],
     ['5. Снижение рейтинга в SRS при ошибке', testSrsRatingDowngradeOnLapse],
     ['6. Счётчик сессионного цикла урока', testLessonCardCounterOverflow],

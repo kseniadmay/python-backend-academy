@@ -67,8 +67,8 @@ def export_canonical_content() -> None:
         json.dump(notes_dict, f, ensure_ascii=False, indent=2)
     logger.info('✓ Сохранено %d конспектов в %s', len(notes_dict), notes_file.name)
 
-    # 3. Экспорт 286 колод флеш-карточек (Ф-*)
-    logger.info('Парсинг 286 колод флеш-карточек...')
+    # 3. Экспорт 287 колод флеш-карточек (Ф-*)
+    logger.info('Парсинг 287 колод флеш-карточек...')
     cards_dict = {}
     total_card_items = 0
     for fid in sorted(f_files_map.keys()):

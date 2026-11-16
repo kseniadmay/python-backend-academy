@@ -1141,41 +1141,83 @@ def md_chunk_to_html(md_chunk, ctx_blocks=None):
     def flush_bq():
         nonlocal in_bq, bq_lines
         if in_bq and bq_lines:
-            jr_txt = ''
-            sr_txt = ''
+            jr_parts = []
+            sr_parts = []
+            cur_role = None
             other_lines = []
             for bl in bq_lines:
                 m_jr = re.match(r'^[-*]?\s*\*\*Junior[^*]*\*\*:\s*(.*)', bl)
                 m_sr = re.match(r'^[-*]?\s*\*\*Senior[^*]*\*\*:\s*(.*)', bl)
                 if m_jr:
-                    jr_txt = m_jr.group(1).strip()
+                    cur_role = 'jr'
+                    if m_jr.group(1).strip():
+                        jr_parts.append(m_jr.group(1).strip())
                 elif m_sr:
-                    sr_txt = m_sr.group(1).strip()
-                elif not re.match(r'^\*\*Junior\s+vs\s+Senior\*\*:?$', bl, re.I):
+                    cur_role = 'sr'
+                    if m_sr.group(1).strip():
+                        sr_parts.append(m_sr.group(1).strip())
+                elif re.match(r'^\*\*Junior\s+vs\s+Senior\*\*:?$', bl, re.I):
+                    cur_role = None
+                elif cur_role in ('jr', 'sr') and re.match(r'^(?:\d+\.|[-*])\s+', bl):
+                    item_txt = bl.strip()
+                    if cur_role == 'jr':
+                        jr_parts.append(item_txt)
+                    else:
+                        sr_parts.append(item_txt)
+                else:
+                    cur_role = None
                     other_lines.append(bl)
-            if jr_txt and sr_txt:
+            if jr_parts and sr_parts:
+                jr_html = '<br>'.join(md_inline(x) for x in jr_parts)
+                sr_html = '<br>'.join(md_inline(x) for x in sr_parts)
                 if other_lines:
                     out.append('<div class="notice">' + '<br>'.join(md_inline(x) for x in other_lines) + '</div>')
                 out.append(
                     f'<div class="jvs-grid">'
-                    f'<div class="jvs-box jvs-box--jr"><span class="jvs-title">❌ Подход Junior</span>{md_inline(jr_txt)}</div>'
-                    f'<div class="jvs-box jvs-box--sr"><span class="jvs-title">✅ Подход Senior</span>{md_inline(sr_txt)}</div>'
+                    f'<div class="jvs-box jvs-box--jr"><span class="jvs-title">❌ Подход Junior</span>{jr_html}</div>'
+                    f'<div class="jvs-box jvs-box--sr"><span class="jvs-title">✅ Подход Senior</span>{sr_html}</div>'
                     f'</div>'
                 )
             else:
+                alert_map = {
+                    'TIP': '💡 <strong>Совет:</strong>',
+                    'NOTE': 'ℹ️ <strong>Примечание:</strong>',
+                    'IMPORTANT': '📌 <strong>Важно:</strong>',
+                    'WARNING': '⚠️ <strong>Внимание:</strong>',
+                    'CAUTION': '🚨 <strong>Осторожно:</strong>',
+                }
                 notice_parts = []
                 li_buf = []
+                pending_prefix = ''
                 def _flush_bq_li():
                     if li_buf:
                         notice_parts.append('<ul>' + ''.join(f'<li>{md_inline(x)}</li>' for x in li_buf) + '</ul>')
                         li_buf.clear()
                 for bl in bq_lines:
-                    if bl.startswith('- ') or bl.startswith('* '):
+                    m_al = re.match(r'^\[!(TIP|NOTE|IMPORTANT|WARNING|CAUTION)\]\s*(.*)$', bl.strip(), re.I)
+                    if m_al:
+                        _flush_bq_li()
+                        badge = alert_map.get(m_al.group(1).upper(), '')
+                        rest = m_al.group(2).strip()
+                        if rest:
+                            notice_parts.append(f'<p>{badge} {md_inline(rest)}</p>')
+                        else:
+                            pending_prefix = badge
+                    elif bl.startswith('- ') or bl.startswith('* '):
+                        if pending_prefix:
+                            notice_parts.append(f'<p>{pending_prefix}</p>')
+                            pending_prefix = ''
                         li_buf.append(bl[2:].strip())
                     else:
                         _flush_bq_li()
-                        notice_parts.append(f'<p>{md_inline(bl)}</p>')
+                        if pending_prefix:
+                            notice_parts.append(f'<p>{pending_prefix} {md_inline(bl)}</p>')
+                            pending_prefix = ''
+                        else:
+                            notice_parts.append(f'<p>{md_inline(bl)}</p>')
                 _flush_bq_li()
+                if pending_prefix:
+                    notice_parts.append(f'<p>{pending_prefix}</p>')
                 out.append('<div class="notice">' + ''.join(notice_parts) + '</div>')
             bq_lines = []
             in_bq = False
@@ -1347,9 +1389,6 @@ def parse_f_deck(fid, module=None):
         elif cur_q is not None:
             cur_a_lines.append(raw_line)
     flush()
-
-    if fid == 'Ф-084' and len(cards) > 7 and cards[7].get('a'):
-        cards[7]['a'] = cards[7]['a'].replace('от 2 до 36', 'от <code>2</code> до <code>36</code>')
 
     return {'id': key, 'title': info['title'], 'cards': cards}
 
