@@ -23997,6 +23997,12 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 .fc-code-false { color: #f43f5e !important; font-weight: 700 !important; }
 .fc-code-note { color: #64748b !important; font-size: 0.82rem !important; }
 
+
+/* Интервальное повторение (#/cards): счётчик карт скрыт по запросу пользователя */
+.cards-hub-container .fc-card-counter-badge {
+  display: none !important;
+}
+
 /* Вариант 2: Двухблочный мини-сниппет */
 .fc-code-box {
   background: rgba(5, 15, 22, 0.75) !important;
@@ -50379,7 +50385,7 @@ function buildFlashcardNoteFooterHTML(cardKey){
 }
 window.buildFlashcardNoteFooterHTML = buildFlashcardNoteFooterHTML;
 
-function buildFlashcardTopFrontHTML(cardKey, idx, total, rescueAttrName, isRescueOpen){
+function buildFlashcardTopFrontHTML(cardKey, idx, total, rescueAttrName, isRescueOpen, showCounter = true){
   const statusHTML = (typeof getRemNoteCardStatusBadgeHTML === 'function') ? getRemNoteCardStatusBadgeHTML(cardKey) : '';
   const safeKey = escapeHtmlStr(cardKey || '');
   const safeIdx = Math.max(0, Number(idx) || 0) + 1;
@@ -50404,12 +50410,12 @@ function buildFlashcardTopFrontHTML(cardKey, idx, total, rescueAttrName, isRescu
                 <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
                   ${theoryBtnHTML}
                   <button type="button" class="fc-top-rescue-btn ${isRescueOpen ? 'is-active' : ''}" ${rescueAttrName}="${safeKey}" title="Подсказка-зацепка (H)" aria-pressed="${isRescueOpen ? 'true' : 'false'}">💡 Зацепка</button>
-                  <span class="fc-card-counter-badge">${safeIdx} / ${safeTotal}</span>
+                  ${showCounter ? `<span class="fc-card-counter-badge">${safeIdx} / ${safeTotal}</span>` : ""}
                 </div>
               </div>`;
 }
 
-function buildFlashcardTopBackHTML(cardKey, idx, total, backBtnAttrs, showEscKbd){
+function buildFlashcardTopBackHTML(cardKey, idx, total, backBtnAttrs, showEscKbd, showCounter = true){
   const statusHTML = (typeof getRemNoteCardStatusBadgeHTML === 'function') ? getRemNoteCardStatusBadgeHTML(cardKey) : '';
   const safeIdx = Math.max(0, Number(idx) || 0) + 1;
   const safeTotal = Math.max(1, Number(total) || 1);
@@ -50436,7 +50442,7 @@ function buildFlashcardTopBackHTML(cardKey, idx, total, backBtnAttrs, showEscKbd
                 </div>
                 <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
                   ${theoryBtnHTML}
-                  <span class="fc-card-counter-badge">${safeIdx} / ${safeTotal}</span>
+                  ${showCounter ? `<span class="fc-card-counter-badge">${safeIdx} / ${safeTotal}</span>` : ""}
                   <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" ${backBtnAttrs} style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--ink-soft);font-size:0.74rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;height:26px;min-height:26px;line-height:24px;padding:0 12px;border-radius:999px;box-sizing:border-box;transition:all .15s ease;">← К вопросу${escHtml}</button>
                 </div>
               </div>`;
@@ -50757,7 +50763,7 @@ function viewCardsHub(){
 
             <div class="card-face card-front fc-card-front">
 
-              ${buildFlashcardTopFrontHTML(curKey, freeIdx, freeCards.length, 'data-hub-rescue', showFreeRescue)}
+              ${buildFlashcardTopFrontHTML(curKey, freeIdx, freeCards.length, 'data-hub-rescue', showFreeRescue, false)}
 
               <div class="fc-card-body fc-q" id="srs-card-prompt" style="margin:0;padding:14px 0 16px;font-size:clamp(1.15rem, 2.1vw, 1.35rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
 
@@ -50773,7 +50779,7 @@ function viewCardsHub(){
 
             <div class="card-face card-back fc-card-back">
 
-              ${buildFlashcardTopBackHTML(curKey, freeIdx, freeCards.length, 'data-action="flip-card"', true)}
+              ${buildFlashcardTopBackHTML(curKey, freeIdx, freeCards.length, 'data-action="flip-card"', true, false)}
 
               <div class="fc-card-body" style="margin:auto 0;padding:12px 0;width:100%;">
 
@@ -50883,7 +50889,7 @@ function viewCardsHub(){
 
             <div class="card-face card-front fc-card-front">
 
-              ${buildFlashcardTopFrontHTML(curCardKey, duePos, qLen, 'data-hub-rescue', showActiveRescue)}
+              ${buildFlashcardTopFrontHTML(curCardKey, duePos, qLen, 'data-hub-rescue', showActiveRescue, false)}
 
               <div class="fc-card-body fc-q" id="srs-card-prompt" style="margin:0;padding:14px 0 16px;font-size:clamp(1.15rem, 2.1vw, 1.35rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
 
@@ -50899,7 +50905,7 @@ function viewCardsHub(){
 
             <div class="card-face card-back fc-card-back">
 
-              ${buildFlashcardTopBackHTML(curCardKey, duePos, qLen, 'data-action="flip-card"', true)}
+              ${buildFlashcardTopBackHTML(curCardKey, duePos, qLen, 'data-action="flip-card"', true, false)}
 
               <div class="fc-card-body" style="margin:auto 0;padding:12px 0;width:100%;">
 
@@ -51153,7 +51159,7 @@ function viewCardsHub(){
 
             <div class="card-face card-front fc-card-front">
 
-              ${buildFlashcardTopFrontHTML(curCardKey, cIdx, cards.length, 'data-hub-rescue', showActiveRescue)}
+              ${buildFlashcardTopFrontHTML(curCardKey, cIdx, cards.length, 'data-hub-rescue', showActiveRescue, false)}
 
               <div class="fc-card-body fc-q" id="srs-card-prompt" style="margin:0;padding:14px 0 16px;font-size:clamp(1.15rem, 2.1vw, 1.35rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
 
@@ -51169,7 +51175,7 @@ function viewCardsHub(){
 
             <div class="card-face card-back fc-card-back">
 
-              ${buildFlashcardTopBackHTML(curCardKey, cIdx, cards.length, 'data-action="flip-card"', true)}
+              ${buildFlashcardTopBackHTML(curCardKey, cIdx, cards.length, 'data-action="flip-card"', true, false)}
 
               <div class="fc-card-body" style="margin:auto 0;padding:12px 0;width:100%;">
 
