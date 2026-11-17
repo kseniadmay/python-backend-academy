@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Интерактивный стенд · Наглядные примеры кода в карточках SRS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090e;
+      --card-bg-front: rgba(15, 23, 42, 0.72);
+      --ink: #f8fafc;
+      --ink-soft: #cbd5e1;
+      --ink-muted: #94a3b8;
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.28);
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --cyan: #06b6d4;
+      --font-d: 'Onest', -apple-system, sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+      --font-t: 'Unbounded', sans-serif;
+
+      /* Mastery Emerald for flipped card back */
+      --mastery-bg: linear-gradient(155deg, rgba(6, 78, 59, 0.48) 0%, rgba(13, 22, 34, 0.90) 50%, rgba(6, 78, 59, 0.32) 100%);
+      --mastery-border: 1.5px solid rgba(16, 185, 129, 0.75);
+      --mastery-shadow: inset 0 1px 0 rgba(16, 185, 129, 0.40), 0 24px 52px -10px rgba(0, 0, 0, 0.75), 0 0 36px rgba(16, 185, 129, 0.28);
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg-front: rgba(255, 255, 255, 0.92);
+      --ink: #0f172a;
+      --ink-soft: #334155;
+      --ink-muted: #64748b;
+      --emerald: #059669;
+      --emerald-glow: rgba(5, 150, 105, 0.2);
+      --amber: #d97706;
+      --rose: #e11d48;
+      --cyan: #0891b2;
+
+      --mastery-bg: linear-gradient(155deg, #ecfdf5 0%, #f0fdfa 50%, #d1fae5 100%);
+      --mastery-border: 1.5px solid rgba(16, 185, 129, 0.65);
+      --mastery-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 20px 40px -10px rgba(16, 185, 129, 0.15), 0 0 24px rgba(16, 185, 129, 0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1.2px, transparent 1.2px);
+      background-size: 24px 24px;
+      color: var(--ink);
+      font-family: var(--font-d);
+      min-height: 100vh;
+      padding: 24px 16px 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+    [data-theme="light"] body {
+      background-image: radial-gradient(rgba(0, 0, 0, 0.045) 1.2px, transparent 1.2px);
+    }
+
+    .stand-header {
+      width: 100%;
+      max-width: 1080px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .stand-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    [data-theme="light"] .stand-topbar {
+      border-bottom-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .stand-title {
+      font-family: var(--font-t);
+      font-size: clamp(1.15rem, 2.5vw, 1.45rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .stand-title .badge {
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+
+    .controls-panel {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pill-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--ink-soft);
+      font-family: var(--font-d);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    [data-theme="light"] .pill-btn {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+    .pill-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .pill-btn.active {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.5);
+      color: #34d399;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+    }
+
+    /* Sub-nav row for cards and variants */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 16px;
+      padding: 12px 16px;
+    }
+    [data-theme="light"] .filter-bar {
+      background: rgba(255, 255, 255, 0.7);
+      border-color: rgba(0, 0, 0, 0.07);
+    }
+
+    .group-label {
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-muted);
+      margin-right: 6px;
+    }
+
+    .btn-group {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    /* Info callout */
+    .banner-note {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-size: 0.86rem;
+      color: #a7f3d0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    [data-theme="light"] .banner-note {
+      color: #065f46;
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    /* Stage canvas */
+    .stage-wrapper {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      transition: max-width 0.3s cubic-bezier(0.2, 0.8, 0.4, 1);
+    }
+    .stage-wrapper.mode-mobile {
+      max-width: 393px;
+      border: 2px dashed rgba(255, 255, 255, 0.18);
+      border-radius: 40px;
+      padding: 24px 14px;
+      background: rgba(0, 0, 0, 0.45);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+    }
+    [data-theme="light"] .stage-wrapper.mode-mobile {
+      background: rgba(255, 255, 255, 0.5);
+      border-color: rgba(0, 0, 0, 0.15);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.06);
+    }
+    .stage-wrapper.mode-desktop {
+      max-width: 720px;
+    }
+
+    /* SRS Header Bar Replica */
+    .srs-top-replica {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 4px 6px;
+    }
+    .srs-sub-label {
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: #34d399;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .srs-sub-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+    .srs-sprint-badge {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 3px 10px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .srs-sprint-badge span { color: #f59e0b; }
+
+    /* Beads progress necklace */
+    .srs-beads-necklace {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 8px 0 16px;
+    }
+    .srs-bead {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.18);
+      transition: all 0.25s ease;
+    }
+    .srs-bead.done {
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+    }
+    .srs-bead.active {
+      width: 9px;
+      height: 9px;
+      background: #ffffff;
+      border: 2px solid #10b981;
+      box-shadow: 0 0 12px #10b981, 0 0 4px #ffffff;
+    }
+
+    /* CARD STRUCTURE */
+    .card-container {
+      width: 100%;
+      perspective: 1200px;
+    }
+
+    .fc-card {
+      width: 100%;
+      min-height: 290px;
+      border-radius: 24px;
+      padding: 22px 20px 20px;
+      position: relative;
+      transition: all 0.35s cubic-bezier(0.2, 0.8, 0.4, 1);
+      backdrop-filter: blur(20px) saturate(140%);
+      -webkit-backdrop-filter: blur(20px) saturate(140%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Front state */
+    .fc-card.fc-card--front {
+      background: linear-gradient(165deg, rgba(20, 28, 42, 0.82) 0%, rgba(11, 15, 23, 0.94) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 20px 48px -10px rgba(0, 0, 0, 0.65);
+    }
+    [data-theme="light"] .fc-card.fc-card--front {
+      background: linear-gradient(165deg, rgba(255, 255, 255, 0.96) 0%, rgba(241, 245, 249, 0.92) 100%);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 16px 36px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Back state (Mastery Emerald) */
+    .fc-card.fc-card--back {
+      background: var(--mastery-bg);
+      border: var(--mastery-border);
+      box-shadow: var(--mastery-shadow);
+    }
+
+    /* Top row of card */
+    .fc-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .fc-tag-chip {
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .fc-tag-chip.review {
+      background: rgba(244, 63, 94, 0.15);
+      border: 1px solid rgba(244, 63, 94, 0.35);
+      color: #fda4af;
+    }
+    .fc-tag-chip.mastery {
+      background: rgba(16, 185, 129, 0.22);
+      border: 1px solid rgba(16, 185, 129, 0.55);
+      color: #34d399;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+    }
+
+    .fc-top-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .fc-clue-btn {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #fbbf24;
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+    .fc-clue-btn:hover {
+      background: rgba(245, 158, 11, 0.22);
+      border-color: rgba(245, 158, 11, 0.6);
+    }
+    .fc-return-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: var(--ink-soft);
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .fc-return-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
+    }
+
+    .fc-counter-badge {
+      font-family: var(--font-m);
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--ink-muted);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 3px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Card Content */
+    .fc-main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin: 8px 0 16px;
+    }
+
+    .fc-prompt-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      line-height: 1.48;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+    [data-theme="light"] .fc-prompt-title {
+      color: #0f172a;
+    }
+
+    /* INLINE CODE STYLE */
+    code {
+      font-family: var(--font-m);
+      font-size: 0.88em;
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(16, 185, 129, 0.32);
+      color: #34d399;
+      padding: 1px 6px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    [data-theme="light"] code {
+      background: rgba(5, 150, 105, 0.1);
+      border-color: rgba(5, 150, 105, 0.25);
+      color: #047857;
+    }
+
+    /* CODE BLOCK (.fc-code-block) */
+    .fc-code-block {
+      background: #090e17 !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      border-radius: 12px !important;
+      padding: 12px 14px !important;
+      margin: 10px 0 12px !important;
+      font-family: var(--font-m) !important;
+      font-size: 0.88rem !important;
+      line-height: 1.55 !important;
+      color: #f1f5f9 !important;
+      text-align: left !important;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+      overflow-x: auto !important;
+    }
+    [data-theme="light"] .fc-code-block {
+      background: #f8fafc !important;
+      border-color: rgba(0, 0, 0, 0.12) !important;
+      color: #0f172a !important;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05), 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+    }
+    .fc-code-block code {
+      background: transparent !important;
+      border: none !important;
+      border-radius: 0 !important;
+      padding: 0 !important;
+      box-shadow: none !important;
+      color: inherit !important;
+      white-space: pre !important;
+      font-size: inherit !important;
+    }
+
+    /* Syntax Tokens */
+    .tok-kw { color: #f43f5e; font-weight: 700; }
+    .tok-def { color: #38bdf8; font-weight: 700; }
+    .tok-str { color: #34d399; }
+    .tok-call { color: #fbbf24; }
+    .tok-num { color: #a78bfa; font-weight: 600; }
+    .tok-com { color: #64748b; font-style: italic; }
+    .tok-hl {
+      background: rgba(245, 158, 11, 0.22);
+      border-bottom: 2px solid #f59e0b;
+      padding: 1px 3px;
+      border-radius: 4px;
+    }
+
+    [data-theme="light"] .tok-kw { color: #e11d48; }
+    [data-theme="light"] .tok-def { color: #0284c7; }
+    [data-theme="light"] .tok-str { color: #059669; }
+    [data-theme="light"] .tok-call { color: #d97706; }
+    [data-theme="light"] .tok-num { color: #7c3aed; }
+
+    /* CODE CAPSULE (.fc-code-capsule) for answers */
+    .fc-code-capsule {
+      background: rgba(10, 16, 26, 0.92) !important;
+      border: 1px solid rgba(245, 158, 11, 0.40) !important;
+      border-radius: 12px !important;
+      padding: 10px 14px !important;
+      margin: 8px 0 12px !important;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5), 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+      position: relative !important;
+    }
+    [data-theme="light"] .fc-code-capsule {
+      background: rgba(254, 243, 199, 0.7) !important;
+      border-color: rgba(217, 119, 6, 0.4) !important;
+    }
+    .fc-code-primary {
+      font-family: var(--font-m) !important;
+      font-size: 1.05rem !important;
+      font-weight: 700 !important;
+      color: #fbbf24 !important;
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
+    }
+    [data-theme="light"] .fc-code-primary {
+      color: #b45309 !important;
+    }
+    .fc-answer-text {
+      font-size: 0.98rem;
+      line-height: 1.55;
+      color: var(--ink);
+    }
+    [data-theme="light"] .fc-answer-text {
+      color: #1e293b;
+    }
+
+    /* ACTION DOCKS */
+    /* Dominant CTA Button */
+    .dominant-btn {
+      width: 100%;
+      height: 48px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(6, 78, 59, 0.35) 100%);
+      border: 1.5px solid rgba(16, 185, 129, 0.6);
+      border-radius: 14px;
+      color: #ffffff;
+      font-family: var(--font-d);
+      font-size: 0.96rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 8px 24px -4px rgba(16, 185, 129, 0.35);
+      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .dominant-btn:hover {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.38) 0%, rgba(6, 78, 59, 0.5) 100%);
+      border-color: #10b981;
+      transform: translateY(-1px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 12px 28px -4px rgba(16, 185, 129, 0.45);
+    }
+    [data-theme="light"] .dominant-btn {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      border-color: #047857;
+      color: #ffffff;
+      box-shadow: 0 8px 20px -4px rgba(5, 150, 105, 0.35);
+    }
+
+    /* 4-BUTTON SOLID HEX RATING DOCK */
+    .rating-dock-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      width: 100%;
+    }
+    @media (max-width: 640px) {
+      .rating-dock-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 46px);
+      }
+    }
+
+    .rating-btn {
+      height: 44px;
+      border-radius: 12px;
+      font-family: var(--font-d);
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.18s ease;
+      user-select: none;
+      border: 1px solid transparent;
+    }
+    .rating-btn .key-hint {
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      opacity: 0.7;
+    }
+    @media (max-width: 640px) {
+      .rating-btn .key-hint { display: none; }
+    }
+
+    /* 1. Не знаю (Ruby Obsidian) */
+    .btn-rate-1 {
+      background: linear-gradient(180deg, #350f18 0%, #1e070e 100%);
+      border-color: #d9435e;
+      color: #fda4af;
+      box-shadow: inset 0 1px 0 rgba(253, 164, 175, 0.25), 0 4px 12px rgba(217, 67, 94, 0.2);
+    }
+    .btn-rate-1:hover {
+      background: linear-gradient(180deg, #441420 0%, #290a14 100%);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    [data-theme="light"] .btn-rate-1 {
+      background: linear-gradient(180deg, #ffe4e6 0%, #fecdd3 100%);
+      border-color: #e11d48;
+      color: #9f1239;
+    }
+
+    /* 2. Частично (Gold Amber) */
+    .btn-rate-2 {
+      background: linear-gradient(180deg, #52350b 0%, #2c1a04 100%);
+      border-color: #f59e0b;
+      color: #fde68a;
+      box-shadow: inset 0 1px 0 rgba(253, 230, 138, 0.25), 0 4px 12px rgba(245, 158, 11, 0.2);
+    }
+    .btn-rate-2:hover {
+      background: linear-gradient(180deg, #66420e 0%, #3a2205 100%);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    [data-theme="light"] .btn-rate-2 {
+      background: linear-gradient(180deg, #fef3c7 0%, #fde68a 100%);
+      border-color: #d97706;
+      color: #92400e;
+    }
+
+    /* 3. Помню (Deep Jade) */
+    .btn-rate-3 {
+      background: linear-gradient(180deg, #103326 0%, #091f17 100%);
+      border-color: #2ea77d;
+      color: #a7f3d0;
+      box-shadow: inset 0 1px 0 rgba(167, 243, 208, 0.25), 0 4px 12px rgba(46, 167, 125, 0.2);
+    }
+    .btn-rate-3:hover {
+      background: linear-gradient(180deg, #174534 0%, #0d2c21 100%);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    [data-theme="light"] .btn-rate-3 {
+      background: linear-gradient(180deg, #d1fae5 0%, #a7f3d0 100%);
+      border-color: #059669;
+      color: #065f46;
+    }
+
+    /* 4. Легко (Topaz Cyan) */
+    .btn-rate-4 {
+      background: linear-gradient(180deg, #0d2a38 0%, #071922 100%);
+      border-color: #1fa3c7;
+      color: #bae6fd;
+      box-shadow: inset 0 1px 0 rgba(186, 230, 253, 0.25), 0 4px 12px rgba(31, 163, 199, 0.2);
+    }
+    .btn-rate-4:hover {
+      background: linear-gradient(180deg, #133a4d 0%, #0b2430 100%);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    [data-theme="light"] .btn-rate-4 {
+      background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
+      border-color: #0891b2;
+      color: #0e7490;
+    }
+
+    /* Comparison side-by-side grid */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 20px;
+      width: 100%;
+    }
+    .card-panel-col {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .col-header {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .col-header .pill-tag {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+    .pill-tag.before {
+      background: rgba(244, 63, 94, 0.15);
+      color: #f43f5e;
+      border: 1px solid rgba(244, 63, 94, 0.3);
+    }
+    .pill-tag.after {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    /* Metrics and audit badge */
+    .audit-box {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-top: 10px;
+    }
+    [data-theme="light"] .audit-box {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+    .audit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+    }
+    .audit-item h4 {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .audit-item p {
+      font-size: 0.88rem;
+      line-height: 1.45;
+      color: var(--ink-soft);
+    }
+    .audit-item strong {
+      color: #10b981;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="stand-header">
+    <div class="stand-topbar">
+      <div class="stand-title">
+        <span>Наглядные примеры кода в карточках SRS</span>
+        <span class="badge">Интерактивный стенд · /grill-me</span>
+      </div>
+      <div class="controls-panel">
+        <button class="pill-btn" id="themeToggle" onclick="toggleTheme()">
+          <span>🌙 Тёмная тема</span>
+        </button>
+        <button class="pill-btn active" id="viewportMobile" onclick="setViewport('mobile')">
+          <span>📱 Смартфон (393px)</span>
+        </button>
+        <button class="pill-btn" id="viewportDesktop" onclick="setViewport('desktop')">
+          <span>💻 Десктоп</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Filter & Switching bar -->
+    <div class="filter-bar">
+      <div class="btn-group">
+        <span class="group-label">Карточка:</span>
+        <button class="pill-btn active" id="btnCard1" onclick="switchCard('card1')">
+          <span>1. Замыкание (make_multiplier)</span>
+        </button>
+        <button class="pill-btn" id="btnCard2" onclick="switchCard('card2')">
+          <span>2. Наследование (Dog/Animal)</span>
+        </button>
+      </div>
+
+      <div class="btn-group">
+        <span class="group-label">Режим:</span>
+        <button class="pill-btn active" id="btnModeCompare" onclick="setMode('compare')">
+          <span>⚖️ Сравнение (Было vs Стало)</span>
+        </button>
+        <button class="pill-btn" id="btnModeInteractive" onclick="setMode('interactive')">
+          <span>🎮 Живая карточка (Переворот)</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="banner-note">
+      <span>💡</span>
+      <span><strong>Калибровка под 393px:</strong> примеры кода ограничены 32–38 символами в строке, нулевой горизонтальный скролл, подсветка синтаксиса встроенным токенизатором платформы.</span>
+    </div>
+  </header>
+
+  <main class="stage-wrapper mode-mobile" id="stageWrapper">
+
+    <!-- SRS Top Context Bar Replica -->
+    <div class="srs-top-replica">
+      <div class="srs-sub-label">
+        <span class="srs-sub-dot"></span>
+        <span id="deckTitle">Карточки SRS · Замыкание</span>
+      </div>
+      <div class="srs-sprint-badge">
+        <span>⚡</span> <span id="sprintCount">Спринт 2 / 12</span>
+      </div>
+    </div>
+
+    <!-- Beads Necklace -->
+    <div class="srs-beads-necklace">
+      <div class="srs-bead done"></div>
+      <div class="srs-bead active"></div>
+      <div class="srs-bead"></div>
+      <div class="srs-bead"></div>
+      <div class="srs-bead"></div>
+      <div class="srs-bead"></div>
+      <div class="srs-bead"></div>
+    </div>
+
+    <!-- MAIN VIEW AREA -->
+    <div id="viewArea" style="width: 100%;">
+      <!-- Dynamically filled by JS -->
+    </div>
+
+    <!-- Live Audit & Design Metrics -->
+    <div class="audit-box">
+      <div class="audit-grid">
+        <div class="audit-item">
+          <h4>Мобильная эргономика 390px</h4>
+          <p>Максимальная длина строки кода: <strong id="metricLineLen">26 символов</strong> (порог 46). Нулевой перенос и 0 горизонтального скролла.</p>
+        </div>
+        <div class="audit-item">
+          <h4>Дидактический эффект</h4>
+          <p>Вместо сухого текста студент <strong>видит структуру класса/фабрики</strong> и мысленно трассирует стек вызовов.</p>
+        </div>
+        <div class="audit-item">
+          <h4>Инварианты платформы</h4>
+          <p>Никаких «Ф-025» в UI, сияние <strong>Mastery Emerald</strong> при перевороте, 100% Solid Hex архитектура кнопок 1–4.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // DATA DEFINITIONS
+    const CARDS = {
+      card1: {
+        id: 'Ф-025',
+        deckName: 'Карточки SRS · Замыкание',
+        sprint: 'Спринт 2 / 12',
+        counter: '2 / 19',
+        // BEFORE: Pure text from user's screenshot
+        before: {
+          questionTitle: 'Какое значение вернёт вызов <code>f(10)</code>, если функция <code>f</code> создана фабрикой <code>make_multiplier(2)</code> с операцией умножения <code>x * n</code>?',
+          questionCode: '',
+          answerCapsule: '20',
+          answerExplanation: 'Аргумент <code>n = 2</code> сохранён во внутренней области видимости замыкания; <code>10 * 2 = 20</code>.'
+        },
+        // AFTER: Visual didactic code
+        after: {
+          questionTitle: 'Какое значение вернёт вызов функции <code>f(10)</code>?',
+          questionCode: `def make_multiplier(n):
+    def multiplier(x):
+        return x * n
+    return multiplier
+
+f = make_multiplier(2)
+f(10)`,
+          answerCapsule: '20',
+          answerExplanation: 'Внутренняя функция <code>multiplier</code> сохраняет <code>n = 2</code> в объекте замыкания; при <code>f(10)</code> вычисляется <code>10 * 2</code>.'
+        }
+      },
+      card2: {
+        id: 'Ф-044',
+        deckName: 'Карточки SRS · ООП Наследование',
+        sprint: 'Спринт 3 / 12',
+        counter: '2 / 15',
+        // BEFORE: Pure text from user's screenshot
+        before: {
+          questionTitle: 'Почему дочерний класс <code>Dog(Animal)</code> имеет доступ к <code>self.name</code>, хотя <code>self.name</code> не присваивается напрямую в <code>Dog.__init__</code> (при вызове <code>super().__init__(name)</code>)?',
+          questionCode: '',
+          answerCapsule: 'super().__init__(name)',
+          answerExplanation: '<code>Dog.__init__</code> передаёт <code>name</code> в родительский <code>Animal.__init__</code> через <code>super().__init__(name)</code>, который и инициализирует <code>self.name</code>; без этого вызова обращение к <code>self.name</code> вызовет <code>AttributeError</code>.'
+        },
+        // AFTER: Visual didactic code
+        after: {
+          questionTitle: 'Почему экземпляр <code>dog</code> имеет доступ к <code>self.name</code>, хотя оно не присваивается напрямую в <code>Dog.__init__</code>?',
+          questionCode: `class Animal:
+    def __init__(self, name):
+        self.name = name
+
+class Dog(Animal):
+    def __init__(self, name):
+        super().__init__(name)
+
+dog = Dog('Бобик')
+dog.name`,
+          answerCapsule: 'super().__init__(name)',
+          answerExplanation: 'Вызов <code>super().__init__(name)</code> делегирует инициализацию родительскому конструктору <code>Animal.__init__</code>, который и связывает атрибут <code>self.name</code> с текущим объектом.'
+        }
+      }
+    };
+
+    let currentCardKey = 'card1';
+    let currentMode = 'compare'; // 'compare' or 'interactive'
+    let isFlipped = false;
+    let currentTheme = 'dark';
+    let currentViewport = 'mobile';
+
+    // Highlight Python syntax tokens
+    function highlightCode(code) {
+      if (!code) return '';
+      const lines = code.split('\n');
+      return lines.map(line => {
+        let l = line
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+        
+        // keywords
+        l = l.replace(/\b(def|class|return)\b/g, '<span class="tok-kw">$1</span>');
+        // calls
+        l = l.replace(/\b(make_multiplier|multiplier|super|__init__|Dog|Animal)\b/g, '<span class="tok-call">$1</span>');
+        // strings
+        l = l.replace(/('Бобик')/g, '<span class="tok-str">$1</span>');
+        // numbers
+        l = l.replace(/\b(2|10)\b/g, '<span class="tok-num">$1</span>');
+        // self
+        l = l.replace(/\bself\b/g, '<span class="tok-def">self</span>');
+        return l;
+      }).join('\n');
+    }
+
+    function renderCardFace(data, isAfter, flipped) {
+      const isBack = flipped;
+      const cardClass = isBack ? 'fc-card fc-card--back' : 'fc-card fc-card--front';
+      const topBadge = isBack 
+        ? `<span class="fc-tag-chip mastery">✓ Ответ</span>` 
+        : `<span class="fc-tag-chip review">⚡ Повторение</span>`;
+
+      const actionTop = isBack
+        ? `<button class="fc-return-btn" onclick="flipCard(event)">← К вопросу</button>`
+        : `<button class="fc-clue-btn">💡 Зацепка</button>`;
+
+      let bodyContent = '';
+      if (!isBack) {
+        // Question Face
+        const qTitle = isAfter ? data.after.questionTitle : data.before.questionTitle;
+        const qCode = isAfter ? data.after.questionCode : '';
+        bodyContent = `
+          <div class="fc-prompt-title">${qTitle}</div>
+          ${qCode ? `<pre class="fc-code-block"><code>${highlightCode(qCode)}</code></pre>` : ''}
+        `;
+      } else {
+        // Answer Face
+        const ans = isAfter ? data.after : data.before;
+        bodyContent = `
+          <div class="fc-code-capsule">
+            <code class="fc-code-primary">${ans.answerCapsule}</code>
+          </div>
+          <div class="fc-answer-text">
+            ${ans.answerExplanation}
+          </div>
+        `;
+      }
+
+      const bottomDock = !isBack
+        ? `
+          <button class="dominant-btn" onclick="flipCard(event)">
+            <span>Показать ответ</span>
+          </button>
+        `
+        : `
+          <div class="rating-dock-grid">
+            <button class="rating-btn btn-rate-1" onclick="flipCard(event)">
+              <span>Не знаю</span> <span class="key-hint">[1]</span>
+            </button>
+            <button class="rating-btn btn-rate-2" onclick="flipCard(event)">
+              <span>Частично</span> <span class="key-hint">[2]</span>
+            </button>
+            <button class="rating-btn btn-rate-3" onclick="flipCard(event)">
+              <span>Помню</span> <span class="key-hint">[3]</span>
+            </button>
+            <button class="rating-btn btn-rate-4" onclick="flipCard(event)">
+              <span>Легко</span> <span class="key-hint">[4]</span>
+            </button>
+          </div>
+        `;
+
+      return `
+        <div class="${cardClass}">
+          <div class="fc-top-row">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              ${topBadge}
+            </div>
+            <div class="fc-top-actions">
+              ${actionTop}
+              <span class="fc-counter-badge">${data.counter}</span>
+            </div>
+          </div>
+          <div class="fc-main-content">
+            ${bodyContent}
+          </div>
+          ${bottomDock}
+        </div>
+      `;
+    }
+
+    function renderView() {
+      const card = CARDS[currentCardKey];
+      document.getElementById('deckTitle').textContent = card.deckName;
+      document.getElementById('sprintCount').textContent = card.sprint;
+
+      // Update metric
+      const codeLines = card.after.questionCode.split('\n');
+      const maxLen = Math.max(...codeLines.map(l => l.length));
+      document.getElementById('metricLineLen').textContent = `${maxLen} символов`;
+
+      const container = document.getElementById('viewArea');
+
+      if (currentMode === 'compare') {
+        container.innerHTML = `
+          <div class="comparison-grid">
+            <div class="card-panel-col">
+              <div class="col-header">
+                <span>Было (Абстрактный текст)</span>
+                <span class="pill-tag before">Как на скриншоте</span>
+              </div>
+              <div class="card-container">
+                ${renderCardFace(card, false, isFlipped)}
+              </div>
+            </div>
+            <div class="card-panel-col">
+              <div class="col-header">
+                <span>Стало (Наглядный код)</span>
+                <span class="pill-tag after">Рекомендуемый дизайн</span>
+              </div>
+              <div class="card-container">
+                ${renderCardFace(card, true, isFlipped)}
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <div class="card-container" style="max-width: 480px; margin: 0 auto;">
+            ${renderCardFace(card, true, isFlipped)}
+          </div>
+        `;
+      }
+    }
+
+    function flipCard(e) {
+      if (e) e.stopPropagation();
+      isFlipped = !isFlipped;
+      renderView();
+    }
+
+    function switchCard(key) {
+      currentCardKey = key;
+      isFlipped = false;
+      document.getElementById('btnCard1').classList.toggle('active', key === 'card1');
+      document.getElementById('btnCard2').classList.toggle('active', key === 'card2');
+      renderView();
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      isFlipped = false;
+      document.getElementById('btnModeCompare').classList.toggle('active', mode === 'compare');
+      document.getElementById('btnModeInteractive').classList.toggle('active', mode === 'interactive');
+      renderView();
+    }
+
+    function setViewport(vp) {
+      currentViewport = vp;
+      const stage = document.getElementById('stageWrapper');
+      stage.classList.remove('mode-mobile', 'mode-desktop');
+      stage.classList.add(`mode-${vp}`);
+      document.getElementById('viewportMobile').classList.toggle('active', vp === 'mobile');
+      document.getElementById('viewportDesktop').classList.toggle('active', vp === 'desktop');
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      if (currentTheme === 'dark') {
+        currentTheme = 'light';
+        html.setAttribute('data-theme', 'light');
+        document.getElementById('themeToggle').innerHTML = '<span>☀️ Светлая тема</span>';
+      } else {
+        currentTheme = 'dark';
+        html.setAttribute('data-theme', 'dark');
+        document.getElementById('themeToggle').innerHTML = '<span>🌙 Тёмная тема</span>';
+      }
+    }
+
+    // Keyboard support: Space to flip, 1-4 for rating
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        flipCard();
+      } else if (['Digit1', 'Digit2', 'Digit3', 'Digit4'].includes(e.code) && isFlipped) {
+        flipCard();
+      }
+    });
+
+    // Initial render
+    renderView();
+  </script>
+</body>
+</html>

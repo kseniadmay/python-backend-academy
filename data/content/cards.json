@@ -1962,8 +1962,8 @@
         "a": "Аргумент <code>n</code> из внешней функции <code>make_multiplier</code>."
       },
       {
-        "q": "Какое значение вернёт вызов <code>f(10)</code>, если функция <code>f</code> создана фабрикой <code>make_multiplier(2)</code> с операцией умножения <code>x * n</code>?",
-        "a": "<code>20</code>."
+        "q": "Какое значение вернёт вызов функции <code>f(10)</code>?\n\n```python\ndef make_multiplier(n):\n    def multiplier(x):\n        return x * n\n    return multiplier\n\nf = make_multiplier(2)\nf(10)\n```",
+        "a": "<div class=\"fc-code-capsule\"><code class=\"fc-code-primary\">20</code></div><div class=\"fc-answer-explanation\"><span class=\"fc-explanation-dash\">—</span> внутренняя функция <code>multiplier</code> сохраняет <code>n = 2</code> в объекте замыкания; при <code>f(10)</code> вычисляется <code>10 * 2</code>.</div>"
       },
       {
         "q": "Как исправить ловушку позднего связывания в цикле <code>[lambda: i for i in range(3)]</code>?",
@@ -3344,8 +3344,8 @@
         "a": "Атрибуты родительского класса не будут инициализированы; обращение к ним вызовет <code>AttributeError</code>."
       },
       {
-        "q": "Почему дочерний класс <code>Dog(Animal)</code> имеет доступ к <code>self.name</code>, хотя <code>self.name</code> не присваивается напрямую в <code>Dog.__init__</code> (при вызове <code>super().__init__(name)</code>)?",
-        "a": "<code>Dog.__init__</code> передаёт <code>name</code> в родительский <code>Animal.__init__</code> через <code>super().__init__(name)</code>, который и инициализирует <code>self.name</code>; без этого вызова обращение к <code>self.name</code> вызовет <code>AttributeError</code>."
+        "q": "Почему экземпляр <code>dog</code> имеет доступ к <code>self.name</code>, хотя оно не присваивается напрямую в <code>Dog.__init__</code>?\n\n```python\nclass Animal:\n    def __init__(self, name):\n        self.name = name\n\nclass Dog(Animal):\n    def __init__(self, name):\n        super().__init__(name)\n\ndog = Dog('Бобик')\ndog.name\n```",
+        "a": "<div class=\"fc-code-capsule\"><code class=\"fc-code-primary\">super().__init__(name)</code></div><div class=\"fc-answer-explanation\"><span class=\"fc-explanation-dash\">—</span> вызов <code>super().__init__(name)</code> делегирует инициализацию родительскому конструктору <code>Animal.__init__</code>, который и связывает атрибут <code>self.name</code> с текущим объектом.</div>"
       },
       {
         "q": "Может ли дочерний класс <code>Dog(Animal)</code> переопределить метод <code>speak</code> родителя?",
