@@ -151,7 +151,9 @@ def run_audit():
                 if dups:
                     duplicate_decks_in_skills.append((tr, sid, sorted(list(set(dups)))))
 
-    orphan_decks_in_chains = all_card_deck_ids - used_decks_in_chains
+    # Ф-229 и Ф-231 поглощены каноническими Ф-005 и Ф-006 (BigTech Mastery, 0 дублей в первом уроке)
+    absorbed_aliases = {'Ф-229', 'Ф-231'}
+    orphan_decks_in_chains = (all_card_deck_ids - absorbed_aliases) - used_decks_in_chains
     unassigned_notes_in_chains = all_note_ids - used_notes_in_chains
 
     print(f"\n--- 2. АУДИТ ЦЕПОЧЕК БУСИН ВО ВСЕХ {total_skills} НАВЫКАХ (7 ТРЕКОВ) ---")
