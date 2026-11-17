@@ -28930,46 +28930,99 @@ body.light-theme .srs-card-theory-anchor:hover svg {
     color: #059669 !important;
   }
 
-  /* Списки в конспектах */
+  /* Чистая верстка конспектов: отказ от маркеров абзацев (ul/atomic-list) для максимального полезного пространства */
   .srs-note-card ul,
+  .srs-notes-container ul,
+  .note-canvas-body ul,
+  .note-review-body ul,
+  .feed-chunk ul,
+  .lesson-theory ul {
+    list-style: none !important;
+    list-style-type: none !important;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+    margin-top: 8px !important;
+    margin-bottom: 12px !important;
+    text-align: left !important;
+  }
   .srs-note-card ol,
-  .lesson-theory ul,
+  .srs-notes-container ol,
+  .note-canvas-body ol,
+  .note-review-body ol,
+  .feed-chunk ol,
   .lesson-theory ol {
-    margin: 10px 0 12px !important;
-    padding-left: 22px !important;
+    margin: 8px 0 12px !important;
+    padding-left: 20px !important;
     text-align: left !important;
   }
   .srs-note-card ul.atomic-list,
   .lesson-theory ul.atomic-list,
-  .feed-chunk ul.atomic-list {
-    margin: 3px 0 !important;
-    padding-left: 20px !important;
+  .feed-chunk ul.atomic-list,
+  ul.atomic-list {
+    list-style: none !important;
+    list-style-type: none !important;
+    margin: 4px 0 !important;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
   }
   .srs-note-card ul.atomic-list li,
   .lesson-theory ul.atomic-list li,
-  .feed-chunk ul.atomic-list li {
-    margin-bottom: 2px !important;
+  .feed-chunk ul.atomic-list li,
+  ul.atomic-list li {
+    list-style: none !important;
+    list-style-type: none !important;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+    margin-bottom: 8px !important;
   }
   .srs-note-card li,
+  .srs-notes-container li,
+  .note-canvas-body li,
+  .note-review-body li,
   .lesson-theory li {
-    margin-bottom: 7px !important;
-    line-height: 1.62 !important;
+    margin-bottom: 8px !important;
+    line-height: 1.68 !important;
     color: #cbd5e1 !important;
     text-align: left !important;
     text-wrap: pretty;
     overflow-wrap: break-word;
   }
-  .srs-note-card li::marker,
-  .lesson-theory li::marker {
+  .srs-note-card ul li,
+  .srs-notes-container ul li,
+  .note-canvas-body ul li,
+  .note-review-body ul li,
+  .feed-chunk ul li,
+  .lesson-theory ul li {
+    list-style: none !important;
+    list-style-type: none !important;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+  }
+  .srs-note-card ul li::marker,
+  .srs-notes-container ul li::marker,
+  .note-canvas-body ul li::marker,
+  .note-review-body ul li::marker,
+  .feed-chunk ul li::marker,
+  .lesson-theory ul li::marker,
+  .atomic-list li::marker,
+  ul.atomic-list li::marker {
+    display: none !important;
+    content: none !important;
+  }
+  .srs-note-card ol li::marker,
+  .lesson-theory ol li::marker {
     color: #10b981 !important;
     font-weight: 700 !important;
   }
   [data-theme="light"] .srs-note-card li,
+  [data-theme="light"] .srs-notes-container li,
+  [data-theme="light"] .note-canvas-body li,
+  [data-theme="light"] .note-review-body li,
   [data-theme="light"] .lesson-theory li {
     color: #334155 !important;
   }
-  [data-theme="light"] .srs-note-card li::marker,
-  [data-theme="light"] .lesson-theory li::marker {
+  [data-theme="light"] .srs-note-card ol li::marker,
+  [data-theme="light"] .lesson-theory ol li::marker {
     color: #059669 !important;
   }
 
@@ -29214,25 +29267,52 @@ body.light-theme .srs-card-theory-anchor:hover svg {
       width: 100% !important;
     }
 
-    /* 3. Дзен-минимализм мета-строки: скрытие шкалы повторений и полная тема без обрезки */
+    /* 3. Дзен-минимализм мета-строки: предотвращение наложения элементов и чистый мобильный лейаут */
     .srs-notes-container .note-memory-chain {
       display: none !important;
+    }
+
+    .srs-notes-container .srs-note-card .fc-top-row {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 10px !important;
+      margin-bottom: 14px !important;
+      width: 100% !important;
+      flex-wrap: nowrap !important;
+    }
+
+    .srs-notes-container .srs-top-right-group {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: flex-end !important;
+      gap: 8px !important;
+      width: 100% !important;
+      order: 1 !important;
+      flex-shrink: 0 !important;
+    }
+
+    .srs-notes-container .srs-return-to-card-btn {
+      margin-right: auto !important;
     }
 
     .srs-notes-container .srs-note-breadcrumbs {
       white-space: normal !important;
       overflow: visible !important;
       flex-wrap: wrap !important;
-      max-width: calc(100% - 38px) !important;
-      line-height: 1.35 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      order: 2 !important;
+      line-height: 1.4 !important;
+      gap: 4px 6px !important;
     }
 
     .srs-notes-container .srs-breadcrumb-track {
       max-width: none !important;
       overflow: visible !important;
       text-overflow: clip !important;
-      white-space: normal !important;
-      font-size: 0.74rem !important;
+      white-space: nowrap !important;
+      font-size: 0.76rem !important;
     }
 
     .srs-notes-container .srs-breadcrumb-topic {
@@ -29240,7 +29320,12 @@ body.light-theme .srs-card-theory-anchor:hover svg {
       overflow: visible !important;
       text-overflow: clip !important;
       white-space: normal !important;
-      font-size: 0.88rem !important;
+      font-size: 0.82rem !important;
+    }
+
+    .srs-notes-container .srs-breadcrumb-skill {
+      font-size: 0.82rem !important;
+      white-space: normal !important;
     }
 
     /* 4. Липкий нижний док (Sticky Dock) с безопасными отступами */
@@ -50102,6 +50187,8 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
   const isNotes = (activeTab === 'notes');
 
+  const isForcedNote = isNotes && ((noteProgress && noteProgress.isForced) || (typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.forcedNoteId));
+
   const finishMode = (typeof state !== 'undefined' && state.srsSprintFinishMode) || 'zen';
 
   const daily = (typeof getSrsDailyProgressData === 'function') ? getSrsDailyProgressData() : null;
@@ -50198,9 +50285,9 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
 
 
-  // Шкала отображается только при progressFillWidth > 0; при 0% подложка и паз полностью скрыты
+  // Шкала отображается только при progressFillWidth > 0 и не форсированном конспекте из карточки; при 0% подложка и паз полностью скрыты
 
-  const trackHTML = (progressFillWidth > 0) ? `
+  const trackHTML = (!isForcedNote && progressFillWidth > 0) ? `
 
       <!-- Фиксированная температурная шкала прогресса SRS с непрерывным накалом и белым калением на финише -->
 
@@ -50230,6 +50317,7 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
       <div class="srs-header-right-cluster" style="display:flex;align-items:center;gap:6px;height:30px;flex-shrink:0;">
 
+        ${!isForcedNote ? `
         <div class="srs-header-goal-status" style="display:inline-flex;align-items:center;gap:6px;padding:0 12px;height:30px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-top:1px solid rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.12),0 4px 16px -2px rgba(0,0,0,0.40);font-size:0.78rem;font-weight:600;color:var(--ink-soft);box-sizing:border-box;line-height:1;" title="${goalTitle}">
 
           ${isNotes ? `
@@ -50244,6 +50332,7 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
           `}
 
         </div>
+        ` : ''}
 
 
 
@@ -50251,7 +50340,7 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
 
 
-        <a href="#/path" class="srs-header-close-btn" style="width:30px;height:30px;min-width:30px;min-height:30px;padding:0;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-top:1px solid rgba(255,255,255,0.20);color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;font-size:0.78rem;text-decoration:none;box-sizing:border-box;transition:all .15s ease;" title="Закрыть (На Путь)">✕</a>
+        <a href="${isForcedNote ? '#/cards' : '#/path'}" class="srs-header-close-btn" ${isForcedNote ? 'data-srs-exit-force-note' : ''} style="width:30px;height:30px;min-width:30px;min-height:30px;padding:0;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-top:1px solid rgba(255,255,255,0.20);color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;font-size:0.78rem;text-decoration:none;box-sizing:border-box;transition:all .15s ease;" title="${isForcedNote ? 'Вернуться к текущей карточке' : 'Закрыть (На Путь)'}">✕</a>
 
       </div>
 
@@ -58279,7 +58368,7 @@ function viewNotesSrsHub(noteSrsStats){
 
   const headerBarHTML = (typeof buildSrsHeaderBarHTML === 'function')
 
-    ? buildSrsHeaderBarHTML('notes', srsGlobalStats.dueTodayCardsCount || 0, stats.dueCount || 0, { current: notePos, total: qLen })
+    ? buildSrsHeaderBarHTML('notes', srsGlobalStats.dueTodayCardsCount || 0, stats.dueCount || 0, { current: notePos, total: qLen, isForced: !!forcedId })
 
     : buildSrsFlowTabsHTML('notes', srsGlobalStats.dueTodayCardsCount || 0, stats.dueCount || 0);
 
@@ -58652,29 +58741,33 @@ function viewNotesSrsHub(noteSrsStats){
 
         <!-- Верхняя строка: лаконичный слэш-путь (🛡️ Эшелон / Урок / Навык) слева, компактный интервал и кнопка возврата справа -->
 
-        <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:0;border-bottom:none;flex-wrap:nowrap;width:100%;">
+        <div class="fc-top-row srs-note-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:0;border-bottom:none;flex-wrap:wrap;width:100%;">
 
-          <div class="fc-badge-group srs-note-breadcrumbs" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px 6px;min-width:0;flex:1 1 auto;font-family:var(--font-m);font-size:0.82rem;line-height:1.35;word-break:break-word;">
+          <div class="fc-badge-group srs-note-breadcrumbs" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px 6px;min-width:0;flex:1 1 auto;font-family:var(--font-m);font-size:0.82rem;line-height:1.4;">
 
-            <span class="srs-breadcrumb-track" style="color:var(--emerald);font-weight:700;font-size:0.80rem;flex-shrink:0;">${escapeHtmlStr(echelonLabel)}</span>
+            <span class="srs-breadcrumb-item" style="display:inline-flex;align-items:center;gap:5px;flex-shrink:0;">
+              <span class="srs-breadcrumb-track" style="color:var(--emerald);font-weight:700;font-size:0.80rem;">${escapeHtmlStr(echelonLabel)}</span>
+              <span class="srs-breadcrumb-sep" style="color:rgba(255,255,255,0.25);font-size:0.74rem;">/</span>
+            </span>
 
-            <span class="srs-breadcrumb-sep" style="color:rgba(255,255,255,0.25);font-size:0.74rem;flex-shrink:0;">/</span>
+            <span class="srs-breadcrumb-item" style="display:inline-flex;align-items:center;gap:5px;flex-shrink:0;">
+              <span class="srs-breadcrumb-topic" style="color:var(--ink-soft);font-weight:600;font-size:0.80rem;">${escapeHtmlStr(displayLessonTitle)}</span>
+              <span class="srs-breadcrumb-sep" style="color:rgba(255,255,255,0.25);font-size:0.74rem;">/</span>
+            </span>
 
-            <span class="srs-breadcrumb-topic" style="color:var(--ink-soft);font-weight:600;font-size:0.80rem;flex-shrink:0;">${escapeHtmlStr(displayLessonTitle)}</span>
-
-            <span class="srs-breadcrumb-sep" style="color:rgba(255,255,255,0.25);font-size:0.74rem;flex-shrink:0;">/</span>
-
-            <span class="srs-breadcrumb-skill" style="color:#34d399;font-weight:700;letter-spacing:-0.01em;font-size:0.82rem;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtmlStr(skillBreadcrumbTitle)}">${escapeHtmlStr(skillBreadcrumbTitle)}</span>
+            <span class="srs-breadcrumb-item" style="display:inline-flex;align-items:center;min-width:0;flex-shrink:1;">
+              <span class="srs-breadcrumb-skill" style="color:#34d399;font-weight:700;letter-spacing:-0.01em;font-size:0.82rem;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtmlStr(skillBreadcrumbTitle)}">${escapeHtmlStr(skillBreadcrumbTitle)}</span>
+            </span>
 
           </div>
 
 
 
           <div class="srs-top-right-group" style="display:inline-flex;align-items:center;gap:8px;flex-shrink:0;">
-            <span class="srs-step-interval-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.30);color:#fbbf24;font-family:var(--font-m);font-size:0.74rem;font-weight:700;" title="График повторений Эббингауза: ступень ${curItem.step + 1} (${curIntervalDays}д)">${curIntervalDays}д</span>
             ${forcedId ? `
               <button type="button" class="btn btn-ghost srs-return-to-card-btn" data-srs-exit-force-note style="display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10px;border-radius:8px;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.35);color:#34d399;font-size:0.74rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s ease;" title="Вернуться к текущей карточке">← К карточке</button>
             ` : ''}
+            <span class="srs-step-interval-badge" style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.30);color:#fbbf24;font-family:var(--font-m);font-size:0.74rem;font-weight:700;" title="График повторений Эббингауза: ступень ${curItem.step + 1} (${curIntervalDays}д)">${curIntervalDays}д</span>
 
             <!-- Кнопка полного обзора конспекта [ 📖 ] (28px) -->
 
