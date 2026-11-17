@@ -36236,12 +36236,198 @@ function loadState(){
 
 }
 
-function saveState(s){
-
-  try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){}
-
+function sanitizeAcademyKey(k, prefix){
+  if(typeof k !== 'string') return k;
+  var m = k.match(/\d+/);
+  if(m){
+    return (prefix || '') + String(m[0]).padStart(3, '0');
+  }
+  return k.replace(/[\uFFFD\u0000-\u001F]+/g, '').trim();
 }
+window.sanitizeAcademyKey = sanitizeAcademyKey;
 
+function sanitizeCardKey(k){
+  if(typeof k !== 'string') return k;
+  var m = k.match(/(\d+):(\d+)/);
+  if(m){
+    return 'Ф-' + String(m[1]).padStart(3, '0') + ':' + m[2];
+  }
+  return k.replace(/[\uFFFD\u0000-\u001F]+/g, '').trim();
+}
+window.sanitizeCardKey = sanitizeCardKey;
+
+function sanitizeAcademyState(s){
+  if(!s || typeof s !== 'object') return s;
+  try{
+    if(Array.isArray(s.readNotes)){
+      var cleanRn = [];
+      var seenRn = new Set();
+      s.readNotes.forEach(function(x){
+        var cx = sanitizeAcademyKey(x, 'К-');
+        if(cx && !seenRn.has(cx)){ seenRn.add(cx); cleanRn.push(cx); }
+      });
+      s.readNotes = cleanRn;
+    }
+    if(Array.isArray(s.reviewedDecks)){
+      var cleanRd = [];
+      var seenRd = new Set();
+      s.reviewedDecks.forEach(function(x){
+        var cd = sanitizeAcademyKey(x, 'Ф-');
+        if(cd && !seenRd.has(cd)){ seenRd.add(cd); cleanRd.push(cd); }
+      });
+      s.reviewedDecks = cleanRd;
+    }
+    if(s.noteSrs && typeof s.noteSrs === 'object'){
+      var cleanNotes = {};
+      Object.keys(s.noteSrs).forEach(function(k){
+        var ck = sanitizeAcademyKey(k, 'К-');
+        var v = s.noteSrs[k];
+        if(!v || typeof v !== 'object') return;
+        if(!cleanNotes[ck]){
+          cleanNotes[ck] = Object.assign({}, v);
+        } else {
+          var cur = cleanNotes[ck];
+          if((v.step || 0) > (cur.step || 0) ||
+             ((v.step || 0) === (cur.step || 0) && (v.interval || 0) > (cur.interval || 0)) ||
+             ((v.step || 0) === (cur.step || 0) && (v.lastReview || '') > (cur.lastReview || ''))){
+            cleanNotes[ck] = Object.assign({}, v);
+          }
+        }
+      });
+      s.noteSrs = cleanNotes;
+    }
+    if(s.cardSrs && typeof s.cardSrs === 'object'){
+      var cleanCards = {};
+      Object.keys(s.cardSrs).forEach(function(k){
+        var ck = sanitizeCardKey(k);
+        var v = s.cardSrs[k];
+        if(!v || typeof v !== 'object') return;
+        if((v.interval || 0) > 365){
+          v.interval = 104;
+          if(v.lastReview && typeof addDaysToDateKey === 'function'){
+            v.dueDate = addDaysToDateKey(v.lastReview, 104);
+          }
+        }
+        if(!cleanCards[ck]){
+          cleanCards[ck] = Object.assign({}, v);
+        } else {
+          var cur = cleanCards[ck];
+          if((v.reps || 0) > (cur.reps || 0) ||
+             ((v.reps || 0) === (cur.reps || 0) && (v.interval || 0) > (cur.interval || 0)) ||
+             ((v.reps || 0) === (cur.reps || 0) && (v.lastReview || '') > (cur.lastReview || ''))){
+            cleanCards[ck] = Object.assign({}, v);
+          }
+        }
+      });
+      s.cardSrs = cleanCards;
+    }
+    if(s.cardRatings && typeof s.cardRatings === 'object'){
+      var cleanRatings = {};
+      Object.keys(s.cardRatings).forEach(function(k){
+        var ck = sanitizeCardKey(k);
+        var val = Number(s.cardRatings[k]) || 0;
+        cleanRatings[ck] = Math.max(cleanRatings[ck] || 0, val);
+      });
+      s.cardRatings = cleanRatings;
+    }
+    if(s.readingPositions && typeof s.readingPositions === 'object'){
+      Object.keys(s.readingPositions).forEach(function(skId){
+        var pos = s.readingPositions[skId];
+        if(pos && typeof pos === 'object'){
+          if(pos.kId) pos.kId = sanitizeAcademyKey(pos.kId, 'К-');
+          if(pos.fId) pos.fId = sanitizeAcademyKey(pos.fId, 'Ф-');
+          if(pos.deckId) pos.deckId = sanitizeAcademyKey(pos.deckId, 'Ф-');
+          if(pos.deckPositions && typeof pos.deckPositions === 'object'){
+            var cleanDp = {};
+            Object.keys(pos.deckPositions).forEach(function(dpK){
+              var cdpK = sanitizeAcademyKey(dpK, 'Ф-');
+              var dpV = pos.deckPositions[dpK];
+              if(!cleanDp[cdpK] || (dpV && (dpV.sessionLearned || 0) > (cleanDp[cdpK].sessionLearned || 0))){
+                cleanDp[cdpK] = dpV;
+              }
+            });
+            pos.deckPositions = cleanDp;
+          }
+        }
+      });
+    }
+    if(s.cardsHubPos && typeof s.cardsHubPos === 'object'){
+      if(s.cardsHubPos.deckId) s.cardsHubPos.deckId = sanitizeAcademyKey(s.cardsHubPos.deckId, 'Ф-');
+      if(Array.isArray(s.cardsHubPos.dueQueue)){
+        var cleanDq = [];
+        var seenDq = new Set();
+        s.cardsHubPos.dueQueue.forEach(function(item){
+          if(item && typeof item === 'object'){
+            var did = sanitizeAcademyKey(item.deckId, 'Ф-');
+            var cidx = Number(item.cardIdx) || 0;
+            var ckey = did + ':' + cidx;
+            if(!seenDq.has(ckey)){
+              seenDq.add(ckey);
+              cleanDq.push(Object.assign({}, item, { deckId: did, cardIdx: cidx }));
+            }
+          }
+        });
+        s.cardsHubPos.dueQueue = cleanDq;
+      }
+    }
+    s.updatedAt = Date.now();
+  }catch(e){}
+  return s;
+}
+window.sanitizeAcademyState = sanitizeAcademyState;
+
+function performFullProgressSave(options){
+  var opts = options || {};
+  try{
+    if(typeof syncActiveEditorDrafts === 'function') syncActiveEditorDrafts();
+    if(typeof saveLessonDraftState === 'function') saveLessonDraftState();
+    if(typeof saveReadingPosition === 'function') saveReadingPosition();
+    if(typeof saveUnitTestDraftState === 'function') saveUnitTestDraftState();
+    if(typeof saveCardsHubPosState === 'function') saveCardsHubPosState();
+    if(typeof savePracticeHubPosState === 'function') savePracticeHubPosState();
+  }catch(e){}
+  if(typeof ensureExtendedState === 'function') ensureExtendedState();
+  sanitizeAcademyState(state);
+  saveState(state);
+  if(opts.download){
+    try{
+      var schemaVer = (typeof ACADEMY_SCHEMA_VERSION !== 'undefined') ? ACADEMY_SCHEMA_VERSION : 3;
+      var exportObj = {
+        schemaVersion: schemaVer,
+        exportedAt: new Date().toISOString(),
+        academyState: state,
+        ideStatus: (typeof getIdeSolvedMap === 'function' ? getIdeSolvedMap() : {}),
+        ideDrafts: (typeof safeParseJsonObj === 'function' ? safeParseJsonObj(localStorage.getItem(IDE_DRAFTS_KEY)) : {}) || {}
+      };
+      var jsonStr = JSON.stringify(exportObj, null, 2);
+      var blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      var datePart = (typeof dateIsoKey === 'function') ? dateIsoKey(new Date()) : new Date().toISOString().slice(0, 10);
+      a.download = 'python_backend_academy_backup_' + datePart + '.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+    }catch(err){
+      console.warn('Backup download failed:', err);
+    }
+  }
+  return true;
+}
+window.performFullProgressSave = performFullProgressSave;
+
+function saveState(s){
+  try{
+    if(s && typeof s === 'object'){
+      sanitizeAcademyState(s);
+      localStorage.setItem(STORE_KEY, JSON.stringify(s));
+      if(typeof writeWindowNameBackup === 'function') writeWindowNameBackup(s);
+      if(typeof syncToIndexedDBAsync === 'function') syncToIndexedDBAsync(s);
+    }
+  }catch(e){}
+}
 window.saveState = saveState;
 
 let state = loadState(); window.state = state;
@@ -39883,7 +40069,7 @@ function mergeProgressStates(baseRaw, incomingRaw){
 
   merged.utSkipStartModal = bNewer ? pickUtPref(b.utSkipStartModal, a.utSkipStartModal, false) : pickUtPref(a.utSkipStartModal, b.utSkipStartModal, false);
 
-  return ensureExtendedState(merged);
+  return ensureExtendedState(typeof sanitizeAcademyState === 'function' ? sanitizeAcademyState(merged) : merged);
 
 }
 
@@ -60453,33 +60639,29 @@ function openSettingsModal(){
 
 
       <!-- Данные и сброс -->
-
-      
-
-
-
-
-
       <div class="settings-section" style="margin-top:20px;border-top:1px solid var(--line);padding-top:16px;">
-
-        <div class="settings-section-title">💾 Управление данными</div>
-
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
-
-          <button type="button" class="btn btn-ghost" data-open-handover style="font-size:0.85rem;">
-
-            🔄 Перенос контекста
-
-          </button>
-
-          <button type="button" class="btn btn-ghost" data-open-bug-modal style="font-size:0.85rem;">
-
-            🐞 Журнал замечаний
-
-          </button>
-
+        <div class="settings-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>💾 Управление данными и сохранение</span>
+          <span id="settings-save-feedback" style="font-size:0.78rem;font-weight:700;color:#10b981;opacity:0;transition:opacity 0.25s ease;">✓ Прогресс сохранён</span>
         </div>
-
+        <p class="meta" style="margin:4px 0 12px;font-size:0.80rem;color:var(--ink-muted);">
+          Мгновенная фиксация прогресса в памяти браузера и скачивание резервной копии .json:
+        </p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <button type="button" class="btn btn-primary" id="btn-settings-quick-save" data-action="quick-save-backup" style="font-size:0.86rem;font-weight:700;padding:9px 18px;border-radius:12px;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(16,185,129,0.28);">
+            <span>💾</span> <span>Сохраниться</span>
+          </button>
+          <button type="button" class="btn btn-ghost" id="btn-settings-quick-upload" data-action="quick-upload-backup" style="font-size:0.84rem;padding:9px 14px;border-radius:12px;display:inline-flex;align-items:center;gap:6px;">
+            <span>📂</span> <span>Загрузить бэкап</span>
+          </button>
+          <button type="button" class="btn btn-ghost" data-open-handover style="font-size:0.84rem;padding:9px 14px;border-radius:12px;display:inline-flex;align-items:center;gap:6px;">
+            <span>🔄</span> <span>Перенос контекста</span>
+          </button>
+          <button type="button" class="btn btn-ghost" data-open-bug-modal style="font-size:0.84rem;padding:9px 14px;border-radius:12px;display:inline-flex;align-items:center;gap:6px;">
+            <span>🐞</span> <span>Журнал замечаний</span>
+          </button>
+          <input type="file" id="settings-file-input" accept=".json,application/json" style="display:none;">
+        </div>
       </div>
 
 
@@ -61266,6 +61448,7 @@ function importAndMergeBackupJsonString(rawText){
   if(incState && typeof incState === 'object'){
 
     state = mergeProgressStates(state, incState);
+    if(typeof sanitizeAcademyState === 'function') sanitizeAcademyState(state);
 
     saveState(state);
 
@@ -64699,6 +64882,34 @@ document.addEventListener('click', async function(e){
 
   }
 
+  if(e.target.closest('[data-action="quick-save-backup"]')){
+    performFullProgressSave({ download: true });
+    var fb = document.getElementById('settings-save-feedback');
+    if(fb){
+      fb.style.opacity = '1';
+      fb.style.color = '#10b981';
+      fb.textContent = '✓ Прогресс сохранён и скачан';
+      setTimeout(function(){ if(fb) fb.style.opacity = '0'; }, 3000);
+    }
+    var btn = e.target.closest('[data-action="quick-save-backup"]');
+    if(btn){
+      var origHtml = btn.innerHTML;
+      btn.innerHTML = '<span>✓</span> <span>Сохранено!</span>';
+      btn.style.background = '#059669';
+      setTimeout(function(){
+        if(btn){
+          btn.innerHTML = origHtml;
+          btn.style.background = '';
+        }
+      }, 2000);
+    }
+    return;
+  }
+  if(e.target.closest('[data-action="quick-upload-backup"]')){
+    var fi = document.getElementById('settings-file-input');
+    if(fi) fi.click();
+    return;
+  }
   if(e.target.closest('[data-download-backup]')){
 
     try{
@@ -68635,6 +68846,37 @@ window.animateCardFlip = animateCardFlip;
 
 document.addEventListener('change', function(e){
 
+  if(e.target.id === 'settings-file-input'){
+    const f = e.target.files && e.target.files[0];
+    if(f && typeof FileReader !== 'undefined'){
+      const reader = new FileReader();
+      reader.onload = function(ev){
+        const rawText = String(ev.target.result || '');
+        const fb = document.getElementById('settings-save-feedback');
+        try{
+          importAndMergeBackupJsonString(rawText);
+          if(fb){
+            fb.style.opacity = '1';
+            fb.style.color = '#34d399';
+            fb.textContent = '✓ Бэкап успешно загружен и объединён';
+            setTimeout(function(){ if(fb) fb.style.opacity = '0'; }, 3500);
+          }
+          setTimeout(function(){
+            closeSettingsModal();
+            if(typeof render === 'function') render();
+          }, 600);
+        }catch(err){
+          if(fb){
+            fb.style.opacity = '1';
+            fb.style.color = '#f87171';
+            fb.textContent = '✕ Ошибка импорта: ' + (err && err.message ? err.message : err);
+          }
+        }
+      };
+      reader.readAsText(f, 'utf-8');
+    }
+    return;
+  }
   if(e.target.id === 'handover-file-input'){
 
     const f = e.target.files && e.target.files[0];
@@ -68681,7 +68923,7 @@ document.addEventListener('change', function(e){
 
       };
 
-      reader.readAsText(f);
+      reader.readAsText(f, 'utf-8');
 
     }
 
