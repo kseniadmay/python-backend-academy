@@ -28533,6 +28533,7 @@ body.light-theme .srs-card-theory-anchor:hover svg {
   }
 
   .code-lang-tag::before,
+  [class*="code-lang-tag"]::before,
   .code-lang-tag--sql::before,
   .code-lang-tag--bash::before,
   .code-lang-tag--http::before,
@@ -29122,20 +29123,18 @@ body.light-theme .srs-card-theory-anchor:hover svg {
     -webkit-font-smoothing: antialiased !important;
     -moz-osx-font-smoothing: grayscale !important;
     text-rendering: geometricPrecision !important;
-    backdrop-filter: blur(28px) saturate(160%) !important;
-    -webkit-backdrop-filter: blur(28px) saturate(160%) !important;
-    background-color: rgba(7, 9, 14, 0.95) !important;
+    backdrop-filter: blur(32px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(32px) saturate(180%) !important;
+    background-color: #07090e !important;
     background-image: 
-      radial-gradient(ellipse 420px 180px at 50% 100%, rgba(16, 185, 129, 0.10) 0%, transparent 70%),
-      linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 32%, transparent 70%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.09) !important;
-    border-top: 1.5px solid rgba(255, 255, 255, 0.32) !important;
-    border-left: 1.2px solid rgba(255, 255, 255, 0.18) !important;
+      radial-gradient(ellipse 520px 240px at 50% 0%, rgba(16, 185, 129, 0.08) 0%, transparent 68%),
+      linear-gradient(180deg, #0a0e17 0%, #06080d 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-top: 1px solid rgba(16, 185, 129, 0.35) !important;
     box-shadow: 
-      inset 0 1.5px 1px rgba(255, 255, 255, 0.22),
-      inset 1px 0 1px rgba(255, 255, 255, 0.10),
-      0 28px 72px -12px rgba(0, 0, 0, 0.70),
-      0 0 32px -8px rgba(16, 185, 129, 0.12) !important;
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 28px 72px -12px rgba(0, 0, 0, 0.88),
+      0 0 36px -4px rgba(16, 185, 129, 0.08) !important;
     margin: 0 auto !important;
     width: 100% !important;
     max-width: 760px !important;
@@ -30914,13 +30913,9 @@ body.light-theme .srs-card-theory-anchor:hover svg {
 
   .feed-chunk h4::before {
 
-    content: '✦' !important;
+    content: none !important;
 
-    color: #10b981 !important;
-
-    font-size: 0.85rem !important;
-
-    margin-right: 7px !important;
+    display: none !important;
 
   }
 
@@ -58410,7 +58405,7 @@ function viewNotesSrsHub(noteSrsStats){
 
   // Разбиение текущего шага на кванты (чанки) для пошаговой подачи со звуком и анимацией
 
-  const cleanStepTitle = (curStep.title || ('Шаг ' + (sIdx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+  const cleanStepTitle = (curStep.title || ('Шаг ' + (sIdx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').replace(/[✦✧★]/g, '').trim();
 
   const pureStepTitle = cleanStepTitle.replace(/^\d+[\.\)\s\-·•]+\s*/, '').trim();
 
@@ -58612,7 +58607,7 @@ function viewNotesSrsHub(noteSrsStats){
 
                 <div style="margin-bottom:18px;padding-bottom:14px;${i < steps.length - 1 ? 'border-bottom:1px dashed rgba(255,255,255,0.08);' : ''}">
 
-                  ${sTitle ? `<h4 style="font-size:1.06rem;font-weight:700;color:#34d399;margin:0 0 10px;line-height:1.35;">${(typeof formatRichInlineText === 'function' ? formatRichInlineText(sTitle.replace(/^[✦\s]+/g, '')) : escapeHtmlStr(sTitle.replace(/^[✦\s]+/g, '')))}</h4>` : ''}
+                  ${sTitle ? `<h4 style="font-size:1.06rem;font-weight:700;color:#34d399;margin:0 0 10px;line-height:1.35;">${(typeof formatRichInlineText === 'function' ? formatRichInlineText(sTitle.replace(/^[✦✧★\s]+/g, '').replace(/[✦✧★]/g, '').trim()) : escapeHtmlStr(sTitle.replace(/^[✦✧★\s]+/g, '').replace(/[✦✧★]/g, '').trim()))}</h4>` : ''}
 
                   <div class="lesson-theory" style="font-size:0.94rem;line-height:1.7;">${sHtml}</div>
 
@@ -63011,7 +63006,7 @@ document.addEventListener('click', async function(e){
 
     const curStep = steps[sIdx] || { html: '' };
 
-    const cleanStepTitle = (curStep.title || ('Шаг ' + (sIdx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+    const cleanStepTitle = (curStep.title || ('Шаг ' + (sIdx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').replace(/[✦✧★]/g, '').trim();
 
     const pureStepTitle = cleanStepTitle.replace(/^\d+[\.\)\s\-·•]+\s*/, '').trim();
 
@@ -70341,7 +70336,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 
   window.addEventListener('load', function(){
 
-    navigator.serviceWorker.register('sw.js').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=103').then(function(reg){
 
       try { reg.update(); } catch(_e){}
 
