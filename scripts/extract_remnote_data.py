@@ -988,8 +988,17 @@ def _align_python_inline_comments(raw_code: str) -> str:
 
 # 3. Markdown to HTML converter for K-notes (splits into micro-step chunks!)
 def md_inline(text):
+    # Protect existing HTML tags if already present
+    tag_stash = []
+    def _save_tag(m):
+        tag_stash.append(m.group(0))
+        return f'\x00TAG{len(tag_stash) - 1}\x00'
+    text = re.sub(r'<[^>]+>', _save_tag, text)
     # Escape HTML first
     text = html.escape(text)
+    # Restore HTML tags
+    for idx, t_html in enumerate(tag_stash):
+        text = text.replace(f'\x00TAG{idx}\x00', t_html)
     # Protect inline code `...` with placeholders before LaTeX processing
     code_stash = []
     def _save_code(m):
