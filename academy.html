@@ -57593,13 +57593,39 @@ function getRemNoteCardStatusBadgeHTML(cardKey){
 
 
 
+function findOwnerSkillForNoteId(noteId){
+  if(!noteId) return null;
+  if(typeof PY_SKILLS_BY_ID !== 'undefined'){
+    for(const sid in PY_SKILLS_BY_ID){
+      const sk = PY_SKILLS_BY_ID[sid];
+      if(sk && Array.isArray(sk.kIds) && sk.kIds.includes(noteId)){
+        return sk;
+      }
+    }
+  }
+  if(typeof ALL_UNITS_COMBINED !== 'undefined' && Array.isArray(ALL_UNITS_COMBINED)){
+    for(let i = 0; i < ALL_UNITS_COMBINED.length; i++){
+      const u = ALL_UNITS_COMBINED[i];
+      if(!u || !Array.isArray(u.skills)) continue;
+      for(let j = 0; j < u.skills.length; j++){
+        const sk = u.skills[j];
+        if(sk && Array.isArray(sk.kIds) && sk.kIds.includes(noteId)){
+          return sk;
+        }
+      }
+    }
+  }
+  return null;
+}
+window.findOwnerSkillForNoteId = findOwnerSkillForNoteId;
+
 function findLinkedSkillAndDeckForNote(noteId){
 
-  let foundSkill = null;
+  let foundSkill = (typeof findOwnerSkillForNoteId === 'function') ? findOwnerSkillForNoteId(noteId) : null;
 
   let foundDeckId = null;
 
-  if(typeof ALL_PY_SKILLS !== 'undefined'){
+  if(!foundSkill && typeof ALL_PY_SKILLS !== 'undefined'){
 
     foundSkill = ALL_PY_SKILLS.find(sk => Array.isArray(sk.kIds) && sk.kIds.includes(noteId)) || null;
 
@@ -62396,7 +62422,8 @@ document.addEventListener('click', async function(e){
 
     if(fnId && ALL_NOTES_COMBINED[fnId]){
 
-      if(location.hash && location.hash.startsWith('#/python/skill') && typeof pySkillViewState !== 'undefined'){
+      // Если кликнули внутри урока темы (любого трека #/<track>/skill/...)
+      if(location.hash && location.hash.includes('/skill/') && typeof pySkillViewState !== 'undefined'){
 
         pySkillViewState.tab = 'theory';
 
@@ -62406,12 +62433,17 @@ document.addEventListener('click', async function(e){
 
         pySkillViewState.chunkIdx = 0;
 
+        pySkillViewState.sprintCelebration = null;
+
+        if(typeof saveReadingPosition === 'function') saveReadingPosition();
+
         render();
 
         return;
 
       }
 
+      // Переход из глобального хаба интервального повторения (#/cards или #/notes-review)
       cardsHubState.hubTab = 'notes';
 
       cardsHubState.forcedNoteId = fnId;
@@ -62424,7 +62456,15 @@ document.addEventListener('click', async function(e){
 
       saveCardsHubPosState();
 
-      render();
+      if(location.hash !== '#/notes-review' && location.hash !== '#/cards?tab=notes'){
+
+        location.hash = '#/notes-review';
+
+      } else {
+
+        render();
+
+      }
 
     }
 
@@ -62448,7 +62488,15 @@ document.addEventListener('click', async function(e){
 
     saveCardsHubPosState();
 
-    render();
+    if(location.hash !== '#/cards'){
+
+      location.hash = '#/cards';
+
+    } else {
+
+      render();
+
+    }
 
     return;
 
