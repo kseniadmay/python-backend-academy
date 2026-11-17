@@ -50331,6 +50331,7 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
         ${isNotes ? `
           ${!isForcedNote ? `
+          ${(noteProgress && typeof noteProgress.total === 'number' && noteProgress.total > 0) ? `
           <div class="zen-counter-3a" style="font-family:var(--font-m);font-size:0.82rem;display:inline-flex;align-items:center;gap:3px;line-height:1;" title="${goalTitle}">
             <span style="color:#ffffff;font-weight:800;">${noteStep}</span>
             <span style="color:rgba(255,255,255,0.20);font-size:0.74rem;margin:0 1px;">/</span>
@@ -50345,6 +50346,11 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </a>
           </div>
+          ` : `
+          <a href="${isForcedNote ? '#/cards' : '#/path'}" class="srs-header-close-btn zen-vector-btn" ${isForcedNote ? 'data-srs-exit-force-note' : ''} style="width:28px;height:28px;min-width:28px;min-height:28px;padding:0;border-radius:50%;background:transparent;border:1px solid transparent;color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;text-decoration:none;box-sizing:border-box;transition:all .18s cubic-bezier(0.16,1,0.3,1);" title="${isForcedNote ? 'Вернуться к текущей карточке' : 'Закрыть (На Путь)'}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </a>
+          `}
           ` : `
           <a href="#/cards" class="srs-header-close-btn zen-vector-btn" data-srs-exit-force-note style="width:28px;height:28px;min-width:28px;min-height:28px;padding:0;border-radius:50%;background:transparent;border:1px solid transparent;color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;text-decoration:none;box-sizing:border-box;transition:all .18s cubic-bezier(0.16,1,0.3,1);" title="Вернуться к текущей карточке">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -58382,6 +58388,12 @@ function viewNotesSrsHub(noteSrsStats){
 
   const notePos = forcedId ? 0 : Math.min(cardsHubState.notePos, Math.max(0, qLen - 1));
 
+  const curItem = (qLen > 0 && notePos < qLen) ? activeQueue[notePos] : null;
+
+  const isFullMode = !!cardsHubState.noteFullMode;
+
+  const curIntervalDays = curItem ? (NOTE_SRS_SCHEDULE[Math.min(curItem.step || 0, NOTE_SRS_SCHEDULE.length - 1)] || 1) : null;
+
 
 
   const headerBarHTML = (typeof buildSrsHeaderBarHTML === 'function')
@@ -58538,19 +58550,15 @@ function viewNotesSrsHub(noteSrsStats){
 
 
 
-  const curItem = activeQueue[notePos];
+  const curNote = (curItem && curItem.noteObj) ? curItem.noteObj : {};
 
-  const curNote = curItem.noteObj || {};
-
-  const cleanTitle = curItem.title || 'Конспект теории';
+  const cleanTitle = (curItem && curItem.title) ? curItem.title : 'Конспект теории';
 
   const steps = (curNote.steps && curNote.steps.length > 0) ? curNote.steps : [{ title: cleanTitle, html: '<p>Конспект готов к повторению.</p>' }];
 
   const sIdx = Math.min(Math.max(0, Number(cardsHubState.noteStepIdx) || 0), steps.length - 1);
 
   const curStep = steps[sIdx] || steps[0];
-
-  const isFullMode = !!cardsHubState.noteFullMode;
 
 
 
@@ -58629,7 +58637,6 @@ function viewNotesSrsHub(noteSrsStats){
     : { tier: effTier, icon: '🛡️' };
   const echelonLabel = `🛡️ Эшелон ${effTier}`;
   const skillBreadcrumbTitle = (topicTitle.split(/[:·•–—]/)[0] || topicTitle).trim();
-  const curIntervalDays = NOTE_SRS_SCHEDULE[Math.min(curItem.step, NOTE_SRS_SCHEDULE.length - 1)] || 1;
 
 
 
