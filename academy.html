@@ -42753,18 +42753,18 @@ function buildFcProgressHeaderHTML(total, currentIdx, getRatingOrItems, clickAtt
 
     if(i === curIdx){
 
-      // Активная бусина: белое ядро с изумрудным свечением
+      // Активная бусина: белое ядро с изумрудным свечением (Квантовый маяк)
 
-      cls += ' active';
+      cls += ' active bead-active-leading';
 
-    } else if(i < curIdx){
+    } else if(i < curIdx || r > 0){
       // Пройденные карточки текущей сессии — все светятся изумрудно-зеленым независимо от ответа
       cls += ' done bead-done rating-easy';
     } else {
 
       // Ожидающие будущие карточки: приглушённо-обсидиановые rgba(255,255,255,0.16)
 
-      cls += ' future';
+      cls += ' future bead-future';
 
     }
 
@@ -50463,8 +50463,8 @@ function buildSrsDeckContextBarHTML(deckTitle, total, currentIdx, getRatingOrIte
     let cls = 'dot-jewel';
 
     const stepInSprint = i - startIdx;
-    const isSprintCurrent = (attrName === 'data-hub-goto-due') ? (stepInSprint === sprintStep) : (i === cur);
-    const isSprintDone = (attrName === 'data-hub-goto-due') ? (stepInSprint < sprintStep) : (i < cur);
+    const isSprintCurrent = (i === cur);
+    const isSprintDone = (i < cur) || (r > 0);
 
     if(isSprintCurrent){
       cls += ' active bead-active-leading';
@@ -68250,7 +68250,9 @@ window.animateCardFlip = animateCardFlip;
 
   if(hGotoCard){
 
-    cardsHubState.cardIdx = parseInt(hGotoCard.getAttribute('data-hub-goto-card'), 10) || 0;
+    const targetCard = parseInt(hGotoCard.getAttribute('data-hub-goto-card'), 10) || 0;
+    cardsHubState.cardIdx = targetCard;
+    cardsHubState.sprintStep = targetCard % 15;
 
     cardsHubState.flipped = false;
 
@@ -68266,7 +68268,9 @@ window.animateCardFlip = animateCardFlip;
 
   if(hGotoDue){
 
-    cardsHubState.duePos = parseInt(hGotoDue.getAttribute('data-hub-goto-due'), 10) || 0;
+    const targetDue = parseInt(hGotoDue.getAttribute('data-hub-goto-due'), 10) || 0;
+    cardsHubState.duePos = targetDue;
+    cardsHubState.sprintStep = targetDue % 15;
 
     cardsHubState.flipped = false;
 
@@ -68319,6 +68323,7 @@ window.animateCardFlip = animateCardFlip;
       if(cardsHubState.duePos > 0){
 
         cardsHubState.duePos--;
+        cardsHubState.sprintStep = cardsHubState.duePos % 15;
 
         cardsHubState.flipped = false;
 
@@ -68335,6 +68340,7 @@ window.animateCardFlip = animateCardFlip;
     if(cardsHubState.cardIdx > 0){
 
       cardsHubState.cardIdx--;
+      cardsHubState.sprintStep = cardsHubState.cardIdx % 15;
 
       cardsHubState.flipped = false;
 
@@ -68416,6 +68422,7 @@ window.animateCardFlip = animateCardFlip;
     if(cardsHubState.cardIdx + 1 < (d.cards || []).length){
 
       cardsHubState.cardIdx++;
+      cardsHubState.sprintStep = cardsHubState.cardIdx % 15;
 
       cardsHubState.flipped = false;
 
