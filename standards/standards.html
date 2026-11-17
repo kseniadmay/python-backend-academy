@@ -23799,6 +23799,38 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     margin: 0 0.05em !important;
     box-shadow: none !important;
   }
+    .srs-card-note-link-btn:hover {
+    background: rgba(16, 185, 129, 0.12) !important;
+    border-color: rgba(16, 185, 129, 0.35) !important;
+    transform: translateY(-1px) !important;
+  }
+  .srs-card-top-note-btn:hover {
+    background: rgba(16, 185, 129, 0.12) !important;
+    border-color: rgba(16, 185, 129, 0.35) !important;
+    color: #34d399 !important;
+  }
+  body.light-theme .srs-card-note-link-btn {
+    background: rgba(15, 23, 42, 0.04) !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    color: #334155 !important;
+  }
+  body.light-theme .srs-card-note-link-btn:hover {
+    background: rgba(16, 185, 129, 0.10) !important;
+    border-color: rgba(16, 185, 129, 0.45) !important;
+  }
+  body.light-theme .srs-card-note-link-btn .srs-card-note-link-title {
+    color: #059669 !important;
+  }
+  body.light-theme .srs-card-top-note-btn {
+    background: rgba(15, 23, 42, 0.04) !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    color: #334155 !important;
+  }
+  body.light-theme .srs-card-top-note-btn:hover {
+    background: rgba(16, 185, 129, 0.10) !important;
+    border-color: rgba(16, 185, 129, 0.45) !important;
+    color: #059669 !important;
+  }
   .card-face .fc-top-row {
     gap: 6px !important;
   }
@@ -47476,6 +47508,7 @@ function viewPythonSkill(sid){
                   ${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(curCard.q) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.q) : curCard.q)}
                 </div>
                 ${pyRescueHTML}
+                ${buildFlashcardNoteFooterHTML(pyCardKey)}
               </div>
 
               <!-- Оборотная грань: Ответ (Mastery Emerald) -->
@@ -47487,6 +47520,7 @@ function viewPythonSkill(sid){
                   <div class="fc-divider" style="height:1px;background:linear-gradient(90deg, transparent, rgba(52,211,153,0.30), transparent);margin:6px 0 10px;"></div>
                   <div class="fc-a-mastery" id="srs-card-answer" style="font-size:1.06rem;line-height:1.6;color:#ffffff;font-weight:500;">${typeof formatCardAnswerHTML === 'function' ? formatCardAnswerHTML(curCard.a) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.a) : curCard.a)}</div>
                 </div>
+                ${buildFlashcardNoteFooterHTML(pyCardKey)}
               </div>
 
             </div>
@@ -49768,15 +49802,101 @@ function buildSrsDeckContextBarHTML(deckTitle, total, currentIdx, getRatingOrIte
 
 window.buildSrsDeckContextBarHTML = buildSrsDeckContextBarHTML;
 
+function findOwnerNoteForDeckId(deckIdOrKey){
+  if(!deckIdOrKey) return null;
+  const rawId = String(deckIdOrKey).split(':')[0].trim();
+  const baseId = rawId.split('@')[0];
+
+  // 1. Если колода открыта в контексте навыка pySkillViewState
+  if(typeof pySkillViewState !== 'undefined' && pySkillViewState && pySkillViewState.kId && typeof pySkillViewState.sid !== 'undefined'){
+    const curSk = (typeof PY_SKILLS_BY_ID !== 'undefined') ? PY_SKILLS_BY_ID[pySkillViewState.sid] : null;
+    if(curSk && Array.isArray(curSk.fIds) && (curSk.fIds.includes(rawId) || curSk.fIds.includes(baseId))){
+      return pySkillViewState.kId;
+    }
+  }
+
+  // 2. Ищем по всем юнитам и навыкам всех треков
+  if(typeof ALL_UNITS_COMBINED !== 'undefined'){
+    for(let i = 0; i < ALL_UNITS_COMBINED.length; i++){
+      const u = ALL_UNITS_COMBINED[i];
+      if(!u || !Array.isArray(u.skills)) continue;
+      for(let j = 0; j < u.skills.length; j++){
+        const sk = u.skills[j];
+        if(!sk || !Array.isArray(sk.fIds)) continue;
+        if(sk.fIds.includes(rawId) || sk.fIds.includes(baseId)){
+          if(Array.isArray(sk.kIds)){
+            for(let k = 0; k < sk.kIds.length; k++){
+              const kid = sk.kIds[k];
+              const matched = (typeof getMatchingDecksForNote === 'function')
+                ? getMatchingDecksForNote(kid, sk)
+                : ((typeof CANONICAL_NOTE_DECKS_MAP !== 'undefined' && CANONICAL_NOTE_DECKS_MAP[kid]) || []);
+              if(Array.isArray(matched) && (matched.includes(rawId) || matched.includes(baseId))){
+                return kid;
+              }
+            }
+            if(sk.kIds.length > 0) return sk.kIds[0];
+          }
+        }
+      }
+    }
+  }
+
+  // 3. Fallback: прямой поиск по CANONICAL_NOTE_DECKS_MAP
+  if(typeof CANONICAL_NOTE_DECKS_MAP !== 'undefined'){
+    for(const kid in CANONICAL_NOTE_DECKS_MAP){
+      const decks = CANONICAL_NOTE_DECKS_MAP[kid];
+      if(Array.isArray(decks)){
+        if(decks.includes(rawId) || decks.includes(baseId)){
+          return kid;
+        }
+        if((rawId === 'Ф-229' || baseId === 'Ф-229') && decks.includes('Ф-005')) return kid;
+        if((rawId === 'Ф-231' || baseId === 'Ф-231') && decks.includes('Ф-006')) return kid;
+      }
+    }
+  }
+
+  return null;
+}
+window.findOwnerNoteForDeckId = findOwnerNoteForDeckId;
+
+function buildFlashcardNoteFooterHTML(cardKey){
+  const kId = (typeof findOwnerNoteForDeckId === 'function') ? findOwnerNoteForDeckId(cardKey) : null;
+  if(!kId) return '';
+  const noteObj = (typeof ALL_NOTES_COMBINED !== 'undefined' && ALL_NOTES_COMBINED[kId]) ? ALL_NOTES_COMBINED[kId] : null;
+  const rawTitle = (noteObj && noteObj.title) ? noteObj.title : '';
+  const cleanNoteTitle = rawTitle.replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim() || 'Конспект теории';
+
+  return `
+              <div class="fc-card-footer" style="display:flex;align-items:center;justify-content:flex-start;width:100%;margin-top:auto;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);box-sizing:border-box;">
+                <button type="button" class="srs-card-note-link-btn" data-srs-force-note="${kId}" title="Открыть конспект «${escapeHtmlStr(cleanNoteTitle)}»" style="display:inline-flex;align-items:center;gap:7px;max-width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);padding:5px 12px;border-radius:999px;color:var(--ink-muted);font-size:0.75rem;font-weight:600;text-decoration:none;cursor:pointer;transition:all .18s ease;box-sizing:border-box;overflow:hidden;">
+                  <span style="font-size:0.82rem;flex-shrink:0;line-height:1;">📖</span>
+                  <span style="color:var(--ink-soft);opacity:0.75;flex-shrink:0;">Конспект:</span>
+                  <span class="srs-card-note-link-title" style="color:#34d399;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1 1 auto;">${escapeHtmlStr(cleanNoteTitle)}</span>
+                  <span style="color:#34d399;opacity:0.8;font-size:0.72rem;flex-shrink:0;margin-left:2px;">➔</span>
+                </button>
+              </div>`;
+}
+window.buildFlashcardNoteFooterHTML = buildFlashcardNoteFooterHTML;
+
 function buildFlashcardTopFrontHTML(cardKey, idx, total, rescueAttrName, isRescueOpen){
   const statusHTML = (typeof getRemNoteCardStatusBadgeHTML === 'function') ? getRemNoteCardStatusBadgeHTML(cardKey) : '';
   const safeKey = escapeHtmlStr(cardKey || '');
   const safeIdx = Math.max(0, Number(idx) || 0) + 1;
   const safeTotal = Math.max(1, Number(total) || 1);
+  const linkedKid = (typeof findOwnerNoteForDeckId === 'function') ? findOwnerNoteForDeckId(cardKey) : null;
+  const linkedNote = linkedKid && typeof ALL_NOTES_COMBINED !== 'undefined' ? ALL_NOTES_COMBINED[linkedKid] : null;
+  const rawNoteTitle = (linkedNote && linkedNote.title) ? linkedNote.title : '';
+  const cleanNoteTitle = rawNoteTitle.replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+  const noteChipHTML = linkedKid ? `
+                  <button type="button" class="srs-card-top-note-btn" data-srs-force-note="${linkedKid}" title="Конспект: ${escapeHtmlStr(cleanNoteTitle)}" aria-label="Открыть конспект «${escapeHtmlStr(cleanNoteTitle)}»" style="display:inline-flex;align-items:center;gap:4px;height:24px;min-height:24px;max-height:24px;padding:0 8px;border-radius:999px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:var(--ink-soft);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;box-sizing:border-box;transition:all .15s ease;">
+                    <span style="font-size:0.80rem;line-height:1;">📖</span>
+                    <span class="hide-on-mobile" style="opacity:0.9;">Конспект</span>
+                  </button>` : '';
   return `
               <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;">
                 <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
                   ${statusHTML}
+                  ${noteChipHTML}
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
                   <button type="button" class="fc-top-rescue-btn ${isRescueOpen ? 'is-active' : ''}" ${rescueAttrName}="${safeKey}" title="Подсказка-зацепка (H)" aria-pressed="${isRescueOpen ? 'true' : 'false'}">💡 Зацепка</button>
@@ -49792,11 +49912,21 @@ function buildFlashcardTopBackHTML(cardKey, idx, total, backBtnAttrs, showEscKbd
   const escHtml = showEscKbd
     ? ' <span class="hide-on-mobile"><span class="fc-kbd-sep"> </span><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span>'
     : '';
+  const linkedKid = (typeof findOwnerNoteForDeckId === 'function') ? findOwnerNoteForDeckId(cardKey) : null;
+  const linkedNote = linkedKid && typeof ALL_NOTES_COMBINED !== 'undefined' ? ALL_NOTES_COMBINED[linkedKid] : null;
+  const rawNoteTitle = (linkedNote && linkedNote.title) ? linkedNote.title : '';
+  const cleanNoteTitle = rawNoteTitle.replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+  const noteChipHTML = linkedKid ? `
+                  <button type="button" class="srs-card-top-note-btn" data-srs-force-note="${linkedKid}" title="Конспект: ${escapeHtmlStr(cleanNoteTitle)}" aria-label="Открыть конспект «${escapeHtmlStr(cleanNoteTitle)}»" style="display:inline-flex;align-items:center;gap:4px;height:24px;min-height:24px;max-height:24px;padding:0 8px;border-radius:999px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:var(--ink-soft);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;box-sizing:border-box;transition:all .15s ease;">
+                    <span style="font-size:0.80rem;line-height:1;">📖</span>
+                    <span class="hide-on-mobile" style="opacity:0.9;">Конспект</span>
+                  </button>` : '';
   return `
               <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;">
                 <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
                   <span class="srs-card-otvet-chip" style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.20);border:1px solid rgba(16,185,129,0.50);padding:0 10px;height:26px;min-height:26px;line-height:24px;border-radius:999px;box-shadow:0 0 12px rgba(16,185,129,0.28);white-space:nowrap;flex-shrink:0;box-sizing:border-box;">✓ Ответ</span>
                   ${statusHTML}
+                  ${noteChipHTML}
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
                   <span class="fc-card-counter-badge">${safeIdx} / ${safeTotal}</span>
@@ -50129,6 +50259,7 @@ function viewCardsHub(){
               </div>
 
               ${freeRescueHTML}
+              ${buildFlashcardNoteFooterHTML(curKey)}
 
             </div>
 
@@ -50147,6 +50278,7 @@ function viewCardsHub(){
                 <div class="fc-a-mastery" id="srs-card-answer" style="font-size:1.06rem;line-height:1.6;color:#ffffff;font-weight:500;">${typeof formatCardAnswerHTML === 'function' ? formatCardAnswerHTML(curCard.a) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.a) : curCard.a)}</div>
 
               </div>
+              ${buildFlashcardNoteFooterHTML(curKey)}
 
             </div>
 
@@ -50255,6 +50387,7 @@ function viewCardsHub(){
               </div>
 
               ${rescueHTML}
+              ${buildFlashcardNoteFooterHTML(curCardKey)}
 
             </div>
 
@@ -50273,6 +50406,7 @@ function viewCardsHub(){
                 <div class="fc-a-mastery" id="srs-card-answer" style="font-size:1.06rem;line-height:1.6;color:#ffffff;font-weight:500;">${typeof formatCardAnswerHTML === 'function' ? formatCardAnswerHTML(curCard.a) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.a) : curCard.a)}</div>
 
               </div>
+              ${buildFlashcardNoteFooterHTML(curCardKey)}
 
             </div>
 
@@ -50525,6 +50659,7 @@ function viewCardsHub(){
               </div>
 
               ${rescueHTML}
+              ${buildFlashcardNoteFooterHTML(curCardKey)}
 
             </div>
 
@@ -50543,6 +50678,7 @@ function viewCardsHub(){
                 <div class="fc-a-mastery" id="srs-card-answer" style="font-size:1.06rem;line-height:1.6;color:#ffffff;font-weight:500;">${typeof formatCardAnswerHTML === 'function' ? formatCardAnswerHTML(curCard.a) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.a) : curCard.a)}</div>
 
               </div>
+              ${buildFlashcardNoteFooterHTML(curCardKey)}
 
             </div>
 
@@ -57858,6 +57994,9 @@ function viewNotesSrsHub(noteSrsStats){
 
 
           <div class="srs-top-right-group" style="display:inline-flex;align-items:center;gap:8px;flex-shrink:0;">
+            ${forcedId ? `
+              <button type="button" class="btn btn-ghost srs-return-to-card-btn" data-srs-exit-force-note style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:999px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.40);color:#34d399;font-size:0.75rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s ease;" title="Вернуться к текущей карточке">← К карточке</button>
+            ` : ''}
 
             <!-- Премиальная капсула повторов Эббингауза (Calm Luxury 30px) -->
 
@@ -62227,6 +62366,22 @@ document.addEventListener('click', async function(e){
 
     if(fnId && ALL_NOTES_COMBINED[fnId]){
 
+      if(location.hash && location.hash.startsWith('#/python/skill') && typeof pySkillViewState !== 'undefined'){
+
+        pySkillViewState.tab = 'theory';
+
+        pySkillViewState.kId = fnId;
+
+        pySkillViewState.stepIdx = 0;
+
+        pySkillViewState.chunkIdx = 0;
+
+        render();
+
+        return;
+
+      }
+
       cardsHubState.hubTab = 'notes';
 
       cardsHubState.forcedNoteId = fnId;
@@ -62252,6 +62407,8 @@ document.addEventListener('click', async function(e){
   if(e.target.closest('[data-srs-exit-force-note]')){
 
     cardsHubState.forcedNoteId = null;
+
+    cardsHubState.hubTab = 'cards';
 
     cardsHubState.noteStepIdx = 0;
 
@@ -65390,7 +65547,7 @@ function animateCardFlip(cardEl, willBeFlipped, onComplete){
 window.animateCardFlip = animateCardFlip;
 
   if(e.target.closest('[data-py-flip-card]')){
-    if(e.target.closest('[data-py-rescue-card], [data-hub-rescue], [data-reveal-rescue-mask], .active-rescue-box')){
+    if(e.target.closest('[data-py-rescue-card], [data-hub-rescue], [data-reveal-rescue-mask], .active-rescue-box, [data-srs-force-note], .srs-card-note-link-btn, .srs-card-top-note-btn')){
       return;
     }
     var isPyTurnBack = !!e.target.closest('.fc-flip-back-btn');
@@ -67239,7 +67396,7 @@ window.animateCardFlip = animateCardFlip;
   }
 
   if(e.target.closest('[data-hub-flip], [data-action="flip-card"]')){
-    if(e.target.closest('[data-hub-rescue], [data-py-rescue-card], [data-reveal-rescue-mask], .active-rescue-box')){
+    if(e.target.closest('[data-hub-rescue], [data-py-rescue-card], [data-reveal-rescue-mask], .active-rescue-box, [data-srs-force-note], .srs-card-note-link-btn, .srs-card-top-note-btn')){
       return;
     }
     var isTurnBack = !!e.target.closest('.fc-flip-back-btn, [data-hub-turn-back]');
