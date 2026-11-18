@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Стенд гармонизации: Законы интерфейсов и ритмика отступов SRS (/grill-me)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #07090e;
+      --card-bg: rgba(15, 23, 42, 0.70);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-border-top: rgba(255, 255, 255, 0.16);
+      --ink: #f8fafc;
+      --ink-soft: #cbd5e1;
+      --ink-muted: #94a3b8;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --font-ui: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    [data-theme="light"] {
+      --bg-canvas: #f8fafc;
+      --card-bg: rgba(255, 255, 255, 0.92);
+      --card-border: rgba(15, 23, 42, 0.09);
+      --card-border-top: rgba(15, 23, 42, 0.16);
+      --ink: #0f172a;
+      --ink-soft: #334155;
+      --ink-muted: #64748b;
+      --emerald: #059669;
+      --amber: #d97706;
+    }
+
+    body {
+      font-family: var(--font-ui);
+      background: var(--bg-canvas);
+      color: var(--ink);
+      margin: 0;
+      padding: 0;
+      transition: background 0.25s ease, color 0.25s ease;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Живая оптическая точка активности (Zero-Jitter: box-shadow + opacity, 0 scale) */
+    .srs-live-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ffffff 0%, #a7f3d0 30%, #34d399 65%, #059669 100%);
+      border: 0.8px solid #6ee7b7;
+      box-shadow: 0 0 2px 0.5px rgba(52, 211, 153, 0.45), 0 0 4px 1px rgba(16, 185, 129, 0.2);
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
+      contain: layout style !important;
+      transform: translateZ(0);
+      animation: srsLiveDotPulse 2.6s infinite ease-in-out;
+    }
+
+    @keyframes srsLiveDotPulse {
+      0%, 100% { box-shadow: 0 0 2px 0.5px rgba(52, 211, 153, 0.45); opacity: 0.74; }
+      50% { box-shadow: 0 0 6px 1.5px rgba(52, 211, 153, 0.70); opacity: 1; }
+    }
+
+    /* Векторные Дзен-кнопки (крестик закрытия и др.) */
+    .zen-vector-btn {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      min-height: 28px;
+      padding: 0;
+      border-radius: 50%;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--ink-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      text-decoration: none;
+      box-sizing: border-box;
+      transition: all .18s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .zen-vector-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--ink);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    [data-theme="light"] .zen-vector-btn:hover {
+      background: rgba(15, 23, 42, 0.06);
+      color: var(--ink);
+      border-color: rgba(15, 23, 42, 0.10);
+    }
+
+    /* На мобилке (390px / ≤640px) у крестика полностью убираем рамку и фон по запросу пользователя */
+    .is-mobile .zen-vector-btn,
+    @media (max-width: 640px) {
+      .zen-vector-btn {
+        background: transparent !important;
+        border: none !important;
+        border-color: transparent !important;
+        box-shadow: none !important;
+      }
+      .zen-vector-btn:hover {
+        background: transparent !important;
+        border: none !important;
+      }
+    }
+
+    .zen-counter-3a {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      line-height: 1;
+    }
+
+    /* Термодинамическая шкала накала памяти */
+    .srs-header-progress-track {
+      position: relative;
+      height: 3.5px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 99px;
+      overflow: visible;
+      box-sizing: border-box;
+    }
+    [data-theme="light"] .srs-header-progress-track {
+      background: rgba(15, 23, 42, 0.08);
+    }
+    .srs-header-progress-glow {
+      position: absolute;
+      top: 0; left: 0; height: 100%; width: 55%;
+      background: linear-gradient(90deg, #f43f5e 0%, #f59e0b 50%, #ffffff 100%);
+      border-radius: 99px;
+      filter: blur(5px);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+      opacity: 0.85;
+      pointer-events: none;
+    }
+    .srs-header-progress-fill {
+      position: relative; height: 100%; width: 55%;
+      background: linear-gradient(90deg, #f43f5e 0%, #f59e0b 50%, #ffffff 100%);
+      border-radius: 99px;
+      box-shadow: 0 0 8px #ffffff;
+    }
+
+    /* Бусины шагов */
+    .bead {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      display: inline-block;
+      position: relative;
+    }
+    .bead-active {
+      width: 8px; height: 8px;
+      background: #ffffff;
+      border: 1.5px solid #10b981;
+      box-shadow: 0 0 4px 1px rgba(167, 243, 208, 0.65), 0 0 9px 1.5px rgba(52, 211, 153, 0.50);
+      animation: bead-pulse-emerald 2.8s infinite ease-in-out;
+    }
+    .bead-active::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 50%;
+      border: 1.2px solid rgba(52, 211, 153, 0.90);
+      animation: bead-ping-wave 2.8s cubic-bezier(0.2, 0.8, 0.4, 1) infinite;
+    }
+    .bead-done {
+      background: radial-gradient(circle at 35% 35%, #ffffff 0%, #a7f3d0 35%, #10b981 100%);
+      border: 1px solid #6ee7b7;
+    }
+    .bead-future {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    [data-theme="light"] .bead-future {
+      background: rgba(15, 23, 42, 0.15);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+    }
+    @keyframes bead-pulse-emerald {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+    @keyframes bead-ping-wave {
+      0% { transform: scale(0.9); opacity: 0.9; }
+      70% { transform: scale(2.6); opacity: 0; }
+      100% { transform: scale(2.6); opacity: 0; }
+    }
+
+    .canvas-dots {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    [data-theme="light"] .canvas-dots {
+      background-image: radial-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px);
+    }
+
+    /* Моноширинный бейдж счетчика внутри карточки */
+    .fc-card-counter-badge {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--ink-muted);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      padding: 2px 7px;
+      border-radius: 6px;
+      white-space: nowrap !important;
+      flex-shrink: 0 !important;
+      line-height: 1.2;
+    }
+    [data-theme="light"] .fc-card-counter-badge {
+      background: rgba(15, 23, 42, 0.05);
+      border: 1px solid rgba(15, 23, 42, 0.09);
+      color: #64748b;
+    }
+
+    /* ВАРИАНТ A: Сплит-чип док */
+    .dock-variant-a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      padding: 2px 3px;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+    }
+    [data-theme="light"] .dock-variant-a {
+      background: rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(15, 23, 42, 0.09);
+    }
+    .dock-variant-a .dock-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 9px;
+      height: 24px;
+      border-radius: 999px;
+      background: transparent;
+      border: none;
+      color: var(--ink-soft);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+    }
+    .dock-variant-a .dock-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+    .dock-variant-a .dock-divider {
+      width: 1px;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.14);
+      margin: 0 1px;
+      flex-shrink: 0;
+    }
+    /* На мобилке для Варианта A: обе кнопки в 100% едином стиле 28×28px */
+    .is-mobile .dock-variant-a {
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
+      gap: 6px !important;
+    }
+    .is-mobile .dock-variant-a .dock-divider {
+      display: none !important;
+    }
+    .is-mobile .dock-variant-a .dock-btn {
+      width: 28px !important;
+      height: 28px !important;
+      min-width: 28px !important;
+      min-height: 28px !important;
+      border-radius: 50% !important;
+      padding: 0 !important;
+      background: rgba(255, 255, 255, 0.06) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      justify-content: center !important;
+      font-size: 1.05rem !important;
+      line-height: 1 !important;
+    }
+    .is-mobile .dock-variant-a .dock-label {
+      display: none !important;
+    }
+
+    /* ВАРИАНТ B: Круглые Дзен-пиктограммы 28×28px */
+    .dock-variant-b {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dock-variant-b .circle-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      color: var(--ink-soft);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.18s ease;
+    }
+    .dock-variant-b .circle-btn:hover {
+      background: rgba(255, 255, 255, 0.10);
+      border-color: rgba(255, 255, 255, 0.20);
+      color: #fff;
+    }
+    .dock-variant-b .circle-btn.is-active {
+      background: rgba(245, 158, 11, 0.18);
+      border-color: rgba(245, 158, 11, 0.40);
+      color: #fbbf24;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.30);
+    }
+
+    /* ВАРИАНТ C: Текстовые микро-пилюли */
+    .dock-variant-c {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dock-variant-c .pill-btn {
+      padding: 2px 9px;
+      height: 24px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      color: var(--ink-soft);
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      transition: all 0.18s ease;
+    }
+    .dock-variant-c .pill-btn:hover {
+      background: rgba(255, 255, 255, 0.09);
+      border-color: rgba(255, 255, 255, 0.18);
+      color: #fff;
+    }
+
+    /* ВАРИАНТ D: Чистые парящие эмодзи без рамок на мобилке */
+    .dock-variant-d {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dock-variant-d .float-emoji-btn {
+      width: 28px;
+      height: 28px;
+      background: transparent;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      transition: transform 0.18s ease, filter 0.18s ease;
+    }
+    .dock-variant-d .float-emoji-btn:hover {
+      transform: scale(1.15);
+    }
+    .dock-variant-d .float-emoji-btn.is-active {
+      filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.8));
+    }
+
+    /* ==========================================================
+       ВИЗУАЛЬНАЯ ЛИНЕЙКА ОТСТУПОВ (8PT GRID RULER)
+       ========================================================== */
+    .show-spacings .spacing-ruler {
+      display: flex !important;
+    }
+    .spacing-ruler {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px dashed rgba(56, 189, 248, 0.45);
+      border-radius: 4px;
+      margin: 0 auto;
+      pointer-events: none;
+      z-index: 10;
+      user-select: none;
+      width: 100%;
+      box-sizing: border-box;
+      line-height: 1;
+    }
+    .spacing-ruler::before,
+    .spacing-ruler::after {
+      content: '';
+      position: absolute;
+      width: 6px;
+      height: 1px;
+      background: #38bdf8;
+    }
+    .spacing-ruler::before { top: 0; left: 50%; transform: translateX(-50%); }
+    .spacing-ruler::after { bottom: 0; left: 50%; transform: translateX(-50%); }
+
+    /* Оптимизированные стили карточки */
+    .card-face-opt {
+      width: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .is-mobile .card-face-opt {
+      padding: 16px 16px 18px !important;
+    }
+    :not(.is-mobile) .card-face-opt {
+      padding: 22px 24px 24px !important;
+    }
+  </style>
+</head>
+<body class="p-3 sm:p-5 select-none">
+
+  <!-- ВЕРХНЯЯ ПАНЕЛЬ УПРАВЛЕНИЯ СТЕНДОМ -->
+  <header class="max-w-5xl mx-auto mb-5 p-4 rounded-2xl bg-[var(--card-bg)] border border-[var(--card-border)] backdrop-blur-xl shadow-2xl flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-black font-extrabold text-sm shadow-[0_0_16px_rgba(16,185,129,0.4)]">
+        📐
+      </div>
+      <div>
+        <h1 class="text-sm sm:text-base font-extrabold flex items-center gap-2 m-0">
+          Оптимизация расстояний SRS по законам интерфейсов (/grill-me)
+        </h1>
+        <p class="text-xs text-[var(--ink-muted)] m-0">
+          Закон близости Гештальта • 8pt Grid • Закон Фиттса • Zero-Scroll на 390px
+        </p>
+      </div>
+    </div>
+
+    <!-- Быстрые контроллеры -->
+    <div class="flex flex-wrap items-center gap-2 text-xs">
+      <!-- Линейка отступов 8pt -->
+      <button type="button" onclick="toggleSpacingsRuler()" id="btn-toggle-ruler" class="px-2.5 py-1 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/40 font-semibold transition-all text-sky-300 flex items-center gap-1.5 shadow-[0_0_10px_rgba(56,189,248,0.2)]">
+        <span id="ruler-icon">📐</span> <span id="ruler-text">Скрыть линейку 8pt</span>
+      </button>
+
+      <!-- Грань карточки -->
+      <div class="flex rounded-lg bg-black/20 p-0.5 border border-white/10" id="face-toggle">
+        <button type="button" onclick="setCardFace('front')" id="btn-face-front" class="px-2.5 py-1 rounded-md font-semibold transition-all bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+          Вопрос
+        </button>
+        <button type="button" onclick="setCardFace('back')" id="btn-face-back" class="px-2.5 py-1 rounded-md font-medium text-slate-400 hover:text-white transition-all">
+          Ответ
+        </button>
+      </div>
+
+      <!-- Вьюпорт -->
+      <div class="flex rounded-lg bg-black/20 p-0.5 border border-white/10" id="vp-toggle">
+        <button type="button" onclick="setViewport('390px')" id="btn-vp-390" class="px-2.5 py-1 rounded-md font-semibold transition-all bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+          📱 390px
+        </button>
+        <button type="button" onclick="setViewport('680px')" id="btn-vp-680" class="px-2.5 py-1 rounded-md font-medium text-slate-400 hover:text-white transition-all">
+          💻 680px
+        </button>
+      </div>
+
+      <!-- Тема -->
+      <button type="button" onclick="toggleTheme()" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 font-medium transition-all text-slate-300 flex items-center gap-1.5">
+        <span id="theme-icon">🌙</span> <span id="theme-text">Обсидиан</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- СЕЛЕКТОРЫ ВАРИАНТОВ ДЛЯ ГРИЛЯ -->
+  <div class="max-w-5xl mx-auto mb-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+    <!-- Выбор шапки экрана -->
+    <div class="p-3 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-xs flex flex-col gap-1.5">
+      <div class="font-bold flex items-center justify-between text-[var(--ink)]">
+        <span class="flex items-center gap-1.5">
+          <span class="text-amber-400">1.</span> Шапка экрана:
+        </span>
+        <span class="text-[11px] text-amber-400 font-mono" id="header-opt-badge">Вариант 1 (Дзен-спринт)</span>
+      </div>
+      <div class="grid grid-cols-2 gap-1.5">
+        <button type="button" onclick="setHeaderOption(1)" id="btn-hdr-1" class="p-1.5 rounded-lg text-left transition-all bg-emerald-500/15 border border-emerald-500/40 text-emerald-200">
+          <b>1. Дзен-спринт:</b> «🟢 Карточки SRS» + «⚡ 1 / 7»
+        </button>
+        <button type="button" onclick="setHeaderOption(2)" id="btn-hdr-2" class="p-1.5 rounded-lg text-left transition-all bg-white/5 border border-white/10 text-slate-400 hover:text-white">
+          <b>2. Чистые:</b> «🟢 Карточки» (без SRS)
+        </button>
+        <button type="button" onclick="setHeaderOption(3)" id="btn-hdr-3" class="p-1.5 rounded-lg text-left transition-all bg-white/5 border border-white/10 text-slate-400 hover:text-white">
+          <b>3. Как в конспектах:</b> «🟢 Повторение» + «1 / 7»
+        </button>
+        <button type="button" onclick="setHeaderOption(4)" id="btn-hdr-4" class="p-1.5 rounded-lg text-left transition-all bg-white/5 border border-white/10 text-slate-400 hover:text-white">
+          <b>4. Компакт:</b> без названия на мобилке
+        </button>
+      </div>
+    </div>
+
+    <!-- Выбор шапки карточки -->
+    <div class="p-3 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-xs flex flex-col gap-1.5">
+      <div class="font-bold flex items-center justify-between text-[var(--ink)]">
+        <span class="flex items-center gap-1.5">
+          <span class="text-amber-400">2.</span> Шапка внутри карточки:
+        </span>
+        <span class="text-[11px] text-amber-400 font-mono" id="card-opt-badge">Вариант A (Сплит-капсула)</span>
+      </div>
+      <div class="grid grid-cols-2 gap-1.5">
+        <button type="button" onclick="setCardOption('A')" id="btn-crd-a" class="p-1.5 rounded-lg text-left transition-all bg-emerald-500/15 border border-emerald-500/40 text-emerald-200">
+          <b>A. Сплит-капсула:</b> [ 📖 │ 💡 ] + 1/19
+        </button>
+        <button type="button" onclick="setCardOption('B')" id="btn-crd-b" class="p-1.5 rounded-lg text-left transition-all bg-white/5 border border-white/10 text-slate-400 hover:text-white">
+          <b>B. Дзен-круги:</b> 28px кнопки (стиль ✕)
+        </button>
+        <button type="button" onclick="setCardOption('C')" id="btn-crd-c" class="p-1.5 rounded-lg text-left transition-all bg-white/5 border border-white/10 text-slate-400 hover:text-white">
+          <b>C. Текст:</b> [Теория] [Зацепка]
+        </button>
+        <button type="button" onclick="setCardOption('D')" id="btn-crd-d" class="p-1.5 rounded-lg text-left transition-all bg-white/5 border border-white/10 text-slate-400 hover:text-white">
+          <b>D. Парящие эмодзи:</b> 📖 и 💡 без рамок
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ОСНОВНОЙ РАМКА-ДЕМОНСТРАТОР С ЛИНЕЙКОЙ РАССТОЯНИЙ -->
+  <main class="max-w-5xl mx-auto flex justify-center items-start min-h-[560px]">
+    <div id="device-frame" class="w-full transition-all duration-300 relative rounded-3xl p-4 sm:p-5 canvas-dots border border-[var(--card-border)] bg-[var(--bg-canvas)] shadow-2xl is-mobile show-spacings" style="max-width: 390px;">
+      
+      <!-- Симуляция статус-бара смартфона -->
+      <div class="flex items-center justify-between text-[11px] text-slate-500 font-mono mb-2 px-1">
+        <span>17:03</span>
+        <div class="flex items-center gap-1.5">
+          <span>5G</span>
+          <span>VPN</span>
+          <span>86%</span>
+        </div>
+      </div>
+
+      <!-- ЛИНЕЙКА 1: Отступ сверху до шапки (10px) -->
+      <div class="spacing-ruler" style="height: 10px; margin-bottom: 2px;">10px (верхний зазор)</div>
+
+      <!-- ВЕРХНЯЯ ШАПКА ЭКРАНА (30px) -->
+      <div id="screen-header-container">
+        <!-- Инжектируется -->
+      </div>
+
+      <!-- ЛИНЕЙКА 2: От шапки до полосы накала (8px) -->
+      <div class="spacing-ruler" style="height: 8px; margin: 4px 0;">8px (зазор до шкалы)</div>
+
+      <!-- ТЕРМОДИНАМИЧЕСКАЯ ШКАЛА НАКАЛА (3.5px) -->
+      <div class="srs-header-progress-track">
+        <div class="srs-header-progress-glow"></div>
+        <div class="srs-header-progress-fill"></div>
+      </div>
+
+      <!-- ЛИНЕЙКА 3: От шкалы накала до ожерелья бусин (12px) -->
+      <div class="spacing-ruler" style="height: 12px; margin: 6px 0;">12px (зазор до бусин)</div>
+
+      <!-- ОЖЕРЕЛЬЕ БУСИН ТЕКУЩЕГО СПРИНТА (16px) -->
+      <div class="flex items-center justify-center py-0.5">
+        <div class="flex items-center justify-center gap-[7px] sm:gap-2">
+          <span class="bead bead-active" title="Карточка 1 из 15"></span>
+          <span class="bead bead-done" title="Карточка 2"></span>
+          <span class="bead bead-future" title="Карточка 3"></span>
+          <span class="bead bead-future" title="Карточка 4"></span>
+          <span class="bead bead-future" title="Карточка 5"></span>
+          <span class="bead bead-future" title="Карточка 6"></span>
+          <span class="bead bead-future" title="Карточка 7"></span>
+          <span class="bead bead-future" title="Карточка 8"></span>
+          <span class="bead bead-future" title="Карточка 9"></span>
+          <span class="bead bead-future" title="Карточка 10"></span>
+          <span class="bead bead-future" title="Карточка 11"></span>
+          <span class="bead bead-future" title="Карточка 12"></span>
+          <span class="bead bead-future" title="Карточка 13"></span>
+          <span class="bead bead-future" title="Карточка 14"></span>
+          <span class="bead bead-future" title="Карточка 15"></span>
+        </div>
+      </div>
+
+      <!-- ЛИНЕЙКА 4: От бусин до карточки (14px) - Закон близости: бусины ближе к карточке -->
+      <div class="spacing-ruler" style="height: 14px; margin: 6px 0;">14px (зазор до карточки)</div>
+
+      <!-- ФЛЕШ-КАРТОЧКА -->
+      <article id="flashcard-box" class="w-full rounded-2xl relative overflow-hidden backdrop-blur-xl border border-[var(--card-border)] shadow-xl transition-all card-face-opt" style="background: linear-gradient(165deg, rgba(255,255,255,0.03) 0%, rgba(13,22,34,0.75) 100%);">
+        
+        <!-- ШАПКА ВНУТРИ САМОЙ КАРТОЧКИ (.fc-top-row, 26px) -->
+        <div id="card-top-row-container">
+          <!-- Инжектируется динамически -->
+        </div>
+
+        <!-- ЛИНЕЙКА 5: Внутренний зазор от шапки карточки до вопроса (12px) -->
+        <div class="spacing-ruler" style="height: 12px; margin: 6px 0; background:rgba(16,185,129,0.12); color:#34d399; border-color:rgba(16,185,129,0.4);">
+          12px (внутренний зазор карточки)
+        </div>
+
+        <!-- ТЕЛО КАРТОЧКИ (ВОПРОС И КОД) -->
+        <div id="card-body-content" class="text-base sm:text-lg font-semibold text-[var(--ink)] leading-relaxed my-1">
+          <!-- Инжектируется -->
+        </div>
+
+        <!-- Декоративное свечение карточки -->
+        <div class="absolute -bottom-10 -right-10 w-32 h-32 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none"></div>
+      </article>
+
+      <!-- ЛИНЕЙКА 6: От карточки до кнопки ответа (14px) - Закон Фиттса -->
+      <div class="spacing-ruler" style="height: 14px; margin: 7px 0;">14px (зазор до Action Dock)</div>
+
+      <!-- НИЖНИЙ ДОК ДЕЙСТВИЙ КАРТОЧКИ (48px) -->
+      <div id="bottom-action-dock">
+        <!-- Инжектируется -->
+      </div>
+
+    </div>
+  </main>
+
+  <!-- СВОДНЫЙ РАЗБОР ЗАКОНОВ ИНТЕРФЕЙСОВ -->
+  <section class="max-w-5xl mx-auto mt-7 p-5 rounded-2xl bg-[var(--card-bg)] border border-[var(--card-border)] text-xs">
+    <h2 class="text-sm font-extrabold text-[var(--ink)] mb-3 flex items-center gap-2">
+      <span>📐</span> Как законы интерфейсов оптимизируют этот экран:
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-[var(--ink-soft)] leading-relaxed">
+      <div class="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex flex-col gap-1.5">
+        <b class="text-sky-300 flex items-center gap-1.5">
+          <span>1.</span> Закон близости (Proximity)
+        </b>
+        <p class="m-0 text-[11.5px]">
+          Внутренний зазор внутри карточки (12px) <b>строго меньше</b> внешнего расстояния между карточкой и бусинами (14px), а бусины ближе к карточке, чем к верхней шапке (14px vs 20px). Это создает однозначную группировку элементов без лишних линий.
+        </p>
+      </div>
+
+      <div class="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex flex-col gap-1.5">
+        <b class="text-emerald-300 flex items-center gap-1.5">
+          <span>2.</span> Закон Фиттса (Fitts's Law)
+        </b>
+        <p class="m-0 text-[11.5px]">
+          Кнопка «Показать ответ» (48px) находится ровно под карточкой (зазор 14px) — в зоне комфортного клика и тапа большим пальцем. Оценочные кнопки (сетка 2×2 на смартфонах) имеют комфортную высоту 44px и зазор 8px.
+        </p>
+      </div>
+
+      <div class="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex flex-col gap-1.5">
+        <b class="text-amber-300 flex items-center gap-1.5">
+          <span>3.</span> Модульная 8pt/4pt сетка
+        </b>
+        <p class="m-0 text-[11.5px]">
+          Все отступы кратны 4px/8px: 8px, 10px, 12px, 14px, 16px. Суммарная высота экрана на 390px составляет <b>~460px</b> при доступных 680px, что гарантирует <b>0 скролла (Zero-Scroll)</b> даже при открытой подсказке-зацепке Сократа!
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    let currentHeaderOption = 1;
+    let currentCardOption = 'A';
+    let currentFace = 'front';
+    let currentViewport = '390px';
+    let isRescueOpen = false;
+    let isRulerVisible = true;
+
+    function renderAll() {
+      renderHeader();
+      renderCardTop();
+      renderCardBody();
+      renderBottomDock();
+      updateBadges();
+    }
+
+    function renderHeader() {
+      const container = document.getElementById('screen-header-container');
+      
+      let leftTitleHTML = '';
+      if(currentHeaderOption === 1) {
+        leftTitleHTML = `<span class="inline-flex items-center gap-2 text-[0.76rem] font-bold text-[var(--ink-soft)] tracking-tight">
+          <span class="srs-live-status-dot"></span>
+          Карточки SRS
+        </span>`;
+      } else if(currentHeaderOption === 2) {
+        leftTitleHTML = `<span class="inline-flex items-center gap-2 text-[0.76rem] font-bold text-[var(--ink-soft)] tracking-tight">
+          <span class="srs-live-status-dot"></span>
+          Карточки
+        </span>`;
+      } else if(currentHeaderOption === 3) {
+        leftTitleHTML = `<span class="inline-flex items-center gap-2 text-[0.76rem] font-bold text-[var(--ink-soft)] tracking-tight">
+          <span class="srs-live-status-dot"></span>
+          Повторение
+        </span>`;
+      } else if(currentHeaderOption === 4) {
+        leftTitleHTML = `<span class="inline-flex items-center gap-2 text-[0.76rem] font-bold text-[var(--ink-soft)] tracking-tight opacity-50">
+          <span class="srs-live-status-dot"></span>
+        </span>`;
+      }
+
+      let rightCounterHTML = '';
+      if(currentHeaderOption === 3) {
+        rightCounterHTML = `
+          <div class="zen-counter-3a" title="Сессия 1 из 7">
+            <span style="color:var(--ink);font-weight:800;font-size:0.85rem;">1</span>
+            <span style="color:var(--ink-muted);opacity:0.35;font-size:0.74rem;margin:0 1px;">/</span>
+            <span style="color:var(--ink-muted);font-weight:600;font-size:0.78rem;">7</span>
+          </div>`;
+      } else {
+        rightCounterHTML = `
+          <div class="zen-counter-3a" title="Спринт 1 из 7">
+            <span style="color:#f59e0b;font-size:0.85rem;margin-right:1px;">⚡</span>
+            <span style="color:var(--ink);font-weight:800;font-size:0.85rem;">1</span>
+            <span style="color:var(--ink-muted);opacity:0.35;font-size:0.74rem;margin:0 1px;">/</span>
+            <span style="color:var(--ink-muted);font-weight:600;font-size:0.78rem;">7</span>
+          </div>`;
+      }
+
+      container.innerHTML = `
+        <header class="relative flex justify-between items-center h-[30px] min-h-[30px] gap-2 px-0.5 box-border">
+          <div class="min-w-0 flex-shrink-0 flex items-center h-[30px]">
+            ${leftTitleHTML}
+          </div>
+
+          <div class="flex items-center gap-2 h-[30px] flex-shrink-0">
+            ${rightCounterHTML}
+            <button type="button" class="zen-vector-btn" title="Закрыть (На Путь)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </header>
+      `;
+    }
+
+    function renderCardTop() {
+      const container = document.getElementById('card-top-row-container');
+
+      // Статус карточки "⚡ Повторение"
+      const statusHTML = `
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-amber-300 bg-amber-500/15 border border-amber-500/30 shadow-[0_0_12px_rgba(245,158,11,0.15)] flex-shrink-0">
+          <span>⚡</span> Повторение
+        </span>
+      `;
+
+      // Чип "✓ Ответ" на обороте
+      const otvetChipHTML = `
+        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-extrabold text-emerald-300 bg-emerald-500/20 border border-emerald-500/50 shadow-[0_0_12px_rgba(16,185,129,0.25)] flex-shrink-0">
+          ✓ Ответ
+        </span>
+      `;
+
+      // Счётчик 1 / 19 внутри карточки
+      const counterHTML = `<span class="fc-card-counter-badge">1 / 19</span>`;
+
+      let actionsHTML = '';
+
+      if(currentFace === 'front') {
+        if(currentCardOption === 'A') {
+          // Сплит-капсула: на мобилке [ 📖 │ 💡 ], на десктопе [ 📖 Теория │ 💡 Зацепка ]
+          actionsHTML = `
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <div class="dock-variant-a">
+                <button type="button" class="dock-btn" title="Конспект теории" onclick="alert('Открытие конспекта теории!')">
+                  <span>📖</span><span class="dock-label">Теория</span>
+                </button>
+                <div class="dock-divider"></div>
+                <button type="button" class="dock-btn ${isRescueOpen ? 'text-amber-300 bg-amber-500/20' : ''}" title="Подсказка-зацепка (H)" onclick="toggleRescue()">
+                  <span>💡</span><span class="dock-label">Зацепка</span>
+                </button>
+              </div>
+              ${counterHTML}
+            </div>
+          `;
+        } else if(currentCardOption === 'B') {
+          // Круглые Дзен-кнопки 28×28px
+          actionsHTML = `
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <div class="dock-variant-b">
+                <button type="button" class="circle-btn" title="Конспект теории" onclick="alert('Открытие конспекта теории!')">
+                  📖
+                </button>
+                <button type="button" class="circle-btn ${isRescueOpen ? 'is-active' : ''}" title="Подсказка-зацепка (H)" onclick="toggleRescue()">
+                  💡
+                </button>
+              </div>
+              ${counterHTML}
+            </div>
+          `;
+        } else if(currentCardOption === 'C') {
+          // Текстовые микро-пилюли
+          actionsHTML = `
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <div class="dock-variant-c">
+                <button type="button" class="pill-btn" title="Конспект теории" onclick="alert('Открытие конспекта теории!')">
+                  Теория
+                </button>
+                <button type="button" class="pill-btn ${isRescueOpen ? 'bg-amber-500/20 text-amber-200 border-amber-500/40' : ''}" title="Подсказка-зацепка" onclick="toggleRescue()">
+                  Зацепка
+                </button>
+              </div>
+              ${counterHTML}
+            </div>
+          `;
+        } else if(currentCardOption === 'D') {
+          // Парящие эмодзи без рамок
+          actionsHTML = `
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <div class="dock-variant-d">
+                <button type="button" class="float-emoji-btn" title="Конспект теории" onclick="alert('Открытие конспекта теории!')">
+                  📖
+                </button>
+                <button type="button" class="float-emoji-btn ${isRescueOpen ? 'is-active' : ''}" title="Подсказка-зацепка (H)" onclick="toggleRescue()">
+                  💡
+                </button>
+              </div>
+              ${counterHTML}
+            </div>
+          `;
+        }
+
+        container.innerHTML = `
+          <div class="flex items-center justify-between gap-2 w-full">
+            <div class="flex items-center gap-2 min-w-0">
+              ${statusHTML}
+            </div>
+            ${actionsHTML}
+          </div>
+        `;
+      } else {
+        // Оборот карточки (Ответ)
+        const flipBackBtn = `
+          <button type="button" onclick="setCardFace('front')" class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex-shrink-0">
+            ← К вопросу
+          </button>
+        `;
+
+        let backTheoryBtn = '';
+        if(currentCardOption === 'A' || currentCardOption === 'C') {
+          backTheoryBtn = `
+            <button type="button" class="dock-btn text-xs px-2 py-1 rounded-full bg-white/5 border border-white/10" onclick="alert('Открытие конспекта!')">
+              📖 <span class="hidden sm:inline">Теория</span>
+            </button>
+          `;
+        } else {
+          backTheoryBtn = `
+            <button type="button" class="circle-btn" style="width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);display:inline-flex;align-items:center;justify-content:center;" onclick="alert('Открытие конспекта!')">
+              📖
+            </button>
+          `;
+        }
+
+        container.innerHTML = `
+          <div class="flex items-center justify-between gap-2 w-full">
+            <div class="flex items-center gap-2 min-w-0 flex-wrap">
+              ${otvetChipHTML}
+              ${statusHTML}
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              ${backTheoryBtn}
+              ${counterHTML}
+              ${flipBackBtn}
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function renderCardBody() {
+      const container = document.getElementById('card-body-content');
+      const cardBox = document.getElementById('flashcard-box');
+
+      if(currentFace === 'front') {
+        container.innerHTML = `
+          Зачем в методе <code class="text-emerald-300 font-mono bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">__new__</code> вызывать <br class="hidden sm:inline">
+          <code class="text-emerald-300 font-mono bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">super().__new__(cls)</code>?
+          ${isRescueOpen ? `
+            <div class="mt-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 transition-all">
+              💡 <b>Зацепка памяти:</b> Метод <code>__new__</code> физически конструирует объект в памяти, делегируя аллокацию предку (классу <code>object</code>), до того как <code>__init__</code> получит созданный экземпляр <code>self</code>.
+            </div>
+          ` : ''}
+        `;
+        cardBox.style.background = 'linear-gradient(165deg, rgba(255,255,255,0.03) 0%, rgba(13,22,34,0.75) 100%)';
+        cardBox.style.borderColor = 'var(--card-border)';
+      } else {
+        container.innerHTML = `
+          <div class="text-xs font-semibold text-emerald-300/80 mb-1">Вопрос: Зачем вызывать super().__new__(cls)?</div>
+          <div class="h-[1px] bg-emerald-500/20 my-2"></div>
+          <div class="text-sm sm:text-base font-normal text-white leading-relaxed">
+            Метод <code>__new__</code> — это конструктор объекта, выделяющий память под новый экземпляр. Вызов <code>super().__new__(cls)</code> делегирует создание объекту-предку (базовому классу <code>object</code>). Без этого вызова объект не будет физически сконструирован.
+          </div>
+        `;
+        cardBox.style.background = 'linear-gradient(155deg, rgba(6, 78, 59, 0.48) 0%, rgba(13, 22, 34, 0.90) 50%, rgba(6, 78, 59, 0.32) 100%)';
+        cardBox.style.borderColor = 'rgba(16, 185, 129, 0.75)';
+      }
+    }
+
+    function renderBottomDock() {
+      const container = document.getElementById('bottom-action-dock');
+
+      if(currentFace === 'front') {
+        container.innerHTML = `
+          <button type="button" onclick="setCardFace('back')" class="w-full h-12 rounded-xl font-bold text-sm tracking-wide text-white bg-gradient-to-r from-emerald-600/80 to-emerald-500/90 hover:from-emerald-500 hover:to-emerald-400 border border-emerald-400/40 shadow-[0_4px_24px_-4px_rgba(16,185,129,0.40)] transition-all flex items-center justify-center gap-2 active:scale-[0.99]">
+            Показать ответ
+          </button>
+        `;
+      } else {
+        container.innerHTML = `
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button type="button" class="h-11 rounded-xl font-bold text-xs bg-rose-950/70 border border-rose-500/50 text-rose-200 hover:bg-rose-900/80 transition-all">Не знаю [1]</button>
+            <button type="button" class="h-11 rounded-xl font-bold text-xs bg-amber-950/70 border border-amber-500/50 text-amber-200 hover:bg-amber-900/80 transition-all">Частично [2]</button>
+            <button type="button" class="h-11 rounded-xl font-bold text-xs bg-emerald-950/70 border border-emerald-500/50 text-emerald-200 hover:bg-emerald-900/80 transition-all">Помню [3]</button>
+            <button type="button" class="h-11 rounded-xl font-bold text-xs bg-cyan-950/70 border border-cyan-500/50 text-cyan-200 hover:bg-cyan-900/80 transition-all">Легко [4]</button>
+          </div>
+        `;
+      }
+    }
+
+    function updateBadges() {
+      const hBadge = document.getElementById('header-opt-badge');
+      const cBadge = document.getElementById('card-opt-badge');
+
+      const hNames = {
+        1: 'Вариант 1 (Дзен-спринт)',
+        2: 'Вариант 2 (Чистые карточки)',
+        3: 'Вариант 3 (В стиле конспектов)',
+        4: 'Вариант 4 (Ультра-компакт)'
+      };
+      const cNames = {
+        'A': 'Вариант A (Сплит-капсула)',
+        'B': 'Вариант B (Дзен-круги)',
+        'C': 'Вариант C (Текстовые пилюли)',
+        'D': 'Вариант D (Парящие эмодзи)'
+      };
+
+      hBadge.textContent = hNames[currentHeaderOption];
+      cBadge.textContent = cNames[currentCardOption];
+    }
+
+    function setHeaderOption(opt) {
+      currentHeaderOption = opt;
+      for(let i = 1; i <= 4; i++) {
+        const btn = document.getElementById(`btn-hdr-${i}`);
+        if(i === opt) {
+          btn.className = 'p-1.5 rounded-lg text-left transition-all bg-emerald-500/15 border border-emerald-500/40 text-emerald-200';
+        } else {
+          btn.className = 'p-1.5 rounded-lg text-left transition-all bg-white/5 border border-white/10 text-slate-400 hover:text-white';
+        }
+      }
+      renderAll();
+    }
+
+    function setCardOption(opt) {
+      currentCardOption = opt;
+      ['a', 'b', 'c', 'd'].forEach(k => {
+        const btn = document.getElementById(`btn-crd-${k}`);
+        if(k.toUpperCase() === opt) {
+          btn.className = 'p-1.5 rounded-lg text-left transition-all bg-emerald-500/15 border border-emerald-500/40 text-emerald-200';
+        } else {
+          btn.className = 'p-1.5 rounded-lg text-left transition-all bg-white/5 border border-white/10 text-slate-400 hover:text-white';
+        }
+      });
+      renderAll();
+    }
+
+    function setCardFace(face) {
+      currentFace = face;
+      const bFront = document.getElementById('btn-face-front');
+      const bBack = document.getElementById('btn-face-back');
+      if(face === 'front') {
+        bFront.className = 'px-2.5 py-1 rounded-md font-semibold transition-all bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+        bBack.className = 'px-2.5 py-1 rounded-md font-medium text-slate-400 hover:text-white transition-all';
+      } else {
+        bBack.className = 'px-2.5 py-1 rounded-md font-semibold transition-all bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+        bFront.className = 'px-2.5 py-1 rounded-md font-medium text-slate-400 hover:text-white transition-all';
+      }
+      renderAll();
+    }
+
+    function setViewport(w) {
+      currentViewport = w;
+      const frame = document.getElementById('device-frame');
+      frame.style.maxWidth = w;
+      const btnM = document.getElementById('btn-vp-390');
+      const btnD = document.getElementById('btn-vp-680');
+      if(w === '390px') {
+        frame.classList.add('is-mobile');
+        btnM.className = 'px-2.5 py-1 rounded-md font-semibold transition-all bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+        btnD.className = 'px-2.5 py-1 rounded-md font-medium text-slate-400 hover:text-white transition-all';
+      } else {
+        frame.classList.remove('is-mobile');
+        btnD.className = 'px-2.5 py-1 rounded-md font-semibold transition-all bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+        btnM.className = 'px-2.5 py-1 rounded-md font-medium text-slate-400 hover:text-white transition-all';
+      }
+      renderAll();
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      document.getElementById('theme-icon').innerText = isDark ? '☀️' : '🌙';
+      document.getElementById('theme-text').innerText = isDark ? 'Шёлк' : 'Обсидиан';
+    }
+
+    function toggleRescue() {
+      isRescueOpen = !isRescueOpen;
+      renderAll();
+    }
+
+    function toggleSpacingsRuler() {
+      isRulerVisible = !isRulerVisible;
+      const frame = document.getElementById('device-frame');
+      const btn = document.getElementById('btn-toggle-ruler');
+      const txt = document.getElementById('ruler-text');
+      if(isRulerVisible) {
+        frame.classList.add('show-spacings');
+        btn.className = 'px-2.5 py-1 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/40 font-semibold transition-all text-sky-300 flex items-center gap-1.5 shadow-[0_0_10px_rgba(56,189,248,0.2)]';
+        txt.textContent = 'Скрыть линейку 8pt';
+      } else {
+        frame.classList.remove('show-spacings');
+        btn.className = 'px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 font-medium transition-all text-slate-300 flex items-center gap-1.5';
+        txt.textContent = 'Линейка 8pt';
+      }
+    }
+
+    renderAll();
+  </script>
+</body>
+</html>
