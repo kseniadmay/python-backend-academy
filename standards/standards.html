@@ -29130,27 +29130,63 @@ body.light-theme .srs-card-theory-anchor:hover svg {
     color: #334155 !important;
   }
 
-  /* Хлебные крошки конспекта SRS: строго единый изумрудный цвет и гармоничный UI-шрифт Onest */
-  .srs-breadcrumb-track,
-  .srs-breadcrumb-topic,
+  /* Хлебные крошки конспекта SRS: строго выверенная компактная строка без раздутых плашек */
+  .srs-note-breadcrumbs {
+    display: inline-flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 0 !important;
+    margin: 0 0 8px 0 !important;
+    padding: 0 !important;
+    font-family: var(--font-d, 'Onest', sans-serif) !important;
+    font-size: 0.78rem !important;
+    line-height: 1.35 !important;
+  }
+  .srs-note-breadcrumbs span {
+    padding: 0 !important;
+    margin: 0 !important;
+    line-height: 1.35 !important;
+    white-space: normal !important;
+  }
+  .srs-breadcrumb-track {
+    color: var(--ink-muted, #94a3b8) !important;
+    font-weight: 600 !important;
+    font-size: 0.78rem !important;
+    display: inline !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .srs-breadcrumb-topic {
+    color: var(--ink-soft, #cbd5e1) !important;
+    font-weight: 600 !important;
+    font-size: 0.78rem !important;
+    display: inline !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
   .srs-breadcrumb-skill {
     color: #10b981 !important;
     font-weight: 700 !important;
-    font-size: 0.80rem !important;
-    font-family: var(--font-d, 'Onest', sans-serif) !important;
-    letter-spacing: -0.01em !important;
-    word-spacing: normal !important;
-    line-height: 1.4 !important;
+    font-size: 0.78rem !important;
+    display: inline !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
   .srs-breadcrumb-sep {
-    color: rgba(255, 255, 255, 0.25) !important;
+    color: rgba(255, 255, 255, 0.22) !important;
     font-size: 0.72rem !important;
-    margin: 0 4px !important;
+    margin: 0 6px !important;
+    display: inline !important;
+    user-select: none !important;
     font-weight: 400 !important;
-    font-family: var(--font-d, 'Onest', sans-serif) !important;
+    padding: 0 !important;
   }
-  [data-theme="light"] .srs-breadcrumb-track,
-  [data-theme="light"] .srs-breadcrumb-topic,
+  [data-theme="light"] .srs-breadcrumb-track {
+    color: #64748b !important;
+  }
+  [data-theme="light"] .srs-breadcrumb-topic {
+    color: #334155 !important;
+  }
   [data-theme="light"] .srs-breadcrumb-skill {
     color: #059669 !important;
   }
@@ -29167,7 +29203,7 @@ body.light-theme .srs-card-theory-anchor:hover svg {
   .feed-chunk h4 {
     font-size: 1.05rem !important;
     font-weight: 700 !important;
-    color: #34d399 !important;
+    color: var(--ink-soft, #cbd5e1) !important;
     margin: 18px 0 10px 0 !important;
     line-height: 1.36 !important;
     text-align: left !important;
@@ -29550,12 +29586,11 @@ body.light-theme .srs-card-theory-anchor:hover svg {
     }
 
     .srs-notes-container .srs-top-right-group {
-      display: flex !important;
+      display: inline-flex !important;
       align-items: center !important;
       justify-content: flex-end !important;
       gap: 8px !important;
-      width: 100% !important;
-      order: 1 !important;
+      width: auto !important;
       flex-shrink: 0 !important;
     }
     .srs-notes-container .srs-top-right-group:empty {
@@ -31384,22 +31419,14 @@ body.light-theme .srs-card-theory-anchor:hover svg {
   /* Смысловые подзаголовки внутри конспекта: сочный изумрудный акцент и строгая иерархия */
 
   .note-canvas-body h3,
-
   .note-canvas-body h4,
-
   .lesson-theory h3,
-
   .lesson-theory h4,
-
   .feed-chunk h3,
-
   .feed-chunk h4 {
-
     font-size: 1.02rem !important;
-
     font-weight: 700 !important;
-
-    color: #34d399 !important;
+    color: var(--ink-soft, #cbd5e1) !important;
 
     margin: 16px 0 8px 0 !important;
 
@@ -31446,8 +31473,7 @@ body.light-theme .srs-card-theory-anchor:hover svg {
   html:not([data-theme="dark"]) .feed-chunk h3,
 
   html:not([data-theme="dark"]) .feed-chunk h4 {
-
-    color: #059669 !important;
+    color: var(--ink-soft, #334155) !important;
 
   }
 
@@ -46791,117 +46817,9 @@ function splitLongCodeSnippets(rawCode) {
   return [rawCode];
 }
 
-// Квантование длинных абзацев (>350 знаков / >3 предложений) на аккуратные микро-порции
+// Подача абзацев конспекта: каждый абзац является шагом независимо от его длины
 function splitLongParagraphs(pInnerHtml) {
-  const plain = String(pInnerHtml || '').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
-  if (plain.length <= 350) return [pInnerHtml];
-
-  const placeholders = [];
-  let masked = String(pInnerHtml || '').replace(/<code\b[^>]*>[\s\S]*?<\/code>/gi, m => {
-    placeholders.push(m);
-    return `___PLH_${placeholders.length - 1}___`;
-  });
-  masked = masked.replace(/<strong\b[^>]*>[\s\S]*?<\/strong>/gi, m => {
-    placeholders.push(m);
-    return `___PLH_${placeholders.length - 1}___`;
-  });
-  masked = masked.replace(/<em\b[^>]*>[\s\S]*?<\/em>/gi, m => {
-    placeholders.push(m);
-    return `___PLH_${placeholders.length - 1}___`;
-  });
-  masked = masked.replace(/\b(?:т\.\s*е|т\.\s*д|т\.\s*п|и\s+др|и\s+пр|см|гл|стр|рис|e\.g|i\.e|etc|vs)\./gi, m => {
-    placeholders.push(m);
-    return `___PLH_${placeholders.length - 1}___`;
-  });
-  masked = masked.replace(/\b\d+(?:\.\d+)+\b/g, m => {
-    placeholders.push(m);
-    return `___PLH_${placeholders.length - 1}___`;
-  });
-  masked = masked.replace(/\b[A-Za-z0-9_-]+\.(?:py|js|ts|json|html|css|md|yml|yaml|sql|env|txt|csv|db|log|sh)\b/gi, m => {
-    placeholders.push(m);
-    return `___PLH_${placeholders.length - 1}___`;
-  });
-
-  function estimatePlainLen(maskedStr) {
-    return maskedStr.replace(/___PLH_(\d+)___/g, (_, idx) =>
-      String(placeholders[Number(idx)] || '').replace(/<[^>]+>/g, '')
-    ).length;
-  }
-
-  const parts = [];
-  let lastIdx = 0;
-  const sentenceRe = /([.!?](?:[»"')]+)?)\s+(?=[A-ZА-ЯЁa-zа-яё0-9«"'(]|___PLH_)/g;
-  let m;
-
-  let currentChunk = '';
-  while ((m = sentenceRe.exec(masked)) !== null) {
-    const endPos = m.index + m[1].length;
-    const sent = masked.slice(lastIdx, endPos).trim();
-    lastIdx = m.index + m[0].length;
-
-    if (!currentChunk) {
-      currentChunk = sent;
-    } else {
-      const combined = currentChunk + ' ' + sent;
-      if (estimatePlainLen(combined) > 220) {
-        parts.push(currentChunk);
-        currentChunk = sent;
-      } else {
-        currentChunk = combined;
-      }
-    }
-  }
-
-  const tail = masked.slice(lastIdx).trim();
-  if (tail) {
-    if (currentChunk && estimatePlainLen(currentChunk + ' ' + tail) <= 250) {
-      parts.push(currentChunk + ' ' + tail);
-    } else {
-      if (currentChunk) parts.push(currentChunk);
-      parts.push(tail);
-    }
-  } else if (currentChunk) {
-    parts.push(currentChunk);
-  }
-
-  // Fallback разбиения очень длинных предложений (>350 симв.) по точке с запятой / тире
-  const refinedParts = [];
-  for (const part of parts) {
-    if (estimatePlainLen(part) <= 350) {
-      refinedParts.push(part);
-      continue;
-    }
-    const clauses = part.split(/(?<=;)\s+|(?=\s+—\s+)/);
-    if (clauses.length <= 1) {
-      refinedParts.push(part);
-      continue;
-    }
-    let acc = '';
-    for (const cl of clauses) {
-      const cTrim = cl.trim();
-      if (!cTrim) continue;
-      if (!acc) {
-        acc = cTrim;
-      } else if (estimatePlainLen(acc + ' ' + cTrim) <= 320) {
-        acc = acc + ' ' + cTrim;
-      } else {
-        refinedParts.push(acc);
-        acc = cTrim;
-      }
-    }
-    if (acc) refinedParts.push(acc);
-  }
-
-  const finalParts = refinedParts.length > 0 ? refinedParts : parts;
-  if (finalParts.length === 0) return [pInnerHtml];
-
-  return finalParts.map(part => {
-    let unmasked = part;
-    for (let i = placeholders.length - 1; i >= 0; i--) {
-      unmasked = unmasked.replace(`___PLH_${i}___`, placeholders[i]);
-    }
-    return unmasked;
-  });
+  return [pInnerHtml];
 }
 
 // Helper to decorate <pre><code> blocks with console output footer and syntax highlighting
@@ -47185,21 +47103,8 @@ function splitStepHtmlIntoChunks(htmlStr, stepTitle){
 
   const rawFilteredBlocks = rawBlocks.filter(b => b.trim().length > 0);
 
-  // Active Microlearning: авто-сплит плотных параграфов <p> (>260 знаков / >=2 предложений)
-  const filteredBlocks = [];
-  for(const blk of rawFilteredBlocks){
-    const pMatch = blk.match(/^<p\b[^>]*>([\s\S]*?)<\/p>$/i);
-    if(pMatch && typeof splitLongParagraphs === 'function'){
-      const innerP = pMatch[1];
-      const plain = innerP.replace(/<[^>]+>/g, '').trim();
-      if(plain.length > 260){
-        const subP = splitLongParagraphs(innerP);
-        subP.forEach(sp => filteredBlocks.push(`<p>${sp}</p>`));
-        continue;
-      }
-    }
-    filteredBlocks.push(blk);
-  }
+  // Подача абзацев: каждый абзац конспекта является шагом независимо от его длины
+  const filteredBlocks = rawFilteredBlocks;
 
   function isHeadingBlock(b){
     if(/^<h[1-6]\b/i.test(b)) return true;
@@ -48943,7 +48848,7 @@ function viewPythonSkill(sid){
         const dTitleHtml = (typeof formatRichInlineText === 'function') ? formatRichInlineText(dTitle) : escapeHtmlStr(dTitle);
         const dBodyHtml = (typeof decorateCodeBlocksWithRunBtn === 'function') ? decorateCodeBlocksWithRunBtn(st.html || '') : (st.html || '');
         return `<div style="margin-bottom:14px;">
-          <h4 style="font-size:0.95rem;font-weight:700;color:#34d399;margin:0 0 6px;">${dTitleHtml}</h4>
+          <h4 style="font-size:0.95rem;font-weight:700;color:var(--ink-soft, #cbd5e1);margin:0 0 6px;">${dTitleHtml}</h4>
           <div>${dBodyHtml}</div>
         </div>`;
       }).join('');
@@ -50960,14 +50865,22 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
   const baseHeat = Math.max(0, Math.min(100, Number(cdData.pct) || 0));
 
   let currentHeatPct = baseHeat;
-  if(!isNotes){
+  if(isNotes){
+    const notesDoneToday = daily ? (daily.notesDoneToday || 0) : 0;
+    const notesDueRemaining = (typeof dueNotesCount === 'number') ? dueNotesCount : (daily ? (daily.notesDueRemaining || 0) : 0);
+    const totalNotesToday = notesDoneToday + notesDueRemaining;
+    const nTotal = noteProgress ? (noteProgress.total || 1) : Math.max(1, totalNotesToday);
+    const nCur = noteProgress ? Math.min(nTotal, (noteProgress.current || 0) + 1) : 1;
+    const sessionRatio = (totalNotesToday > 0) ? Math.min(1, Math.max(0, notesDoneToday / totalNotesToday)) : Math.min(1, Math.max(0, (nCur - 1) / nTotal));
+    currentHeatPct = (sessionRatio >= 1) ? 100 : Math.max(12, Math.round(baseHeat > 0 ? (baseHeat + (100 - baseHeat) * sessionRatio) : Math.round(sessionRatio * 100 || (nCur / nTotal) * 100)));
+  } else {
     const cardsDoneToday = daily ? (daily.cardsDoneToday || 0) : 0;
     const cardsDueRemaining = (typeof dueCardsCount === 'number') ? dueCardsCount : (daily ? (daily.cardsDueRemaining || 0) : 0);
     const totalToday = cardsDoneToday + cardsDueRemaining;
     const sessionRatio = (totalToday > 0) ? Math.min(1, Math.max(0, cardsDoneToday / totalToday)) : 1;
     currentHeatPct = (sessionRatio >= 1) ? 100 : Math.round(baseHeat + (100 - baseHeat) * sessionRatio);
   }
-  const progressFillWidth = currentHeatPct;
+  const progressFillWidth = Math.max(8, Math.min(100, currentHeatPct));
   const thermo = (typeof getThermodynamicProgressStyle === 'function')
     ? getThermodynamicProgressStyle(currentHeatPct)
     : { bg: 'linear-gradient(90deg, #be123c 0%, #ffffff 100%)', glow: '0 0 12px rgba(255,255,255,0.7)', boxShadow: '0 0 8px #ffffff', title: `Накал памяти: ${currentHeatPct}%` };
@@ -51033,13 +50946,11 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
 
 
-  // Шкала отображается только при progressFillWidth > 0 и не форсированном конспекте из карточки; при 0% подложка и паз полностью скрыты
+  // Фиксированная температурная шкала прогресса SRS: всегда отображается (кроме форсированных) с достаточным воздухом
 
-  const trackHTML = (!isForcedNote && progressFillWidth > 0) ? `
+  const trackHTML = (!isForcedNote) ? `
 
-      <!-- Фиксированная температурная шкала прогресса SRS с непрерывным накалом и белым калением на финише -->
-
-      <div class="srs-header-progress-track" style="position:absolute;bottom:-10px;left:0;right:0;height:3.5px;background:rgba(255,255,255,0.06);border:none;border-radius:99px;overflow:visible;pointer-events:auto;box-shadow:none;container-type:inline-size;" title="${progressFillTitle}">
+      <div class="srs-header-progress-track" style="position:absolute;bottom:-13px;left:0;right:0;height:3.5px;background:rgba(255,255,255,0.06);border:none;border-radius:99px;overflow:visible;pointer-events:auto;box-shadow:none;container-type:inline-size;" title="${progressFillTitle}">
 
         <div class="srs-header-progress-glow" style="position:absolute;top:0;left:0;height:100%;width:${progressFillWidth}%;background:${thermo.bg};background-size:100% 100%;background-position:left top;border-radius:99px;filter:blur(5px);box-shadow:${thermo.glow};opacity:0.85;pointer-events:none;"></div>
 
@@ -51053,35 +50964,33 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
   return `
 
-    <header class="srs-unified-header-bar" style="position:relative;display:flex;justify-content:space-between;align-items:center;height:36px;min-height:36px;gap:12px;margin-bottom:${isNotes ? '22px' : '26px'};padding:0 2px;background:transparent;border:none;box-shadow:none;box-sizing:border-box;">
+    <header class="srs-unified-header-bar" style="position:relative;display:flex;justify-content:space-between;align-items:center;height:28px;min-height:28px;gap:8px;margin-bottom:28px;padding:0 2px;background:transparent;border:none;box-shadow:none;box-sizing:border-box;">
 
-      <div style="min-width:0;flex-shrink:0;display:flex;align-items:center;height:36px;">
+      <div style="min-width:0;flex-shrink:0;display:flex;align-items:center;height:28px;">
 
-        <span class="srs-header-mode-title" style="display:inline-flex;align-items:center;gap:7px;font-size:0.78rem;font-weight:700;color:var(--ink-soft);letter-spacing:0.02em;box-sizing:border-box;"><span class="srs-live-status-dot"></span>${activeTab === 'notes' ? 'Конспекты SRS' : 'Карточки SRS'}</span>
+        <span class="srs-header-mode-title" style="display:inline-flex;align-items:center;gap:7px;height:28px;line-height:28px;font-size:0.78rem;font-weight:700;color:var(--ink-soft);letter-spacing:0.02em;box-sizing:border-box;"><span class="srs-live-status-dot"></span>${activeTab === 'notes' ? 'Конспекты SRS' : 'Карточки SRS'}</span>
 
       </div>
 
 
 
-      <div class="srs-header-right-cluster" style="display:flex;align-items:center;gap:6px;height:36px;flex-shrink:0;">
+      <div class="srs-header-right-cluster" style="display:flex;align-items:center;gap:6px;height:28px;flex-shrink:0;">
 
         ${isNotes ? `
           ${!isForcedNote ? `
           ${(noteProgress && typeof noteProgress.total === 'number' && noteProgress.total > 0) ? `
-          <div class="zen-counter-3a" style="font-family:var(--font-m);font-size:0.82rem;display:inline-flex;align-items:center;gap:3px;line-height:1;height:24px;" title="${goalTitle}">
+          <div class="zen-counter-3a" style="font-family:var(--font-m);font-size:0.80rem;display:inline-flex;align-items:center;justify-content:center;gap:3px;height:28px;min-height:28px;line-height:28px;padding:0 8px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);box-sizing:border-box;" title="${goalTitle}">
             <span class="zen-counter-cur" style="color:var(--ink);font-weight:800;">${noteStep}</span>
             <span class="zen-counter-sep" style="color:var(--ink-muted);opacity:0.35;font-size:0.74rem;margin:0 1px;">/</span>
             <span class="zen-counter-tot" style="color:var(--ink-muted);font-weight:600;font-size:0.78rem;">${noteTotal}</span>
           </div>
-          ${(noteProgress && noteProgress.intervalDays) ? `<span class="zen-amber-chip" style="display:inline-flex;align-items:center;justify-content:center;height:22px;padding:0 7px;border-radius:6px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);color:#fbbf24;font-family:var(--font-m);font-size:0.70rem;font-weight:700;line-height:1;box-shadow:0 0 8px rgba(245,158,11,0.15);box-sizing:border-box;" title="График повторений: ${noteProgress.intervalDays}д">${noteProgress.intervalDays}д</span>` : ''}
-          <div style="display:inline-flex;align-items:center;gap:4px;">
-            <button type="button" class="btn btn-ghost note-util-btn zen-vector-btn ${(noteProgress && noteProgress.isFullMode) ? 'is-active' : ''}" data-srs-note-toggle-full style="width:28px;height:28px;min-width:28px;min-height:28px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:${(noteProgress && noteProgress.isFullMode) ? '#34d399' : 'var(--ink-muted)'};padding:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;transition:all .18s cubic-bezier(0.16,1,0.3,1);" title="${(noteProgress && noteProgress.isFullMode) ? 'Свернуть в пошаговый режим' : 'Развернуть весь конспект'}">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-            </button>
-            <a href="${isForcedNote ? '#/cards' : '#/path'}" class="srs-header-close-btn zen-vector-btn" ${isForcedNote ? 'data-srs-exit-force-note' : ''} style="width:28px;height:28px;min-width:28px;min-height:28px;padding:0;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;text-decoration:none;box-sizing:border-box;transition:all .18s cubic-bezier(0.16,1,0.3,1);" title="${isForcedNote ? 'Вернуться к текущей карточке' : 'Закрыть (На Путь)'}">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </a>
-          </div>
+          ${(noteProgress && noteProgress.intervalDays) ? `<span class="zen-amber-chip" style="display:inline-flex;align-items:center;justify-content:center;height:28px;min-height:28px;line-height:28px;padding:0 8px;border-radius:8px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.28);color:#fbbf24;font-family:var(--font-m);font-size:0.72rem;font-weight:700;box-sizing:border-box;box-shadow:0 0 8px rgba(245,158,11,0.15);" title="График повторений: ${noteProgress.intervalDays}д">${noteProgress.intervalDays}д</span>` : ''}
+          <button type="button" class="btn btn-ghost note-util-btn zen-vector-btn ${(noteProgress && noteProgress.isFullMode) ? 'is-active' : ''}" data-srs-note-toggle-full style="width:28px;height:28px;min-width:28px;min-height:28px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:${(noteProgress && noteProgress.isFullMode) ? '#10b981' : 'var(--ink-muted)'};padding:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;transition:all .18s cubic-bezier(0.16,1,0.3,1);" title="${(noteProgress && noteProgress.isFullMode) ? 'Свернуть в пошаговый режим' : 'Развернуть весь конспект'}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+          </button>
+          <a href="${isForcedNote ? '#/cards' : '#/path'}" class="srs-header-close-btn zen-vector-btn" ${isForcedNote ? 'data-srs-exit-force-note' : ''} style="width:28px;height:28px;min-width:28px;min-height:28px;padding:0;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;text-decoration:none;box-sizing:border-box;transition:all .18s cubic-bezier(0.16,1,0.3,1);" title="${isForcedNote ? 'Вернуться к текущей карточке' : 'Закрыть (На Путь)'}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </a>
           ` : `
           <a href="${isForcedNote ? '#/cards' : '#/path'}" class="srs-header-close-btn zen-vector-btn" ${isForcedNote ? 'data-srs-exit-force-note' : ''} style="width:28px;height:28px;min-width:28px;min-height:28px;padding:0;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;text-decoration:none;box-sizing:border-box;transition:all .18s cubic-bezier(0.16,1,0.3,1);" title="${isForcedNote ? 'Вернуться к текущей карточке' : 'Закрыть (На Путь)'}">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -59532,33 +59441,23 @@ function viewNotesSrsHub(noteSrsStats){
 
         <!-- Верхняя строка: лаконичный слэш-путь (🛡️ Эшелон / Урок / Навык) слева, компактный интервал и кнопка возврата справа -->
 
-        <div class="fc-top-row srs-note-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:0;border-bottom:none;flex-wrap:wrap;width:100%;">
+        <div class="srs-note-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:0;border-bottom:none;width:100%;box-sizing:border-box;">
 
-          <div class="fc-badge-group srs-note-breadcrumbs" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px 6px;min-width:0;flex:1 1 auto;font-family:var(--font-d, 'Onest', sans-serif);font-size:0.80rem;line-height:1.4;">
-
-            <span class="srs-breadcrumb-item" style="display:inline-flex;align-items:center;gap:4px;flex-shrink:0;">
-              <span class="srs-breadcrumb-track" style="color:#10b981;font-weight:700;font-size:0.80rem;letter-spacing:-0.01em;">${escapeHtmlStr(echelonLabel)}</span>
-              <span class="srs-breadcrumb-sep" style="color:rgba(255,255,255,0.25);font-size:0.72rem;margin:0 3px;">/</span>
-            </span>
-
-            <span class="srs-breadcrumb-item" style="display:inline-flex;align-items:center;gap:4px;flex-shrink:0;">
-              <span class="srs-breadcrumb-topic" style="color:#10b981;font-weight:700;font-size:0.80rem;letter-spacing:-0.01em;">${escapeHtmlStr(displayLessonTitle)}</span>
-              <span class="srs-breadcrumb-sep" style="color:rgba(255,255,255,0.25);font-size:0.72rem;margin:0 3px;">/</span>
-            </span>
-
-            <span class="srs-breadcrumb-item" style="display:inline-flex;align-items:center;min-width:0;flex-shrink:1;">
-              <span class="srs-breadcrumb-skill" style="color:#10b981;font-weight:700;letter-spacing:-0.01em;font-size:0.80rem;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtmlStr(skillBreadcrumbTitle)}">${escapeHtmlStr(skillBreadcrumbTitle)}</span>
-            </span>
-
-          </div>
+          <nav class="srs-note-breadcrumbs" aria-label="Путь конспекта" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;min-width:0;flex:1 1 auto;font-family:var(--font-d, 'Onest', sans-serif);font-size:0.78rem;line-height:1.35;margin:0;padding:0;">
+            <span class="srs-breadcrumb-track" style="color:var(--ink-muted, #94a3b8);font-weight:600;font-size:0.78rem;">${escapeHtmlStr(echelonLabel)}</span>
+            <span class="srs-breadcrumb-sep" style="color:rgba(255,255,255,0.22);font-size:0.72rem;margin:0 6px;user-select:none;">/</span>
+            <span class="srs-breadcrumb-topic" style="color:var(--ink-soft, #cbd5e1);font-weight:600;font-size:0.78rem;">${escapeHtmlStr(displayLessonTitle)}</span>
+            <span class="srs-breadcrumb-sep" style="color:rgba(255,255,255,0.22);font-size:0.72rem;margin:0 6px;user-select:none;">/</span>
+            <span class="srs-breadcrumb-skill" style="color:#10b981;font-weight:700;font-size:0.78rem;" title="${escapeHtmlStr(skillBreadcrumbTitle)}">${escapeHtmlStr(skillBreadcrumbTitle)}</span>
+          </nav>
 
 
 
+          ${forcedId ? `
           <div class="srs-top-right-group" style="display:inline-flex;align-items:center;gap:8px;flex-shrink:0;">
-            ${forcedId ? `
-              <button type="button" class="btn btn-ghost srs-return-to-card-btn" data-srs-exit-force-note style="display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10px;border-radius:8px;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.35);color:#34d399;font-size:0.74rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s ease;" title="Вернуться к текущей карточке">← К карточке</button>
-            ` : ''}
+            <button type="button" class="btn btn-ghost srs-return-to-card-btn" data-srs-exit-force-note style="display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 9px;border-radius:8px;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.35);color:#34d399;font-size:0.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s ease;" title="Вернуться к текущей карточке">← К карточке</button>
           </div>
+        ` : ''}
 
         </div>
 
@@ -59608,7 +59507,7 @@ function viewNotesSrsHub(noteSrsStats){
 
                 <div style="margin-bottom:18px;padding-bottom:14px;${i < steps.length - 1 ? 'border-bottom:1px dashed rgba(255,255,255,0.08);' : ''}">
 
-                  ${sTitle ? `<h4 style="font-size:1.06rem;font-weight:700;color:#34d399;margin:0 0 10px;line-height:1.35;">${(typeof formatRichInlineText === 'function' ? formatRichInlineText(sTitle.replace(/^[✦✧★\s]+/g, '').replace(/[✦✧★]/g, '').trim()) : escapeHtmlStr(sTitle.replace(/^[✦✧★\s]+/g, '').replace(/[✦✧★]/g, '').trim()))}</h4>` : ''}
+                  ${sTitle ? `<h4 style="font-size:1.05rem;font-weight:700;color:var(--ink-soft, #cbd5e1);margin:0 0 10px;line-height:1.35;">${(typeof formatRichInlineText === 'function' ? formatRichInlineText(sTitle.replace(/^[✦✧★\s]+/g, '').replace(/[✦✧★]/g, '').trim()) : escapeHtmlStr(sTitle.replace(/^[✦✧★\s]+/g, '').replace(/[✦✧★]/g, '').trim()))}</h4>` : ''}
 
                   <div class="lesson-theory" style="font-size:0.94rem;line-height:1.7;">${sHtml}</div>
 
