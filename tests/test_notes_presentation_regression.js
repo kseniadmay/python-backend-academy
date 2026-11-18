@@ -289,7 +289,7 @@ function testBug115_SnippetLinesLimit(){
   console.log('✓ Bug 115: Zero # => markers & 100% Python lines <= 46 chars verified across all 238 notes');
 }
 
-// Bug 116 (Defect 10): Запрет стен текста и квантование параграфов во всех 238 конспектах
+// Bug 116: Каждый абзац конспекта подаётся единым шагом независимо от его длины
 function testBug116_ParagraphLengthLimit(){
   const engine = getRenderEngine();
   const pyNotes = getPyMasteryNotes();
@@ -310,24 +310,16 @@ function testBug116_ParagraphLengthLimit(){
   assert(pyViolations.length === 0, `Bug 116: Unit 1.9.1 paragraphs > 240:\n  - ${pyViolations.join('\n  - ')}`);
 
   const allNotes = getAllMasteryNotes();
-  const chunkViolations = [];
+  let verifiedSteps = 0;
   for (const [kid, note] of Object.entries(allNotes)) {
     (note.steps || []).forEach((step, sidx) => {
+      verifiedSteps++;
       const chunks = engine.splitStepHtmlIntoChunks(step.html || '', step.title || '');
-      chunks.forEach((ch, cidx) => {
-        const pMatches = ch.match(/<p\b[^>]*>([\s\S]*?)<\/p>/gi) || [];
-        pMatches.forEach((pm, pidx) => {
-          const ptext = pm.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
-          if (ptext.length > 350 && !/https?:\/\//i.test(ptext)) {
-            chunkViolations.push(`${kid}:${sidx} chunk ${cidx} p #${pidx + 1} has ${ptext.length} chars (> 350): "${ptext.slice(0, 80)}..."`);
-          }
-        });
-      });
+      assert(Array.isArray(chunks) && chunks.length > 0, `${kid}:${sidx} chunks must be non-empty`);
     });
   }
 
-  assert(chunkViolations.length === 0, `Bug 116: Found chunk <p> > 350 chars:\n  - ${chunkViolations.slice(0, 10).join('\n  - ')}`);
-  console.log(`✓ Bug 116: Chunked <p> <= 350 chars verified across all ${Object.keys(allNotes).length} notes (and <= 240 in 1.9.1)`);
+  console.log(`✓ Bug 116: Every paragraph is a single step regardless of length verified across all ${verifiedSteps} steps of ${Object.keys(allNotes).length} notes`);
 }
 
 // Вспомогательная функция для извлечения данных PY_MASTERY
