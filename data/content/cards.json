@@ -87,7 +87,7 @@
     "cards": [
       {
         "q": "Даны последовательности <code>main_seq = (1, 2, 3, 4, 5)</code> и <code>subset = (2, 3)</code>. Как проверить, что все элементы <code>subset</code> входят в <code>main_seq</code>, через <code>all()</code>?",
-        "a": "<div style=\"line-height:1.55;color:#f1f5f9;margin-bottom:10px;\">Возвращает <code>True</code>, если все элементы истинны (и для пустой коллекции). Работает по принципу <code>short-circuit</code> — мгновенно останавливает обход на первом же <code>False</code>.</div><div class=\"fc-code-box\" style=\"display:block !important;background:rgba(5, 15, 22, 0.75) !important;border:1px solid rgba(16, 185, 129, 0.32) !important;box-shadow:inset 0 2px 6px rgba(0, 0, 0, 0.45) !important;border-radius:12px !important;padding:12px 16px !important;margin-top:10px !important;font-family:var(--font-m, monospace) !important;font-size:0.92rem !important;line-height:1.6 !important;text-align:left !important;color:#f8fafc !important;\"><div><span class=\"code-fn\">all(x &gt; 0 for x in [1, 2, 3])</span>  <span class=\"code-comment\"># ➔</span> <span class=\"code-bool-t\">True</span>  <span class=\"code-comment\">(лениво, O(1) памяти)</span></div><div><span class=\"code-fn\">all</span>([<span class=\"code-bool-t\">True</span>, <span class=\"code-bool-f\">False</span>, <span class=\"code-bool-t\">True</span>])        <span class=\"code-comment\"># ➔</span> <span class=\"code-bool-f\">False</span> <span class=\"code-comment\">(стоп на 2-м элементе)</span></div></div>"
+        "a": "<code>all(x in main_seq for x in subset)</code> — генераторное выражение лениво обходит <code>subset</code>: при первом же элементе, отсутствующем в <code>main_seq</code>, функция <code>all()</code> мгновенно останавливает вычисление (<code>short-circuit</code>) и возвращает <code>False</code>. Если все элементы найдены — возвращает <code>True</code>."
       },
       {
         "q": "В чём разница между методом <code>set.issubset()</code> и оператором <code>&lt;=</code>?",
@@ -103,7 +103,7 @@
       },
       {
         "q": "Как работает встроенная функция <code>all()</code> в Python и как с её помощью проверить истинность списка условий?",
-        "a": "Возвращает <code>True</code>, если все элементы истинны (и для пустой коллекции). Работает по принципу <code>short-circuit</code> — мгновенно останавливает обход на первом же <code>False</code>.<!-- all(x > 0 for x in [1, 2, 3]) --&gt;<div class=\"fc-code-box\"><div><span class=\"code-fn\">all</span>(x &gt; 0 <span class=\"code-kw\">for</span> x <span class=\"code-kw\">in</span> [1, 2, 3])  <span class=\"code-comment\"># ➔</span> <span class=\"code-bool-t\">True</span>  <span class=\"code-comment\">(лениво, O(1) памяти)</span></div><div><span class=\"code-fn\">all</span>([<span class=\"code-bool-t\">True</span>, <span class=\"code-bool-f\">False</span>, <span class=\"code-bool-t\">True</span>])        <span class=\"code-comment\"># ➔</span> <span class=\"code-bool-f\">False</span> <span class=\"code-comment\">(стоп на 2-м элементе)</span></div></div>"
+        "a": "Возвращает <code>True</code>, если все элементы истинны (и для пустой коллекции). Работает по принципу <code>short-circuit</code> — мгновенно останавливает обход на первом же <code>False</code>.<div class=\"fc-code-box\" style=\"display:block !important;background:rgba(5, 15, 22, 0.75) !important;border:1px solid rgba(16, 185, 129, 0.32) !important;box-shadow:inset 0 2px 6px rgba(0, 0, 0, 0.45) !important;border-radius:12px !important;padding:12px 16px !important;margin-top:10px !important;font-family:var(--font-m, monospace) !important;font-size:0.92rem !important;line-height:1.6 !important;text-align:left !important;color:#f8fafc !important;\"><div><span class=\"code-fn\">all(x &gt; 0 for x in [1, 2, 3])</span>  <span class=\"code-comment\"># ➔</span> <span class=\"code-bool-t\">True</span>  <span class=\"code-comment\">(лениво, O(1) памяти)</span></div><div><span class=\"code-fn\">all</span>([<span class=\"code-bool-t\">True</span>, <span class=\"code-bool-f\">False</span>, <span class=\"code-bool-t\">True</span>])        <span class=\"code-comment\"># ➔</span> <span class=\"code-bool-f\">False</span> <span class=\"code-comment\">(стоп на 2-м элементе)</span></div></div>"
       },
       {
         "q": "Какую операцию нужно выполнить с кортежем перед <code>.issubset()</code>?",
@@ -1962,8 +1962,8 @@
         "a": "Аргумент <code>n</code> из внешней функции <code>make_multiplier</code>."
       },
       {
-        "q": "Какое значение вернёт вызов функции <code>f(10)</code>?\n\n```python\ndef make_multiplier(n):\n    def multiplier(x):\n        return x * n\n    return multiplier\n\nf = make_multiplier(2)\nf(10)\n```",
-        "a": "<div class=\"fc-code-capsule\"><code class=\"fc-code-primary\">20</code></div><div class=\"fc-answer-explanation\"><span class=\"fc-explanation-dash\">—</span> внутренняя функция <code>multiplier</code> сохраняет <code>n = 2</code> в объекте замыкания; при <code>f(10)</code> вычисляется <code>10 * 2</code>.</div>"
+        "q": "Какое значение вернёт вызов функции <code>f(10)</code> при фабрике <code>make_multiplier(2)</code>?",
+        "a": "<code>20</code> – внутренняя функция <code>multiplier</code> сохраняет <code>n = 2</code> в замыкании; при <code>f(10)</code> вычисляется <code>10 * 2</code>"
       },
       {
         "q": "Как исправить ловушку позднего связывания в цикле <code>[lambda: i for i in range(3)]</code>?",
@@ -1978,8 +1978,8 @@
         "a": "<code>2</code> — последнее значение после завершения цикла."
       },
       {
-        "q": "Какое числовое значение вернёт вызов <code>times3(5)</code> для замыкания-умножителя на 3?\n\n```python\ndef make_multiplier(n):\n    def multiplier(x):\n        return x * n\n    return multiplier\n\ntimes3 = make_multiplier(3)\ntimes3(5)\n```",
-        "a": "<div class=\"fc-code-capsule\"><code class=\"fc-code-primary\">15</code></div><div class=\"fc-answer-explanation\"><span class=\"fc-explanation-dash\">—</span> внутренняя функция <code>multiplier</code> сохраняет <code>n = 3</code> в объекте замыкания; при <code>times3(5)</code> вычисляется <code>5 * 3</code>.</div>"
+        "q": "Какое числовое значение вернёт вызов <code>times3(5)</code> для замыкания-умножителя на 3?",
+        "a": "<code>15</code> – внутренняя функция <code>multiplier</code> сохраняет <code>n = 3</code> в объекте замыкания; при <code>times3(5)</code> вычисляется <code>5 * 3</code>."
       },
       {
         "q": "Почему конструкция <code>lambda i=i: i</code> решает проблему позднего связывания в цикле?",
@@ -2049,7 +2049,7 @@
       },
       {
         "q": "Может ли тело <code>lambda</code>-функции содержать несколько инструкций, и как перенести длинную лямбду на несколько строк?",
-        "a": "Нет: тело <code>lambda</code> строго ограничено одним выражением; при необходимости длинное выражение переносят на несколько строк внутри круглых скобок <code>(...)</code>:<div class=\"fc-code-box\" style=\"margin-top:8px;padding:8px 12px;font-size:0.86rem;line-height:1.45;\"><span class=\"code-kw\">lambda</span> x: (<br>&nbsp;&nbsp;&nbsp;&nbsp;x * 2 <span class=\"code-kw\">if</span> x &gt; 0 <span class=\"code-kw\">else</span> 0<br>)</div>Однако по PEP 8 при такой сложности функцию следует объявлять через <code>def</code>."
+        "a": "Нет: тело <code>lambda</code> строго ограничено одним выражением; при необходимости длинное выражение переносят на несколько строк внутри круглых скобок <code>(...)</code>:<div class=\"fc-code-box\" style=\"margin-top:8px;padding:8px 12px;font-size:0.86rem;line-height:1.45;\">(<span class=\"code-kw\">lambda</span> x:<br>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;x * 2 <span class=\"code-kw\">if</span> x &amp;gt; 0 <span class=\"code-kw\">else</span> 0)</div>Однако по PEP 8 при такой сложности функцию следует объявлять через <code>def</code>."
       },
       {
         "q": "Что является приоритетом при выборе между <code>lambda</code> и <code>def</code>?",
@@ -3344,8 +3344,8 @@
         "a": "Атрибуты родительского класса не будут инициализированы; обращение к ним вызовет <code>AttributeError</code>."
       },
       {
-        "q": "Почему экземпляр <code>dog</code> имеет доступ к <code>self.name</code>, хотя оно не присваивается напрямую в <code>Dog.__init__</code>?\n\n```python\nclass Animal:\n    def __init__(self, name):\n        self.name = name\n\nclass Dog(Animal):\n    def __init__(self, name):\n        super().__init__(name)\n\ndog = Dog('Бобик')\ndog.name\n```",
-        "a": "<div class=\"fc-code-capsule\"><code class=\"fc-code-primary\">super().__init__(name)</code></div><div class=\"fc-answer-explanation\"><span class=\"fc-explanation-dash\">—</span> вызов <code>super().__init__(name)</code> делегирует инициализацию родительскому конструктору <code>Animal.__init__</code>, который и связывает атрибут <code>self.name</code> с текущим объектом.</div>"
+        "q": "Почему экземпляр <code>dog</code> имеет доступ к <code>self.name</code>, хотя оно не присваивается напрямую в <code>Dog.__init__</code>?",
+        "a": "<code>super().__init__(name)</code> делегирует инициализацию родительскому конструктору <code>Animal.__init__</code>, который и связывает атрибут <code>self.name</code> с текущим объектом"
       },
       {
         "q": "Может ли дочерний класс <code>Dog(Animal)</code> переопределить метод <code>speak</code> родителя?",
@@ -11111,7 +11111,7 @@
     "cards": [
       {
         "q": "Два главных преимущества массивов?",
-        "a": "Быстрый доступ по индексу <span class=\"math-formula\">O(1)</span> и хорошая локальность данных (cache-friendly)."
+        "a": "Быстрый доступ по индексу <span class=\"math-formula\">O(1)</span> и высокая локальность данных (элементы лежат в памяти вплотную, поэтому процессор загружает их в кэш пачкой за раз — cache-friendly)."
       },
       {
         "q": "Какова амортизированная временная сложность добавления элемента в конец динамического массива (<code>append</code>)?",
