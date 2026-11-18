@@ -42966,13 +42966,16 @@ function buildFcProgressHeaderHTML(total, currentIdx, getRatingOrItems, clickAtt
 
     let cls = 'dot-jewel';
 
+    const itemObj = Array.isArray(getRatingOrItems) ? getRatingOrItems[i] : null;
+    const isCardDone = (r > 0) || Boolean(itemObj && (itemObj.reviewed || itemObj.answered));
+
     if(i === curIdx){
 
       // Активная бусина: белое ядро с изумрудным свечением (Квантовый маяк)
 
       cls += ' active bead-active-leading';
 
-    } else if(i < curIdx){
+    } else if(isCardDone){
       // Пройденные карточки текущей сессии — все светятся изумрудно-зеленым независимо от ответа
       cls += ' done bead-done rating-easy';
     } else {
@@ -48251,7 +48254,7 @@ function viewPythonSkill(sid){
     const stepDots = [];
     for(let i = startStepIdx; i < endStepIdx; i++){
       let qCls = 'dock-quantum-bead';
-      const isStepCompleted = (i < curStepPos) || (state.completedNoteSteps && state.completedNoteSteps[`${activeK}:${i}`]);
+      const isStepCompleted = Boolean(state.completedNoteSteps && state.completedNoteSteps[`${activeK}:${i}`]);
       if(i === curStepPos) qCls += ' active';
       else if(isStepCompleted) qCls += ' done';
       else qCls += ' future';
@@ -49705,6 +49708,26 @@ const _savedDueQueue = (_isSameDay && Array.isArray(_initCardsPos.dueQueue) && _
 
   : [];
 
+const _initReviewedDue = (_isSameDay && _initCardsPos.reviewedDueIndices && typeof _initCardsPos.reviewedDueIndices === 'object')
+  ? Object.assign({}, _initCardsPos.reviewedDueIndices)
+  : {};
+
+if(_isSameDay && Object.keys(_initReviewedDue).length === 0 && typeof _initCardsPos.duePos === 'number' && _initCardsPos.duePos > 0){
+  for(let k = 0; k < _initCardsPos.duePos; k++){
+    _initReviewedDue[k] = true;
+  }
+}
+
+const _initReviewedCard = (_isSameDay && _initCardsPos.reviewedCardIndices && typeof _initCardsPos.reviewedCardIndices === 'object')
+  ? Object.assign({}, _initCardsPos.reviewedCardIndices)
+  : {};
+
+if(_isSameDay && Object.keys(_initReviewedCard).length === 0 && typeof _initCardsPos.cardIdx === 'number' && _initCardsPos.cardIdx > 0){
+  for(let k = 0; k < _initCardsPos.cardIdx; k++){
+    _initReviewedCard[k] = true;
+  }
+}
+
 let cardsHubState = {
 
   hubTab: _initCardsPos.hubTab === 'notes' ? 'notes' : 'cards',
@@ -49728,6 +49751,12 @@ let cardsHubState = {
   dueQueue: _savedDueQueue,
 
   duePos: (_savedDueQueue.length > 0 && !_initCardsPos.completed) ? 0 : (typeof _initCardsPos.duePos === 'number' ? _initCardsPos.duePos : 0),
+
+  reviewedDueIndices: _initReviewedDue,
+
+  reviewedCardIndices: _initReviewedCard,
+
+  reviewedNoteSteps: (_isSameDay && _initCardsPos.reviewedNoteSteps && typeof _initCardsPos.reviewedNoteSteps === 'object') ? Object.assign({}, _initCardsPos.reviewedNoteSteps) : {},
 
   notePos: typeof _initCardsPos.notePos === 'number' ? _initCardsPos.notePos : 0,
 
@@ -49776,6 +49805,12 @@ function saveCardsHubPosState(){
     dueMode: cardsHubState.dueMode !== false,
 
     duePos: isDone ? 0 : (cardsHubState.duePos || 0),
+
+    reviewedDueIndices: cardsHubState.reviewedDueIndices || {},
+
+    reviewedCardIndices: cardsHubState.reviewedCardIndices || {},
+
+    reviewedNoteSteps: cardsHubState.reviewedNoteSteps || {},
 
     dueQueue: (isDone || !Array.isArray(cardsHubState.dueQueue))
 
@@ -50096,7 +50131,12 @@ function formatCardAnswerHTML(rawAnswer){
   // разделяем по ';' на аккуратный структурированный список пунктов ТОЛЬКО если точка с запятой
   // не является частью HTML-сущности (&gt;, &lt;, &amp; и т.д.), не находится внутри кода и не внутри тегов HTML!
   if(s.includes(';') && !s.includes('```')){
-    const cleanForCheck = s.replace(/<[^>]+>/g, '').replace(/&[a-zA-Z0-9#]+;/g, '').replace(/`[^`\n]+`/g, '');
+    const cleanForCheck = s
+      .replace(/<code[\s\S]*?<\/code>/gi, '')
+      .replace(/<pre[\s\S]*?<\/pre>/gi, '')
+      .replace(/`[^`\n]+`/g, '')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&[a-zA-Z0-9#]+;/g, '');
     if(cleanForCheck.includes(';')){
       const tokenMap = {};
       let tokenCounter = 0;
@@ -50106,10 +50146,12 @@ function formatCardAnswerHTML(rawAnswer){
         return key;
       }
 
-      // 1. Сначала маскируем HTML-теги и кодовые блоки, чтобы сущности и атрибуты (style="...") не перебивались токенами
+      // 1. Сначала маскируем блоки кода целиком (вместе с внутренними ;), затем HTML-теги и инлайн-код
       let masked = s
-        .replace(/<[^>]+>/g, m => createToken(m))
-        .replace(/`[^`\n]+`/g, m => createToken(m));
+        .replace(/<code[\s\S]*?<\/code>/gi, m => createToken(m))
+        .replace(/<pre[\s\S]*?<\/pre>/gi, m => createToken(m))
+        .replace(/`[^`\n]+`/g, m => createToken(m))
+        .replace(/<[^>]+>/g, m => createToken(m));
 
       // 2. Затем маскируем оставшиеся HTML-сущности вне блоков кода (&amp;, &#x27; и т.д.)
       masked = masked.replace(/&[a-zA-Z0-9#]+;/g, m => createToken(m));
@@ -50422,6 +50464,10 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
   let noteTotal = 1;
 
+  let displaySprintNum = 1;
+
+  let totalSprintsToday = 1;
+
 
 
   // 1. Прогресс интервального повторения по непрерывной температурной шкале накала памяти
@@ -50482,7 +50528,7 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
     // Расчет N: число спринтов по 15 карточек на сегодня
     const SPRINT_SIZE = 15;
-    const totalSprintsToday = Math.max(1, Math.ceil(totalDebtCardsToday / SPRINT_SIZE));
+    totalSprintsToday = Math.max(1, Math.ceil(totalDebtCardsToday / SPRINT_SIZE));
 
     let curSprint = Math.min(totalSprintsToday, Math.max(1, Math.floor(cardsDoneToday / SPRINT_SIZE) + 1));
     if(typeof cardsHubState !== 'undefined' && typeof cardsHubState.sprintNum === 'number' && cardsHubState.sprintNum > 0){
@@ -50492,7 +50538,7 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
     }
 
     const isSprintJustFinished = (typeof cardsHubState !== 'undefined' && cardsHubState.sprintFinished);
-    const displaySprintNum = isSprintJustFinished ? Math.max(1, curSprint - 1) : curSprint;
+    displaySprintNum = isSprintJustFinished ? Math.max(1, curSprint - 1) : curSprint;
 
     // Шапка: Спринт X из N спринтов дня
     goalLabel = `Спринт ${displaySprintNum} / ${totalSprintsToday}`;
@@ -50697,7 +50743,20 @@ function buildSrsDeckContextBarHTML(deckTitle, total, currentIdx, getRatingOrIte
 
     const stepInSprint = i - startIdx;
     const isSprintCurrent = (i === cur);
-    const isSprintDone = (i < cur);
+
+    let isSprintDone = false;
+    if(attrName === 'data-hub-goto-due'){
+      const curItem = Array.isArray(getRatingOrItems) ? getRatingOrItems[i] : null;
+      isSprintDone = Boolean(
+        (curItem && (curItem.reviewed === true || curItem.answered === true)) ||
+        (typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.reviewedDueIndices && cardsHubState.reviewedDueIndices[i])
+      );
+    } else {
+      isSprintDone = Boolean(
+        (r > 0) ||
+        (typeof cardsHubState !== 'undefined' && cardsHubState && cardsHubState.reviewedCardIndices && cardsHubState.reviewedCardIndices[i])
+      );
+    }
 
     if(isSprintCurrent){
       cls += ' active bead-active-leading';
@@ -58945,9 +59004,15 @@ function viewNotesSrsHub(noteSrsStats){
 
           let cls = 'dot-jewel';
 
-          if(idx < sIdx) cls += ' done bead-done rating-easy';
+          const noteKey = (curItem && curItem.noteId) ? curItem.noteId : ((cardsHubState && cardsHubState.forcedNoteId) || 'note');
+          const isNoteStepDone = Boolean(
+            (cardsHubState && cardsHubState.reviewedNoteSteps && cardsHubState.reviewedNoteSteps[`${noteKey}:${idx}`]) ||
+            (state.completedNoteSteps && state.completedNoteSteps[`${noteKey}:${idx}`])
+          );
 
-          else if(idx === sIdx) cls += ' active bead-active-leading';
+          if(idx === sIdx) cls += ' active bead-active-leading';
+
+          else if(isNoteStepDone) cls += ' done bead-done rating-easy';
 
           else cls += ' future bead-future';
 
@@ -63481,6 +63546,10 @@ document.addEventListener('click', async function(e){
 
             cardsHubState.duePos = 0;
 
+            cardsHubState.reviewedDueIndices = {};
+
+            cardsHubState.reviewedCardIndices = {};
+
             cardsHubState.sprintFinished = false;
 
             cardsHubState.dueQueue = (typeof collectDueCardsQueue === 'function') ? collectDueCardsQueue() : [];
@@ -63538,6 +63607,10 @@ document.addEventListener('click', async function(e){
       cardsHubState.completed = false;
 
       cardsHubState.duePos = 0;
+
+      cardsHubState.reviewedDueIndices = {};
+
+      cardsHubState.reviewedCardIndices = {};
 
       cardsHubState.sprintFinished = false;
 
@@ -63954,6 +64027,13 @@ document.addEventListener('click', async function(e){
 
   if(srsNoteFinishBtn){
 
+    const curNotePos = cardsHubState.notePos || 0;
+    const curNoteQ = (typeof collectDueNotesQueue === 'function') ? collectDueNotesQueue() : [];
+    const curNoteItem = curNoteQ[curNotePos] || {};
+    const nId = curNoteItem.noteId || cardsHubState.forcedNoteId || 'note';
+    if(!cardsHubState.reviewedNoteSteps) cardsHubState.reviewedNoteSteps = {};
+    cardsHubState.reviewedNoteSteps[`${nId}:${cardsHubState.noteStepIdx || 0}`] = true;
+
     cardsHubState.noteCompleted = true;
 
     try{ awardXp(15); }catch(err){}
@@ -64027,6 +64107,13 @@ document.addEventListener('click', async function(e){
   if(srsNoteNextStepBtn){
 
     const nextIdx = parseInt(srsNoteNextStepBtn.getAttribute('data-srs-note-next-step'), 10) || 0;
+
+    const curNotePos = cardsHubState.notePos || 0;
+    const curNoteQ = (typeof collectDueNotesQueue === 'function') ? collectDueNotesQueue() : [];
+    const curNoteItem = curNoteQ[curNotePos] || {};
+    const nId = curNoteItem.noteId || cardsHubState.forcedNoteId || 'note';
+    if(!cardsHubState.reviewedNoteSteps) cardsHubState.reviewedNoteSteps = {};
+    cardsHubState.reviewedNoteSteps[`${nId}:${cardsHubState.noteStepIdx || 0}`] = true;
 
     try{ awardXp(10); }catch(err){}
 
@@ -68753,6 +68840,10 @@ window.animateCardFlip = animateCardFlip;
 
     cardsHubState.duePos = 0;
 
+    cardsHubState.reviewedDueIndices = {};
+
+    cardsHubState.reviewedCardIndices = {};
+
     cardsHubState.flipped = false;
 
     saveCardsHubPosState();
@@ -68947,6 +69038,11 @@ window.animateCardFlip = animateCardFlip;
 
       if(curItem){
 
+        curItem.reviewed = true;
+        curItem.answered = true;
+        if(!cardsHubState.reviewedDueIndices) cardsHubState.reviewedDueIndices = {};
+        cardsHubState.reviewedDueIndices[cardsHubState.duePos] = true;
+
         const ck = curItem.deckId + ':' + curItem.cardIdx;
 
         const wasStudied = (state.cardRatings[ck] !== undefined && state.cardRatings[ck] > 0);
@@ -68978,7 +69074,7 @@ window.animateCardFlip = animateCardFlip;
 
         if(r === 1){
 
-          cardsHubState.dueQueue.push(curItem);
+          cardsHubState.dueQueue.push(Object.assign({}, curItem, { reviewed: false, answered: false }));
 
         }
 
@@ -69025,6 +69121,10 @@ window.animateCardFlip = animateCardFlip;
 
         cardsHubState.duePos = 0;
 
+        cardsHubState.reviewedDueIndices = {};
+
+        cardsHubState.reviewedCardIndices = {};
+
         cardsHubState.flipped = false;
 
         cardsHubState.sprintFinished = false;
@@ -69045,6 +69145,9 @@ window.animateCardFlip = animateCardFlip;
     let ckFree = null;
 
     if(cardsHubState.deckId){
+
+      if(!cardsHubState.reviewedCardIndices) cardsHubState.reviewedCardIndices = {};
+      cardsHubState.reviewedCardIndices[cardsHubState.cardIdx || 0] = true;
 
       ckFree = cardsHubState.deckId + ':' + (cardsHubState.cardIdx || 0);
 
@@ -69223,6 +69326,10 @@ window.animateCardFlip = animateCardFlip;
       cardsHubState.dueQueue = dueQueue;
 
       cardsHubState.duePos = 0;
+
+      cardsHubState.reviewedDueIndices = {};
+
+      cardsHubState.reviewedCardIndices = {};
 
       cardsHubState.flipped = false;
 
@@ -70134,9 +70241,7 @@ document.addEventListener('change', function(e){
     cardsHubState.isRepeatPhase = false;
 
     cardsHubState.dueMode = false;
-
     saveCardsHubPosState();
-
     render();
 
   } else if(e.target.id === 'prac-echelon-filter'){
