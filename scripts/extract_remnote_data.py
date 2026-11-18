@@ -1387,30 +1387,51 @@ def parse_f_deck(fid, module=None):
     with open(info['path'], encoding='utf-8') as f:
         content = f.read()
 
-    cur_q = None
+    cur_q_lines = []
     cur_a_lines = []
+    in_answer = False
 
     def flush():
-        nonlocal cur_q, cur_a_lines
-        if cur_q is not None:
+        nonlocal cur_q_lines, cur_a_lines, in_answer
+        if cur_q_lines and cur_a_lines:
+            q_text = '\n'.join(cur_q_lines).strip()
             a_text = '\n'.join(cur_a_lines).strip()
-            if a_text:
-                cards.append({'q': md_inline(cur_q), 'a': md_inline(a_text)})
-            cur_q = None
-            cur_a_lines = []
+            if q_text and a_text:
+                cards.append({'q': md_inline(q_text), 'a': md_inline(a_text)})
+        cur_q_lines = []
+        cur_a_lines = []
+        in_answer = False
 
     for raw_line in content.splitlines():
-        m_card = re.match(r'^(?:\d+\.\s*)?((?:[^`]|`[^`]*`)+?)>>(.*)$', raw_line)
-        if m_card:
+        m_num = re.match(r'^\d+\.\s+(.*)$', raw_line)
+        if m_num:
             flush()
-            cur_q = re.sub(r'^\d+\.\s*', '', m_card.group(1)).strip()
-            first_a = m_card.group(2).strip()
-            if first_a:
-                cur_a_lines.append(first_a)
-        elif cur_q is not None:
-            cur_a_lines.append(raw_line)
-    flush()
+            rest = m_num.group(1)
+            if '>>' in rest:
+                q_part, a_part = rest.split('>>', 1)
+                cur_q_lines.append(q_part.strip())
+                if a_part.strip():
+                    cur_a_lines.append(a_part.strip())
+                in_answer = True
+            else:
+                cur_q_lines.append(rest.strip())
+                in_answer = False
+            continue
 
+        if not in_answer:
+            if '>>' in raw_line:
+                q_part, a_part = raw_line.split('>>', 1)
+                if q_part.strip():
+                    cur_q_lines.append(q_part.strip())
+                if a_part.strip():
+                    cur_a_lines.append(a_part.strip())
+                in_answer = True
+            else:
+                cur_q_lines.append(raw_line)
+        else:
+            cur_a_lines.append(raw_line)
+
+    flush()
     return {'id': key, 'title': info['title'], 'cards': cards}
 
 # Test parsing all Mod 01 notes & cards
