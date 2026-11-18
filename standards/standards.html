@@ -50133,6 +50133,9 @@ function collectDueCardsQueue(){
 
     if(item && item.dueDate && item.dueDate <= today){
 
+      // Карточки, уже повторённые сегодня, пропускаются до следующей даты
+      if(item.lastReview === today) return;
+
       const parts = k.split(':');
 
       const did = parts[0];
@@ -51409,8 +51412,6 @@ function viewCardsHub(){
 
     if(cardsHubState.completed || qLen === 0 || cardsHubState.duePos >= qLen){
 
-      const wasCompletedToday = (cardsHubState.completed || (cardsHubState.duePos >= qLen && qLen > 0));
-
       const hasAnyStudiedCards = (
 
         (state.reviewedDecks && state.reviewedDecks.length > 0) ||
@@ -51421,6 +51422,14 @@ function viewCardsHub(){
 
       );
 
+      const wasCompletedToday = Boolean(cardsHubState.completed || (cardsHubState.duePos >= qLen && qLen > 0) || (qLen === 0 && hasAnyStudiedCards));
+
+      if(wasCompletedToday && !cardsHubState.completed){
+
+        cardsHubState.completed = true;
+
+      }
+
       const isDayOne = (!wasCompletedToday && !hasAnyStudiedCards);
 
 
@@ -51428,6 +51437,10 @@ function viewCardsHub(){
       // Если очередь на сегодня уже была полностью завершена — показываем Zen-экран отдыха
 
       if(wasCompletedToday){
+
+        const todayKey = (typeof dateIsoKey === 'function') ? dateIsoKey() : new Date().toISOString().slice(0, 10);
+
+        const reviewedTodayCardsCount = Object.values(state.cardSrs || {}).filter(it => it && it.lastReview === todayKey).length;
 
         return `
 
@@ -51451,7 +51464,7 @@ function viewCardsHub(){
 
             <div style="display:flex;gap:10px;justify-content:center;margin-bottom:26px;flex-wrap:wrap;">
 
-              <span class="cocoon-pill">⚡ Повторено: <b>${srsGlobalStats.dueTodayCardsCount || 0}</b></span>
+              <span class="cocoon-pill">⚡ Повторено: <b>${reviewedTodayCardsCount || srsGlobalStats.dueTodayCardsCount || 1}</b></span>
 
               <span class="cocoon-pill">🔥 Стрик: <b>${state.streak || 1} дн</b></span>
 
@@ -59933,6 +59946,8 @@ function getSpacedRepetitionStats(){
 
       if(item.dueDate <= today){
 
+        if(item.lastReview === today) return;
+
         const parts = k.split(':');
 
         const did = parts[0];
@@ -63815,21 +63830,30 @@ document.addEventListener('click', async function(e){
 
           cardsHubState.flipped = false;
 
-          // Если очередь была помечена завершенной, сбрасываем завершение для свежей сессии
-
+          // Если очередь была помечена завершенной, проверяем наличие свежих карточек
           if(cardsHubState.completed){
 
-            cardsHubState.completed = false;
+            const freshDue = (typeof collectDueCardsQueue === 'function') ? collectDueCardsQueue() : [];
 
-            cardsHubState.duePos = 0;
+            if(freshDue.length > 0){
 
-            cardsHubState.reviewedDueIndices = {};
+              cardsHubState.completed = false;
 
-            cardsHubState.reviewedCardIndices = {};
+              cardsHubState.duePos = 0;
 
-            cardsHubState.sprintFinished = false;
+              cardsHubState.reviewedDueIndices = {};
 
-            cardsHubState.dueQueue = (typeof collectDueCardsQueue === 'function') ? collectDueCardsQueue() : [];
+              cardsHubState.reviewedCardIndices = {};
+
+              cardsHubState.sprintFinished = false;
+
+              cardsHubState.dueQueue = freshDue;
+
+            } else {
+
+              cardsHubState.dueQueue = [];
+
+            }
 
           }
 
@@ -63895,7 +63919,47 @@ document.addEventListener('click', async function(e){
 
       cardsHubState.flipped = false;
 
-      cardsHubState.dueQueue = (typeof collectDueCardsQueue === 'function') ? collectDueCardsQueue() : [];
+      let freshQueue = (typeof collectDueCardsQueue === 'function') ? collectDueCardsQueue() : [];
+
+      if(freshQueue.length === 0){
+
+        // Если суточная очередь уже закрыта, собираем карточки, повторённые сегодня (для дополнительной тренировки)
+
+        const todayKey = (typeof dateIsoKey === 'function') ? dateIsoKey() : new Date().toISOString().slice(0, 10);
+
+        const srsMap = state.cardSrs || {};
+
+        const ratings = state.cardRatings || {};
+
+        const repeatTodayQueue = [];
+
+        Object.keys(srsMap).forEach(k => {
+
+          const item = srsMap[k];
+
+          if(item && item.lastReview === todayKey){
+
+            const parts = k.split(':');
+
+            const did = parts[0];
+
+            const cIdx = parseInt(parts[1], 10);
+
+            if(ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
+
+              repeatTodayQueue.push({ deckId: did, cardIdx: cIdx, dueDate: item.dueDate, rating: Number(ratings[k]) || 0 });
+
+            }
+
+          }
+
+        });
+
+        freshQueue = repeatTodayQueue;
+
+      }
+
+      cardsHubState.dueQueue = freshQueue;
 
       if(typeof saveCardsHubPosState === 'function') saveCardsHubPosState();
 
@@ -69353,11 +69417,9 @@ window.animateCardFlip = animateCardFlip;
 
         }
 
-        if(r === 1){
-
-          cardsHubState.dueQueue.push(Object.assign({}, curItem, { reviewed: false, answered: false }));
-
-        }
+        // В Single-Pass Pure Daily Due Stream карточка с оценкой «Не знаю» (r === 1)
+        // фиксируется через applyRemNoteCardRating с интервалом 1 день (lastReview = today, dueDate = tomorrow)
+        // и уходит на повторение на следующий день без зацикливания и накопления в хвосте текущей сессии.
 
       }
 
