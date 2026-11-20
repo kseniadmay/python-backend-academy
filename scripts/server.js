@@ -405,8 +405,12 @@ const server = http.createServer((req, res) => {
                             const ea = ma[k];
                             const eb = mb[k];
                             if (ea && eb && typeof ea === 'object' && typeof eb === 'object') {
-                                const pickB = String(eb.lastReview || '') >= String(ea.lastReview || '') ||
-                                    Number(eb[progKey] || 0) > Number(ea[progKey] || 0);
+                                const revA = String(ea.lastReview || '');
+                                const revB = String(eb.lastReview || '');
+                                const cntA = Number(ea.reviewCount) || 0;
+                                const cntB = Number(eb.reviewCount) || 0;
+                                const pickB = revB > revA ||
+                                    (revB === revA && (cntB > cntA || (cntB === cntA && Number(eb[progKey] || 0) >= Number(ea[progKey] || 0))));
                                 out[k] = Object.assign({}, ea, pickB ? eb : ea);
                             } else if (eb !== undefined) {
                                 out[k] = eb;

@@ -41300,7 +41300,15 @@ function mergeProgressStates(baseRaw, incomingRaw){
 
     if(entryA && entryB){
 
-      const pickB = (entryB.lastReview || '') >= (entryA.lastReview || '') || (entryB.step || 0) > (entryA.step || 0);
+      const revA = entryA.lastReview || '';
+
+      const revB = entryB.lastReview || '';
+
+      const cntA = Number(entryA.reviewCount) || 0;
+
+      const cntB = Number(entryB.reviewCount) || 0;
+
+      const pickB = revB > revA || (revB === revA && (cntB > cntA || (cntB === cntA && (entryB.step || 0) >= (entryA.step || 0))));
 
       merged.noteSrs[nid] = Object.assign({}, entryA, pickB ? entryB : entryA);
 
@@ -60123,6 +60131,31 @@ function applyNoteReview(noteId, modeOrSuccess, anchorEl){
 
 
 
+function scrollSrsNoteToTop(){
+  const doScroll = function(){
+    try {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      if(document.documentElement) document.documentElement.scrollTop = 0;
+      if(document.body) document.body.scrollTop = 0;
+      const rootEl = document.getElementById('view-root');
+      if(rootEl) rootEl.scrollTop = 0;
+    } catch(_e){}
+  };
+  doScroll();
+  if(typeof requestAnimationFrame === 'function') requestAnimationFrame(doScroll);
+}
+
+function advanceToNextSrsNote(){
+  cardsHubState.forcedNoteId = null;
+  cardsHubState.noteStepIdx = 0;
+  cardsHubState.noteChunkIdx = 0;
+  cardsHubState.noteCompleted = false;
+  cardsHubState.notePos = 0;
+  saveCardsHubPosState();
+  render();
+  scrollSrsNoteToTop();
+}
+
 function getNoteSpacedRepetitionStats(){
 
   ensureExtendedState();
@@ -64576,6 +64609,8 @@ document.addEventListener('click', async function(e){
 
       }
 
+      scrollSrsNoteToTop();
+
     }
 
     return;
@@ -64787,6 +64822,7 @@ document.addEventListener('click', async function(e){
 
     saveCardsHubPosState();
     render();
+    scrollSrsNoteToTop();
     return;
   }
 
@@ -64807,6 +64843,8 @@ document.addEventListener('click', async function(e){
     saveCardsHubPosState();
 
     render();
+
+    scrollSrsNoteToTop();
 
     return;
 
@@ -64839,21 +64877,7 @@ document.addEventListener('click', async function(e){
       try { triggerSparksBurst(srsNotePassBtn, 3, e); } catch(_e){}
       try { triggerSrsDegreeToast(srsNotePassBtn, 3, e, earnedDeg); } catch(_e){}
       applyNoteReview(nid, 'pass', srsNotePassBtn);
-
-      cardsHubState.forcedNoteId = null;
-
-      cardsHubState.noteStepIdx = 0;
-
-      cardsHubState.noteChunkIdx = 0;
-
-      cardsHubState.noteCompleted = false;
-
-      cardsHubState.notePos = 0;
-
-      saveCardsHubPosState();
-
-      render();
-
+      advanceToNextSrsNote();
     }
 
     return;
@@ -64873,21 +64897,7 @@ document.addEventListener('click', async function(e){
       try { triggerSparksBurst(srsNoteEasyBtn, 4, e); } catch(_e){}
       try { triggerSrsDegreeToast(srsNoteEasyBtn, 4, e, earnedDeg); } catch(_e){}
       applyNoteReview(nid, 'easy', srsNoteEasyBtn);
-
-      cardsHubState.forcedNoteId = null;
-
-      cardsHubState.noteStepIdx = 0;
-
-      cardsHubState.noteChunkIdx = 0;
-
-      cardsHubState.noteCompleted = false;
-
-      cardsHubState.notePos = 0;
-
-      saveCardsHubPosState();
-
-      render();
-
+      advanceToNextSrsNote();
     }
 
     return;
@@ -64905,21 +64915,7 @@ document.addEventListener('click', async function(e){
     if(nid){
       try { triggerSparksBurst(srsNoteResetBtn, 1, e); } catch(_e){}
       applyNoteReview(nid, 'reset', srsNoteResetBtn);
-
-      cardsHubState.forcedNoteId = null;
-
-      cardsHubState.noteStepIdx = 0;
-
-      cardsHubState.noteChunkIdx = 0;
-
-      cardsHubState.noteCompleted = false;
-
-      cardsHubState.notePos = 0;
-
-      saveCardsHubPosState();
-
-      render();
-
+      advanceToNextSrsNote();
     }
 
     return;
