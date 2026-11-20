@@ -986,25 +986,33 @@ def _align_python_inline_comments(raw_code: str) -> str:
         return '\n'.join(out_lines)
     return raw_code
 
+def _normalize_py_slices(s: str) -> str:
+    return re.sub(r'\[:\s+:\s*(-?\w*)\]', r'[::\1]', s)
+
 # 3. Markdown to HTML converter for K-notes (splits into micro-step chunks!)
 def md_inline(text):
-    # Protect existing HTML tags if already present
+    # Protect inline code `...` first and escape HTML inside it so `<tag>` placeholders don't vanish
+    code_stash = []
+    def _save_code(m):
+        code_stash.append(f'<code>{html.escape(_normalize_py_slices(m.group(1)))}</code>')
+        return f'\x00CODE{len(code_stash) - 1}\x00'
+    text = re.sub(r'`([^`\n]+)`', _save_code, text)
+    # Protect only real HTML formatting/layout tags if already present
     tag_stash = []
     def _save_tag(m):
         tag_stash.append(m.group(0))
         return f'\x00TAG{len(tag_stash) - 1}\x00'
-    text = re.sub(r'<[^>]+>', _save_tag, text)
-    # Escape HTML first
+    text = re.sub(
+        r'</?(?:strong|em|b|i|u|br|code|span|sub|sup|mark|kbd|a|p|div|ul|ol|li|table|tr|th|td|h[1-6])\b[^>]*>',
+        _save_tag,
+        text,
+        flags=re.I,
+    )
+    # Escape remaining HTML characters
     text = html.escape(text)
     # Restore HTML tags
     for idx, t_html in enumerate(tag_stash):
         text = text.replace(f'\x00TAG{idx}\x00', t_html)
-    # Protect inline code `...` with placeholders before LaTeX processing
-    code_stash = []
-    def _save_code(m):
-        code_stash.append(f'<code>{m.group(1)}</code>')
-        return f'\x00CODE{len(code_stash) - 1}\x00'
-    text = re.sub(r'`([^`\n]+)`', _save_code, text)
     # Convert $$...$$ and $...$ math expressions into clean readable text
     text = re.sub(r'\$\$([^\$]+)\$\$', lambda m: _format_latex_expr(m.group(1)), text)
     text = re.sub(r'\$([^$\n]+)\$', lambda m: _format_latex_expr(m.group(1)), text)
@@ -1259,7 +1267,7 @@ def md_chunk_to_html(md_chunk, ctx_blocks=None):
                     continue
                 is_py = _is_runnable_python(code_lang, raw_code)
                 if is_py or code_lang in ('python', 'py', ''):
-                    raw_code = _align_python_inline_comments(raw_code)
+                    raw_code = _normalize_py_slices(_align_python_inline_comments(raw_code))
                 esc_code = html.escape(raw_code)
                 lang_label = code_lang or ('python' if is_py else 'code')
                 header_bar = f'<div class="code-run-bar"><span class="code-lang-tag">{lang_label}</span><button type="button" class="btn-copy-code" data-copy-code="1" title="Скопировать код">Копировать</button></div>'
@@ -1343,9 +1351,14 @@ def md_chunk_to_html(md_chunk, ctx_blocks=None):
     if in_code and code_buf:
         raw_tail = textwrap.dedent('\n'.join(code_buf)).strip()
         if raw_tail:
-            out.append(f'<pre><code>{html.escape(raw_tail)}</code></pre>')
+            out.append(f'<pre><code>{html.escape(_normalize_py_slices(raw_tail))}</code></pre>')
 
     final_title = chunk_title or 'Ключевая концепция'
+    final_title = re.sub(
+        r'\$([^$\n]+)\$',
+        lambda m: re.sub(r'<[^>]+>', '', _format_latex_expr(m.group(1))),
+        final_title,
+    )
     if out and not re.match(r'^<h[1-6]\b', out[0].strip(), re.I):
         out.insert(0, f'<h4>{md_inline(final_title)}</h4>')
 

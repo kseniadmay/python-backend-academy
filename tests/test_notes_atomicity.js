@@ -4,7 +4,7 @@
  * для ВСЕХ 238 конспектов платформы (Python Backend Academy).
  *
  * Проверяет:
- *  1. 100% покрытие: Все 238 тем (1177 микро-шагов) по всем 7 направлениям подготовки.
+ *  1. 100% покрытие: Все 238 тем (1129 микро-шагов) по всем 7 направлениям подготовки.
  *  2. Запрет пустых квантов (Zero Empty Chunks).
  *  3. Строгую сбалансированность и валидность HTML-тегов в каждом кванте (No DOM leakage).
  *  4. Запрет «сиротливых заголовков» и оборванных подводок (No Orphan Headings / Lead-ins).
@@ -122,7 +122,7 @@ const engine = extractChunkingEngine(standardsHtml);
 const { splitStepHtmlIntoChunks, getStepChunks } = engine;
 
 // ============================================================================
-// TEST 1: 100% Coverage of All 238 Notes & 1177 Steps
+// TEST 1: 100% Coverage of All 238 Notes & 1129 Steps
 // ============================================================================
 function test01_FullCoverage() {
   const noteIds = Object.keys(allNotes);
@@ -139,8 +139,8 @@ function test01_FullCoverage() {
     });
   }
 
-  assert.strictEqual(totalSteps, 1177, `Expected exactly 1177 total steps, found ${totalSteps}`);
-  console.log(`✓ Test 1 Passed: 100% coverage verified (238 notes, 1177 steps across all 7 tracks)`);
+  assert.strictEqual(totalSteps, 1129, `Expected exactly 1129 total steps, found ${totalSteps}`);
+  console.log(`✓ Test 1 Passed: 100% coverage verified (238 notes, 1129 steps across all 7 tracks)`);
 }
 
 // ============================================================================

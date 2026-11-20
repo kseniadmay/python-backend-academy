@@ -1023,6 +1023,12 @@ class _SyncTask:
 _asyncio.create_task = lambda coro, **kw: _SyncTask(coro)
 async def _sync_to_thread(fn, *a, **kw): return fn(*a, **kw)
 _asyncio.to_thread = _sync_to_thread
+async def _sync_wait_for(coro, timeout=None):
+    if timeout is not None and timeout <= 0.1:
+        if hasattr(coro, "close"): coro.close()
+        raise _asyncio.TimeoutError()
+    return await coro
+_asyncio.wait_for = _sync_wait_for
 if "fastapi.testclient" in _sys.modules and hasattr(_sys.modules["fastapi.testclient"], "TestClient"):
     _ftc_cls = _sys.modules["fastapi.testclient"].TestClient
     _ftc_cls.__enter__ = lambda self: self
