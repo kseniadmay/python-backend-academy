@@ -2757,13 +2757,13 @@
 
   .sprint-progress-track{
 
-    height:7px;border-radius:999px;background:var(--surface-2);overflow:hidden;border:1px solid var(--line-soft);
+    height:5px;border-radius:999px;background:rgba(255,255,255,0.06);overflow:visible;border:none;position:relative;
 
   }
 
   .sprint-progress-fill{
 
-    height:100%;border-radius:999px;background:linear-gradient(90deg, #be123c, #10b981);transition:width .35s ease;
+    height:100%;border-radius:999px;background:linear-gradient(90deg, #e11d48 0%, #f43f5e 28%, #10b981 72%, #34d399 90%, #a7f3d0 100%);box-shadow:0 0 12px rgba(52,211,153,0.82), 0 0 24px rgba(16,185,129,0.45), 0 0 4px rgba(255,255,255,0.40);transition:width .35s ease;
 
   }
 
@@ -14051,17 +14051,17 @@
 
   .echelon-clean-track {
 
-    height: 6px;
+    height: 4px;
 
     border-radius: 999px;
 
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.06);
 
-    overflow: hidden;
+    overflow: visible;
 
     position: relative;
 
-    border: 1px solid rgba(255, 255, 255, 0.04);
+    border: none;
 
   }
 
@@ -14073,9 +14073,9 @@
 
     border-radius: 999px;
 
-    background: linear-gradient(90deg, #6b1d2f 0%, #be123c 35%, #059669 75%, #10b981 100%);
+    background: linear-gradient(90deg, #e11d48 0%, #f43f5e 28%, #10b981 72%, #34d399 90%, #a7f3d0 100%);
 
-    box-shadow: none;
+    box-shadow: 0 0 12px rgba(52, 211, 153, 0.82), 0 0 24px rgba(16, 185, 129, 0.45), 0 0 4px rgba(255, 255, 255, 0.40);
 
     position: relative;
 
@@ -23683,7 +23683,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     flex-direction: column !important;
     justify-content: space-between !important;
   }
-  .cards-hub-container:not(.srs-notes-container):not(:has(.srs-note-card)) {
+  .cards-hub-container:not(.srs-notes-container):not(.lesson-monolith-shell):not(:has(.srs-note-card)) {
     width: 100% !important;
     max-width: 740px !important;
     min-height: auto !important;
@@ -23714,9 +23714,8 @@ html:not([data-theme="dark"]) .fc-card--Answer,
 .srs-header-progress-track {
   container-type: inline-size !important;
 }
-.srs-header-progress-glow,
 .srs-header-progress-fill {
-  background-size: 100% 100% !important;
+  background-size: 100% 100%;
 }
 
 /* 2. Мобильная посадка парящей карточки SRS (Zero-Scroll & Atmospheric Zen) */
@@ -33612,15 +33611,16 @@ body.light-theme .srs-card-theory-anchor:hover svg {
      Деликатный винный кант + Спектральный прогресс + 0 плашек вокруг бусин
      ══════════════════════════════════════════════════════════════════════ */
 
-  /* 1. Модальное окно урока на десктопе: Monolithic Obsidian Glass (1:1 стиль srs-notes-container из stand_note_screen_harmony.html) */
+  /* 1. Модальное окно урока на десктопе: Monolithic Obsidian Glass (1:1 стиль .srs-notes-container) */
   @media (min-width: 641px) {
   .cards-hub-theory,
   .cards-hub-container.cards-hub-theory,
+  .container.cards-hub-container.lesson-monolith-shell,
   .cards-hub-container:has(#py-theory-text),
   .cards-hub-container:has(.lesson-theory):not(.srs-notes-container):not(:has(.srs-note-card)) {
     position: relative !important;
     overflow: hidden !important;
-    padding: 32px 36px 40px !important;
+    padding: 32px 36px !important;
     border-radius: 28px !important;
     min-height: auto !important;
     height: auto !important;
@@ -33630,64 +33630,80 @@ body.light-theme .srs-card-theory-anchor:hover svg {
     -webkit-font-smoothing: antialiased !important;
     -moz-osx-font-smoothing: grayscale !important;
     text-rendering: geometricPrecision !important;
-    backdrop-filter: blur(28px) saturate(160%) !important;
-    -webkit-backdrop-filter: blur(28px) saturate(160%) !important;
-    background-color: rgba(13, 16, 24, 0.48) !important;
+    backdrop-filter: blur(32px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(32px) saturate(180%) !important;
+    background-color: #07090e !important;
     background-image: 
-      radial-gradient(ellipse 420px 180px at 50% 100%, rgba(16, 185, 129, 0.16) 0%, transparent 70%),
-      radial-gradient(ellipse 260px 140px at 15% 0%, rgba(136, 19, 55, 0.18) 0%, transparent 65%),
-      radial-gradient(ellipse 240px 130px at 85% 0%, rgba(16, 185, 129, 0.10) 0%, transparent 65%),
-      linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 32%, transparent 60%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.09) !important;
-    border-top: 1.5px solid rgba(255, 255, 255, 0.32) !important;
-    border-left: 1.2px solid rgba(255, 255, 255, 0.18) !important;
+      radial-gradient(ellipse 520px 240px at 50% 0%, rgba(16, 185, 129, 0.08) 0%, transparent 68%),
+      linear-gradient(180deg, #0a0e17 0%, #06080d 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-top: 1px solid rgba(16, 185, 129, 0.35) !important;
     box-shadow: 
-      inset 0 1.5px 1px rgba(255, 255, 255, 0.22),
-      inset 1px 0 1px rgba(255, 255, 255, 0.10),
-      0 28px 72px -12px rgba(0, 0, 0, 0.70),
-      0 0 32px -8px rgba(16, 185, 129, 0.12) !important;
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 28px 72px -12px rgba(0, 0, 0, 0.88),
+      0 0 36px -4px rgba(16, 185, 129, 0.08) !important;
     margin: 0 auto !important;
     width: 100% !important;
-    max-width: 760px !important;
+    max-width: 700px !important;
     box-sizing: border-box !important;
     transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
   }
 
+  .container.cards-hub-container.lesson-monolith-shell--wide {
+    max-width: 940px !important;
+  }
+
+  .cards-hub-theory > *,
+  .cards-hub-container.lesson-monolith-shell > *,
+  .cards-hub-container:has(#py-theory-text) > * {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
   :root:not([data-theme="light"]):not(.theme-light) .cards-hub-theory::before,
+  :root:not([data-theme="light"]):not(.theme-light) .cards-hub-container.lesson-monolith-shell::before,
   :root:not([data-theme="light"]):not(.theme-light) .cards-hub-container:has(#py-theory-text)::before {
-    content: '';
-    position: absolute;
-    top: -60px;
-    left: 20%;
-    width: 320px;
-    height: 120px;
-    background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.09) 0%, transparent 70%);
-    pointer-events: none;
+    content: '' !important;
+    position: absolute !important;
+    top: -40px !important;
+    left: -40px !important;
+    width: 260px !important;
+    height: 180px !important;
+    border-radius: 50% !important;
+    background: rgba(244, 63, 94, 0.08) !important;
+    filter: blur(54px) !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
   }
 
   :root:not([data-theme="light"]):not(.theme-light) .cards-hub-theory::after,
+  :root:not([data-theme="light"]):not(.theme-light) .cards-hub-container.lesson-monolith-shell::after,
   :root:not([data-theme="light"]):not(.theme-light) .cards-hub-container:has(#py-theory-text)::after {
-    content: '';
-    position: absolute;
-    bottom: -60px;
-    right: 15%;
-    width: 280px;
-    height: 100px;
-    background: radial-gradient(ellipse at center, rgba(6, 182, 212, 0.06) 0%, transparent 70%);
-    pointer-events: none;
+    content: '' !important;
+    position: absolute !important;
+    bottom: -40px !important;
+    right: 20% !important;
+    width: 300px !important;
+    height: 180px !important;
+    border-radius: 50% !important;
+    background: rgba(16, 185, 129, 0.07) !important;
+    filter: blur(56px) !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
   }
 
   [data-theme="light"] .cards-hub-theory,
   [data-theme="light"] .cards-hub-container.cards-hub-theory,
+  [data-theme="light"] .cards-hub-container.lesson-monolith-shell,
   [data-theme="light"] .cards-hub-container:has(#py-theory-text) {
-    background: rgba(255, 255, 255, 0.88) !important;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
-    border-top: 1.5px solid rgba(255, 255, 255, 0.95) !important;
-    box-shadow: 0 20px 48px -10px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+    background: linear-gradient(155deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.92) 50%, rgba(241, 245, 249, 0.88) 100%) !important;
+    border: 1px solid rgba(15, 23, 42, 0.09) !important;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.8) !important;
+    color: #0f172a !important;
   }
   }
 
-  /* 2. Полоса прогресса эшелона: попиксельное постепенное заполнение + мягкое свечение */
+  /* 2. Полоса прогресса эшелона и интервалок: единый стандарт свечения */
   .srs-header-progress-track {
     container-type: inline-size !important;
     position: absolute !important;
@@ -33706,21 +33722,12 @@ body.light-theme .srs-card-theory-anchor:hover svg {
     left: 0 !important;
     height: 100% !important;
     border-radius: 99px !important;
-    background: linear-gradient(90deg, #881337 0%, #be123c 35%, #059669 80%, #10b981 100%) !important;
-    background-size: 100cqw 100% !important;
-    background-position: left top !important;
-    filter: blur(4px) !important;
-    opacity: 0.75 !important;
     pointer-events: none !important;
   }
   .srs-header-progress-fill-echelon {
     position: relative !important;
     height: 100% !important;
     border-radius: 99px !important;
-    background: linear-gradient(90deg, #881337 0%, #be123c 35%, #059669 80%, #10b981 100%) !important;
-    background-size: 100cqw 100% !important;
-    background-position: left top !important;
-    box-shadow: 0 0 8px rgba(16, 185, 129, 0.35) !important;
     transition: width 0.4s ease !important;
   }
 
@@ -33895,6 +33902,207 @@ body.light-theme .srs-card-theory-anchor:hover svg {
     outline: none !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════
+     SSOT: ЕДИНАЯ СИНХРОНИЗАЦИЯ УРОКОВ КУРСА, КОНСПЕКТОВ SRS И КАРТОЧЕК SRS
+     (Утверждено по /grill-me: Типографика Уроков, Full-Bleed моб.,
+      Изумрудная капсула кода + ровные списки, Единый fixed-док на ≤640px)
+     ══════════════════════════════════════════════════════════════════════ */
+
+  /* A. Типографика конспектов (Десктоп): H2 1.42rem/800, текст 1rem/1.7 var(--ink-soft) */
+  .srs-notes-container h2,
+  .srs-notes-container .srs-note-card h2,
+  .srs-note-step-title,
+  .cards-hub-theory h2,
+  .cards-hub-container:has(#py-theory-text) h2 {
+    font-family: var(--font-d, 'Onest', sans-serif) !important;
+    font-size: 1.42rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.35 !important;
+    margin: 0 0 16px !important;
+    text-wrap: balance !important;
+    color: var(--ink, #f8fafc) !important;
+  }
+
+  [data-theme="light"] .srs-notes-container h2,
+  [data-theme="light"] .srs-notes-container .srs-note-card h2,
+  [data-theme="light"] .srs-note-step-title,
+  [data-theme="light"] .cards-hub-theory h2,
+  [data-theme="light"] .cards-hub-container:has(#py-theory-text) h2 {
+    color: #0f172a !important;
+  }
+
+  .srs-notes-container .note-canvas-body,
+  .srs-notes-container .note-review-body,
+  .srs-notes-container .feed-chunk.lesson-theory,
+  .srs-notes-container .lesson-theory,
+  .srs-notes-container .lesson-theory p,
+  .srs-notes-container .note-canvas-body p,
+  .cards-hub-theory .lesson-theory,
+  .cards-hub-theory .lesson-theory p,
+  .cards-hub-theory .feed-chunk,
+  .cards-hub-theory .feed-chunk p {
+    font-size: 1rem !important;
+    line-height: 1.7 !important;
+    color: var(--ink-soft, #cbd5e1) !important;
+  }
+
+  [data-theme="light"] .srs-notes-container .note-canvas-body,
+  [data-theme="light"] .srs-notes-container .lesson-theory,
+  [data-theme="light"] .srs-notes-container .lesson-theory p,
+  [data-theme="light"] .cards-hub-theory .lesson-theory,
+  [data-theme="light"] .cards-hub-theory .lesson-theory p {
+    color: #334155 !important;
+  }
+
+  /* B. Ровные списки и единая изумрудная капсула кода (Десктоп + Мобилка) */
+  .cards-hub-theory .lesson-theory ul,
+  .cards-hub-theory .lesson-theory ol,
+  .cards-hub-theory .lesson-theory p,
+  .cards-hub-theory .feed-chunk {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  .srs-notes-container .snippet-wrap,
+  .srs-notes-container .code-snippet-wrap,
+  .cards-hub-theory .snippet-wrap,
+  .cards-hub-theory .code-snippet-wrap {
+    margin: 14px 0 16px !important;
+    border-radius: 14px !important;
+    background: rgba(11, 15, 25, 0.95) !important;
+    border: 1px solid rgba(52, 211, 153, 0.25) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
+    overflow: hidden !important;
+  }
+
+  [data-theme="light"] .srs-notes-container .snippet-wrap,
+  [data-theme="light"] .srs-notes-container .code-snippet-wrap,
+  [data-theme="light"] .cards-hub-theory .snippet-wrap,
+  [data-theme="light"] .cards-hub-theory .code-snippet-wrap {
+    background: #f1f5f9 !important;
+    border-color: rgba(16, 185, 129, 0.35) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  .srs-notes-container pre,
+  .cards-hub-theory pre {
+    line-height: 1.65 !important;
+  }
+
+  /* C. Мобильная синхронизация ≤640px: Full-Bleed, типографика Уроков, код 1.62, единый fixed-док */
+  @media (max-width: 640px) {
+    /* 1. Полный Full-Bleed Book Mode без внутренней рамки и в SRS-конспектах */
+    .srs-notes-container .srs-note-card,
+    .srs-note-card:not(.srs-note-card-clean) {
+      background: transparent !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      border: none !important;
+      border-top: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      padding: 2px 0 20px !important;
+      margin: 0 !important;
+    }
+
+    .container.srs-notes-container,
+    .srs-notes-container {
+      padding: 6px 16px calc(92px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    .cards-hub-container:has(.cards-hub-content) {
+      padding-bottom: calc(132px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    /* 2. Единая мобильная типографика (эталон Уроков) */
+    .srs-notes-container h2,
+    .srs-notes-container .srs-note-card h2,
+    .srs-note-step-title,
+    .cards-hub-theory h2,
+    .cards-hub-container:has(#py-theory-text) h2 {
+      font-size: 1.25rem !important;
+      font-weight: 800 !important;
+      line-height: 1.34 !important;
+      letter-spacing: -0.015em !important;
+      margin: 0 0 14px !important;
+    }
+
+    .srs-notes-container .note-canvas-body,
+    .srs-notes-container .feed-chunk.lesson-theory,
+    .srs-notes-container .lesson-theory p,
+    .srs-notes-container .note-canvas-body p,
+    .cards-hub-theory .lesson-theory p,
+    .cards-hub-theory .feed-chunk p {
+      font-size: 0.98rem !important;
+      line-height: 1.68 !important;
+      color: var(--ink-soft, #cbd5e1) !important;
+      margin: 0 0 14px !important;
+    }
+
+    [data-theme="light"] .srs-notes-container .lesson-theory p,
+    [data-theme="light"] .srs-notes-container .note-canvas-body p,
+    [data-theme="light"] .cards-hub-theory .lesson-theory p {
+      color: #334155 !important;
+    }
+
+    /* 3. Код на мобильных: line-height 1.62 (Инвариант 12) */
+    .srs-notes-container pre,
+    .cards-hub-theory pre,
+    .cards-hub-container:has(#py-theory-text) pre {
+      font-size: 0.82rem !important;
+      line-height: 1.62 !important;
+      padding: 12px 14px 18px 14px !important;
+      white-space: pre !important;
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
+
+    /* 4. Единый fixed-док внизу экрана с градиентной шторкой (Конспекты SRS + Карточки SRS + Карточки урока) */
+    .srs-notes-container .note-action-dock,
+    .srs-notes-container .srs-action-dock,
+    .cards-hub-content .srs-action-dock {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 9999 !important;
+      margin: 0 !important;
+      padding: 10px 16px calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+      background: linear-gradient(180deg, rgba(7, 9, 14, 0.1) 0%, rgba(7, 9, 14, 0.95) 28%, #07090e 100%) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      box-sizing: border-box !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+
+    [data-theme="light"] .srs-notes-container .note-action-dock,
+    [data-theme="light"] .srs-notes-container .srs-action-dock,
+    [data-theme="light"] .cards-hub-content .srs-action-dock {
+      background: linear-gradient(180deg, rgba(248, 250, 252, 0.1) 0%, rgba(248, 250, 252, 0.95) 28%, #f8fafc 100%) !important;
+      border-top-color: rgba(0, 0, 0, 0.06) !important;
+    }
+
+    .srs-notes-container .btn-cta-dominant,
+    .srs-notes-container .btn-step-prev,
+    .cards-hub-content .srs-action-dock .btn-cta-dominant {
+      height: 46px !important;
+      font-size: 0.94rem !important;
+      max-width: 480px !important;
+    }
+
+    .cards-hub-content .srs-action-dock .srs-rating-grid {
+      width: 100% !important;
+      max-width: 480px !important;
+    }
   }
 
   /* 6. Плавное проявление новых квантов без подскакивания и без сдвигов вёрстки (Zero-Jitter Invariant) */
@@ -41859,9 +42067,10 @@ function restoreFromIndexedDBIfNeeded(){
 
             if(changed){
 
-              saveState(state);
+              if(typeof localSaveState === 'function') localSaveState(state); else saveState(state);
 
-              if(typeof render === 'function') render();
+              if(typeof applyProgressSyncUiUpdate === 'function') applyProgressSyncUiUpdate();
+              else if(typeof render === 'function') render();
 
             }
 
@@ -42400,15 +42609,22 @@ window.addEventListener('storage', function(e){
       if(inc){
 
         const candidate = (inc.academyState && typeof inc.academyState === 'object') ? inc.academyState : inc;
+        const prevRoute = state && state.lastRoute;
+        const beforeSig = (typeof canonicalProgressSignature === 'function') ? canonicalProgressSignature(state) : '';
 
         state = mergeProgressStates(state, candidate);
+        if(prevRoute) state.lastRoute = prevRoute;
         window.state = state;
 
         writeWindowNameBackup(state);
 
+        const afterSig = (typeof canonicalProgressSignature === 'function') ? canonicalProgressSignature(state) : '';
         const activeTag = (document.activeElement && document.activeElement.tagName) ? document.activeElement.tagName.toLowerCase() : '';
 
-        if(activeTag !== 'textarea' && activeTag !== 'input' && typeof render === 'function') render();
+        if(beforeSig !== afterSig && activeTag !== 'textarea' && activeTag !== 'input'){
+          if(typeof applyProgressSyncUiUpdate === 'function') applyProgressSyncUiUpdate();
+          else if(typeof render === 'function') render();
+        }
 
       }
 
@@ -42418,13 +42634,20 @@ window.addEventListener('storage', function(e){
 
       if(incIde){
 
-        const mergedIde = mergeIdeStatusMaps(getIdeSolvedMap(), incIde);
+        const prevIde = getIdeSolvedMap();
+        const mergedIde = mergeIdeStatusMaps(prevIde, incIde);
 
         writeWindowNameBackup(state, mergedIde);
 
+        const ideChanged = (typeof canonicalProgressSignature === 'function')
+          ? canonicalProgressSignature(prevIde) !== canonicalProgressSignature(mergedIde)
+          : (JSON.stringify(prevIde) !== JSON.stringify(mergedIde));
         const activeTag = (document.activeElement && document.activeElement.tagName) ? document.activeElement.tagName.toLowerCase() : '';
 
-        if(activeTag !== 'textarea' && activeTag !== 'input' && typeof render === 'function') render();
+        if(ideChanged && activeTag !== 'textarea' && activeTag !== 'input'){
+          if(typeof applyProgressSyncUiUpdate === 'function') applyProgressSyncUiUpdate();
+          else if(typeof render === 'function') render();
+        }
 
       }
 
@@ -42504,6 +42727,42 @@ function progressSyncBundle(){
 
 }
 
+function canonicalProgressSignature(val){
+  const SKIP_KEYS = { updatedAt: true, lastRoute: true };
+  function normalize(node){
+    if(node === null || node === undefined) return node;
+    if(Array.isArray(node)) return node.map(normalize);
+    if(typeof node === 'object'){
+      const out = {};
+      Object.keys(node).sort().forEach(k => {
+        if(SKIP_KEYS[k]) return;
+        const v = node[k];
+        if(v !== undefined) out[k] = normalize(v);
+      });
+      return out;
+    }
+    return node;
+  }
+  try{ return JSON.stringify(normalize(val)); }catch(e){ return ''; }
+}
+
+function applyProgressSyncUiUpdate(){
+  const h = location.hash || '';
+  const isActiveStudyScreen = Boolean(
+    h.includes('/skill/') || h.includes('/lesson/') || h.includes('/cards') || h.includes('/notes-review') ||
+    document.getElementById('srs-note-feed') ||
+    document.getElementById('lesson-theory-text') ||
+    document.getElementById('py-theory-text') ||
+    document.getElementById('srs-active-card')
+  );
+  if(isActiveStudyScreen){
+    if(typeof renderNav === 'function') renderNav();
+    if(typeof restoreSnippetOutputs === 'function') restoreSnippetOutputs();
+  } else if(typeof render === 'function'){
+    render();
+  }
+}
+
 function progressSyncMergeBundle(bundle){
 
   if(!bundle || typeof bundle !== 'object') return false;
@@ -42512,12 +42771,12 @@ function progressSyncMergeBundle(bundle){
 
   if(bundle.academyState && typeof bundle.academyState === 'object'){
 
-    const before = JSON.stringify(state);
+    const beforeSig = canonicalProgressSignature(state);
 
     state = mergeProgressStates(state, bundle.academyState);
     window.state = state;
 
-    changed = changed || before !== JSON.stringify(state);
+    if(beforeSig !== canonicalProgressSignature(state)) changed = true;
 
   }
 
@@ -42527,9 +42786,10 @@ function progressSyncMergeBundle(bundle){
 
     const merged = mergeIdeStatusMaps(current, bundle.ideStatus);
 
-    if(JSON.stringify(current) !== JSON.stringify(merged)) changed = true;
-
-    try{ localStorage.setItem('practice-ide-status', JSON.stringify(merged)); localStorage.setItem('practice-ide-status-backup', JSON.stringify(merged)); }catch(e){}
+    if(canonicalProgressSignature(current) !== canonicalProgressSignature(merged)){
+      changed = true;
+      try{ localStorage.setItem('practice-ide-status', JSON.stringify(merged)); localStorage.setItem('practice-ide-status-backup', JSON.stringify(merged)); }catch(e){}
+    }
 
   }
 
@@ -42539,9 +42799,10 @@ function progressSyncMergeBundle(bundle){
 
     const merged = mergeIdeDraftMaps(current, bundle.ideDrafts);
 
-    if(JSON.stringify(current) !== JSON.stringify(merged)) changed = true;
-
-    try{ localStorage.setItem(IDE_DRAFTS_KEY, JSON.stringify(merged)); }catch(e){}
+    if(canonicalProgressSignature(current) !== canonicalProgressSignature(merged)){
+      changed = true;
+      try{ localStorage.setItem(IDE_DRAFTS_KEY, JSON.stringify(merged)); }catch(e){}
+    }
 
   }
 
@@ -42599,7 +42860,7 @@ async function runProgressSync(){
 
     if(remote.data.bundle && revision > knownRevision){
 
-      if(progressSyncMergeBundle(remote.data.bundle) && typeof render === 'function') render();
+      if(progressSyncMergeBundle(remote.data.bundle)) applyProgressSyncUiUpdate();
 
       progressSyncSaveRevision(revision);
 
@@ -42607,7 +42868,11 @@ async function runProgressSync(){
 
     const bundle = progressSyncBundle();
 
-    const signature = JSON.stringify(bundle);
+    const signature = canonicalProgressSignature(bundle);
+
+    if(remote.data.bundle && revision > 0 && canonicalProgressSignature(remote.data.bundle) === signature){
+      progressSyncLastSignature = signature;
+    }
 
     if(signature !== progressSyncLastSignature || progressSyncDirty || !revision){
 
@@ -42625,31 +42890,26 @@ async function runProgressSync(){
 
       if(pushed.status === 409){
 
-        if(progressSyncMergeBundle(pushed.data.bundle) && typeof render === 'function') render();
+        if(progressSyncMergeBundle(pushed.data.bundle)) applyProgressSyncUiUpdate();
 
         progressSyncSaveRevision(pushed.data.updatedAt);
 
-        progressSyncDirty = true;
+        window._sync409Count = (window._sync409Count || 0) + 1;
+        if(window._sync409Count <= 2) progressSyncDirty = true;
 
       }else{
 
+        window._sync409Count = 0;
+
         progressSyncSaveRevision(pushed.data.updatedAt);
 
-        if(pushed.data.bundle && progressSyncMergeBundle(pushed.data.bundle) && typeof render === 'function'){
+        if(pushed.data.bundle && progressSyncMergeBundle(pushed.data.bundle)){
 
-          if((location.hash && location.hash.includes('tab=theory')) || document.getElementById('srs-note-feed') || document.getElementById('lesson-theory-text') || document.getElementById('py-theory-text')){
-
-            restoreSnippetOutputs();
-
-          } else {
-
-            render();
-
-          }
+          applyProgressSyncUiUpdate();
 
         }
 
-        progressSyncLastSignature = JSON.stringify(progressSyncBundle());
+        progressSyncLastSignature = canonicalProgressSignature(progressSyncBundle());
 
       }
 
@@ -48922,6 +49182,21 @@ function viewPythonSkill(sid){
 
 
 
+  // Яркий неоновый градиент и свечение полосы прогресса урока (симметрично температурной шкале в интервалках)
+  const lessonBarBg = 'linear-gradient(90deg, #e11d48 0%, #f43f5e 28%, #10b981 72%, #34d399 90%, #a7f3d0 100%)';
+  let lessonGlowShadow = '0 0 14px rgba(244, 63, 94, 0.75), 0 0 26px rgba(225, 29, 72, 0.48)';
+  let lessonFillShadow = '0 0 10px rgba(251, 113, 133, 0.85), 0 0 4px rgba(255, 228, 230, 0.45)';
+  if(displayEchPct >= 98){
+    lessonGlowShadow = '0 0 16px #a7f3d0, 0 0 32px rgba(52, 211, 153, 0.92)';
+    lessonFillShadow = '0 0 14px #ecfdf5, 0 0 5px #ffffff';
+  } else if(displayEchPct >= 65){
+    lessonGlowShadow = '0 0 14px rgba(52, 211, 153, 0.78), 0 0 28px rgba(16, 185, 129, 0.50)';
+    lessonFillShadow = '0 0 10px rgba(52, 211, 153, 0.88), 0 0 4px rgba(167, 243, 208, 0.65)';
+  } else if(displayEchPct >= 35){
+    lessonGlowShadow = '0 0 14px rgba(16, 185, 129, 0.72), 0 0 26px rgba(244, 63, 94, 0.45)';
+    lessonFillShadow = '0 0 10px rgba(52, 211, 153, 0.82), 0 0 4px rgba(255, 255, 255, 0.40)';
+  }
+
   // Деликатный заголовок: верхний статус «Урок курса» + 30px кнопка + шкала эшелона
   const srsHeaderHTML = `
     <header class="srs-unified-header-bar" style="position:relative;display:flex;justify-content:space-between;align-items:center;height:30px;min-height:30px;gap:12px;margin-bottom:20px;padding:0 2px;background:transparent !important;border:none !important;box-shadow:none !important;box-sizing:border-box;">
@@ -48938,28 +49213,35 @@ function viewPythonSkill(sid){
         <a href="#${tr.routePrefix}" class="srs-header-close-btn" style="width:30px;height:30px;min-width:30px;min-height:30px;padding:0;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-top:1px solid rgba(255,255,255,0.20);color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;font-size:0.78rem;text-decoration:none;box-sizing:border-box;transition:all .15s ease;" title="Закрыть (На Путь)">✕</a>
       </div>
 
-      <!-- Полоса прогресса эшелона: попиксельное постепенное заполнение (#881337 -> #10b981) + мягкое свечение -->
+      <!-- Полоса прогресса эшелона: яркий неоновый луч + симметричное диффузное свечение -->
       <div class="srs-header-progress-track" style="container-type:inline-size;position:absolute;bottom:-12px;left:0;right:0;height:4px;background:rgba(255,255,255,0.06);border:none;border-radius:99px;overflow:visible;margin:0;padding:0;z-index:2;" title="Прогресс эшелона: ${displayEchPct}%">
-        <!-- Мягкий диффузный слой свечения острия и луча -->
-        <div class="srs-header-progress-glow" style="position:absolute;top:0;left:0;height:100%;width:${displayEchPct}%;background:linear-gradient(90deg, #881337 0%, #be123c 35%, #059669 80%, #10b981 100%);background-size:100cqw 100%;background-position:left top;border-radius:99px;filter:blur(4px);opacity:0.75;pointer-events:none;"></div>
+        <!-- Диффузный слой свечения острия и луча -->
+        <div class="srs-header-progress-glow" style="position:absolute;top:0;left:0;height:100%;width:${displayEchPct}%;background:${lessonBarBg};background-size:100cqw 100%;background-position:left top;border-radius:99px;filter:blur(5px);box-shadow:${lessonGlowShadow};opacity:0.9;pointer-events:none;"></div>
         <!-- Основное тело полосы прогресса -->
-        <div class="srs-header-progress-fill-echelon" style="position:relative;width:${displayEchPct}%;height:100%;border-radius:99px;background:linear-gradient(90deg, #881337 0%, #be123c 35%, #059669 80%, #10b981 100%);background-size:100cqw 100%;background-position:left top;box-shadow:0 0 8px rgba(16,185,129,0.35);transition:width 0.4s ease;"></div>
+        <div class="srs-header-progress-fill-echelon" style="position:relative;width:${displayEchPct}%;height:100%;border-radius:99px;background:${lessonBarBg};background-size:100cqw 100%;background-position:left top;box-shadow:${lessonFillShadow};transition:width 0.4s ease;"></div>
       </div>
     </header>
   `;
 
-  // Хлебные крошки и ожерелье бусин (1:1 стиль srs-notes-container, 0 дублирования названия темы)
+  // Ожерелье бусин (сверху по центру) и хлебные крошки (под бусинами, 1:1 стиль .srs-notes-container)
+  const lessonEchelonLabel = `🛡️ Эшелон ${curEchTier || 1}`;
+  const cleanItemBreadcrumb = (activeItemTitle.split(/[:·•–—]/)[0] || activeItemTitle).trim();
+  const showUnitInBreadcrumb = Boolean(cleanUnitTitleVal && cleanUnitTitleVal !== activeItemTitle && cleanUnitTitleVal !== cleanItemBreadcrumb);
   const eyebrowDotsHTML = `
-    <div class="topic-eyebrow-track" style="max-width:100%;margin:16px 0 22px;padding:0 2px;">
-      <div style="display:flex;flex-direction:column;gap:14px;width:100%;">
-        <div class="fc-badge-group srs-note-breadcrumbs" style="display:inline-flex;align-items:center;gap:6px;min-width:0;width:100%;overflow:hidden;font-family:var(--font-m);font-size:0.82rem;white-space:nowrap;">
-          <span class="srs-breadcrumb-track" style="color:#10b981;font-weight:700;overflow:hidden;text-overflow:ellipsis;max-width:140px;font-size:0.78rem;">${escapeHtmlStr(cleanUnitTitleVal)}</span>
-          <span class="srs-breadcrumb-sep" style="color:rgba(255,255,255,0.25);font-size:0.72rem;flex-shrink:0;">/</span>
-          <span class="srs-breadcrumb-topic" style="color:#34d399;font-weight:700;letter-spacing:-0.01em;font-size:0.84rem;overflow:hidden;text-overflow:ellipsis;">${escapeHtmlStr(activeItemTitle)}</span>
-        </div>
+    <div class="topic-eyebrow-track" style="max-width:100%;margin:14px 0 8px;padding:0;">
+      <div style="display:flex;flex-direction:column;gap:16px;width:100%;">
         <div style="display:flex;justify-content:center;width:100%;">
           ${dotsNecklaceHTML}
         </div>
+        <nav class="srs-note-breadcrumbs" aria-label="Путь урока" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;min-width:0;flex:1 1 auto;font-family:var(--font-golos, 'Golos Text', sans-serif);font-size:0.78rem;line-height:1.4;white-space:normal;overflow:visible;letter-spacing:-0.01em;margin:0;padding:0;">
+          <span class="srs-breadcrumb-track" style="color:var(--ink, #f8fafc);font-weight:700;font-size:0.78rem;font-family:var(--font-golos, 'Golos Text', sans-serif);letter-spacing:-0.01em;white-space:nowrap;flex-shrink:0;">${escapeHtmlStr(lessonEchelonLabel)}</span>
+          <span class="srs-breadcrumb-sep" style="color:rgba(255,255,255,0.22);font-size:0.72rem;margin:0 4px;user-select:none;font-family:var(--font-golos, 'Golos Text', sans-serif);white-space:nowrap;flex-shrink:0;">/</span>
+          ${showUnitInBreadcrumb ? `
+            <span class="srs-breadcrumb-topic" style="color:var(--ink, #f8fafc);font-weight:700;font-size:0.78rem;font-family:var(--font-golos, 'Golos Text', sans-serif);letter-spacing:-0.01em;white-space:nowrap;flex-shrink:0;" title="${escapeHtmlStr(cleanUnitTitleVal)}">${escapeHtmlStr(cleanUnitTitleVal)}</span>
+            <span class="srs-breadcrumb-sep" style="color:rgba(255,255,255,0.22);font-size:0.72rem;margin:0 4px;user-select:none;font-family:var(--font-golos, 'Golos Text', sans-serif);white-space:nowrap;flex-shrink:0;">/</span>
+          ` : ''}
+          <span class="srs-breadcrumb-skill" style="color:#10b981;font-weight:700;font-size:0.78rem;font-family:var(--font-golos, 'Golos Text', sans-serif);letter-spacing:-0.01em;white-space:normal;overflow:visible;line-height:1.35;" title="${escapeHtmlStr(activeItemTitle)}">${escapeHtmlStr(cleanItemBreadcrumb)}</span>
+        </nav>
       </div>
     </div>`;
 
@@ -49038,7 +49320,7 @@ function viewPythonSkill(sid){
 
     bodyHTML = `
       <!-- Уровень 3: Лаконичный конспект без внутренней плашки (Book Mode) -->
-      <main class="srs-card-stage srs-stage-seamless" style="margin-top:0;perspective:none;margin-bottom:0;width:100%;max-width:760px;margin-left:auto;margin-right:auto;">
+      <main class="srs-card-stage srs-stage-seamless" style="margin-top:0;perspective:none;margin-bottom:0;width:100%;max-width:700px;margin-left:auto;margin-right:auto;">
         <div class="srs-note-content-area srs-note-card-clean" style="width:100%;background:transparent;border:none;box-shadow:none;padding:0;">
           <h2 style="font-size:1.42rem;font-weight:800;color:var(--ink);letter-spacing:-0.02em;margin:0 0 16px;line-height:1.35;text-align:left;">
             <span style="color:var(--ink);font-weight:800;letter-spacing:-0.02em;">${typeof formatRichInlineText === 'function' ? formatRichInlineText(pureStepTitle || cleanStepTitle || cleanNoteTitle) : escapeHtmlStr(pureStepTitle || cleanStepTitle || cleanNoteTitle)}</span>
@@ -49272,7 +49554,7 @@ function viewPythonSkill(sid){
 
   if(pySkillViewState.tab === 'theory'){
     return `
-      <div class="container cards-hub-container cards-hub-theory" style="max-width:760px;margin:0 auto;width:100%;box-sizing:border-box;">
+      <div class="container cards-hub-container cards-hub-theory lesson-monolith-shell" style="max-width:700px;margin:0 auto;width:100%;box-sizing:border-box;">
         ${srsHeaderHTML}
         ${eyebrowDotsHTML}
         ${bodyHTML}
@@ -49282,7 +49564,7 @@ function viewPythonSkill(sid){
 
   if(pySkillViewState.tab === 'cards'){
     return `
-      <div class="container cards-hub-container" style="max-width:700px;padding:32px 16px 60px;margin:0 auto;box-sizing:border-box;">
+      <div class="container cards-hub-container lesson-monolith-shell" style="max-width:700px;margin:0 auto;width:100%;box-sizing:border-box;">
         ${srsHeaderHTML}
         ${eyebrowDotsHTML}
         ${bodyHTML}
@@ -49291,8 +49573,8 @@ function viewPythonSkill(sid){
   }
 
   return `
-    <div class="container" style="max-width:880px;">
-      ${focusTopbarHTML}
+    <div class="container cards-hub-container lesson-monolith-shell lesson-monolith-shell--wide" style="max-width:940px;margin:0 auto;width:100%;box-sizing:border-box;">
+      ${srsHeaderHTML}
       ${eyebrowDotsHTML}
       ${bodyHTML}
       ${celebrationBanner}
@@ -51129,6 +51411,51 @@ function buildSrsRatingDockHTML(srsInfo, isFlipped, rateAttr = 'data-hub-rate', 
 
 window.buildSrsRatingDockHTML = buildSrsRatingDockHTML;
 
+// Единый DRY-хелпер 3-уровневых хлебных крошек (🛡️ Эшелон X / Юнит / Колода) для карточек SRS (1:1 с конспектами и уроками)
+function buildDeckBreadcrumbsHTML(deckId, cleanDeckTitle){
+  let matchedUnit = null;
+  let matchedSkill = null;
+  if(deckId && typeof ALL_UNITS_COMBINED !== 'undefined' && Array.isArray(ALL_UNITS_COMBINED)){
+    for(let ui = 0; ui < ALL_UNITS_COMBINED.length; ui++){
+      const u = ALL_UNITS_COMBINED[ui];
+      const skills = (u && Array.isArray(u.skills)) ? u.skills : [];
+      for(let si = 0; si < skills.length; si++){
+        const s = skills[si];
+        const fList = (s && Array.isArray(s.fIds) && s.fIds.length) ? s.fIds : ((s && Array.isArray(s.decks)) ? s.decks : []);
+        if(fList.includes(deckId)){
+          matchedUnit = u;
+          matchedSkill = s;
+          break;
+        }
+      }
+      if(matchedSkill) break;
+    }
+  }
+  const effTier = (matchedSkill && typeof getEffectiveSkillTier === 'function')
+    ? getEffectiveSkillTier(matchedSkill.id)
+    : ((matchedUnit && matchedUnit.tier) ? matchedUnit.tier : ((matchedSkill && matchedSkill.tier) ? matchedSkill.tier : 1));
+  const echelonLabel = `🛡️ Эшелон ${effTier || 1}`;
+  const rawUnitTitle = (matchedUnit && (matchedUnit.title || matchedUnit.name)) || '';
+  const unitTitleVal = (typeof cleanUnitTitle === 'function' && matchedUnit)
+    ? cleanUnitTitle(matchedUnit.id, rawUnitTitle)
+    : rawUnitTitle.replace(/^(?:Юнит|Урок|Модуль)\s+[\d.]+\s*[:·•\-–—]?\s*/i, '').trim();
+  const safeDeckTitle = String(cleanDeckTitle || deckId || 'Карточки').trim();
+  const shortDeckTitle = (safeDeckTitle.split(/[:·•–—]/)[0] || safeDeckTitle).trim();
+  const showUnit = Boolean(unitTitleVal && unitTitleVal !== safeDeckTitle && unitTitleVal !== shortDeckTitle);
+
+  return `
+    <nav class="srs-note-breadcrumbs srs-cards-breadcrumbs" aria-label="Путь колоды" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;min-width:0;width:100%;max-width:700px;margin:0 auto 12px;padding:0 2px;font-family:var(--font-golos, 'Golos Text', sans-serif);font-size:0.78rem;line-height:1.4;white-space:normal;overflow:visible;letter-spacing:-0.01em;box-sizing:border-box;">
+      <span class="srs-breadcrumb-track" style="color:var(--ink, #f8fafc);font-weight:700;font-size:0.78rem;font-family:var(--font-golos, 'Golos Text', sans-serif);letter-spacing:-0.01em;white-space:nowrap;flex-shrink:0;">${escapeHtmlStr(echelonLabel)}</span>
+      <span class="srs-breadcrumb-sep" style="color:rgba(255,255,255,0.22);font-size:0.72rem;margin:0 4px;user-select:none;font-family:var(--font-golos, 'Golos Text', sans-serif);white-space:nowrap;flex-shrink:0;">/</span>
+      ${showUnit ? `
+        <span class="srs-breadcrumb-topic" style="color:var(--ink, #f8fafc);font-weight:700;font-size:0.78rem;font-family:var(--font-golos, 'Golos Text', sans-serif);letter-spacing:-0.01em;white-space:nowrap;flex-shrink:0;" title="${escapeHtmlStr(unitTitleVal)}">${escapeHtmlStr(unitTitleVal)}</span>
+        <span class="srs-breadcrumb-sep" style="color:rgba(255,255,255,0.22);font-size:0.72rem;margin:0 4px;user-select:none;font-family:var(--font-golos, 'Golos Text', sans-serif);white-space:nowrap;flex-shrink:0;">/</span>
+      ` : ''}
+      <span class="srs-breadcrumb-skill" style="color:#10b981;font-weight:700;font-size:0.78rem;font-family:var(--font-golos, 'Golos Text', sans-serif);letter-spacing:-0.01em;white-space:normal;overflow:visible;line-height:1.35;" title="${escapeHtmlStr(safeDeckTitle)}">${escapeHtmlStr(shortDeckTitle)}</span>
+    </nav>`;
+}
+window.buildDeckBreadcrumbsHTML = buildDeckBreadcrumbsHTML;
+
 
 
 function buildSrsFlowTabsHTML(activeTab, dueCardsCount, dueNotesCount){
@@ -52047,6 +52374,8 @@ function viewCardsHub(){
 
       }, 'data-hub-goto-card', echelonOpts, unitOpts, deckOpts) : '')}
 
+      ${buildDeckBreadcrumbsHTML(freeDeckId, cleanTitle)}
+
       <div class="cards-hub-content" style="width:100%;max-width:700px;margin:0 auto;box-sizing:border-box;">
 
         <main class="srs-card-stage fc-stage" style="width:100%;max-width:700px;margin:0 auto;padding:0;perspective:1200px;box-sizing:border-box;">
@@ -52169,7 +52498,7 @@ function viewCardsHub(){
 
       ${(typeof buildSrsDeckContextBarHTML === 'function' ? buildSrsDeckContextBarHTML(cleanDeckName, qLen, duePos, cardsHubState.dueQueue || [], 'data-hub-goto-due', echelonOpts, unitOpts, deckOpts) : '')}
 
-
+      ${buildDeckBreadcrumbsHTML(safeItem.deckId, cleanDeckName)}
 
       <div class="cards-hub-content" style="width:100%;max-width:700px;margin:0 auto;box-sizing:border-box;">
 
