@@ -41043,7 +41043,7 @@ function mergeProgressStates(baseRaw, incomingRaw){
 
   merged.schemaVersion = Math.max(a.schemaVersion || 1, b.schemaVersion || 1, ACADEMY_SCHEMA_VERSION);
 
-  merged.updatedAt = Math.max(a.updatedAt || 0, b.updatedAt || 0, Date.now());
+  merged.updatedAt = Math.max(a.updatedAt || 0, b.updatedAt || 0) || Date.now();
 
   merged.xp = Math.max(a.xp || 0, b.xp || 0);
 
@@ -42321,7 +42321,7 @@ function progressSyncMergeBundle(bundle){
 
   }
 
-  if(changed){ saveState(state); writeWindowNameBackup(state); }
+  if(changed){ if(typeof localSaveState === 'function') localSaveState(state); else saveState(state); writeWindowNameBackup(state); }
 
   return changed;
 
@@ -42413,7 +42413,7 @@ async function runProgressSync(){
 
         if(pushed.data.bundle && progressSyncMergeBundle(pushed.data.bundle) && typeof render === 'function'){
 
-          if(location.hash && location.hash.includes('tab=theory')){
+          if((location.hash && location.hash.includes('tab=theory')) || document.getElementById('srs-note-feed') || document.getElementById('lesson-theory-text') || document.getElementById('py-theory-text')){
 
             restoreSnippetOutputs();
 
