@@ -3759,222 +3759,327 @@
 
 
   /* ---------- Micro-Split for Skill Practice (Zen IDE Pro) ---------- */
-
-  .practice-atomic-split{
-
-    display:grid;grid-template-columns:minmax(0, 0.95fr) minmax(0, 1.05fr);gap:20px;align-items:stretch;
-
+  .zen-ide-stage {
+    width: 100%;
+    margin-top: 12px;
   }
-
+  .practice-atomic-split {
+    display: grid;
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    gap: 20px;
+    align-items: stretch;
+  }
   .practice-atomic-split > *,
-
   .practice-spec-pane,
-
-  .practice-right-pane{
-
-    min-width:0 !important;
-
-    max-width:100% !important;
-
-    box-sizing:border-box !important;
-
+  .practice-right-pane {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
-
-  .dataflow-card,
-
-  .slice-anatomy-widget{
-
-    max-width:100% !important;
-
-    box-sizing:border-box !important;
-
-    overflow-x:auto !important;
-
+  .practice-left-pane {
+    background: rgba(13, 18, 28, 0.52);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 18px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
   }
-
-  .dataflow-stream{
-
-    flex-wrap:wrap !important;
-
-    gap:8px !important;
-
+  [data-theme="light"] .practice-left-pane {
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(15, 23, 42, 0.08);
   }
-
-  .slice-grid{
-
-    max-width:100% !important;
-
-    overflow-x:auto !important;
-
-    padding-bottom:4px !important;
-
-  }
-
-  .slice-flow-cue{
-
-    word-break:break-word !important;
-
-    white-space:normal !important;
-
-  }
-
-  @media (max-width:860px){
-
-    .practice-atomic-split{
-
-      grid-template-columns:minmax(0, 1fr) !important;gap:14px;
-
-    }
-
-  }
-
-  @media (max-width:768px){
-
-    .practice-mobile-tab-bar{
-
-      display:flex !important;
-
-      position:sticky !important;
-
-      top:0;
-
-      z-index:10;
-
-      background:rgba(18,24,27,0.92) !important;
-
-      backdrop-filter:blur(16px);
-
-      -webkit-backdrop-filter:blur(16px);
-
-      box-shadow:0 4px 16px rgba(0,0,0,0.25);
-
-    }
-
-    .practice-mobile-cta{
-      display:inline-flex !important;
-    }
-  @media (min-width:769px){
-    .practice-mobile-cta,
-    .hide-on-desktop{
-      display:none !important;
-    }
-  }
-
-  /* Zen Inline I/O Flow styling (Minimalist, 0 Noise) */
-  .io-flow-block{
-    margin-top:10px;
-    padding:8px 12px;
-    background:rgba(255,255,255,0.02);
-    border-left:2px solid var(--moss, #10b981);
-    border-radius:8px;
-    font-size:0.8rem;
-    line-height:1.45;
-  }
-  .io-flow-label{
-    display:none;
-  }
-  .io-flow-row{
-    display:flex;
-    flex-wrap:wrap;
-    align-items:center;
-    gap:8px;
-    font-family:var(--font-m, monospace);
-    font-size:0.78rem;
-  }
-  .io-pill{
-    display:inline-flex;
-    align-items:center;
-    padding:2px 6px;
-    border-radius:6px;
-    background:rgba(255,255,255,0.04);
-    color:var(--ink-soft);
-  }
-  .io-pill-out{
-    color:#34d399;
-    background:rgba(16,185,129,0.08);
-  }
-  .io-arrow{
-    color:var(--moss, #10b981);
-    font-size:0.75rem;
-    opacity:0.7;
-  }
-
-    .practice-atomic-split.show-spec .practice-right-pane{
-
-      display:none !important;
-
-    }
-
-    .practice-atomic-split.show-spec .practice-left-pane{
-
-      display:flex !important;
-
-      animation:stepFadeIn 0.22s cubic-bezier(0.16,1,0.3,1);
-
-    }
-
-    .practice-atomic-split.show-code .practice-left-pane{
-
-      display:none !important;
-
-    }
-
-    .practice-atomic-split.show-code .practice-right-pane{
-
-      display:flex !important;
-
-      animation:stepFadeIn 0.22s cubic-bezier(0.16,1,0.3,1);
-
-    }
-
-  }
-
-  @keyframes stepFadeIn {
-
-    from { opacity: 0; transform: translateY(4px); }
-
-    to { opacity: 1; transform: translateY(0); }
-
-  }
-
-  
-  /* =========================================================================
-     ZEN IDE MASTER STANDARD (Canonical Task Solving Screen & Drawer)
-     ========================================================================= */
-  .zen-accordion {
-    background: rgba(12, 16, 24, 0.7);
-    border: 1px solid var(--glass-border);
-    border-radius: 14px;
-    overflow: hidden;
-    margin-top: 10px;
-    transition: all 0.2s ease;
-  }
-  .zen-accordion-header {
-    padding: 11px 14px;
+  .zen-meta-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
+    padding-bottom: 11px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 0.78rem;
+  }
+  [data-theme="light"] .zen-meta-bar {
+    border-bottom-color: rgba(15, 23, 42, 0.08);
+  }
+  .zen-meta-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+  .zen-meta-level {
+    color: var(--ink-muted);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .zen-meta-dot {
+    color: rgba(255, 255, 255, 0.22);
+    user-select: none;
+  }
+  [data-theme="light"] .zen-meta-dot {
+    color: rgba(15, 23, 42, 0.25);
+  }
+  .zen-meta-solved {
+    color: #34d399;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  [data-theme="light"] .zen-meta-solved {
+    color: #059669;
+  }
+  .zen-meta-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .zen-cheatsheet-link {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #6ee7b7;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+  }
+  .zen-cheatsheet-link:hover {
+    background: rgba(16, 185, 129, 0.10);
+    border-color: rgba(16, 185, 129, 0.24);
+    color: #a7f3d0;
+  }
+  [data-theme="light"] .zen-cheatsheet-link {
+    color: #047857;
+  }
+  [data-theme="light"] .zen-cheatsheet-link:hover {
+    background: rgba(16, 185, 129, 0.10);
+    color: #065f46;
+  }
+  .zen-task-title {
+    font-family: var(--font-d, 'Onest', sans-serif);
+    font-size: 1.12rem;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    line-height: 1.35;
+    color: var(--ink, #f8fafc);
+    margin: 0 0 8px 0;
+  }
+  [data-theme="light"] .zen-task-title {
+    color: #0f172a;
+  }
+  .zen-task-desc {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+  [data-theme="light"] .zen-task-desc {
+    color: #334155;
+  }
+  .dataflow-card,
+  .slice-anatomy-widget {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: auto !important;
+  }
+  .dataflow-stream {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  .slice-grid {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    padding-bottom: 4px !important;
+  }
+  .slice-flow-cue {
+    word-break: break-word !important;
+    white-space: normal !important;
+  }
+
+  /* Zen Inline I/O Flow styling (Дзен-лист: тонкая изумрудная линия, 0 шума) */
+  .io-flow-block {
+    margin: 12px 0 4px;
+    padding: 4px 0 4px 12px;
+    background: transparent;
+    border-left: 2px solid rgba(16, 185, 129, 0.72);
+    border-radius: 0;
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+  .io-flow-label {
+    display: none;
+  }
+  .io-flow-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    font-size: 0.8rem;
+  }
+  .io-pill {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--ink-muted);
+    font-size: 0.78rem;
+  }
+  .io-pill code {
+    font-family: var(--font-m, 'JetBrains Mono', monospace);
+    font-size: 0.78rem;
+    color: #e2e8f0;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+  .io-pill-out code {
+    color: #6ee7b7;
+  }
+  [data-theme="light"] .io-pill code {
+    color: #0f172a;
+  }
+  [data-theme="light"] .io-pill-out code {
+    color: #047857;
+  }
+  .io-arrow {
+    display: none;
+  }
+
+  @media (max-width: 860px) {
+    .practice-atomic-split {
+      grid-template-columns: minmax(0, 1fr) !important;
+      gap: 14px;
+    }
+  }
+  @media (min-width: 769px) {
+    .practice-mobile-cta,
+    .hide-on-desktop {
+      display: none !important;
+    }
+  }
+  @media (max-width: 768px) {
+    .practice-mobile-tab-bar {
+      display: flex !important;
+      position: sticky !important;
+      top: 0;
+      z-index: 10;
+      background: rgba(18, 24, 27, 0.92) !important;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    }
+    .practice-mobile-cta {
+      display: inline-flex !important;
+    }
+    .practice-atomic-split.show-spec .practice-right-pane {
+      display: none !important;
+    }
+    .practice-atomic-split.show-spec .practice-left-pane {
+      display: flex !important;
+      animation: stepFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .practice-atomic-split.show-code .practice-left-pane {
+      display: none !important;
+    }
+    .practice-atomic-split.show-code .practice-right-pane {
+      display: flex !important;
+      animation: stepFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  }
+
+  @keyframes stepFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* =========================================================================
+     ZEN IDE MASTER STANDARD (Дзен-лист + Фокус на коде)
+     ========================================================================= */
+  .zen-spoilers-group {
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  [data-theme="light"] .zen-spoilers-group {
+    border-top-color: rgba(15, 23, 42, 0.08);
+  }
+  .zen-accordion {
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 0;
+    transition: background 0.16s ease;
+  }
+  .zen-accordion-header {
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
     cursor: pointer;
     user-select: none;
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: var(--ink-dim);
-    transition: background 0.15s;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    border-radius: 10px;
+    transition: background 0.15s ease, color 0.15s ease;
   }
   .zen-accordion-header:hover {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.04);
     color: #fff;
   }
+  [data-theme="light"] .zen-accordion-header {
+    color: #334155;
+  }
+  [data-theme="light"] .zen-accordion-header:hover {
+    background: rgba(15, 23, 42, 0.04);
+    color: #0f172a;
+  }
+  .zen-accordion--socrates .zen-accordion-header {
+    color: #fbbf24;
+  }
+  .zen-accordion--socrates .zen-accordion-header:hover {
+    background: rgba(245, 158, 11, 0.07);
+    color: #fcd34d;
+  }
+  [data-theme="light"] .zen-accordion--socrates .zen-accordion-header {
+    color: #b45309;
+  }
+  .zen-accordion .acc-meta-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-size: 0.74rem;
+    font-weight: 500;
+    opacity: 0.75;
+  }
   .zen-accordion .acc-icon {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     transition: transform 0.2s ease;
-    color: var(--ink-muted);
+    color: currentColor;
   }
   .zen-accordion.is-open .acc-icon {
     transform: rotate(180deg);
   }
   .zen-accordion-content {
-    padding: 0 14px 14px 14px;
+    padding: 4px 10px 10px 10px;
     display: none;
     animation: stepFadeIn 0.2s ease;
   }
@@ -3982,63 +4087,257 @@
     display: block;
   }
 
+  /* Студийное окно редактора (Вариант C · Фокус на коде) */
+  .zen-editor-frame {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: #0a0f17;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.36);
+  }
+  [data-theme="light"] .zen-editor-frame {
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  }
+  .zen-editor-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 14px;
+    background: rgba(255, 255, 255, 0.025);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 0.75rem;
+  }
+  [data-theme="light"] .zen-editor-topbar {
+    background: #f8fafc;
+    border-bottom-color: rgba(15, 23, 42, 0.08);
+  }
+  .zen-editor-filename {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font-m, 'JetBrains Mono', monospace);
+    font-weight: 600;
+    color: #e2e8f0;
+  }
+  [data-theme="light"] .zen-editor-filename {
+    color: #0f172a;
+  }
+  .zen-editor-file-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.65);
+    flex-shrink: 0;
+  }
+  .zen-editor-top-tools {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--ink-muted);
+    font-size: 0.72rem;
+  }
+  .zen-editor-kbd-hint {
+    opacity: 0.7;
+    white-space: nowrap;
+  }
+  .zen-editor-reset-btn {
+    background: transparent;
+    border: none;
+    color: var(--ink-muted);
+    font-size: 0.74rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+  .zen-editor-reset-btn:hover {
+    color: #f8fafc;
+    background: rgba(255, 255, 255, 0.06);
+  }
+  [data-theme="light"] .zen-editor-reset-btn:hover {
+    color: #0f172a;
+    background: rgba(15, 23, 42, 0.06);
+  }
+  .zen-editor-frame .py-editor-shell,
+  .zen-editor-frame .editor-with-gutter,
+  .zen-editor-frame .code-editor-shell {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    flex: 1;
+  }
+  .zen-editor-frame .editor-with-gutter {
+    background: transparent !important;
+  }
+  .zen-editor-frame textarea.code-editor {
+    resize: none !important;
+  }
+
+  /* Встроенный статус-бар / консоль внутри окна редактора */
   .vscode-mini-drawer {
-    background: #080b11;
-    border: 1px solid var(--glass-border);
-    border-radius: 14px;
-    margin-top: 10px;
+    background: rgba(4, 7, 12, 0.65);
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    border-radius: 0;
+    margin-top: 0;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+  }
+  [data-theme="light"] .vscode-mini-drawer {
+    background: #f8fafc;
+    border-top-color: rgba(15, 23, 42, 0.08);
   }
   .vscode-mini-drawer .drawer-nav-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: rgba(255, 255, 255, 0.02);
-    border-bottom: 1px solid var(--glass-border);
-    padding-right: 12px;
+    gap: 8px;
+    background: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 0 12px 0 8px;
+    min-height: 36px;
+  }
+  .vscode-mini-drawer.is-collapsed .drawer-nav-bar {
+    border-bottom: none;
+  }
+  [data-theme="light"] .vscode-mini-drawer .drawer-nav-bar {
+    border-bottom-color: rgba(15, 23, 42, 0.08);
   }
   .vscode-mini-drawer .drawer-tabs-group {
     display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
   }
   .vscode-mini-drawer .drawer-tab-btn {
-    padding: 7px 14px;
-    font-size: 0.75rem;
-    font-family: var(--font-m, monospace);
+    padding: 6px 10px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    font-family: var(--font-d, 'Onest', sans-serif);
     color: var(--ink-muted);
     cursor: pointer;
-    border-right: 1px solid var(--glass-border);
+    border: none;
     background: transparent;
-    border-top: none;
-    border-left: none;
     border-bottom: 2px solid transparent;
-    transition: all 0.15s;
+    white-space: nowrap;
+    transition: color 0.15s ease, border-color 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .vscode-mini-drawer .drawer-tab-btn:hover {
+    color: #e2e8f0;
+  }
+  [data-theme="light"] .vscode-mini-drawer .drawer-tab-btn:hover {
+    color: #0f172a;
   }
   .vscode-mini-drawer .drawer-tab-btn.is-active {
     color: #34d399;
-    background: rgba(16, 185, 129, 0.08);
-    border-bottom-color: var(--emerald);
+    background: transparent;
+    border-bottom-color: var(--emerald, #10b981);
   }
+  .vscode-mini-drawer.is-collapsed .drawer-tab-btn.is-active {
+    border-bottom-color: transparent;
+    color: var(--ink-muted);
+  }
+  .drawer-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #64748b;
+    flex-shrink: 0;
+  }
+  .drawer-status-dot--pass { background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,0.7); }
+  .drawer-status-dot--fail { background: #f43f5e; box-shadow: 0 0 6px rgba(244,63,94,0.7); }
+  .drawer-status-dot--running { background: #f59e0b; box-shadow: 0 0 6px rgba(245,158,11,0.7); }
   .vscode-mini-drawer .drawer-toggle-btn {
     background: transparent;
     border: none;
     color: var(--ink-muted);
     cursor: pointer;
-    font-size: 0.74rem;
+    font-size: 0.73rem;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 4px 6px;
+    border-radius: 6px;
+    transition: color 0.15s ease, background 0.15s ease;
   }
-  .vscode-mini-drawer .drawer-toggle-btn:hover { color: #fff; }
+  .vscode-mini-drawer .drawer-toggle-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  [data-theme="light"] .vscode-mini-drawer .drawer-toggle-btn:hover {
+    color: #0f172a;
+    background: rgba(15, 23, 42, 0.05);
+  }
   .vscode-mini-drawer .drawer-body-panel {
-    padding: 12px 16px;
+    padding: 12px 14px;
     font-family: var(--font-m, monospace);
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     color: #cbd5e1;
-    max-height: 140px;
+    max-height: 150px;
     overflow-y: auto;
     line-height: 1.5;
   }
+  [data-theme="light"] .vscode-mini-drawer .drawer-body-panel {
+    color: #334155;
+  }
   .vscode-mini-drawer.is-collapsed .drawer-body-panel {
     display: none !important;
+  }
+
+  .zen-action-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .zen-skip-btn {
+    padding: 12px 16px;
+    border-radius: 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    white-space: nowrap;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+  }
+  .zen-skip-btn:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+  }
+  [data-theme="light"] .zen-skip-btn {
+    background: rgba(15, 23, 42, 0.03);
+    border-color: rgba(15, 23, 42, 0.12);
+    color: #334155;
+  }
+  [data-theme="light"] .zen-skip-btn:hover {
+    background: rgba(15, 23, 42, 0.07);
+    color: #0f172a;
   }
 
   .triumph-celebration-banner {
@@ -4304,33 +4603,42 @@
   }
 
   .btn-check-solution{
-
-    flex:1;background:linear-gradient(135deg, #059669 0%, #10b981 100%);
-
-    border:1px solid rgba(52,211,153,0.45);color:#ffffff;font-family:inherit;
-
-    font-size:0.90rem;font-weight:700;padding:12px 18px;border-radius:14px;
-
-    cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
-
-    gap:8px;box-shadow:inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 4px 20px -2px rgba(16, 185, 129, 0.38);transition:all .2s ease;
-
+    flex:1;
+    min-width:0;
+    background:linear-gradient(135deg, #059669 0%, #10b981 100%);
+    border:1px solid rgba(52,211,153,0.45);
+    color:#ffffff;
+    font-family:inherit;
+    font-size:0.88rem;
+    font-weight:700;
+    padding:12px 16px;
+    border-radius:14px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    white-space:nowrap;
+    box-shadow:inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 4px 20px -2px rgba(16, 185, 129, 0.38);
+    transition:all .2s ease;
   }
 
   .btn-check-solution:hover{
-
-    transform:translateY(-1px);box-shadow:inset 0 1px 1px rgba(255, 255, 255, 0.35), 0 6px 24px -2px rgba(16, 185, 129, 0.52);
-
-    background:linear-gradient(135deg, #10b981 0%, #34d399 100%);color:#042f1f;
-
+    transform:translateY(-1px);
+    box-shadow:inset 0 1px 1px rgba(255, 255, 255, 0.35), 0 6px 24px -2px rgba(16, 185, 129, 0.52);
+    background:linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    color:#042f1f;
   }
 
   .xp-tag{
-
-    background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.2);
-
-    border-radius:6px;padding:1px 6px;font-size:0.74rem;font-weight:700;
-
+    background:rgba(0,0,0,0.25);
+    border:1px solid rgba(255,255,255,0.2);
+    border-radius:6px;
+    padding:2px 7px;
+    font-size:0.72rem;
+    font-weight:700;
+    white-space:nowrap;
+    flex-shrink:0;
   }
 
 
@@ -33617,7 +33925,7 @@ body.light-theme .srs-card-theory-anchor:hover svg {
   .cards-hub-container.cards-hub-theory,
   .container.cards-hub-container.lesson-monolith-shell,
   .cards-hub-container:has(#py-theory-text),
-  .cards-hub-container:has(.lesson-theory):not(.srs-notes-container):not(:has(.srs-note-card)) {
+  .cards-hub-container:has(.lesson-theory):not(.srs-notes-container):not(.lesson-monolith-shell--wide):not(:has(.srs-note-card)) {
     position: relative !important;
     overflow: hidden !important;
     padding: 32px 36px !important;
@@ -33649,8 +33957,8 @@ body.light-theme .srs-card-theory-anchor:hover svg {
     transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
   }
 
-  .container.cards-hub-container.lesson-monolith-shell--wide {
-    max-width: 940px !important;
+  .container.cards-hub-container.lesson-monolith-shell.lesson-monolith-shell--wide {
+    max-width: 980px !important;
   }
 
   .cards-hub-theory > *,
@@ -42552,6 +42860,14 @@ function getIdeDraft(taskId, fallback){
 
     if(typeof draft === 'string'){
 
+      // Автоисцеление битой кодировки (mojibake U+FFFD) из устаревших черновиков localStorage
+      if(draft.includes('\uFFFD')){
+        const saneLines = draft.split('\n').filter(l => !l.includes('\uFFFD'));
+        const saneCode = saneLines.join('\n').trim();
+        if(!saneCode) return fallback;
+        draft = saneCode;
+      }
+
       const isLegacyStub = draft.includes('# TODO') || draft.includes('# Заполните значения целевых переменных') || draft.includes('# Задача #');
 
       const nonCommentLines = draft.split('\n').filter(l => l.trim() && !l.trim().startsWith('#'));
@@ -48715,7 +49031,11 @@ function buildUnifiedZenIdeHTML(params){
   const tObj = params.task || {};
   const tid = tObj.id;
   const editorId = params.editorId || 'py-skill-editor';
-  const codeDraft = params.codeDraft || '';
+  let codeDraft = String(params.codeDraft || '');
+  if(codeDraft.includes('\uFFFD')){
+    const sane = codeDraft.split('\n').filter(l => !l.includes('\uFFFD')).join('\n').trim();
+    codeDraft = sane || String(tObj.initialCode || '');
+  }
   const socraticHints = params.socraticHints || [];
   const hintLevel = params.hintLevel || 0;
   const runStatus = params.runStatus;
@@ -48732,7 +49052,9 @@ function buildUnifiedZenIdeHTML(params){
   const swiperHTML = params.swiperHTML || '';
   const backBtnHTML = params.backBtnHTML || '';
   const drawerTab = params.drawerTab || 'tests';
-  const drawerCollapsed = !!params.drawerCollapsed;
+  const drawerCollapsed = (params.drawerCollapsed === undefined || params.drawerCollapsed === null)
+    ? !runStatus
+    : !!params.drawerCollapsed;
   const accSliceOpen = !!params.accSliceOpen;
   const accSocratesOpen = !!params.accSocratesOpen;
 
@@ -48749,35 +49071,42 @@ function buildUnifiedZenIdeHTML(params){
   const hasInlineIo = /io-flow-block|io-flow-row|dataflow-card/i.test(cleanDesc);
   const ioCardHtml = hasInlineIo ? '' : (spec.ioCard || '');
 
+  // Clean tier label without noisy emoji prefix (e.g. "🥚 Уровень 1" -> "Уровень 1")
+  const cleanTierLabel = String(tObj.tier || 'Уровень 1').replace(/^[^\p{L}\p{N}]+/u, '').trim() || 'Уровень 1';
+
+  // Compact button label for next step (never overflows container; full title stays in tooltip)
+  const shortNextLabel = (/^(?:Следующая задача|К следующему конспекту)/i.test(nextBtnLabel))
+    ? 'Далее ➔'
+    : nextBtnLabel;
+
   const shownHints = socraticHints.slice(0, hintLevel).map((h, i) =>
     `<div class="socratic-hint socratic-bubble" style="margin:8px 0;padding:8px 12px;border-radius:10px;background:rgba(217,119,6,0.08);border-left:3px solid var(--amber);font-size:0.82rem;line-height:1.45;color:#fef3c7;"><strong>💡 Наводка ${i+1}:</strong> ${h}</div>`
   ).join('');
 
   const mobileTabBarHTML = `
     <div class="practice-mobile-tab-bar" style="display:none;margin-bottom:14px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:14px;padding:4px;gap:6px;">
-      <button type="button" class="btn btn-ghost ${mobTab === 'spec' ? 'is-active active' : ''}" ${mobTabAttr}="spec" style="flex:1;padding:8px 12px;font-size:0.82rem;font-weight:700;border-radius:10px;justify-content:center;${mobTab === 'spec' ? 'background:rgba(16,185,129,0.18);color:#34d399;border:1px solid rgba(16,185,129,0.35);' : ''}">📋 Условие &amp; Схемы</button>
-      <button type="button" class="btn btn-ghost ${mobTab === 'code' ? 'is-active active' : ''}" ${mobTabAttr}="code" style="flex:1;padding:8px 12px;font-size:0.82rem;font-weight:700;border-radius:10px;justify-content:center;${mobTab === 'code' ? 'background:rgba(16,185,129,0.18);color:#34d399;border:1px solid rgba(16,185,129,0.35);' : ''}">💻 Редактор кода</button>
+      <button type="button" class="btn btn-ghost ${mobTab === 'spec' ? 'is-active active' : ''}" ${mobTabAttr}="spec" style="flex:1;padding:8px 12px;font-size:0.82rem;font-weight:700;border-radius:10px;justify-content:center;${mobTab === 'spec' ? 'background:rgba(16,185,129,0.18);color:#34d399;border:1px solid rgba(16,185,129,0.35);' : ''}">📋 Условие</button>
+      <button type="button" class="btn btn-ghost ${mobTab === 'code' ? 'is-active active' : ''}" ${mobTabAttr}="code" style="flex:1;padding:8px 12px;font-size:0.82rem;font-weight:700;border-radius:10px;justify-content:center;${mobTab === 'code' ? 'background:rgba(16,185,129,0.18);color:#34d399;border:1px solid rgba(16,185,129,0.35);' : ''}">💻 Код</button>
     </div>`;
 
-  // Clean Human UI: no technical #ID
+  // Вариант A · Дзен-лист: 1 тонкая мета-строка без визуального шума
   const metaHeaderHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-      <div style="display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;font-weight:700;">
+    <div class="zen-meta-bar">
+      <div class="zen-meta-left">
         ${backBtnHTML}
-        <span style="color:var(--ink-muted);">${context === 'sprint' ? 'Практика' : 'Банк задач'}</span>
-        <span class="badge" style="background:rgba(217,119,6,0.18);color:var(--amber);padding:2px 8px;border-radius:8px;font-weight:700;white-space:nowrap;">${escapeHtmlStr(tObj.tier || 'Уровень 1')}</span>
+        <span class="zen-meta-level">${escapeHtmlStr(cleanTierLabel)}</span>
+        ${isSolved ? `<span class="zen-meta-dot">·</span><span class="zen-meta-solved">✓ Решено</span>` : ''}
       </div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        ${params.ownerKid ? `<button type="button" class="btn btn-ghost btn-cheatsheet-pill" data-zen-open-cheatsheet="${escapeHtmlStr(params.ownerKid)}" style="padding:4px 10px;font-size:0.75rem;font-weight:700;border-radius:8px;border:1px solid rgba(16,185,129,0.3);background:rgba(16,185,129,0.08);color:#34d399;display:inline-flex;align-items:center;gap:4px;cursor:pointer;" title="Открыть конспект текущей темы в шторке">💡 Шпаргалка</button>` : ''}
+      <div class="zen-meta-actions">
+        ${params.ownerKid ? `<button type="button" class="zen-cheatsheet-link btn-cheatsheet-pill" data-zen-open-cheatsheet="${escapeHtmlStr(params.ownerKid)}" title="Открыть конспект текущей темы в шторке"><span>💡</span><span>Шпаргалка</span></button>` : ''}
         ${swiperHTML}
-        ${isSolved ? `<span class="state-tag state-tag--mastered" style="margin:0;">✓ Решено</span>` : ''}
       </div>
     </div>
   `;
 
   const conditionHTML = `
-    <div class="lesson-theory" style="font-size:0.89rem;color:var(--ink-soft);line-height:1.55;margin-bottom:12px;">
-      <h3 style="font-size:1.05rem;font-weight:700;color:var(--ink);margin:0 0 6px 0;">${escapeHtmlStr(tObj.title || 'Задание')}</h3>
+    <div class="lesson-theory zen-task-desc">
+      <h3 class="zen-task-title">${escapeHtmlStr(tObj.title || 'Задание')}</h3>
       ${cleanDesc ? `<div>${cleanDesc}</div>` : ''}
     </div>
     ${ioCardHtml}
@@ -48788,8 +49117,8 @@ function buildUnifiedZenIdeHTML(params){
     sliceAccordionHTML = `
       <div class="zen-accordion ${accSliceOpen ? 'is-open' : ''}" data-zen-accordion="slice">
         <div class="zen-accordion-header" data-zen-toggle-acc="slice">
-          <span>📐 Анатомия среза [start:stop:step]</span>
-          <span class="acc-icon">${accSliceOpen ? '▲' : '▼'}</span>
+          <span>📐 Анатомия среза <span style="font-family:var(--font-m, monospace);opacity:0.65;font-weight:500;">[start:stop:step]</span></span>
+          <span class="acc-meta-right"><span class="acc-icon">${accSliceOpen ? '▲' : '▾'}</span></span>
         </div>
         <div class="zen-accordion-content" style="${accSliceOpen ? 'display:block;' : 'display:none;'}">
           ${spec.sliceVisual}
@@ -48799,13 +49128,13 @@ function buildUnifiedZenIdeHTML(params){
   }
 
   const socratesAccordionHTML = `
-    <div class="zen-accordion ${accSocratesOpen ? 'is-open' : ''}" data-zen-accordion="socrates" style="border:1px solid rgba(245,158,11,0.22);background:rgba(245,158,11,0.03);">
+    <div class="zen-accordion zen-accordion--socrates ${accSocratesOpen ? 'is-open' : ''}" data-zen-accordion="socrates">
       <div class="zen-accordion-header" data-zen-toggle-acc="socrates">
-        <span style="color:var(--amber);">💡 Наставник Сократ (Наводки: <strong>${hintLevel} / ${socraticHints.length}</strong>)</span>
-        <span class="acc-icon">${accSocratesOpen ? '▲' : '▼'}</span>
+        <span>💡 Наставник Сократ</span>
+        <span class="acc-meta-right"><strong>${hintLevel} / ${socraticHints.length}</strong><span class="acc-icon">${accSocratesOpen ? '▲' : '▾'}</span></span>
       </div>
       <div class="zen-accordion-content" style="${accSocratesOpen ? 'display:block;' : 'display:none;'}">
-        <button type="button" class="btn btn-ghost" ${hintBtnAttr} style="width:100%;justify-content:center;font-size:0.82rem;padding:9px 12px;border-radius:12px;border:1px dashed rgba(217,119,6,0.35);background:rgba(217,119,6,0.06);color:#fcd34d;font-weight:600;" ${hintLevel >= socraticHints.length ? 'disabled' : ''}>
+        <button type="button" class="btn btn-ghost" ${hintBtnAttr} style="width:100%;justify-content:center;font-size:0.8rem;padding:8px 12px;border-radius:10px;border:1px dashed rgba(217,119,6,0.35);background:rgba(217,119,6,0.06);color:#fcd34d;font-weight:600;" ${hintLevel >= socraticHints.length ? 'disabled' : ''}>
           ${hintLevel >= socraticHints.length ? '✓ Все наводки раскрыты' : 'Получить наводку без готового кода ➔'}
         </button>
         <div class="socrates-hints-stack" style="margin-top:8px;">
@@ -48817,44 +49146,49 @@ function buildUnifiedZenIdeHTML(params){
 
   let drawerTabContent = '';
   if(drawerTab === 'stdout'){
-    drawerTabContent = `<pre style="margin:0;font-family:var(--font-m, monospace);font-size:0.78rem;white-space:pre-wrap;color:#cbd5e1;">${escapeHtmlStr(runOutput || '[Python 3.12 Sandboxed Session]\n>>> Готов к запуску кода.')}</pre>`;
+    drawerTabContent = `<pre style="margin:0;font-family:var(--font-m, monospace);font-size:0.78rem;white-space:pre-wrap;color:inherit;">${escapeHtmlStr(runOutput || '[Python 3.12 Sandboxed Session]\n>>> Готов к запуску кода.')}</pre>`;
   } else {
     if(runStatus === 'running'){
-      drawerTabContent = `<div class="test-running-shimmer" style="color:var(--amber);font-size:0.82rem;">⚡ Выполняю проверки в песочнице…</div>`;
+      drawerTabContent = `<div class="test-running-shimmer" style="color:var(--amber);font-size:0.8rem;">⚡ Выполняю проверки в песочнице…</div>`;
     } else if(runStatus === 'pass'){
       drawerTabContent = `
         <div style="color:#34d399;font-weight:700;">✓ Все тесты пройдены чисто! (+15 XP)</div>
-        <div style="font-size:0.75rem;opacity:0.85;margin-top:2px;">Задание успешно решено и закреплено.</div>
+        <div style="font-size:0.74rem;opacity:0.85;margin-top:2px;">Задание успешно решено и закреплено.</div>
       `;
     } else if(runStatus === 'fail'){
       drawerTabContent = `
         <div style="color:#fb7185;font-weight:700;margin-bottom:4px;">✗ Ошибка выполнения или неверный результат:</div>
         ${buildSocraticDiffHTML(runOutput)}
         <div style="margin-top:8px;font-size:0.74rem;color:var(--amber);display:flex;align-items:center;gap:6px;">
-          <span>💡</span> <span>Нужна помощь? Раскройте Наставника Сократа в условии задачи слева.</span>
+          <span>💡</span> <span>Нужна помощь? Раскройте Наставника Сократа слева.</span>
         </div>
       `;
     } else {
-      drawerTabContent = `<div style="color:var(--ink-muted);font-size:0.8rem;">Редактор готов к проверке. Нажмите «▷ Проверить решение».</div>`;
+      drawerTabContent = `<div style="color:var(--ink-muted);font-size:0.78rem;">Готов к проверке. Нажмите «▷ Проверить решение» или Ctrl+Enter.</div>`;
     }
   }
 
+  const statusDotClass = runStatus === 'pass'
+    ? 'drawer-status-dot--pass'
+    : (runStatus === 'fail' ? 'drawer-status-dot--fail' : (runStatus === 'running' ? 'drawer-status-dot--running' : ''));
+
   const testsTabTitle = runStatus === 'pass'
-    ? '✓ Тесты пройдены'
-    : (runStatus === 'fail' ? '✗ Тесты не прошли' : (runStatus === 'running' ? '⚡ Проверка…' : 'Тесты (готов)'));
+    ? 'Тесты пройдены'
+    : (runStatus === 'fail' ? 'Есть ошибки' : (runStatus === 'running' ? 'Проверка…' : (drawerCollapsed ? 'Тесты · ожидание запуска' : 'Тесты')));
   const testsTabColor = runStatus === 'pass' ? '#34d399' : (runStatus === 'fail' ? '#fb7185' : 'inherit');
 
-  // Zen Drawer: exactly 2 clean tabs [Тесты] & [Терминал] (Socrates lives cleanly on the left)
+  // Вариант C · Фокус на коде: встроенный тонкий статус-бар (свёрнут до запуска, раскрывается по клику или при проверке)
   const miniDrawerHTML = `
     <div class="vscode-mini-drawer ${drawerCollapsed ? 'is-collapsed' : ''}" data-zen-drawer="${editorId}">
       <div class="drawer-nav-bar">
         <div class="drawer-tabs-group">
           <button type="button" class="drawer-tab-btn ${drawerTab === 'tests' || (drawerTab !== 'stdout') ? 'is-active' : ''}" data-zen-drawer-tab="tests" style="color:${testsTabColor};">
-            ${testsTabTitle}
+            <span class="drawer-status-dot ${statusDotClass}"></span>
+            <span>${testsTabTitle}</span>
           </button>
-          <button type="button" class="drawer-tab-btn ${drawerTab === 'stdout' ? 'is-active' : ''}" data-zen-drawer-tab="stdout">Терминал (stdout)</button>
+          ${drawerCollapsed ? '' : `<button type="button" class="drawer-tab-btn ${drawerTab === 'stdout' ? 'is-active' : ''}" data-zen-drawer-tab="stdout">Терминал</button>`}
         </div>
-        <button type="button" class="drawer-toggle-btn" data-zen-toggle-drawer title="Свернуть / Развернуть консоль">${drawerCollapsed ? 'Развернуть ▴' : 'Свернуть ▾'}</button>
+        <button type="button" class="drawer-toggle-btn" data-zen-toggle-drawer title="Свернуть / Развернуть консоль">${drawerCollapsed ? 'Терминал ▴' : 'Свернуть ▾'}</button>
       </div>
       <div class="drawer-body-panel" style="${drawerCollapsed ? 'display:none;' : ''}">
         ${drawerTabContent}
@@ -48868,53 +49202,57 @@ function buildUnifiedZenIdeHTML(params){
         <div class="triumph-text-title">🏆 Задача решена чисто!</div>
         <div style="font-size:0.78rem;color:var(--ink-muted);margin-top:2px;">+15 XP зачислено на баланс эшелона</div>
       </div>
-      <button type="button" class="btn-triumph-next" ${nextBtnAttr}>${nextBtnLabel}</button>
+      <button type="button" class="btn-triumph-next" ${nextBtnAttr} title="${escapeHtmlStr(nextBtnLabel)}">${escapeHtmlStr(shortNextLabel)}</button>
     </div>
   `;
 
   const actionButtonRowHTML = `
-    <div class="action-button-row" style="${runStatus === 'pass' ? 'display:none !important;' : 'display:flex;gap:10px;align-items:center;flex-wrap:wrap;'}">
-      <button type="button" class="btn-reset-code btn btn-ghost" ${resetBtnAttr} style="padding:12px 14px;border-radius:14px;flex:none;opacity:0.8;" title="Сбросить код к исходному шаблону">↺</button>
-      <button type="button" class="btn-check-solution" ${runBtnAttr}>
+    <div class="action-button-row zen-action-row" style="${runStatus === 'pass' ? 'display:none !important;' : ''}">
+      <button type="button" class="btn-check-solution" ${runBtnAttr} title="Запустить проверку (Ctrl+Enter)">
         <span>${ICONS.play || '▷'} Проверить решение</span>
         <span class="xp-tag">+15 XP</span>
-        <span class="hide-on-mobile" style="font-size:0.75rem;opacity:0.85;font-weight:500;">(Ctrl+Enter)</span>
       </button>
-      <button type="button" class="btn-ghost btn-skip-task" ${nextBtnAttr} style="padding:12px 16px;border-radius:14px;font-size:0.88rem;font-weight:600;color:var(--ink-muted);border:1px solid rgba(255,255,255,0.08);white-space:nowrap;margin-left:auto;display:inline-flex;align-items:center;gap:6px;" title="Перейти к следующему шагу без блокировки">
-        <span>${escapeHtmlStr(nextBtnLabel)}</span>
+      <button type="button" class="zen-skip-btn btn-skip-task" ${nextBtnAttr} title="${escapeHtmlStr(nextBtnLabel)}">
+        <span>${escapeHtmlStr(shortNextLabel)}</span>
       </button>
     </div>
   `;
 
   return `
-    <div class="card" style="margin-top:0;">
+    <div class="zen-ide-stage">
       ${mobileTabBarHTML}
       <div class="practice-layout practice-atomic-split ${mobTab === 'code' ? 'show-code' : 'show-spec'}">
-        <div class="practice-left-pane practice-spec-pane" style="display:flex;flex-direction:column;justify-content:space-between;gap:12px;">
+        <div class="practice-left-pane practice-spec-pane">
           <div>
             ${metaHeaderHTML}
             ${conditionHTML}
+          </div>
+          <div class="zen-spoilers-group">
             ${sliceAccordionHTML}
             ${socratesAccordionHTML}
           </div>
-          <div class="hide-on-desktop" style="margin-top:auto;">
-            <button type="button" class="btn-glass-emerald practice-mobile-cta" ${mobTabAttr}="code" style="display:none;width:100%;justify-content:center;margin-top:14px;padding:12px 16px;border-radius:12px;font-size:0.88rem;font-weight:700;">Перейти к коду ➔</button>
+          <div class="hide-on-desktop" style="margin-top:12px;">
+            <button type="button" class="btn-glass-emerald practice-mobile-cta" ${mobTabAttr}="code" style="display:none;width:100%;justify-content:center;padding:12px 16px;border-radius:12px;font-size:0.88rem;font-weight:700;">Перейти к коду ➔</button>
           </div>
         </div>
         <div class="practice-right-pane" style="display:flex;flex-direction:column;justify-content:space-between;">
-          <div>
-            ${buildCodeEditorWithGutterHTML(editorId, codeDraft, 240, null, true)}
-            <div class="practice-kbd-dock hide-on-mobile" style="display:flex;align-items:center;gap:14px;padding:6px 14px;background:rgba(0,0,0,0.25);border-radius:0 0 10px 10px;font-size:0.72rem;color:var(--ink-muted);margin-top:-2px;">
-              <span><kbd>Ctrl</kbd>+<kbd>Enter</kbd> Запустить проверку</span>
-              <span><kbd>Tab</kbd> Отступ 4 пробела</span>
+          <div class="zen-editor-frame">
+            <div class="zen-editor-topbar">
+              <div class="zen-editor-filename">
+                <span class="zen-editor-file-dot"></span>
+                <span>solution.py</span>
+              </div>
+              <div class="zen-editor-top-tools">
+                <span class="zen-editor-kbd-hint hide-on-mobile">Ctrl+Enter</span>
+                <button type="button" class="zen-editor-reset-btn btn-reset-code" ${resetBtnAttr} title="Сбросить код к исходному шаблону">↺ <span>Сбросить</span></button>
+              </div>
             </div>
-          </div>
-          <div style="margin-top:10px;">
+            ${buildCodeEditorWithGutterHTML(editorId, codeDraft, 270, null, true)}
             ${miniDrawerHTML}
-            <div style="margin-top:10px;">
-              ${triumphBannerHTML}
-              ${actionButtonRowHTML}
-            </div>
+          </div>
+          <div>
+            ${triumphBannerHTML}
+            ${actionButtonRowHTML}
           </div>
         </div>
       </div>
@@ -49225,7 +49563,7 @@ function viewPythonSkill(sid){
 
   // Ожерелье бусин (сверху по центру) и хлебные крошки (под бусинами, 1:1 стиль .srs-notes-container)
   const lessonEchelonLabel = `🛡️ Эшелон ${curEchTier || 1}`;
-  const cleanItemBreadcrumb = (activeItemTitle.split(/[:·•–—]/)[0] || activeItemTitle).trim();
+  const cleanItemBreadcrumb = (activeItemTitle.split(/\s*[·•–—]\s*|:\s+/)[0] || activeItemTitle).trim();
   const showUnitInBreadcrumb = Boolean(cleanUnitTitleVal && cleanUnitTitleVal !== activeItemTitle && cleanUnitTitleVal !== cleanItemBreadcrumb);
   const eyebrowDotsHTML = `
     <div class="topic-eyebrow-track" style="max-width:100%;margin:14px 0 8px;padding:0;">
@@ -49541,7 +49879,7 @@ function viewPythonSkill(sid){
       hintBtnAttr: `data-py-task-hint`,
       mobTabAttr: `data-py-practice-tab`,
       drawerTab: pySkillViewState.drawerTab || 'tests',
-      drawerCollapsed: !!pySkillViewState.drawerCollapsed,
+      drawerCollapsed: pySkillViewState.drawerCollapsed,
       accSliceOpen: !!pySkillViewState.accSliceOpen,
       accSocratesOpen: !!pySkillViewState.accSocratesOpen,
       ownerKid: ownerKid,
@@ -49573,7 +49911,7 @@ function viewPythonSkill(sid){
   }
 
   return `
-    <div class="container cards-hub-container lesson-monolith-shell lesson-monolith-shell--wide" style="max-width:940px;margin:0 auto;width:100%;box-sizing:border-box;">
+    <div class="container cards-hub-container lesson-monolith-shell lesson-monolith-shell--wide" style="max-width:980px;margin:0 auto;width:100%;box-sizing:border-box;">
       ${srsHeaderHTML}
       ${eyebrowDotsHTML}
       ${bodyHTML}
@@ -53092,7 +53430,7 @@ function viewPracticeHub(){
 
       drawerTab: practiceHubState.drawerTab || 'tests',
 
-      drawerCollapsed: !!practiceHubState.drawerCollapsed,
+      drawerCollapsed: practiceHubState.drawerCollapsed,
 
       accSliceOpen: !!practiceHubState.accSliceOpen,
 
@@ -68885,7 +69223,10 @@ window.animateCardFlip = animateCardFlip;
   if(zTog){
     const isSprint = (pySkillViewState && pySkillViewState.tab === 'code');
     const targetState = isSprint ? pySkillViewState : practiceHubState;
-    targetState.drawerCollapsed = !targetState.drawerCollapsed;
+    const isCurrentlyCollapsed = (targetState.drawerCollapsed === undefined || targetState.drawerCollapsed === null)
+      ? !targetState.runStatus
+      : !!targetState.drawerCollapsed;
+    targetState.drawerCollapsed = !isCurrentlyCollapsed;
     render();
     return;
   }
