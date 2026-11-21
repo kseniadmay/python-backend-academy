@@ -49842,6 +49842,7 @@ function viewPythonSkill(sid){
       pySkillViewState.sessionFid = activeF;
       pySkillViewState.sessionQueue = cards.map((_, i) => i);
       pySkillViewState.sessionQueueOriginalLen = cards.length;
+      pySkillViewState.sessionRescuedMap = {};
       pySkillViewState.sessionPos = isDone ? cards.length : Math.max(0, Math.min(savedCardPos, Math.max(0, cards.length - 1)));
       pySkillViewState.cardIdx = pySkillViewState.sessionPos;
       pySkillViewState.sessionRepeats = (typeof savedDeckInfo.sessionRepeats === 'number')
@@ -49911,13 +49912,18 @@ function viewPythonSkill(sid){
           </div>
         </div>`;
     } else {
-      const qPos = Math.max(0, Math.min(pySkillViewState.sessionPos, cards.length - 1));
-      const curCardRealIdx = pySkillViewState.sessionQueue[qPos];
+      const qLen = (Array.isArray(pySkillViewState.sessionQueue) && pySkillViewState.sessionQueue.length > 0)
+        ? pySkillViewState.sessionQueue.length
+        : cards.length;
+      const qPos = Math.max(0, Math.min(pySkillViewState.sessionPos, Math.max(0, qLen - 1)));
+      const curCardRealIdx = (pySkillViewState.sessionQueue && pySkillViewState.sessionQueue[qPos] !== undefined)
+        ? pySkillViewState.sessionQueue[qPos]
+        : Math.min(qPos, Math.max(0, cards.length - 1));
       const curCard = cards[curCardRealIdx] || {q: 'Карточка не найдена', a: ''};
       const pyCardKey = activeF + ':' + curCardRealIdx;
       const pyRescueOpen = !pySkillViewState.cardFlipped && (
         pySkillViewState.rescueCardKey === pyCardKey ||
-        (window.__rescuePrimedCards && window.__rescuePrimedCards[pyCardKey])
+        (typeof isCardRescuePrimed === 'function' ? isCardRescuePrimed(pyCardKey) : !!(window.__rescuePrimedCards && window.__rescuePrimedCards[pyCardKey]))
       );
       const pyRescueHTML = (pyRescueOpen && typeof buildActiveRescueScaffoldHTML === 'function')
         ? buildActiveRescueScaffoldHTML(curCard.a, curCard.q, pyCardKey)
@@ -49931,7 +49937,7 @@ function viewPythonSkill(sid){
               
               <!-- Лицевая грань: Вопрос (Liquid Obsidian Glass) -->
               <div class="card-face card-front fc-card-front">
-                ${buildFlashcardTopFrontHTML(pyCardKey, qPos, cards.length, 'data-py-rescue-card', pyRescueOpen)}
+                ${buildFlashcardTopFrontHTML(pyCardKey, qPos, qLen, 'data-py-rescue-card', pyRescueOpen)}
                 <div class="fc-card-body fc-q" id="srs-card-prompt" style="margin:0;padding:12px 0 16px;font-size:clamp(1.15rem, 2.1vw, 1.35rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
                   ${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(curCard.q) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.q) : curCard.q)}
                 </div>
@@ -49940,7 +49946,7 @@ function viewPythonSkill(sid){
 
               <!-- Оборотная грань: Ответ (Mastery Emerald) -->
               <div class="card-face card-back fc-card-back">
-                ${buildFlashcardTopBackHTML(pyCardKey, qPos, cards.length, 'data-py-flip-card', true)}
+                ${buildFlashcardTopBackHTML(pyCardKey, qPos, qLen, 'data-py-flip-card', true)}
 
                 <div class="fc-card-body" style="margin:auto 0;padding:12px 0;width:100%;">
                   <div class="fc-q-sub" style="font-size:0.88rem;font-weight:600;line-height:1.4;color:#a7f3d0;opacity:0.85;margin-bottom:6px;">${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(curCard.q) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.q) : curCard.q)}</div>
@@ -52778,7 +52784,7 @@ function viewCardsHub(){
 
       const showFreeRescue = !isFlipped && (
         cardsHubState.rescueCardKey === curKey ||
-        (window.__rescuePrimedCards && window.__rescuePrimedCards[curKey])
+        (typeof isCardRescuePrimed === 'function' ? isCardRescuePrimed(curKey) : !!(window.__rescuePrimedCards && window.__rescuePrimedCards[curKey]))
       );
 
       const freeRescueHTML = (showFreeRescue && typeof buildActiveRescueScaffoldHTML === 'function')
@@ -52911,7 +52917,7 @@ function viewCardsHub(){
 
       cardsHubState.rescueCardKey === curCardKey ||
 
-      (window.__rescuePrimedCards && window.__rescuePrimedCards[curCardKey])
+      (typeof isCardRescuePrimed === 'function' ? isCardRescuePrimed(curCardKey) : !!(window.__rescuePrimedCards && window.__rescuePrimedCards[curCardKey]))
 
     );
 
@@ -53167,7 +53173,7 @@ function viewCardsHub(){
 
     cardsHubState.rescueCardKey === curCardKey ||
 
-    (window.__rescuePrimedCards && window.__rescuePrimedCards[curCardKey])
+    (typeof isCardRescuePrimed === 'function' ? isCardRescuePrimed(curCardKey) : !!(window.__rescuePrimedCards && window.__rescuePrimedCards[curCardKey]))
 
   );
 
@@ -59893,6 +59899,25 @@ function buildActiveRescueScaffoldHTML(rawAnswer, rawQuestion, cardKey){
 
 window.buildActiveRescueScaffoldHTML = buildActiveRescueScaffoldHTML;
 
+function isCardRescuePrimed(cardKey){
+  if(!cardKey) return false;
+  if(window.__rescuePrimedCards && window.__rescuePrimedCards[cardKey]) return true;
+  const srsEntry = (typeof state !== 'undefined' && state && state.cardSrs) ? state.cardSrs[cardKey] : null;
+  if(srsEntry && Number(srsEntry.lastGrade) === 1) return true;
+  return false;
+}
+window.isCardRescuePrimed = isCardRescuePrimed;
+
+function resetCardsHubDeckRescueState(){
+  if(typeof cardsHubState === 'undefined' || !cardsHubState) return;
+  cardsHubState.repeatQueue = [];
+  cardsHubState.isRepeatPhase = false;
+  cardsHubState.inRescueStep = false;
+  cardsHubState.nextMainCardIdx = null;
+  cardsHubState.rescuedCardIndices = {};
+}
+window.resetCardsHubDeckRescueState = resetCardsHubDeckRescueState;
+
 
 
 function computeRemNoteIntervals(cardKey){
@@ -60088,6 +60113,8 @@ function applyRemNoteCardRating(cardKey, grade){
 
 
   if(!window.__rescuePrimedCards) window.__rescuePrimedCards = {};
+
+  if(window.__rescueMaskRevealed) delete window.__rescueMaskRevealed[cardKey];
 
   if(g === 1){
 
@@ -68488,6 +68515,8 @@ const psk = e.target.closest('[data-py-select-k]');
 
     pySkillViewState.sessionQueue = null;
 
+    pySkillViewState.sessionRescuedMap = {};
+
     pySkillViewState.sessionPos = 0;
 
     pySkillViewState.cardIdx = 0;
@@ -68866,6 +68895,8 @@ window.animateCardFlip = animateCardFlip;
 
     pySkillViewState.sessionQueue = null;
 
+    pySkillViewState.sessionRescuedMap = {};
+
     pySkillViewState.sessionPos = 0;
 
     pySkillViewState.cardIdx = 0;
@@ -69067,11 +69098,20 @@ window.animateCardFlip = animateCardFlip;
 
     if(rating === 1){
 
-      // Карточка не запомнена — возвращаем в конец очереди текущей сессии
-
-      curQueue.push(cIdx);
-
-      pySkillViewState.sessionRepeats = (pySkillViewState.sessionRepeats || 0) + 1;
+      // «Один спасательный круг»: максимум 1 возврат за сессию через 2–3 карточки с раскрытой зацепкой.
+      // При повторном «Не знаю» или на последней карточке — без зацикливания, перенос в SRS на завтра.
+      if(!pySkillViewState.sessionRescuedMap || typeof pySkillViewState.sessionRescuedMap !== 'object'){
+        pySkillViewState.sessionRescuedMap = {};
+      }
+      if(!pySkillViewState.sessionRescuedMap[cIdx]){
+        pySkillViewState.sessionRescuedMap[cIdx] = true;
+        const remainingAfter = curQueue.length - (qPos + 1);
+        if(remainingAfter > 0){
+          const offset = Math.min(remainingAfter, 3);
+          curQueue.splice(qPos + 1 + offset, 0, cIdx);
+        }
+        pySkillViewState.sessionRepeats = (pySkillViewState.sessionRepeats || 0) + 1;
+      }
 
     } else {
 
@@ -70460,6 +70500,8 @@ window.animateCardFlip = animateCardFlip;
 
     const targetCard = parseInt(hGotoCard.getAttribute('data-hub-goto-card'), 10) || 0;
     cardsHubState.cardIdx = targetCard;
+    cardsHubState.inRescueStep = false;
+    cardsHubState.nextMainCardIdx = null;
     cardsHubState.sprintStep = targetCard % 15;
 
     cardsHubState.flipped = false;
@@ -70839,50 +70881,65 @@ window.animateCardFlip = animateCardFlip;
 
     }
 
-    if(r === 1){
+    const d = ALL_DECKS_COMBINED[cardsHubState.deckId] || {cards:[]};
+    const totalCards = (d.cards || []).length;
+    const curFreeIdx = cardsHubState.cardIdx || 0;
+    const wasRescueStep = !!cardsHubState.inRescueStep;
 
-      if(!Array.isArray(cardsHubState.repeatQueue)) cardsHubState.repeatQueue = [];
+    if(!Array.isArray(cardsHubState.repeatQueue)) cardsHubState.repeatQueue = [];
+    if(!cardsHubState.rescuedCardIndices || typeof cardsHubState.rescuedCardIndices !== 'object'){
+      cardsHubState.rescuedCardIndices = {};
+    }
 
-      if(!cardsHubState.repeatQueue.includes(cardsHubState.cardIdx || 0)){
-
-        cardsHubState.repeatQueue.push(cardsHubState.cardIdx || 0);
-
+    // Уменьшаем счётчик задержки для ранее отложенных карточек
+    for(let i = 0; i < cardsHubState.repeatQueue.length; i++){
+      const entry = cardsHubState.repeatQueue[i];
+      if(entry && typeof entry === 'object'){
+        entry.dueAfterSteps = Math.max(0, (Number(entry.dueAfterSteps) || 0) - 1);
+      } else {
+        cardsHubState.repeatQueue[i] = { cardIdx: Number(entry) || 0, dueAfterSteps: 0 };
       }
+    }
 
+    const nextMainIdx = wasRescueStep
+      ? (typeof cardsHubState.nextMainCardIdx === 'number' ? cardsHubState.nextMainCardIdx : totalCards)
+      : (curFreeIdx + 1);
+
+    // «Один спасательный круг»: максимум 1 возврат за сессию через 3 карточки с раскрытой зацепкой.
+    // При повторном «Не знаю» или если впереди нет других карточек — уходит в SRS на завтра без цикла.
+    const hasCardsAhead = (nextMainIdx < totalCards) || (cardsHubState.repeatQueue.length > 0);
+    if(r === 1 && !cardsHubState.rescuedCardIndices[curFreeIdx] && hasCardsAhead){
+      cardsHubState.rescuedCardIndices[curFreeIdx] = true;
+      cardsHubState.repeatQueue.push({ cardIdx: curFreeIdx, dueAfterSteps: 3 });
     }
 
     // Микро-спринт по 15 карточек (Инвариант 15 бусин):
-
     cardsHubState.sprintStep = (Number(cardsHubState.sprintStep) || 0) + 1;
-
     const isSprintFinish = cardsHubState.sprintStep >= 15;
 
-
-
-    const d = ALL_DECKS_COMBINED[cardsHubState.deckId] || {cards:[]};
-
-    const totalCards = (d.cards || []).length;
-
     let finishedDeckNow = false;
+    const readyRescueIdx = cardsHubState.repeatQueue.findIndex(item => item && (Number(item.dueAfterSteps) || 0) <= 0);
 
-    if(!cardsHubState.isRepeatPhase && cardsHubState.cardIdx + 1 < totalCards){
-
-      cardsHubState.cardIdx++;
-
+    if(readyRescueIdx >= 0){
+      const rescuedItem = cardsHubState.repeatQueue.splice(readyRescueIdx, 1)[0];
+      cardsHubState.inRescueStep = true;
+      cardsHubState.nextMainCardIdx = nextMainIdx;
+      cardsHubState.cardIdx = rescuedItem.cardIdx;
       cardsHubState.flipped = false;
-
-    } else if(Array.isArray(cardsHubState.repeatQueue) && cardsHubState.repeatQueue.length > 0){
-
+    } else if(nextMainIdx < totalCards){
+      cardsHubState.inRescueStep = false;
+      cardsHubState.nextMainCardIdx = null;
+      cardsHubState.cardIdx = nextMainIdx;
+      cardsHubState.flipped = false;
+    } else if(cardsHubState.repeatQueue.length > 0){
+      const tailRescue = cardsHubState.repeatQueue.shift();
       cardsHubState.isRepeatPhase = true;
-
-      cardsHubState.cardIdx = cardsHubState.repeatQueue.shift();
-
+      cardsHubState.inRescueStep = true;
+      cardsHubState.nextMainCardIdx = totalCards;
+      cardsHubState.cardIdx = (tailRescue && typeof tailRescue === 'object') ? tailRescue.cardIdx : (Number(tailRescue) || 0);
       cardsHubState.flipped = false;
-
     } else {
-
       finishedDeckNow = true;
-
     }
 
     if(finishedDeckNow){
@@ -70893,9 +70950,7 @@ window.animateCardFlip = animateCardFlip;
 
       cardsHubState.flipped = false;
 
-      cardsHubState.isRepeatPhase = false;
-
-      cardsHubState.repeatQueue = [];
+      resetCardsHubDeckRescueState();
 
       cardsHubState.sprintFinished = false;
 
@@ -70929,9 +70984,7 @@ window.animateCardFlip = animateCardFlip;
 
     cardsHubState.flipped = false;
 
-    cardsHubState.repeatQueue = [];
-
-    cardsHubState.isRepeatPhase = false;
+    resetCardsHubDeckRescueState();
 
     saveCardsHubPosState();
 
@@ -70957,9 +71010,7 @@ window.animateCardFlip = animateCardFlip;
 
       cardsHubState.flipped = false;
 
-      cardsHubState.repeatQueue = [];
-
-      cardsHubState.isRepeatPhase = false;
+      resetCardsHubDeckRescueState();
 
       saveCardsHubPosState();
 
@@ -71896,9 +71947,7 @@ document.addEventListener('change', function(e){
 
     cardsHubState.completed = false;
 
-    cardsHubState.repeatQueue = [];
-
-    cardsHubState.isRepeatPhase = false;
+    resetCardsHubDeckRescueState();
 
     cardsHubState.dueMode = false;
     saveCardsHubPosState();
