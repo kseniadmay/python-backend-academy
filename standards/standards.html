@@ -1582,69 +1582,116 @@
     -webkit-font-smoothing: subpixel-antialiased;
   }
 
-  #sidebar-hero-action-container{
-    flex-shrink:0;
+  /* Золотая адаптация сайдбара по высоте (Вариант B · /grill-me): динамические шрифты, иконки и перераспределение воздуха (0 скролла, 0 скрытия) */
+  .sidebar {
+    padding: clamp(5px, calc(3dvh - 12px), 22px) 12px clamp(5px, calc(2.7dvh - 10px), 20px);
+    overflow: visible;
   }
-  #nav-desktop{
-    flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:none;-ms-overflow-style:none;
+  .sidebar .brand-box-unified {
+    padding: 0 2px clamp(3px, calc(1.8dvh - 7px), 14px);
+    margin-bottom: clamp(3px, calc(2.1dvh - 8px), 16px);
   }
-  #nav-desktop::-webkit-scrollbar{display:none;}
-  #nav-desktop .navlink{
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:6px 10px;font-size:.85rem;font-weight:500;border-radius:9px;border:1px solid transparent;border-left:3px solid transparent;box-sizing:border-box;display:flex;align-items:center;gap:9px;flex-shrink:0;
+  .sidebar .brand-glyph {
+    width: clamp(18px, 2.3dvh, 26px);
+    height: clamp(18px, 2.3dvh, 26px);
   }
-
-  .nav-group-label{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-muted);padding:4px 8px 2px;margin-top:6px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-  .nav-group-label:first-child{margin-top:0;padding-top:2px;}
-
-  /* Плавная многоступенчатая адаптация сайдбара под высоту вьюпорта (dvh) */
-  @media (max-height: 780px) {
-    .sidebar { padding: 9px 12px 9px; }
-    .brand-box-unified { padding: 0 2px 6px; margin-bottom: 6px; }
-    .card-laser { padding: 8px 10px; margin-bottom: 6px; }
-    .top-meta-row { margin-bottom: 3px; }
-    .card-mission-title { font-size: 0.82rem; margin-bottom: 5px; line-height: 1.18; }
-    .dominant-btn { padding: 6px 10px; font-size: 0.79rem; }
-    #nav-desktop .navlink { padding: 5px 10px; font-size: 0.83rem; margin-bottom: 1px; }
-    .nav-group-label { margin-top: 5px; padding: 3px 8px 1px; font-size: 0.63rem; }
-    .nav-sub-list { gap: 1px; margin: 1px 0 3px 0; }
-    .nav-sub-item { padding: 3px 9px; min-height: 22px; font-size: 0.78rem; }
-    .sidebar-foot { padding-top: 6px; gap: 5px; }
-    .sidebar-search-bar { height: 28px; }
+  .sidebar .brand-title {
+    font-size: clamp(0.9rem, 0.6rem + 0.85dvh, 1.22rem);
   }
-  @media (max-height: 680px) {
-    .sidebar { padding: 7px 11px 7px; }
-    .brand-box-unified { padding: 0 2px 5px; margin-bottom: 5px; }
-    .brand-title { font-size: 0.98rem; }
-    .brand-sub { font-size: 0.72rem; }
-    .card-laser { padding: 6px 9px; margin-bottom: 5px; }
-    .top-meta-row { margin-bottom: 2px; }
-    .card-mission-title { font-size: 0.79rem; margin-bottom: 4px; line-height: 1.15; -webkit-line-clamp: 1; }
-    .dominant-btn { padding: 5px 9px; font-size: 0.77rem; }
-    #nav-desktop .navlink { padding: 4px 9px; font-size: 0.8rem; margin-bottom: 0; gap: 8px; }
-    #nav-desktop .navlink .icon { width: 15px; height: 15px; }
-    .nav-group-label { margin-top: 4px; padding: 2px 8px 1px; font-size: 0.61rem; }
-    .nav-sub-list { gap: 1px; margin: 1px 0 2px 0; }
-    .nav-sub-item { padding: 2.5px 9px; min-height: 20px; font-size: 0.76rem; }
-    .sidebar-foot { padding-top: 5px; gap: 4px; }
-    .sidebar-search-bar { height: 26px; font-size: 0.75rem; }
+  .sidebar .brand-sub {
+    font-size: clamp(0.66rem, 0.48rem + 0.52dvh, 0.85rem);
   }
-  @media (max-height: 580px) {
-    .sidebar { padding: 6px 10px 6px; }
-    .brand-box-unified { padding: 0 2px 4px; margin-bottom: 4px; }
-    .brand-sub { display: none; }
-    .card-laser { padding: 5px 8px; margin-bottom: 4px; }
-    .top-meta-row { display: none; }
-    .card-mission-title { font-size: 0.76rem; margin-bottom: 3px; }
-    .dominant-btn { padding: 4px 8px; font-size: 0.75rem; }
-    #nav-desktop .navlink { padding: 3px 8px; font-size: 0.78rem; }
-    .nav-group-label { margin-top: 3px; padding: 1px 8px 1px; font-size: 0.58rem; }
-    .nav-sub-item { padding: 2px 8px; min-height: 19px; font-size: 0.74rem; }
-    .sidebar-foot { padding-top: 4px; gap: 4px; }
-    .sidebar-search-bar { height: 25px; }
+  #sidebar-hero-action-container {
+    flex-shrink: 0;
   }
-  @media (max-height: 440px) {
-    .sidebar { overflow-y: auto; overscroll-behavior: contain; }
-    #nav-desktop { flex: 0 0 auto; overflow-y: visible; }
+  .sidebar .card-laser {
+    padding: clamp(5px, calc(2dvh - 6px), 15px) 11px;
+    margin-bottom: clamp(2px, calc(1.2dvh - 5px), 8px);
+  }
+  .sidebar .top-meta-row {
+    margin-bottom: clamp(2px, calc(0.9dvh - 3px), 7px);
+  }
+  .sidebar .step-pill,
+  .sidebar .eta-chip {
+    font-size: clamp(0.6rem, 0.44rem + 0.42dvh, 0.74rem);
+  }
+  .sidebar .card-mission-title {
+    font-size: clamp(0.75rem, 0.53rem + 0.6dvh, 0.97rem);
+    margin-bottom: clamp(3px, calc(1.5dvh - 5px), 11px);
+    line-height: 1.2;
+  }
+  .sidebar .dominant-btn {
+    padding: clamp(4px, calc(1.5dvh - 5px), 11px) 10px;
+    font-size: clamp(0.74rem, 0.55rem + 0.52dvh, 0.92rem);
+  }
+  #nav-desktop {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    gap: clamp(1px, calc(1.6dvh - 8px), 14px);
+    overflow: visible;
+  }
+  #nav-desktop .nav-group {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0px, calc(1dvh - 5px), 6px);
+    flex-shrink: 0;
+  }
+  #nav-desktop .navlink {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: clamp(2px, calc(1.75dvh - 8px), 11px) 10px;
+    margin-bottom: 0;
+    font-size: clamp(0.75rem, 0.52rem + 0.68dvh, 1rem);
+    font-weight: 500;
+    border-radius: 9px;
+    border: 1px solid transparent;
+    border-left: 3px solid transparent;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: clamp(7px, 0.95dvh, 11px);
+    flex-shrink: 0;
+    line-height: 1.2;
+  }
+  #nav-desktop .navlink .icon {
+    width: clamp(13px, 1.85dvh, 20px);
+    height: clamp(13px, 1.85dvh, 20px);
+    flex-shrink: 0;
+  }
+  .nav-group-label {
+    font-size: clamp(0.58rem, 0.42rem + 0.47dvh, 0.76rem);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--ink-muted);
+    padding: clamp(1px, calc(0.9dvh - 4px), 6px) 8px clamp(1px, calc(0.7dvh - 3px), 5px);
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  #nav-desktop .nav-sub-list {
+    gap: clamp(0px, calc(0.8dvh - 4px), 5px);
+    margin: clamp(0px, calc(0.6dvh - 3px), 4px) 0 clamp(0px, calc(0.9dvh - 4px), 6px) 0;
+    flex-shrink: 0;
+  }
+  #nav-desktop .nav-sub-item {
+    padding: clamp(1px, calc(1.25dvh - 6px), 8px) 9px;
+    min-height: clamp(16px, calc(4.2dvh - 8px), 32px);
+    font-size: clamp(0.7rem, 0.49rem + 0.6dvh, 0.92rem);
+  }
+  .sidebar .sidebar-foot {
+    padding-top: clamp(4px, calc(2dvh - 7px), 16px);
+    gap: clamp(4px, calc(1.4dvh - 4px), 10px);
+  }
+  .sidebar .sidebar-search-bar {
+    height: clamp(24px, calc(3.6dvh), 36px);
+    font-size: clamp(0.71rem, 0.53rem + 0.44dvh, 0.86rem);
   }
   .navlink__badge-emerald{background:var(--emerald-soft, rgba(16,185,129,0.15)) !important;color:var(--emerald, #10b981) !important;border:1px solid rgba(16,185,129,0.3) !important;}
 
@@ -18895,80 +18942,65 @@
     to { transform: translateX(-100%); }
   }
 
+  .drawer-nav-area {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-evenly !important;
+    gap: clamp(2px, 0.8dvh, 14px) !important;
+  }
+
+  .mobile-side-drawer-panel .nav-group {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: clamp(0px, 0.48dvh, 6px) !important;
+    margin-bottom: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
   .drawer-nav-section-title {
-    font-size: 0.66rem !important;
+    font-size: clamp(0.6rem, 0.44rem + 0.45dvh, 0.76rem) !important;
     font-weight: 700 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.06em !important;
     color: var(--ink-muted, rgba(255, 255, 255, 0.45)) !important;
-    margin: 8px 0 3px 4px !important;
+    margin: clamp(1px, 0.35dvh, 5px) 0 clamp(1px, 0.35dvh, 5px) 4px !important;
     line-height: 1.2 !important;
   }
 
   .drawer-nav-link {
     display: flex !important;
     align-items: center !important;
-    gap: 10px !important;
-    padding: 6px 10px !important;
+    gap: clamp(8px, 1dvh, 12px) !important;
+    padding: clamp(3px, 0.92dvh, 11px) 10px !important;
     border-radius: 10px !important;
     background: transparent !important;
     border: 1px solid transparent !important;
     color: var(--ink-soft, #cbd5e1) !important;
     text-decoration: none !important;
-    font-size: 0.85rem !important;
+    font-size: clamp(0.77rem, 0.55rem + 0.63dvh, 1rem) !important;
     font-weight: 600 !important;
     line-height: 1.25 !important;
-    margin-bottom: 1px !important;
+    margin-bottom: 0 !important;
     transition: all 0.15s ease !important;
+  }
+  .drawer-nav-link .icon {
+    width: clamp(15px, 1.85dvh, 20px) !important;
+    height: clamp(15px, 1.85dvh, 20px) !important;
+    flex-shrink: 0 !important;
   }
 
   .mobile-side-drawer-panel .nav-sub-list {
-    gap: 1px !important;
-    margin: 1px 0 3px 0 !important;
+    gap: clamp(0px, 0.35dvh, 5px) !important;
+    margin: clamp(0px, 0.25dvh, 3px) 0 clamp(1px, 0.4dvh, 5px) 0 !important;
     padding-left: 24px !important;
   }
 
   .mobile-side-drawer-panel .nav-sub-item {
-    padding: 4px 9px !important;
-    min-height: 26px !important;
-    font-size: 0.8rem !important;
-  }
-
-  @media (max-height: 680px) {
-    .mobile-side-drawer-panel {
-      padding: calc(8px + env(safe-area-inset-top, 0px)) 12px calc(10px + env(safe-area-inset-bottom, 0px)) !important;
-    }
-    .drawer-nav-section-title {
-      margin: 6px 0 2px 4px !important;
-      font-size: 0.62rem !important;
-    }
-    .drawer-nav-link {
-      padding: 5px 10px !important;
-      font-size: 0.82rem !important;
-    }
-    .mobile-side-drawer-panel .nav-sub-item {
-      padding: 3px 9px !important;
-      min-height: 22px !important;
-      font-size: 0.78rem !important;
-    }
-  }
-  @media (max-height: 580px) {
-    .mobile-side-drawer-panel {
-      padding: calc(6px + env(safe-area-inset-top, 0px)) 11px calc(8px + env(safe-area-inset-bottom, 0px)) !important;
-    }
-    .drawer-nav-section-title {
-      margin: 4px 0 1px 4px !important;
-      font-size: 0.59rem !important;
-    }
-    .drawer-nav-link {
-      padding: 4px 9px !important;
-      font-size: 0.79rem !important;
-    }
-    .mobile-side-drawer-panel .nav-sub-item {
-      padding: 2px 8px !important;
-      min-height: 20px !important;
-      font-size: 0.75rem !important;
-    }
+    padding: clamp(2px, 0.62dvh, 8px) 9px !important;
+    min-height: clamp(19px, 3dvh, 32px) !important;
+    font-size: clamp(0.72rem, 0.52rem + 0.56dvh, 0.92rem) !important;
   }
 
   .drawer-nav-link:hover,
@@ -62985,7 +63017,7 @@ function renderUnifiedNavLinks(isMobile, curRoute){
       }
     }).join('');
 
-    return headerHtml + linksHtml;
+    return `<div class="nav-group">${headerHtml}${linksHtml}</div>`;
   }).join('');
 }
 
@@ -63268,9 +63300,9 @@ function openMobileDrawer(){
       ${renderDominantHeroCard(true)}
 
       <!-- Unified Nav Groups (Top, Тренажёры, Инструменты) -->
-      ${renderUnifiedNavLinks(true, curRoute)}
-
-      <div style="flex:1 1 auto;min-height:4px;"></div>
+      <nav class="drawer-nav-area">
+        ${renderUnifiedNavLinks(true, curRoute)}
+      </nav>
 
       <!-- Unified Footer HUD: Pomodoro + Cooldown + Service Row -->
       <div style="border-top:1px solid rgba(255, 255, 255, 0.06);padding-top:8px;margin-top:auto;display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
