@@ -57439,7 +57439,7 @@ function viewPathSerpentine(options){
   options = options || {};
   ensureExtendedState();
 
-  const curEchelon = (options.echelon !== undefined) ? options.echelon : ((state && state.selectedEchelon) || 'all');
+  const curEchelon = (options.echelon !== undefined) ? options.echelon : ((state && state.selectedEchelon) || 1);
   const { units: allUnits, chapters: chapterBreakpoints } = getEchelonUnitsAndChapters(curEchelon, ALL_UNITS_COMBINED);
   const curTierNum = (curEchelon === 'all') ? 'all' : (Number(curEchelon) || 1);
   let echelonLabel = '🛡️ Скрининг';
@@ -57466,9 +57466,9 @@ function viewPathSerpentine(options){
   const curChapterCompletedCount = curChapter.units ? curChapter.units.filter(isUnitCompleted).length : 0;
   const curChapterTotalCount = curChapter.units ? curChapter.units.length : 1;
 
-  // HARMONIC S-CURVE WAYPOINTS (ZERO DRIFT, ROCK-SOLID ANCHORS, STEP Y = 150px)
-  // Rhythm: Center (340) -> Right (450) -> Center (340) -> Left (230) -> Center (340)
-  // Chapter exams and milestone gates sit strictly on the centerline (340)
+  // HARMONIC S-CURVE WAYPOINTS (CONTINUOUS WAVE, ZERO PROSKOKS, Y-STEP = 150px)
+  // Continuous sinusoidal oscillation across all waypoints without abrupt jumps
+  // Chapter exams and milestone gates sit strictly on the centerline (380)
   let curY = 70;
   const unitCoords = [];
   const examCoords = [];
@@ -57476,12 +57476,13 @@ function viewPathSerpentine(options){
   const allWaypoints = [];
 
   chapterBreakpoints.forEach((cb, ci) => {
-    cb.units.forEach((u, uIdx) => {
+    cb.units.forEach((u) => {
       if(unitCoords.length > 0){
         curY += 150;
       }
-      const x = Math.round(380 + 170 * Math.sin((uIdx * Math.PI) / 2));
-      const pt = { x, y: curY, type: 'unit', unit: u, globalIdx: allUnits.indexOf(u) };
+      const gIdx = allUnits.indexOf(u);
+      const x = Math.round(380 + 140 * Math.sin((gIdx * Math.PI) / 2.2));
+      const pt = { x, y: curY, type: 'unit', unit: u, globalIdx: gIdx };
       unitCoords.push(pt);
       allWaypoints.push(pt);
     });
@@ -57765,6 +57766,22 @@ function viewPathSerpentine(options){
           </button>
         </div>
 
+        <!-- Echelon / Program Selector Bottom Sheet & Modal -->
+        <div id="path-echelon-modal-backdrop" class="path-echelon-modal-backdrop" style="display:none;" aria-hidden="true"></div>
+        <div id="path-echelon-modal" class="path-echelon-modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="path-echelon-modal-title">
+          <div class="path-echelon-modal-handle"></div>
+          <div class="path-echelon-modal-head">
+            <div>
+              <h3 class="path-echelon-modal-title" id="path-echelon-modal-title">Программы подготовки к собеседованию</h3>
+              <p class="path-echelon-modal-sub">Выберите целевой эшелон. Маршрут обучения перестроится под выбранную программу.</p>
+            </div>
+            <button type="button" class="path-echelon-modal-close" data-close-echelon-modal="1" aria-label="Закрыть">✕</button>
+          </div>
+          <div class="path-echelon-cards-list">
+            ${renderEchelonCardsModalHTML(curEchelon)}
+          </div>
+        </div>
+
       </div>
 
       ${renderFloatingChapterRailHTML(chapterBreakpoints, activeChapterNum)}
@@ -57851,11 +57868,11 @@ function viewProPath(options){
 
 
 
-  const isCurChallenge = curActiveUnit.id.endsWith('.9') || curActiveUnit.id.endsWith('.6') || curActiveUnit.id.endsWith('.8');
+  const isCurChallenge = false;
 
-  const heroTypeLabel = isCurChallenge ? '⚔️ Аттестация' : '💻 Практика IDE';
+  const heroTypeLabel = '💻 Практика IDE';
 
-  const heroXp = isCurChallenge ? '+100 XP' : '+50 XP';
+  const heroXp = '+50 XP';
 
   const echelonProg = (typeof getEchelonProgress === 'function') ? getEchelonProgress(curTierNum) : { pct: 0, mastered: 0, unitsCount: allUnits.length };
   const isEchelonFullyMastered = echelonProg.pct >= 100 || (allUnits.length > 0 && allUnits.every(isUnitCompleted));
@@ -58026,11 +58043,9 @@ function viewProPath(options){
 
 
 
-      const isChallenge = u.id.endsWith('.9') || u.id.endsWith('.6') || u.id.endsWith('.8');
+      const badgeClass = 'pro-lesson-badge';
 
-      const badgeClass = isChallenge ? 'pro-lesson-badge pro-lesson-badge--challenge' : 'pro-lesson-badge';
-
-      const badgeText = isChallenge ? 'Испытание (зачёт)' : 'Теория + Практика';
+      const badgeText = 'Теория + Практика';
 
       
 
@@ -58095,7 +58110,7 @@ function viewProPath(options){
           </div>
 
           <div class="pro-lesson-tail">
-            ${isCompleted ? '<span class="pro-stat-chip" style="font-family:var(--font-m,monospace);font-size:0.72rem;font-weight:700;color:var(--emerald,#34d399);">100%</span>' : (isChallenge ? '<span class="pro-unlocked-chip" style="font-family:var(--font-m,monospace);font-size:0.70rem;font-weight:700;color:#f8fafc;background:linear-gradient(180deg, rgba(136, 19, 55, 0.45) 0%, rgba(76, 5, 25, 0.60) 100%);padding:2.5px 8.5px;border-radius:7px;border:1px solid rgba(225, 29, 72, 0.42);box-shadow:inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 6px rgba(136, 19, 55, 0.25);">⚔️ Зачёт</span>' : '')}
+            ${isCompleted ? '<span class="pro-stat-chip" style="font-family:var(--font-m,monospace);font-size:0.72rem;font-weight:700;color:var(--emerald,#34d399);">100%</span>' : ''}
           </div>
 
         </div>
@@ -66542,14 +66557,9 @@ document.addEventListener('click', async function(e){
     const u = ALL_UNITS_COMBINED.find(x => x.id === uid);
     if(u){
       const track = getTrackForUnit(uid);
-      const isChallenge = u.id.endsWith('.9') || u.id.endsWith('.6') || u.id.endsWith('.8');
-      if(isChallenge){
-        location.hash = `#${track.routePrefix}/unittest/${u.id}`;
-      } else {
-        const activeSkill = (u.skills || []).find(s => (getSkillMP(s.id) || 0) < 80) || (u.skills && u.skills[0]);
-        const targetSkillId = activeSkill ? activeSkill.id : '';
-        location.hash = targetSkillId ? `#${track.routePrefix}/skill/${targetSkillId}` : `#${track.routePrefix}`;
-      }
+      const activeSkill = (u.skills || []).find(s => (typeof getSkillMP === 'function' ? getSkillMP(s.id) : 0) < 80) || (u.skills && u.skills[0]);
+      const targetSkillId = activeSkill ? activeSkill.id : '';
+      location.hash = targetSkillId ? `#${track.routePrefix}/skill/${targetSkillId}` : `#${track.routePrefix}`;
     }
     return;
   }
@@ -66561,14 +66571,9 @@ document.addEventListener('click', async function(e){
     const u = ALL_UNITS_COMBINED.find(x => x.id === uid);
     if(u){
       const track = getTrackForUnit(uid);
-      const isChallenge = u.id.endsWith('.9') || u.id.endsWith('.6') || u.id.endsWith('.8');
-      if(isChallenge){
-        location.hash = `#${track.routePrefix}/unittest/${u.id}`;
-      } else {
-        const activeSkill = (u.skills || []).find(s => (getSkillMP(s.id) || 0) < 80) || (u.skills && u.skills[0]);
-        const targetSkillId = activeSkill ? activeSkill.id : '';
-        location.hash = targetSkillId ? `#${track.routePrefix}/skill/${targetSkillId}` : `#${track.routePrefix}`;
-      }
+      const activeSkill = (u.skills || []).find(s => (typeof getSkillMP === 'function' ? getSkillMP(s.id) : 0) < 80) || (u.skills && u.skills[0]);
+      const targetSkillId = activeSkill ? activeSkill.id : '';
+      location.hash = targetSkillId ? `#${track.routePrefix}/skill/${targetSkillId}` : `#${track.routePrefix}`;
     }
     return;
   }
