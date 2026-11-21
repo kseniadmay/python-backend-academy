@@ -30398,17 +30398,7 @@ body.light-theme .srs-card-theory-anchor:hover svg {
     [data-theme="light"] .srs-note-step-title {
       color: #0f172a !important;
     }
-    .srs-notes-container .note-action-dock {
-      position: sticky !important;
-      bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
-      z-index: 100 !important;
-      margin-top: 16px !important;
-      margin-bottom: 0 !important;
-      padding: 6px 0 !important;
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-    }
+
     .srs-note-card,
     .srs-note-card:not(.srs-note-card-clean),
     .srs-notes-container .srs-note-card {
@@ -34610,6 +34600,99 @@ html:not([data-theme="dark"]) .diagram-vector-card .arch-c-amber { color: #d9770
 [data-theme="light"] .diagram-vector-card .arch-c-rose,
 html:not([data-theme="dark"]) .diagram-vector-card .arch-c-rose { color: #e11d48; }
 
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     УНИФИЦИРОВАННЫЙ ЛИПКИЙ ДОК КОНСПЕКТОВ ИНТЕРВАЛКИ (ДЕСКТОП + МОБИЛЬНЫЕ)
+     ══════════════════════════════════════════════════════════════════════════ */
+  footer.srs-note-fixed-dock,
+  .srs-note-fixed-dock,
+  body:not(.is-sprint-focus) footer.srs-note-fixed-dock,
+  body:not(.is-sprint-focus) .srs-note-fixed-dock {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 270px !important;
+    right: 0 !important;
+    z-index: 9999 !important;
+    margin: 0 !important;
+    padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+    background: linear-gradient(180deg, rgba(7, 9, 14, 0.08) 0%, rgba(7, 9, 14, 0.94) 30%, #07090e 100%) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    width: auto !important;
+    max-width: none !important;
+    box-shadow: none !important;
+  }
+
+  body.zen-mode footer.srs-note-fixed-dock,
+  body.zen-mode .srs-note-fixed-dock {
+    left: 0 !important;
+  }
+
+  @media (max-width: 880px) {
+    footer.srs-note-fixed-dock,
+    .srs-note-fixed-dock,
+    body:not(.is-sprint-focus) footer.srs-note-fixed-dock,
+    body:not(.is-sprint-focus) .srs-note-fixed-dock {
+      left: 0 !important;
+      padding: 10px 16px calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+  }
+
+  [data-theme="light"] footer.srs-note-fixed-dock,
+  [data-theme="light"] .srs-note-fixed-dock,
+  html:not([data-theme="dark"]) footer.srs-note-fixed-dock {
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0.08) 0%, rgba(248, 250, 252, 0.95) 30%, #f8fafc 100%) !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
+  }
+
+  .srs-note-fixed-dock .srs-dock-action-wrapper {
+    max-width: 480px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  .srs-note-fixed-dock .btn-dock-cta-single {
+    height: 48px !important;
+    border-radius: 14px !important;
+    font-size: 0.96rem !important;
+    font-weight: 700 !important;
+    width: 100% !important;
+    max-width: 480px !important;
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35) !important;
+  }
+
+  @media (max-width: 640px) {
+    .srs-note-fixed-dock .btn-dock-cta-single {
+      height: 46px !important;
+      font-size: 0.94rem !important;
+    }
+  }
+
+  .srs-note-fixed-dock .finish-rating-panel {
+    width: 100% !important;
+    max-width: 480px !important;
+    margin: 0 auto !important;
+  }
+
+  .srs-note-fixed-dock .note-rate-row {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .srs-notes-container {
+    margin-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+  }
 </style>
 
 <link rel="manifest" href="manifest.json">
@@ -60707,15 +60790,12 @@ function viewNotesSrsHub(noteSrsStats){
 
 
 
-    <!-- Уровень 4: Зона действий (Single Dominant CTA Dock) -->
+  </div>
 
-    <footer class="srs-action-dock note-action-dock srs-action-dock-container" style="display:flex;justify-content:center;width:100%;">
-
-      ${actionAreaHTML}
-
-    </footer>
-
-  </div>`;
+  <!-- Уровень 4: Липкий док действий (снаружи .srs-notes-container для 100% работы position:fixed без конфликта с transform/backdrop-filter) -->
+  <footer class="srs-action-dock note-action-dock srs-action-dock-container srs-note-fixed-dock">
+    ${actionAreaHTML}
+  </footer>`;
 
 }
 
