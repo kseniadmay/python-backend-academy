@@ -139,7 +139,11 @@ assert(!srsPulseMatch[1].includes('scale('),
 console.log('✓ [12/14] [Zero-Jitter] Оптическое дыхание точек строго через box-shadow и opacity (0 scale).');
 
 // 13. Инвариант симметричной рамки кнопок сайдбара (0px Border Jump)
-assert(content.includes('.navlink{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:11px;text-decoration:none;color:var(--ink-soft);font-weight:500;font-size:.88rem;margin-bottom:2px;border:1px solid transparent;border-left:3px solid transparent;box-sizing:border-box;'),
+const navlinkMatch = content.match(/\.navlink\{([^}]+)\}/);
+assert(navlinkMatch &&
+       /border:\s*1px\s+solid\s+transparent/.test(navlinkMatch[1]) &&
+       /border-left:\s*3px\s+solid\s+transparent/.test(navlinkMatch[1]) &&
+       /box-sizing:\s*border-box/.test(navlinkMatch[1]),
   '❌ ZERO-JITTER VIOLATION: .navlink обязан иметь border-left: 3px solid transparent для исключения 2px скачка при активации.');
 console.log('✓ [13/14] [Zero-Jitter] Симметричные рамки кнопок сайдбара соблюдены (0px border jump).');
 
