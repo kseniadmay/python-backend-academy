@@ -49,10 +49,18 @@ def _merge_srs_entries(base_map: Any, incoming_map: Any, progress_key: str) -> D
         if isinstance(entry_a, dict) and isinstance(entry_b, dict):
             rev_a = str(entry_a.get('lastReview') or '')
             rev_b = str(entry_b.get('lastReview') or '')
-            prog_a = int(entry_a.get(progress_key) or 0)
-            prog_b = int(entry_b.get(progress_key) or 0)
-            pick_b = (rev_b >= rev_a) or (prog_b > prog_a)
-            merged[k] = {**entry_a, **(entry_b if pick_b else entry_a)}
+            if rev_b != rev_a:
+                pick_b = rev_b > rev_a
+            else:
+                ts_a = int(entry_a.get('reviewedAt') or entry_a.get('lastSignalAt') or 0)
+                ts_b = int(entry_b.get('reviewedAt') or entry_b.get('lastSignalAt') or 0)
+                if ts_a != ts_b:
+                    pick_b = ts_b > ts_a
+                else:
+                    prog_a = int(entry_a.get(progress_key) or 0)
+                    prog_b = int(entry_b.get(progress_key) or 0)
+                    pick_b = prog_b >= prog_a
+            merged[k] = dict(entry_b if pick_b else entry_a)
         elif isinstance(entry_b, dict):
             merged[k] = dict(entry_b)
         elif isinstance(entry_a, dict):
@@ -99,6 +107,11 @@ def merge_academy_states(stored_state: Optional[Dict[str, Any]], incoming_state:
 
     if isinstance(a.get('cardSrs'), dict) or isinstance(b.get('cardSrs'), dict):
         merged['cardSrs'] = _merge_srs_entries(a.get('cardSrs'), b.get('cardSrs'), 'reps')
+        if not isinstance(merged.get('cardRatings'), dict):
+            merged['cardRatings'] = {}
+        for ck, srs_item in merged['cardSrs'].items():
+            if isinstance(srs_item, dict) and isinstance(srs_item.get('lastGrade'), (int, float)) and srs_item['lastGrade'] > 0:
+                merged['cardRatings'][ck] = int(srs_item['lastGrade'])
 
     if isinstance(a.get('readingPositions'), dict) or isinstance(b.get('readingPositions'), dict):
         pos_a = a.get('readingPositions') if isinstance(a.get('readingPositions'), dict) else {}

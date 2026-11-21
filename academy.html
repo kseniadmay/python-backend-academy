@@ -38435,9 +38435,16 @@ function sanitizeAcademyState(s){
           cleanCards[ck] = Object.assign({}, v);
         } else {
           var cur = cleanCards[ck];
-          if((v.reps || 0) > (cur.reps || 0) ||
-             ((v.reps || 0) === (cur.reps || 0) && (v.interval || 0) > (cur.interval || 0)) ||
-             ((v.reps || 0) === (cur.reps || 0) && (v.lastReview || '') > (cur.lastReview || ''))){
+          var vRev = v.lastReview || '';
+          var cRev = cur.lastReview || '';
+          var vTs = Number(v.reviewedAt) || 0;
+          var cTs = Number(cur.reviewedAt) || 0;
+          var vNewer = (vRev !== cRev)
+            ? (vRev > cRev)
+            : (vTs !== cTs
+              ? (vTs > cTs)
+              : ((v.reps || 0) > (cur.reps || 0) || ((v.reps || 0) === (cur.reps || 0) && (v.interval || 0) > (cur.interval || 0))));
+          if(vNewer){
             cleanCards[ck] = Object.assign({}, v);
           }
         }
@@ -42119,17 +42126,45 @@ function mergeProgressStates(baseRaw, incomingRaw){
 
     if(entryA && entryB){
 
-      const pickB = (entryB.lastReview || '') >= (entryA.lastReview || '') || (entryB.reps || 0) > (entryA.reps || 0);
+      const revA = entryA.lastReview || '';
 
-      merged.cardSrs[ck] = Object.assign({}, entryA, pickB ? entryB : entryA);
+      const revB = entryB.lastReview || '';
+
+      const tsA = Number(entryA.reviewedAt) || 0;
+
+      const tsB = Number(entryB.reviewedAt) || 0;
+
+      let pickB;
+
+      if(revB !== revA){
+
+        pickB = revB > revA;
+
+      } else if(tsA !== tsB){
+
+        pickB = tsB > tsA;
+
+      } else {
+
+        pickB = bNewer || (entryB.lapses || 0) > (entryA.lapses || 0) || ((entryB.lapses || 0) === (entryA.lapses || 0) && (entryB.reps || 0) >= (entryA.reps || 0));
+
+      }
+
+      merged.cardSrs[ck] = Object.assign({}, pickB ? entryB : entryA);
 
     } else if(entryB){
 
-      merged.cardSrs[ck] = entryB;
+      merged.cardSrs[ck] = Object.assign({}, entryB);
 
     } else if(entryA){
 
-      merged.cardSrs[ck] = entryA;
+      merged.cardSrs[ck] = Object.assign({}, entryA);
+
+    }
+
+    if(merged.cardSrs[ck] && typeof merged.cardSrs[ck].lastGrade === 'number' && merged.cardSrs[ck].lastGrade > 0){
+
+      merged.cardRatings[ck] = merged.cardSrs[ck].lastGrade;
 
     }
 
@@ -60180,7 +60215,9 @@ function applyRemNoteCardRating(cardKey, grade){
 
     dueDate: nextDueDate,
 
-    lastGrade: g
+    lastGrade: g,
+
+    reviewedAt: Date.now()
 
   };
 
