@@ -51287,7 +51287,8 @@ let cardsHubState = {
 
   dueQueue: _savedDueQueue,
 
-  duePos: _initCardsPos.completed ? 0 : (typeof _initCardsPos.duePos === 'number' ? _initCardsPos.duePos : 0),
+  // _savedDueQueue уже очищен от всех повторённых сегодня карточек, поэтому стартуем строго с индекса 0
+  duePos: 0,
 
   reviewedDueIndices: _initReviewedDue,
 
@@ -52089,15 +52090,15 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
     const SPRINT_SIZE = 15;
     totalSprintsToday = Math.max(1, Math.ceil(totalDebtCardsToday / SPRINT_SIZE));
 
-    let curSprint = Math.min(totalSprintsToday, Math.max(1, Math.floor(cardsDoneToday / SPRINT_SIZE) + 1));
-    if(typeof cardsHubState !== 'undefined' && typeof cardsHubState.sprintNum === 'number' && cardsHubState.sprintNum > 0){
-      curSprint = Math.min(totalSprintsToday, cardsHubState.sprintNum);
-    } else if(typeof cardsHubState !== 'undefined'){
-      cardsHubState.sprintNum = curSprint;
-    }
-
     const isSprintJustFinished = (typeof cardsHubState !== 'undefined' && cardsHubState.sprintFinished);
-    displaySprintNum = isSprintJustFinished ? Math.max(1, curSprint - 1) : curSprint;
+    if(cardsDueRemaining === 0 && cardsDoneToday > 0){
+      displaySprintNum = totalSprintsToday;
+      if(typeof cardsHubState !== 'undefined') cardsHubState.sprintNum = totalSprintsToday;
+    } else {
+      const computedSprint = Math.min(totalSprintsToday, Math.max(1, Math.floor(cardsDoneToday / SPRINT_SIZE) + 1));
+      if(typeof cardsHubState !== 'undefined') cardsHubState.sprintNum = computedSprint;
+      displaySprintNum = isSprintJustFinished ? Math.max(1, computedSprint - 1) : computedSprint;
+    }
 
     // Шапка: Спринт X из N спринтов дня
     goalLabel = `Спринт ${displaySprintNum} / ${totalSprintsToday}`;
@@ -52670,9 +52671,27 @@ function viewCardsHub(){
 
   if(cardsHubState.dueMode){
 
-    if(!Array.isArray(cardsHubState.dueQueue) || cardsHubState.dueQueue.length === 0){
+    if(cardsHubState.completed){
+
+      const freshDueCheck = collectDueCardsQueue();
+
+      if(freshDueCheck.length > 0){
+
+        cardsHubState.completed = false;
+
+        cardsHubState.dueQueue = freshDueCheck;
+
+        cardsHubState.duePos = 0;
+
+        cardsHubState.reviewedDueIndices = {};
+
+      }
+
+    } else if(!Array.isArray(cardsHubState.dueQueue) || cardsHubState.dueQueue.length === 0){
 
       cardsHubState.dueQueue = collectDueCardsQueue();
+
+      cardsHubState.duePos = 0;
 
     }
 
@@ -62073,9 +62092,13 @@ viewDashboard = function(){
 
   // 2. Приоритет 2 (Интервальная память SRS)
   const cardRatingsMap = state.cardRatings || {};
+  const todayIsoDash = (typeof dateIsoKey === 'function') ? dateIsoKey() : new Date().toISOString().slice(0, 10);
   const weakCardKeys = Object.keys(cardRatingsMap).filter(k => {
     const r = Number(cardRatingsMap[k]) || 0;
-    return r === 1 || r === 2;
+    if(r !== 1 && r !== 2) return false;
+    const srsE = state.cardSrs && state.cardSrs[k];
+    if(srsE && srsE.lastReview === todayIsoDash && srsE.dueDate && srsE.dueDate > todayIsoDash) return false;
+    return true;
   });
 
   weakCardKeys.slice(0, 3).forEach(cardKey => {
@@ -70817,19 +70840,39 @@ window.animateCardFlip = animateCardFlip;
         const sprintConsolidationBonus = Math.max(12, Math.min(24, Math.round(15 * 0.85 + (cardsHubState.sprintNum || 1) * 0.5)));
         awardXp(sprintConsolidationBonus);
 
-        cardsHubState.completed = true;
+        const remainingDue = (typeof collectDueCardsQueue === 'function') ? collectDueCardsQueue() : [];
 
-        cardsHubState.dueQueue = [];
+        if(remainingDue.length > 0){
 
-        cardsHubState.duePos = 0;
+          cardsHubState.completed = false;
 
-        cardsHubState.reviewedDueIndices = {};
+          cardsHubState.dueQueue = remainingDue;
 
-        cardsHubState.reviewedCardIndices = {};
+          cardsHubState.duePos = 0;
 
-        cardsHubState.flipped = false;
+          cardsHubState.reviewedDueIndices = {};
 
-        cardsHubState.sprintFinished = false;
+          cardsHubState.flipped = false;
+
+          cardsHubState.sprintFinished = false;
+
+        } else {
+
+          cardsHubState.completed = true;
+
+          cardsHubState.dueQueue = [];
+
+          cardsHubState.duePos = 0;
+
+          cardsHubState.reviewedDueIndices = {};
+
+          cardsHubState.reviewedCardIndices = {};
+
+          cardsHubState.flipped = false;
+
+          cardsHubState.sprintFinished = false;
+
+        }
 
       }
 
