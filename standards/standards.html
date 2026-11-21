@@ -30048,24 +30048,25 @@ body.light-theme .srs-card-theory-anchor:hover svg {
       flex-shrink: 0 !important;
     }
 
-    /* 4. Липкий нижний док (Sticky Dock) с безопасными отступами */
+    /* 4. Липкий нижний док (Sticky/Fixed Dock) с размытием и безопасными отступами */
     .srs-notes-container .note-action-dock,
     .srs-notes-container .srs-action-dock {
-      position: sticky !important;
-      bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+      position: fixed !important;
+      bottom: 0 !important;
       left: 0 !important;
       right: 0 !important;
-      z-index: 100 !important;
-      margin: 16px auto 0 !important;
-      padding: 6px 0 !important;
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
+      z-index: 9999 !important;
+      margin: 0 !important;
+      padding: 10px 16px calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+      background: linear-gradient(180deg, rgba(7, 9, 14, 0.1) 0%, rgba(7, 9, 14, 0.95) 28%, #07090e 100%) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
       display: flex !important;
       justify-content: center !important;
       box-sizing: border-box !important;
       width: 100% !important;
-      max-width: 700px !important;
+      max-width: 100% !important;
     }
 
     [data-theme="light"] .srs-notes-container .note-action-dock,
@@ -30074,22 +30075,25 @@ body.light-theme .srs-card-theory-anchor:hover svg {
       border-top-color: rgba(0, 0, 0, 0.06) !important;
     }
 
-    .srs-notes-container .step-actions-row {
+    .srs-notes-container .srs-dock-action-wrapper {
       max-width: 480px !important;
       width: 100% !important;
-      gap: 8px !important;
+      gap: 0 !important;
+      margin: 0 auto !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
     }
 
-    .srs-notes-container .btn-step-prev {
-      height: 44px !important;
-      padding: 0 14px !important;
-      font-size: 0.85rem !important;
-      flex-shrink: 0 !important;
-    }
-
+    .srs-notes-container .btn-dock-cta-single,
     .srs-notes-container .btn-cta-dominant {
-      height: 44px !important;
-      font-size: 0.92rem !important;
+      height: 48px !important;
+      border-radius: 14px !important;
+      font-size: 0.96rem !important;
+      font-weight: 700 !important;
+      width: 100% !important;
+      max-width: 480px !important;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35) !important;
     }
 
     /* 5. Финишные кнопки оценки памяти: 1x3 компактный эргономичный ряд */
@@ -60505,7 +60509,7 @@ function viewNotesSrsHub(noteSrsStats){
   if(isCompleted){
 
     actionAreaHTML = `
-      <div class="finish-rating-panel" style="display:flex;flex-direction:column;gap:8px;width:100%;margin:0 auto;">
+      <div class="finish-rating-panel" style="display:flex;flex-direction:column;gap:8px;width:100%;max-width:480px;margin:0 auto;">
         <div class="fc-rate-row note-rate-row rating-buttons-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;">
           <button type="button" class="btn-solid-again fc-rate-btn card-rating-btn card-rating-btn--again rate-btn rate-btn-again" data-srs-note-reset="${curItem.noteId}" style="min-height:44px;border-radius:12px;padding:6px 10px;border:1px solid #d9435e;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s ease;">
             <span class="srs-btn-title rate-label" style="font-size:0.88rem;font-weight:700;line-height:1;">Не помню</span>
@@ -60522,27 +60526,24 @@ function viewNotesSrsHub(noteSrsStats){
 
   } else {
 
+    let finishBtnAttr = '';
+    let finishBtnText = 'Дальше';
+    if(hasMoreChunks){
+      finishBtnAttr = 'data-srs-note-chunk-more="1"';
+      finishBtnText = 'Дальше';
+    } else if(!isLastStep){
+      finishBtnAttr = `data-srs-note-next-step="${sIdx + 1}"`;
+      finishBtnText = 'Следующий шаг';
+    } else {
+      finishBtnAttr = 'data-srs-note-finish="1"';
+      finishBtnText = 'Дальше';
+    }
+
     actionAreaHTML = `
-      <div class="step-actions-row" style="display:flex;align-items:center;gap:10px;margin:0 auto;width:100%;">
-        ${canGoBack ? `
-        <button type="button" class="btn-step-prev" data-srs-note-chunk-prev="1" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;height:46px;padding:0 18px;border-radius:14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.10);color:var(--ink-soft);font-weight:600;font-size:0.88rem;cursor:pointer;flex:0 0 auto;width:92px;min-width:92px;max-width:92px;font-family:var(--font-d);transition:all 0.18s ease;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-          <span>Назад</span>
+      <div class="srs-dock-action-wrapper" style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:480px;margin:0 auto;">
+        <button type="button" class="btn-cta-dominant btn-sprint-cta btn-dock-cta-single" style="height:48px;border-radius:14px;font-size:0.96rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;width:100%;letter-spacing:0.01em;background:linear-gradient(135deg, #10b981 0%, #059669 100%);border:1px solid rgba(255,255,255,0.22);box-shadow:inset 0 1px 1px rgba(255,255,255,0.30), 0 4px 22px -2px rgba(16,185,129,0.42);color:#ffffff;" ${finishBtnAttr}>
+          <span>${finishBtnText}</span>
         </button>
-        ` : ''}
-        ${hasMoreChunks ? `
-        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta btn-step-next" data-srs-note-chunk-more="1" style="flex:1;width:100%;min-width:0;display:inline-flex;align-items:center;justify-content:center;gap:10px;height:46px;padding:0 20px;border-radius:14px;background:linear-gradient(135deg, #10b981 0%, #059669 100%);border:1px solid rgba(255,255,255,0.20);color:#ffffff;font-weight:700;font-size:0.96rem;cursor:pointer;font-family:var(--font-d);letter-spacing:0.01em;">
-          <span>Понятно, дальше</span>
-        </button>
-        ` : (!isLastStep ? `
-        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta btn-step-next" data-srs-note-next-step="${sIdx + 1}" style="flex:1;width:100%;min-width:0;display:inline-flex;align-items:center;justify-content:center;gap:10px;height:46px;padding:0 20px;border-radius:14px;background:linear-gradient(135deg, #10b981 0%, #059669 100%);border:1px solid rgba(255,255,255,0.20);color:#ffffff;font-weight:700;font-size:0.96rem;cursor:pointer;font-family:var(--font-d);letter-spacing:0.01em;">
-          <span>К следующей подтеме</span>
-        </button>
-        ` : `
-        <button type="button" class="btn-cta-dominant btn-glass-emerald btn-sprint-cta btn-step-next" data-srs-note-finish="1" style="flex:1;width:100%;min-width:0;display:inline-flex;align-items:center;justify-content:center;gap:10px;height:46px;padding:0 20px;border-radius:14px;background:linear-gradient(135deg, #10b981 0%, #059669 100%);border:1px solid rgba(255,255,255,0.20);color:#ffffff;font-weight:700;font-size:0.96rem;cursor:pointer;font-family:var(--font-d);letter-spacing:0.01em;">
-          <span>Завершить конспект</span>
-        </button>
-        `)}
       </div>
     `;
 
@@ -60560,7 +60561,7 @@ function viewNotesSrsHub(noteSrsStats){
 
   return `
 
-  <div class="container srs-notes-container" style="max-width:700px;margin:0 auto;width:100%;box-sizing:border-box;padding-bottom:20px;">
+  <div class="container srs-notes-container" style="max-width:700px;margin:0 auto;width:100%;box-sizing:border-box;padding-bottom:calc(96px + env(safe-area-inset-bottom, 0px));">
 
     ${headerBarHTML}
 
@@ -60706,9 +60707,9 @@ function viewNotesSrsHub(noteSrsStats){
 
 
 
-    <!-- Уровень 4: Зона действий (снаружи карточки, строго по центру) -->
+    <!-- Уровень 4: Зона действий (Single Dominant CTA Dock) -->
 
-    <footer class="srs-action-dock note-action-dock" style="margin-top:16px;margin-bottom:0;width:100%;max-width:700px;margin-left:auto;margin-right:auto;text-align:center;">
+    <footer class="srs-action-dock note-action-dock srs-action-dock-container" style="display:flex;justify-content:center;width:100%;">
 
       ${actionAreaHTML}
 
@@ -65616,10 +65617,10 @@ document.addEventListener('click', async function(e){
         srsChunkMoreBtn.removeAttribute('data-srs-note-chunk-more');
         if(sIdx + 1 < steps.length){
           srsChunkMoreBtn.setAttribute('data-srs-note-next-step', sIdx + 1);
-          srsChunkMoreBtn.innerHTML = `<span>К следующей подтеме</span>`;
+          srsChunkMoreBtn.innerHTML = `<span>Следующий шаг</span>`;
         } else {
           srsChunkMoreBtn.setAttribute('data-srs-note-finish', '1');
-          srsChunkMoreBtn.innerHTML = `<span>Завершить конспект</span>`;
+          srsChunkMoreBtn.innerHTML = `<span>Дальше</span>`;
         }
       }
 
