@@ -37098,6 +37098,7 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
         </button>
         <button class="icon-btn-compact sidebar-settings-btn btn-ghost" data-open-settings-modal="" type="button" title="Настройки" aria-label="Настройки"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
       </div>
+      <button type="button" class="link-quiet" id="sidebar-auth-btn" data-auth-action="toggle" style="display:none;margin-top:6px;font-size:0.76rem;padding:4px 8px;border-radius:8px;border:1px solid var(--line-soft);background:transparent;color:var(--ink-muted);cursor:pointer;width:100%;text-align:center;">🔐 Войти</button>
       <button class="link-quiet" id="reset-btn-d" style="display:none;" aria-hidden="true">Сбросить прогресс</button>
       <span id="streak-num-d" style="display:none;" aria-hidden="true">0</span>
     </div>
@@ -59373,6 +59374,138 @@ function getHrStageFilterKey(st){
   return getHrStageCardCats(st).join(',');
 }
 
+window.AUTH_STATUS = window.AUTH_STATUS || { checked: false, authenticated: false, site_lock_enabled: false, has_private_profile: false };
+window.PRIVATE_PROFILE_DATA = window.PRIVATE_PROFILE_DATA || null;
+let _authProfileFetchPromise = null;
+
+function getHrPitchTemplate(isMale){
+  const p = window.PRIVATE_PROFILE_DATA;
+  if(isMale){
+    return (p && p.pitchTemplateMale) ? p.pitchTemplateMale : HR_PITCH_TEMPLATE_MALE;
+  }
+  return (p && p.pitchTemplate) ? p.pitchTemplate : HR_PITCH_TEMPLATE;
+}
+
+function getHrOfferSalary(){
+  const ui = (window.PRIVATE_PROFILE_DATA && window.PRIVATE_PROFILE_DATA.ui) || {};
+  return mockInterviewState.hrOfferSalary || ui.defaultOfferSalary || 85000;
+}
+
+function getHrOfferSalaryPhrase(salary){
+  const ui = (window.PRIVATE_PROFILE_DATA && window.PRIVATE_PROFILE_DATA.ui) || {};
+  const s = (salary !== undefined ? salary : getHrOfferSalary()).toLocaleString('ru-RU');
+  if(ui.offerSalaryPhrasePrefix){
+    return `${ui.offerSalaryPhrasePrefix} ${s} ${ui.offerSalaryPhraseSuffix || ''}`.trim();
+  }
+  return `Я ориентируюсь на вилку от ${s} рублей на руки на испытательный срок, с возможностью пересмотра по результатам его прохождения.`;
+}
+
+function applyPrivateProfile(profile){
+  if(!profile || typeof profile !== 'object') return;
+  window.PRIVATE_PROFILE_DATA = profile;
+  const mergeById = (arr, map) => {
+    if(!Array.isArray(arr) || !map || typeof map !== 'object') return;
+    arr.forEach(item => {
+      if(item && item.id && map[item.id] && typeof map[item.id] === 'object'){
+        Object.assign(item, map[item.id]);
+      }
+    });
+  };
+  mergeById(HR_NOTES, profile.notes);
+  mergeById(HR_PRACTICE_TASKS, profile.tasks);
+  mergeById(HR_GENERAL_QUESTIONS, profile.questions);
+  mergeById(HR_KEYWORD_CARDS, profile.cards);
+  mergeById(HR_UNCOMFORTABLE_QUESTIONS, profile.uncomfortableQuestions);
+  mergeById(HR_QUESTIONS_TO_COMPANY, profile.questionsToCompany);
+  mergeById(HR_SCREENING_PATH, profile.screeningPath);
+
+  if(profile.scheduledEvent && typeof state !== 'undefined' && Array.isArray(state.scheduledEvents)){
+    const ev = state.scheduledEvents.find(x => x.id === (profile.scheduledEvent.id || 'ev-hr-main'));
+    if(ev){
+      if(ev.title === 'Python Backend Developer (Junior)' && profile.scheduledEvent.title){
+        ev.title = profile.scheduledEvent.title;
+      }
+      if(ev.company === 'Backend-команда (FastAPI / PostgreSQL)' && profile.scheduledEvent.company){
+        ev.company = profile.scheduledEvent.company;
+      }
+    }
+  }
+}
+
+function updateAuthButtonsUI(){
+  const isHttp = (typeof location !== 'undefined') && (location.protocol === 'http:' || location.protocol === 'https:');
+  const label = window.AUTH_STATUS && window.AUTH_STATUS.authenticated ? '🚪 Выйти' : '🔐 Войти';
+  document.querySelectorAll('[data-auth-action="toggle"]').forEach(btn => {
+    if(!isHttp){
+      btn.style.display = 'none';
+      return;
+    }
+    if(btn.id === 'sidebar-auth-btn') btn.style.display = 'block';
+    btn.textContent = label;
+  });
+}
+
+async function handleAuthToggleAction(){
+  if(typeof location === 'undefined' || location.protocol === 'file:') return;
+  if(window.AUTH_STATUS && window.AUTH_STATUS.authenticated){
+    try {
+      await fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin', cache: 'no-store' });
+    } catch (_) {}
+    window.AUTH_STATUS.authenticated = false;
+    window.PRIVATE_PROFILE_DATA = null;
+    if(window.AUTH_STATUS.site_lock_enabled){
+      window.location.href = '/login';
+    } else {
+      window.location.reload();
+    }
+  } else {
+    window.location.href = '/login';
+  }
+}
+
+async function loadAuthAndPrivateProfile(forceReload){
+  if(typeof location === 'undefined' || location.protocol === 'file:' || typeof fetch !== 'function'){
+    return window.AUTH_STATUS;
+  }
+  if(_authProfileFetchPromise && !forceReload){
+    return _authProfileFetchPromise;
+  }
+  _authProfileFetchPromise = (async () => {
+    try {
+      const meRes = await fetch('/api/v1/auth/me', { credentials: 'same-origin', cache: 'no-store' });
+      if(!meRes.ok){
+        window.AUTH_STATUS.checked = true;
+        updateAuthButtonsUI();
+        return window.AUTH_STATUS;
+      }
+      const meData = await meRes.json();
+      window.AUTH_STATUS = Object.assign({ checked: true }, meData);
+      if(meData.authenticated === true && (!window.PRIVATE_PROFILE_DATA || forceReload)){
+        const profRes = await fetch('/api/v1/private/profile', { credentials: 'same-origin', cache: 'no-store' });
+        if(profRes.ok){
+          const profData = await profRes.json();
+          applyPrivateProfile(profData);
+          if(typeof render === 'function'){
+            const h = (typeof location !== 'undefined' ? location.hash : '') || '#/';
+            if(h === '#/' || h === '' || h.startsWith('#mock') || h.startsWith('#/mock')){
+              render();
+            }
+          }
+        }
+      }
+      updateAuthButtonsUI();
+      return window.AUTH_STATUS;
+    } catch (_) {
+      window.AUTH_STATUS.checked = true;
+      updateAuthButtonsUI();
+      return window.AUTH_STATUS;
+    } finally {
+      _authProfileFetchPromise = null;
+    }
+  })();
+  return _authProfileFetchPromise;
+}
+
 function ensureScheduledEventsState(){
   if(!state.scheduledEvents || !Array.isArray(state.scheduledEvents) || state.scheduledEvents.length === 0){
     state.scheduledEvents = [
@@ -59410,6 +59543,11 @@ function renderScreeningBannerHTML(){
   const ev = getActiveScheduledEvent();
   if(!ev) return '';
 
+  const ui = (window.PRIVATE_PROFILE_DATA && window.PRIVATE_PROFILE_DATA.ui) || {};
+  const badgeTitle = ui.screeningBadgeTitle || 'ТРЕНАЖЁР СКРИНИНГА';
+  const bannerDesc = ui.screeningBannerDesc || 'Экспресс-подготовка: Питч 120с · 74 блиц-карточки · Кейсы STAR · Условия оффера';
+  const bannerCta = ui.screeningBannerCta || 'К ПОДГОТОВКЕ ➔';
+
   const diffMs = ev.date - Date.now();
   const diffHours = Math.max(0, Math.round(diffMs / (3600 * 1000)));
   const diffDays = Math.floor(diffHours / 24);
@@ -59421,13 +59559,13 @@ function renderScreeningBannerHTML(){
       <div class="swr-content" style="position:relative;z-index:2;">
         <div class="swr-badge">
           <span class="swr-pulse-dot"></span>
-          <span>ТРЕНАЖЁР СКРИНИНГА · ДО ИНТЕРВЬЮ: ${timeLabel}</span>
+          <span>${escapeHtmlStr(badgeTitle)} · ДО ИНТЕРВЬЮ: ${timeLabel}</span>
         </div>
         <h2 class="swr-title" style="margin:4px 0 6px 0;font-size:1.25rem;font-weight:800;color:var(--ink);">${escapeHtmlStr(ev.title)} (${escapeHtmlStr(ev.company)})</h2>
-        <p class="swr-desc" style="margin:0;font-size:0.86rem;color:var(--ink-soft);">Экспресс-подготовка: Питч 120с · 74 блиц-карточки · Кейсы STAR · Условия оффера</p>
+        <p class="swr-desc" style="margin:0;font-size:0.86rem;color:var(--ink-soft);">${escapeHtmlStr(bannerDesc)}</p>
       </div>
       <div class="swr-actions" style="position:relative;z-index:2;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-        <button class="btn btn-primary dominant-btn" data-open-hr-sprint="true" style="padding:9px 18px;font-weight:700;">К ПОДГОТОВКЕ ➔</button>
+        <button class="btn btn-primary dominant-btn" data-open-hr-sprint="true" style="padding:9px 18px;font-weight:700;">${escapeHtmlStr(bannerCta)}</button>
       </div>
     </div>
   `;
@@ -59485,6 +59623,11 @@ function buildMockSlimHeaderHTML(overallPct){
           <span class="hide-on-mobile" style="opacity:0.65;">✎</span>
         </button>
         <span class="mock-pct-chip" title="${escapeHtmlStr(thermo.title)}">⚡ ${overallPct}%</span>
+        ${(typeof location !== 'undefined' && (location.protocol === 'http:' || location.protocol === 'https:')) ? `
+          <button type="button" class="mock-target-pill" data-auth-action="toggle" style="padding:4px 10px;font-size:0.76rem;" title="Управление сессией">
+            ${(window.AUTH_STATUS && window.AUTH_STATUS.authenticated) ? '🚪 Выйти' : '🔐 Войти'}
+          </button>
+        ` : ''}
       </div>
       <div class="srs-header-progress-track" title="${escapeHtmlStr(thermo.title)}">
         <div class="srs-header-progress-fill-echelon" style="width:${fillW}%;background:${thermo.bg};box-shadow:${thermo.boxShadow};"></div>
@@ -59557,7 +59700,7 @@ function renderHrSprintRoomHTML(){
   mockInterviewState.hrTermIndex = mockInterviewState.hrTermIndex || 0;
   mockInterviewState.hrPitchText = mockInterviewState.hrPitchText || (state.hrPitchText || '');
   mockInterviewState.hrOfferLvl = mockInterviewState.hrOfferLvl || 'junior';
-  mockInterviewState.hrOfferSalary = mockInterviewState.hrOfferSalary || 85000;
+  mockInterviewState.hrOfferSalary = getHrOfferSalary();
   mockInterviewState.hrOpenStages = mockInterviewState.hrOpenStages || { 'stage-1': true };
   state.hrKnownTerms = state.hrKnownTerms || {};
   state.hrReadNotes = state.hrReadNotes || {};
@@ -60259,7 +60402,7 @@ function renderHrPitchTabHTML(){
             <button type="button" class="btn btn-ghost" data-paste-pitch-template="true" style="padding:3px 10px;font-size:0.74rem;border:1px solid rgba(16,185,129,0.35);color:var(--emerald);border-radius:8px;">Скопировать в блокнот 📋</button>
           </div>
           <div style="font-size:0.84rem;line-height:1.58;color:var(--ink);">
-            ${escapeHtmlStr(HR_PITCH_TEMPLATE).replace(/\n\n/g, '<br><br>')}
+            ${escapeHtmlStr(getHrPitchTemplate(false)).replace(/\n\n/g, '<br><br>')}
           </div>
         </div>
 
@@ -60687,10 +60830,14 @@ function renderHrStarTabHTML(){
 }
 
 function renderHrOfferTabHTML(){
+  const ui = (window.PRIVATE_PROFILE_DATA && window.PRIVATE_PROFILE_DATA.ui) || {};
   const lvl = mockInterviewState.hrOfferLvl || 'junior';
-  const salary = mockInterviewState.hrOfferSalary || 85000;
+  const salary = getHrOfferSalary();
 
-  const phraseText = `Я ориентируюсь на вилку от ${salary.toLocaleString('ru-RU')} рублей на руки на испытательный срок, с возможностью пересмотра по результатам его прохождения.`;
+  const phraseText = getHrOfferSalaryPhrase(salary);
+  const offerTitle = ui.offerSectionTitle || 'Формат оформления и условия оффера';
+  const offerDesc = ui.offerSectionDesc || 'На старте важно уточнить формат договора (штат по ТК РФ или B2B-контракт) и соотнести суммы «на руки» (net) и «до налогов» (gross).';
+  const offerSafeAnswer = ui.offerSafeAnswer || '«Подходит как оформление в штат, так и B2B-формат. Подскажите, какой вариант принят в вашей команде?»';
 
   const uncomfortableHTML = HR_UNCOMFORTABLE_QUESTIONS.map(uq => `
     <div class="mock-glass-box" style="margin-bottom:10px;">
@@ -60717,14 +60864,14 @@ function renderHrOfferTabHTML(){
         <div class="mock-glass-box mock-glass-box--amber">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
             <span style="font-size:1.1rem;">📑</span>
-            <h3 style="margin:0;font-size:1.02rem;font-weight:800;color:#fbbf24;">Формат оформления и условия оффера</h3>
+            <h3 style="margin:0;font-size:1.02rem;font-weight:800;color:#fbbf24;">${escapeHtmlStr(offerTitle)}</h3>
           </div>
           <div style="font-size:0.84rem;line-height:1.55;color:var(--ink-soft);margin-bottom:10px;">
-            На старте важно уточнить формат договора (штат по ТК РФ или B2B-контракт) и соотнести суммы «на руки» (net) и «до налогов» (gross).
+            ${escapeHtmlStr(offerDesc)}
           </div>
           <div class="mock-glass-box mock-glass-box--emerald" style="padding:10px 12px;font-size:0.84rem;color:var(--ink);">
             <b style="color:var(--emerald);">Спокойный ответ на скрининге:</b><br>
-            <i>«Подходит как оформление в штат, так и B2B-формат. Подскажите, какой вариант принят в вашей команде?»</i>
+            <i>${escapeHtmlStr(offerSafeAnswer)}</i>
           </div>
         </div>
 
@@ -60888,6 +61035,9 @@ function renderEventsModalHTML(){
 }
 
 function viewMockInterview(){
+  if(typeof loadAuthAndPrivateProfile === 'function' && (!window.AUTH_STATUS || !window.AUTH_STATUS.checked || (window.AUTH_STATUS.authenticated && !window.PRIVATE_PROFILE_DATA))){
+    loadAuthAndPrivateProfile();
+  }
   if(mockInterviewState.tab === 'hr' && (mockInterviewState.hrSubTab === 'star' || mockInterviewState.hrRehearsalSubTab === 'star')){
     mockInterviewState.hrRehearsalSubTab = 'questions';
     mockInterviewState.tab = 'star';
@@ -69098,6 +69248,12 @@ function openSettingsModal(){
 
           </button>
 
+          ${(typeof location !== 'undefined' && (location.protocol === 'http:' || location.protocol === 'https:')) ? `
+          <button type="button" class="btn btn-ghost" id="settings-auth-toggle" data-auth-action="toggle" style="flex:1;min-width:140px;">
+            ${(window.AUTH_STATUS && window.AUTH_STATUS.authenticated) ? '🚪 Выйти' : '🔐 Войти'}
+          </button>
+          ` : ''}
+
         </div>
 
         <p class="meta" style="margin:8px 0 0;font-size:0.78rem;color:var(--ink-muted);">Подсказки горячих клавиш (<kbd>Пробел</kbd>, <kbd>Esc</kbd>, <kbd>1</kbd>–<kbd>4</kbd>) на кнопках карточек. Сами клавиши активны всегда.</p>
@@ -76188,11 +76344,15 @@ window.animateCardFlip = animateCardFlip;
     render();
     return;
   }
+  if(e.target.closest('[data-auth-action="toggle"]')){
+    handleAuthToggleAction();
+    return;
+  }
   const personaBtn = e.target.closest('[data-hr-pitch-persona]');
   if(personaBtn){
     const pType = personaBtn.getAttribute('data-hr-pitch-persona');
     const ed = document.getElementById('hr-pitch-editor');
-    const newText = (pType === 'masc') ? HR_PITCH_TEMPLATE_MALE : HR_PITCH_TEMPLATE;
+    const newText = getHrPitchTemplate(pType === 'masc');
     mockInterviewState.hrPitchText = newText;
     state.hrPitchText = newText;
     saveState(state);
@@ -76207,8 +76367,8 @@ window.animateCardFlip = animateCardFlip;
     return;
   }
   if(e.target.closest('[data-copy-salary-phrase]')){
-    const salary = mockInterviewState.hrOfferSalary || 85000;
-    const phrase = 'Я ориентируюсь на вилку от ' + salary.toLocaleString('ru-RU') + ' рублей на руки на испытательный срок, с возможностью пересмотра по результатам его прохождения.';
+    const salary = getHrOfferSalary();
+    const phrase = getHrOfferSalaryPhrase(salary);
     navigator.clipboard.writeText(phrase).then(() => {
       const btn = e.target.closest('[data-copy-salary-phrase]');
       if(btn){
@@ -76220,11 +76380,12 @@ window.animateCardFlip = animateCardFlip;
     return;
   }
   if(e.target.closest('[data-paste-pitch-template]')){
-    mockInterviewState.hrPitchText = HR_PITCH_TEMPLATE;
-    state.hrPitchText = HR_PITCH_TEMPLATE;
+    const tpl = getHrPitchTemplate(false);
+    mockInterviewState.hrPitchText = tpl;
+    state.hrPitchText = tpl;
     saveState(state);
     const ed = document.getElementById('hr-pitch-editor');
-    if(ed) ed.value = HR_PITCH_TEMPLATE;
+    if(ed) ed.value = tpl;
     render();
     return;
   }
@@ -79887,6 +80048,9 @@ if (!window._zenBeaconBound) {
 }
 
 render();
+if(typeof loadAuthAndPrivateProfile === 'function'){
+  loadAuthAndPrivateProfile();
+}
 
 
 

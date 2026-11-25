@@ -1,11 +1,13 @@
 import json
 import logging
 import os
+import secrets
 import time
 from pathlib import Path
 from typing import Any, Optional
 
 _DEFAULT_ROOT_DIR = Path(__file__).resolve().parents[3]
+_EPHEMERAL_SESSION_SECRET = secrets.token_urlsafe(32)
 
 
 def read_json_file(
@@ -41,7 +43,7 @@ def atomic_write_json_file(file_path: Path, data: Any) -> None:
 
 
 try:
-    from pydantic import AliasChoices, Field
+    from pydantic import AliasChoices, Field, model_validator
     from pydantic_settings import BaseSettings, SettingsConfigDict
 
     class Settings(BaseSettings):
@@ -62,10 +64,24 @@ try:
         # Локальный dev-раннер кода на базе exec(); в публичном окружении рекомендуется false
         ALLOW_CODE_RUNNER: bool = True
 
+        # Site-wide lock & personal profile
+        SITE_LOCK_ENABLED: bool = False
+        ADMIN_USERNAME: str = ''
+        ADMIN_PASSWORD: str = ''
+        SESSION_SECRET: str = ''
+        SESSION_TTL_DAYS: int = 30
+        PRIVATE_PROFILE_PATH: str = 'data/private/personal_profile.json'
+
         # Paths (derived from single _DEFAULT_ROOT_DIR)
         ROOT_DIR: Path = _DEFAULT_ROOT_DIR
         DATA_DIR: Path = _DEFAULT_ROOT_DIR / 'data'
         CLOUDFLARED_PATH: Path = _DEFAULT_ROOT_DIR / 'scripts' / 'cloudflared.exe'
+
+        @model_validator(mode='after')
+        def _ensure_session_secret(self) -> 'Settings':
+            if not self.SESSION_SECRET:
+                self.SESSION_SECRET = _EPHEMERAL_SESSION_SECRET
+            return self
 
         @property
         def progress_sync_file(self) -> Path:
@@ -74,6 +90,11 @@ try:
         @property
         def feedback_queue_file(self) -> Path:
             return self.DATA_DIR / 'user_feedback_queue.json'
+
+        @property
+        def private_profile_file(self) -> Path:
+            p = Path(self.PRIVATE_PROFILE_PATH)
+            return p if p.is_absolute() else (self.ROOT_DIR / p)
 
 except ImportError:
     from pydantic import BaseModel
@@ -85,6 +106,12 @@ except ImportError:
         DATABASE_URL: str = os.getenv('DATABASE_URL', '')
         SYNC_DEVICE_TTL_MS: int = int(os.getenv('SYNC_DEVICE_TTL_MS', str(60 * 1000)))
         ALLOW_CODE_RUNNER: bool = os.getenv('ALLOW_CODE_RUNNER', 'true').strip().lower() in ('1', 'true', 'yes', 'on')
+        SITE_LOCK_ENABLED: bool = os.getenv('SITE_LOCK_ENABLED', 'false').strip().lower() in ('1', 'true', 'yes', 'on')
+        ADMIN_USERNAME: str = os.getenv('ADMIN_USERNAME', '')
+        ADMIN_PASSWORD: str = os.getenv('ADMIN_PASSWORD', '')
+        SESSION_SECRET: str = os.getenv('SESSION_SECRET') or _EPHEMERAL_SESSION_SECRET
+        SESSION_TTL_DAYS: int = int(os.getenv('SESSION_TTL_DAYS', '30'))
+        PRIVATE_PROFILE_PATH: str = os.getenv('PRIVATE_PROFILE_PATH', 'data/private/personal_profile.json')
         ROOT_DIR: Path = _DEFAULT_ROOT_DIR
         DATA_DIR: Path = Path(os.getenv('PBA_DATA_DIR', str(_DEFAULT_ROOT_DIR / 'data')))
         CLOUDFLARED_PATH: Path = _DEFAULT_ROOT_DIR / 'scripts' / 'cloudflared.exe'
@@ -96,6 +123,11 @@ except ImportError:
         @property
         def feedback_queue_file(self) -> Path:
             return self.DATA_DIR / 'user_feedback_queue.json'
+
+        @property
+        def private_profile_file(self) -> Path:
+            p = Path(self.PRIVATE_PROFILE_PATH)
+            return p if p.is_absolute() else (self.ROOT_DIR / p)
 
 
 settings = Settings()

@@ -38,8 +38,14 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Не кэшируем динамические API запросы и healthz
-  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/healthz')) {
+  // Не кэшируем страницу входа, динамические API запросы и healthz
+  if (
+    url.pathname === '/login' ||
+    url.pathname.startsWith('/api/v1/auth/') ||
+    url.pathname.startsWith('/api/v1/private/') ||
+    url.pathname.startsWith('/api/') ||
+    url.pathname.startsWith('/healthz')
+  ) {
     return;
   }
 
@@ -48,7 +54,7 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(event.request)
         .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+          if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic' && !networkResponse.redirected) {
             const responseToCache = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(event.request, responseToCache);

@@ -5,12 +5,13 @@ from typing import AsyncGenerator
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse, RedirectResponse, Response
 
 from backend.app.api.legacy_compat import legacy_router
 from backend.app.api.v1.router import api_v1_router
 from backend.app.core.config import settings
 from backend.app.core.network import get_local_ip
+from backend.app.core.security import get_authenticated_admin
 
 
 @asynccontextmanager
@@ -102,14 +103,189 @@ def _serve_spa_entry(root_dir: Path, request: Request) -> Response:
     return _serve_file_with_etag(root_dir / 'academy.html', 'text/html; charset=utf-8', request)
 
 
-@app.middleware('http')
-async def add_no_store_headers(request: Request, call_next):
-    response = await call_next(request)
-    path = request.url.path
-    if path.startswith('/api/') or path.startswith('/healthz'):
+SITE_LOCK_ALLOWLIST = frozenset({
+    '/login',
+    '/api/v1/auth/login',
+    '/api/v1/auth/me',
+    '/api/v1/health',
+    '/robots.txt',
+    '/favicon.ico',
+    '/manifest.json',
+})
+
+LOGIN_PAGE_HTML = """<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <title>Вход — Python Backend Academy</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.14), transparent 45%), #07090e;
+      color: #f8fafc;
+    }
+    .card {
+      width: 100%;
+      max-width: 390px;
+      padding: 28px 24px;
+      border-radius: 20px;
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 20px 44px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(18px);
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+    p {
+      margin: 0 0 22px;
+      color: #94a3b8;
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+    input {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(7, 9, 14, 0.75);
+      color: #f8fafc;
+      font-size: 16px;
+      outline: none;
+    }
+    input:focus {
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    }
+    button {
+      width: 100%;
+      min-height: 50px;
+      border: 0;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #03150e;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.65; cursor: wait; }
+    .err {
+      min-height: 20px;
+      margin-top: 12px;
+      color: #fb7185;
+      font-size: 0.88rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Python Backend Academy</h1>
+    <p>Введите логин и пароль для доступа к персональному тренажёру.</p>
+    <form id="login-form" method="post" action="/api/v1/auth/login">
+      <label for="username">Логин</label>
+      <input id="username" name="username" type="text" autocomplete="username" autocapitalize="none" required>
+      <label for="password">Пароль</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+      <button id="submit-btn" type="submit">Войти</button>
+      <div id="err-msg" class="err" role="alert"></div>
+    </form>
+  </main>
+  <script>
+    const form = document.getElementById('login-form');
+    const btn = document.getElementById('submit-btn');
+    const err = document.getElementById('err-msg');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      err.textContent = '';
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({
+            username: form.username.value.trim(),
+            password: form.password.value
+          })
+        });
+        if (res.ok) {
+          window.location.replace('/');
+          return;
+        }
+        err.textContent = 'Неверный логин или пароль';
+      } catch (_) {
+        err.textContent = 'Ошибка соединения с сервером';
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
+"""
+
+
+def _apply_security_headers(response: Response, path: str) -> Response:
+    if path.startswith('/api/') or path.startswith('/healthz') or path == '/login':
         for key, val in NO_STORE_HEADERS.items():
             response.headers[key] = val
+    if settings.SITE_LOCK_ENABLED:
+        response.headers['X-Robots-Tag'] = 'noindex, nofollow, noarchive'
     return response
+
+
+@app.middleware('http')
+async def site_lock_and_headers_middleware(request: Request, call_next):
+    path = request.url.path
+    if settings.SITE_LOCK_ENABLED and path not in SITE_LOCK_ALLOWLIST:
+        if not get_authenticated_admin(request):
+            if path.startswith('/api/'):
+                resp = JSONResponse({'detail': 'Unauthorized'}, status_code=401)
+            else:
+                resp = RedirectResponse(url='/login', status_code=302)
+            for key, val in NO_STORE_HEADERS.items():
+                resp.headers[key] = val
+            resp.headers['X-Robots-Tag'] = 'noindex, nofollow, noarchive'
+            return resp
+
+    response = await call_next(request)
+    return _apply_security_headers(response, path)
+
+
+@app.get('/robots.txt', include_in_schema=False)
+def robots_txt() -> PlainTextResponse:
+    if settings.SITE_LOCK_ENABLED:
+        body = 'User-agent: *\nDisallow: /\n'
+    else:
+        body = 'User-agent: *\nAllow: /\n'
+    return PlainTextResponse(body, media_type='text/plain; charset=utf-8')
+
+
+@app.get('/login', include_in_schema=False)
+def login_page() -> HTMLResponse:
+    return HTMLResponse(LOGIN_PAGE_HTML, headers=dict(NO_STORE_HEADERS))
 
 
 # Подключение API роутеров
