@@ -286,19 +286,6 @@ LOGIN_PAGE_HTML = """<!DOCTYPE html>
       animation: beadBeacon 2.8s infinite ease-in-out;
       pointer-events: none;
       z-index: 2;
-      transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-    }
-    .invite-bead.filled {
-      background: radial-gradient(circle at 35% 35%, #a7f3d0, #10b981);
-      border-color: #6ee7b7;
-      animation: none;
-      box-shadow: 0 0 8px rgba(16, 185, 129, 0.75);
-    }
-    .invite-bead.error {
-      background: #fda4af;
-      border-color: #f43f5e;
-      animation: none;
-      box-shadow: 0 0 10px rgba(244, 63, 94, 0.8);
     }
     .input-wrap {
       position: relative;
@@ -459,17 +446,8 @@ LOGIN_PAGE_HTML = """<!DOCTYPE html>
     const userEl = document.getElementById('username');
     const passEl = document.getElementById('password');
     const eyeBtn = document.getElementById('toggle-pass');
-    const bead = document.getElementById('login-bead');
     const btn = document.getElementById('submit-btn');
     const err = document.getElementById('err-msg');
-
-    const syncBead = () => {
-      bead.classList.remove('error');
-      bead.classList.toggle('filled', userEl.value.trim().length > 0);
-    };
-    userEl.addEventListener('input', syncBead);
-    userEl.addEventListener('change', syncBead);
-    setTimeout(syncBead, 150);
 
     eyeBtn.addEventListener('click', () => {
       const show = passEl.type === 'password';
@@ -480,7 +458,6 @@ LOGIN_PAGE_HTML = """<!DOCTYPE html>
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       err.textContent = '';
-      bead.classList.remove('error');
       btn.disabled = true;
       try {
         const res = await fetch('/api/v1/auth/login', {
@@ -496,10 +473,8 @@ LOGIN_PAGE_HTML = """<!DOCTYPE html>
           window.location.replace('/');
           return;
         }
-        bead.classList.add('error');
         err.textContent = 'Неверный логин или пароль';
       } catch (_) {
-        bead.classList.add('error');
         err.textContent = 'Ошибка соединения с сервером';
       } finally {
         btn.disabled = false;
