@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Гармония футера сайдбара — Варианты компоновки</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #090c13;
+      --bg-surface: #0f1420;
+      --bg-card: rgba(18, 24, 38, 0.7);
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --line: rgba(255, 255, 255, 0.08);
+      --ink: #f8fafc;
+      --ink-soft: #cbd5e1;
+      --ink-muted: #94a3b8;
+      --emerald: #10b981;
+      --emerald-soft: rgba(16, 185, 129, 0.14);
+      --amber: #f59e0b;
+      --font-d: 'Onest', -apple-system, sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+      --font-title: 'Unbounded', sans-serif;
+      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    [data-theme="light"] {
+      --bg-canvas: #faf8f5;
+      --bg-surface: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.9);
+      --border-glass: rgba(0, 0, 0, 0.08);
+      --line: rgba(0, 0, 0, 0.07);
+      --ink: #0f172a;
+      --ink-soft: #334155;
+      --ink-muted: #64748b;
+      --emerald: #059669;
+      --emerald-soft: rgba(5, 150, 105, 0.1);
+      --amber: #d97706;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-canvas);
+      color: var(--ink);
+      font-family: var(--font-d);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    /* Верхняя панель переключения */
+    .stand-bar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-glass);
+      padding: 12px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+    }
+    .stand-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .stand-bar-title {
+      font-family: var(--font-title);
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+    .layout-pills {
+      display: flex;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-glass);
+      border-radius: 9999px;
+      padding: 3px;
+      gap: 3px;
+    }
+    [data-theme="light"] .layout-pills {
+      background: rgba(0, 0, 0, 0.04);
+    }
+    .lay-btn {
+      padding: 6px 14px;
+      border-radius: 9999px;
+      border: none;
+      background: transparent;
+      color: var(--ink-soft);
+      font-family: var(--font-m);
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .lay-btn:hover { color: var(--ink); }
+    .lay-btn.active {
+      background: #38bdf8;
+      color: #090c13;
+      box-shadow: 0 2px 8px rgba(56, 189, 248, 0.4);
+    }
+
+    .theme-flip-btn {
+      padding: 7px 16px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-glass);
+      color: var(--ink);
+      font-family: var(--font-m);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .theme-flip-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1px);
+    }
+
+    /* ОСНОВНОЙ ЛЕЙАУТ */
+    .app-shell {
+      flex: 1;
+      display: flex;
+      min-height: calc(100vh - 58px);
+    }
+
+    .sidebar {
+      width: 270px;
+      flex: none;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--line);
+      padding: 18px 14px;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 58px;
+      height: calc(100vh - 58px);
+      box-sizing: border-box;
+      backdrop-filter: blur(24px);
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 1.05rem;
+    }
+    .level-badge {
+      font-family: var(--font-m);
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: var(--emerald-soft);
+      color: var(--emerald);
+      border: 1px solid var(--emerald);
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+
+    .hero-card {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(5, 150, 105, 0.03));
+      border: 1px solid rgba(16, 185, 129, 0.18);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .hero-tag {
+      font-family: var(--font-m);
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--emerald);
+      text-transform: uppercase;
+    }
+    .hero-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+    .nav-item {
+      height: 34px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 10px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      text-decoration: none;
+    }
+    .nav-item.active {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--emerald);
+      font-weight: 700;
+    }
+
+    /* ФУТЕР САЙДБАРА */
+    .sidebar-foot {
+      margin-top: auto;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    /* БАЗОВЫЕ ЭЛЕМЕНТЫ */
+    .hud-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .pomo-btn, .heat-btn {
+      height: 33px;
+      border-radius: 10px;
+      font-family: var(--font-m);
+      font-size: 0.74rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .pomo-btn {
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: var(--ink);
+    }
+    [data-theme="light"] .pomo-btn {
+      background: rgba(0, 0, 0, 0.025);
+      border-color: rgba(0, 0, 0, 0.05);
+    }
+    .heat-btn {
+      background: linear-gradient(135deg, rgba(254, 243, 199, 0.12), rgba(245, 158, 11, 0.18));
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      color: #fef08a;
+      animation: heatBreath 2.8s infinite ease-in-out;
+    }
+    @keyframes heatBreath {
+      0%, 100% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.25); }
+      50% { box-shadow: 0 0 14px rgba(245, 158, 11, 0.5); }
+    }
+
+    .icon-btn-compact {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--ink-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, transform 0.2s;
+    }
+    .icon-btn-compact:hover {
+      background: rgba(255, 255, 255, 0.09);
+      color: var(--ink);
+      transform: scale(1.06);
+    }
+    [data-theme="light"] .icon-btn-compact:hover {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    .icon-btn-compact .icon {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+      stroke-width: 1.9;
+    }
+
+    /* Свитчер тем */
+    .theme-pill-toggle {
+      width: 60px;
+      height: 30px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      padding: 2px;
+      display: inline-flex;
+      align-items: center;
+      position: relative;
+      cursor: pointer;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
+      flex-shrink: 0;
+    }
+    [data-theme="light"] .theme-pill-toggle {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.08);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    .theme-pill-track {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 5px;
+      position: relative;
+    }
+    .theme-pill-icon {
+      width: 14px;
+      height: 14px;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .theme-pill-icon svg { width: 13px; height: 13px; }
+    .theme-pill-sun { color: #f59e0b; opacity: 0.35; }
+    .theme-pill-moon {
+      color: #34d399;
+      opacity: 1;
+      filter: drop-shadow(0 0 3px rgba(52, 211, 153, 0.5));
+    }
+    [data-theme="light"] .theme-pill-sun {
+      opacity: 1;
+      filter: drop-shadow(0 0 3px rgba(245, 158, 11, 0.4));
+    }
+    [data-theme="light"] .theme-pill-moon {
+      opacity: 0.35;
+      color: var(--ink-muted);
+      filter: none;
+    }
+    .theme-pill-thumb {
+      position: absolute;
+      top: 50%;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      margin-top: -12px;
+      left: 2px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(8px);
+      transform: translateX(30px);
+      transition: transform 0.32s var(--spring), background 0.25s, border-color 0.25s;
+      z-index: 1;
+    }
+    [data-theme="light"] .theme-pill-thumb {
+      transform: translateX(0px);
+      background: #ffffff;
+      border-color: rgba(0, 0, 0, 0.10);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    }
+
+    /* РАЗЛИЧНЫЕ СХЕМЫ КОМПОНОВКИ (LAYOUTS) */
+
+    /* Вариант 1: «Оптический баланс» (Tools слева 70px, Пилюля справа 60px) */
+    .lay-balance .svc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2px;
+    }
+    .lay-balance .tools-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Вариант 2: «Центрированный триптих» (Centered Island) */
+    .lay-center .svc-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      padding: 0 2px;
+    }
+
+    /* Вариант 3: «Поисковая строка + Трио внизу» */
+    .lay-searchbar .search-wide-btn {
+      width: 100%;
+      height: 32px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      color: var(--ink-muted);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 8px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .lay-searchbar .search-wide-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--ink);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    [data-theme="light"] .lay-searchbar .search-wide-btn {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.06);
+    }
+    .lay-searchbar .trio-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    /* Вариант 4: «Инверсия: Инструменты сверху, Статус внизу» */
+    .lay-invert .sidebar-foot {
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 9px;
+    }
+
+    /* ПРАВАЯ ОБЛАСТЬ */
+    .main-canvas {
+      flex: 1;
+      padding: 32px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .explainer-box {
+      padding: 14px 18px;
+      border-radius: 14px;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+    .explainer-title {
+      font-weight: 800;
+      color: #38bdf8;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="stand-bar">
+    <div class="stand-bar-left">
+      <span class="stand-bar-title">Варианты гармонии футера:</span>
+      <div class="layout-pills">
+        <button class="lay-btn active" onclick="setLayout('harmonic')">★ Внедрено: Поиск + Квартет</button>
+        <button class="lay-btn" onclick="setLayout('balance')">1. Оптический баланс (Топ)</button>
+        <button class="lay-btn" onclick="setLayout('center')">2. Центрированный триптих</button>
+        <button class="lay-btn" onclick="setLayout('searchbar')">3. Строка поиска + Трио</button>
+        <button class="lay-btn" onclick="setLayout('invert')">4. Инструменты сверху</button>
+      </div>
+    </div>
+    <button class="theme-flip-btn" onclick="toggleTheme()">
+      <span>🌓</span> Сменить тему (Dark / Light)
+    </button>
+  </header>
+
+  <div class="app-shell">
+
+    <!-- САЙДБАР -->
+    <aside class="sidebar lay-balance" id="sidebar-root">
+      <div class="brand-wrap">
+        <div class="brand-left"><span>🐍</span> Academy</div>
+        <span class="level-badge">Junior 1</span>
+      </div>
+
+      <div class="hero-card">
+        <div class="hero-tag">🚀 Доминантное действие</div>
+        <div class="hero-title">Урок 1.2: Переменные и типы данных</div>
+      </div>
+
+      <nav class="nav-list">
+        <a href="#/path" class="nav-item active">🗺️ Карта Мастерства</a>
+        <a href="#/cards" class="nav-item">🗂️ Тренажер SRS</a>
+        <a href="#/practice" class="nav-item">⚡ Практика IDE</a>
+      </nav>
+
+      <!-- ДИНАМИЧЕСКИЙ ФУТЕР -->
+      <div class="sidebar-foot" id="footer-container">
+        <!-- Заполняется JS -->
+      </div>
+    </aside>
+
+    <!-- КОНТЕНТ -->
+    <main class="main-canvas">
+      <div class="explainer-box">
+        <div class="explainer-title" id="explainer-title">1. «Оптический баланс весов» (Инструменты слева, Тема справа)</div>
+        <div id="explainer-desc">
+          Вместо раскидывания трёх кнопок по краям с огромными дырами в 60px, поиск 🔍 и настройки ⚙️ сгруппированы вместе слева (~70px), а свитчер тем занимает правый угол (~60px). Это даёт идеальный баланс «70px слева vs 60px справа» и логичное деление: слева инструменты, справа состояние темы.
+        </div>
+      </div>
+
+      <div style="background:var(--bg-card);border:1px solid var(--border-glass);border-radius:16px;padding:24px;">
+        <h2 style="font-family:var(--font-title);font-size:1.15rem;margin-bottom:8px;">🗺️ Карта Мастерства — Python Backend</h2>
+        <p style="font-size:0.85rem;color:var(--ink-soft);">Обратите внимание, как меняется ритм и восприятие футера слева при переключении вариантов сверху.</p>
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    let currentLayout = 'balance';
+    let isDark = true;
+
+    const sidebar = document.getElementById('sidebar-root');
+    const footerContainer = document.getElementById('footer-container');
+    const expTitle = document.getElementById('explainer-title');
+    const expDesc = document.getElementById('explainer-desc');
+    const layButtons = document.querySelectorAll('.lay-btn');
+
+    const searchSvg = `<svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`;
+    const settingsSvg = `<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06-.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`;
+
+    const themePillHtml = `
+      <div class="theme-pill-toggle" onclick="toggleTheme()" title="Сменить тему оформления">
+        <span class="theme-pill-track">
+          <span class="theme-pill-icon theme-pill-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg></span>
+          <span class="theme-pill-icon theme-pill-moon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/></svg></span>
+          <span class="theme-pill-thumb"></span>
+        </span>
+      </div>
+    `;
+
+    const hudRowHtml = `
+      <div class="hud-row">
+        <button class="pomo-btn" type="button" title="Pomodoro">⏱ 15:00 ▶</button>
+        <div class="heat-btn" title="Кулдаун">🔥 100%</div>
+      </div>
+    `;
+
+    const layoutData = {
+      'harmonic': {
+        title: '★ Внедрено: Полноразмерный поиск + Гармоничный квартет',
+        desc: 'Верхняя строка: полноразмерная плашка быстрого поиска Ctrl+K во всю ширину (32px). Нижняя строка: единый гармоничный квартет высотой 30px — Pomodoro фокус + Кулдаун + Свитчер тем (пилюля 58px) + Кнопка настроек (30px). Идеальный баланс без рамочного шума.',
+        render: () => `
+          <div style="width:100%;margin-bottom:6px;">
+            <button class="search-wide-btn" style="width:100%;height:32px;border-radius:9999px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:var(--ink-muted);display:flex;align-items:center;padding:0 10px;gap:8px;font-size:0.78rem;font-family:var(--font-d);cursor:pointer;box-sizing:border-box;" title="Быстрый поиск (Ctrl+K)">
+              ` + searchSvg + `
+              <span style="flex:1;text-align:left;">Поиск по темам...</span>
+              <kbd style="font-family:var(--font-m);font-size:0.64rem;font-weight:700;opacity:0.55;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:1px 5px;line-height:1;">Ctrl+K</kbd>
+            </button>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;">
+            <button class="pomo-btn" style="flex:0 0 68px;width:68px;min-width:68px;max-width:68px;height:30px;padding:0 4px;border-radius:9px;font-size:0.72rem;display:flex;align-items:center;justify-content:center;gap:4px;box-sizing:border-box;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.035);" title="Pomodoro">⏱ 15:00</button>
+            <div class="heat-btn" style="flex:0 0 68px;width:68px;min-width:68px;max-width:68px;height:30px;padding:0 4px;border-radius:9px;font-size:0.72rem;display:flex;align-items:center;justify-content:center;gap:4px;box-sizing:border-box;border:1px solid rgba(244,63,94,0.35);background:linear-gradient(145deg, rgba(50,28,36,0.88) 0%, rgba(32,18,24,0.94) 50%, rgba(18,12,16,0.98) 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,0.16), 0 0 8px rgba(225,29,72,0.16);color:#cbd5e1;" title="Кулдаун (Остывшая сталь)">🥀 0%</div>
+            ` + themePillHtml + `
+            <button class="icon-btn-compact" style="width:30px;height:30px;min-width:30px;min-height:30px;border-radius:50%;" title="Настройки">` + settingsSvg + `</button>
+          </div>
+        `
+      },
+      'balance': {
+        title: '1. «Оптический баланс весов» (Инструменты слева, Тема справа — Топ)',
+        desc: 'Поиск 🔍 и настройки ⚙️ сгруппированы вместе слева (занимают ~70px), а свитчер тем расположен справа (~60px). Устранена пустая дыра в центре, элементы уравновешивают друг друга по оптической массе.',
+        render: () => `
+          ${hudRowHtml}
+          <div class="svc-row">
+            <div class="tools-group">
+              <button class="icon-btn-compact" title="Быстрый поиск (Ctrl+K)">${searchSvg}</button>
+              <button class="icon-btn-compact" title="Настройки">${settingsSvg}</button>
+            </div>
+            ${themePillHtml}
+          </div>
+        `
+      },
+      'center': {
+        title: '2. «Центрированный триптих» (Centered Island)',
+        desc: 'Элементы не раскидываются по краям с огромными щелями, а собраны аккуратным островом по центру с гармоничным зазором 16px. Симметричная и спокойная композиция.',
+        render: () => `
+          ${hudRowHtml}
+          <div class="svc-row">
+            <button class="icon-btn-compact" title="Быстрый поиск (Ctrl+K)">${searchSvg}</button>
+            ${themePillHtml}
+            <button class="icon-btn-compact" title="Настройки">${settingsSvg}</button>
+          </div>
+        `
+      },
+      'searchbar': {
+        title: '3. «Полноразмерный поиск + Трио внизу»',
+        desc: 'Поиск вынесен на отдельную строку как удобная интерактивная строка «Быстрый поиск... Ctrl+K», а под ним в ряд встают Pomodoro (слева), Кулдаун (по центру) и Свитчер тем (справа).',
+        render: () => `
+          <button class="search-wide-btn" title="Быстрый поиск (Ctrl+K)">
+            ${searchSvg}
+            <span style="flex:1;text-align:left;">Быстрый поиск...</span>
+            <kbd style="font-family:var(--font-m);font-size:0.68rem;opacity:0.6;">Ctrl+K</kbd>
+          </button>
+          <div class="trio-row">
+            <button class="pomo-btn" style="flex:1;height:30px;" title="Pomodoro">⏱ 15:00</button>
+            <div class="heat-btn" style="flex:1;height:30px;" title="Кулдаун">🔥 100%</div>
+            ${themePillHtml}
+          </div>
+        `
+      },
+      'invert': {
+        title: '4. «Инструменты сверху, Статус внизу»',
+        desc: 'Инвертированный порядок: кнопки управления (поиск, тема, настройки) примыкают к навигации, а показатели фокуса (Pomodoro и нагрев) опущены в самый низ как приборная панель платформы.',
+        render: () => `
+          <div class="svc-row" style="display:flex;justify-content:space-between;align-items:center;padding:0 2px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <button class="icon-btn-compact" title="Быстрый поиск">${searchSvg}</button>
+              <button class="icon-btn-compact" title="Настройки">${settingsSvg}</button>
+            </div>
+            ${themePillHtml}
+          </div>
+          ${hudRowHtml}
+        `
+      }
+    };
+
+    function setLayout(key) {
+      currentLayout = key;
+      sidebar.className = 'sidebar lay-' + key;
+      expTitle.textContent = layoutData[key].title;
+      expDesc.textContent = layoutData[key].desc;
+
+      const keys = ['harmonic', 'balance', 'center', 'searchbar', 'invert'];
+      layButtons.forEach((b, i) => {
+        if(keys[i] === key) b.classList.add('active');
+        else b.classList.remove('active');
+      });
+
+      footerContainer.innerHTML = layoutData[key].render();
+    }
+
+    function toggleTheme() {
+      isDark = !isDark;
+      const html = document.documentElement;
+      html.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    }
+
+    // Старт
+    setLayout('harmonic');
+  </script>
+</body>
+</html>

@@ -1,0 +1,1360 @@
+{
+  "1": {
+    "id": 1,
+    "title": "Напишите INNER JOIN двух связанных таблиц",
+    "io_in": "users(id, username), orders(id, user_id, total_amount, status)",
+    "io_out": "SELECT u.username, o.id AS order_id, o.total_amount WHERE o.status = 'completed'",
+    "hint": "Шаг 1: Укажи нужные поля в SELECT. Шаг 2: В секции FROM задай первую таблицу. Шаг 3: Свяжи со второй через INNER JOIN ... ON и добавь фильтр WHERE."
+  },
+  "2": {
+    "id": 2,
+    "title": "Напишите парсинг form-data в HTTP-запросе",
+    "io_in": "body_bytes = b'username=alex&role=developer'",
+    "io_out": "{'username': 'alex', 'role': 'developer'}",
+    "hint": "Шаг 1: Декодируй байты body_bytes.decode(\"utf-8\"). Шаг 2: Вызови urllib.parse.parse_qs. Шаг 3: Распакуй одиночные элементы списков."
+  },
+  "4": {
+    "id": 4,
+    "title": "Напишите DDL создания таблиц пользователей и профилей (1:1)",
+    "io_in": "users(id, email), profiles(user_id PK FK -> users.id)",
+    "io_out": "CREATE TABLE users (...); CREATE TABLE profiles (user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE, ...)",
+    "hint": "Шаг 1: Создай в строке sql сначала таблицу users с id SERIAL PRIMARY KEY, уникальным email и TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP. Шаг 2: Опиши зависимую таблицу profiles, где user_id одновременно является PRIMARY KEY для связи 1:1 и ссылается через REFERENCES users(id). Шаг 3: Добавь к внешнему ключу каскадное удаление ON DELETE CASCADE и строковые поля профиля."
+  },
+  "6": {
+    "id": 6,
+    "title": "Напишите парсинг URL и query-параметров через urllib.parse",
+    "io_in": "raw_url = 'https://api.example.com/v1/users?role=admin&active=true&page=2'",
+    "io_out": "parsed.path = '/v1/users', params = {'role': ['admin'], 'active': ['true'], 'page': ['2']}",
+    "hint": "Шаг 1: Импортируй urlparse и parse_qs из urllib.parse. Шаг 2: Разбери URL через parsed = urlparse(raw_url) и передай строку параметров в params = parse_qs(parsed.query). Шаг 3: Помни, что parse_qs возвращает значения параметров в виде списков."
+  },
+  "9": {
+    "id": 9,
+    "title": "Создайте класс точки Point2D с кастомным repr",
+    "io_in": "Point2D(x=3.0, y=4.0)",
+    "io_out": "repr: 'Point2D(x=3.0, y=4.0)'",
+    "hint": "Шаг 1: Реализуй метод def __repr__(self) -> str. Шаг 2: Сформируй f-строку вида f'{self.__class__.__name__}(attr={self.attr})', точно описывающую состояние. Шаг 3: Убедись, что метод возвращает строку, полезную для разработчика при отладке."
+  },
+  "10": {
+    "id": 10,
+    "title": "Напишите юнит-тест проверки единственности экземпляра Singleton",
+    "io_in": "s1 = ThreadSafeSingleton(), s2 = ThreadSafeSingleton()",
+    "io_out": "s1 is s2 (True), id(s1) == id(s2)",
+    "hint": "Шаг 1: Внутри test_singleton_identity() создай два независимых вызова конструктора s1 и s2 класса ThreadSafeSingleton(). Шаг 2: Сравни сами ссылки в памяти через оператор идентичности is (s1 is s2), а не просто равенство по значению. Шаг 3: Дополнительно зафиксируй совпадение адресов объектов в памяти через assert id(s1) == id(s2)."
+  },
+  "11": {
+    "id": 11,
+    "title": "Напишите базовую транзакцию с BEGIN, COMMIT, ROLLBACK",
+    "io_in": "transfer_funds(conn, from_acc=1, to_acc=2, amount=100.0)",
+    "io_out": "Атомарный COMMIT двух UPDATE или ROLLBACK при ошибке",
+    "hint": "Шаг 1: Открой транзакционный блок (BEGIN). Шаг 2: Выполни операции. Шаг 3: Зафиксируй изменения через COMMIT или откати через ROLLBACK при ошибке."
+  },
+  "12": {
+    "id": 12,
+    "title": "Создайте составной первичный ключ из двух полей",
+    "io_in": "order_items (order_id, item_id, quantity, price)",
+    "io_out": "PRIMARY KEY (order_id, item_id)",
+    "hint": "Шаг 1: В строковой переменной sql начни инструкцию CREATE TABLE order_items с перечнем столбцов и типами INTEGER и NUMERIC(10, 2). Шаг 2: Задай для quantity значение по умолчанию DEFAULT 1 и проставь ограничения NOT NULL. Шаг 3: На уровне таблицы вместо одиночного ключа в конце добавь составное ограничение PRIMARY KEY (order_id, item_id)."
+  },
+  "13": {
+    "id": 13,
+    "title": "Проверьте строку на палиндром двумя указателями",
+    "io_in": "is_palindrome('А роза упала на лапу Азора')",
+    "io_out": "True",
+    "hint": "Шаг 1: Преобразуй строку в нижний регистр, отбросив небуквенно-цифровые символы через c.isalnum() и lower(). Шаг 2: Инициализируй два встречных указателя на начало (left = 0) и конец (right = len - 1) последовательности. Шаг 3: Пока указатель left меньше right, сравнивай символы по индексам и при первом расхождении возвращай False, а после цикла верни True."
+  },
+  "15": {
+    "id": 15,
+    "title": "Создайте класс TreeNode для бинарного дерева",
+    "io_in": "TreeNode(val=10, left=TreeNode(5), right=TreeNode(15))",
+    "io_out": "node.val == 10, node.left.val == 5, node.right.val == 15",
+    "hint": "Шаг 1: В конструкторе TreeNode __init__(self, val=0, left=None, right=None) сохрани переданные атрибуты. Шаг 2: Для обхода используй рекурсию: сначала левое поддерево, затем текущий узел, затем правое поддерево (In-order). Шаг 3: Базовым случаем рекурсии является if node is None: return."
+  },
+  "16": {
+    "id": 16,
+    "title": "Определение временной сложности Big-O для вложенного цикла",
+    "io_in": "for i in range(n): for j in range(n): ...",
+    "io_out": "Временная сложность O(N²), память O(1)",
+    "hint": "Шаг 1: Оцени число итераций внешнего цикла (N). Шаг 2: Оцени, сколько раз выполняется тело внутреннего цикла для каждой итерации внешнего. Шаг 3: Перемножь зависимости: два независимых вложенных цикла от N дают временную сложность O(N²)."
+  },
+  "18": {
+    "id": 18,
+    "title": "Реализуйте подсчёт частоты элементов через collections.Counter",
+    "io_in": "frequency_analysis(['apple', 'banana', 'apple'])",
+    "io_out": "[('apple', 2), ('banana', 1)]",
+    "hint": "Шаг 1: Импортируй Counter из модуля collections. Шаг 2: Передай коллекцию в Counter(items) или используй .most_common() для поиска топа. Шаг 3: Верни словарь частот или список кортежей (элемент, частота)."
+  },
+  "19": {
+    "id": 19,
+    "title": "Извлеките срез матрицы 3x3 по диагонали",
+    "io_in": "matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]",
+    "io_out": "diagonal = [matrix[i][i] for i in range(3)] ➔ [1, 5, 9]",
+    "hint": "Шаг 1: Пойми, что у элемента на главной диагонали квадратной матрицы номер строки совпадает с номером столбца. Шаг 2: Пройди по индексам i от 0 до длины matrix минус единица с помощью генератора списка. Шаг 3: Забери диагональные значения выражением matrix[i][i] и присвой итоговый список переменной main_diagonal."
+  },
+  "20": {
+    "id": 20,
+    "title": "Разворот списка срезом [::-1]",
+    "io_in": "original = [1, 2, 3, 4, 5]",
+    "io_out": "reversed_list = original[::-1] ➔ [5, 4, 3, 2, 1]",
+    "hint": "Шаг 1: Используй синтаксис среза последовательности [start:stop:step] без изменения исходного списка original. Шаг 2: Оставь границы start и stop пустыми, чтобы охватить все элементы списка от края до края. Шаг 3: Укажи отрицательный шаг -1 для обратного порядка обхода и запиши копию в переменную reversed_list."
+  },
+  "24": {
+    "id": 24,
+    "title": "Напишите SELECT с условиями WHERE и сортировкой ORDER BY",
+    "io_in": "users(id, username, email, is_active, created_at)",
+    "io_out": "SELECT id, username, email, created_at FROM users WHERE is_active = true AND created_at >= '2026-01-01' ORDER BY created_at DESC LIMIT 50",
+    "hint": "Шаг 1: В переменной sql перечисли столбцы id, username, email и created_at после SELECT из таблицы users. Шаг 2: В секции WHERE отфильтруй записи по активности (is_active = true) и нижней границе даты (не раньше '2026-01-01'). Шаг 3: Упорядочи результат по убыванию времени создания (ORDER BY created_at DESC) и отрежь первые 50 строк через LIMIT 50."
+  },
+  "28": {
+    "id": 28,
+    "title": "Напишите тест функции с фикстурой @pytest.fixture",
+    "io_in": "@pytest.fixture def sample_user(): return {'name': 'Alex'}",
+    "io_out": "def test_user(sample_user): assert sample_user['name'] == 'Alex'",
+    "hint": "Шаг 1: В функции user_payload() под декоратором @pytest.fixture верни словарь с ключами username и email из условия. Шаг 2: Передай точное имя фикстуры user_payload в качестве параметра тестовой функции test_create_user. Шаг 3: Внутри теста проверь с помощью assert, что поле 'username' в полученном словаре равно 'test_user'."
+  },
+  "30": {
+    "id": 30,
+    "title": "Напишите подзапрос в секции WHERE с оператором IN",
+    "io_in": "products(title, price, category_id), categories(id, is_active, priority)",
+    "io_out": "SELECT title, price FROM products WHERE category_id IN (SELECT id FROM categories WHERE is_active = true AND priority > 5)",
+    "hint": "Шаг 1: В переменной sql начни внешний запрос SELECT title, price FROM products. Шаг 2: В условии WHERE сравни category_id с подзапросом с помощью оператора IN. Шаг 3: Внутри скобок подзапроса выбери id из categories с фильтром is_active = true и priority больше 5."
+  },
+  "33": {
+    "id": 33,
+    "title": "Опишите Pydantic схему создания пользователя с валидацией",
+    "io_in": "UserCreateSchema(username='dev', email='dev@corp.com', age=25)",
+    "io_out": "Валидированный объект схемы со строгой типизацией",
+    "hint": "Шаг 1: Импортируй BaseModel, Field из pydantic. Шаг 2: Создай класс схемы, отнаследованный от BaseModel, и объяви поля с явными типами и валидаторами. Шаг 3: Для экспорта используй метод .model_dump() или .model_dump_json()."
+  },
+  "38": {
+    "id": 38,
+    "title": "Создайте простой декоратор-логгер вызова",
+    "io_in": "@log_call def add(a, b): return a + b",
+    "io_out": "add(2, 3) ➔ логирование 'Вызов add(2, 3)' и возврат 5",
+    "hint": "Шаг 1: Определи функцию-декоратор, принимающую func. Шаг 2: Внутри объяви wrapper(*args, **kwargs), вызови func и верни результат. Шаг 3: Верни wrapper."
+  },
+  "39": {
+    "id": 39,
+    "title": "Получите подстроку по отрицательным индексам",
+    "io_in": "s = 'Python Backend Academy'",
+    "io_out": "s[-7:] ➔ 'Academy'",
+    "hint": "Шаг 1: Отсчитай число символов целевого последнего слова 'Developer' в строке s справа налево (9 символов). Шаг 2: Примени отрицательный начальный индекс в срезе строки s[-9:]. Шаг 3: Оставь правую границу среза пустой, чтобы захватить подстроку до самого конца и присвоить её переменной sub."
+  },
+  "42": {
+    "id": 42,
+    "title": "Рассчитайте средний чек и число уникальных покупателей",
+    "io_in": "orders(id, user_id, total_amount, status='completed')",
+    "io_out": "SELECT COUNT(DISTINCT user_id) AS unique_customers, ROUND(AVG(total_amount), 2) AS avg_order_value FROM orders WHERE status = 'completed'",
+    "hint": "Шаг 1: В переменной sql выбери данные из таблицы orders и оставь в WHERE только завершённые заказы со статусом 'completed'. Шаг 2: Подсчитай уникальных клиентов с помощью COUNT(DISTINCT user_id) и присвой алиас unique_customers. Шаг 3: Вычисли средний чек через ROUND(AVG(total_amount), 2) под алиасом avg_order_value."
+  },
+  "48": {
+    "id": 48,
+    "title": "Реализуйте проверку сертификата TLS при HTTPS запросе",
+    "io_in": "requests.get('https://api.internal.corp', verify='/path/to/ca.crt')",
+    "io_out": "HTTPS-сессия с валидацией доверенного корневого CA",
+    "hint": "Шаг 1: В verify_tls_cert извлеки DNS-имена из поля subjectAltName сертификата и проверь наличие в них hostname. Шаг 2: Считай срок окончания действия notAfter, приведи его к осведомлённому UTC-времени и сравни с текущим моментом datetime.now(timezone.utc). Шаг 3: Создай тестовый словарь sample_cert с актуальной датой и сохрани булев результат вызова verify_tls_cert в переменную ok."
+  },
+  "49": {
+    "id": 49,
+    "title": "Устраните дублирование бизнес-логики по правилу DRY",
+    "io_in": "apply_discount(price, 0.15) вместо дублирования math-логики",
+    "io_out": "Единая чистая функция без копипаста расчёта налога/скидки",
+    "hint": "Ориентир по реализации: проверь сигнатуру в стартовом коде и используй ключевые конструкции задачи (def apply_discount(base_price: float, discount_percent: float, min_price: float = 0.0) -> float: ; discounted = base_price * (1 - discoun...)."
+  },
+  "50": {
+    "id": 50,
+    "title": "Сгенерируйте криптостойкий токен сессии через secrets",
+    "io_in": "generate_session_token(length=32)",
+    "io_out": "Криптостойкая hex-строка secrets.token_hex(32)",
+    "hint": "Шаг 1: В функции generate_session_token(nbytes) сгенерируй криптографически стойкий URL-безопасный токен через модуль secrets. Шаг 2: Выбери вызов secrets.token_urlsafe(nbytes), чтобы длина итоговой строки при 32 байтах превышала 40 символов. Шаг 3: Вызови функцию дважды, сохранив разные токены в глобальные переменные tok1 и tok2."
+  },
+  "51": {
+    "id": 51,
+    "title": "Используйте Savepoints для частичного отката операций",
+    "io_in": "BEGIN; SAVEPOINT sp1; ... ROLLBACK TO SAVEPOINT sp1; COMMIT;",
+    "io_out": "Откат проблемных команд с сохранением успешных операций транзакции",
+    "hint": "Шаг 1: В переменной sql открой транзакцию командой BEGIN; и выполни первую полезную операцию (например, вставку в журнал). Шаг 2: Установи точку сохранения SAVEPOINT sp1;, затем смоделируй ошибочный шаг и откати только его через ROLLBACK TO SAVEPOINT sp1;. Шаг 3: Зафиксируй уцелевшую часть транзакции завершающей командой COMMIT;."
+  },
+  "58": {
+    "id": 58,
+    "title": "Выполните ALTER TABLE с добавлением колонки и DEFAULT",
+    "io_in": "Таблица users",
+    "io_out": "ALTER TABLE users ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT true, ADD COLUMN last_login TIMESTAMP WITH TIME ZONE",
+    "hint": "Шаг 1: Запиши в переменную sql команду изменения существующей таблицы ALTER TABLE users. Шаг 2: Добавь первую колонку через ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT true. Шаг 3: Через запятую добавь вторую колонку ADD COLUMN last_login TIMESTAMP WITH TIME ZONE."
+  },
+  "59": {
+    "id": 59,
+    "title": "Используйте оконную функцию ROW_NUMBER() с PARTITION BY",
+    "io_in": "orders: user_id, created_at, total_amount",
+    "io_out": "ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at DESC) AS rn",
+    "hint": "Шаг 1: В переменной sql перечисли столбцы id, user_id и total_amount из таблицы orders. Шаг 2: Добавь вызов оконной функции ROW_NUMBER() с клаузой OVER (...). Шаг 3: Внутри окна разбей выборку по пользователю (PARTITION BY user_id), отсортируй от свежих к старым (ORDER BY created_at DESC) и задай алиас rn."
+  },
+  "65": {
+    "id": 65,
+    "title": "Проверьте, являются ли две строки анаграммами",
+    "io_in": "is_anagram('listen', 'silent')",
+    "io_out": "True (одинаковый частотный словарь символов)",
+    "hint": "Шаг 1: Вспомни, что две строки являются анаграммами, если частоты каждого символа в них полностью совпадают. Шаг 2: Построй частотные словари для строк s и t с помощью класса Counter из модуля collections. Шаг 3: Верни результат прямого сравнения двух объектов Counter на равенство."
+  },
+  "66": {
+    "id": 66,
+    "title": "Напишите lambda-фильтрацию чётных чисел в списке",
+    "io_in": "nums = [1, 2, 3, 4, 5, 6]",
+    "io_out": "list(filter(lambda x: x % 2 == 0, nums)) ➔ [2, 4, 6]",
+    "hint": "Шаг 1: Подготовь встроенную функцию filter(predicate, iterable), принимающую анонимную lambda-функцию и список numbers. Шаг 2: Внутри lambda-выражения проверь остаток от деления элемента на 2 на равенство нулю. Шаг 3: Оберни ленивый итератор filter в list(...) и сохрани готовый список чётных чисел в переменную evens."
+  },
+  "68": {
+    "id": 68,
+    "title": "Создайте параметризованный тест через @pytest.mark.parametrize",
+    "io_in": "@pytest.mark.parametrize('x, expected', [(2, 4), (3, 9)])",
+    "io_out": "Параметризованный запуск тестовых кейсов с автоотчётом",
+    "hint": "Шаг 1: Объяви внешнюю функцию, принимающую декорируемую функцию func. Шаг 2: Внутри создай обёртку def wrapper(*args, **kwargs) с аннотацией @functools.wraps(func). Шаг 3: Вызови func(*args, **kwargs), верни её результат и верни сам wrapper."
+  },
+  "71": {
+    "id": 71,
+    "title": "Удалите дубликаты из отсортированного массива in-place",
+    "io_in": "remove_duplicates([1, 1, 2, 2, 3])",
+    "io_out": "3 (длина массива с уникальными [1, 2, 3] in-place)",
+    "hint": "Шаг 1: Убедись, что пустой список обрабатывается сразу возвратом 0. Шаг 2: Веди указатель записи write = 1 с позиции второго элемента и иди вторым указателем чтения по массиву. Шаг 3: Если текущий элемент отличается от предыдущего, копируй его в позицию write, сдвигай write вперёд и в конце верни write."
+  },
+  "72": {
+    "id": 72,
+    "title": "Создайте namedtuple для хранения координат точки",
+    "io_in": "Point = namedtuple('Point', ['x', 'y']); pt = Point(10, 20)",
+    "io_out": "pt.x == 10, pt.y == 20 (неизменяемый кортеж с именованными полями)",
+    "hint": "Шаг 1: Вызови импортированную фабрику namedtuple, передав имя типа 'Point' и список трёх имён полей x, y, z. Шаг 2: Присвой созданный класс кортежа переменной Point. Шаг 3: Создай экземпляр p с числами (1.0, 2.5, -0.5) для проверки доступа по именам атрибутов."
+  },
+  "73": {
+    "id": 73,
+    "title": "Переместите все нули в конец массива с сохранением порядка",
+    "io_in": "move_zeros([0, 1, 0, 3, 12])",
+    "io_out": "[1, 3, 12, 0, 0] (сдвиг нулей in-place за O(n))",
+    "hint": "Шаг 1: В move_zeroes заведи индекс write = 0 для следующей позиции ненулевого элемента без выделения нового списка. Шаг 2: Пройди по индексам массива слева направо и каждое ненулевое число запиши на место write, увеличивая write. Шаг 3: Оставшиеся позиции от write до конца списка заполни нулями in-place."
+  },
+  "74": {
+    "id": 74,
+    "title": "Реализуйте клиент запросов через httpx с обработкой статус-кодов",
+    "io_in": "fetch_user(user_id: int)",
+    "io_out": "Ожидаемый результат (dict)",
+    "hint": "Шаг 1: В асинхронной функции fetch_user откройте контекстный менеджер async with httpx.AsyncClient() as client с таймаутом. Шаг 2: Выполните await client.get(...) к эндпоинту пользователей, проверьте статус ответа через resp.raise_for_status() и верните resp.json(). Шаг 3: В main() вызовите fetch_user(1) через await, а при проверке убедитесь, что вернулся словарь с полем 'id'."
+  },
+  "75": {
+    "id": 75,
+    "title": "Реализуйте рекурсивный In-order обход дерева",
+    "io_in": "inorder_traversal(root)",
+    "io_out": "Список значений [left -> root -> right] в отсортированном порядке",
+    "hint": "Шаг 1: В конструкторе TreeNode __init__(self, val=0, left=None, right=None) сохрани переданные атрибуты. Шаг 2: Для обхода используй рекурсию: сначала левое поддерево, затем текущий узел, затем правое поддерево (In-order). Шаг 3: Базовым случаем рекурсии является if node is None: return."
+  },
+  "79": {
+    "id": 79,
+    "title": "Опишите связь 1:N с каскадным удалением ON DELETE CASCADE",
+    "io_in": "posts: user_id INTEGER REFERENCES users(id) ON DELETE CASCADE",
+    "io_out": "Каскадное удаление всех постов автора при удалении его аккаунта",
+    "hint": "Шаг 1: В переменной sql опиши CREATE TABLE posts со столбцом id SERIAL PRIMARY KEY и текстовыми полями title, body NOT NULL. Шаг 2: Добавь столбец внешнего ключа user_id INTEGER NOT NULL и свяжи его с таблицей пользователей через REFERENCES users(id). Шаг 3: В том же объявлении допиши политику ON DELETE CASCADE для автоматического удаления постов автора."
+  },
+  "80": {
+    "id": 80,
+    "title": "Найдите наименьшего общего предка (LCA) в BST",
+    "io_in": "lowest_common_ancestor(root, p=2, q=8)",
+    "io_out": "Узел-предок 6 (наименьший общий узел в дереве BST)",
+    "hint": "Шаг 1: Используй инвариант бинарного дерева поиска: все ключи слева меньше корня, все ключи справа больше. Шаг 2: Начни с текущего узла curr = root и в цикле сравнивай значения узлов p и q со значением curr.val. Шаг 3: Если оба меньше — шагай в curr.left, если оба больше — в curr.right, а при расхождении веток или совпадении верни curr."
+  },
+  "87": {
+    "id": 87,
+    "title": "Используйте скалярный подзапрос в блоке SELECT",
+    "io_in": "users u: id, username",
+    "io_out": "(SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS orders_count",
+    "hint": "Шаг 1: В переменной sql напиши внешний запрос по таблице users с псевдонимом u, выбрав u.id и u.username. Шаг 2: Внутри списка SELECT добавь коррелированный скалярный подзапрос в скобках для подсчёта строк из orders o. Шаг 3: Свяжи подзапрос условием o.user_id = u.id и присвой вычисляемому столбцу алиас orders_count."
+  },
+  "89": {
+    "id": 89,
+    "title": "Решите задачу Two Sum за O(n) через хэш-таблицу",
+    "io_in": "two_sum([2, 7, 11, 15], target=9)",
+    "io_out": "[0, 1] (индексы чисел 2 + 7 = 9 за O(n) времени)",
+    "hint": "Шаг 1: Создай пустой словарь seen для отображения уже встреченных значений в их индексы за O(1). Шаг 2: Итерируйся по паре (индекс, число) через enumerate(nums) и вычисляй недостающее слагаемое target - num. Шаг 3: Если дополнение уже есть в seen — верни пару индексов [seen[complement], i], иначе запиши текущее число в словарь."
+  },
+  "90": {
+    "id": 90,
+    "title": "Сформируйте безопасный Set-Cookie с HttpOnly и SameSite",
+    "io_in": "make_secure_cookie(name: str, value: str, max_age: int = 86400)",
+    "io_out": "Ожидаемый результат (str)",
+    "hint": "Шаг 1: В функции make_secure_cookie скомпонуй базовую строку cookie из name=value и директивы Max-Age=max_age. Шаг 2: Добавь путь и обязательные флаги защиты: Path=/, HttpOnly, Secure и SameSite=Strict через точку с запятой. Шаг 3: Вызови функцию вне её определения и сохрани сформированный заголовок в глобальную переменную header."
+  },
+  "91": {
+    "id": 91,
+    "title": "Используйте LEFT JOIN для поиска пользователей без заказов",
+    "io_in": "users LEFT JOIN orders ON u.id = o.user_id",
+    "io_out": "WHERE o.id IS NULL (пользователи без единого заказа)",
+    "hint": "Шаг 1: В переменной sql начни выборку столбцов u.id, u.username, u.email из таблицы users u. Шаг 2: Присоедини заказы через LEFT JOIN orders o ON u.id = o.user_id, чтобы сохранить пользователей без заказов. Шаг 3: Отфильтруй именно тех, у кого нет заказов, условием WHERE o.id IS NULL (не забудь проверку IS NULL вместо равенства)."
+  },
+  "93": {
+    "id": 93,
+    "title": "Напишите декоратор измерения времени выполнения функции @timer",
+    "io_in": "@timer def fetch_data(): ...",
+    "io_out": "Вывод в лог: 'fetch_data выполнена за 0.045 сек'",
+    "hint": "Шаг 1: Определи функцию-декоратор, принимающую func. Шаг 2: Внутри объяви wrapper(*args, **kwargs), вызови func и верни результат. Шаг 3: Верни wrapper."
+  },
+  "94": {
+    "id": 94,
+    "title": "Спроектируйте связь M:N через промежуточную таблицу",
+    "io_in": "Студенты M:N Курсы",
+    "io_out": "Промежуточная таблица student_courses(student_id, course_id, PRIMARY KEY(student_id, course_id))",
+    "hint": "Шаг 1: В переменной sql создай связующую таблицу student_courses с внешними ключами student_id на students(id) и course_id на courses(id). Шаг 2: Для обоих внешних ключей задай ON DELETE CASCADE и добавь столбец enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP. Шаг 3: Объедини пару столбцов в единый составной первичный ключ PRIMARY KEY (student_id, course_id)."
+  },
+  "97": {
+    "id": 97,
+    "title": "Напишите CTE для поиска топ-3 заказов в каждой категории",
+    "io_in": "WITH ranked_orders AS (SELECT ..., ROW_NUMBER() OVER (...) as rn ...)",
+    "io_out": "SELECT * FROM ranked_orders WHERE rn <= 3",
+    "hint": "Шаг 1: В переменной sql объяви обобщённое табличное выражение WITH RankedOrders AS (...) с объединением orders, order_items и products. Шаг 2: Посчитай ранг заказа внутри каждой категории через DENSE_RANK() OVER (PARTITION BY p.category_id ORDER BY o.total_amount DESC) AS rnk. Шаг 3: Во внешнем запросе выбери строки из RankedOrders с ограничением rnk не больше 3."
+  },
+  "105": {
+    "id": 105,
+    "title": "Найдите K самых частых элементов через heapq.nlargest",
+    "io_in": "top_k_frequent([1, 1, 1, 2, 2, 3], k=2)",
+    "io_out": "[1, 2] (k наиболее часто встречающихся чисел через heapq)",
+    "hint": "Шаг 1: Подсчитай частоты каждого числа в списке nums с помощью Counter из collections. Шаг 2: Передай уникальные ключи count.keys() в функцию heapq.nlargest вместе с числом k. Шаг 3: Укажи параметр key=count.get, чтобы куча отбирала элементы с максимальной частотой за O(N log k)."
+  },
+  "108": {
+    "id": 108,
+    "title": "Найдите максимальную глубину бинарного дерева (maxDepth)",
+    "io_in": "max_depth(root_node)",
+    "io_out": "3 (максимальная глубина от корня до самого дальнего листа)",
+    "hint": "Шаг 1: В конструкторе TreeNode __init__(self, val=0, left=None, right=None) сохрани переданные атрибуты. Шаг 2: Для обхода используй рекурсию: сначала левое поддерево, затем текущий узел, затем правое поддерево (In-order). Шаг 3: Базовым случаем рекурсии является if node is None: return."
+  },
+  "110": {
+    "id": 110,
+    "title": "Функция-счётчик вызовов через nonlocal",
+    "io_in": "counter = make_counter(); counter(); counter()",
+    "io_out": "1, затем 2 (сохранение состояния счётчика в замыкании через nonlocal)",
+    "hint": "Шаг 1: Во внешней функции определи переменную-счётчик count = 0. Шаг 2: Во вложенной функции укажи директиву nonlocal count, чтобы изменять переменную из объемлющей области видимости. Шаг 3: Увеличивай count += 1 при каждом вызове и возвращай его значение."
+  },
+  "118": {
+    "id": 118,
+    "title": "Напишите обработчик запроса GetOrderByIdQuery",
+    "io_in": "__init__(self, db_session)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В замороженном датаклассе GetOrderByIdQuery объяви единственное целочисленное поле order_id: int. Шаг 2: В конструкторе GetOrderByIdHandler сохрани переданную сессию в self.db. Шаг 3: Реализуй метод handle(self, query), который запрашивает заказ в сессии и возвращает словарь (включая {'order_id': query.order_id})."
+  },
+  "119": {
+    "id": 119,
+    "title": "Сгруппируйте заказы по клиентам и подсчитайте суммы",
+    "io_in": "orders: client_id, amount",
+    "io_out": "SELECT client_id, SUM(amount) FROM orders GROUP BY client_id",
+    "hint": "Шаг 1: В переменной sql выбери user_id, количество заказов COUNT(*) и их сумму SUM(total_amount) из таблицы orders. Шаг 2: Сгруппируй строки по идентификатору покупателя через клаузу GROUP BY user_id. Шаг 3: Отсортируй сводную выборку по убыванию потраченной суммы (ORDER BY ... DESC)."
+  },
+  "120": {
+    "id": 120,
+    "title": "Решите задачу 3Sum (сумма трёх чисел до 0)",
+    "io_in": "three_sum([-1, 0, 1, 2, -1, -4])",
+    "io_out": "[[-1, -1, 2], [-1, 0, 1]] (тройки с суммой 0 без дубликатов)",
+    "hint": "Шаг 1: Отсортируй исходный список nums на месте, чтобы использовать два указателя и легко пропускать дубликаты. Шаг 2: Внешним циклом фиксируй первый элемент i (пропуская повторы nums[i] == nums[i - 1] и прерывая цикл при положительном nums[i]). Шаг 3: Для пары оставшихся элементов запусти встречные указатели left = i + 1 и right = len - 1, сдвигая их к нулевой сумме и пропуская дубли."
+  },
+  "125": {
+    "id": 125,
+    "title": "Реализуйте слияние K отсортированных списков через min-heap",
+    "io_in": "merge_k_sorted_lists(lists: list)",
+    "io_out": "Ожидаемый результат (list)",
+    "hint": "Шаг 1: Инициализируй min-кучу heap и положи туда первые элементы каждого непустого списка в виде кортежа (значение, индекс_списка, индекс_элемента). Шаг 2: Пока куча не пуста, извлекай наименьший кортеж через heapq.heappop и добавляй значение в итоговый массив. Шаг 3: Если в извлечённом списке есть следующий элемент (elem_idx + 1 меньше len), протолкни его в кучу через heapq.heappush."
+  },
+  "126": {
+    "id": 126,
+    "title": "Добавьте ограничение CHECK для проверки возраста >= 18",
+    "io_in": "ALTER TABLE users ADD CONSTRAINT chk_age CHECK (age >= 18);",
+    "io_out": "Ограничение целостности CHECK на уровне базы данных",
+    "hint": "Шаг 1: В переменной sql укажи модификацию таблицы пользователей командой ALTER TABLE users. Шаг 2: Примени инструкцию ADD CONSTRAINT check_adult_age для именованного ограничения таблицы. Шаг 3: Опиши правило проверки в скобках CHECK (age не меньше 18) с использованием оператора больше или равно."
+  },
+  "129": {
+    "id": 129,
+    "title": "Отфильтруйте группы через HAVING COUNT(orders) > 5",
+    "io_in": "SELECT user_id, COUNT(*) FROM orders GROUP BY user_id",
+    "io_out": "HAVING COUNT(*) > 5 (фильтрация агрегированных групп)",
+    "hint": "Шаг 1: В переменной sql выбери user_id и агрегаты COUNT(id), SUM(total_amount) из таблицы orders. Шаг 2: Выполни группировку по пользователям с помощью GROUP BY user_id. Шаг 3: Отфильтруй сформированные корзины условием HAVING COUNT(id) больше 5 и отсортируй результат по убыванию числа заказов."
+  },
+  "130": {
+    "id": 130,
+    "title": "Рассчитайте разницу между датами через LAG и LEAD",
+    "io_in": "LAG(price) OVER (ORDER BY date), LEAD(price) OVER (ORDER BY date)",
+    "io_out": "Предыдущее и следующее значение цены для анализа динамики",
+    "hint": "Шаг 1: В переменной sql выбери user_id и created_at из таблицы orders, а для предыдущей даты заказа примени LAG(created_at) OVER (PARTITION BY user_id ORDER BY created_at). Шаг 2: Вычисли интервал между текущим и предыдущим заказом, вычитая оконный LAG из created_at под алиасом days_between. Шаг 3: Дополнительно получи дату следующего заказа через LEAD(created_at) с аналогичным окном OVER."
+  },
+  "135": {
+    "id": 135,
+    "title": "Реализуйте параметризованный декоратор @repeat(num_times)",
+    "io_in": "@repeat(num_times=3) def ping(): print('ping')",
+    "io_out": "Троекратный запуск функции ping()",
+    "hint": "Шаг 1: Определи функцию-декоратор, принимающую func. Шаг 2: Внутри объяви wrapper(*args, **kwargs), вызови func и верни результат. Шаг 3: Верни wrapper."
+  },
+  "142": {
+    "id": 142,
+    "title": "Реализуйте кастомный ExceptionHandler для ошибки 404",
+    "io_in": "custom_http_exception_handler(request: Request, exc: StarletteHTTPException)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В обработчике custom_http_exception_handler верни экземпляр JSONResponse со статус-кодом из exc.status_code и телом словаря с ключами error и path. Шаг 2: В маршруте @app.get('/items/{item_id}') при отсутствии элемента (например, item_id не равен 1) выбрасывай StarletteHTTPException(status_code=404). Шаг 3: Зафиксируй поле content словаря, передав str(request.url.path) в качестве пути."
+  },
+  "150": {
+    "id": 150,
+    "title": "Найдите максимальную сумму подмассива размера K (окно)",
+    "io_in": "max_sub_array_of_size_k([2, 1, 5, 1, 3, 2], k=3)",
+    "io_out": "9 (максимальная сумма окна [5, 1, 3] за O(n))",
+    "hint": "Шаг 1: Проверь граничный случай: если длина массива меньше k или k не положителен, верни 0. Шаг 2: Вычисли сумму первых k элементов как начальное окно window_sum и запиши её в max_sum. Шаг 3: Скользящим окном от индекса k до конца списка прибавляй новый правый элемент arr[i], вычитай уходящий левый arr[i - k] и обновляй максимум."
+  },
+  "151": {
+    "id": 151,
+    "title": "Постройте множественное наследование и вызов super() по MRO",
+    "io_in": "class Derived(BaseA, BaseB): super().__init__()",
+    "io_out": "Корректный порядок обхода методов по C3-линеаризации (MRO)",
+    "hint": "Шаг 1: В Base.ping верни базовый маркер (например, список ['Base']), с которого начинается цепочка вызовов. Шаг 2: В MixinA и MixinB вызывай метод следующего класса по порядку C3 MRO через super().ping() и добавляй метку текущего миксина. Шаг 3: В итоговом классе Service(MixinA, MixinB) также прокинь super().ping(), чтобы в ответе сохранились все шаги линейного обхода."
+  },
+  "153": {
+    "id": 153,
+    "title": "Напишите проверку: является ли дерево валидным BST",
+    "io_in": "is_valid_bst(root: TreeNode)",
+    "io_out": "Ожидаемый результат (bool)",
+    "hint": "Шаг 1: В конструкторе TreeNode __init__(self, val=0, left=None, right=None) сохрани переданные атрибуты. Шаг 2: Для обхода используй рекурсию: сначала левое поддерево, затем текущий узел, затем правое поддерево (In-order). Шаг 3: Базовым случаем рекурсии является if node is None: return."
+  },
+  "159": {
+    "id": 159,
+    "title": "Нормализуйте денормализованную таблицу заказов до 3НФ",
+    "io_in": "Заказы с дублированием данных клиента (1НФ -> 3НФ)",
+    "io_out": "Вынос клиентов в отдельную таблицу customers(id, name, phone)",
+    "hint": "Шаг 1: Вынеси в переменную sql независимые справочники в отдельные таблицы до 3НФ: clients (с city_id), cities и products с первичными ключами SERIAL PRIMARY KEY. Шаг 2: Создай таблицу orders, ссылающуюся внешним ключом client_id на clients(id), без хранения повторяющихся полей клиента. Шаг 3: Для позиций заказа создай таблицу order_items с внешними ключами order_id на orders(id) и product_id на products(id) и количеством."
+  },
+  "161": {
+    "id": 161,
+    "title": "Реализуйте вставку узла в BST с сохранением свойств",
+    "io_in": "insert_into_bst(root: TreeNode, val: int)",
+    "io_out": "Ожидаемый результат (TreeNode)",
+    "hint": "Шаг 1: Проверь базовый случай рекурсии: если текущий узел root равен None, верни новый узел TreeNode(val). Шаг 2: Если вставляемое значение val меньше root.val, рекурсивно обнови левое поддерево root.left; иначе обнови правое root.right. Шаг 3: В конце верни неизменённую ссылку на текущий узел root, сохранив структуру дерева."
+  },
+  "162": {
+    "id": 162,
+    "title": "Создайте контекстный менеджер для временного изменения sys.stdout",
+    "io_in": "with redirect_stdout(buffer): print('hello')",
+    "io_out": "Перехват стандартного потока вывода в io.StringIO буфер",
+    "hint": "Шаг 1: Внутри генератора redirect_stdout сохрани текущий поток sys.stdout во временную переменную и создай буфер StringIO(). Шаг 2: Перенаправь sys.stdout на созданный буфер, оберни последующий блок try...finally и отдай буфер вызывающему коду через yield buffer. Шаг 3: В секции finally обязательно восстанови исходный sys.stdout независимо от ошибок внутри блока with."
+  },
+  "164": {
+    "id": 164,
+    "title": "Напишите хэш-таблицу с коллизиями методом цепочек",
+    "io_in": "__init__(self, size=100)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В __init__ класса SimpleHashTable сохрани размер и создай массив пустых корзин-списков [[] for _ in range(size)], а в _hash(key) вычисляй индекс через hash(key) % self.size. Шаг 2: В put(key, value) найди нужную корзину и перебери пары; если ключ уже существует — обнови значение на месте, иначе добавь новую пару в корзину. Шаг 3: В get(key) найди корзину по хешу, верни значение при совпадении ключа либо None при отсутствии."
+  },
+  "168": {
+    "id": 168,
+    "title": "Объедините результаты двух запросов через UNION ALL",
+    "io_in": "SELECT id, title FROM active_tasks UNION ALL SELECT id, title FROM archived_tasks",
+    "io_out": "Объединение двух независимых выборок без затратного устранения дубликатов",
+    "hint": "Шаг 1: В переменной sql напиши первый SELECT id, amount, 'card' AS source, created_at FROM card_transactions с нужными полями. Шаг 2: Объедини его со вторым запросом к таблице crypto_transactions с таким же набором и типами колонок с помощью UNION ALL без дедупликации. Шаг 3: Добавь общую финальную сортировку ORDER BY created_at DESC в самом конце объединённого запроса."
+  },
+  "169": {
+    "id": 169,
+    "title": "Постройте рекурсивный CTE для обхода дерева категорий",
+    "io_in": "WITH RECURSIVE category_tree AS (... UNION ALL ...)",
+    "io_out": "Иерархический обход бесконечного дерева категорий и подкатегорий",
+    "hint": "Шаг 1: В конструкторе TreeNode __init__(self, val=0, left=None, right=None) сохрани переданные атрибуты. Шаг 2: Для обхода используй рекурсию: сначала левое поддерево, затем текущий узел, затем правое поддерево (In-order). Шаг 3: Базовым случаем рекурсии является if node is None: return."
+  },
+  "173": {
+    "id": 173,
+    "title": "Найдите самую длинную подстроку без повторений",
+    "io_in": "length_of_longest_substring('abcabcbb')",
+    "io_out": "3 (подстрока 'abc' без повторяющихся символов за O(n))",
+    "hint": "Шаг 1: Используй динамическое скользящее окно: словарь last_seen для последнего индекса каждого символа, левую границу left = 0 и счётчик max_len = 0. Шаг 2: Итерируйся по паре (right, ch) с помощью enumerate(s): если символ ch уже в last_seen и его позиция не левее left, сдвинь left на last_seen[ch] + 1. Шаг 3: Обнови last_seen[ch] = right и вычисли максимум ширины окна right - left + 1."
+  },
+  "177": {
+    "id": 177,
+    "title": "Реализация операторов сложения и сравнения (add, eq)",
+    "io_in": "Money(100) + Money(50) == Money(150)",
+    "io_out": "Перегрузка операторов сложения (__add__) и равенства (__eq__)",
+    "hint": "Шаг 1: В __init__ сохрани координаты self.x и self.y экземпляра Vector2D. Шаг 2: В __add__(self, other) проверь isinstance(other, Vector2D) (иначе верни NotImplemented) и верни новый Vector2D с суммой компонент. Шаг 3: В __eq__(self, other) проверь тип оппонента и сравни равенство соответствующих координат x и y."
+  },
+  "185": {
+    "id": 185,
+    "title": "Постройте структуру для поиска медианы в потоке чисел",
+    "io_in": "__init__(self)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В __init__ класса MedianFinder создай две кучи: self.small (max-куча через отрицательные числа) и self.large (обычная min-куча из модуля heapq). Шаг 2: В add_num(num) клади значение в small (с инверсией знака), затем переноси максимум из small в large и при перекосе размеров (len(small) меньше len(large)) балансируй обратно в small. Шаг 3: В find_median: если small больше large — верни инвертированный корень small, при равенстве длин — среднее арифметическое корней двух куч."
+  },
+  "186": {
+    "id": 186,
+    "title": "Напишите парсер raw HTTP-запроса из байтового потока",
+    "io_in": "parse_raw_http(raw_bytes: bytes)",
+    "io_out": "Ожидаемый результат (dict)",
+    "hint": "Шаг 1: Раздели сырые байты по первому маркеру b'\\r\\n\\r\\n' через partition, отделив блок заголовков от тела body. Шаг 2: Декодируй блок заголовков, разбей на строки по '\\r\\n': из первой строки извлеки method и path, а из остальных пар 'Key: Value' собери словарь headers в нижнем регистре ключей. Шаг 3: Верни словарь с ключами 'method', 'path', 'headers' и 'body'."
+  },
+  "192": {
+    "id": 192,
+    "title": "Напишите workflow GitHub Actions: линтеры + тесты pytest",
+    "io_in": "name: CI / on: [push, pull_request] / jobs: test:",
+    "io_out": "Автоматический запуск ruff, flake8 и pytest на каждый коммит",
+    "hint": "Шаг 1: Запиши в github_actions_yaml заголовок name и триггеры on: [push, pull_request]. Шаг 2: В секции jobs опиши задачу test на раннере ubuntu-latest с шагами actions/checkout@v4 и actions/setup-python@v5. Шаг 3: Добавь команды установки зависимостей, прогона линтера ruff и запуска тестов pytest."
+  },
+  "194": {
+    "id": 194,
+    "title": "Настройте генерацию UUID v4 в качестве первичного ключа",
+    "io_in": "CREATE TABLE events (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), ...);",
+    "io_out": "Генерация глобально уникального первичного ключа UUID v4 в PostgreSQL",
+    "hint": "Шаг 1: В переменной sql при необходимости включи расширение CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\" (или используй встроенный в PostgreSQL gen_random_uuid()). Шаг 2: Опиши CREATE TABLE api_keys с первичным ключом id типа UUID PRIMARY KEY и значением по умолчанию DEFAULT gen_random_uuid(). Шаг 3: Добавь ссылку user_id и временную метку created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP."
+  },
+  "195": {
+    "id": 195,
+    "title": "Напишите безопасный перевод денег между счетами",
+    "io_in": "safe_transfer(conn, acc1: int, acc2: int, amount: float)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: Чтобы избежать взаимной блокировки (Deadlock) при встречных переводах, отсортируй пару идентификаторов acc1 и acc2 по возрастанию: first, second = sorted([acc1, acc2]). Шаг 2: Открой транзакцию с помощью контекстных менеджеров with conn: и with conn.cursor() as cur:. Шаг 3: Заблокируй оба счёта в детерминированном порядке запросами SELECT ... FOR UPDATE, затем выполни списание и зачисление средствами UPDATE."
+  },
+  "197": {
+    "id": 197,
+    "title": "Реализуйте стек декораторов с сохранением метаданных functools.wraps",
+    "io_in": "@functools.wraps(func)",
+    "io_out": "Сохранение исходного имени функции (__name__) и docstring (__doc__) в декораторе",
+    "hint": "Шаг 1: В каждом декораторе bold(func) и italic(func) создай внутреннюю функцию wrapper(*args, **kwargs) и укрась её декоратором @wraps(func) из functools. Шаг 2: Внутри wrapper в bold верни результат вызова func, обёрнутый в HTML-теги b, а в italic — в теги i. Шаг 3: В целевой функции greet(name), декорированной @bold и @italic, верни строку вида f'Hello, {name}'."
+  },
+  "198": {
+    "id": 198,
+    "title": "Проверьте дерево на зеркальную симметрию (Symmetric Tree)",
+    "io_in": "is_symmetric(root: TreeNode)",
+    "io_out": "Ожидаемый результат (bool)",
+    "hint": "Шаг 1: В конструкторе TreeNode __init__(self, val=0, left=None, right=None) сохрани переданные атрибуты. Шаг 2: Для обхода используй рекурсию: сначала левое поддерево, затем текущий узел, затем правое поддерево (In-order). Шаг 3: Базовым случаем рекурсии является if node is None: return."
+  },
+  "199": {
+    "id": 199,
+    "title": "Постройте тройной JOIN: пользователи, заказы, товары",
+    "io_in": "Реляционная таблица базы данных",
+    "io_out": "SQL-запрос выборки/модификации",
+    "hint": "Шаг 1: В переменной sql выбери имя пользователя, id заказа, название товара, количество и цену из таблицы users u. Шаг 2: Последовательно соедини четыре таблицы цепочкой JOIN: orders o (по user_id), order_items oi (по order_id) и products p (по product_id). Шаг 3: Проверь корректность всех алиасов столбцов и условий ON во всех трёх соединениях."
+  },
+  "200": {
+    "id": 200,
+    "title": "Постройте сложный агрегационный запрос с Coalesce",
+    "io_in": "User.objects, поле bonuses__amount (возможен NULL)",
+    "io_out": "stats = {'total_bonus': 0} через User.objects.aggregate(total_bonus=Coalesce(Sum('bonuses__amount'), Value(0)))",
+    "hint": "Шаг 1: Вызови менеджер модели User.objects.aggregate(...) для расчёта суммарного бонуса в переменную stats. Шаг 2: Оберни агрегат Sum('bonuses__amount') внутрь функции Coalesce первым аргументом. Шаг 3: Передай вторым аргументом Value(0), чтобы при отсутствии записей возвращался ноль вместо None, и задай имя аргумента total_bonus."
+  },
+  "203": {
+    "id": 203,
+    "title": "Решите задачу о наибольшем контейнере с водой",
+    "io_in": "max_area(height: list)",
+    "io_out": "Ожидаемый результат (int)",
+    "hint": "Шаг 1: Поставь два встречных указателя на края массива высот: left = 0 и right = len(height) - 1, а также переменную best = 0. Шаг 2: На каждом шаге цикла пока left меньше right вычисляй площадь как ширину (right - left), умноженную на меньшую из двух стенок, и обновляй максимум. Шаг 3: Сдвигай внутрь тот указатель, чья стенка ниже, чтобы получить шанс найти более высокий барьер."
+  },
+  "207": {
+    "id": 207,
+    "title": "Реализуйте итеративный обход BST с использованием стека",
+    "io_in": "inorder_iterative(root: TreeNode)",
+    "io_out": "Ожидаемый результат (list)",
+    "hint": "Шаг 1: Создай пустые списки result и stack и заведи текущий указатель curr = root. Шаг 2: Пока curr не None или стек не пуст, спускайся до самого левого края: клади curr в stack и переходи к curr.left. Шаг 3: Извлеки узел из стека через pop(), добавь его значение node.val в result и перейди к правому поддереву curr = node.right."
+  },
+  "208": {
+    "id": 208,
+    "title": "Посчитайте нарастающий итог через SUM() OVER(ORDER BY date)",
+    "io_in": "SUM(amount) OVER (ORDER BY date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)",
+    "io_out": "Нарастающий кумулятивный итог суммы платежей по дням",
+    "hint": "Шаг 1: В переменной sql выбери дату (например, date_trunc('day', created_at) AS day) и сумму платежа amount. Шаг 2: Вычисли накопительный итог с помощью оконной функции SUM(amount) OVER (...). Шаг 3: Внутри окна задай порядок ORDER BY и явную физическую рамку ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW под алиасом running_total."
+  },
+  "209": {
+    "id": 209,
+    "title": "Создайте кастомный пагинатор PageNumberPagination",
+    "io_in": "items = [1..10], query_params={'page': 2, 'page_size': 3}",
+    "io_out": "page_2 == [4, 5, 6] (page_size=3, max_page_size=100)",
+    "hint": "Шаг 1: Унаследуй класс StandardResultsPagination от базового PageNumberPagination и задай атрибуты page_size = 3, page_size_query_param = 'page_size' и max_page_size = 100. Шаг 2: Подготовь тестовый список элементов items и создай экземпляр пагинатора для имитации запроса второй страницы. Шаг 3: Получи срез элементов второй страницы в глобальную переменную page_2."
+  },
+  "210": {
+    "id": 210,
+    "title": "Топологическая сортировка графа зависимостей",
+    "io_in": "topological_sort(dependencies_graph)",
+    "io_out": "Последовательность сборки модулей без циклических зависимостей",
+    "hint": "Шаг 1: Построй списки смежности adj и массив входящих степеней in_degree длины num_tasks, заполнив их по парам зависимостей prereqs. Шаг 2: Помести в очередь deque все вершины с нулевой входящей степенью (без невыполненных предусловий). Шаг 3: Извлекай задачи из очереди в итоговый список order, уменьшай in_degree соседей и добавляй ставших свободными в очередь; если длина результата не равна num_tasks, верни пустой список из-за цикла."
+  },
+  "211": {
+    "id": 211,
+    "title": "Оптимизация анти-джойна NOT EXISTS vs LEFT JOIN WHERE NULL",
+    "io_in": "Реляционная таблица базы данных",
+    "io_out": "SQL-запрос выборки/модификации",
+    "hint": "Шаг 1: В переменной sql начни SELECT нужных полей (u.id, u.email) из основной таблицы пользователей users u. Шаг 2: В условии WHERE используй фильтр с отрицанием подзапроса NOT EXISTS (...), устойчивый к значениям NULL. Шаг 3: Внутри скобок подзапроса проверь существование связанной записи: SELECT 1 FROM orders o WHERE o.user_id = u.id."
+  },
+  "217": {
+    "id": 217,
+    "title": "Реализуйте генератор бесконечных простых чисел с yield",
+    "io_in": "primes_generator = get_primes()",
+    "io_out": "next(primes_generator) ➔ 2, 3, 5, 7, 11 (ленивое вычисление простых чисел)",
+    "hint": "Шаг 1: В генераторе prime_generator отдай первое простое число 2 через yield 2 и сохрани его в список найденных primes = [2]. Шаг 2: Запусти бесконечный цикл начиная с кандидата 3 с шагом 2 (перебирая только нечётные числа). Шаг 3: Проверяй делимость кандидата на уже найденные простые числа вплоть до квадрата делителя; если делителей нет — добавляй в список и отдавай через yield."
+  },
+  "218": {
+    "id": 218,
+    "title": "LRU Cache на базе хэш-таблицы и двусвязного списка",
+    "io_in": "__init__(self, key=0, val=0)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В DNode храни key, val, prev и next; в LRUCache заведи словарь cache, ёмкость и пару фиктивных граничных узлов head и tail для двусвязного списка. Шаг 2: Реализуй внутренние _remove(node) и _add(node) (вставка у головы как самого свежего), работающие за O(1). Шаг 3: В get() при наличии узла перемещай его в начало и возвращай val (иначе -1); в put() обновляй существующий узел или вставляй новый и вытесняй узел перед tail при превышении capacity."
+  },
+  "220": {
+    "id": 220,
+    "title": "Найдите минимальный подмассив с суммой не менее S",
+    "io_in": "min_sub_array_len(s: int, nums: list)",
+    "io_out": "Ожидаемый результат (int)",
+    "hint": "Шаг 1: Заведи два указателя скользящего окна left = 0, накопленную сумму curr_sum = 0 и минимальную длину min_len = float('inf'). Шаг 2: Двигай правый указатель right по индексам массива nums, прибавляя nums[right] к curr_sum. Шаг 3: Пока curr_sum не меньше целевого порога s, обновляй min_len длиной окна (right - left + 1), вычитай nums[left] и сдвигай left вправо; если min_len не обновился, верни 0."
+  },
+  "227": {
+    "id": 227,
+    "title": "Реализуйте приоритетную очередь с кастомными весами",
+    "io_in": "__init__(self)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В __init__ класса PriorityQueue создай список self._heap для бинарной кучи и монотонный счётчик self._index = 0. Шаг 2: В push(item, priority) клади в кучу тройку (priority, self._index, item) через heapq.heappush и увеличивай счётчик, чтобы избежать сравнения разнотипных item при равном приоритете. Шаг 3: В pop() при пустой куче выбрасывай IndexError, иначе извлекай элемент через heapq.heappop и возвращай третий компонент кортежа."
+  },
+  "230": {
+    "id": 230,
+    "title": "Реализуйте контекстный менеджер транзакций с rollback при ошибке",
+    "io_in": "__init__(self, session)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: Открой транзакционный блок (BEGIN). Шаг 2: Выполни операции. Шаг 3: Зафиксируй изменения через COMMIT или откати через ROLLBACK при ошибке."
+  },
+  "245": {
+    "id": 245,
+    "title": "Создайте простую иерархию классов с одиночным наследованием",
+    "io_in": "class Animal: def speak(self): ... / class Dog(Animal): ...",
+    "io_out": "Наследование поведения и переопределение метода speak()",
+    "hint": "Шаг 1: В базовом классе Animal сохрани self.name и определи базовый метод speak(self), возвращающий строку с именем. Шаг 2: В подклассах Dog(Animal) и Cat(Animal) переопредели метод speak(), чтобы они возвращали строки с лаем и мяуканьем. Шаг 3: Создай глобальный список animals с экземплярами разных классов (включая Dog, Cat и Animal) для проверки полиморфного вызова."
+  },
+  "253": {
+    "id": 253,
+    "title": "Распакуйте кортеж из трёх элементов в три переменные",
+    "io_in": "data = (10, 20, 30); x, y, z = data",
+    "io_out": "x = 10, y = 20, z = 30 (распаковка кортежа)",
+    "hint": "Шаг 1: Запиши в левой части оператора присваивания три целевые переменные x, y, z через запятую. Шаг 2: В правой части укажи готовый кортеж point без обращения по индексам [0], [1], [2]. Шаг 3: Выполни распаковку одной инструкцией: Python проверит совпадение длины и свяжет каждую переменную со своим элементом."
+  },
+  "255": {
+    "id": 255,
+    "title": "Извлеките подсписок первых трёх и последних двух элементов через срез",
+    "io_in": "lst = [10, 20, 30, 40, 50, 60]",
+    "io_out": "first_three == [10, 20, 30], last_two == [50, 60]",
+    "hint": "Шаг 1: Используй срез последовательности с открытой левой границей lst[:3], чтобы забрать первые три элемента списка. Шаг 2: Для выбора последних двух элементов примени отрицательный индекс старта с открытым концом lst[-2:]. Шаг 3: Присвой полученные срезы глобальным переменным first_three и last_two."
+  },
+  "256": {
+    "id": 256,
+    "title": "Напишите список квадратов чисел через map()",
+    "io_in": "numbers = [1, 2, 3, 4, 5]",
+    "io_out": "squares == [1, 4, 9, 16, 25]",
+    "hint": "Шаг 1: Передай функцию возведения в квадрат (lambda x: x ** 2) и исходный список numbers в функцию map(). Шаг 2: Учитывай, что map() возвращает ленивый итератор, а не готовый список. Шаг 3: Преобразуй результат конструктором list(...) и запиши итог в переменную squares."
+  },
+  "257": {
+    "id": 257,
+    "title": "Получите значение из словаря через get() с значением по умолчанию",
+    "io_in": "config = {'timeout': 30}; retries = config.get('retries', 3)",
+    "io_out": "retries == 3 (дефолтное значение без вызова KeyError)",
+    "hint": "Шаг 1: Обратись к словарю config с помощью безопасного метода .get() вместо квадратных скобок, которые бросают KeyError. Шаг 2: Передай первым аргументом имя искомого ключа 'retries', а вторым — запасное значение по умолчанию 3. Шаг 3: Сохрани возвращённый результат метода в переменную retries."
+  },
+  "258": {
+    "id": 258,
+    "title": "Различие списка и кортежа: мутабельность и хешируемость в словаре",
+    "io_in": "point_list = [10, 20]; point_tuple = (10, 20)",
+    "io_out": "point_list == [99, 20]; cache == {(10, 20): 'запись в кэше'}",
+    "hint": "Шаг 1: Измени первый элемент изменяемого списка point_list напрямую по индексу [0] на 99. Шаг 2: Создай словарь cache, передав неизменяемый и хэшируемый кортеж point_tuple в качестве ключа. Шаг 3: Привяжи к этому ключу строку 'запись в кэше', подтвердив отличие кортежа от списка."
+  },
+  "260": {
+    "id": 260,
+    "title": "Найдите email в тексте с помощью регулярного выражения",
+    "io_in": "find_emails('Пишите на support@corp.com или info@test.ru')",
+    "io_out": "['support@corp.com', 'info@test.ru'] (поиск по regex-шаблону)",
+    "hint": "Шаг 1: Подготовь регулярное выражение для адреса почты, объединяющее имя пользователя, символ '@' и доменную часть с точкой. Шаг 2: Запусти поиск первого совпадения в строке text функцией re.search(pattern, text). Шаг 3: Сохрани возвращённый объект Match в переменную match."
+  },
+  "261": {
+    "id": 261,
+    "title": "Сериализуйте словарь в JSON-строку и обратно",
+    "io_in": "data = {'user': 'admin', 'active': True}",
+    "io_out": "json_str = json.dumps(data) ➔ '{\"user\": \"admin\", \"active\": true}'",
+    "hint": "Шаг 1: Импортируй модуль json. Шаг 2: Для преобразования Python-объекта в строку используй json.dumps(obj, ensure_ascii=False), а для обратного разбора — json.loads(json_str). Шаг 3: Убедись, что ключи словарей сериализуются в строковый формат."
+  },
+  "262": {
+    "id": 262,
+    "title": "Исправьте функцию с ловушкой изменяемого аргумента по умолчанию",
+    "io_in": "add_item('apple'), затем add_item('banana')",
+    "io_out": "['apple'], затем ['banana'] (независимые списки в каждом вызове)",
+    "hint": "Шаг 1: Не используй пустой список в качестве дефолтного значения прямо в заголовке функции def add_item(item, cart=[]). Шаг 2: Внутри тела функции проверь строгое условие: если cart is None, создай новый пустой список. Шаг 3: Добавь переданный item в список и верни его."
+  },
+  "263": {
+    "id": 263,
+    "title": "Создайте frozenset и используйте его как ключ словаря",
+    "io_in": "tag_set = frozenset(['python', 'backend'])",
+    "io_out": "cache[tag_set] = 'ready' (неизменяемое множество как ключ словаря)",
+    "hint": "Шаг 1: Обычный set мутабелен и не хешируется, поэтому не может быть ключом словаря. Шаг 2: Оберни элементы во frozenset([...]) — неизменяемое хешируемое множество. Шаг 3: Используй созданный frozenset как ключ в словаре."
+  },
+  "264": {
+    "id": 264,
+    "title": "Переберите словарь через items() и выведите пары ключ-значение",
+    "io_in": "user = {'name': 'Alex', 'age': 30, 'city': 'Moscow'}",
+    "io_out": "Вывод пар: name: Alex, age: 30, city: Moscow",
+    "hint": "Шаг 1: Инициализируй словарь user с ключами 'name', 'age', 'city' и значениями из условия. Шаг 2: Перебери пары ключ-значение словаря в цикле for по представлению user.items(). Шаг 3: На каждой итерации выведи отформатированную пару через print()."
+  },
+  "265": {
+    "id": 265,
+    "title": "Реализуйте протокол итератора вручную через __iter__ и __next__",
+    "io_in": "class NumberRangeIterator: __iter__(), __next__()",
+    "io_out": "Кастомный итератор с возбуждением StopIteration в конце диапазона",
+    "hint": "Шаг 1: В __init__ класса CountUp сохрани предел limit и начальный счётчик current = 0; в __iter__ верни сам объект self. Шаг 2: В __next__ проверь условие завершения: когда self.current достигает self.limit, выбрось исключение StopIteration. Шаг 3: В остальных случаях увеличь счётчик на единицу и верни новое число, чтобы цикл дошёл от 1 до limit включительно."
+  },
+  "266": {
+    "id": 266,
+    "title": "Напишите генератор чисел Фибоначчи через yield",
+    "io_in": "fib_gen = fibonacci(); [next(fib_gen) for _ in range(6)]",
+    "io_out": "[0, 1, 1, 2, 3, 5] (генератор чисел Фибоначчи через yield)",
+    "hint": "Шаг 1: Задай две начальные переменные последовательности Фибоначчи: a, b = 0, 1. Шаг 2: Запусти цикл ровно на n шагов через range(n), на каждой итерации отдавая текущее значение a оператором yield. Шаг 3: После yield одновременно сдвинь пару значений по правилу Фибоначчи: a, b = b, a + b."
+  },
+  "267": {
+    "id": 267,
+    "title": "Сделайте глубокую копию вложенного списка и докажите независимость",
+    "io_in": "original = [[1, 2], [3, 4]]; cloned = copy.deepcopy(original)",
+    "io_out": "cloned[0][0] = 999 ➔ original[0][0] остаётся 1 (полная изоляция)",
+    "hint": "Шаг 1: Создай независимую только на верхнем уровне поверхностную копию вложенного списка original с помощью copy.copy() и запиши в shallow. Шаг 2: Создай полную рекурсивную копию с независимыми внутренними списками через copy.deepcopy() и сохрани в deep. Шаг 3: Измени вложенный элемент в одной копии и убедись через print, что deep не затронул исходный список."
+  },
+  "270": {
+    "id": 270,
+    "title": "Напишите декоратор, прозрачно прокидывающий аргументы через *args, **kwargs",
+    "io_in": "log_call(func)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: Определи функцию-декоратор, принимающую func. Шаг 2: Внутри объяви wrapper(*args, **kwargs), вызови func и верни результат. Шаг 3: Верни wrapper."
+  },
+  "274": {
+    "id": 274,
+    "title": "Извлеките структурированные данные из строки лога через regex-группы",
+    "io_in": "log_line = '2026-10-25 18:00:00 [ERROR] Connection timeout: 192.168.1.1'",
+    "io_out": "date='2026-10-25', level='ERROR', ip='192.168.1.1' (re.match с группами)",
+    "hint": "Шаг 1: Импортируй модуль re и составь сырую строку шаблона r'^...$'. Шаг 2: Вызови re.match(pattern, text) (поиск с начала строки) или re.search (по всей строке). Шаг 3: Проверь match is not None или извлеки совпадение через match.group()."
+  },
+  "280": {
+    "id": 280,
+    "title": "Напишите конвейер обработки лога с regex, генератором и JSON-выводом",
+    "io_in": "process_log_stream('access.log')",
+    "io_out": "Ленивый конвейер: чтение строк ➔ regex-парсинг ➔ JSON-генератор",
+    "hint": "Шаг 1: Импортируй модуль re и составь сырую строку шаблона r'^...$'. Шаг 2: Вызови re.match(pattern, text) (поиск с начала строки) или re.search (по всей строке). Шаг 3: Проверь match is not None или извлеки совпадение через match.group()."
+  },
+  "283": {
+    "id": 283,
+    "title": "Проверьте строку на соответствие шаблону через re.match",
+    "io_in": "is_valid_username('alex_99'), is_valid_username('9alex')",
+    "io_out": "True, False",
+    "hint": "Шаг 1: Импортируй модуль re и составь сырую строку шаблона r'^...$'. Шаг 2: Вызови re.match(pattern, text) (поиск с начала строки) или re.search (по всей строке). Шаг 3: Проверь match is not None или извлеки совпадение через match.group()."
+  },
+  "286": {
+    "id": 286,
+    "title": "Сгруппируйте элементы списка по ключу через collections.defaultdict",
+    "io_in": "words = ['apple', 'banana', 'avocado', 'blueberry', 'cherry']",
+    "io_out": "{'a': ['apple', 'avocado'], 'b': ['banana', 'blueberry'], 'c': ['cherry']}",
+    "hint": "Шаг 1: Инициализируй переменную grouped с помощью defaultdict(list), чтобы отсутствующие ключи автоматически получали пустой список. Шаг 2: Пройди по всем словам из списка words в цикле. Шаг 3: Используй первую букву word[0] как ключ словаря и добавляй текущее слово в grouped[word[0]] через append()."
+  },
+  "287": {
+    "id": 287,
+    "title": "Сохраните и загрузите объект класса через pickle",
+    "io_in": "__init__(self, name, age)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В конструкторе класса User сохрани переданные атрибуты self.name и self.age. Шаг 2: Создай экземпляр user, сериализуй его в байты функцией pickle.dumps() и сохрани в переменную binary_data. Шаг 3: Восстанови новый объект из байтов через pickle.loads(binary_data) и запиши его в переменную restored."
+  },
+  "290": {
+    "id": 290,
+    "title": "Реализуйте собственный класс, поддерживающий срезы через __getitem__",
+    "io_in": "class CustomSeq: def __getitem__(self, index): ...",
+    "io_out": "Поддержка индексации my_seq[0] и срезов my_seq[1:3]",
+    "hint": "Шаг 1: В __init__ класса Sequence сохрани копию входной коллекции в self._data = list(data). Шаг 2: Реализуй __len__(self) через len(self._data) и __getitem__(self, key), просто делегируя индексацию и срезы списку self._data[key]. Шаг 3: Создай экземпляр класса в глобальной переменной seq и проверь на нём срез и разворот."
+  },
+  "291": {
+    "id": 291,
+    "title": "Дизассемблируйте функцию через модуль dis и объясните байткод",
+    "io_in": "add(a, b)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В теле функции add(a, b) верни сумму аргументов a + b. Шаг 2: Импортируй модуль dis и вызови dis.dis(add), чтобы распечатать инструкции байткода CPython PVM. Шаг 3: Проверь корректность работы самой функции add на тестовых числах."
+  },
+  "295": {
+    "id": 295,
+    "title": "Напишите валидатор конфигурации на regex с именованными группами и сериализацией в JSON",
+    "io_in": "parse_config(lines)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: Импортируй модуль re и составь сырую строку шаблона r'^...$'. Шаг 2: Вызови re.match(pattern, text) (поиск с начала строки) или re.search (по всей строке). Шаг 3: Проверь match is not None или извлеки совпадение через match.group()."
+  },
+  "296": {
+    "id": 296,
+    "title": "Запишите и прочитайте текстовый файл через with open()",
+    "io_in": "Запись в 'notes.txt' ('w') и чтение ('r') через with open()",
+    "io_out": "content == 'Первая строка\\nВторая строка\\n'",
+    "hint": "Шаг 1: Открой файл 'notes.txt' на запись ('w') с кодировкой 'utf-8' через контекстный менеджер with open(...) и запиши две строки текста. Шаг 2: После закрытия первого блока открой тот же файл на чтение ('r') снова через with open(...). Шаг 3: Считай весь текст файла методом .read() и сохрани его в глобальную переменную content."
+  },
+  "297": {
+    "id": 297,
+    "title": "Дополните список через append и расширьте другим списком через extend",
+    "io_in": "cart = ['apple']; append('banana'); extend(['cherry', 'date'])",
+    "io_out": "cart == ['apple', 'banana', 'cherry', 'date', ['extra', 'items']]",
+    "hint": "Шаг 1: Инициализируй переменную cart как список с одним элементом 'apple' и добавь строку 'banana' в конец через append(). Шаг 2: Распакуй элементы списка ['cherry', 'date'] поштучно в тот же список с помощью метода extend(). Шаг 3: В завершение добавь вложенный список ['extra', 'items'] как один элемент методом append()."
+  },
+  "298": {
+    "id": 298,
+    "title": "Используйте моржовый оператор для проверки длины и вывода в одном выражении",
+    "io_in": "data = [1, 2, 3, 4, 5, 6]; if (n := len(data)) > 3",
+    "io_out": "n == 6; вывод: 'Слишком много элементов: 6'",
+    "hint": "Шаг 1: Присвой переменной data список чисел от 1 до 6 включительно. Шаг 2: В заголовке условия if используй моржовый оператор (n := len(data)), чтобы сразу вычислить длину и сравнить её с числом 3. Шаг 3: В ветке if выведи диагностическое сообщение с полученным значением n."
+  },
+  "299": {
+    "id": 299,
+    "title": "Объедините списки имён и оценок через zip() и найдите лучшего студента",
+    "io_in": "names = ['Alice', 'Bob', 'Charlie'], scores = [85, 92, 78]",
+    "io_out": "best_name == 'Bob', best_score == 92",
+    "hint": "Шаг 1: Свяжи списки names и scores попарно с помощью встроенной функции zip(names, scores). Шаг 2: Передай пары в max(...) с функцией-ключом сравнения key=lambda pair: pair[1], выбирающей максимальный балл. Шаг 3: Распакуй найденную пару-лидера в переменные best_name и best_score."
+  },
+  "300": {
+    "id": 300,
+    "title": "Сравните id() объекта до и после присваивания и после копирования",
+    "io_in": "a = [1, 2, 3]; b = a; c = a.copy()",
+    "io_out": "(a is b) == True, (a is c) == False, a == c",
+    "hint": "Шаг 1: Свяжи переменную b прямым присваиванием с существующим списком a (b = a). Шаг 2: Создай отдельный объект в памяти с помощью поверхностной копии c = a.copy(). Шаг 3: Сравни результаты id(a) с id(b) и id(c), чтобы убедиться: b разделяет тот же адрес, а c — новый объект."
+  },
+  "301": {
+    "id": 301,
+    "title": "Прочитайте файл построчно и посчитайте количество непустых строк",
+    "io_in": "Файл 'log.txt' с 3 непустыми и 3 пустыми строками",
+    "io_out": "count == 3",
+    "hint": "Шаг 1: Открой файл 'log.txt' в режиме записи ('w') и запиши три непустые строки, разделённые пустыми переводами строки. Шаг 2: Открой файл на чтение ('r') в новом блоке with и перебери его построчно. Шаг 3: Заведи счётчик count = 0 и увеличивай его на 1 только для тех строк, где line.strip() не пусто."
+  },
+  "302": {
+    "id": 302,
+    "title": "Используйте моржовый оператор внутри спискового включения с regex",
+    "io_in": "lines = ['user: alex@example.com', 'нет почты тут', 'user: nina@test.org']",
+    "io_out": "emails == ['alex@example.com', 'nina@test.org']",
+    "hint": "Шаг 1: Импортируй модуль re и составь сырую строку шаблона r'^...$'. Шаг 2: Вызови re.match(pattern, text) (поиск с начала строки) или re.search (по всей строке). Шаг 3: Проверь match is not None или извлеки совпадение через match.group()."
+  },
+  "303": {
+    "id": 303,
+    "title": "Реализуйте класс с __len__ и __contains__ для кастомной коллекции",
+    "io_in": "class Cart: __len__(), __contains__()",
+    "io_out": "len(cart) == 3, 'item' in cart == True",
+    "hint": "Шаг 1: Для поддержки len() реализуй __len__(self), возвращающий целое неотрицательное число. Шаг 2: Для оператора in реализуй __contains__(self, item), возвращающий bool. Шаг 3: Делегируй проверку внутренней коллекции (self._items)."
+  },
+  "304": {
+    "id": 304,
+    "title": "Используйте zip(*matrix) для транспонирования матрицы",
+    "io_in": "matrix = [[1, 2, 3], [4, 5, 6]]",
+    "io_out": "transposed == [(1, 4), (2, 5), (3, 6)]",
+    "hint": "Шаг 1: Распакуй строки матрицы matrix как отдельные позиционные аргументы в функцию zip через оператор звёздочки: zip(*matrix). Шаг 2: В результате каждый кортеж выдаст соответствующий столбец исходной таблицы. Шаг 3: Оберни итератор zip в list(...) и сохрани транспонированную матрицу в переменную transposed."
+  },
+  "305": {
+    "id": 305,
+    "title": "Напишите функцию слияния логов из нескольких файлов с дедупликацией по id() содержимого",
+    "io_in": "merge_log_files(['log1.txt', 'log2.txt'])",
+    "io_out": "Объединённый поток логов с фильтрацией дубликатов по хешу строки",
+    "hint": "Шаг 1: В функции merge_unique_lines(*file_paths) создай множество seen для быстрой проверки уникальности и итоговый список result. Шаг 2: Перебери пути, открывай каждый файл с помощью with open(...) в кодировке 'utf-8' и очищай каждую строку через strip(). Шаг 3: Пропускай пустые строки и уже встречавшиеся в seen; новые добавляй в seen и в result, затем верни result."
+  },
+  "306": {
+    "id": 306,
+    "title": "Реализуйте инкапсуляцию с приватным атрибутом через name mangling",
+    "io_in": "class BankAccount: def __init__(self): self.__balance = 0",
+    "io_out": "Атрибут недоступен напрямую как .__balance (name mangling: _BankAccount__balance)",
+    "hint": "Шаг 1: В __init__ класса BankAccount сохрани переданный баланс в приватный атрибут с двойным подчёркиванием self.__balance. Шаг 2: В методе get_balance() верни значение self.__balance. Шаг 3: В deposit(amount) проверь положительность суммы (иначе ValueError) и увеличь баланс."
+  },
+  "307": {
+    "id": 307,
+    "title": "Продемонстрируйте разницу между __new__ и __init__",
+    "io_in": "__new__(cls, *args) -> instance, затем __init__(self, *args)",
+    "io_out": "Разделение этапа создания объекта в памяти (__new__) и инициализации полей (__init__)",
+    "hint": "Шаг 1: В методе класса __new__(cls, *args, **kwargs) создай новый экземпляр через вызов super().__new__(cls), выведи диагностику и верни созданный instance. Шаг 2: В __init__(self, name) инициализируй атрибут self.name на уже созданном объекте. Шаг 3: Создай тестовый экземпляр Tracked и проследи порядок вызова двух методов."
+  },
+  "308": {
+    "id": 308,
+    "title": "Реализуйте паттерн \"приватное состояние + публичное свойство\" через self",
+    "io_in": "__init__(self, celsius)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В __init__ класса Temperature сохрани температуру в защищённый атрибут self._celsius. Шаг 2: В методе to_fahrenheit(self) верни пересчёт по формуле Цельсий * 9 / 5 + 32. Шаг 3: Создай два независимых экземпляра в переменных t1 и t2 и убедись, что их состояния не смешиваются."
+  },
+  "309": {
+    "id": 309,
+    "title": "Изоляция точки входа исполняемого модуля через if __name__ == \"__main__\"",
+    "io_in": "greet(name)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В теле функции greet(name) сформируй и верни отформатированную строку приветствия f'Привет, {name}!'. Шаг 2: Ниже добавь защитную точку входа с проверкой равенства __name__ и строки '__main__'. Шаг 3: Внутри блока if вызови greet и распечатай результат, чтобы код не выполнялся при импорте модуля."
+  },
+  "310": {
+    "id": 310,
+    "title": "Используйте functools.lru_cache для мемоизации медленной функции",
+    "io_in": "slow_square(n)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: Под декоратором @lru_cache(maxsize=128) в slow_square(n) имитируй паузу и верни квадрат числа n. Шаг 2: Вызови slow_square(4) минимум дважды подряд, чтобы второй вызов попал в кэш. Шаг 3: Проверь статистику попаданий через slow_square.cache_info(), убедившись в росте счётчика hits."
+  },
+  "313": {
+    "id": 313,
+    "title": "Продемонстрируйте ловушку замыкания в цикле и исправьте её",
+    "io_in": "Цикл for i in range(3) с lambda: i против lambda i=i: i",
+    "io_out": "[f() for f in funcs_broken] == [2, 2, 2]; [f() for f in funcs_fixed] == [0, 1, 2]",
+    "hint": "Шаг 1: Во внешней функции определи переменную-счётчик count = 0. Шаг 2: Во вложенной функции укажи директиву nonlocal count, чтобы изменять переменную из объемлющей области видимости. Шаг 3: Увеличивай count += 1 при каждом вызове и возвращай его значение."
+  },
+  "314": {
+    "id": 314,
+    "title": "Используйте functools.partial для фиксации части аргументов функции",
+    "io_in": "power(base, exponent)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В функции power(base, exponent) верни результат возведения в степень base ** exponent. Шаг 2: С помощью partial(power, exponent=2) зафиксируй второй аргумент и запиши новую функцию в глобальную переменную square. Шаг 3: Аналогично создай глобальную функцию cube с зафиксированной степенью exponent=3."
+  },
+  "315": {
+    "id": 315,
+    "title": "Сравните global и nonlocal на примере счётчика на двух уровнях вложенности",
+    "io_in": "increment_global(...)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: Во внешней функции определи переменную-счётчик count = 0. Шаг 2: Во вложенной функции укажи директиву nonlocal count, чтобы изменять переменную из объемлющей области видимости. Шаг 3: Увеличивай count += 1 при каждом вызове и возвращай его значение."
+  },
+  "316": {
+    "id": 316,
+    "title": "Продемонстрируйте три уровня доступа: public, _protected, __private",
+    "io_in": "__init__(self, owner, balance)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В __init__ класса Account задай публичный self.owner, защищённый self._balance и приватный self.__pin через двойное подчёркивание. Шаг 2: Создай экземпляр Account в глобальной переменной acc. Шаг 3: Обратись к защищённому полю и проверь искажённое имя приватного атрибута через _Account__pin."
+  },
+  "317": {
+    "id": 317,
+    "title": "Продемонстрируйте, что __str__ падает обратно на __repr__, если не определён",
+    "io_in": "__init__(self, x, y)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В __init__ класса Point сохрани координаты self.x и self.y. Шаг 2: Реализуй __repr__(self) без объявления __str__, вернув информативную строку вида f'Point(x={self.x}, y={self.y})'. Шаг 3: Создай экземпляр в переменной p и проверь, что str(p) и print(p) автоматически используют __repr__."
+  },
+  "318": {
+    "id": 318,
+    "title": "Продемонстрируйте, что переопределение __eq__ без __hash__ делает объект нехэшируемым",
+    "io_in": "__init__(self, amount)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В классе Money сохрани self.amount и реализуй __eq__ (при этом Python обнулит __hash__, сделав объект нехэшируемым). Шаг 2: Убедись в блоке try...except, что hash(m1) бросает TypeError. Шаг 3: Во втором классе MoneyFixed определи и __eq__, и __hash__ (на базе hash(self.amount)) и создай экземпляр m2, который уже можно класть в set."
+  },
+  "322": {
+    "id": 322,
+    "title": "Напишите декоратор без аргументов и примените к нескольким функциям",
+    "io_in": "@announce над add(2, 3) и greet('Алекс')",
+    "io_out": "add(2, 3) == 5; greet('Алекс') == 'Привет, Алекс!'",
+    "hint": "Шаг 1: Определи функцию-декоратор, принимающую func. Шаг 2: Внутри объяви wrapper(*args, **kwargs), вызови func и верни результат. Шаг 3: Верни wrapper."
+  },
+  "323": {
+    "id": 323,
+    "title": "Функции как объекты первого класса: сохранение и передача в коллекции",
+    "io_in": "operations = {'+': add, '-': sub, '*': mul}; вызов для (5, 3)",
+    "io_out": "add(5, 3) == 8, sub(5, 3) == 2, mul(5, 3) == 15",
+    "hint": "Шаг 1: Реализуй три арифметические функции add, sub и mul, возвращающие сумму, разность и произведение своих аргументов. Шаг 2: Собери словарь operations с ключами '+', '-', '*', сопоставив их с функциями без круглых скобок. Шаг 3: Вызови нужную функцию из словаря по строковому ключу, передав ей аргументы."
+  },
+  "324": {
+    "id": 324,
+    "title": "Реализуйте параметризованный декоратор @repeat(num_times) с тремя уровнями вложенности",
+    "io_in": "repeat(num_times)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: Определи функцию-декоратор, принимающую func. Шаг 2: Внутри объяви wrapper(*args, **kwargs), вызови func и верни результат. Шаг 3: Верни wrapper."
+  },
+  "325": {
+    "id": 325,
+    "title": "Напишите функцию, генерирующую другие функции (замыкание-фабрика)",
+    "io_in": "make_multiplier(factor)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: Во внешней функции определи переменную-счётчик count = 0. Шаг 2: Во вложенной функции укажи директиву nonlocal count, чтобы изменять переменную из объемлющей области видимости. Шаг 3: Увеличивай count += 1 при каждом вызове и возвращай его значение."
+  },
+  "326": {
+    "id": 326,
+    "title": "Стек декораторов: примените два декоратора к одной функции и определите порядок",
+    "io_in": "bold(func)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В декораторах bold(func) и italic(func) создай внутренние обёртки wrapper, оборачивающие результат func() в теги b и i соответственно. Шаг 2: Внутри декорированной функции text() верни исходный текст (например, 'Привет'). Шаг 3: Вызови text() и проследи порядок применения снизу вверх: сначала оборачивает @italic, затем @bold."
+  },
+  "327": {
+    "id": 327,
+    "title": "Реализуйте конвейер генераторов данных с трансформацией через yield",
+    "io_in": "data_stream | filter_positive | square_numbers",
+    "io_out": "Многоэтапный конвейер генераторов с расходом памяти O(1)",
+    "hint": "Шаг 1: В numbers(n) отдавай числа от 0 до n - 1 через yield; в double_values(nums) отдавай удвоенные значения; в only_positive(nums) отдавай числа строго больше 0. Шаг 2: Собери ленивый конвейер, последовательно передав генератор numbers(5) в double_values и в only_positive, и сохрани его в переменную pipeline. Шаг 3: Материализуй результат конвейера в список через list(pipeline) и выведи его."
+  },
+  "328": {
+    "id": 328,
+    "title": "Реализуйте бесконечный генератор простых чисел через yield",
+    "io_in": "primes = infinite_primes(); [next(primes) for _ in range(5)]",
+    "io_out": "[2, 3, 5, 7, 11] (бесконечный генератор простых чисел)",
+    "hint": "Шаг 1: В генераторе primes() сразу отдай первое простое число 2 через yield 2 и занеси его в список found. Шаг 2: В бесконечном цикле начиная с 3 с шагом 2 проверяй, не делится ли кандидат на уже найденные простые (достаточно проверять пока p * p не больше candidate). Шаг 3: Создай генератор в глобальной переменной gen и забери первые пять простых чисел через islice или next() в переменную first_five."
+  },
+  "331": {
+    "id": 331,
+    "title": "Напишите менеджер соединения с БД через контекстный менеджер (__enter__/__exit__)",
+    "io_in": "with DatabaseConnection() as db:",
+    "io_out": "Внутри with: db.connected == True; после выхода: db.connected == False",
+    "hint": "Шаг 1: В методе __enter__(self) класса DatabaseConnection установи флаг self.connected = True и обязательно верни self для работы конструкции as. Шаг 2: В __exit__(self, exc_type, exc_value, traceback) переведи self.connected в False, гарантируя закрытие ресурса. Шаг 3: Проверь жизненный цикл соединения внутри и после блока with DatabaseConnection()."
+  },
+  "335": {
+    "id": 335,
+    "title": "Извлеките именованные группы из строки лога через re",
+    "io_in": "re.search(r'(?P<ip>\\d+\\.\\d+\\.\\d+\\.\\d+)', line).groupdict()",
+    "io_out": "{'ip': '192.168.1.1'} (именованные группы регулярного выражения)",
+    "hint": "Шаг 1: Запусти поиск по строке log с подготовленным шаблоном pattern через re.match() (или re.search()) и сохрани объект совпадения в переменную match. Шаг 2: Убедись, что match не равен None перед чтением групп. Шаг 3: Извлеки словарь всех именованных групп 'date', 'time', 'level' и 'message' методом match.groupdict()."
+  },
+  "337": {
+    "id": 337,
+    "title": "Сериализуйте datetime объект в JSON через кастомный encoder",
+    "io_in": "custom_encoder(obj)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: Импортируй модуль json. Шаг 2: Для преобразования Python-объекта в строку используй json.dumps(obj, ensure_ascii=False), а для обратного разбора — json.loads(json_str). Шаг 3: Убедись, что ключи словарей сериализуются в строковый формат."
+  },
+  "339": {
+    "id": 339,
+    "title": "Напишите тест производительности: dis.dis() для сравнения байткода двух реализаций",
+    "io_in": "sum_loop(n)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: Реализуй sum_loop(n) через явный цикл for с аккумулятором total и sum_builtin(n) через встроенный вызов sum(range(n)). Шаг 2: Передай обе функции по очереди в dis.dis(...) для сравнения сгенерированного байткода. Шаг 3: Проверь на небольшом n, что обе функции возвращают одинаковую сумму."
+  },
+  "340": {
+    "id": 340,
+    "title": "Профилируйте функцию через cProfile и найдите узкое место",
+    "io_in": "slow_function(...)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В теле функции slow_function() напиши ресурсоёмкий цикл (например, суммирование квадратов чисел от 0 до 999) и верни итог. Шаг 2: Запусти профилирование функции строковым вызовом через cProfile.run('slow_function()'). Шаг 3: Проанализируй счётчики вызовов ncalls и времени tottime в отчёте."
+  },
+  "341": {
+    "id": 341,
+    "title": "Изоляция состояния независимых экземпляров класса через self",
+    "io_in": "__init__(self)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В __init__ класса Counter инициализируй атрибут экземпляра self.count = 0 (не на уровне класса). Шаг 2: В методе increment() увеличивай self.count на 1. Шаг 3: Создай два независимых экземпляра c1 и c2 и сделай разное число вызовов increment(), убедившись в изоляции их счётчиков."
+  },
+  "342": {
+    "id": 342,
+    "title": "Реализуйте жизненный цикл объекта: создание, использование, удаление через __del__",
+    "io_in": "__init__(self, name)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В __init__ класса Resource сохрани self.name и напечатай сообщение о создании ресурса. Шаг 2: В деструкторе __del__(self) выведи сообщение об освобождении ресурса по имени. Шаг 3: Создай объект Resource, выполни условную работу и удали ссылку через del для наблюдения вызова __del__."
+  },
+  "343": {
+    "id": 343,
+    "title": "Вызов связанного и несвязанного метода через Class.method(instance)",
+    "io_in": "bark(self)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В методе bark(self) класса Dog верни строку f'{self.name} гавкает!'. Шаг 2: Создай экземпляр rex = Dog() и присвой ему атрибут rex.name = 'Рекс'. Шаг 3: Проверь, что связанный вызов rex.bark() и несвязанный вызов Dog.bark(rex) дают одинаковый результат."
+  },
+  "344": {
+    "id": 344,
+    "title": "Реализуйте класс-обёртку с __repr__ для отладочного вывода коллекции",
+    "io_in": "cart = ShoppingCart(); cart.add('хлеб')",
+    "io_out": "repr(cart) == \"ShoppingCart(['хлеб'])\"",
+    "hint": "Шаг 1: В __init__ класса ShoppingCart создай пустой список self.items = []. Шаг 2: В методе add(self, item) добавляй переданный элемент в self.items. Шаг 3: В __repr__(self) верни отладочную строку формата f'ShoppingCart({self.items!r})'."
+  },
+  "345": {
+    "id": 345,
+    "title": "Инкапсулируйте валидацию внутри __init__, запретив создание объекта в невалидном состоянии",
+    "io_in": "__init__(self, value)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В __init__ класса Age проверь переданное value на допустимые границы от 0 до 150 включительно. Шаг 2: Если значение выходит за пределы, немедленно выбрось исключение ValueError вместо сохранения некорректного состояния. Шаг 3: Сохрани валидное значение в self._value и реализуй __repr__ для понятного отображения объекта."
+  },
+  "350": {
+    "id": 350,
+    "title": "Реализуйте иерархию со __slots__ и поддержкой weakref",
+    "io_in": "AuditRecord(42), CacheRecord(77)",
+    "io_out": "оба без __dict__; c = CacheRecord(77), ref = weakref.ref(c), ref() is c",
+    "hint": "Шаг 1: Как запретить создание __dict__ в BaseRecord, если экземпляру нужно хранить только одно поле record_id? Шаг 2: Что случится с экземплярами AuditRecord, если не объявить __slots__ в дочернем классе, и какое значение задают при отсутствии новых полей? Шаг 3: Почему вызов weakref.ref() не работает для обычных слотовых классов и какой служебный слот разрешает слабые ссылки? Шаг 4: Проверь, что AuditRecord и CacheRecord не имеют __dict__ и запрещают лишние поля, а при сохранении сильной ссылки c = CacheRecord(77) вызов weakref.ref(c)() возвращает сам объект c."
+  },
+  "351": {
+    "id": 351,
+    "title": "Проверьте выброс исключения и текст ошибки через pytest.raises",
+    "io_in": "divide_safe(a: float, b: float)",
+    "io_out": "Ожидаемый результат (float)",
+    "hint": "Шаг 1: В divide_safe(a, b) при нулевом делителе b выбрось ValueError('Деление на ноль запрещено'), иначе верни a / b. Шаг 2: Внутри test_divide_by_zero_raises откройте блок with pytest.raises(ValueError, match='Деление на ноль запрещено'):. Шаг 3: Внутри контекстного менеджера вызови divide_safe(10, 0), подтверждая генерацию исключения."
+  },
+  "352": {
+    "id": 352,
+    "title": "Проверьте приближённое равенство float в тестах через pytest.approx",
+    "io_in": "calculate_tax(amount: float)",
+    "io_out": "Ожидаемый результат (float)",
+    "hint": "Шаг 1: В calculate_tax(amount) вычисли и верни сумму amount * 0.1 + amount * 0.2. Шаг 2: В тестовой функции учти двоичную погрешность чисел с плавающей точкой (0.1 + 0.2). Шаг 3: Сравни фактический результат вызова calculate_tax(1.0) с эталоном 0.3 через assert и pytest.approx(0.3, rel=1e-6)."
+  },
+  "353": {
+    "id": 353,
+    "title": "Напишите фикстуру pytest с setup и teardown через yield",
+    "io_in": "__init__(self)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: В классе FakeDBConnection реализуй флаги closed и in_tx, а также методы rollback() и close(), сбрасывающие их в False / True. Шаг 2: В фикстуре @pytest.fixture def db_conn() создай соединение, отдай его тесту через yield conn в блоке try и вызови rollback() с close() в finally. Шаг 3: В тесте test_connection_active_during_test(db_conn) проверь через assert активное состояние соединения."
+  },
+  "354": {
+    "id": 354,
+    "title": "Протестируйте работу с файлами через встроенную фикстуру tmp_path",
+    "io_in": "save_user_report(directory: Path, username: str, score: int)",
+    "io_out": "Ожидаемый результат (Path)",
+    "hint": "Шаг 1: В save_user_report построй путь directory / f'{username}.txt', запиши туда строку через write_text с UTF-8 и верни объект Path. Шаг 2: В тесте test_save_user_report(tmp_path) используй встроенную фикстуру tmp_path в качестве директории для сохранения отчёта. Шаг 3: Проверь через assert существование созданного файла (.exists()) и наличие в нём ожидаемого текста."
+  },
+  "355": {
+    "id": 355,
+    "title": "Подмените переменные окружения в тесте через фикстуру monkeypatch",
+    "io_in": "get_api_dsn(...)",
+    "io_out": "Ожидаемый результат (str)",
+    "hint": "Шаг 1: В get_api_dsn() прочитай переменные окружения API_HOST (дефолт 'localhost') и API_PORT (дефолт '8000') через os.getenv и верни строку DSN. Шаг 2: В тесте test_get_api_dsn_custom_env(monkeypatch) подмени обе переменные через monkeypatch.setenv(...). Шаг 3: Вызови get_api_dsn() и проверь через assert, что вернулся обновлённый адрес."
+  },
+  "356": {
+    "id": 356,
+    "title": "Проверьте вызовы и аргументы зависимости через unittest.mock.MagicMock",
+    "io_in": "notify_admin_on_error(notifier, service_name: str, error_code: int)",
+    "io_out": "Ожидаемый результат (bool)",
+    "hint": "Шаг 1: В notify_admin_on_error проверь: если error_code не меньше 500, вызови notifier.send_alert(service=service_name, code=error_code) и верни True, иначе верни False. Шаг 2: Создай мок зависимости mock_notifier = MagicMock() и протестируй на нём оба сценария (код 200 и код 503). Шаг 3: Проверь точность вызова метода через assert_called_once_with."
+  },
+  "357": {
+    "id": 357,
+    "title": "Замокайте внешний HTTP-клиент через unittest.mock.patch по месту использования",
+    "io_in": "fetch_currency_rate(currency: str)",
+    "io_out": "Ожидаемый результат (float)",
+    "hint": "Шаг 1: В fetch_currency_rate откройте запрос через urllib.request.urlopen с таймаутом, прочитайте JSON из тела ответа и верните float курса валюты. Шаг 2: Подготовьте мок-ответ mock_response через MagicMock, настроив __enter__ и байтовый вывод read(). Шаг 3: Замокайте 'urllib.request.urlopen' с помощью контекстного менеджера patch, выполните вызов и проверьте аргументы мока через assert_called_once_with."
+  },
+  "358": {
+    "id": 358,
+    "title": "Симулируйте сетевой сбой и успешный retry через side_effect списка",
+    "io_in": "fetch_with_retry(client, url: str, retries: int = 3)",
+    "io_out": "Ожидаемый результат (dict)",
+    "hint": "Шаг 1: В функции fetch_with_retry запусти цикл на retries попыток, отлавливая TimeoutError вокруг вызова client.get(url); при исчерпании попыток пробрасывай ошибку. Шаг 2: Создай Mock-клиент и задай ему список последовательных эффектов mock_client.get.side_effect = [TimeoutError(), TimeoutError(), {'status': 200, 'data': 'ok'}]. Шаг 3: Вызови fetch_with_retry и проверь итоговый словарь и счётчик попыток call_count."
+  },
+  "359": {
+    "id": 359,
+    "title": "Протестируйте запись в лог через встроенную фикстуру caplog",
+    "io_in": "process_refund(order_id: int, amount: float)",
+    "io_out": "Ожидаемый результат (None)",
+    "hint": "Шаг 1: В process_refund при сумме amount строго больше 10_000 запиши предупреждение через logger.warning(...). Шаг 2: В тестовую функцию передай встроенную фикстуру caplog и установи уровень захвата caplog.set_level(logging.WARNING). Шаг 3: Вызови process_refund с крупной суммой и проверь наличие сообщения в caplog.text через assert."
+  },
+  "360": {
+    "id": 360,
+    "title": "Напишите параметризованный тест граничных случаев с pytest.param и id",
+    "io_in": "parse_age(raw: str)",
+    "io_out": "Ожидаемый результат (int)",
+    "hint": "Шаг 1: Примени декоратор @pytest.mark.parametrize('param1,param2', [(v1, v2), ...]). Шаг 2: Прими param1 и param2 в сигнатуре теста def test_*(param1, param2). Шаг 3: Вызови тестируемую логику и проверь результат через assert."
+  },
+  "361": {
+    "id": 361,
+    "title": "Напишите фабрику фикстур (factory as fixture) для генерации тестовых сущностей",
+    "io_in": "make_user(...)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: Внутри фикстуры make_user определи счётчик, список созданных пользователей и вложенную функцию _factory(username, role, is_active), генерирующую словари с уникальным id. Шаг 2: Сама фикстура make_user должна вернуть функцию _factory (фабрика без вызова). Шаг 3: В тесте test_admin_permissions(make_user) вызови фабрику несколько раз для разных ролей и проверь права через assert."
+  },
+  "362": {
+    "id": 362,
+    "title": "Протестируйте асинхронный сервис с помощью unittest.mock.AsyncMock",
+    "io_in": "charge(self, user_id: int, amount: int)",
+    "io_out": "Ожидаемый результат (dict)",
+    "hint": "Шаг 1: В PaymentGateway.charge объяви асинхронный интерфейс с raise NotImplementedError, а в checkout_order вызови await gateway.charge(...) и верни отформатированный идентификатор транзакции. Шаг 2: В корутине main() создай AsyncMock(spec=PaymentGateway) и задай return_value для его метода charge. Шаг 3: Вызови checkout_order с этим моком и проверь аргументы через assert_awaited_once_with."
+  },
+  "363": {
+    "id": 363,
+    "title": "Защитите мок от опечаток в именах методов и аргументах через create_autospec",
+    "io_in": "activate_user(self, user_id: int, send_email: bool = True)",
+    "io_out": "Ожидаемый результат (bool)",
+    "hint": "Шаг 1: В классе UserService реализуй метод activate_user(self, user_id, send_email=True), возвращающий True. Шаг 2: Создай строгий мок strict_mock в глобальной области через create_autospec(UserService, instance=True). Шаг 3: Продемонстрируй корректный вызов метода и поймай TypeError в блоке try...except при передаче несуществующего аргумента."
+  },
+  "364": {
+    "id": 364,
+    "title": "Замокайте контекстный менеджер и его __enter__ с помощью MagicMock",
+    "io_in": "read_first_line(file_opener, path: str)",
+    "io_out": "Ожидаемый результат (str)",
+    "hint": "Шаг 1: В read_first_line(file_opener, path) открой ресурс через with file_opener(path, 'r') as f и верни первую строку без пробельных переносов (.readline().strip()). Шаг 2: Создай mock_opener = MagicMock() и задай строку в цепочке атрибутов mock_opener.return_value.__enter__.return_value.readline.return_value. Шаг 3: Вызови read_first_line с настроенным моком и проверь результат."
+  },
+  "365": {
+    "id": 365,
+    "title": "Замокайте @property класса через unittest.mock.PropertyMock",
+    "io_in": "balance(self)",
+    "io_out": "Ожидаемый результат (int)",
+    "hint": "Шаг 1: Объяви внешнюю функцию, принимающую декорируемую функцию func. Шаг 2: Внутри создай обёртку def wrapper(*args, **kwargs) с аннотацией @functools.wraps(func). Шаг 3: Вызови func(*args, **kwargs), верни её результат и верни сам wrapper."
+  },
+  "366": {
+    "id": 366,
+    "title": "Разберите файловый путь и замените расширение через pathlib.Path",
+    "io_in": "build_backup_path('/var/data/reports/monthly_2026.csv')",
+    "io_out": "{'name': 'monthly_2026.csv', 'stem': 'monthly_2026', 'suffix': '.csv', 'parent': '/var/data/reports', 'backup': '/var/data/reports/monthly_2026_backup.bak'}",
+    "hint": "Шаг 1: В build_backup_path преобразуй строковый путь raw_path в объект p = PurePosixPath(raw_path). Шаг 2: Считай имя файла p.name, имя без расширения p.stem, суффикс p.suffix и родителя str(p.parent). Шаг 3: Построй путь бэкапа через p.with_name(f'{p.stem}_backup').with_suffix('.bak') и верни словарь из этих пяти ключей."
+  },
+  "367": {
+    "id": 367,
+    "title": "Реализуйте безопасное удаление временных ключей через contextlib.suppress",
+    "io_in": "with contextlib.suppress(FileNotFoundError): os.remove('temp.lock')",
+    "io_out": "Идиоматичный пропуск ожидаемого исключения без многострочного try/except/pass",
+    "hint": "Шаг 1: В функции cleanup_cache_keys перебери переданные ключи из списка keys_to_remove. Шаг 2: Оберни операцию удаления del cache[key] внутрь блока with suppress(KeyError): из модуля contextlib, чтобы отсутствующие ключи не прерывали цикл. Шаг 3: Верни обновлённый словарь cache и проверь результат в глобальной переменной data."
+  },
+  "369": {
+    "id": 369,
+    "title": "Реализуйте битовую маску прав доступа через enum.Flag",
+    "io_in": "has_access(user_perm: Permission, required: Permission)",
+    "io_out": "Ожидаемый результат (bool)",
+    "hint": "Шаг 1: В перечислении Permission(Flag) задай атомарные права READ, WRITE, DELETE, EXPORT через auto() и составные роли EDITOR, ADMIN через побитовое ИЛИ. Шаг 2: В функции has_access проверь наличие всех требуемых флагов битовой операцией (user_perm & required) == required. Шаг 3: Сохрани маску редактора в переменную editor_mask и убедись, что право DELETE для неё запрещено."
+  },
+  "370": {
+    "id": 370,
+    "title": "Напишите транзакционный контекстный менеджер через @contextmanager",
+    "io_in": "atomic_dict_update(target: dict)",
+    "io_out": "Ожидаемый результат (result)",
+    "hint": "Шаг 1: Открой транзакционный блок (BEGIN). Шаг 2: Выполни операции. Шаг 3: Зафиксируй изменения через COMMIT или откати через ROLLBACK при ошибке."
+  },
+  "371": {
+    "id": 371,
+    "title": "Настройте модульный логгер с кастомным Formatter и перехватом в StringIO",
+    "io_in": "create_memory_logger(name: str)",
+    "io_out": "Ожидаемый результат (tuple[logging.Logger, io.StringIO])",
+    "hint": "Шаг 1: В create_memory_logger создай буфер stream = io.StringIO(), получи логгер logging.getLogger(name) с уровнем INFO и добавь StreamHandler(stream) с Formatter('[%(levelname)s] %(name)s: %(message)s'). Шаг 2: Сбрось предыдущие handlers при необходимости, включи нужный форматтер и верни пару (logger, stream). Шаг 3: Запиши событие уровня info через созданный логгер и проверь текст из буфера."
+  },
+  "372": {
+    "id": 372,
+    "title": "Реализуйте logging.Filter для маскирования секретных токенов в логах",
+    "io_in": "filter(self, record: logging.LogRecord)",
+    "io_out": "Ожидаемый результат (bool)",
+    "hint": "Шаг 1: В SecretMaskingFilter.filter(self, record) примени PATTERN.sub(r'\\1***', ...) к строковому сообщению записи record.getMessage(), обнови record.msg, сбрось record.args = () и верни True. Шаг 2: В глобальной области создай логгер в переменной logger и потоковый обработчик в переменной handler с привязанным SecretMaskingFilter. Шаг 3: Залогируй тестовый Bearer-токен и сохрани маскированную строку из StringIO в переменную result."
+  },
+  "373": {
+    "id": 373,
+    "title": "Управляйте динамическим набором контекстных менеджеров через ExitStack",
+    "io_in": "with ExitStack() as stack: files = [stack.enter_context(open(f)) for f in filenames]",
+    "io_out": "Динамическое открытие произвольного числа файлов с безопасным закрытием всех",
+    "hint": "Шаг 1: В генераторе acquire_resource(name) при входе проверяй ошибку (для 'broken_db' выбрасывай ConnectionError), отдай имя ресурса через yield внутри try...finally и в finally добавляй name в closed_resources. Шаг 2: В run_with_resources(names) создай пустой список активных ресурсов и открой динамический стек with ExitStack() as stack:. Шаг 3: Внутри цикла регистрируй каждый ресурс через stack.enter_context(acquire_resource(name)); при ошибке ранее открытые ресурсы закроются в обратном порядке LIFO."
+  },
+  "374": {
+    "id": 374,
+    "title": "Выровняйте вложенные списки за O(1) памяти через itertools.chain.from_iterable",
+    "io_in": "flatten_batches([[1, 2, 3], [4, 5], [6, 7, 8, 9]])",
+    "io_out": "[1, 2, 3, 4, 5, 6, 7, 8, 9]",
+    "hint": "Шаг 1: Импортируй нужный инструмент из модуля itertools (chain, islice, cycle, groupby). Шаг 2: Примени функцию к итерируемому объекту для ленивой генерации без дублирования данных в памяти. Шаг 3: При необходимости итогового списка оберни генератор в list()."
+  },
+  "375": {
+    "id": 375,
+    "title": "Извлеките страницу данных из ленивого генератора через itertools.islice",
+    "io_in": "list(itertools.islice(infinite_generator, 10, 20))",
+    "io_out": "Извлечение страницы (элементы с 10 по 19) без загрузки всего потока в память",
+    "hint": "Шаг 1: Импортируй нужный инструмент из модуля itertools (chain, islice, cycle, groupby). Шаг 2: Примени функцию к итерируемому объекту для ленивой генерации без дублирования данных в памяти. Шаг 3: При необходимости итогового списка оберни генератор в list()."
+  },
+  "376": {
+    "id": 376,
+    "title": "Сгенерируйте все уникальные пары команд турнира через itertools.combinations",
+    "io_in": "list(itertools.combinations(['Team A', 'Team B', 'Team C'], 2))",
+    "io_out": "[('Team A', 'Team B'), ('Team A', 'Team C'), ('Team B', 'Team C')]",
+    "hint": "Шаг 1: Импортируй нужный инструмент из модуля itertools (chain, islice, cycle, groupby). Шаг 2: Примени функцию к итерируемому объекту для ленивой генерации без дублирования данных в памяти. Шаг 3: При необходимости итогового списка оберни генератор в list()."
+  },
+  "377": {
+    "id": 377,
+    "title": "Постройте матрицу конфигураций тестирования через itertools.product",
+    "io_in": "list(itertools.product(['Python 3.11', 'Python 3.12'], ['Linux', 'Windows']))",
+    "io_out": "Декартово произведение параметров матрицы тестирования (4 окружения)",
+    "hint": "Шаг 1: Импортируй нужный инструмент из модуля itertools (chain, islice, cycle, groupby). Шаг 2: Примени функцию к итерируемому объекту для ленивой генерации без дублирования данных в памяти. Шаг 3: При необходимости итогового списка оберни генератор в list()."
+  },
+  "378": {
+    "id": 378,
+    "title": "Сгруппируйте транзакции по категории через предварительную сортировку и itertools.groupby",
+    "io_in": "itertools.groupby(sorted(transactions, key=cat), key=cat)",
+    "io_out": "Группировка транзакций по категориям после обязательной сортировки",
+    "hint": "Шаг 1: Открой транзакционный блок (BEGIN). Шаг 2: Выполни операции. Шаг 3: Зафиксируй изменения через COMMIT или откати через ROLLBACK при ошибке."
+  },
+  "379": {
+    "id": 379,
+    "title": "Реализуйте round-robin балансировщик воркеров через itertools.cycle",
+    "io_in": "workers = itertools.cycle(['worker-1', 'worker-2', 'worker-3'])",
+    "io_out": "next(workers) ➔ циклический round-robin перебор исполнителей",
+    "hint": "Шаг 1: Импортируй нужный инструмент из модуля itertools (chain, islice, cycle, groupby). Шаг 2: Примени функцию к итерируемому объекту для ленивой генерации без дублирования данных в памяти. Шаг 3: При необходимости итогового списка оберни генератор в list()."
+  },
+  "380": {
+    "id": 380,
+    "title": "Разбейте поток данных на пакеты фиксированного размера (chunking) через islice",
+    "io_in": "chunked_stream(data, chunk_size=100)",
+    "io_out": "Пакетная передача данных чанками фиксированного размера",
+    "hint": "Шаг 1: Импортируй нужный инструмент из модуля itertools (chain, islice, cycle, groupby). Шаг 2: Примени функцию к итерируемому объекту для ленивой генерации без дублирования данных в памяти. Шаг 3: При необходимости итогового списка оберни генератор в list()."
+  },
+  "381": {
+    "id": 381,
+    "title": "Постройте ленивый генераторный конвейер (pipeline) анализа логов за O(1) памяти",
+    "io_in": "pipeline: read_lines -> parse_json -> filter_errors -> write_db",
+    "io_out": "Поточная обработка терабайтных логов в памяти O(1) через генераторы",
+    "hint": "Шаг 1: В генераторе parse_lines перебирай строки, разбивай их по '|' на 3 поля и отдавай словарь с ключами level, service и int(ms) через yield. Шаг 2: В filter_slow_errors лениво пропускай дальше только записи с уровнем 'ERROR' и задержкой ms не ниже min_ms. Шаг 3: В глобальной области подготовь список строк raw_stream, построй ленивый конвейер pipeline и возьми первые 2 элемента через islice в переменную top_two."
+  },
+  "383": {
+    "id": 383,
+    "title": "Реализуйте частичное обновление ресурса (PATCH) через model_dump(exclude_unset=True)",
+    "io_in": "user.model_dump(exclude_unset=True)",
+    "io_out": "Словарь только переданных в PATCH-запросе полей без перезаписи значений по умолчанию",
+    "hint": "Шаг 1: В Pydantic-модели ProfilePatch(BaseModel) объяви необязательные поля bio, city и is_public со значением по умолчанию None. Шаг 2: В функции apply_patch сделай копию словаря db_record и извлеки только реально присланные в PATCH поля через patch_model.model_dump(exclude_unset=True). Шаг 3: Обнови копию записи этими полями и протестируй сценарий на глобальных переменных user_in_db, patch_payload и updated."
+  },
+  "384": {
+    "id": 384,
+    "title": "Реализуйте идемпотентный обработчик платежей через заголовок Idempotency-Key",
+    "io_in": "process_payment('key-1', 1500) дважды подряд",
+    "io_out": "Первый вызов: status='created'; повторный вызов с тем же ключом: тот же tx_id без дублирования списания",
+    "hint": "Шаг 1: В __init__ класса IdempotentPaymentService создай словарь self._storage для сохранения хэша тела запроса и ответа и счётчик ID транзакций. Шаг 2: В process_payment посчитай детерминированный SHA-256 хэш от json.dumps(payload, sort_keys=True); если idempotency_key уже есть в хранилище — при совпадении хэша верни (200, cached_res), а при несовпадении верни конфликт (422, ошибка). Шаг 3: При новом ключе сгенерируй транзакцию, сохрани (hash, response) и верни (201, response); создай сервис в глобальной переменной svc."
+  },
+  "385": {
+    "id": 385,
+    "title": "Реализуйте Cursor (Keyset) пагинацию с непрозрачным base64-курсором и проверкой has_more",
+    "io_in": "GET /items?limit=10&cursor=eyJpZCI6IDQyfQ==",
+    "io_out": "Быстрая Keyset-пагинация без медленного OFFSET по индексу (created_at, id)",
+    "hint": "Шаг 1: Реализуй encode_cursor через base64.urlsafe_b64encode и decode_cursor с обратной расшифровкой и префиксом 'id:'. Шаг 2: В paginate_keyset при переданном cursor декодируй last_id и отфильтруй элементы со строго большим id. Шаг 3: Отбери slice длины limit + 1 для проверки флага has_more, обрежь результат до limit и сформируй next_cursor; протестируй постраничный проход в page1, page2 и page3."
+  },
+  "386": {
+    "id": 386,
+    "title": "Сформируйте стандартизированный ответ об ошибке по RFC 7807 (Problem Details)",
+    "io_in": "build_problem_details(status=422, title='Validation Error', detail='...', instance='/api/v1/orders')",
+    "io_out": "{'type': 'https://example.com/probs/out-of-credit', 'title': '...', 'status': 422, 'detail': '...', 'instance': '/api/v1/orders'}",
+    "hint": "Шаг 1: В build_problem_details задай словарь заголовков {'Content-Type': 'application/problem+json'}. Шаг 2: Сформируй тело ошибки по RFC 7807: ключи type (URL на базе аргумента code), title, status, detail и instance. Шаг 3: Верни кортеж (status, headers, problem) и вызови функцию на тестовом примере с недостатком средств."
+  },
+  "388": {
+    "id": 388,
+    "title": "Протестируйте защищённый эндпоинт FastAPI с подменой зависимости через app.dependency_overrides",
+    "io_in": "app.dependency_overrides[get_current_user] = mock_admin_user",
+    "io_out": "Тестирование эндпоинтов с подменой авторизации без реальной БД",
+    "hint": "Шаг 1: В get_current_user выбрасывай HTTPException(status_code=401), а в обработчике read_me возвращай словарь {'user_id': user['id'], 'role': user['role']}. Шаг 2: В test_read_me_with_dependency_override создай TestClient(app) и подмени зависимость в app.dependency_overrides[get_current_user] функцией-заглушкой админа. Шаг 3: Выполни GET-запрос '/me', проверь статус 200 с телом ответа и в блоке try...finally очисти app.dependency_overrides."
+  },
+  "389": {
+    "id": 389,
+    "title": "Реализуйте параметризованную фабрику зависимостей RBAC require_roles в FastAPI",
+    "io_in": "Depends(require_roles(['admin', 'billing']))",
+    "io_out": "Фабрика зависимостей FastAPI для контроля ролевого доступа",
+    "hint": "Шаг 1: Примени декоратор @pytest.mark.parametrize('param1,param2', [(v1, v2), ...]). Шаг 2: Прими param1 и param2 в сигнатуре теста def test_*(param1, param2). Шаг 3: Вызови тестируемую логику и проверь результат через assert."
+  },
+  "395": {
+    "id": 395,
+    "title": "Закройте уязвимость SQL Injection переходом на параметризованный запрос sqlite3",
+    "io_in": "cursor.execute('SELECT * FROM users WHERE email = ?', (user_input,))",
+    "io_out": "Исключение SQL-инъекций через плейсхолдеры вместо f-строк",
+    "hint": "Шаг 1: Примени декоратор @pytest.mark.parametrize('param1,param2', [(v1, v2), ...]). Шаг 2: Прими param1 и param2 в сигнатуре теста def test_*(param1, param2). Шаг 3: Вызови тестируемую логику и проверь результат через assert."
+  },
+  "396": {
+    "id": 396,
+    "title": "Реализуйте WSGI-приложение и Middleware замера времени ответа X-Process-Time",
+    "io_in": "X-Process-Time: 0.012s",
+    "io_out": "WSGI/ASGI Middleware замера latency между началом и завершением запроса",
+    "hint": "Шаг 1: В simple_wsgi_app вызови start_response со статусом и списком заголовков и верни список байтовых чанков тела (для '/health' статус '200 OK' и JSON). Шаг 2: В TimingMiddleware.__call__ оберни переданный start_response локальной функцией, чтобы встроить заголовок ('X-Process-Time', ...) перед передачей заголовков, и вызови self.app(environ, custom_start). Шаг 3: В глобальной области создай wrapped_app = TimingMiddleware(simple_wsgi_app), выполни вызов с mock_start_response и сохрани тело ответа в body_chunks."
+  },
+  "397": {
+    "id": 397,
+    "title": "Реализуйте ASGI-приложение с нуля с обработкой lifespan и HTTP-маршрутизацией",
+    "io_in": "async def app(scope, receive, send): ...",
+    "io_out": "Обработка протоколов lifespan (старт/стоп приложения) и HTTP-ответов",
+    "hint": "Шаг 1: В asgi_app обработай scope['type'] == 'lifespan': при получении 'lifespan.startup' переведи app_state['db_connected'] = True и отправь событие 'lifespan.startup.complete'; при 'lifespan.shutdown' сбрось флаг и отправь 'lifespan.shutdown.complete'. Шаг 2: Для HTTP-запросов scope['type'] == 'http' отправь 'http.response.start' со статусом 200 и 'http.response.body' с JSON-байтами. Шаг 3: В функции main() симулируй оба протокола, проверяя жизненный цикл app_state."
+  },
+  "399": {
+    "id": 399,
+    "title": "Реализуйте менеджер WebSocket-комнат (ConnectionManager) с рассылкой broadcast",
+    "io_in": "manager = ConnectionManager(); await manager.broadcast('Уведомление')",
+    "io_out": "Менеджер активных WebSocket-соединений с рассылкой сообщений клиентам",
+    "hint": "Шаг 1: В __init__ класса ConnectionManager храни активные соединения комнат в defaultdict(list). Шаг 2: В async def connect прими соединение через await ws.accept() и добавь ws в комнату; в disconnect удали сокет из списка комнаты. Шаг 3: В broadcast пройди по копии списка клиентов комнаты и отправь каждому await ws.send_text(message); протестируй на FakeWebSocket в main()."
+  },
+  "390": {
+    "id": 390,
+    "title": "Реализуйте алгоритм Token Bucket для Rate Limiting с поддержкой burst-трафика",
+    "io_in": "limiter = TokenBucket(capacity=3, refill_rate=1.0); 4 запроса при t=0.0 и 1 при t=1.0",
+    "io_out": "burst == [True, True, True, False], after_1s == True",
+    "hint": "Ориентир по реализации: проверь сигнатуру в стартовом коде и используй ключевые конструкции задачи (class TokenBucket: ; def __init__(self, capacity: int, refill_rate: float): ; self.capacity = float(capacity))."
+  },
+  "391": {
+    "id": 391,
+    "title": "Реализуйте Sliding Window Log Rate Limiter на базе deque с расчётом Retry-After",
+    "io_in": "sw = SlidingWindowLimiter(max_requests=2, window_seconds=10.0); запросы в t=1.0, 4.0, 4.2",
+    "io_out": "В t=4.2: (False, 7); в t=11.1: (True, 0)",
+    "hint": "Ориентир по реализации: проверь сигнатуру в стартовом коде и используй ключевые конструкции задачи (class SlidingWindowLimiter: ; def __init__(self, max_requests: int, window_seconds: float): ; self.max_requests = max_requests)."
+  },
+  "392": {
+    "id": 392,
+    "title": "Реализуйте безопасное хранение API-ключей (SHA-256) и защиту от Timing Attack",
+    "io_in": "key = store.issue_key('billing_worker'); store.verify_key('billing_worker', key)",
+    "io_out": "verify_key(valid) == True, verify_key('sk_live_forged') == False",
+    "hint": "Ориентир по реализации: проверь сигнатуру в стартовом коде и используй ключевые конструкции задачи (class ApiKeyStore: ; def __init__(self): ; self._hashes: dict[str, str] = {})."
+  },
+  "401": {
+    "id": 401,
+    "title": "Верифицируйте HMAC-SHA256 подпись входящего Webhook-запроса с защитой от Replay-атак",
+    "io_in": "header = sign_webhook(body, now, 'whsec_test_key'); verify_webhook(body, header, 'whsec_test_key')",
+    "io_out": "header == 't=<ts>,v1=<hex>', verify_webhook(...) == True",
+    "hint": "Ориентир по реализации: проверь сигнатуру в стартовом коде и используй ключевые конструкции задачи (def sign_webhook(raw_body: bytes, timestamp: int, secret: str) -> str: ; payload_to_sign = f\"{timestamp}.\".encode() + raw_body ; digest =...)."
+  },
+  "92": {
+    "id": 92,
+    "title": "Реализуйте классы со __slots__ и замерьте память",
+    "io_in": "compare_memory(10, 20)",
+    "io_out": "(reg_bytes, slot_bytes), где reg_bytes > slot_bytes",
+    "hint": "Шаг 1: Чем отличается хранение атрибутов у RegularPoint и SlottedPoint? Какие поля нужно сохранить внутри __init__ обоих классов? Шаг 2: Как объявить неизменяемый перечень разрешённых полей на уровне класса SlottedPoint, чтобы у экземпляра не создавался __dict__? Шаг 3: В чём слепая зона вызова sys.getsizeof(obj) для обычного экземпляра и какую вложенную структуру необходимо прибавить для честного замера? Шаг 4: В compare_memory создай экземпляры RegularPoint(x, y) и SlottedPoint(x, y), сложи размер объекта и его словаря для первого и верни пару (reg_bytes, slot_bytes)."
+  }
+}

@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Гибрид Вариантов 1 и 2: Пьедестал Мастерства в кольце Звездных Врат</title>
+  <style>
+    :root {
+      --bg: #07090e;
+      --card-bg: rgba(15, 23, 42, 0.82);
+      --gold: #facc15;
+      --gold-light: #fef08a;
+      --emerald: #10b981;
+      --emerald-light: #34d399;
+      --slate: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: #f8fafc;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 16px 80px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Living atmospheric orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(85px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.35;
+    }
+    .orb-b { width: 500px; height: 500px; background: radial-gradient(circle, #831843 0%, transparent 70%); top: -80px; left: -80px; animation: moveB 16s infinite alternate ease-in-out; }
+    .orb-e { width: 560px; height: 560px; background: radial-gradient(circle, #065f46 0%, transparent 70%); bottom: -100px; right: -80px; animation: moveE 20s infinite alternate ease-in-out; }
+    @keyframes moveB { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(60px, 70px) scale(1.15); } }
+    @keyframes moveE { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(-70px, -60px) scale(1.18); } }
+
+    #confettiCanvas {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    header {
+      text-align: center;
+      max-width: 720px;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 2;
+    }
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      color: var(--emerald-light);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-family: monospace;
+      margin-bottom: 10px;
+    }
+    h1 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p.subtitle {
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    /* State Switcher */
+    .state-bar {
+      display: inline-flex;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 9999px;
+      padding: 4px;
+      margin-bottom: 28px;
+      position: relative;
+      z-index: 2;
+      backdrop-filter: blur(12px);
+    }
+    .state-btn {
+      padding: 6px 16px;
+      border-radius: 9999px;
+      border: none;
+      background: transparent;
+      color: var(--slate);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .state-btn.active {
+      background: var(--emerald);
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+    }
+
+    .finale-container {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    /* Incoming beam */
+    .incoming-beam {
+      width: 4px;
+      height: 48px;
+      background: linear-gradient(180deg, #facc15 0%, #10b981 100%);
+      box-shadow: 0 0 16px rgba(250, 204, 21, 0.9);
+      margin-bottom: -16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* HYBRID COMPONENT */
+    .hybrid-card {
+      width: 100%;
+      background: linear-gradient(165deg, rgba(255, 255, 255, 0.08) 0%, rgba(15, 23, 42, 0.92) 100%);
+      border: 1.5px solid rgba(254, 240, 138, 0.45);
+      border-radius: 28px;
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.8), 0 0 55px rgba(250, 204, 21, 0.2), 0 0 80px rgba(16, 185, 129, 0.15);
+      padding: 28px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .hybrid-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(254, 240, 138, 0.8);
+      box-shadow: 0 30px 85px rgba(0, 0, 0, 0.9), 0 0 70px rgba(250, 204, 21, 0.35), 0 0 100px rgba(16, 185, 129, 0.25);
+    }
+
+    /* Portal & Trophy Hybrid Centerpiece */
+    .portal-trophy-cluster {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      cursor: pointer;
+    }
+
+    /* Outer rotating event horizon */
+    .outer-quantum-ring {
+      position: absolute;
+      width: 154px;
+      height: 154px;
+      border-radius: 50%;
+      border: 2px dashed rgba(52, 211, 153, 0.7);
+      animation: rotateRing 22s linear infinite;
+    }
+    @keyframes rotateRing { 100% { transform: rotate(360deg); } }
+
+    /* Middle counter-rotating golden laurel circle */
+    .inner-laurel-ring {
+      position: absolute;
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      border: 1px dotted rgba(250, 204, 21, 0.6);
+      animation: rotateRingRev 30s linear infinite;
+    }
+    @keyframes rotateRingRev { 100% { transform: rotate(-360deg); } }
+
+    /* Singularity Core */
+    .singularity-core {
+      width: 104px;
+      height: 104px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #34d399 0%, #059669 40%, #064e3b 75%, #022c22 100%);
+      box-shadow: 0 0 35px #10b981, inset 0 0 18px #6ee7b7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulseCore 3.2s ease-in-out infinite alternate;
+    }
+    @keyframes pulseCore {
+      0% { transform: scale(0.95); box-shadow: 0 0 25px #10b981; }
+      100% { transform: scale(1.06); box-shadow: 0 0 45px #34d399, 0 0 60px rgba(52, 211, 153, 0.6); }
+    }
+
+    /* Floating 3D Trophy inside the Singularity */
+    .floating-trophy {
+      font-size: 52px;
+      line-height: 1;
+      filter: drop-shadow(0 0 18px rgba(250, 204, 21, 0.95));
+      animation: floatT 3.5s ease-in-out infinite;
+      user-select: none;
+      z-index: 2;
+    }
+    @keyframes floatT {
+      0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 16px rgba(250, 204, 21, 0.7)); }
+      50% { transform: translateY(-7px); filter: drop-shadow(0 0 30px rgba(250, 204, 21, 1)); }
+    }
+
+    /* Badges & Titles */
+    .badge-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(52, 211, 153, 0.45);
+      color: var(--emerald-light);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .badge-tag.locked {
+      background: rgba(148, 163, 184, 0.1);
+      border-color: rgba(148, 163, 184, 0.25);
+      color: #94a3b8;
+    }
+
+    .hybrid-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+    .hybrid-sub {
+      font-size: 12px;
+      color: var(--gold-light);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 18px;
+      font-family: monospace;
+    }
+
+    /* Stats strip */
+    .stats-strip {
+      display: flex;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 10px 16px;
+      margin-bottom: 20px;
+      width: 100%;
+      justify-content: space-around;
+    }
+    .stat-item { display: flex; flex-direction: column; align-items: center; }
+    .stat-val { font-size: 16px; font-weight: 800; color: #ffffff; font-family: monospace; }
+    .stat-val.gold { color: var(--gold-light); }
+    .stat-lbl { font-size: 9px; color: #94a3b8; text-transform: uppercase; margin-top: 2px; }
+
+    /* Actions: Primary Diploma + Secondary Portal */
+    .actions-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .cta-diploma {
+      width: 100%;
+      padding: 13px 20px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border: 1px solid rgba(52, 211, 153, 0.5);
+      border-radius: 14px;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.45);
+      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .cta-diploma:hover {
+      transform: scale(1.02);
+      box-shadow: 0 6px 26px rgba(16, 185, 129, 0.65);
+      background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    }
+
+    .cta-portal {
+      width: 100%;
+      padding: 11px 18px;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      border-radius: 14px;
+      color: #6ee7b7;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.22s ease;
+    }
+    .cta-portal:hover {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: rgba(52, 211, 153, 0.65);
+      color: #ffffff;
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.3);
+    }
+
+    /* Locked state */
+    .hybrid-card.is-locked {
+      border-color: rgba(71, 85, 105, 0.35);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      background: linear-gradient(165deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.85) 100%);
+    }
+    .hybrid-card.is-locked .outer-quantum-ring { border-color: rgba(71, 85, 105, 0.4); animation: none; }
+    .hybrid-card.is-locked .singularity-core {
+      background: rgba(30, 41, 59, 0.4);
+      box-shadow: none;
+      filter: grayscale(1) opacity(0.4);
+      animation: none;
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(14px);
+      z-index: 110;
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px; opacity: 0; pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal-box {
+      width: 100%; max-width: 440px; background: #0f172a;
+      border: 1.5px solid rgba(250, 204, 21, 0.5); border-radius: 22px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.9), 0 0 45px rgba(250, 204, 21, 0.3);
+      padding: 26px 22px; position: relative; text-align: center;
+    }
+    .modal-close {
+      position: absolute; top: 12px; right: 12px; width: 28px; height: 28px;
+      border-radius: 50%; background: rgba(255,255,255,0.08); border: none;
+      color: #94a3b8; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="orb orb-b"></div>
+  <div class="orb orb-e"></div>
+  <canvas id="confettiCanvas"></canvas>
+
+  <header>
+    <div class="header-badge">Синтез фаворитов · Гибрид Вариантов 1 и 2</div>
+    <h1>Пьедестал Мастерства в кольце Звездных Врат</h1>
+    <p class="subtitle">Идеальное соединение: золотой 3D-Кубок и академический диплом выпускника (Вариант 1) гармонично окружены вращающимся кольцом квантового перехода в Highload и распределенные системы (Вариант 2).</p>
+  </header>
+
+  <div class="state-bar">
+    <button class="state-btn active" id="btnU" onclick="toggleState('unlocked')">🎓 Курс завершён (100%)</button>
+    <button class="state-btn" id="btnL" onclick="toggleState('locked')">🔒 В процессе обучения</button>
+  </div>
+
+  <div class="finale-container">
+    <div class="incoming-beam"></div>
+
+    <div class="hybrid-card" id="card">
+      <!-- Portal & Trophy Cluster -->
+      <div class="portal-trophy-cluster" onclick="clickCluster()">
+        <div class="outer-quantum-ring"></div>
+        <div class="inner-laurel-ring"></div>
+        <div class="singularity-core">
+          <span class="floating-trophy" id="trophyIcon">🏆</span>
+        </div>
+      </div>
+
+      <div class="badge-tag" id="badgeTag">⚡ Полярная звезда · Кульминация и Квантовый переход</div>
+      <h2 class="hybrid-title" id="title">Выпускник Академии</h2>
+      <div class="hybrid-sub" id="sub">Certified Python Backend Engineer</div>
+
+      <div class="stats-strip">
+        <div class="stat-item"><span class="stat-val" id="stCh">5 / 5</span><span class="stat-lbl">Глав</span></div>
+        <div class="stat-item"><span class="stat-val gold" id="stMs">100%</span><span class="stat-lbl">Мастерство</span></div>
+        <div class="stat-item"><span class="stat-val" id="stXp">4 850</span><span class="stat-lbl">Опыт XP</span></div>
+      </div>
+
+      <div class="actions-stack">
+        <button class="cta-diploma" id="btnDip" onclick="openDiplomaModal()">
+          <span>📜</span> Получить диплом и портфолио ➔
+        </button>
+        <button class="cta-portal" id="btnPort" onclick="openPortalModal()">
+          <span>🌀</span> Войти в портал Highload & Senior ➔
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared Modal -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    // Audio synthesis
+    const AudioEngine = {
+      ctx: null,
+      getCtx() {
+        if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+        return this.ctx;
+      },
+      playFanfare() {
+        try {
+          const ctx = this.getCtx();
+          const now = ctx.currentTime;
+          const notes = [
+            { f: 523.25, t: 0.00, d: 0.12 },
+            { f: 659.25, t: 0.11, d: 0.12 },
+            { f: 783.99, t: 0.22, d: 0.14 },
+            { f: 1046.50, t: 0.36, d: 0.45 },
+            { f: 1318.51, t: 0.50, d: 0.65 }
+          ];
+          notes.forEach(n => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(n.f, now + n.t);
+            gain.gain.setValueAtTime(0.2, now + n.t);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + n.t + n.d);
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.start(now + n.t); osc.stop(now + n.t + n.d);
+          });
+        } catch(e) {}
+      },
+      playPortalWarp() {
+        try {
+          const ctx = this.getCtx();
+          const now = ctx.currentTime;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(110, now);
+          osc.frequency.exponentialRampToValueAtTime(440, now + 0.5);
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(now); osc.stop(now + 0.8);
+        } catch(e) {}
+      }
+    };
+
+    // Confetti
+    const canvas = document.getElementById('confettiCanvas');
+    const ctx = canvas.getContext('2d');
+    let pts = [];
+    function fitCv() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', fitCv); fitCv();
+
+    function launchConfetti(colors) {
+      pts = [];
+      const col = colors || ['#facc15', '#fef08a', '#10b981', '#34d399', '#ffffff'];
+      for (let i = 0; i < 85; i++) {
+        pts.push({
+          x: canvas.width / 2 + (Math.random() - 0.5) * 160,
+          y: canvas.height * 0.4,
+          vx: (Math.random() - 0.5) * 10,
+          vy: -Math.random() * 8 - 4,
+          s: Math.random() * 5 + 3,
+          c: col[Math.floor(Math.random() * col.length)],
+          r: Math.random() * 360,
+          vr: (Math.random() - 0.5) * 8,
+          l: 1
+        });
+      }
+      renderP();
+    }
+    function renderP() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      pts.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.vy += 0.22; p.r += p.vr; p.l -= 0.013;
+        if (p.l > 0) {
+          alive = true;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.r * Math.PI) / 180);
+          ctx.fillStyle = p.c;
+          ctx.globalAlpha = Math.max(0, p.l);
+          ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * 0.6);
+          ctx.restore();
+        }
+      });
+      if (alive) requestAnimationFrame(renderP);
+    }
+
+    function clickCluster() {
+      AudioEngine.playFanfare();
+      launchConfetti();
+    }
+
+    function openDiplomaModal() {
+      AudioEngine.playFanfare();
+      launchConfetti(['#facc15', '#fef08a', '#10b981', '#34d399', '#ffffff']);
+      const body = document.getElementById('modalBody');
+      body.innerHTML = `
+        <div style="font-size:38px; margin-bottom:8px;">🏆</div>
+        <h3 style="font-size:19px; font-weight:800; color:#fff; margin-bottom:4px;">ДИПЛОМ ИНЖЕНЕРА</h3>
+        <p style="font-size:11px; color:var(--gold-light); font-family:monospace; margin-bottom:14px;">PYTHON BACKEND ACADEMY · ВЕРИФИЦИРОВАНО</p>
+        <div style="background:rgba(0,0,0,0.45); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:12px; text-align:left; font-size:12px; line-height:1.6; color:#cbd5e1; margin-bottom:16px;">
+          <div><b>Квалификация:</b> Python Backend Software Engineer</div>
+          <div><b>Эшелон:</b> Junior+ / Ready for Tech Screening</div>
+          <div><b>Опыт:</b> 4 850 XP · 45 уроков (100%)</div>
+          <div><b>ID:</b> PBA-2026-CERT-98214</div>
+        </div>
+        <button class="cta-diploma" onclick="alert('Диплом готов к экспорту в PDF / LinkedIn'); closeModal();">
+          <span>💾</span> Скачать сертификат в PDF
+        </button>
+      `;
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    function openPortalModal() {
+      AudioEngine.playPortalWarp();
+      launchConfetti(['#10b981', '#34d399', '#6ee7b7', '#059669', '#a7f3d0']);
+      const body = document.getElementById('modalBody');
+      body.innerHTML = `
+        <div style="font-size:38px; margin-bottom:8px;">🌀</div>
+        <h3 style="font-size:19px; font-weight:800; color:#fff; margin-bottom:4px;">ЗВЕЗДНЫЕ ВРАТА SENIOR</h3>
+        <p style="font-size:11px; color:#34d399; font-family:monospace; margin-bottom:14px;">ГОРИЗОНТ HIGHLOAD & ДИСТРИБЬЮТЕД</p>
+        <div style="background:rgba(0,0,0,0.45); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:12px; text-align:left; font-size:12px; line-height:1.6; color:#cbd5e1; margin-bottom:16px;">
+          <div><b>Разблокированные разделы:</b></div>
+          <div style="margin-top:4px; color:#6ee7b7;">• Глава 6: Распределенные базы данных и шардинг</div>
+          <div style="color:#6ee7b7;">• Глава 7: Apache Kafka, RabbitMQ и Event-Driven</div>
+          <div style="color:#6ee7b7;">• Глава 8: Архитектурные паттерны Highload</div>
+        </div>
+        <button class="cta-diploma" style="background:linear-gradient(135deg, #059669 0%, #047857 100%);" onclick="closeModal()">
+          <span>🚀</span> Начать продвинутый трек
+        </button>
+      `;
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('open');
+    }
+
+    function toggleState(s) {
+      const card = document.getElementById('card');
+      const badge = document.getElementById('badgeTag');
+      const title = document.getElementById('title');
+      const sub = document.getElementById('sub');
+      const icon = document.getElementById('trophyIcon');
+      const ch = document.getElementById('stCh');
+      const ms = document.getElementById('stMs');
+      const xp = document.getElementById('stXp');
+      const btnDip = document.getElementById('btnDip');
+      const btnPort = document.getElementById('btnPort');
+      const bU = document.getElementById('btnU');
+      const bL = document.getElementById('btnL');
+
+      if (s === 'locked') {
+        bL.classList.add('active'); bU.classList.remove('active');
+        card.classList.add('is-locked');
+        badge.className = 'badge-tag locked';
+        badge.textContent = '🔒 Финальная вершина · Заблокировано';
+        title.textContent = 'Пьедестал Выпускника и Врата';
+        sub.textContent = 'Откроется после завершения 5 глав';
+        icon.textContent = '🔒';
+        ch.textContent = '2 / 5'; ms.textContent = '40%'; xp.textContent = '1 420';
+        btnDip.innerHTML = '<span>🔒</span> Завершите все главы для открытия';
+        btnDip.style.background = '#334155';
+        btnDip.onclick = () => alert('Пройдите текущие главы пути (Web, Алгоритмы, БД, DevOps), чтобы разблокировать сертификат!');
+        btnPort.style.display = 'none';
+      } else {
+        bU.classList.add('active'); bL.classList.remove('active');
+        card.classList.remove('is-locked');
+        badge.className = 'badge-tag';
+        badge.textContent = '⚡ Полярная звезда · Кульминация и Квантовый переход';
+        title.textContent = 'Выпускник Академии';
+        sub.textContent = 'Certified Python Backend Engineer';
+        icon.textContent = '🏆';
+        ch.textContent = '5 / 5'; ms.textContent = '100%'; xp.textContent = '4 850';
+        btnDip.innerHTML = '<span>📜</span> Получить диплом и портфолио ➔';
+        btnDip.style.background = '';
+        btnDip.onclick = openDiplomaModal;
+        btnPort.style.display = '';
+        clickCluster();
+      }
+    }
+  </script>
+</body>
+</html>

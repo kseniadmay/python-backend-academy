@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Визуальный стенд /grill-me — Шаг 3: Нижний HUD геймификации и свечение энергии</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Onest:wght@400;500;600;700;800;900&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #0a0d14;
+      --bg-surface: #10141f;
+      --bg-card: rgba(18, 24, 38, 0.75);
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --ink: #f1f5f9;
+      --ink-soft: #94a3b8;
+      --ink-muted: #64748b;
+      --emerald: #10b981;
+      --emerald-soft: rgba(16, 185, 129, 0.12);
+      --amber: #f59e0b;
+      --amber-soft: rgba(245, 158, 11, 0.15);
+      --font-d: 'Onest', -apple-system, sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+      --font-title: 'Unbounded', sans-serif;
+      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    [data-theme="light"] {
+      --bg-canvas: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.9);
+      --border-glass: rgba(0, 0, 0, 0.08);
+      --ink: #0f172a;
+      --ink-soft: #475569;
+      --ink-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-canvas);
+      color: var(--ink);
+      font-family: var(--font-d);
+      padding: 24px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.15;
+    }
+    .orb-1 { width: 400px; height: 400px; background: var(--emerald); top: -80px; left: -80px; }
+    .orb-2 { width: 450px; height: 450px; background: var(--amber); bottom: -80px; right: -80px; }
+
+    header.stand-header {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-glass);
+    }
+
+    .stand-badge {
+      font-family: var(--font-m);
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: var(--amber-soft);
+      color: var(--amber);
+      border: 1px solid var(--amber);
+      padding: 3px 10px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    h1.stand-title {
+      font-family: var(--font-title);
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+    }
+
+    .controls-panel {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-toggle {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      color: var(--ink);
+      font-family: var(--font-d);
+      font-weight: 600;
+      font-size: 0.82rem;
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: all 0.2s var(--spring);
+    }
+    .btn-toggle:hover {
+      border-color: var(--emerald);
+      transform: translateY(-1px);
+    }
+
+    .stands-grid {
+      position: relative;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .stand-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1.5px solid var(--border-glass);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: all 0.25s var(--spring);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+    }
+
+    .stand-card.recommended {
+      border-color: var(--amber);
+      box-shadow: 0 0 0 1px var(--amber), 0 16px 40px rgba(245, 158, 11, 0.12);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .option-tag {
+      font-family: var(--font-m);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 8px;
+    }
+    .tag-rec { background: var(--amber-soft); color: var(--amber); border: 1px solid var(--amber); }
+    .tag-alt { background: rgba(255, 255, 255, 0.05); color: var(--ink-soft); border: 1px solid var(--border-glass); }
+
+    .option-title {
+      font-family: var(--font-title);
+      font-size: 1.05rem;
+      margin-top: 4px;
+    }
+
+    .option-desc {
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      line-height: 1.45;
+    }
+
+    /* Mock Footers */
+    .mock-hud-box {
+      background: #0d121c;
+      border: 1px solid var(--border-glass);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 260px;
+      margin: 0 auto;
+    }
+
+    /* Variant A (Zen Calibrated HUD) */
+    .hud-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pomo-chip {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
+      border-radius: 10px;
+      padding: 7px 8px;
+      font-family: var(--font-m);
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--ink);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .pomo-chip:hover { background: rgba(255, 255, 255, 0.08); }
+
+    .streak-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--amber);
+      border-radius: 10px;
+      padding: 7px 10px;
+      font-family: var(--font-m);
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .energy-chip-zen {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: linear-gradient(135deg, rgba(254, 243, 199, 0.15), rgba(245, 158, 11, 0.2));
+      border: 1.5px solid rgba(251, 191, 36, 0.45);
+      color: #fef08a;
+      border-radius: 10px;
+      padding: 7px 11px;
+      font-family: var(--font-m);
+      font-size: 0.78rem;
+      font-weight: 800;
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.25); /* Soft, elegant, crystal clear */
+      cursor: pointer;
+    }
+
+    .sys-actions-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .sys-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-glass);
+      border-radius: 8px;
+      padding: 7px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink-soft);
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.15s;
+    }
+    .sys-btn:hover { background: rgba(255, 255, 255, 0.08); color: var(--ink); }
+
+    /* Variant B (Current Aggressive Overglow) */
+    .overglow-container {
+      position: relative;
+      width: 100%;
+    }
+    .energy-overglow {
+      width: 100%;
+      background: #fef3c7;
+      color: #78350f;
+      font-family: var(--font-m);
+      font-weight: 800;
+      font-size: 0.85rem;
+      padding: 8px 12px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      /* Heavy blurry halo as shown in screenshot */
+      box-shadow: 0 0 35px 12px rgba(252, 211, 77, 0.65), 0 0 15px rgba(245, 158, 11, 0.9);
+      border: 1.5px solid #fff;
+    }
+
+    /* Variant C (Flat Minimal) */
+    .hud-flat-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 10px;
+      border: 1px solid var(--border-glass);
+      font-family: var(--font-m);
+      font-size: 0.74rem;
+    }
+
+    .key-points {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.8rem;
+    }
+    .key-points li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      color: var(--ink-soft);
+    }
+    .key-points li strong { color: var(--ink); }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <header class="stand-header">
+    <div>
+      <span class="stand-badge">ЭТАП 3 / GRILL-ME ИНТЕРВЬЮ</span>
+      <h1 class="stand-title">Нижний HUD: Батарея энергии ✨ 100%, Стрик 🔥 и Таймер Помодоро</h1>
+    </div>
+    <div class="controls-panel">
+      <button class="btn-toggle" onclick="toggleTheme()">🌓 Переключить тему (Dark/Light)</button>
+    </div>
+  </header>
+
+  <div class="stands-grid">
+
+    <!-- ВАРИАНТ A -->
+    <div class="stand-card recommended">
+      <div class="card-header">
+        <span class="option-tag tag-rec">РЕКОМЕНДУЕМЫЙ (ZEN CALIBRATED)</span>
+      </div>
+      <h2 class="option-title">Вариант A: Калиброванный Дзен-HUD (Soft Crystal Glow)</h2>
+      <p class="option-desc">
+        Устранение мутного белого ореола-пересвета. Деликатное золотое свечение <code>✨ 100%</code>, огонь <code>🔥 1</code> как эталон стрика на всех экранах, и сохранение таймера Помодоро <code>⏱ 15:00 ▶</code> в один гармоничный ряд.
+      </p>
+
+      <div class="mock-hud-box">
+        <div class="hud-row">
+          <div class="pomo-chip">⏱ 15:00 ▶</div>
+          <div class="streak-chip">🔥 1</div>
+          <div class="energy-chip-zen">✨ 100%</div>
+        </div>
+        <div class="sys-actions-row">
+          <div class="sys-btn" title="Поиск">🔍</div>
+          <div class="sys-btn" title="Тема">🌙</div>
+          <div class="sys-btn" title="Язык">RU</div>
+          <div class="sys-btn" title="Настройки">⚙</div>
+        </div>
+      </div>
+
+      <ul class="key-points">
+        <li>🌿 <strong>Чистый свет:</strong> ореол локализован вокруг плашки, текст читается идеально, соседние кнопки не засвечены.</li>
+        <li>🌿 <strong>Единый стрик:</strong> огонь 🔥 везде (вместо рассинхрона огонь vs молния ⚡).</li>
+        <li>🌿 <strong>Полноценный функционал:</strong> Помодоро доступен и на десктопе, и в мобильном дровере.</li>
+      </ul>
+    </div>
+
+    <!-- ВАРИАНТ B -->
+    <div class="stand-card">
+      <div class="card-header">
+        <span class="option-tag tag-alt">ВАРИАНТ B</span>
+      </div>
+      <h2 class="option-title">Вариант B: Неоновый акцент с пересветом (Как на скриншоте)</h2>
+      <p class="option-desc">
+        Широкая плашка энергии с ярким диффузным блумом (radial glow). На смартфонах вытесняет таймер Помодоро, оставляя только энергию и стрик-молнию <code>⚡ 1</code>.
+      </p>
+
+      <div class="mock-hud-box">
+        <div class="overglow-container">
+          <div class="energy-overglow">✨ 100% ЭНЕРГИЯ</div>
+        </div>
+        <div class="hud-row" style="margin-top: 6px;">
+          <div class="streak-chip" style="flex:1; justify-content:center;">⚡ Стрик: 1 день</div>
+        </div>
+        <div class="sys-actions-row">
+          <div class="sys-btn">🔍 Поиск</div>
+          <div class="sys-btn">🌙 Тема</div>
+          <div class="sys-btn">🌐 RU</div>
+          <div class="sys-btn">⚙ Опции</div>
+        </div>
+      </div>
+
+      <ul class="key-points">
+        <li>⚡ <strong>Яркий акцент:</strong> невозможно не заметить заряд энергии.</li>
+        <li>⚠️ <strong>Визуальный шум:</strong> пересвет создает ощущение перегруженного экрана и вытесняет Помодоро.</li>
+      </ul>
+    </div>
+
+    <!-- ВАРИАНТ C -->
+    <div class="stand-card">
+      <div class="card-header">
+        <span class="option-tag tag-alt">ВАРИАНТ C</span>
+      </div>
+      <h2 class="option-title">Вариант C: Строгий монохром (Без свечений)</h2>
+      <p class="option-desc">
+        Полное отключение световых эффектов: единая плоская строгая плашка статусов без теней и размытий.
+      </p>
+
+      <div class="mock-hud-box">
+        <div class="hud-flat-row">
+          <span>⏱ 15:00</span>
+          <span>🔥 1 дн</span>
+          <span>⚡ 100%</span>
+        </div>
+        <div class="sys-actions-row">
+          <div class="sys-btn">🔍</div>
+          <div class="sys-btn">🌓</div>
+          <div class="sys-btn">RU</div>
+          <div class="sys-btn">⚙</div>
+        </div>
+      </div>
+
+      <ul class="key-points">
+        <li>🍃 <strong>Аскетизм:</strong> 0 световых эффектов, строгий технический вид.</li>
+        <li>⚠️ <strong>Снижение геймификации:</strong> теряется эмоциональная радость от 100% заряда.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    }
+  </script>
+</body>
+</html>
