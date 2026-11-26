@@ -37106,6 +37106,297 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
   border-color: rgba(15, 23, 42, 0.12);
   color: #0f172a;
 }
+
+/* --- 8. Screening Mode Switcher (HR-скрининг <-> Техническое интервью) --- */
+.screening-mode-switcher-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.screening-mode-tablist {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 20px rgba(0, 0, 0, 0.32);
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.screening-mode-tablist::-webkit-scrollbar {
+  display: none;
+}
+.screening-mode-tab {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink-muted);
+  font-family: var(--font-b, sans-serif);
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color .18s ease, background .18s ease, border-color .18s ease;
+}
+.screening-mode-tab:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.05);
+}
+.screening-mode-tab:focus-visible {
+  outline: 2px solid var(--emerald, #10b981);
+  outline-offset: 2px;
+}
+.screening-mode-tab[aria-selected="true"],
+.screening-mode-tab.active {
+  color: #ffffff;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.24) 0%, rgba(6, 78, 59, 0.45) 100%);
+  border-color: rgba(16, 185, 129, 0.55);
+}
+.screening-mode-tab[aria-selected="true"]::after,
+.screening-mode-tab.active::after {
+  content: '';
+  position: absolute;
+  inset: auto 14px 2px;
+  border-block-end: 2.5px solid var(--emerald, #10b981);
+  border-radius: 2px;
+}
+.screening-mode-badge {
+  font-family: var(--font-m, monospace);
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ink-soft);
+}
+.screening-mode-tab[aria-selected="true"] .screening-mode-badge,
+.screening-mode-tab.active .screening-mode-badge {
+  background: rgba(16, 185, 129, 0.22);
+  color: #6ee7b7;
+}
+.screening-mode-subtitle {
+  font-size: 0.80rem;
+  color: var(--ink-muted);
+  line-height: 1.4;
+}
+@media (max-width: 640px), (pointer: coarse) {
+  .screening-mode-tablist {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .screening-mode-tab {
+    min-height: 48px;
+    min-block-size: 48px;
+    padding: 10px 10px;
+    font-size: 0.82rem;
+    gap: 6px;
+  }
+  .ti-touch-btn {
+    min-height: 48px !important;
+    min-block-size: 48px !important;
+  }
+}
+
+/* --- 9. Tech Interview Roadmap, Cheatsheets & Flashcards --- */
+.ti-stage-progress-mini {
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+  margin-top: 6px;
+}
+.ti-stage-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  transition: width 0.25s ease;
+}
+.ti-stage-cheatsheet {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ti-stage-cheatsheet-title {
+  font-family: var(--font-m, monospace);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #34d399;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.ti-cheatsheet-item {
+  font-size: 0.83rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.ti-cheatsheet-item b {
+  color: var(--ink);
+}
+.ti-checklist-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 4px;
+}
+.ti-checklist-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+.ti-stage-done-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .18s ease;
+}
+.ti-stage-done-toggle:hover {
+  border-color: rgba(16, 185, 129, 0.48);
+  color: #34d399;
+}
+.ti-stage-done-toggle.is-done {
+  background: rgba(16, 185, 129, 0.16);
+  border-color: rgba(16, 185, 129, 0.50);
+  color: #6ee7b7;
+}
+.ti-trap-callout {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.10);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  text-align: left;
+}
+.ti-trap-callout-title {
+  font-family: var(--font-m, monospace);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #fbbf24;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.ti-trap-callout-body {
+  font-size: 0.86rem;
+  line-height: 1.52;
+  color: #fef3c7;
+}
+.ti-answer-pre,
+.ti-card-rich code {
+  font-family: var(--font-m, monospace);
+}
+.ti-card-rich pre {
+  margin: 10px 0 4px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(5, 8, 15, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  font-family: var(--font-m, monospace);
+  font-size: 0.80rem;
+  line-height: 1.62;
+  color: #e2e8f0;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+[data-theme="light"] .screening-mode-tablist {
+  background: rgba(255, 255, 255, 0.90);
+  border-color: rgba(15, 23, 42, 0.12);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+}
+[data-theme="light"] .screening-mode-tab {
+  color: #475569;
+}
+[data-theme="light"] .screening-mode-tab:hover {
+  color: #0f172a;
+  background: rgba(15, 23, 42, 0.04);
+}
+[data-theme="light"] .screening-mode-tab[aria-selected="true"],
+[data-theme="light"] .screening-mode-tab.active {
+  color: #064e3b;
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(5, 150, 105, 0.45);
+}
+[data-theme="light"] .screening-mode-badge {
+  background: rgba(15, 23, 42, 0.06);
+  color: #475569;
+}
+[data-theme="light"] .screening-mode-tab[aria-selected="true"] .screening-mode-badge,
+[data-theme="light"] .screening-mode-tab.active .screening-mode-badge {
+  background: #10b981;
+  color: #061c14;
+}
+[data-theme="light"] .ti-stage-progress-mini {
+  background: rgba(15, 23, 42, 0.08);
+}
+[data-theme="light"] .ti-stage-cheatsheet {
+  background: rgba(15, 23, 42, 0.03);
+  border-color: rgba(15, 23, 42, 0.10);
+}
+[data-theme="light"] .ti-stage-cheatsheet-title {
+  color: #047857;
+}
+[data-theme="light"] .ti-stage-done-toggle {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(15, 23, 42, 0.14);
+  color: #334155;
+}
+[data-theme="light"] .ti-stage-done-toggle.is-done {
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(5, 150, 105, 0.45);
+  color: #065f46;
+}
+[data-theme="light"] .ti-trap-callout {
+  background: rgba(245, 158, 11, 0.10);
+  border-color: rgba(217, 119, 6, 0.35);
+}
+[data-theme="light"] .ti-trap-callout-title {
+  color: #b45309;
+}
+[data-theme="light"] .ti-trap-callout-body {
+  color: #78350f;
+}
+[data-theme="light"] .ti-card-rich pre {
+  background: #f1f5f9;
+  border-color: rgba(15, 23, 42, 0.12);
+  color: #0f172a;
+}
 </style>
 
 <link rel="manifest" href="manifest.json">
@@ -40928,7 +41219,8 @@ function performFullProgressSave(options){
         exportedAt: new Date().toISOString(),
         academyState: state,
         ideStatus: (typeof getIdeSolvedMap === 'function' ? getIdeSolvedMap() : {}),
-        ideDrafts: (typeof safeParseJsonObj === 'function' ? safeParseJsonObj(localStorage.getItem(IDE_DRAFTS_KEY)) : {}) || {}
+        ideDrafts: (typeof safeParseJsonObj === 'function' ? safeParseJsonObj(localStorage.getItem(IDE_DRAFTS_KEY)) : {}) || {},
+        techInterviewState: (typeof loadTechInterviewState === 'function' ? loadTechInterviewState() : null)
       };
       var jsonStr = JSON.stringify(exportObj, null, 2);
       var blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
@@ -59721,6 +60013,608 @@ function getHrStageFilterKey(st){
   return getHrStageCardCats(st).join(',');
 }
 
+/* ================= TECH INTERVIEW MODE (6 STAGES & 36 BLITZ CARDS) ================= */
+
+const TECH_INTERVIEW_STORE_KEY = 'academy_tech_interview_v1';
+
+const TECH_INTERVIEW_STAGES = [
+  {
+    id: 'project_defense',
+    stepNum: 1,
+    title: 'Защита проектов и кода',
+    shortTitle: '1. Защита проектов',
+    icon: '🛡️',
+    duration: '45 мин',
+    goal: 'Уверенно рассказать архитектуру своих пет-проектов, обосновать замеры производительности, безопасность репозитория и компромиссы стека.',
+    cheatsheet: [
+      { title: 'Архитектура слоёв', detail: 'Разделяйте HTTP-слой (роутеры/вьюхи), бизнес-логику (сервисы), схемы валидации (Pydantic/DRF) и доступ к БД.' },
+      { title: 'Честные замеры', detail: 'Фиксируйте методику (число записей, кэш до/после, p50/p95, число SQL-запросов) и не выдавайте локальный бенчмарк за прод-нагрузку.' },
+      { title: 'Безопасность кода', detail: 'Секреты только в .env, порты БД/Redis привязаны к 127.0.0.1, DEBUG=False, отсутствие печати токенов в логах.' },
+      { title: 'AI-assisted проекты', detail: 'Чётко отделяйте код, написанный вручную, от AI-инструментов; умейте объяснить каждую ветку и контракт.' }
+    ],
+    checklist: [
+      'Готова схема потоков данных и сервисов основного пет-проекта',
+      'Понятно, как измерялось ускорение запросов и кэширования',
+      'Сформулированы честные ответы по пробелам в коммерческом опыте'
+    ]
+  },
+  {
+    id: 'sql_postgres',
+    stepNum: 2,
+    title: 'PostgreSQL и SQL',
+    shortTitle: '2. PostgreSQL и SQL',
+    icon: '🐘',
+    duration: '60 мин',
+    goal: 'Свободно писать аналитические и бизнес-запросы (LEFT JOIN, GROUP BY/HAVING), проектировать составные индексы и читать EXPLAIN ANALYZE.',
+    cheatsheet: [
+      { title: 'LEFT JOIN: ON vs WHERE', detail: 'Фильтр по правой таблице в WHERE отсекает NULL-строки и превращает LEFT JOIN в INNER JOIN. Условие фильтра правой таблицы пишите в ON.' },
+      { title: 'Порядок выполнения', detail: 'FROM/JOIN -> WHERE -> GROUP BY -> HAVING -> SELECT -> DISTINCT -> ORDER BY -> LIMIT.' },
+      { title: 'Составные B-Tree индексы', detail: 'Работает правило левого префикса: индекс (a, b) ускоряет WHERE a = ... и WHERE a = ... AND b = ..., но не WHERE b = ...' },
+      { title: 'Изоляция и блокировки', detail: 'Read Committed — дефолт PostgreSQL; для защиты инвариантов при конкурентных записях используйте SELECT ... FOR UPDATE.' }
+    ],
+    checklist: [
+      'Умеете искать записи без связей через LEFT JOIN ... WHERE right.id IS NULL',
+      'Различаете COUNT(*) и COUNT(col) с учётом NULL',
+      'Читаете Seq Scan, Index Scan и Buffers в EXPLAIN (ANALYZE, BUFFERS)'
+    ]
+  },
+  {
+    id: 'fastapi_pydantic',
+    stepNum: 3,
+    title: 'FastAPI и Pydantic v2',
+    shortTitle: '3. FastAPI & Pydantic',
+    icon: '⚡',
+    duration: '60 мин',
+    goal: 'Объяснять модель конкурентности (event loop vs threadpool), DI через Depends с yield, валидацию Pydantic v2 и контракты REST API.',
+    cheatsheet: [
+      { title: 'async def vs def', detail: 'async def крутится прямо в event loop (блокирующий I/O вешает воркер); def FastAPI автоматически отправляет в threadpool.' },
+      { title: 'Depends с yield', detail: 'Код до yield подготавливает ресурс (например, сессию БД), код после yield в finally гарантированно закрывает его после ответа.' },
+      { title: 'Pydantic v2', detail: 'model_validate(obj) с ConfigDict(from_attributes=True) для ORM-объектов, @field_validator и @model_validator(mode="after").' },
+      { title: 'Коды HTTP', detail: '400 (бизнес-ошибка формата), 401 (нет аутентификации), 403 (нет прав), 404 (не найдено), 409 (конфликт состояния), 422 (валидация схемы).' }
+    ],
+    checklist: [
+      'Не вызываете синхронный requests/psycopg2 внутри async def',
+      'Разделяете Pydantic-схемы входа (Create/Update) и ответа (Read)',
+      'Понимаете отличия FastAPI от Django/DRF в DI, ORM и миграциях'
+    ]
+  },
+  {
+    id: 'sqlalchemy_alembic',
+    stepNum: 4,
+    title: 'SQLAlchemy 2.0 и Alembic',
+    shortTitle: '4. SQLAlchemy & Alembic',
+    icon: '🧱',
+    duration: '60 мин',
+    goal: 'Писать запросы в стиле 2.0 (select/scalars), устранять N+1 через joinedload/selectinload и безопасно вести миграции Alembic.',
+    cheatsheet: [
+      { title: 'Стиль 2.0', detail: 'select(Model).where(...) + session.scalars(stmt).all(), декларативные модели через Mapped[T] и mapped_column().' },
+      { title: 'joinedload vs selectinload', detail: 'joinedload делает LEFT OUTER JOIN (хорош для many-to-one); selectinload делает отдельный SELECT ... WHERE id IN (...) для one-to-many без раздувания строк.' },
+      { title: 'flush vs commit', detail: 'flush() отправляет SQL в БД и получает PK внутри транзакции без фиксации; commit() завершает транзакцию (в AsyncSession ставьте expire_on_commit=False).' },
+      { title: 'Слепые зоны Alembic', detail: 'autogenerate не распознаёт переименование (делает drop+add), partial/functional индексы без донастройки, изменения внутри JSON и data migrations.' }
+    ],
+    checklist: [
+      'Всегда проверяете сгенерированную миграцию и функцию downgrade()',
+      'Знаете, почему одну AsyncSession нельзя шарить между asyncio.gather()',
+      'Умеете откатывать несовместимые изменения через expand-and-contract'
+    ]
+  },
+  {
+    id: 'pytest_docker_git',
+    stepNum: 5,
+    title: 'pytest, Docker и Git',
+    shortTitle: '5. pytest, Docker & Git',
+    icon: '🐳',
+    duration: '50 мин',
+    goal: 'Настраивать фикстуры и изоляцию тестов FastAPI, оптимизировать слои Dockerfile и безопасно работать с Docker Compose и историей Git.',
+    cheatsheet: [
+      { title: 'Scope фикстур', detail: 'function (на каждый тест), class, module, session (один раз на прогон, например, движок БД или схема).' },
+      { title: 'dependency_overrides', detail: 'app.dependency_overrides[get_db] = override_get_db позволяет подменить реальную БД/шлюз в TestClient/AsyncClient.' },
+      { title: 'Кэш слоёв Dockerfile', detail: 'Сначала COPY requirements.txt и RUN pip install, и только потом COPY . — тогда смена кода не пересобирает зависимости.' },
+      { title: 'Git в команде', detail: 'git merge сохраняет граф истории; git rebase даёт линейную историю (но нельзя ребейзить общие ветки вроде main).' }
+    ],
+    checklist: [
+      'Тесты проходят изолированно без ручного копирования локального .env',
+      'В docker-compose настроены healthcheck и bind портов на 127.0.0.1',
+      'В опубликованных ветках ошибки откатываются через git revert'
+    ]
+  },
+  {
+    id: 'crm_cases_livecoding',
+    stepNum: 6,
+    title: 'Практические кейсы и лайвкодинг',
+    shortTitle: '6. Кейсы и лайвкодинг',
+    icon: '🧩',
+    duration: '65 мин',
+    goal: 'Решать прикладные бэкенд-кейсы на уровне транзакций, гонок, идемпотентности, пагинации, внешних API и диагностики медленных эндпоинтов.',
+    cheatsheet: [
+      { title: 'Гонка за последнее место', detail: 'Открыть транзакцию -> SELECT ... FOR UPDATE на родительской сущности -> проверить число подтверждённых записей -> INSERT + UNIQUE-ограничение.' },
+      { title: 'Атомарное списание', detail: 'Вместо read-check-write делайте условный UPDATE ... WHERE balance >= 1 RETURNING balance или блокировку строки FOR UPDATE.' },
+      { title: 'Идемпотентность', detail: 'Уникальный ключ Idempotency-Key / external_id + UNIQUE в БД; при повторном запросе или IntegrityError возвращаем сохранённый ответ.' },
+      { title: 'Отладка медленного API', detail: 'Метрика по этапам: сеть/клиент -> сериализация -> количество SQL-запросов (N+1) -> EXPLAIN ANALYZE -> ожидание локов и пула соединений.' }
+    ],
+    checklist: [
+      'Отличаете OFFSET-пагинацию от keyset (cursor) пагинации под нагрузкой',
+      'Закладываете таймауты и ретраи только на идемпотентные внешние вызовы',
+      'Комбинируете блокировку транзакции и констрейнты БД для инвариантов'
+    ]
+  }
+];
+
+const TECH_INTERVIEW_CARDS = [
+  // --- Stage 1: project_defense (6) ---
+  {
+    id: 'ti-pd-1',
+    stageId: 'project_defense',
+    stageLabel: '1. Защита проектов',
+    q: 'Как кратко и структурированно описать архитектуру вашего основного backend-проекта за 60 секунд?',
+    answer: 'Идите сверху вниз по пути запроса: 1) клиент и REST API (валидация входа и коды ответов); 2) сервисный слой с бизнес-правилами; 3) хранилище (реляционная БД с индексами + кэш для горячих чтений + фоновые задачи для тяжёлых операций); 4) упаковка в Docker Compose и покрытие тестами.',
+    trap: 'Интервьюер проверяет, видите ли вы границы ответственности слоёв, или просто перечисляете модные названия библиотек без понимания потока данных.'
+  },
+  {
+    id: 'ti-pd-2',
+    stageId: 'project_defense',
+    stageLabel: '1. Защита проектов',
+    q: 'Вы называете в проекте метрики ускорения (число SQL-запросов, миллисекунды, p95). Как доказать, что это честные замеры?',
+    answer: 'Назовите конкретные условия эксперимента: объём данных (сколько строк в таблицах), инструмент замера (логирование SQL, profiling/middleware, нагрузочный прогон), сравнение медианы и p95 до/после и то, что именно изменилось в плане запроса или кэше.',
+    trap: 'Ловушка — сказать «ускорил в 10 раз» без знания объёма выборки, разницы между cold/warm cache и отличия локального теста от продакшена.'
+  },
+  {
+    id: 'ti-pd-3',
+    stageId: 'project_defense',
+    stageLabel: '1. Защита проектов',
+    q: 'Какие базовые меры безопасности вы проверяете в репозитории и Docker-конфигурации перед показом кода?',
+    answer: 'Отсутствие секретов и `.env` в истории Git, выключенный `DEBUG` в прод-конфиге, отсутствие `print()`/логов с паролями и токенами, закрытие портов БД/кэша через `127.0.0.1` вместо `0.0.0.0`, хеширование паролей и проверка прав доступа на уровне владельца ресурса.',
+    trap: 'Частая ошибка джунов — закоммитить `SECRET_KEY` или оставить открытый наружу порт PostgreSQL/Redis в `docker-compose.yml`.'
+  },
+  {
+    id: 'ti-pd-4',
+    stageId: 'project_defense',
+    stageLabel: '1. Защита проектов',
+    q: 'Почему вы выбрали именно этот стек в проекте и какие у него ограничения при росте нагрузки?',
+    answer: 'Объясните выбор через требования задачи: быстрая разработка CRUD и админки (Django) или строгие контракты и асинхронный I/O (FastAPI). Честно назовите узкие места: например, синхронный воркер, один инстанс БД или отсутствие горизонтального шардирования — и как бы вы их снимали (индексы, кэш, очереди, read-реплики).',
+    trap: 'Ответ «потому что все так пишут» или «это самый быстрый фреймворк» сразу показывает отсутствие инженерного мышления.'
+  },
+  {
+    id: 'ti-pd-5',
+    stageId: 'project_defense',
+    stageLabel: '1. Защита проектов',
+    q: 'Если часть пет-проекта или инструментов вы делали с помощью ИИ-ассистентов, как честно защищать такой проект на техсобесе?',
+    answer: 'Говорите прямо: что именно вы проектировали и писали руками, а где использовали ИИ как ускоритель рутины (шаблоны, UI, генерация заготовок), при этом вы сами проверяли архитектуру, запускали тесты и можете объяснить ключевые модули кода.',
+    trap: 'Попытка выдать чужой или полностью сгенерированный код за полностью ручной мгновенно вскрывается на первом уточняющем вопросе по файлу.'
+  },
+  {
+    id: 'ti-pd-6',
+    stageId: 'project_defense',
+    stageLabel: '1. Защита проектов',
+    q: 'Как спокойно отвечать, если интервьюер находит расхождение или амбициозную формулировку в резюме (покрытие, опыт, CI/CD)?',
+    answer: 'Не уходите в глухую оборону и не придумывайте детали на ходу. Спокойно уточните реальный масштаб: где использовался локальный деплой/контейнеры вместо сложного CI, какой именно процент модулей покрыт тестами и какие задачи вы готовы сразу закрывать под код-ревью.',
+    trap: 'Смотрят на инженерную честность и адекватность под давлением: спокойное признание границ опыта ценится выше, чем попытка выкрутиться.'
+  },
+
+  // --- Stage 2: sql_postgres (6) ---
+  {
+    id: 'ti-sql-1',
+    stageId: 'sql_postgres',
+    stageLabel: '2. PostgreSQL и SQL',
+    q: 'В чём критическая разница между фильтром правой таблицы в `ON` и в `WHERE` при `LEFT JOIN`?',
+    answer: '```sql\nSELECT u.id, o.id\nFROM users u\nLEFT JOIN orders o\n  ON o.user_id = u.id\n AND o.status = \'paid\';\n```\nУсловие в `ON` фильтрует строки `orders` до соединения и сохраняет пользователей без оплаченных заказов (`o.id IS NULL`). Если перенести `o.status = \'paid\'` в `WHERE`, все строки с `NULL` отбросятся, и `LEFT JOIN` фактически превратится в `INNER JOIN`.',
+    trap: 'Классическая ловушка на лайвкодинге: кандидат пишет `LEFT JOIN ... WHERE right.status = ...` и теряет строки с нулём связей.'
+  },
+  {
+    id: 'ti-sql-2',
+    stageId: 'sql_postgres',
+    stageLabel: '2. PostgreSQL и SQL',
+    q: 'Чем `WHERE` отличается от `HAVING` и в каком логическом порядке выполняется SQL-запрос?',
+    answer: 'Порядок выполнения: `FROM / JOIN` → `WHERE` → `GROUP BY` → `HAVING` → `SELECT` → `DISTINCT` → `ORDER BY` → `LIMIT`. `WHERE` отсекает отдельные строки до группировки (и работает с индексами), а `HAVING` фильтрует уже сформированные группы (обычно по агрегатам `COUNT`, `SUM`).',
+    trap: 'Интервьюер проверяет, не пытаетесь ли вы фильтровать обычные поля в `HAVING` (теряя индексную оптимизацию) или использовать алиас из `SELECT` внутри `WHERE`.'
+  },
+  {
+    id: 'ti-sql-3',
+    stageId: 'sql_postgres',
+    stageLabel: '2. PostgreSQL и SQL',
+    q: 'В чём разница между `COUNT(*)`, `COUNT(col)` и `COUNT(DISTINCT col)` при наличии `NULL` и в `LEFT JOIN`?',
+    answer: '`COUNT(*)` считает все строки группы, включая те, где все колонки `NULL`. `COUNT(col)` считает только строки, где `col IS NOT NULL`. При `LEFT JOIN` для подсчёта связанных записей важно писать `COUNT(right.id)`, иначе `COUNT(*)` вернёт `1` вместо `0` для сущности без связей.',
+    trap: 'На собеседовании просят вывести элементы с `0` связей, и кандидат получает `1` из-за `COUNT(*)` после `LEFT JOIN`.'
+  },
+  {
+    id: 'ti-sql-4',
+    stageId: 'sql_postgres',
+    stageLabel: '2. PostgreSQL и SQL',
+    q: 'Как работает составной B-Tree индекс `(a, b)` в PostgreSQL и в каком порядке выбирать колонки?',
+    answer: 'B-Tree отсортирован сначала по `a`, затем при равных `a` — по `b` (правило левого префикса). Индекс `(a, b)` эффективен для `a = 1`, `a = 1 AND b = 2`, `a = 1 ORDER BY b`, но обычно бесполезен для фильтра только по `b`. Сначала ставят колонку с равенством (`=`) и высокой селективностью, потом диапазоны (`>`, `BETWEEN`) или сортировку.',
+    trap: 'Распространённая ошибка — поставить колонку с диапазоном (`created_at >= ...`) первой перед равенством (`status = \'active\'`), ломая эффективный поиск по второй колонке.'
+  },
+  {
+    id: 'ti-sql-5',
+    stageId: 'sql_postgres',
+    stageLabel: '2. PostgreSQL и SQL',
+    q: 'На какие метрики смотреть в выводе `EXPLAIN (ANALYZE, BUFFERS)` при поиске тормозов?',
+    answer: '1) Тип сканирования: `Seq Scan` на большой таблице вместо `Index Scan` / `Index Only Scan`; 2) `actual rows` vs `estimated rows` (сильный перекос означает устаревшую статистику — нужен `ANALYZE`); 3) `Buffers: shared hit` (кэш памяти) vs `shared read` (чтение с диска); 4) `loops` и дорогие узлы `Sort` / `Nested Loop`.',
+    trap: 'Не путайте `EXPLAIN` (только оценка планировщика) и `EXPLAIN ANALYZE` (реальное выполнение запроса с замером времени и строк — осторожнее с `UPDATE`/`DELETE` без `ROLLBACK`!).'
+  },
+  {
+    id: 'ti-sql-6',
+    stageId: 'sql_postgres',
+    stageLabel: '2. PostgreSQL и SQL',
+    q: 'Чем `Read Committed` отличается от `Repeatable Read` в PostgreSQL и зачем нужен `SELECT ... FOR UPDATE`?',
+    answer: 'При `Read Committed` каждый оператор внутри транзакции видит свой свежий снимок зафиксированных данных (возможны неповторяемое чтение и гонка read-then-write). При `Repeatable Read` вся транзакция работает со снимком на момент первого запроса (при конфликте обновления кидает serialization failure). `SELECT ... FOR UPDATE` ставит строковую блокировку до конца транзакции, заставляя конкурентные транзакции ждать.',
+    trap: 'Многие думают, что оборачивания чтения и записи в `BEGIN ... COMMIT` на дефолтном `Read Committed` достаточно от race condition — это не так без блокировки или атомарного `UPDATE`.'
+  },
+
+  // --- Stage 3: fastapi_pydantic (6) ---
+  {
+    id: 'ti-fa-1',
+    stageId: 'fastapi_pydantic',
+    stageLabel: '3. FastAPI & Pydantic',
+    q: 'В чём разница между `async def` и обычной `def` функцией эндпоинта в FastAPI?',
+    answer: '```python\n@router.get(\'/fast\')\nasync def fast_route():\n    return await fetch_async()\n\n@router.get(\'/sync\')\ndef sync_route():\n    return sync_db_call()\n```\n`async def` выполняется прямо в основном event loop: любой блокирующий вызов (`time.sleep`, `requests.get`, синхронный драйвер БД) замораживает весь воркер. Обычный `def` FastAPI автоматически запускает во внешнем `anyio` threadpool.',
+    trap: 'Главная ошибка — объявить `async def`, а внутри вызвать синхронный SQLAlchemy `Session` или `requests`, убив конкурентность.'
+  },
+  {
+    id: 'ti-fa-2',
+    stageId: 'fastapi_pydantic',
+    stageLabel: '3. FastAPI & Pydantic',
+    q: 'Как работает `Depends` с генератором `yield` и что происходит с ним при исключении в роуте?',
+    answer: '```python\nasync def get_db():\n    async with SessionLocal() as db:\n        try:\n            yield db\n        finally:\n            await db.close()\n```\nКод до `yield` выполняется до обработчика маршрута, передавая ресурс внутрь. После формирования ответа (или при ошибке в роуте) FastAPI возобновляет генератор, пробрасывая исключение, поэтому блок `finally` гарантированно освобождает ресурс. В рамках одного запроса результат `Depends` по умолчанию кэшируется (`use_cache=True`).',
+    trap: 'Если не обернуть `yield` в `try/except/finally` или сделать `commit()` после `yield` без отката при ошибке, транзакция может повести себя непредсказуемо.'
+  },
+  {
+    id: 'ti-fa-3',
+    stageId: 'fastapi_pydantic',
+    stageLabel: '3. FastAPI & Pydantic',
+    q: 'Какие ключевые возможности и изменения появились в Pydantic v2 (`model_validate`, `from_attributes`, валидаторы)?',
+    answer: 'Ядро переписано на Rust (`pydantic-core`), в 5–50× быстрее. Вместо `parse_obj`/`from_orm` используется `Model.model_validate(obj)` с `model_config = ConfigDict(from_attributes=True)`. Для сериализации — `model_dump()` / `model_dump_json()`. Валидаторы объявляются через `@field_validator` (`@classmethod`) и `@model_validator(mode=\'after\')`.',
+    trap: 'Смешивание синтаксиса Pydantic v1 (`class Config: orm_mode = True`, `@validator`, `.dict()`) и v2 в новом коде вызывает предупреждения или ошибки.'
+  },
+  {
+    id: 'ti-fa-4',
+    stageId: 'fastapi_pydantic',
+    stageLabel: '3. FastAPI & Pydantic',
+    q: 'Когда в REST API возвращать `400`, `401`, `403`, `404`, `409` и `422`?',
+    answer: '• `400 Bad Request` — синтаксически битый запрос или бизнес-невозможность операции.\n• `401 Unauthorized` — клиент не аутентифицирован (нет/просрочен токен).\n• `403 Forbidden` — пользователь известен, но нет прав на действие.\n• `404 Not Found` — ресурс не найден (или скрыт из соображений приватности).\n• `409 Conflict` — конфликт состояния (дубликат email, нет мест, гонка версий).\n• `422 Unprocessable Entity` — валидация типов/схемы (дефолт FastAPI/Pydantic).',
+    trap: 'Путаница между `401` (кто ты?) и `403` (мы тебя знаем, но тебе нельзя), а также возврат `400` там, где нарушен конфликт состояния ресурса (`409`).'
+  },
+  {
+    id: 'ti-fa-5',
+    stageId: 'fastapi_pydantic',
+    stageLabel: '3. FastAPI & Pydantic',
+    q: 'Зачем в FastAPI разделять проект через `APIRouter`, `schemas`, `services` и `repositories`?',
+    answer: '`APIRouter` группирует маршруты по доменам с общим `prefix`, `tags` и `dependencies`. Слой `routers` отвечает только за HTTP (параметры, коды, DI), `schemas` — за DTO-контракты, `services` — за бизнес-логику и границы транзакций, `repositories`/ORM — за SQL. Так бизнес-логику легко тестировать и переиспользовать вне HTTP (например, из CLI или воркера).',
+    trap: '«Толстые контроллеры» с сырым SQL и бизнес-правилами прямо внутри `@router.post` быстро становятся нетестируемыми и дублируют логику.'
+  },
+  {
+    id: 'ti-fa-6',
+    stageId: 'fastapi_pydantic',
+    stageLabel: '3. FastAPI & Pydantic',
+    q: 'В чём главные архитектурные отличия FastAPI от Django/DRF при переходе с одного фреймворка на другой?',
+    answer: 'Django/DRF — «батарейки в комплекте»: единая ORM, встроенные миграции, админка, auth и синхронный пайплайн с middleware/viewsets. FastAPI — микрофреймворк поверх Starlette и Pydantic: асинхронность из коробки, явный Dependency Injection через `Depends`, автогенерация OpenAPI по type hints, а ORM (SQLAlchemy) и миграции (Alembic) подключаются и управляются явно.',
+    trap: 'Кандидат с опытом Django иногда пытается искать в FastAPI встроенную магию вроде `ModelViewSet` или глобального `request.user` без понимания `Depends`.'
+  },
+
+  // --- Stage 4: sqlalchemy_alembic (6) ---
+  {
+    id: 'ti-sa-1',
+    stageId: 'sqlalchemy_alembic',
+    stageLabel: '4. SQLAlchemy & Alembic',
+    q: 'Как выглядит современный стиль SQLAlchemy 2.0 (`select`, `scalars`, `Mapped`) в отличие от legacy 1.x?',
+    answer: '```python\nclass User(Base):\n    __tablename__ = \'users\'\n    id: Mapped[int] = mapped_column(primary_key=True)\n    email: Mapped[str] = mapped_column(unique=True)\n\nstmt = select(User).where(User.email == email)\nuser = await session.scalar(stmt)\n```\nВместо legacy `session.query(User).filter_by(...)` в 2.0 строятся явные объекты `select()`/`update()`/`delete()`, которые выполняются через `session.execute()` или `session.scalars()`, а модели строго типизированы через `Mapped`.',
+    trap: 'Использование `session.query()` в асинхронном проекте: в `AsyncSession` метода `.query()` вообще нет.'
+  },
+  {
+    id: 'ti-sa-2',
+    stageId: 'sqlalchemy_alembic',
+    stageLabel: '4. SQLAlchemy & Alembic',
+    q: 'Как бороться с проблемой N+1 в SQLAlchemy: когда выбирать `joinedload`, а когда `selectinload`?',
+    answer: 'По умолчанию в `AsyncSession` ленивые связи при обращении падают с ошибкой (`MissingGreenlet`).\n• `joinedload` делает `LEFT OUTER JOIN` в одном запросе — идеален для `many-to-one` / `one-to-one` (у записи 1 родитель).\n• `selectinload` делает второй запрос `SELECT ... WHERE fk IN (...)` — лучший выбор для коллекций `one-to-many` / `many-to-many`, чтобы `JOIN` не умножал строки и не ломал `LIMIT` по родителю.',
+    trap: 'Использовать `joinedload` для коллекции `one-to-many` с `.limit(20)`: без `.unique()` или `selectinload` можно получить дубликаты или урезанную страницу.'
+  },
+  {
+    id: 'ti-sa-3',
+    stageId: 'sqlalchemy_alembic',
+    stageLabel: '4. SQLAlchemy & Alembic',
+    q: 'Чем `session.flush()` отличается от `session.commit()` и зачем в `AsyncSession` ставят `expire_on_commit=False`?',
+    answer: '`flush()` отправляет накопленные `INSERT/UPDATE/DELETE` в БД в рамках текущей транзакции (можно сразу прочитать сгенерированный `id`, но изменения ещё не видны другим и откатятся при `rollback()`). `commit()` фиксирует транзакцию и по умолчанию помечает атрибуты ORM-объектов как expired. В `AsyncSession` обращение к expired-полю после `commit()` попытается сделать ленивый синхронный запрос и упадёт, поэтому ставят `expire_on_commit=False`.',
+    trap: 'Классическая ошибка в FastAPI + `AsyncSession`: вернуть ORM-объект после `await session.commit()` и получить `MissingGreenlet` при сериализации Pydantic.'
+  },
+  {
+    id: 'ti-sa-4',
+    stageId: 'sqlalchemy_alembic',
+    stageLabel: '4. SQLAlchemy & Alembic',
+    q: 'Почему нельзя делить одну `AsyncSession` между параллельными задачами в `asyncio.gather()`?',
+    answer: '`AsyncSession` не является coroutine-safe и держит одно соединение и буфер состояния (identity map). Конкурентное использование одной сессии в `asyncio.gather()` приводит к гонкам состояний и ошибке `InvalidRequestError` на драйвере вроде `asyncpg`. Каждая независимая задача должна создавать свою сессию из `async_sessionmaker`.',
+    trap: 'Передача одной `session` из `Depends` в несколько фоновых корутин через `asyncio.gather`.'
+  },
+  {
+    id: 'ti-sa-5',
+    stageId: 'sqlalchemy_alembic',
+    stageLabel: '4. SQLAlchemy & Alembic',
+    q: 'Как устроен рабочий цикл миграций Alembic и что `alembic revision --autogenerate` НЕ умеет отслеживать?',
+    answer: 'Цикл: изменить модель → `alembic revision --autogenerate -m "..."` → вручную прочитать сгенерированный файл (`upgrade` и `downgrade`) → применить `alembic upgrade head`. `autogenerate` не ловит: переименование таблиц/колонок (генерирует `drop` + `add` с потерей данных!), миграции данных (`UPDATE`), значения PostgreSQL `ENUM` (в старых/частичных случаях), кастомные триггеры, view и сложные функциональные индексы.',
+    trap: 'Слепо накатывать `--autogenerate` в прод без чтения файла миграции — верный способ потерять колонку с данными при её переименовании.'
+  },
+  {
+    id: 'ti-sa-6',
+    stageId: 'sqlalchemy_alembic',
+    stageLabel: '4. SQLAlchemy & Alembic',
+    q: 'Как безопасно откатывать миграции и делать несовместимые изменения схемы без простоя (zero-downtime)?',
+    answer: 'Откат схемы делается через `alembic downgrade -1` (или целевую ревизию), но при уже удалённой колонке данные не вернутся. Поэтому в проде используют паттерн **expand-and-contract**: 1) добавить новую колонку nullable / новый индекс `CONCURRENTLY`; 2) выкатить код, пишущий в оба поля; 3) перелить данные и переключить чтение; 4) отдельным релизом удалить старую колонку.',
+    trap: 'На собеседовании проверяют, понимаете ли вы, что во время деплоя старая и новая версии кода работают одновременно против одной БД.'
+  },
+
+  // --- Stage 5: pytest_docker_git (6) ---
+  {
+    id: 'ti-pdg-1',
+    stageId: 'pytest_docker_git',
+    stageLabel: '5. pytest, Docker & Git',
+    q: 'Какие `scope` есть у фикстур `pytest` и как правильно очищать ресурсы после теста?',
+    answer: 'Уровни `scope`: `function` (по умолчанию, на каждый тест), `class`, `module`, `package`, `session` (один раз за весь запуск). Для setup/teardown используют генераторную фикстуру с `yield`: код до `yield` подготавливает ресурс, код после `yield` выполняется даже при падении теста (аналог `finally`).',
+    trap: 'Поместить мутабельный ресурс (например, общую сессию БД без отката) в `scope="session"` и получить взаимовлияние тестов друг на друга.'
+  },
+  {
+    id: 'ti-pdg-2',
+    stageId: 'pytest_docker_git',
+    stageLabel: '5. pytest, Docker & Git',
+    q: 'Как тестировать эндпоинты FastAPI с подменой зависимостей (`dependency_overrides`)?',
+    answer: '```python\napp.dependency_overrides[get_db] = override_get_db\ntry:\n    with TestClient(app) as client:\n        res = client.get(\'/items\')\nfinally:\n    app.dependency_overrides.clear()\n```\nЧерез `app.dependency_overrides` подменяют БД, текущего пользователя или внешний клиент на тестовые дублёры. Обязательно очищать `dependency_overrides` в teardown (`yield`-фикстуры), чтобы оверрайд не протёк в соседние тесты.',
+    trap: 'Забыть сделать `app.dependency_overrides.clear()` после теста, из-за чего следующие тесты неожиданно используют мок вместо своей зависимости.'
+  },
+  {
+    id: 'ti-pdg-3',
+    stageId: 'pytest_docker_git',
+    stageLabel: '5. pytest, Docker & Git',
+    q: 'Как обеспечить полную изоляцию БД, кэша и настроек в автотестах, чтобы `pytest` запускался в чистом окружении?',
+    answer: '1) Тесты не должны зависеть от ручного `.env` — задавайте тестовые переменные по умолчанию в `conftest.py` или фабриках настроек; 2) Каждому тесту даётся откат транзакции (`ROLLBACK` / savepoint) или очистка таблиц; 3) Кэш и очереди в unit/integration-тестах подменяются на in-memory/eager-режим или изолированные тестовые инстансы, а внешние HTTP API мокаются (`respx`/`monkeypatch`).',
+    trap: 'Тесты, падающие на машине коллеги или в CI, потому что требуют локально запущенного Redis или секретов из незакоммиченного `.env`.'
+  },
+  {
+    id: 'ti-pdg-4',
+    stageId: 'pytest_docker_git',
+    stageLabel: '5. pytest, Docker & Git',
+    q: 'Как правильно организовать слои `Dockerfile` для Python-приложения, чтобы сборка и образ были оптимальными?',
+    answer: '```dockerfile\nFROM python:3.12-slim\nWORKDIR /app\n\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt\n\nCOPY . .\n```\nЗависимости копируются и ставятся ДО копирования исходников, чтобы при правке кода переиспользовался кэш Docker-слоя. Также добавляют `.dockerignore` (исключая `.git`, `.venv`, `__pycache__`), флаг `--no-cache-dir`, multi-stage сборку при наличии компиляции и запуск от непривилегированного пользователя.',
+    trap: 'Сделать `COPY . .` перед `pip install -r requirements.txt` — тогда любое изменение в `.py`-файле инвалидирует кэш и заново качает все пакеты.'
+  },
+  {
+    id: 'ti-pdg-5',
+    stageId: 'pytest_docker_git',
+    stageLabel: '5. pytest, Docker & Git',
+    q: 'На что обращают внимание в `docker-compose.yml` для связки API + PostgreSQL + Redis?',
+    answer: '1) `healthcheck` у БД и брокера (например, `pg_isready`, `redis-cli ping`) + `depends_on: condition: service_healthy`, чтобы приложение не падало при холодном старте; 2) Named volumes для персистентности данных PostgreSQL; 3) Привязка служебных портов к `127.0.0.1:5432:5432`, чтобы не светить БД в публичную сеть сервера.',
+    trap: 'Простое `depends_on: [db]` ждёт только старта контейнера, но не готовности PostgreSQL принимать TCP-подключения.'
+  },
+  {
+    id: 'ti-pdg-6',
+    stageId: 'pytest_docker_git',
+    stageLabel: '5. pytest, Docker & Git',
+    q: 'В чём разница между `git merge` и `git rebase`, и как безопасно исправить ошибку в уже запушенной ветке?',
+    answer: '`git merge` создаёт merge-коммит и сохраняет точную ветвистую историю. `git rebase` переносит ваши коммиты поверх целевой ветки, делая историю линейной, но переписывает хэши коммитов. Золотое правило: не делать `rebase` и `reset --hard` на общих ветках (`main`, `develop`), уже открытых команде — ошибку в опубликованной ветке отменяют новым коммитом через `git revert`.',
+    trap: 'Сделать `git push --force` в общую ветку после `rebase` — это ломает историю всем участникам команды.'
+  },
+
+  // --- Stage 6: crm_cases_livecoding (6) ---
+  {
+    id: 'ti-case-1',
+    stageId: 'crm_cases_livecoding',
+    stageLabel: '6. Кейсы и лайвкодинг',
+    q: 'Кейс: на событие/слот осталось 1 место, но два пользователя нажали «Записаться» одновременно. Как не допустить овербукинга?',
+    answer: '```python\nstmt = select(Event).where(Event.id == eid).with_for_update()\nevent = await session.scalar(stmt)\n\nconfirmed = await count_confirmed(session, eid)\nif confirmed >= event.capacity:\n    raise ConflictError(\'Мест нет\')\n```\nОткрываем транзакцию, блокируем родительскую запись (`SELECT ... FOR UPDATE`), пересчитываем подтверждённые записи, вставляем бронь и страхуемся `UNIQUE (event_id, user_id)` от дубля одного пользователя. При `IntegrityError` — `409 Conflict`.',
+    trap: 'Обычный `SELECT count(*)` без `FOR UPDATE` даёт классическую гонку: оба запроса увидят `count = 9` при лимите `10` и оба вставят бронь.'
+  },
+  {
+    id: 'ti-case-2',
+    stageId: 'crm_cases_livecoding',
+    stageLabel: '6. Кейсы и лайвкодинг',
+    q: 'Кейс: как атомарно списать 1 единицу ресурса (баланс / лимит пакета) в PostgreSQL без ухода в минус?',
+    answer: '```sql\nUPDATE balances\nSET remaining = remaining - 1\nWHERE id = :bid\n  AND status = \'active\'\n  AND remaining >= 1\nRETURNING remaining;\n```\nЛучше избегать паттерна «прочитал в Python → проверил `if >= 1` → обновил». Условный `UPDATE ... WHERE remaining >= 1 RETURNING` (плюс `CHECK (remaining >= 0)` в схеме БД) выполняется атомарно под строковой блокировкой PostgreSQL: если вернулось 0 строк, ресурса недостаточно.',
+    trap: 'Проверка остатка только на уровне Python-кода без `FOR UPDATE` или условия в `WHERE` при параллельных запросах загонит баланс в отрицательное значение.'
+  },
+  {
+    id: 'ti-case-3',
+    stageId: 'crm_cases_livecoding',
+    stageLabel: '6. Кейсы и лайвкодинг',
+    q: 'Кейс: платёжный шлюз или клиент прислал вебхук/запрос на оплату дважды из-за сетевого таймаута. Как гарантировать идемпотентность?',
+    answer: 'Принимать уникальный `Idempotency-Key` (или `external_payment_id` от шлюза) с `UNIQUE`-ограничением в таблице платежей/идемпотентности. Вся операция идёт в одной транзакции: при повторном ключе (`IntegrityError` или найденная запись) не создаём второй платёж и не начисляем баланс повторно, а возвращаем ранее сохранённый статус и результат.',
+    trap: 'Проверка `if exists` перед вставкой без `UNIQUE`-индекса в БД всё равно падает в гонке двух одновременных запросов.'
+  },
+  {
+    id: 'ti-case-4',
+    stageId: 'crm_cases_livecoding',
+    stageLabel: '6. Кейсы и лайвкодинг',
+    q: 'Пагинация больших списков: почему `OFFSET / LIMIT` плох на глубине и как работает Keyset (Cursor) pagination?',
+    answer: 'При `OFFSET 100000 LIMIT 20` БД всё равно читает и отбрасывает первые 100 000 строк (`O(N)`), а при вставке новой записи строки сдвигаются и дублируются между страницами. Keyset-пагинация фильтрует по последнему виденному ключу: `WHERE (created_at, id) < (:last_ts, :last_id) ORDER BY created_at DESC, id DESC LIMIT 20` — это всегда `O(log N)` по индексу и стабильно при вставках.',
+    trap: 'Использовать keyset только по `created_at` без tie-breaker (`id`): при одинаковом времени создания записи на границе страницы пропадут.'
+  },
+  {
+    id: 'ti-case-5',
+    stageId: 'crm_cases_livecoding',
+    stageLabel: '6. Кейсы и лайвкодинг',
+    q: 'Ваш сервис обращается к внешнему HTTP API (оплата, SMS, CRM). Какие защитные механизмы обязательны?',
+    answer: '1) Явные таймауты (`connect` + `read`, никогда бесконечный wait по умолчанию); 2) Не держать открытую транзакцию БД во время внешнего HTTP-запроса; 3) Ретраи с exponential backoff + jitter только для временных ошибок (`5xx`, таймаут) и только на идемпотентные запросы или с ключом идемпотентности; 4) Логирование correlation/request ID и безопасная деградация.',
+    trap: 'Самая болезненная ошибка — делать внешний HTTP-вызов внутри транзакции БД: тормоза стороннего API мгновенно исчерпают пул соединений PostgreSQL.'
+  },
+  {
+    id: 'ti-case-6',
+    stageId: 'crm_cases_livecoding',
+    stageLabel: '6. Кейсы и лайвкодинг',
+    q: 'Эндпоинт в проде начал отвечать 2–4 секунды вместо 50 мс. Какой ваш пошаговый алгоритм диагностики?',
+    answer: '1) Проверить логи/метрики: на каком слое задержка (БД, внешний API, сериализация, CPU/GIL); 2) Посчитать число SQL-запросов на один HTTP-вызов (исключить N+1); 3) Взять самый медленный запрос из `pg_stat_statements` и прогнать `EXPLAIN (ANALYZE, BUFFERS)`; 4) Проверить `pg_stat_activity` на висящие блокировки (locks) и исчерпание пула соединений.',
+    trap: 'Гадать «на глаз» и сразу переписывать код или добавлять Redis-кэш до того, как локализована реальная причина задержки.'
+  }
+];
+
+function formatTechCardRichHTML(rawStr){
+  const s = String(rawStr || '');
+  if(!s) return '';
+  const blocks = [];
+  const withPlaceholders = s.replace(/```(?:[a-z0-9_+-]+)?\s*([\s\S]*?)```/gi, function(_, codeInner){
+    const token = '@@TI_CODE_BLOCK_' + blocks.length + '@@';
+    const trimmed = String(codeInner || '').replace(/^\n+|\n+$/g, '');
+    const highlighted = (typeof highlightPythonTokens === 'function')
+      ? highlightPythonTokens(escapeHtmlStr(trimmed))
+      : escapeHtmlStr(trimmed);
+    blocks.push(`<pre class="quiz-question-code fc-code-block notranslate" translate="no" style="margin:10px 0 4px;text-align:left;"><code class="notranslate" translate="no">${highlighted}</code></pre>`);
+    return token;
+  });
+  let html = (typeof formatRichInlineText === 'function')
+    ? formatRichInlineText(withPlaceholders)
+    : escapeHtmlStr(withPlaceholders);
+  html = html.replace(/\n/g, '<br>');
+  blocks.forEach((bHtml, idx) => {
+    html = html.replace('@@TI_CODE_BLOCK_' + idx + '@@', bHtml);
+  });
+  return html;
+}
+
+function getDefaultTechInterviewState(){
+  return {
+    activeMode: 'hr',
+    subView: 'path',
+    selectedStageId: 'all',
+    openStages: { project_defense: true },
+    completedStages: {},
+    knownCards: {},
+    cardRatings: {},
+    cardIndex: 0,
+    cardFlipped: false,
+    sprintFinished: false,
+    cardOrder: null,
+    cardOrderFilter: null,
+    updatedAt: 0
+  };
+}
+
+function sanitizeTechInterviewState(raw){
+  const def = getDefaultTechInterviewState();
+  const s = (raw && typeof raw === 'object' && !Array.isArray(raw)) ? Object.assign({}, def, raw) : def;
+  s.activeMode = (s.activeMode === 'tech') ? 'tech' : 'hr';
+  s.subView = (s.subView === 'cards') ? 'cards' : 'path';
+  const validStageIds = ['all', 'weak'].concat(TECH_INTERVIEW_STAGES.map(st => st.id));
+  if(!validStageIds.includes(s.selectedStageId)) s.selectedStageId = 'all';
+  s.openStages = (s.openStages && typeof s.openStages === 'object' && !Array.isArray(s.openStages)) ? Object.assign({}, s.openStages) : { project_defense: true };
+  s.completedStages = (s.completedStages && typeof s.completedStages === 'object' && !Array.isArray(s.completedStages)) ? Object.assign({}, s.completedStages) : {};
+  s.knownCards = (s.knownCards && typeof s.knownCards === 'object' && !Array.isArray(s.knownCards)) ? Object.assign({}, s.knownCards) : {};
+  s.cardRatings = (s.cardRatings && typeof s.cardRatings === 'object' && !Array.isArray(s.cardRatings)) ? Object.assign({}, s.cardRatings) : {};
+  s.cardIndex = Math.max(0, parseInt(s.cardIndex, 10) || 0);
+  s.cardFlipped = !!s.cardFlipped;
+  s.sprintFinished = !!s.sprintFinished;
+  s.cardOrder = Array.isArray(s.cardOrder) ? s.cardOrder.slice() : null;
+  s.cardOrderFilter = (typeof s.cardOrderFilter === 'string') ? s.cardOrderFilter : null;
+  s.updatedAt = Number(s.updatedAt) || 0;
+  return s;
+}
+
+function loadTechInterviewState(){
+  try{
+    const raw = localStorage.getItem(TECH_INTERVIEW_STORE_KEY);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      return sanitizeTechInterviewState(parsed);
+    }
+  }catch(_e){}
+  return getDefaultTechInterviewState();
+}
+
+function saveTechInterviewState(nextState){
+  const target = sanitizeTechInterviewState(nextState || techInterviewState);
+  target.updatedAt = Date.now();
+  techInterviewState = target;
+  window.techInterviewState = techInterviewState;
+  try{
+    localStorage.setItem(TECH_INTERVIEW_STORE_KEY, JSON.stringify(target));
+  }catch(_e){}
+  return target;
+}
+
+function mergeTechInterviewStates(baseRaw, incomingRaw){
+  const a = sanitizeTechInterviewState(baseRaw);
+  const b = sanitizeTechInterviewState(incomingRaw);
+  const bNewer = (b.updatedAt || 0) >= (a.updatedAt || 0);
+  const merged = Object.assign({}, bNewer ? b : a);
+  merged.completedStages = Object.assign({}, a.completedStages || {});
+  Object.keys(b.completedStages || {}).forEach(k => {
+    if(b.completedStages[k]) merged.completedStages[k] = true;
+  });
+  merged.knownCards = Object.assign({}, a.knownCards || {}, b.knownCards || {});
+  Object.keys(a.knownCards || {}).forEach(k => {
+    if(a.knownCards[k] === true && !(b.knownCards && b.knownCards[k] === true && bNewer)){
+      if(!(b.knownCards && Object.prototype.hasOwnProperty.call(b.knownCards, k) && bNewer)){
+        merged.knownCards[k] = true;
+      }
+    }
+  });
+  merged.cardRatings = Object.assign({}, a.cardRatings || {}, b.cardRatings || {});
+  merged.openStages = Object.assign({}, a.openStages || {}, b.openStages || {});
+  merged.updatedAt = Math.max(a.updatedAt || 0, b.updatedAt || 0) || Date.now();
+  return sanitizeTechInterviewState(merged);
+}
+
+let techInterviewState = loadTechInterviewState();
+window.techInterviewState = techInterviewState;
+window.loadTechInterviewState = loadTechInterviewState;
+window.saveTechInterviewState = saveTechInterviewState;
+window.mergeTechInterviewStates = mergeTechInterviewStates;
+
+function getTechStageCards(stageId){
+  return TECH_INTERVIEW_CARDS.filter(c => c.stageId === stageId);
+}
+
+function getTechInterviewStats(){
+  const ti = techInterviewState || loadTechInterviewState();
+  const knownMap = ti.knownCards || {};
+  const completedStagesMap = ti.completedStages || {};
+  const totalCards = TECH_INTERVIEW_CARDS.length;
+  const doneCards = TECH_INTERVIEW_CARDS.filter(c => knownMap[c.id] === true).length;
+  const weakCount = TECH_INTERVIEW_CARDS.filter(c => knownMap[c.id] === false).length;
+  const totalStages = TECH_INTERVIEW_STAGES.length;
+  const doneStages = TECH_INTERVIEW_STAGES.filter(st => {
+    if(completedStagesMap[st.id]) return true;
+    const stCards = getTechStageCards(st.id);
+    return stCards.length > 0 && stCards.every(c => knownMap[c.id] === true);
+  }).length;
+  const totalUnits = totalCards + totalStages;
+  const doneUnits = doneCards + doneStages;
+  const overallPct = totalUnits > 0 ? Math.round((doneUnits / totalUnits) * 100) : 0;
+  return { knownMap, completedStagesMap, totalCards, doneCards, weakCount, totalStages, doneStages, overallPct };
+}
+
+function getTechInterviewPoolCards(forceReshuffle){
+  const ti = techInterviewState || loadTechInterviewState();
+  const filter = ti.selectedStageId || 'all';
+  const knownMap = ti.knownCards || {};
+  let baseCards = TECH_INTERVIEW_CARDS;
+  if(filter === 'weak'){
+    baseCards = TECH_INTERVIEW_CARDS.filter(c => knownMap[c.id] === false);
+  } else if(filter !== 'all'){
+    baseCards = TECH_INTERVIEW_CARDS.filter(c => c.stageId === filter);
+  }
+  const baseIds = baseCards.map(c => c.id);
+  const needRebuild = forceReshuffle
+    || ti.cardOrderFilter !== filter
+    || !Array.isArray(ti.cardOrder)
+    || ti.cardOrder.length !== baseIds.length
+    || baseIds.some(id => !ti.cardOrder.includes(id));
+  if(needRebuild){
+    const nextOrder = forceReshuffle ? baseIds.slice() : baseIds.slice();
+    if(forceReshuffle){
+      for(let i = nextOrder.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = nextOrder[i];
+        nextOrder[i] = nextOrder[j];
+        nextOrder[j] = tmp;
+      }
+    }
+    ti.cardOrder = nextOrder;
+    ti.cardOrderFilter = filter;
+    saveTechInterviewState(ti);
+  }
+  const byId = {};
+  baseCards.forEach(c => { byId[c.id] = c; });
+  return ti.cardOrder.map(id => byId[id]).filter(Boolean);
+}
+window.getTechInterviewPoolCards = getTechInterviewPoolCards;
+window.TECH_INTERVIEW_STAGES = TECH_INTERVIEW_STAGES;
+window.TECH_INTERVIEW_CARDS = TECH_INTERVIEW_CARDS;
+
 window.AUTH_STATUS = window.AUTH_STATUS || { checked: false, authenticated: false, site_lock_enabled: false, has_private_profile: false };
 window.PRIVATE_PROFILE_DATA = window.PRIVATE_PROFILE_DATA || null;
 let _authProfileFetchPromise = null;
@@ -59775,6 +60669,14 @@ function applyPrivateProfile(profile){
   mergeById(HR_QUESTIONS_TO_COMPANY, profile.questionsToCompany);
   mergeById(HR_SCREENING_PATH, profile.screeningPath);
   if(typeof STAR_SCENARIOS !== 'undefined') mergeById(STAR_SCENARIOS, profile.starScenarios);
+  if(profile.techInterview && typeof profile.techInterview === 'object'){
+    if(typeof TECH_INTERVIEW_STAGES !== 'undefined' && profile.techInterview.stages){
+      mergeById(TECH_INTERVIEW_STAGES, profile.techInterview.stages);
+    }
+    if(typeof TECH_INTERVIEW_CARDS !== 'undefined' && profile.techInterview.cards){
+      mergeById(TECH_INTERVIEW_CARDS, profile.techInterview.cards);
+    }
+  }
   if(Array.isArray(profile.curatedTaskIds) && profile.curatedTaskIds.length && typeof MOCK_CURATED_TASK_IDS !== 'undefined' && Array.isArray(MOCK_CURATED_TASK_IDS)){
     MOCK_CURATED_TASK_IDS.splice(0, MOCK_CURATED_TASK_IDS.length, ...profile.curatedTaskIds);
   }
@@ -60055,7 +60957,421 @@ function buildMockEventEditorHTML(){
   `;
 }
 
+function renderScreeningModeSwitcherHTML(){
+  const ti = (typeof techInterviewState !== 'undefined' && techInterviewState) ? techInterviewState : loadTechInterviewState();
+  const activeMode = (ti && ti.activeMode === 'tech') ? 'tech' : 'hr';
+  const hrStats = getHrOverallSprintStats();
+  const tiStats = getTechInterviewStats();
+  const tiUi = (window.PRIVATE_PROFILE_DATA && window.PRIVATE_PROFILE_DATA.techInterview && window.PRIVATE_PROFILE_DATA.techInterview.ui) || {};
+  const subtitle = activeMode === 'tech'
+    ? (tiUi.subtitle || '6 этапов подготовки: защита кода, PostgreSQL, FastAPI, SQLAlchemy 2.0, pytest/Docker и практические кейсы.')
+    : 'Экспресс-подготовка к первичному созвону: питч 120с, конспекты, блиц-карточки, задачи и условия оффера.';
+
+  return `
+    <div class="screening-mode-switcher-wrap">
+      <div class="screening-mode-tablist" role="tablist" aria-label="Режим тренажёра собеседования">
+        <button type="button" role="tab" id="tab-mode-hr"
+          aria-selected="${activeMode === 'hr' ? 'true' : 'false'}"
+          tabindex="${activeMode === 'hr' ? '0' : '-1'}"
+          class="screening-mode-tab ${activeMode === 'hr' ? 'active' : ''}"
+          data-screening-mode="hr">
+          <span aria-hidden="true">🎙️</span>
+          <span>HR-скрининг</span>
+          <span class="screening-mode-badge">${hrStats.doneCards}/${hrStats.totalCards}</span>
+        </button>
+        <button type="button" role="tab" id="tab-mode-tech"
+          aria-selected="${activeMode === 'tech' ? 'true' : 'false'}"
+          tabindex="${activeMode === 'tech' ? '0' : '-1'}"
+          class="screening-mode-tab ${activeMode === 'tech' ? 'active' : ''}"
+          data-screening-mode="tech">
+          <span aria-hidden="true">🛠️</span>
+          <span>Техническое интервью</span>
+          <span class="screening-mode-badge">${tiStats.doneCards}/${tiStats.totalCards}</span>
+        </button>
+      </div>
+      <div class="screening-mode-subtitle">${escapeHtmlStr(subtitle)}</div>
+    </div>
+  `;
+}
+
+function renderTechInterviewPathHTML(){
+  const ti = techInterviewState || loadTechInterviewState();
+  const knownMap = ti.knownCards || {};
+  const completedMap = ti.completedStages || {};
+  const openMap = ti.openStages || {};
+
+  let activeStageIdx = -1;
+  TECH_INTERVIEW_STAGES.forEach((st, idx) => {
+    const stCards = getTechStageCards(st.id);
+    const stCardsDone = stCards.filter(c => knownMap[c.id] === true).length;
+    const isStageDone = !!completedMap[st.id] || (stCards.length > 0 && stCardsDone === stCards.length);
+    if(!isStageDone && activeStageIdx === -1){
+      activeStageIdx = idx;
+    }
+  });
+  if(activeStageIdx === -1) activeStageIdx = TECH_INTERVIEW_STAGES.length - 1;
+
+  const stagesHTML = TECH_INTERVIEW_STAGES.map((st, idx) => {
+    const stCards = getTechStageCards(st.id);
+    const stCardsDone = stCards.filter(c => knownMap[c.id] === true).length;
+    const isManualDone = !!completedMap[st.id];
+    const isAllCardsDone = (stCards.length > 0 && stCardsDone === stCards.length);
+    const isDone = isManualDone || isAllCardsDone;
+    const isActive = (idx === activeStageIdx && !isDone);
+    const isOpen = (openMap[st.id] !== undefined) ? !!openMap[st.id] : isActive;
+    const stateCls = isDone ? 'is-done' : (isActive ? 'is-active' : '');
+    const pct = stCards.length > 0 ? Math.round((stCardsDone / stCards.length) * 100) : 0;
+
+    const cheatsheetHTML = (Array.isArray(st.cheatsheet) && st.cheatsheet.length > 0) ? `
+      <div class="ti-stage-cheatsheet">
+        <div class="ti-stage-cheatsheet-title">📌 Шпаргалка ключевых тезисов</div>
+        ${st.cheatsheet.map(item => `
+          <div class="ti-cheatsheet-item">
+            <span style="color:var(--emerald);font-weight:800;">•</span>
+            <div><b>${escapeHtmlStr(item.title)}:</b> ${formatTechCardRichHTML(item.detail)}</div>
+          </div>
+        `).join('')}
+      </div>
+    ` : '';
+
+    const checklistHTML = (Array.isArray(st.checklist) && st.checklist.length > 0) ? `
+      <div class="ti-checklist-list">
+        ${st.checklist.map(chk => `
+          <div class="ti-checklist-row">
+            <span style="color:${isDone ? '#34d399' : '#94a3b8'};font-weight:800;">${isDone ? '✓' : '○'}</span>
+            <span>${escapeHtmlStr(chk)}</span>
+          </div>
+        `).join('')}
+      </div>
+    ` : '';
+
+    return `
+      <article class="hr-path-stage-card ${stateCls}">
+        <button type="button" class="hr-path-stage-head" data-ti-toggle-stage="${st.id}" aria-expanded="${isOpen ? 'true' : 'false'}">
+          <div style="display:flex;align-items:center;gap:12px;min-width:0;flex:1;">
+            <span class="hr-path-stage-orb">${isDone ? '✓' : (isActive ? '⚡' : st.stepNum)}</span>
+            <div style="min-width:0;flex:1;">
+              <div style="font-size:0.94rem;font-weight:700;color:var(--ink);line-height:1.3;">${escapeHtmlStr(st.icon || '')} ${escapeHtmlStr(st.title)}</div>
+              <div style="font-size:0.75rem;color:var(--ink-muted);margin-top:2px;">
+                ⏱ ${escapeHtmlStr(st.duration)} · Карточки: <b style="color:${isAllCardsDone ? '#34d399' : 'var(--ink-soft)'};">${stCardsDone}/${stCards.length}</b> (${pct}%)${isManualDone ? ' · ✓ Этап отмечен' : ''}
+              </div>
+              <div class="ti-stage-progress-mini" aria-hidden="true">
+                <div class="ti-stage-progress-fill" style="width:${isDone ? 100 : pct}%;"></div>
+              </div>
+            </div>
+          </div>
+          <span style="font-size:0.78rem;color:var(--ink-muted);flex-shrink:0;">${isOpen ? '▾' : '▸'}</span>
+        </button>
+
+        ${isOpen ? `
+          <div class="hr-path-stage-body">
+            <div style="font-size:0.84rem;line-height:1.55;color:var(--ink-soft);">${escapeHtmlStr(st.goal)}</div>
+            ${cheatsheetHTML}
+            ${checklistHTML}
+            <div class="hr-path-actions-row" style="margin-top:4px;">
+              <button type="button" class="hr-path-action-chip ti-touch-btn" data-ti-open-stage-cards="${st.id}">
+                <span>🗂️ Блиц-карточки этапа</span>
+                <span style="font-family:var(--font-m);opacity:0.85;">${stCardsDone}/${stCards.length} ➔</span>
+              </button>
+              <button type="button" class="ti-stage-done-toggle ti-touch-btn ${isManualDone ? 'is-done' : ''}" data-ti-toggle-stage-done="${st.id}" aria-pressed="${isManualDone ? 'true' : 'false'}">
+                <span>${isManualDone ? '✓ Этап пройден' : 'Отметить этап пройденным'}</span>
+              </button>
+            </div>
+          </div>
+        ` : ''}
+      </article>
+    `;
+  }).join('');
+
+  return `
+    <div class="hr-path-zen-container">
+      <div class="hr-path-stack">
+        ${stagesHTML}
+      </div>
+
+      <div class="mock-flat-section" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div style="min-width:0;flex:1 1 240px;">
+          <div style="font-size:0.86rem;font-weight:700;color:var(--ink);">Сквозная тренировка по всем 36 блиц-карточкам</div>
+          <div style="font-size:0.78rem;color:var(--ink-muted);margin-top:2px;">Фильтруйте по нужному этапу или прогоните весь пул целиком с ловушками интервьюера.</div>
+        </div>
+        <button type="button" class="btn btn-primary dominant-btn ti-touch-btn" data-ti-open-stage-cards="all" style="padding:9px 18px;font-size:0.82rem;font-weight:700;border-radius:12px;">
+          Все 36 карточек ➔
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function renderTechInterviewCardsHTML(){
+  const ti = techInterviewState || loadTechInterviewState();
+  const filter = ti.selectedStageId || 'all';
+  const allCards = TECH_INTERVIEW_CARDS;
+  const knownMap = ti.knownCards || {};
+  const weakCards = allCards.filter(c => knownMap[c.id] === false);
+  const filteredCards = getTechInterviewPoolCards(false);
+
+  const knownCount = allCards.filter(c => knownMap[c.id] === true).length;
+  const pct = allCards.length > 0 ? Math.round((knownCount / allCards.length) * 100) : 0;
+
+  const filterChips = [
+    { key: 'all', label: `Все этапы (${allCards.length})` }
+  ].concat(TECH_INTERVIEW_STAGES.map(st => {
+    const stCards = getTechStageCards(st.id);
+    const stDone = stCards.filter(c => knownMap[c.id] === true).length;
+    return { key: st.id, label: `${st.icon} ${st.shortTitle} (${stDone}/${stCards.length})` };
+  })).concat([
+    { key: 'weak', label: `↺ Повторить (${weakCards.length})`, isWeak: true }
+  ]);
+
+  const catChipsHTML = filterChips.map(cat => {
+    const isWeak = !!cat.isWeak;
+    const isAct = (filter === cat.key);
+    const borderCol = isAct ? (isWeak ? 'var(--danger)' : 'var(--emerald)') : (isWeak && weakCards.length > 0 ? 'rgba(244,63,94,0.45)' : 'var(--line)');
+    const bgCol = isAct ? (isWeak ? 'rgba(244,63,94,0.18)' : 'var(--emerald-soft)') : 'transparent';
+    const textCol = isAct ? (isWeak ? 'var(--danger)' : 'var(--emerald)') : (isWeak && weakCards.length > 0 ? '#fb7185' : 'var(--ink)');
+
+    return `
+      <button type="button" class="btn btn-ghost ${isAct?'active':''}" data-ti-filter="${cat.key}"
+        style="padding:6px 12px;min-height:36px;font-size:0.78rem;border-radius:999px;border:1px solid ${borderCol};background:${bgCol};color:${textCol};white-space:nowrap;flex-shrink:0;">
+        ${escapeHtmlStr(cat.label)}
+      </button>
+    `;
+  }).join('');
+
+  const topControlsBar = `
+    <div class="hr-terms-top-bar" style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;">
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;align-items:center;min-width:0;flex:1;">
+        ${catChipsHTML}
+      </div>
+      <div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;">
+        <button type="button" class="btn btn-ghost" data-ti-shuffle-cards="true" title="Перемешать карточки" style="padding:4px 10px;min-height:34px;border-radius:999px;border:1px solid var(--line);font-size:0.78rem;line-height:1.2;cursor:pointer;">🔀</button>
+        <div class="hr-srs-status-chip" style="display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:999px;background:var(--emerald-soft);border:1px solid rgba(16,185,129,0.3);font-size:0.76rem;font-weight:700;color:var(--emerald);white-space:nowrap;flex-shrink:0;">
+          <span style="color:#f59e0b;">⚡</span> ${knownCount} / ${allCards.length} · ${pct}%
+        </div>
+      </div>
+    </div>
+  `;
+
+  if(filter === 'weak' && weakCards.length === 0){
+    return `
+      <div class="hr-terms-wrapper">
+        ${topControlsBar}
+        <div class="card srs-empty-glow-card" style="max-width:600px;margin:20px auto 8px;text-align:center;padding:36px 24px;border-radius:24px;">
+          <div style="font-size:2.4rem;margin-bottom:10px;">✨</div>
+          <h3 style="margin:0 0 8px 0;font-size:1.28rem;font-weight:800;color:var(--emerald);">Карточек на повторение нет!</h3>
+          <p style="margin:0 0 18px 0;font-size:0.88rem;color:var(--ink-soft);line-height:1.55;max-width:420px;margin-left:auto;margin-right:auto;">Все отмеченные карточки усвоены. Откройте полный пул из 36 вопросов или вернитесь на дорожную карту этапов.</p>
+          <button type="button" class="btn btn-primary dominant-btn ti-touch-btn" data-ti-filter="all" style="padding:10px 22px;font-weight:700;border-radius:14px;">Показать все карточки (${allCards.length})</button>
+        </div>
+      </div>
+    `;
+  }
+
+  const currentStage = TECH_INTERVIEW_STAGES.find(st => st.id === filter) || null;
+  if(ti.sprintFinished){
+    const nextStage = currentStage ? TECH_INTERVIEW_STAGES.find(st => st.stepNum === currentStage.stepNum + 1) : null;
+    return `
+      <div class="hr-terms-wrapper">
+        ${topControlsBar}
+        <div class="card srs-empty-glow-card srs-zen-rest-screen" style="max-width:600px;margin:20px auto 8px;text-align:center;padding:36px 24px;border-radius:24px;">
+          <div style="font-size:2.8rem;margin-bottom:10px;display:inline-block;filter:drop-shadow(0 0 16px rgba(16,185,129,0.45));">✨</div>
+          <div style="display:inline-block;padding:4px 12px;border-radius:999px;background:rgba(16,185,129,0.15);color:#10b981;font-size:0.74rem;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.06em;">
+            ${currentStage ? `Этап «${escapeHtmlStr(currentStage.title)}» проработан` : 'Спринт техсобеса завершён'}
+          </div>
+          <h2 style="font-size:1.35rem;font-weight:800;color:var(--ink);margin:0 0 8px;">
+            ${currentStage ? 'Все 6 карточек этапа пройдены' : 'Колода техсобеса отработана'}
+          </h2>
+          <p style="font-size:0.90rem;color:var(--ink-muted);max-width:440px;margin:0 auto 20px;line-height:1.55;">
+            Освоено: <b style="color:var(--emerald);">${knownCount} из ${allCards.length}</b> карточек. Вы можете перейти к следующему этапу или повторить колоду.
+          </p>
+          <div style="display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;max-width:460px;margin:0 auto;">
+            ${nextStage ? `
+              <button type="button" class="btn btn-primary dominant-btn ti-touch-btn" data-ti-filter="${nextStage.id}" style="width:100%;padding:11px 22px;font-weight:700;border-radius:14px;">
+                К этапу ${nextStage.stepNum}: ${escapeHtmlStr(nextStage.title)} ➔
+              </button>
+            ` : `
+              <button type="button" class="btn btn-primary dominant-btn ti-touch-btn" data-ti-subview="path" style="width:100%;padding:11px 22px;font-weight:700;border-radius:14px;">
+                Вернуться к 6 этапам ➔
+              </button>
+            `}
+            <button type="button" class="btn btn-ghost ti-touch-btn" data-ti-restart-cards="true" style="padding:9px 18px;border:1px solid var(--line);border-radius:12px;font-size:0.84rem;font-weight:600;">
+              Повторить колоду ещё раз ↺
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  let curIdx = ti.cardIndex || 0;
+  if(curIdx >= filteredCards.length) curIdx = 0;
+  ti.cardIndex = curIdx;
+
+  const card = filteredCards[curIdx] || allCards[0];
+  const isFlipped = !!ti.cardFlipped;
+  const totalInFilter = filteredCards.length;
+
+  const SPRINT_SIZE = 15;
+  let startIdx = 0;
+  let endIdx = totalInFilter;
+  if(totalInFilter > SPRINT_SIZE){
+    const half = Math.floor(SPRINT_SIZE / 2);
+    startIdx = Math.max(0, Math.min(totalInFilter - SPRINT_SIZE, curIdx - half));
+    endIdx = Math.min(totalInFilter, startIdx + SPRINT_SIZE);
+  }
+  const jewelsHTML = [];
+  for(let i = startIdx; i < endIdx; i++){
+    const cItem = filteredCards[i];
+    const isCur = (i === curIdx);
+    const isDone = (knownMap[cItem.id] === true);
+    let cls = 'dot-jewel';
+    if(isCur){
+      cls += ' active bead-active-leading';
+    } else if(isDone){
+      cls += ' done bead-done rating-easy';
+    } else {
+      cls += ' future bead-future';
+    }
+    const cleanTitleQ = String(cItem.q || '').replace(/```[\s\S]*?```/g, '').replace(/`/g, '').replace(/\s+/g, ' ').trim();
+    const titleAttr = `Карточка ${i + 1} из ${totalInFilter}: ${escapeHtmlStr(cleanTitleQ.slice(0, 45))}...`;
+    jewelsHTML.push(`<span class="${cls}" data-ti-goto-card="${i}" role="button" tabindex="0" title="${titleAttr}"></span>`);
+  }
+
+  const cardStatusBadge = knownMap[card.id] === true
+    ? '<span class="srs-card-status-badge" style="display:inline-flex;align-items:center;padding:0 9px;height:24px;border-radius:999px;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.35);color:#34d399;font-size:0.72rem;font-weight:700;white-space:nowrap;">✓ Знаю</span>'
+    : (knownMap[card.id] === false ? '<span class="srs-card-status-badge" style="display:inline-flex;align-items:center;padding:0 9px;height:24px;border-radius:999px;background:rgba(244,63,94,0.14);border:1px solid rgba(244,63,94,0.35);color:#fda4af;font-size:0.72rem;font-weight:700;white-space:nowrap;">↺ Повторить</span>' : '');
+
+  const formattedQ = formatTechCardRichHTML(card.q);
+  const formattedAnswer = formatTechCardRichHTML(card.answer);
+  const formattedTrap = formatTechCardRichHTML(card.trap);
+
+  return `
+    <div class="hr-terms-wrapper">
+      ${topControlsBar}
+
+      <div class="srs-deck-beads-bar srs-beads-pure-floating" style="display:flex;align-items:center;justify-content:center;margin:0 auto 16px;padding:0;background:transparent;border:none;box-shadow:none;">
+        <div class="srs-beads-necklace fc-beads-necklace" style="display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto;padding:2px 0;background:transparent;border:none;box-shadow:none;">
+          ${jewelsHTML.join('')}
+        </div>
+      </div>
+
+      <div class="cards-hub-content" style="width:100%;max-width:700px;margin:0 auto;box-sizing:border-box;">
+        <main class="srs-card-stage fc-stage" style="width:100%;max-width:700px;margin:0 auto;padding:0;perspective:1200px;box-sizing:border-box;">
+          <div class="fc-card demo-card ti-card-rich ${isFlipped ? 'is-flipped fc-card--flipped' : ''}" id="ti-active-card" data-flipped="${isFlipped ? 'true' : 'false'}" data-ti-flip="true" style="width:100%;max-width:700px;box-sizing:border-box;">
+
+            <div class="card-face card-front fc-card-front">
+              <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;">
+                <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
+                  <span class="srs-card-status-badge" style="display:inline-flex;align-items:center;padding:0 10px;height:24px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);font-size:0.72rem;font-weight:700;color:var(--ink-soft);white-space:nowrap;">
+                    ${escapeHtmlStr(card.stageLabel)}
+                  </span>
+                  ${cardStatusBadge}
+                </div>
+                <div class="fc-top-actions-cluster" style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                  <span class="fc-card-counter-badge">${curIdx + 1} / ${filteredCards.length}</span>
+                </div>
+              </div>
+
+              <div class="fc-card-body fc-q" style="margin:0;padding:12px 0 16px;font-size:clamp(1.08rem, 2vw, 1.28rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
+                ${formattedQ}
+              </div>
+            </div>
+
+            <div class="card-face card-back fc-card-back">
+              <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;">
+                <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
+                  <span class="srs-card-otvet-chip" style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.20);border:1px solid rgba(16,185,129,0.50);padding:0 10px;height:26px;min-height:26px;line-height:24px;border-radius:999px;box-shadow:0 0 12px rgba(16,185,129,0.28);white-space:nowrap;flex-shrink:0;box-sizing:border-box;">✓ Ответ</span>
+                  ${cardStatusBadge}
+                </div>
+                <div class="fc-top-actions-cluster" style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                  <span class="fc-card-counter-badge">${curIdx + 1} / ${filteredCards.length}</span>
+                  <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" data-ti-flip="true" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--ink-soft);font-size:0.74rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;height:26px;min-height:26px;line-height:24px;padding:0 12px;border-radius:999px;box-sizing:border-box;transition:all .15s ease;">← К вопросу <span class="hide-on-mobile"><span class="fc-kbd-sep"> </span><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span></button>
+                </div>
+              </div>
+
+              <div class="fc-card-body" style="margin:auto 0;padding:12px 0;width:100%;">
+                <div class="fc-q-sub" style="font-size:0.86rem;font-weight:600;line-height:1.4;color:#a7f3d0;opacity:0.88;margin-bottom:6px;">${formattedQ}</div>
+                <div class="fc-divider" style="height:1px;background:linear-gradient(90deg, transparent, rgba(52,211,153,0.30), transparent);margin:6px 0 10px;"></div>
+                <div class="fc-a-mastery" style="font-size:0.98rem;line-height:1.58;color:#ffffff;font-weight:500;">${formattedAnswer}</div>
+                ${card.trap ? `
+                  <div class="ti-trap-callout">
+                    <div class="ti-trap-callout-title">⚠️ Ловушка интервьюера / На что смотрят</div>
+                    <div class="ti-trap-callout-body">${formattedTrap}</div>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+
+          </div>
+        </main>
+
+        <footer class="srs-action-dock" style="margin-top:14px;">
+          <button type="button" class="btn-cta-dominant btn-glass-emerald btn-style-glass btn-sprint-cta ti-touch-btn ${isFlipped ? 'srs-hidden' : ''}" id="ti-btn-show-answer" data-ti-flip="true" style="${isFlipped ? 'display:none !important;' : 'display:flex !important;'}">
+            <span>Показать ответ</span>
+          </button>
+
+          <div class="srs-rating-grid card-rating-grid hr-rating-grid ${isFlipped ? '' : 'srs-hidden'}" id="ti-rating-panel" style="${isFlipped ? 'display:grid !important;' : 'display:none !important;'}">
+            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--again fc-rate-btn--again ti-touch-btn" data-ti-rate="repeat" data-card-id="${card.id}">
+              <span class="srs-btn-title">↺ Повторить</span>
+              <span class="kbd-badge hide-on-mobile" style="font-size:0.7rem;opacity:0.7;">1</span>
+            </button>
+            <button type="button" class="fc-rate-btn card-rating-btn card-rating-btn--good fc-rate-btn--good action-accent ti-touch-btn" data-ti-rate="know" data-card-id="${card.id}">
+              <span class="srs-btn-title">✓ Знаю</span>
+              <span class="kbd-badge hide-on-mobile" style="font-size:0.7rem;opacity:0.7;">2</span>
+            </button>
+          </div>
+        </footer>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;">
+          <button type="button" class="btn btn-ghost ti-touch-btn" data-ti-prev="true" style="padding:7px 16px;border:1px solid var(--line);border-radius:12px;font-size:0.82rem;" ${curIdx===0?'disabled':''}>← Предыдущая</button>
+          <div class="hide-on-mobile" style="font-size:0.76rem;color:var(--ink-muted);">Горячие клавиши: <b>Пробел</b> — оборот · <b>1–2</b> — оценка · <b>←/→</b> — навигация</div>
+          <button type="button" class="btn btn-ghost ti-touch-btn" data-ti-next="true" style="padding:7px 16px;border:1px solid var(--line);border-radius:12px;font-size:0.82rem;" ${curIdx===filteredCards.length-1?'disabled':''}>Следующая →</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderTechInterviewRoomHTML(){
+  const ti = techInterviewState || loadTechInterviewState();
+  const subView = ti.subView === 'cards' ? 'cards' : 'path';
+  const tiStats = getTechInterviewStats();
+
+  const innerHTML = (subView === 'cards')
+    ? renderTechInterviewCardsHTML()
+    : renderTechInterviewPathHTML();
+
+  return `
+    <div class="ti-room-shell">
+      <div class="mock-subtabs-bar" role="tablist" aria-label="Разделы технического интервью">
+        <button type="button" role="tab" aria-selected="${subView==='path'?'true':'false'}" class="mock-subtab-btn ti-touch-btn ${subView==='path'?'active':''}" data-ti-subview="path">
+          <span>Путь (6 этапов)</span>
+          <span class="mock-subtab-badge">${tiStats.doneStages}/${tiStats.totalStages}</span>
+        </button>
+        <button type="button" role="tab" aria-selected="${subView==='cards'?'true':'false'}" class="mock-subtab-btn ti-touch-btn ${subView==='cards'?'active':''}" data-ti-subview="cards">
+          <span>Блиц-карточки</span>
+          <span class="mock-subtab-badge">${tiStats.doneCards}/${tiStats.totalCards}</span>
+        </button>
+      </div>
+      ${innerHTML}
+    </div>
+  `;
+}
+
 function renderHrSprintRoomHTML(){
+  const ti = (typeof techInterviewState !== 'undefined' && techInterviewState) ? techInterviewState : loadTechInterviewState();
+  const activeMode = (ti && ti.activeMode === 'tech') ? 'tech' : 'hr';
+
+  if(activeMode === 'tech'){
+    return `
+      <div class="hr-sprint-container">
+        ${renderScreeningModeSwitcherHTML()}
+        <div role="tabpanel" aria-labelledby="tab-mode-tech" tabindex="0">
+          ${renderTechInterviewRoomHTML()}
+        </div>
+      </div>
+    `;
+  }
+
   mockInterviewState.hrSubTab = mockInterviewState.hrSubTab || 'path';
   if(['questions', 'pitch', 'offer', 'plan'].includes(mockInterviewState.hrSubTab)){
     mockInterviewState.hrRehearsalSubTab = mockInterviewState.hrSubTab === 'offer' ? 'plan' : mockInterviewState.hrSubTab;
@@ -60119,25 +61435,28 @@ function renderHrSprintRoomHTML(){
 
   return `
     <div class="hr-sprint-container">
-      <div class="mock-subtabs-bar" role="tablist" aria-label="Этапы подготовки к скринингу">
-        <button type="button" class="mock-subtab-btn ${mockInterviewState.hrSubTab==='path'?'active':''}" data-hr-subtab="path">
-          <span>Путь</span> <span class="mock-subtab-badge">5</span>
-        </button>
-        <button type="button" class="mock-subtab-btn ${mockInterviewState.hrSubTab==='notes'?'active':''}" data-hr-subtab="notes">
-          <span>Конспекты</span> <span class="mock-subtab-badge">${HR_NOTES.length}</span>
-        </button>
-        <button type="button" class="mock-subtab-btn ${mockInterviewState.hrSubTab==='terms'?'active':''}" data-hr-subtab="terms">
-          <span>Карточки</span> <span class="mock-subtab-badge">${HR_KEYWORD_CARDS.length}</span>
-        </button>
-        <button type="button" class="mock-subtab-btn ${mockInterviewState.hrSubTab==='tasks'?'active':''}" data-hr-subtab="tasks">
-          <span>Задачи</span> <span class="mock-subtab-badge">${HR_PRACTICE_TASKS.length}</span>
-        </button>
-        <button type="button" class="mock-subtab-btn ${mockInterviewState.hrSubTab==='rehearsal'?'active':''}" data-hr-subtab="rehearsal">
-          <span>Репетиция HR</span>
-        </button>
-      </div>
+      ${renderScreeningModeSwitcherHTML()}
+      <div role="tabpanel" aria-labelledby="tab-mode-hr" tabindex="0">
+        <div class="mock-subtabs-bar" role="tablist" aria-label="Этапы подготовки к скринингу">
+          <button type="button" class="mock-subtab-btn ${mockInterviewState.hrSubTab==='path'?'active':''}" data-hr-subtab="path">
+            <span>Путь</span> <span class="mock-subtab-badge">5</span>
+          </button>
+          <button type="button" class="mock-subtab-btn ${mockInterviewState.hrSubTab==='notes'?'active':''}" data-hr-subtab="notes">
+            <span>Конспекты</span> <span class="mock-subtab-badge">${HR_NOTES.length}</span>
+          </button>
+          <button type="button" class="mock-subtab-btn ${mockInterviewState.hrSubTab==='terms'?'active':''}" data-hr-subtab="terms">
+            <span>Карточки</span> <span class="mock-subtab-badge">${HR_KEYWORD_CARDS.length}</span>
+          </button>
+          <button type="button" class="mock-subtab-btn ${mockInterviewState.hrSubTab==='tasks'?'active':''}" data-hr-subtab="tasks">
+            <span>Задачи</span> <span class="mock-subtab-badge">${HR_PRACTICE_TASKS.length}</span>
+          </button>
+          <button type="button" class="mock-subtab-btn ${mockInterviewState.hrSubTab==='rehearsal'?'active':''}" data-hr-subtab="rehearsal">
+            <span>Репетиция HR</span>
+          </button>
+        </div>
 
-      ${innerHTML}
+        ${innerHTML}
+      </div>
     </div>
   `;
 }
@@ -61456,13 +62775,15 @@ function viewMockInterview(){
     mockInterviewState.tab = 'star';
   }
 
+  const tiActive = (typeof techInterviewState !== 'undefined' && techInterviewState && techInterviewState.activeMode === 'tech');
   const sprintStats = getHrOverallSprintStats();
-  const slimHeaderHTML = buildMockSlimHeaderHTML(sprintStats.overallPct);
+  const activePct = (mockInterviewState.tab === 'hr' && tiActive) ? getTechInterviewStats().overallPct : sprintStats.overallPct;
+  const slimHeaderHTML = buildMockSlimHeaderHTML(activePct);
   const eventEditorHTML = buildMockEventEditorHTML();
 
   const curTab = mockInterviewState.tab || 'hr';
   const curHrSub = mockInterviewState.hrSubTab || 'path';
-  const isWideMock = (curTab === 'live') || (curTab === 'star') || (curTab === 'hr' && ['notes', 'tasks', 'rehearsal'].includes(curHrSub));
+  const isWideMock = (curTab === 'live') || (curTab === 'star') || (curTab === 'hr' && !tiActive && ['notes', 'tasks', 'rehearsal'].includes(curHrSub));
 
   let bodyHTML = '';
   if(curTab === 'hr'){
@@ -70540,8 +71861,72 @@ document.addEventListener('click', function(e){
 });
 
 document.addEventListener('keydown', function(e){
+  const activeModeTab = (e.target && e.target.closest) ? e.target.closest('.screening-mode-tab') : null;
+  if(activeModeTab && ['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)){
+    e.preventDefault();
+    const curMode = activeModeTab.getAttribute('data-screening-mode') || 'hr';
+    const nextMode = (e.key === 'Home') ? 'hr' : (e.key === 'End' ? 'tech' : (curMode === 'hr' ? 'tech' : 'hr'));
+    if(typeof techInterviewState !== 'undefined' && typeof saveTechInterviewState === 'function'){
+      techInterviewState.activeMode = nextMode;
+      saveTechInterviewState(techInterviewState);
+      render();
+      const nextEl = document.getElementById(nextMode === 'tech' ? 'tab-mode-tech' : 'tab-mode-hr');
+      if(nextEl && typeof nextEl.focus === 'function') nextEl.focus();
+    }
+    return;
+  }
   if(mockInterviewState.tab === 'hr'){
-    if(mockInterviewState.hrSubTab === 'tasks'){
+    const tiActive = (typeof techInterviewState !== 'undefined' && techInterviewState && techInterviewState.activeMode === 'tech');
+    if(tiActive){
+      if(techInterviewState.subView === 'cards'){
+        const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+        if(tag !== 'input' && tag !== 'textarea'){
+          if(e.code === 'Space'){
+            e.preventDefault();
+            techInterviewState.cardFlipped = !techInterviewState.cardFlipped;
+            if(typeof playSound === 'function') playSound('flip');
+            saveTechInterviewState(techInterviewState);
+            render();
+            return;
+          } else if(['1','2'].includes(e.key) && techInterviewState.cardFlipped){
+            e.preventDefault();
+            const targetRate = e.key === '2' ? 'know' : 'repeat';
+            const rateBtn = document.querySelector('[data-ti-rate="' + targetRate + '"]');
+            if(rateBtn) rateBtn.click();
+            return;
+          } else if(e.key === 'ArrowRight'){
+            e.preventDefault();
+            const pool = (typeof getTechInterviewPoolCards === 'function') ? getTechInterviewPoolCards(false) : TECH_INTERVIEW_CARDS;
+            if(techInterviewState.cardIndex < pool.length - 1){
+              techInterviewState.cardIndex++;
+              techInterviewState.cardFlipped = false;
+              saveTechInterviewState(techInterviewState);
+              render();
+            }
+            return;
+          } else if(e.key === 'ArrowLeft'){
+            e.preventDefault();
+            if(techInterviewState.cardFlipped){
+              techInterviewState.cardFlipped = false;
+              saveTechInterviewState(techInterviewState);
+              render();
+            } else if(techInterviewState.cardIndex > 0){
+              techInterviewState.cardIndex--;
+              techInterviewState.cardFlipped = false;
+              saveTechInterviewState(techInterviewState);
+              render();
+            }
+            return;
+          } else if(e.key === 'Escape' && techInterviewState.cardFlipped){
+            e.preventDefault();
+            techInterviewState.cardFlipped = false;
+            saveTechInterviewState(techInterviewState);
+            render();
+            return;
+          }
+        }
+      }
+    } else if(mockInterviewState.hrSubTab === 'tasks'){
       if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
         e.preventDefault();
         const runBtn = document.querySelector('[data-hr-task-run]');
@@ -70981,6 +72366,18 @@ function importAndMergeBackupJsonString(rawText){
 
   }
 
+  if(parsed && parsed.techInterviewState && typeof parsed.techInterviewState === 'object' && typeof mergeTechInterviewStates === 'function' && typeof saveTechInterviewState === 'function'){
+
+    const curTi = (typeof loadTechInterviewState === 'function') ? loadTechInterviewState() : {};
+
+    const mergedTi = mergeTechInterviewStates(curTi, parsed.techInterviewState);
+
+    if(typeof techInterviewState !== 'undefined') techInterviewState = mergedTi;
+
+    saveTechInterviewState(mergedTi);
+
+  }
+
 }
 
 
@@ -71015,7 +72412,9 @@ function openHandoverModal(){
 
     ideStatus: getIdeSolvedMap(),
 
-    ideDrafts: safeParseJsonObj(localStorage.getItem(IDE_DRAFTS_KEY)) || {}
+    ideDrafts: safeParseJsonObj(localStorage.getItem(IDE_DRAFTS_KEY)) || {},
+
+    techInterviewState: (typeof loadTechInterviewState === 'function' ? loadTechInterviewState() : null)
 
   };
 
@@ -76943,6 +78342,135 @@ window.animateCardFlip = animateCardFlip;
   if(e.target.closest('[data-open-hr-sprint]')){
     mockInterviewState.tab = 'hr';
     window.location.hash = '#/mock';
+    render();
+    return;
+  }
+  const screeningModeBtn = e.target.closest('[data-screening-mode]');
+  if(screeningModeBtn){
+    const nextMode = screeningModeBtn.getAttribute('data-screening-mode') === 'tech' ? 'tech' : 'hr';
+    techInterviewState.activeMode = nextMode;
+    saveTechInterviewState(techInterviewState);
+    if(typeof playSound === 'function') playSound('tick');
+    render();
+    return;
+  }
+  const tiSubviewBtn = e.target.closest('[data-ti-subview]');
+  if(tiSubviewBtn){
+    techInterviewState.subView = tiSubviewBtn.getAttribute('data-ti-subview') === 'cards' ? 'cards' : 'path';
+    techInterviewState.sprintFinished = false;
+    saveTechInterviewState(techInterviewState);
+    if(typeof playSound === 'function') playSound('tick');
+    render();
+    return;
+  }
+  const tiToggleStageBtn = e.target.closest('[data-ti-toggle-stage]');
+  if(tiToggleStageBtn){
+    const stId = tiToggleStageBtn.getAttribute('data-ti-toggle-stage');
+    techInterviewState.openStages = techInterviewState.openStages || {};
+    techInterviewState.openStages[stId] = !techInterviewState.openStages[stId];
+    saveTechInterviewState(techInterviewState);
+    render();
+    return;
+  }
+  const tiToggleDoneBtn = e.target.closest('[data-ti-toggle-stage-done]');
+  if(tiToggleDoneBtn){
+    const stId = tiToggleDoneBtn.getAttribute('data-ti-toggle-stage-done');
+    techInterviewState.completedStages = techInterviewState.completedStages || {};
+    techInterviewState.completedStages[stId] = !techInterviewState.completedStages[stId];
+    saveTechInterviewState(techInterviewState);
+    if(typeof playSound === 'function') playSound(techInterviewState.completedStages[stId] ? 'success' : 'tick');
+    render();
+    return;
+  }
+  const tiOpenStageCardsBtn = e.target.closest('[data-ti-open-stage-cards]');
+  if(tiOpenStageCardsBtn){
+    const stId = tiOpenStageCardsBtn.getAttribute('data-ti-open-stage-cards') || 'all';
+    techInterviewState.subView = 'cards';
+    techInterviewState.selectedStageId = stId;
+    techInterviewState.cardOrder = null;
+    techInterviewState.cardIndex = 0;
+    techInterviewState.cardFlipped = false;
+    techInterviewState.sprintFinished = false;
+    saveTechInterviewState(techInterviewState);
+    if(typeof playSound === 'function') playSound('tick');
+    render();
+    return;
+  }
+  const tiFilterBtn = e.target.closest('[data-ti-filter]');
+  if(tiFilterBtn){
+    techInterviewState.selectedStageId = tiFilterBtn.getAttribute('data-ti-filter') || 'all';
+    techInterviewState.cardOrder = null;
+    techInterviewState.cardIndex = 0;
+    techInterviewState.cardFlipped = false;
+    techInterviewState.sprintFinished = false;
+    saveTechInterviewState(techInterviewState);
+    render();
+    return;
+  }
+  if(e.target.closest('[data-ti-flip]')){
+    techInterviewState.cardFlipped = !techInterviewState.cardFlipped;
+    saveTechInterviewState(techInterviewState);
+    if(typeof playSound === 'function') playSound('flip');
+    render();
+    return;
+  }
+  if(e.target.closest('[data-ti-prev]')){
+    if(techInterviewState.cardIndex > 0) techInterviewState.cardIndex--;
+    techInterviewState.cardFlipped = false;
+    techInterviewState.sprintFinished = false;
+    saveTechInterviewState(techInterviewState);
+    render();
+    return;
+  }
+  if(e.target.closest('[data-ti-next]')){
+    const pool = (typeof getTechInterviewPoolCards === 'function') ? getTechInterviewPoolCards(false) : TECH_INTERVIEW_CARDS;
+    if(techInterviewState.cardIndex < pool.length - 1) techInterviewState.cardIndex++;
+    techInterviewState.cardFlipped = false;
+    techInterviewState.sprintFinished = false;
+    saveTechInterviewState(techInterviewState);
+    render();
+    return;
+  }
+  const tiGotoCardBtn = e.target.closest('[data-ti-goto-card]');
+  if(tiGotoCardBtn){
+    techInterviewState.cardIndex = parseInt(tiGotoCardBtn.getAttribute('data-ti-goto-card'), 10) || 0;
+    techInterviewState.cardFlipped = false;
+    techInterviewState.sprintFinished = false;
+    saveTechInterviewState(techInterviewState);
+    if(typeof playSound === 'function') playSound('tick');
+    render();
+    return;
+  }
+  if(e.target.closest('[data-ti-restart-cards]') || e.target.closest('[data-ti-shuffle-cards]')){
+    if(typeof getTechInterviewPoolCards === 'function') getTechInterviewPoolCards(true);
+    techInterviewState.cardIndex = 0;
+    techInterviewState.cardFlipped = false;
+    techInterviewState.sprintFinished = false;
+    saveTechInterviewState(techInterviewState);
+    if(typeof playSound === 'function') playSound('tick');
+    render();
+    return;
+  }
+  const tiRateBtn = e.target.closest('[data-ti-rate]');
+  if(tiRateBtn){
+    const cardId = tiRateBtn.getAttribute('data-card-id');
+    const rateKind = tiRateBtn.getAttribute('data-ti-rate');
+    const isKnown = (rateKind === 'know');
+    techInterviewState.knownCards = techInterviewState.knownCards || {};
+    techInterviewState.cardRatings = techInterviewState.cardRatings || {};
+    techInterviewState.knownCards[cardId] = isKnown;
+    techInterviewState.cardRatings[cardId] = isKnown ? 3 : 1;
+    if(typeof addXp === 'function') addXp(isKnown ? 10 : 2);
+    if(typeof playSound === 'function') playSound('rate', isKnown ? 3 : 1);
+    const pool = (typeof getTechInterviewPoolCards === 'function') ? getTechInterviewPoolCards(false) : TECH_INTERVIEW_CARDS;
+    if(techInterviewState.cardIndex >= pool.length - 1){
+      techInterviewState.sprintFinished = true;
+      if(typeof playSound === 'function') playSound('success');
+    } else {
+      techInterviewState.cardIndex++;
+      techInterviewState.cardFlipped = false;
+    }
+    saveTechInterviewState(techInterviewState);
     render();
     return;
   }
