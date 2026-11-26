@@ -31,6 +31,12 @@ EXTRA_F_BY_SKILL = {
 
 EXPLICIT_DECKS_BY_SKILL = {
     '1.9.1': ['Ф-081', 'Ф-082', 'Ф-083', 'Ф-252', 'Ф-253', 'Ф-255'],
+    '5.5.1': ['Ф-162'],
+    '5.5.2': ['Ф-163'],
+    '5.5.3': ['Ф-161', 'Ф-164'],
+    '6.2.1': ['Ф-175'],
+    '6.6.2': ['Ф-177'],
+    '7.6.1': ['Ф-186', 'Ф-217', 'Ф-218'],
 }
 
 # Explicit mapping of Python, Web, Backend, Algorithms, Databases, Architecture, and Infrastructure skills to their best matching IDE task IDs from TASKS_381

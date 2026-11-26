@@ -123,7 +123,7 @@ const engine = extractChunkingEngine(standardsHtml);
 const { splitStepHtmlIntoChunks, getStepChunks } = engine;
 
 // ============================================================================
-// TEST 1: 100% Coverage of All 246 Notes & 1223 Steps
+// TEST 1: 100% Coverage of All 246 Notes & 1229 Steps
 // ============================================================================
 function test01_FullCoverage() {
   const noteIds = Object.keys(allNotes);
@@ -140,8 +140,8 @@ function test01_FullCoverage() {
     });
   }
 
-  assert.strictEqual(totalSteps, 1223, `Expected exactly 1223 total steps, found ${totalSteps}`);
-  console.log(`✓ Test 1 Passed: 100% coverage verified (246 notes, 1223 steps across all 8 tracks)`);
+  assert.strictEqual(totalSteps, 1229, `Expected exactly 1229 total steps, found ${totalSteps}`);
+  console.log(`✓ Test 1 Passed: 100% coverage verified (246 notes, 1229 steps across all 8 tracks)`);
 }
 
 // ============================================================================
