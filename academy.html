@@ -59752,9 +59752,18 @@ function applyPrivateProfile(profile){
   window.PRIVATE_PROFILE_DATA = profile;
   const mergeById = (arr, map) => {
     if(!Array.isArray(arr) || !map || typeof map !== 'object') return;
+    const existingIds = new Set();
     arr.forEach(item => {
-      if(item && item.id && map[item.id] && typeof map[item.id] === 'object'){
-        Object.assign(item, map[item.id]);
+      if(item && item.id){
+        existingIds.add(item.id);
+        if(map[item.id] && typeof map[item.id] === 'object'){
+          Object.assign(item, map[item.id]);
+        }
+      }
+    });
+    Object.keys(map).forEach(id => {
+      if(!existingIds.has(id) && map[id] && typeof map[id] === 'object'){
+        arr.push(Object.assign({ id }, map[id]));
       }
     });
   };
@@ -59765,15 +59774,28 @@ function applyPrivateProfile(profile){
   mergeById(HR_UNCOMFORTABLE_QUESTIONS, profile.uncomfortableQuestions);
   mergeById(HR_QUESTIONS_TO_COMPANY, profile.questionsToCompany);
   mergeById(HR_SCREENING_PATH, profile.screeningPath);
+  if(typeof STAR_SCENARIOS !== 'undefined') mergeById(STAR_SCENARIOS, profile.starScenarios);
+  if(Array.isArray(profile.curatedTaskIds) && profile.curatedTaskIds.length && typeof MOCK_CURATED_TASK_IDS !== 'undefined' && Array.isArray(MOCK_CURATED_TASK_IDS)){
+    MOCK_CURATED_TASK_IDS.splice(0, MOCK_CURATED_TASK_IDS.length, ...profile.curatedTaskIds);
+  }
+  if(profile.ui && typeof mockInterviewState !== 'undefined' && !mockInterviewState._hrSalaryTouched){
+    if(profile.ui.defaultOfferLvl) mockInterviewState.hrOfferLvl = profile.ui.defaultOfferLvl;
+    if(profile.ui.defaultOfferSalary) mockInterviewState.hrOfferSalary = profile.ui.defaultOfferSalary;
+  }
 
-  if(profile.scheduledEvent && typeof state !== 'undefined' && Array.isArray(state.scheduledEvents)){
-    const ev = state.scheduledEvents.find(x => x.id === (profile.scheduledEvent.id || 'ev-hr-main'));
-    if(ev){
-      if(ev.title === 'Python Backend Developer (Junior)' && profile.scheduledEvent.title){
-        ev.title = profile.scheduledEvent.title;
-      }
-      if(ev.company === 'Backend-команда (FastAPI / PostgreSQL)' && profile.scheduledEvent.company){
-        ev.company = profile.scheduledEvent.company;
+  if(profile.scheduledEvent && typeof state !== 'undefined'){
+    if(typeof ensureScheduledEventsState === 'function'){
+      ensureScheduledEventsState();
+    }
+    if(Array.isArray(state.scheduledEvents)){
+      const ev = state.scheduledEvents.find(x => x.id === (profile.scheduledEvent.id || 'ev-hr-main'));
+      if(ev){
+        if(ev.title === 'Python Backend Developer (Junior)' && profile.scheduledEvent.title){
+          ev.title = profile.scheduledEvent.title;
+        }
+        if(ev.company === 'Backend-команда (FastAPI / PostgreSQL)' && profile.scheduledEvent.company){
+          ev.company = profile.scheduledEvent.company;
+        }
       }
     }
   }
@@ -59834,8 +59856,10 @@ async function loadAuthAndPrivateProfile(forceReload){
           applyPrivateProfile(profData);
           if(typeof render === 'function'){
             const h = (typeof location !== 'undefined' ? location.hash : '') || '#/';
-            if(h === '#/' || h === '' || h.startsWith('#mock') || h.startsWith('#/mock')){
+            if(h === '#/' || h === '' || h === '#dashboard' || h === '#/dashboard' || h === '#map' || h === '#/map' || h.startsWith('#mock') || h.startsWith('#/mock') || h.startsWith('#interview-sim') || h.startsWith('#/interview-sim') || h.startsWith('#hr') || h.startsWith('#/hr') || h.startsWith('#path') || h.startsWith('#/path')){
               render();
+            } else if(typeof renderUnifiedNavigation === 'function'){
+              renderUnifiedNavigation();
             }
           }
         }
@@ -59855,12 +59879,13 @@ async function loadAuthAndPrivateProfile(forceReload){
 
 function ensureScheduledEventsState(){
   if(!state.scheduledEvents || !Array.isArray(state.scheduledEvents) || state.scheduledEvents.length === 0){
+    const privEv = (window.PRIVATE_PROFILE_DATA && window.PRIVATE_PROFILE_DATA.scheduledEvent) || {};
     state.scheduledEvents = [
       {
-        id: 'ev-hr-main',
-        title: 'Python Backend Developer (Junior)',
-        company: 'Backend-команда (FastAPI / PostgreSQL)',
-        type: 'hr',
+        id: privEv.id || 'ev-hr-main',
+        title: privEv.title || 'Python Backend Developer (Junior)',
+        company: privEv.company || 'Backend-команда (FastAPI / PostgreSQL)',
+        type: privEv.type || 'hr',
         date: Date.now() + 48 * 3600 * 1000,
         active: true,
         completed: false
@@ -60043,10 +60068,11 @@ function renderHrSprintRoomHTML(){
   }
   mockInterviewState.hrRehearsalSubTab = mockInterviewState.hrRehearsalSubTab || 'questions';
 
+  const ui = (window.PRIVATE_PROFILE_DATA && window.PRIVATE_PROFILE_DATA.ui) || {};
   mockInterviewState.hrTermFilter = mockInterviewState.hrTermFilter || 'all';
   mockInterviewState.hrTermIndex = mockInterviewState.hrTermIndex || 0;
   mockInterviewState.hrPitchText = mockInterviewState.hrPitchText || (state.hrPitchText || '');
-  mockInterviewState.hrOfferLvl = mockInterviewState.hrOfferLvl || 'junior';
+  mockInterviewState.hrOfferLvl = mockInterviewState.hrOfferLvl || ui.defaultOfferLvl || 'junior';
   mockInterviewState.hrOfferSalary = getHrOfferSalary();
   mockInterviewState.hrOpenStages = mockInterviewState.hrOpenStages || { 'stage-1': true };
   state.hrKnownTerms = state.hrKnownTerms || {};
@@ -60083,7 +60109,7 @@ function renderHrSprintRoomHTML(){
             <span>Питч 120с</span>
           </button>
           <button type="button" class="mock-subtab-btn ${mockInterviewState.hrRehearsalSubTab==='plan'?'active':''}" data-hr-rehearsal-subtab="plan">
-            <span>Оффер и вилка</span>
+            <span>${escapeHtmlStr(ui.rehearsalPlanTabLabel || 'Оффер и вилка')}</span>
           </button>
         </div>
         ${rehearsalContent}
@@ -60223,7 +60249,8 @@ function renderHrNotesTabHTML(){
   const isCurRead = !!readMap[curNote.id];
   const doneNotesCount = HR_NOTES.filter(n => readMap[n.id]).length;
 
-  const noteMetaLookup = {
+  const ui = (window.PRIVATE_PROFILE_DATA && window.PRIVATE_PROFILE_DATA.ui) || {};
+  const noteMetaLookup = Object.assign({
     'hr-note-1': { short: 'Анатомия HR-скрининга', sub: 'Психология и фильтр рисков' },
     'hr-note-2': { short: 'Конструктор Elevator Pitch', sub: 'Схема за 90 секунд' },
     'hr-note-3': { short: 'Поведенческое интервью', sub: 'Методика STAR бэкендера' },
@@ -60233,7 +60260,7 @@ function renderHrNotesTabHTML(){
     'hr-note-7': { short: 'FastAPI и Pydantic v2', sub: 'Depends и async/await' },
     'hr-note-8': { short: 'Python Core и ООП', sub: 'Блиц-опросник рекрутера' },
     'hr-note-9': { short: 'SQL и SQLAlchemy 2.0', sub: 'Реляционная база и миграции' }
-  };
+  }, (ui.noteShortMeta && typeof ui.noteShortMeta === 'object') ? ui.noteShortMeta : {});
 
   const mobileChipsHTML = HR_NOTES.map((n, idx) => {
     const isAct = (n.id === curNote.id);
@@ -60898,7 +60925,7 @@ function renderHrTermsTabHTML(){
               </button>
             ` : (currentStage && currentStage.practiceTab === 'offer' ? `
               <button type="button" class="btn btn-primary dominant-btn" data-hr-subtab="offer" style="width:100%;padding:11px 22px;font-weight:700;border-radius:14px;">
-                Перейти к условиям оффера ➔
+                ${escapeHtmlStr(((window.PRIVATE_PROFILE_DATA && window.PRIVATE_PROFILE_DATA.ui) || {}).termsOfferCtaLabel || 'Перейти к условиям оффера ➔')}
               </button>
             ` : (nextStage ? `
               <button type="button" class="btn btn-primary dominant-btn" data-hr-filter="${getHrStageFilterKey(nextStage)}" style="width:100%;padding:11px 22px;font-weight:700;border-radius:14px;">
@@ -61176,10 +61203,71 @@ function renderHrStarTabHTML(){
   return renderUnifiedStarSplitHTML();
 }
 
+function buildHrOfferTaxBreakdownHTML(salary){
+  const ui = (window.PRIVATE_PROFILE_DATA && window.PRIVATE_PROFILE_DATA.ui) || {};
+  const sal = Number(salary) || (ui.defaultOfferSalary || 85000);
+  const grossSalary = Math.round(sal / 0.87);
+  const tkGrossTotal = Math.round(grossSalary * 1.30);
+  if(ui.offerTaxMode === 'ip_npd'){
+    const npdGross = Math.round(sal / 0.94);
+    return `
+      <div style="font-family:var(--font-m);font-size:0.72rem;font-weight:800;color:var(--emerald);text-transform:uppercase;margin-bottom:8px;letter-spacing:0.04em;">
+        📊 Налоговые режимы для ${sal.toLocaleString('ru-RU')} ₽ на руки:
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;font-size:0.78rem;">
+        <div class="mock-glass-box mock-glass-box--cyan" style="padding:9px;">
+          <b style="color:#38bdf8;display:block;margin-bottom:2px;">НПД (Самозан.)</b>
+          <div style="color:var(--ink-muted);font-size:0.72rem;">Налог 6%</div>
+          <div style="font-size:0.92rem;font-weight:800;color:var(--ink);margin:3px 0;">${npdGross.toLocaleString('ru-RU')} ₽</div>
+          <div style="color:var(--emerald);font-size:0.70rem;">Взносы: 0 ₽</div>
+        </div>
+        <div class="mock-glass-box mock-glass-box--emerald" style="padding:9px;">
+          <b style="color:var(--emerald);display:block;margin-bottom:2px;">ИП УСН 6%</b>
+          <div style="color:var(--ink-muted);font-size:0.72rem;">B2B счёт</div>
+          <div style="font-size:0.92rem;font-weight:800;color:var(--ink);margin:3px 0;">${npdGross.toLocaleString('ru-RU')} ₽</div>
+          <div style="color:var(--emerald);font-size:0.70rem;">Расход компании</div>
+        </div>
+        <div class="mock-glass-box mock-glass-box--amber" style="padding:9px;">
+          <b style="color:#fbbf24;display:block;margin-bottom:2px;">ТК РФ (штат)</b>
+          <div style="color:var(--ink-muted);font-size:0.72rem;">13% + 30%</div>
+          <div style="font-size:0.92rem;font-weight:800;color:var(--ink);margin:3px 0;">${tkGrossTotal.toLocaleString('ru-RU')} ₽</div>
+          <div style="color:#fbbf24;font-size:0.70rem;">Полный ФОТ</div>
+        </div>
+      </div>
+    `;
+  }
+  return `
+    <div style="font-family:var(--font-m);font-size:0.72rem;font-weight:800;color:var(--emerald);text-transform:uppercase;margin-bottom:8px;letter-spacing:0.04em;">
+      📊 Пересчёт вилки для ${sal.toLocaleString('ru-RU')} ₽ на руки:
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;font-size:0.78rem;">
+      <div class="mock-glass-box mock-glass-box--cyan" style="padding:9px;">
+        <b style="color:#38bdf8;display:block;margin-bottom:2px;">Net (на руки)</b>
+        <div style="color:var(--ink-muted);font-size:0.72rem;">Чистая сумма</div>
+        <div style="font-size:0.92rem;font-weight:800;color:var(--ink);margin:3px 0;">${sal.toLocaleString('ru-RU')} ₽</div>
+        <div style="color:var(--emerald);font-size:0.70rem;">Ориентир кандидата</div>
+      </div>
+      <div class="mock-glass-box mock-glass-box--emerald" style="padding:9px;">
+        <b style="color:var(--emerald);display:block;margin-bottom:2px;">Gross (оклад)</b>
+        <div style="color:var(--ink-muted);font-size:0.72rem;">До вычета 13%</div>
+        <div style="font-size:0.92rem;font-weight:800;color:var(--ink);margin:3px 0;">${grossSalary.toLocaleString('ru-RU')} ₽</div>
+        <div style="color:var(--emerald);font-size:0.70rem;">Сумма в договоре</div>
+      </div>
+      <div class="mock-glass-box mock-glass-box--amber" style="padding:9px;">
+        <b style="color:#fbbf24;display:block;margin-bottom:2px;">Полный бюджет</b>
+        <div style="color:var(--ink-muted);font-size:0.72rem;">С учётом взносов</div>
+        <div style="font-size:0.92rem;font-weight:800;color:var(--ink);margin:3px 0;">${tkGrossTotal.toLocaleString('ru-RU')} ₽</div>
+        <div style="color:#fbbf24;font-size:0.70rem;">Ориентир ФОТ</div>
+      </div>
+    </div>
+  `;
+}
+
 function renderHrOfferTabHTML(){
   const ui = (window.PRIVATE_PROFILE_DATA && window.PRIVATE_PROFILE_DATA.ui) || {};
-  const lvl = mockInterviewState.hrOfferLvl || 'junior';
+  const lvl = mockInterviewState.hrOfferLvl || ui.defaultOfferLvl || 'junior';
   const salary = getHrOfferSalary();
+  const lvlLabels = (ui.offerLevelLabels && typeof ui.offerLevelLabels === 'object') ? ui.offerLevelLabels : {};
 
   const phraseText = getHrOfferSalaryPhrase(salary);
   const offerTitle = ui.offerSectionTitle || 'Формат оформления и условия оффера';
@@ -61225,9 +61313,9 @@ function renderHrOfferTabHTML(){
         <div>
           <h3 style="margin:0 0 10px 0;font-size:1.10rem;font-weight:800;color:var(--ink);">💰 Конструктор вилки</h3>
           <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;">
-            <button type="button" class="mock-subtab-btn ${lvl==='junior'?'active':''}" data-hr-lvl="junior">Junior</button>
-            <button type="button" class="mock-subtab-btn ${lvl==='junior_plus'?'active':''}" data-hr-lvl="junior_plus">Junior+</button>
-            <button type="button" class="mock-subtab-btn ${lvl==='middle'?'active':''}" data-hr-lvl="middle">Middle-</button>
+            <button type="button" class="mock-subtab-btn ${lvl==='junior'?'active':''}" data-hr-lvl="junior">${escapeHtmlStr(lvlLabels.junior || 'Junior')}</button>
+            <button type="button" class="mock-subtab-btn ${lvl==='junior_plus'?'active':''}" data-hr-lvl="junior_plus">${escapeHtmlStr(lvlLabels.junior_plus || 'Junior+')}</button>
+            <button type="button" class="mock-subtab-btn ${lvl==='middle'?'active':''}" data-hr-lvl="middle">${escapeHtmlStr(lvlLabels.middle || 'Middle-')}</button>
           </div>
 
           <div style="margin-bottom:12px;">
@@ -61237,29 +61325,7 @@ function renderHrOfferTabHTML(){
           </div>
 
           <div id="hr-tax-breakdown-box" class="mock-glass-box" style="margin-bottom:12px;">
-            <div style="font-family:var(--font-m);font-size:0.72rem;font-weight:800;color:var(--emerald);text-transform:uppercase;margin-bottom:8px;letter-spacing:0.04em;">
-              📊 Пересчёт вилки для ${salary.toLocaleString('ru-RU')} ₽ на руки:
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;font-size:0.78rem;">
-              <div class="mock-glass-box mock-glass-box--cyan" style="padding:9px;">
-                <b style="color:#38bdf8;display:block;margin-bottom:2px;">Net (на руки)</b>
-                <div style="color:var(--ink-muted);font-size:0.72rem;">Чистая сумма</div>
-                <div style="font-size:0.92rem;font-weight:800;color:var(--ink);margin:3px 0;">${salary.toLocaleString('ru-RU')} ₽</div>
-                <div style="color:var(--emerald);font-size:0.70rem;">Ориентир кандидата</div>
-              </div>
-              <div class="mock-glass-box mock-glass-box--emerald" style="padding:9px;">
-                <b style="color:var(--emerald);display:block;margin-bottom:2px;">Gross (оклад)</b>
-                <div style="color:var(--ink-muted);font-size:0.72rem;">До вычета 13%</div>
-                <div style="font-size:0.92rem;font-weight:800;color:var(--ink);margin:3px 0;">${Math.round(salary / 0.87).toLocaleString('ru-RU')} ₽</div>
-                <div style="color:var(--emerald);font-size:0.70rem;">Сумма в договоре</div>
-              </div>
-              <div class="mock-glass-box mock-glass-box--amber" style="padding:9px;">
-                <b style="color:#fbbf24;display:block;margin-bottom:2px;">Полный бюджет</b>
-                <div style="color:var(--ink-muted);font-size:0.72rem;">С учётом взносов</div>
-                <div style="font-size:0.92rem;font-weight:800;color:var(--ink);margin:3px 0;">${Math.round((salary / 0.87) * 1.30).toLocaleString('ru-RU')} ₽</div>
-                <div style="color:#fbbf24;font-size:0.70rem;">Ориентир ФОТ</div>
-              </div>
-            </div>
+            ${buildHrOfferTaxBreakdownHTML(salary)}
           </div>
 
           <div class="mock-glass-box mock-glass-box--emerald" style="margin-bottom:10px;">
@@ -69135,7 +69201,8 @@ function renderUnifiedNavLinks(isMobile, curRoute){
       } else if(it.route === '/mock'){
         const activeEv = (typeof getActiveScheduledEvent === 'function') ? getActiveScheduledEvent() : null;
         if(activeEv){
-          dotHtml = `<span class="swr-pulse-dot" style="margin-left:auto;" title="Активна подготовка к собеседованию"></span>`;
+          const mockDotTitle = (window.PRIVATE_PROFILE_DATA && window.PRIVATE_PROFILE_DATA.ui && window.PRIVATE_PROFILE_DATA.ui.sidebarMockDotTitle) || 'Активна подготовка к собеседованию';
+          dotHtml = `<span class="swr-pulse-dot" style="margin-left:auto;" title="${escapeHtmlStr(mockDotTitle)}"></span>`;
         }
       }
 
@@ -76949,6 +77016,7 @@ window.animateCardFlip = animateCardFlip;
   }
   const hrLvlBtn = e.target.closest('[data-hr-lvl]');
   if(hrLvlBtn){
+    mockInterviewState._hrSalaryTouched = true;
     mockInterviewState.hrOfferLvl = hrLvlBtn.getAttribute('data-hr-lvl');
     if(mockInterviewState.hrOfferLvl === 'junior') mockInterviewState.hrOfferSalary = 75000;
     else if(mockInterviewState.hrOfferLvl === 'junior_plus') mockInterviewState.hrOfferSalary = 95000;
@@ -79134,44 +79202,17 @@ document.addEventListener('input', function(e){
     }
   }
   if(e.target && e.target.id === 'hr-salary-input'){
-    const sal = parseInt(e.target.value, 10) || 85000;
+    const ui = (window.PRIVATE_PROFILE_DATA && window.PRIVATE_PROFILE_DATA.ui) || {};
+    const sal = parseInt(e.target.value, 10) || ui.defaultOfferSalary || 85000;
+    mockInterviewState._hrSalaryTouched = true;
     mockInterviewState.hrOfferSalary = sal;
     const phraseEl = document.getElementById('hr-salary-phrase-text');
     if(phraseEl){
-      phraseEl.textContent = 'Я ориентируюсь на вилку от ' + sal.toLocaleString('ru-RU') + ' рублей на руки на испытательный срок, с возможностью пересмотра по результатам его прохождения.';
+      phraseEl.textContent = getHrOfferSalaryPhrase(sal);
     }
     const taxBox = document.getElementById('hr-tax-breakdown-box');
     if(taxBox){
-      const grossSalary = Math.round(sal / 0.87);
-      const tkGrossTotal = Math.round(grossSalary * 1.30);
-      taxBox.innerHTML = `
-        <div style="font-size:0.75rem;font-weight:800;color:#06b6d4;text-transform:uppercase;margin-bottom:8px;letter-spacing:0.04em;">
-          📊 Пересчёт вилки для суммы ${sal.toLocaleString('ru-RU')} ₽ на руки:
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;font-size:0.80rem;">
-          <div style="background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.25);border-radius:10px;padding:10px;">
-            <b style="color:#06b6d4;display:block;margin-bottom:2px;">Net (на руки)</b>
-            <div style="color:var(--ink-muted);font-size:0.72rem;">Чистая сумма</div>
-            <div style="font-size:0.95rem;font-weight:800;color:var(--ink);margin:4px 0;">${sal.toLocaleString('ru-RU')} ₽</div>
-            <div style="color:#10b981;font-size:0.72rem;">Ориентир кандидата</div>
-          </div>
-          <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:10px;padding:10px;">
-            <b style="color:#10b981;display:block;margin-bottom:2px;">Gross (оклад)</b>
-            <div style="color:var(--ink-muted);font-size:0.72rem;">До вычета 13%</div>
-            <div style="font-size:0.95rem;font-weight:800;color:var(--ink);margin:4px 0;">${grossSalary.toLocaleString('ru-RU')} ₽</div>
-            <div style="color:#10b981;font-size:0.72rem;">Сумма в договоре</div>
-          </div>
-          <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:10px;">
-            <b style="color:#f59e0b;display:block;margin-bottom:2px;">Полный бюджет</b>
-            <div style="color:var(--ink-muted);font-size:0.72rem;">13% НДФЛ + 30% взносы</div>
-            <div style="font-size:0.95rem;font-weight:800;color:var(--ink);margin:4px 0;">${tkGrossTotal.toLocaleString('ru-RU')} ₽</div>
-            <div style="color:#f59e0b;font-size:0.72rem;">Полный расход работодателя</div>
-          </div>
-        </div>
-        <div style="font-size:0.74rem;color:var(--ink-muted);margin-top:8px;line-height:1.4;">
-          💡 <i>При обсуждении оффера заранее уточняйте, указывается ли сумма «на руки» (net) или до вычета налогов (gross).</i>
-        </div>
-      `;
+      taxBox.innerHTML = buildHrOfferTaxBreakdownHTML(sal);
     }
   }
 
@@ -80290,6 +80331,7 @@ window.openSilkSheet = function(uid, title, desc, status, customRoute, triggerEl
         `}
       `;
     } else if(uid === 'hr-exam'){
+      const ui = (window.PRIVATE_PROFILE_DATA && window.PRIVATE_PROFILE_DATA.ui) || {};
       chipsEl.className = 'sheet-cl-list hr-screening-checklist';
       const readMap = (typeof state !== 'undefined' && state.hrReadNotes) || {};
       const knownMap = (typeof state !== 'undefined' && state.hrKnownTerms) || {};
@@ -80299,6 +80341,12 @@ window.openSilkSheet = function(uid, title, desc, status, customRoute, triggerEl
       const doneCards = Object.keys(knownMap).filter(k => knownMap[k] === true).length;
       const doneTasks = Object.keys(solvedMap).filter(k => solvedMap[k]).length;
 
+      const lastItem = (ui.hrExamLastItem && typeof ui.hrExamLastItem === 'object') ? ui.hrExamLastItem : {
+        title: 'Условия оффера: ожидания и формат работы',
+        sub: 'Аргументация вилки, пересмотр после испытательного срока и формат договора',
+        done: true,
+        badge: 'Условия готовы'
+      };
       const items = [
         {
           title: 'Самопрезентация и самопитч (90–120с)',
@@ -80324,12 +80372,7 @@ window.openSilkSheet = function(uid, title, desc, status, customRoute, triggerEl
           done: doneTasks >= 1 || doneCards >= 12,
           badge: 'Практика сдана'
         },
-        {
-          title: 'Условия оффера: ожидания и формат работы',
-          sub: 'Аргументация вилки, пересмотр после испытательного срока и формат договора',
-          done: true,
-          badge: 'Условия готовы'
-        }
+        lastItem
       ];
 
       const readyCount = items.filter(x => x.done).length;
@@ -80338,7 +80381,7 @@ window.openSilkSheet = function(uid, title, desc, status, customRoute, triggerEl
       chipsEl.innerHTML = `
         <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:12px;padding:8px 12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:0.75rem;font-weight:800;color:var(--emerald);font-family:var(--font-m);">ГОТОВНОСТЬ К СОЗВОНУ: ${readyCount} ИЗ 5 РУБЕЖЕЙ (${readyPct}%)</span>
-          <span style="font-size:0.70rem;color:var(--ink-muted);">Screening Prep</span>
+          <span style="font-size:0.70rem;color:var(--ink-muted);">${escapeHtmlStr(ui.hrExamSub || 'Screening Prep')}</span>
         </div>
         ${items.map((it, idx) => `
           <div class="hr-sheet-step-card ${it.done ? 'step--done' : ''}" style="cursor:default;margin-bottom:6px;">
@@ -80380,14 +80423,15 @@ window.openSilkSheet = function(uid, title, desc, status, customRoute, triggerEl
   const hrStageCurrent = (typeof HR_SCREENING_PATH !== 'undefined' && uid) ? HR_SCREENING_PATH.find(st => st.id === uid) : null;
 
   if (uid === 'hr-exam') {
+    const ui = (window.PRIVATE_PROFILE_DATA && window.PRIVATE_PROFILE_DATA.ui) || {};
     if(tagEl) {
       tagEl.textContent = '⚡ ДОПУСК К СКРИНИНГУ · 5 ТЕМ КАРЬЕРНОГО ПОРТФОЛИО';
       tagEl.style.color = '#34d399';
     }
-    if(titleEl) titleEl.textContent = 'Чек-лист готовности к HR-скринингу';
+    if(titleEl) titleEl.textContent = ui.hrExamTitle || 'Чек-лист готовности к HR-скринингу';
     if(descEl) {
       descEl.style.display = 'block';
-      descEl.textContent = 'Финальный контроль 5 ключевых тезисов перед выходом на контакт с рекрутером.';
+      descEl.textContent = ui.hrExamDesc || 'Финальный контроль 5 ключевых тезисов перед выходом на контакт с рекрутером.';
     }
     if(btn) {
       btn.className = 'sheet-action-btn sheet-action-btn--primary dominant-btn';
