@@ -312,18 +312,41 @@ assert.deepStrictEqual(
   'getEchelonUnits("backend") обязан сохранять точный порядок массива backend.units'
 );
 
-// 7.3 Безопасная обработка отсутствующих 0.1-0.4 в HR-скрининге на Шаге 1
+// 7.3 Проверка подключённых 0.1–0.4 в HR-скрининге, отсутствия фейковых Python-задач и fallback-режима «В разработке»
 const hrProg = ctx.getEchelonProgress('hr');
-assert.strictEqual(hrProg.unitsCount, 0, 'На Шаге 1 в HR-скрининге должно быть 0 загруженных юнитов');
-assert.strictEqual(hrProg.plannedUnitsCount, 4, 'HR-скрининг должен знать о 4 запланированных юнитах');
-assert.strictEqual(hrProg.isInDevelopment, true, 'HR-скрининг на Шаге 1 должен помечаться как isInDevelopment');
-assert.strictEqual(hrProg.pct, 0, 'Процент пустого эшелона должен быть 0 без NaN');
+assert.strictEqual(hrProg.unitsCount, 4, 'В HR-скрининге обязаны быть загружены все 4 юнита 0.1–0.4');
+assert.strictEqual(hrProg.plannedUnitsCount, 4, 'HR-скрининг должен знать о 4 юнитах');
+assert.strictEqual(hrProg.isInDevelopment, false, 'После Шага 2 HR-скрининг больше не должен помечаться как isInDevelopment');
+assert.deepStrictEqual(
+  Array.from(ctx.getEchelonUnits('hr').map(u => u.id)),
+  ['0.1', '0.2', '0.3', '0.4'],
+  'getEchelonUnits("hr") обязан возвращать юниты 0.1–0.4 в строгом порядке'
+);
 const hrSnakeHtml = ctx.viewPathSerpentine({ echelon: 'hr' });
 const hrSnakeVisibleText = hrSnakeHtml.replace(/\sstyle="[^"]*"/g, '').replace(/<[^>]+>/g, ' ');
-assert(hrSnakeHtml.includes('В разработке') && !/\b0\.[1-4]\b/.test(hrSnakeVisibleText), 'Плейсхолдер HR на Тропе не должен падать и не должен утекать техкод 0.1-0.4 в UI');
+assert(!hrSnakeHtml.includes('Эшелон в разработке') && !/\b0\.[1-4]\b/.test(hrSnakeVisibleText), 'Тропа HR должна отображать 4 реальных урока без плашки «В разработке» и без утечки техкода 0.1–0.4');
 const hrProHtml = ctx.viewProPath({ echelon: 'hr' });
 const hrProVisibleText = hrProHtml.replace(/\sstyle="[^"]*"/g, '').replace(/<[^>]+>/g, ' ');
-assert(hrProHtml.includes('В разработке') && !/\b0\.[1-4]\b/.test(hrProVisibleText), 'Плейсхолдер HR в Pro-режиме не должен падать и не должен утекать техкод 0.1-0.4 в UI');
+assert(!hrProHtml.includes('Эшелон в разработке') && !/\b0\.[1-4]\b/.test(hrProVisibleText), 'Pro-режим HR должен отображать 4 реальных урока без плашки «В разработке» и без утечки техкода 0.1–0.4');
+
+// Fallback-проверка: при пустом списке юнитов getEchelonUnits / getEchelonUnitsAndChapters безопасно возвращают []
+assert.deepStrictEqual(Array.from(ctx.getEchelonUnits('hr', [])), [], 'На пустом массиве источников getEchelonUnits возвращает []');
+const emptyChapRes = ctx.getEchelonUnitsAndChapters('hr', []);
+assert.deepStrictEqual(Array.from(emptyChapRes.units), [], 'На пустом массиве источников getEchelonUnitsAndChapters возвращает пустой список юнитов');
+
+// Zero-IDE режим для HR (0.1.1): 0 задач Zen IDE, 3 этапа на дашборде, корректные экраны навыка и теста
+const sk011 = ctx.PY_SKILLS_BY_ID['0.1.1'];
+assert(sk011 && Array.isArray(sk011.taskIds) && sk011.taskIds.length === 0, 'У HR-навыка 0.1.1 должно быть 0 фейковых задач IDE');
+assert.strictEqual(ctx.skillHasIdeTasks(sk011), false, 'skillHasIdeTasks(0.1.1) обязан возвращать false');
+const hrSkillHtml = ctx.viewPythonSkill('0.1.1');
+assert(hrSkillHtml.includes('ATS') && !hrSkillHtml.includes('solution.py') && !hrSkillHtml.includes('data-py-select-task'), 'Экран HR-навыка 0.1.1 не должен подгружать Zen IDE или фейковые задачи Python');
+ctx.location.hash = '#/hr/unittest/0.1';
+ctx.render();
+const hrUtHtml = String(fakeElementsById['view-root'].innerHTML || '');
+assert(hrUtHtml.length > 100 && !hrUtHtml.includes('Юнит 0.1'), 'Маршрут #/hr/unittest/0.1 и рубежный тест 0.1 должны рендериться без утечки техкода');
+ctx.location.hash = '#/';
+const dashHtml = ctx.viewDashboard();
+assert(dashHtml.includes('01 ТЕОРИЯ') && dashHtml.includes('03 ЗАЧЁТ') && !dashHtml.includes('03 ПРАКТИКА'), 'Дашборд при фокусе на HR-скрининге показывает 3 макро-этапа без блока Zen IDE');
 
 // 7.4 Пресеты воронки: порядок, номера 1..6 и сохранение прогресса
 assert.strictEqual(ctx.FUNNEL_PRESETS.bigtech.label, 'BigTech (алгоритмы до Backend)');

@@ -37,8 +37,9 @@ assert(fs.existsSync(academyPath), `academy.html missing at ${academyPath}`);
 const standardsHtml = fs.readFileSync(standardsPath, 'utf-8');
 const academyHtml = fs.readFileSync(academyPath, 'utf-8');
 
-// --- 0. Извлечение базы знаний (все 7 MASTERY объектов) ---
+// --- 0. Извлечение базы знаний (все 8 MASTERY объектов) ---
 const masteryNames = [
+  'HR_MASTERY',
   'PY_MASTERY',
   'WEB_MASTERY',
   'BACKEND_MASTERY',
@@ -122,11 +123,11 @@ const engine = extractChunkingEngine(standardsHtml);
 const { splitStepHtmlIntoChunks, getStepChunks } = engine;
 
 // ============================================================================
-// TEST 1: 100% Coverage of All 238 Notes & 1183 Steps
+// TEST 1: 100% Coverage of All 246 Notes & 1223 Steps
 // ============================================================================
 function test01_FullCoverage() {
   const noteIds = Object.keys(allNotes);
-  assert.strictEqual(noteIds.length, 238, `Expected exactly 238 notes, found ${noteIds.length}`);
+  assert.strictEqual(noteIds.length, 246, `Expected exactly 246 notes, found ${noteIds.length}`);
 
   let totalSteps = 0;
   for (const [kId, note] of Object.entries(allNotes)) {
@@ -139,8 +140,8 @@ function test01_FullCoverage() {
     });
   }
 
-  assert.strictEqual(totalSteps, 1183, `Expected exactly 1183 total steps, found ${totalSteps}`);
-  console.log(`✓ Test 1 Passed: 100% coverage verified (238 notes, 1183 steps across all 7 tracks)`);
+  assert.strictEqual(totalSteps, 1223, `Expected exactly 1223 total steps, found ${totalSteps}`);
+  console.log(`✓ Test 1 Passed: 100% coverage verified (246 notes, 1223 steps across all 8 tracks)`);
 }
 
 // ============================================================================
@@ -402,7 +403,7 @@ function test07_StateTransitionSimulation() {
     simulatedNotesCount++;
   }
 
-  assert.strictEqual(simulatedNotesCount, 238, 'Expected 238 simulated note reading sessions');
+  assert.strictEqual(simulatedNotesCount, 246, 'Expected 246 simulated note reading sessions');
   console.log(`✓ Test 7 Passed: Step-by-step state transition simulation completed for 100% of notes (0 deadlocks)`);
 }
 

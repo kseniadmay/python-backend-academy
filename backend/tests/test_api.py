@@ -97,7 +97,7 @@ class TestBackendApi(unittest.TestCase):
         self.assertTrue(data['ok'])
         self.assertEqual(data['modulesCount'], 7)
         self.assertEqual(data['tasksCount'], 404)
-        self.assertEqual(data['notesCount'], 238)
+        self.assertEqual(data['notesCount'], 246)
 
     def test_content_modules(self) -> None:
         res = self.client.get('/api/v1/content/modules')

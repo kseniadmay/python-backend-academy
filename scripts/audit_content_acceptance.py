@@ -27,6 +27,7 @@ STANDARDS_HTML = ROOT_DIR / 'standards' / 'standards.html'
 CONTENT_DIR = ROOT_DIR / 'data' / 'content'
 
 MASTERY_NAMES = [
+    'HR_MASTERY',
     'PY_MASTERY',
     'WEB_MASTERY',
     'BACKEND_MASTERY',
@@ -108,7 +109,7 @@ def extract_unit_meta(html_text: str) -> dict[str, dict]:
 
 
 def extract_mastery_objects(html_text: str) -> dict[str, dict]:
-    """Извлекает 7 объектов *_MASTERY из standards/standards.html."""
+    """Извлекает 8 объектов *_MASTERY из standards/standards.html."""
     decoder = json.JSONDecoder()
     loaded: dict[str, dict] = {}
     for name in MASTERY_NAMES:

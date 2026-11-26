@@ -1541,6 +1541,7 @@ const MASTERY_TRACKS = {
   }
 };
 
+const ALL_HR_SKILLS = [];
 const ALL_PY_SKILLS = [];
 const ALL_WEB_SKILLS = [];
 const ALL_BACKEND_SKILLS = [];
@@ -1549,10 +1550,26 @@ const ALL_DB_SKILLS = [];
 const ALL_ARCH_SKILLS = [];
 const ALL_INFRA_SKILLS = [];
 const PY_SKILLS_BY_ID = {};
-const ALL_NOTES_COMBINED = Object.assign({}, PY_MASTERY.notes, WEB_MASTERY.notes, BACKEND_MASTERY.notes, ALGO_MASTERY.notes, DB_MASTERY.notes, ARCH_MASTERY.notes, INFRA_MASTERY.notes);
-const ALL_DECKS_COMBINED = Object.assign({}, PY_MASTERY.decks, WEB_MASTERY.decks, BACKEND_MASTERY.decks, ALGO_MASTERY.decks, DB_MASTERY.decks, ARCH_MASTERY.decks, INFRA_MASTERY.decks);
-const ALL_UNIT_TESTS_COMBINED = Object.assign({}, PY_MASTERY.unitTests, WEB_MASTERY.unitTests, BACKEND_MASTERY.unitTests, ALGO_MASTERY.unitTests, DB_MASTERY.unitTests, ARCH_MASTERY.unitTests, INFRA_MASTERY.unitTests);
-const ALL_UNITS_COMBINED = [].concat(PY_MASTERY.units, WEB_MASTERY.units, BACKEND_MASTERY.units, ALGO_MASTERY.units, DB_MASTERY.units, ARCH_MASTERY.units, INFRA_MASTERY.units);
+const _HR_DATA = (typeof HR_MASTERY !== 'undefined' && HR_MASTERY) ? HR_MASTERY : { units: [], notes: {}, decks: {}, unitTests: {} };
+const ALL_NOTES_COMBINED = Object.assign({}, _HR_DATA.notes, PY_MASTERY.notes, WEB_MASTERY.notes, BACKEND_MASTERY.notes, ALGO_MASTERY.notes, DB_MASTERY.notes, ARCH_MASTERY.notes, INFRA_MASTERY.notes);
+const ALL_DECKS_COMBINED = Object.assign({}, _HR_DATA.decks, PY_MASTERY.decks, WEB_MASTERY.decks, BACKEND_MASTERY.decks, ALGO_MASTERY.decks, DB_MASTERY.decks, ARCH_MASTERY.decks, INFRA_MASTERY.decks);
+const ALL_UNIT_TESTS_COMBINED = Object.assign({}, _HR_DATA.unitTests, PY_MASTERY.unitTests, WEB_MASTERY.unitTests, BACKEND_MASTERY.unitTests, ALGO_MASTERY.unitTests, DB_MASTERY.unitTests, ARCH_MASTERY.unitTests, INFRA_MASTERY.unitTests);
+const ALL_UNITS_COMBINED = [].concat(_HR_DATA.units, PY_MASTERY.units, WEB_MASTERY.units, BACKEND_MASTERY.units, ALGO_MASTERY.units, DB_MASTERY.units, ARCH_MASTERY.units, INFRA_MASTERY.units);
+
+if(_HR_DATA && Array.isArray(_HR_DATA.units) && _HR_DATA.units.length > 0 && !MASTERY_TRACKS.hr){
+  MASTERY_TRACKS.hr = {
+    key: 'hr',
+    routePrefix: '/hr',
+    title: '🗣️ Матрица Мастерства HR-скрининг',
+    shortTitle: '🗣️ Модуль 0 · Карьера и HR',
+    badge: 'Модуль 00 · 💼 Карьера и HR (4 урока · 8 навыков · 8 конспектов · 8 колод · 96 карточек)',
+    backLabel: 'К Матрице Мастерства HR-скрининг',
+    courseUnitRange: 'Уроки 0.1–0.4',
+    cols: 4,
+    data: _HR_DATA,
+    skills: []
+  };
+}
 
 Object.values(MASTERY_TRACKS).forEach(tr => {
   tr.data.units.forEach(u => {
@@ -1564,7 +1581,8 @@ Object.values(MASTERY_TRACKS).forEach(tr => {
       s.routePrefix = tr.routePrefix;
       tr.skills.push(s);
       PY_SKILLS_BY_ID[s.id] = s;
-      if(tr.key === 'python') ALL_PY_SKILLS.push(s);
+      if(tr.key === 'hr') ALL_HR_SKILLS.push(s);
+      else if(tr.key === 'python') ALL_PY_SKILLS.push(s);
       else if(tr.key === 'web') ALL_WEB_SKILLS.push(s);
       else if(tr.key === 'backend') ALL_BACKEND_SKILLS.push(s);
       else if(tr.key === 'algorithms') ALL_ALGO_SKILLS.push(s);
@@ -1574,6 +1592,14 @@ Object.values(MASTERY_TRACKS).forEach(tr => {
     });
   });
 });
+
+function skillHasIdeTasks(sk){
+  if(!sk) return true;
+  const tList = Array.isArray(sk.taskIds) ? sk.taskIds : [];
+  if(tList.length > 0) return true;
+  if(sk.trackKey === 'hr' || String(sk.id || '').indexOf('0.') === 0) return false;
+  return true;
+}
 
 function getTrackForSkill(sid){
   const s = PY_SKILLS_BY_ID[sid];
@@ -7507,6 +7533,16 @@ render = function(){
   if(route === '/' || route === '/dashboard'){
     root.innerHTML = viewDashboard();
     navRoute = '/';
+  } else if(route === '/hr' || route === '/hr/boss'){
+    root.innerHTML = viewPythonMastery('hr');
+    navRoute = '/hr';
+  } else if(route.indexOf('/hr/skill/') === 0){
+    const sid = route.slice(10);
+    root.innerHTML = viewPythonSkill(sid);
+    navRoute = getTrackForSkill(sid).routePrefix;
+  } else if(route.indexOf('/hr/unittest/') === 0){
+    root.innerHTML = viewPythonUnitTest(route.slice(13), 'hr');
+    navRoute = '/hr';
   } else if(route === '/python'){
     root.innerHTML = viewPythonMastery('python');
     navRoute = '/python';

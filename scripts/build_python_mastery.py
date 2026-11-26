@@ -226,12 +226,14 @@ for _t_idx, (_ech_id, _ech_lbl, _ech_units) in enumerate(ECHELON_ORDER_BUILD, st
 PRIORITY_ARCHITECTURE_MD = """## 🎯 Приоритетная архитектура подготовки к собеседованиям (6 эшелонов и пресеты воронки)
 
 Программа разделена на **6 эшелонов** со строковыми идентификаторами и явным порядком юнитов внутри каждого эшелона (от самых частых вопросов на собеседованиях к редким):
-1. **`hr` — HR-скрининг** (в разработке).
+1. **`hr` — HR-скрининг**: `0.1`, `0.2`, `0.3`, `0.4`.
 2. **`screening` — Техскрининг**: `1.1`, `1.2`, `1.7`, `1.4`, `5.1`, `5.2`, `2.2`, `2.3`, `1.8`, `1.3`, `7.1`.
 3. **`algo` — Алгоритмическая секция**: `4.1`, `4.2`, `4.4`, `4.3`, `4.6`, `4.5`.
 4. **`backend` — Backend и БД**: `3.1`, `5.5`, `5.4`, `3.5`, `5.6`, `3.6`, `5.3`, `1.9`, `6.1`, `2.4`, `3.2`, `3.3`, `1.6`, `1.5`, `3.4`.
 5. **`infra` — Продакшен и инфраструктура**: `7.2`, `7.5`, `7.4`, `2.1`, `7.3`, `3.8`.
 6. **`system_design` — Финал · Архитектура и System Design**: `6.6`, `3.7`, `7.6`, `6.2`, `6.5`, `6.4`, `6.3`.
+
+Пресеты воронки: `BigTech (алгоритмы до Backend)` и `Продуктовый рынок (Backend и инфра до алгоритмов)`.
 
 ---"""
 
@@ -313,6 +315,7 @@ DB_UNITS, DB_NOTES_DATA, DB_DECKS_DATA = parse_module_section(mod5_db_text, '5')
 ARCH_UNITS, ARCH_NOTES_DATA, ARCH_DECKS_DATA = parse_module_section(mod6_arch_text, '6')
 INFRA_UNITS, INFRA_NOTES_DATA, INFRA_DECKS_DATA = parse_module_section(mod7_infra_text, '7')
 
+print(f"HR      -> Units: {len(HR_UNITS)}, Skills: {sum(len(u['skills']) for u in HR_UNITS)}, K: {len(HR_NOTES_DATA)}, F: {len(HR_DECKS_DATA)} ({sum(len(d['cards']) for d in HR_DECKS_DATA.values())} cards)")
 print(f"Python  -> Units: {len(PY_UNITS)}, Skills: {sum(len(u['skills']) for u in PY_UNITS)}, K: {len(PY_NOTES_DATA)}, F: {len(PY_DECKS_DATA)} ({sum(len(d['cards']) for d in PY_DECKS_DATA.values())} cards)")
 print(f"Web     -> Units: {len(WEB_UNITS)}, Skills: {sum(len(u['skills']) for u in WEB_UNITS)}, K: {len(WEB_NOTES_DATA)}, F: {len(WEB_DECKS_DATA)} ({sum(len(d['cards']) for d in WEB_DECKS_DATA.values())} cards)")
 print(f"Backend -> Units: {len(BACKEND_UNITS)}, Skills: {sum(len(u['skills']) for u in BACKEND_UNITS)}, K: {len(BACKEND_NOTES_DATA)}, F: {len(BACKEND_DECKS_DATA)} ({sum(len(d['cards']) for d in BACKEND_DECKS_DATA.values())} cards)")

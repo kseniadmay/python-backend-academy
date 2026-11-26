@@ -1436,7 +1436,7 @@ full_env_code = _preloaded_full_env_code if _preloaded_full_env_code is not None
 if __name__ == '__main__':
     def _run_suite():
         from extract_remnote_data import TASKS_381
-        from build_python_mastery import PY_NOTES_DATA, WEB_NOTES_DATA, BACKEND_NOTES_DATA, ALGO_NOTES_DATA, DB_NOTES_DATA, ARCH_NOTES_DATA, INFRA_NOTES_DATA
+        from build_python_mastery import HR_NOTES_DATA, PY_NOTES_DATA, WEB_NOTES_DATA, BACKEND_NOTES_DATA, ALGO_NOTES_DATA, DB_NOTES_DATA, ARCH_NOTES_DATA, INFRA_NOTES_DATA
         import html as _html, re as _re, io as _io, contextlib as _cl, sys as _sys, types as _types
 
         passed_tasks = 0
@@ -1459,7 +1459,7 @@ if __name__ == '__main__':
         assert passed_tasks == len(TASKS_381) and not failed_tasks, f"IDE tasks failed: {failed_tasks}"
         print(f"✓ All {passed_tasks}/{len(TASKS_381)} IDE tasks passed in full_env_code!")
 
-        all_notes = {**PY_NOTES_DATA, **WEB_NOTES_DATA, **BACKEND_NOTES_DATA, **ALGO_NOTES_DATA, **DB_NOTES_DATA, **ARCH_NOTES_DATA, **INFRA_NOTES_DATA}
+        all_notes = {**HR_NOTES_DATA, **PY_NOTES_DATA, **WEB_NOTES_DATA, **BACKEND_NOTES_DATA, **ALGO_NOTES_DATA, **DB_NOTES_DATA, **ARCH_NOTES_DATA, **INFRA_NOTES_DATA}
         passed_snippets = 0
         failed_snippets = []
         for kid, note in sorted(all_notes.items()):
@@ -1492,7 +1492,7 @@ if __name__ == '__main__':
                     except Exception as e:
                         failed_snippets.append((kid, si + 1, f"{type(e).__name__}: {e}"))
 
-        assert len(all_notes) == 238 and passed_snippets >= 540 and not failed_snippets, f"Theory snippets failed ({passed_snippets}): {failed_snippets[:5]}"
+        assert len(all_notes) == 246 and passed_snippets >= 540 and not failed_snippets, f"Theory snippets failed ({passed_snippets}): {failed_snippets[:5]}"
         print(f"✓ All {passed_snippets}/{passed_snippets} K-note Python snippets across all {len(all_notes)} notes passed successfully!")
 
         # Also verify Brython fallback sqlite3 shim (when native _sqlite3 is absent in browser)

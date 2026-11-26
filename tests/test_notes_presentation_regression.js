@@ -32,7 +32,7 @@ function getRenderEngine() {
 }
 
 const MASTERY_TRACK_VARS = [
-  'PY_MASTERY', 'WEB_MASTERY', 'BACKEND_MASTERY',
+  'HR_MASTERY', 'PY_MASTERY', 'WEB_MASTERY', 'BACKEND_MASTERY',
   'ALGO_MASTERY', 'DB_MASTERY', 'ARCH_MASTERY', 'INFRA_MASTERY'
 ];
 
@@ -186,11 +186,11 @@ function getPyMasteryNotes() {
   return parseMasteryObject('PY_MASTERY').notes || {};
 }
 
-// Bug 114 (Defect 8): Запрет склеивания нескольких независимых примеров кода в один сниппет (# 1., # 2.) по всем 238 конспектам
+// Bug 114 (Defect 8): Запрет склеивания нескольких независимых примеров кода в один сниппет (# 1., # 2.) по всем 246 конспектам
 function testBug114_NoMultiExampleBundlingInSnippets(){
   const notes = getAllMasteryNotes();
   const targetKids = Object.keys(notes).sort();
-  assert.strictEqual(targetKids.length, 238, `Bug 114: Expected 238 notes across all tracks, got ${targetKids.length}`);
+  assert.strictEqual(targetKids.length, 246, `Bug 114: Expected 246 notes across all tracks, got ${targetKids.length}`);
   const violations = [];
 
   for (const kid of targetKids) {
@@ -233,7 +233,7 @@ function testBug115_SnippetLinesLimit(){
     }
   }
   walk(kbRoot);
-  assert.strictEqual(mdFiles.length, 238, `Bug 115: Expected 238 note markdown files, got ${mdFiles.length}`);
+  assert.strictEqual(mdFiles.length, 246, `Bug 115: Expected 246 note markdown files, got ${mdFiles.length}`);
 
   const widthViolations = [];
   const arrowViolations = [];

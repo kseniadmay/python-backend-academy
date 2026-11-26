@@ -82,8 +82,8 @@ if os.path.isfile(zip_path):
         rem_bytes = zf.read('knowledge_base.zip')
         with zipfile.ZipFile(io.BytesIO(rem_bytes)) as rzf:
             r_names = rzf.namelist()
-            assert len(r_names) in (525, 526), f"Expected 525 or 526 files inside nested RemNote zip, got {len(r_names)}"
-    print(f"2. [PASS] Project archive academy_backup.zip verified ({len(namelist)} items, nested RemNote 525 items)!", flush=True)
+            assert len(r_names) in (541, 542), f"Expected 541 or 542 files inside nested RemNote zip, got {len(r_names)}"
+    print(f"2. [PASS] Project archive academy_backup.zip verified ({len(namelist)} items, nested RemNote {len(r_names)} items)!", flush=True)
 
 # 4. Проверка инвариантов Zero-Jitter и стабильности сцены SRS
 zero_jit_test = os.path.normpath(os.path.join(_HERE, '..', 'tests', 'test_srs_zero_jitter_invariants.js'))
