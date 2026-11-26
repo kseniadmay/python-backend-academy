@@ -181,7 +181,190 @@ requiredThemeTokens.forEach(token => {
 assert(htmlContent.includes(':root[data-theme="dark"]'), '[DRY ERROR] Тема «Вечерний Обсидиан» :root[data-theme="dark"] обязана быть определена в дизайн-системе!');
 console.log('  ✓ Дизайн-токены определены централизованно в :root, тема «Вечерний Обсидиан» зафиксирована');
 
+// -----------------------------------------------------------------------------
+// 7. СЛОЙ 6 ЭШЕЛОНОВ И ВОРОНКИ: Строковые ID, 49 юнитов, явный порядок, BigTech/Product
+// -----------------------------------------------------------------------------
+console.log('\n▶ [7/7] Проверка архитектуры 6 эшелонов, 49 юнитов и пресетов воронки...');
+const vm = require('vm');
+const expectedEchelons = {
+  hr: ['0.1', '0.2', '0.3', '0.4'],
+  screening: ['1.1', '1.2', '1.7', '1.4', '5.1', '5.2', '2.2', '2.3', '1.8', '1.3', '7.1'],
+  algo: ['4.1', '4.2', '4.4', '4.3', '4.6', '4.5'],
+  backend: ['3.1', '5.5', '5.4', '3.5', '5.6', '3.6', '5.3', '1.9', '6.1', '2.4', '3.2', '3.3', '1.6', '1.5', '3.4'],
+  infra: ['7.2', '7.5', '7.4', '2.1', '7.3', '3.8'],
+  system_design: ['6.6', '3.7', '7.6', '6.2', '6.5', '6.4', '6.3']
+};
+
+function makeFakeEl(id = '', tag = 'div'){
+  return {
+    id,
+    tagName: tag.toUpperCase(),
+    textContent: '',
+    innerHTML: '',
+    value: '',
+    style: {},
+    children: [],
+    childNodes: [],
+    classList: { add: () => {}, remove: () => {}, toggle: () => {}, contains: () => false },
+    setAttribute: () => {},
+    getAttribute: () => null,
+    removeAttribute: () => {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    querySelector: () => null,
+    querySelectorAll: () => [],
+    appendChild: (c) => {
+      if(c && c.id) fakeElementsById[c.id] = c;
+      return c;
+    },
+    removeChild: (c) => c,
+    insertBefore: (c) => c,
+    remove: () => { if(id && fakeElementsById[id]) delete fakeElementsById[id]; },
+    focus: () => {},
+    blur: () => {},
+    click: () => {},
+    scrollTop: 0,
+    scrollIntoView: () => {},
+    getBoundingClientRect: () => ({ top: 0, left: 0, width: 100, height: 100, right: 100, bottom: 100 })
+  };
+}
+const fakeElementsById = {};
+const markupOnly = htmlContent.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
+let idM;
+const idRx = /id=["']([^"']+)["']/g;
+while((idM = idRx.exec(markupOnly)) !== null){
+  fakeElementsById[idM[1]] = makeFakeEl(idM[1]);
+}
+const fakeStorageMap = {};
+const fakeStore = {
+  getItem: (k) => fakeStorageMap[k] || null,
+  setItem: (k, v) => { fakeStorageMap[k] = String(v); },
+  removeItem: (k) => { delete fakeStorageMap[k]; },
+  clear: () => {}
+};
+const fakeDocument = {
+  documentElement: makeFakeEl('html', 'html'),
+  body: makeFakeEl('body', 'body'),
+  head: makeFakeEl('head', 'head'),
+  getElementById: (id) => fakeElementsById[id] || null,
+  querySelector: (sel) => (sel && sel.startsWith('#') ? (fakeElementsById[sel.slice(1)] || null) : makeFakeEl('', 'div')),
+  querySelectorAll: () => [],
+  createElement: (tag) => makeFakeEl('', tag),
+  addEventListener: () => {},
+  removeEventListener: () => {}
+};
+const fakeWinCtx = {
+  document: fakeDocument,
+  localStorage: fakeStore,
+  sessionStorage: fakeStore,
+  location: { hash: '', search: '', pathname: '/', href: 'http://localhost/' },
+  navigator: { userAgent: 'Mozilla/5.0 Node.js' },
+  addEventListener: () => {},
+  removeEventListener: () => {},
+  scrollTo: () => {},
+  innerWidth: 1024,
+  innerHeight: 768,
+  setTimeout: () => 0,
+  clearTimeout: () => {},
+  setInterval: () => 1,
+  clearInterval: () => {},
+  console: { log: () => {}, warn: () => {}, error: () => {} },
+  requestAnimationFrame: () => 1,
+  cancelAnimationFrame: () => {}
+};
+fakeWinCtx.window = fakeWinCtx;
+fakeWinCtx.global = fakeWinCtx;
+fakeDocument.defaultView = fakeWinCtx;
+
+const scRx = /<script(?:\s+([^>]*))?>([\s\S]*?)<\/script>/gi;
+let vmScriptSrc = '';
+let scM;
+while((scM = scRx.exec(htmlContent)) !== null){
+  if((scM[1] || '').includes('src=')) continue;
+  vmScriptSrc += '\n' + scM[2];
+}
+const ctx = vm.createContext(fakeWinCtx);
+vm.runInContext(vmScriptSrc, ctx, { timeout: 4000 });
+
+// 7.1 Точный состав 6 эшелонов и ровно 49 уникальных юнитов
+assert.deepStrictEqual(Object.keys(ctx.ECHELONS_BY_ID), Object.keys(expectedEchelons), 'Ключи ECHELONS_BY_ID должны точно соответствовать 6 эшелонам');
+const collectedIds = [];
+Object.keys(expectedEchelons).forEach(eid => {
+  const actualUnits = Array.from(ctx.ECHELONS_BY_ID[eid].units);
+  assert.deepStrictEqual(actualUnits, expectedEchelons[eid], `Список юнитов эшелона ${eid} не совпадает с эталоном`);
+  collectedIds.push(...actualUnits);
+});
+const uniqueSet = new Set(collectedIds);
+assert.strictEqual(collectedIds.length, 49, `Ожидалось 49 юнитов с учётом 0.1–0.4, получено ${collectedIds.length}`);
+assert.strictEqual(uniqueSet.size, 49, `Обнаружены дубликаты юнитов: ${collectedIds.length} vs ${uniqueSet.size} уникальных`);
+['0.1', '0.2', '0.3', '0.4'].forEach(id => assert(uniqueSet.has(id), `Отсутствует юнит ${id}`));
+ctx.ALL_UNITS_COMBINED.forEach(u => assert(uniqueSet.has(u.id), `Действующий юнит ${u.id} не распределён по эшелонам`));
+
+// 7.2 Явный порядок внутри эшелона (не 1->7)
+assert.deepStrictEqual(
+  Array.from(ctx.getEchelonUnits('screening').map(u => u.id)),
+  ['1.1', '1.2', '1.7', '1.4', '5.1', '5.2', '2.2', '2.3', '1.8', '1.3', '7.1'],
+  'getEchelonUnits("screening") обязан возвращать юниты в частотном порядке эшелона, а не по номерам модулей'
+);
+assert.deepStrictEqual(
+  Array.from(ctx.getEchelonUnits('backend').map(u => u.id)),
+  ['3.1', '5.5', '5.4', '3.5', '5.6', '3.6', '5.3', '1.9', '6.1', '2.4', '3.2', '3.3', '1.6', '1.5', '3.4'],
+  'getEchelonUnits("backend") обязан сохранять точный порядок массива backend.units'
+);
+
+// 7.3 Безопасная обработка отсутствующих 0.1-0.4 в HR-скрининге на Шаге 1
+const hrProg = ctx.getEchelonProgress('hr');
+assert.strictEqual(hrProg.unitsCount, 0, 'На Шаге 1 в HR-скрининге должно быть 0 загруженных юнитов');
+assert.strictEqual(hrProg.plannedUnitsCount, 4, 'HR-скрининг должен знать о 4 запланированных юнитах');
+assert.strictEqual(hrProg.isInDevelopment, true, 'HR-скрининг на Шаге 1 должен помечаться как isInDevelopment');
+assert.strictEqual(hrProg.pct, 0, 'Процент пустого эшелона должен быть 0 без NaN');
+const hrSnakeHtml = ctx.viewPathSerpentine({ echelon: 'hr' });
+const hrSnakeVisibleText = hrSnakeHtml.replace(/\sstyle="[^"]*"/g, '').replace(/<[^>]+>/g, ' ');
+assert(hrSnakeHtml.includes('В разработке') && !/\b0\.[1-4]\b/.test(hrSnakeVisibleText), 'Плейсхолдер HR на Тропе не должен падать и не должен утекать техкод 0.1-0.4 в UI');
+const hrProHtml = ctx.viewProPath({ echelon: 'hr' });
+const hrProVisibleText = hrProHtml.replace(/\sstyle="[^"]*"/g, '').replace(/<[^>]+>/g, ' ');
+assert(hrProHtml.includes('В разработке') && !/\b0\.[1-4]\b/.test(hrProVisibleText), 'Плейсхолдер HR в Pro-режиме не должен падать и не должен утекать техкод 0.1-0.4 в UI');
+
+// 7.4 Пресеты воронки: порядок, номера 1..6 и сохранение прогресса
+assert.strictEqual(ctx.FUNNEL_PRESETS.bigtech.label, 'BigTech (алгоритмы до Backend)');
+assert.strictEqual(ctx.FUNNEL_PRESETS.product.label, 'Продуктовый рынок (Backend и инфра до алгоритмов)');
+assert.strictEqual(ctx.getFunnelPreset(), 'bigtech');
+assert.strictEqual(ctx.getEchelonDisplayNum('algo'), 3);
+assert.strictEqual(ctx.getEchelonDisplayNum('backend'), 4);
+assert.strictEqual(ctx.getEchelonDisplayNum('infra'), 5);
+
+ctx.setFunnelPreset('product');
+assert.strictEqual(ctx.getFunnelPreset(), 'product');
+assert.deepStrictEqual(Array.from(ctx.getOrderedEchelonIds()), ['hr', 'screening', 'backend', 'infra', 'algo', 'system_design']);
+assert.strictEqual(ctx.getEchelonDisplayNum('backend'), 3);
+assert.strictEqual(ctx.getEchelonDisplayNum('infra'), 4);
+assert.strictEqual(ctx.getEchelonDisplayNum('algo'), 5);
+
+ctx.setFunnelPreset('bigtech');
+assert.deepStrictEqual(Array.from(ctx.getOrderedEchelonIds()), ['hr', 'screening', 'algo', 'backend', 'infra', 'system_design']);
+
+// 7.5 Санитизация и слияние legacy state (stackBranch удаляется, funnelPreset и selectedEchelon сохраняются)
+const cleanedLegacy = ctx.sanitizeAcademyState({ stackBranch: 'django', selectedEchelon: 2, funnelPreset: 'product', xp: 120 });
+assert.strictEqual(Object.prototype.hasOwnProperty.call(cleanedLegacy, 'stackBranch'), false, 'Legacy stackBranch должен удаляться при санитизации');
+assert.strictEqual(cleanedLegacy.funnelPreset, 'product', 'funnelPreset должен сохраняться при санитизации');
+assert.strictEqual(cleanedLegacy.selectedEchelon, 'backend', 'Числовой legacy selectedEchelon должен безопасно мигрировать на строковый id');
+
+const mergedState = ctx.mergeProgressStates(
+  { updatedAt: 100, funnelPreset: 'bigtech', stackBranch: 'fastapi', xp: 50 },
+  { updatedAt: 200, funnelPreset: 'product', xp: 75 }
+);
+assert.strictEqual(mergedState.funnelPreset, 'product', 'mergeProgressStates должен переносить более новый funnelPreset');
+assert.strictEqual(Object.prototype.hasOwnProperty.call(mergedState, 'stackBranch'), false, 'mergeProgressStates не должен сохранять stackBranch');
+
+// 7.6 Переключатель в настройках SPA
+ctx.openSettingsModal();
+const settingsModalEl = fakeElementsById['settings-modal'];
+assert(settingsModalEl && settingsModalEl.innerHTML.includes('🎯 Порядок воронки'), 'Модалка настроек обязана содержать секцию Порядок воронки');
+assert(settingsModalEl.innerHTML.includes('BigTech (алгоритмы до Backend)') && settingsModalEl.innerHTML.includes('Продуктовый рынок (Backend и инфра до алгоритмов)'), 'Модалка настроек должна содержать точные подписи обоих пресетов');
+
+console.log('  ✓ 6 эшелонов, 49 уникальных юнитов, порядок внутри эшелона и переключение воронки (BigTech/Product) подтверждены');
+
 console.log('\n================================================================');
-console.log('🏆 ВСЕ 6 УРОВНЕЙ DRY-АРХИТЕКТУРЫ УСПЕШНО ПОДТВЕРЖДЕНЫ (100% DRY)');
+console.log('🏆 ВСЕ 7 УРОВНЕЙ DRY-АРХИТЕКТУРЫ УСПЕШНО ПОДТВЕРЖДЕНЫ (100% DRY)');
 console.log('================================================================');
 process.exit(0);

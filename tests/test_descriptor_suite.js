@@ -317,6 +317,34 @@ assert(schemaSql.includes('CREATE TABLE IF NOT EXISTS sync_revisions'), 'Invaria
 assert(schemaSql.includes('CREATE TABLE IF NOT EXISTS feedback_reports'), 'Invariant 16: feedback_reports table required');
 console.log('✓ Invariant 16: SQLite DDL Test Database Schema (9/9 tables & indices) verified');
 
+// -----------------------------------------------------------------------------
+// 18. Инвариант 17: 6 эшелонов собеседования, 49 юнитов и переключатель воронки
+// -----------------------------------------------------------------------------
+assert(
+  academyHtml.includes('const ECHELONS_BY_ID =') &&
+  academyHtml.includes('const FUNNEL_PRESETS =') &&
+  academyHtml.includes('function setFunnelPreset('),
+  'Invariant 17: 6-echelon core and funnel preset engine must exist in academy.html'
+);
+assert(
+  academyHtml.includes('BigTech (алгоритмы до Backend)') &&
+  academyHtml.includes('Продуктовый рынок (Backend и инфра до алгоритмов)') &&
+  academyHtml.includes('🎯 Порядок воронки'),
+  'Invariant 17: Funnel order presets and settings section must be present in academy.html'
+);
+assert(
+  !academyHtml.includes('function setStackBranch(') &&
+  !academyHtml.includes('data-stack-branch='),
+  'Invariant 17: Legacy stackBranch switcher must be completely removed'
+);
+assert(
+  projectContext.includes('Матрица 6 эшелонов собеседования') &&
+  projectContext.includes('49 уникальных юнитов') &&
+  projectContext.includes('BigTech (алгоритмы до Backend)'),
+  'Invariant 17: PROJECT_CONTEXT.md must document 6 echelons, 49 units, and funnel presets'
+);
+console.log('✓ Invariant 17: 6 interview echelons, 49 units & funnel preset selector verified');
+
 console.log('\n================================================================');
 console.log('  ALL STRICT DESCRIPTOR INVARIANTS & AUDITS PASSED (100% PERFECT)');
 console.log('================================================================');

@@ -72,15 +72,33 @@ def strip_html(raw: str) -> str:
 
 
 def extract_unit_meta(html_text: str) -> dict[str, dict]:
-    """Извлекает карту UNIT_INTERVIEW_META из standards/standards.html."""
+    """Извлекает карту эшелонов юнитов (6 эшелонов / legacy fallback) из standards/standards.html."""
+    result: dict[str, dict] = {}
+    ech_marker = 'const ECHELONS_BY_ID ='
+    ech_start = html_text.find(ech_marker)
+    if ech_start != -1:
+        ech_brace = html_text.find('{', ech_start)
+        ech_end = html_text.find('};\n', ech_brace)
+        if ech_end == -1:
+            ech_end = html_text.find('};', ech_brace)
+        ech_block = html_text[ech_brace:ech_end + 1]
+        order = ['hr', 'screening', 'algo', 'backend', 'infra', 'system_design']
+        for tier_num, ech_id in enumerate(order, start=1):
+            m_units = re.search(rf'\b{ech_id}\s*:\s*\{{[\s\S]*?\bunits\s*:\s*\[([^\]]*)\]', ech_block)
+            if m_units:
+                uids = re.findall(r"'(\d+\.\d+)'", m_units.group(1))
+                for rank_idx, uid in enumerate(uids):
+                    result[uid] = {'echelonId': ech_id, 'tier': tier_num, 'rank': rank_idx, 'stackTag': 'core'}
+    if result:
+        return result
+
     marker = 'const UNIT_INTERVIEW_META ='
     start = html_text.find(marker)
     if start == -1:
-        raise RuntimeError('UNIT_INTERVIEW_META не найден в standards/standards.html')
+        raise RuntimeError('UNIT_INTERVIEW_META и ECHELONS_BY_ID не найдены в standards/standards.html')
     brace_start = html_text.find('{', start)
     end = html_text.find('};', brace_start)
     block = html_text[brace_start:end + 1]
-    result: dict[str, dict] = {}
     pattern = re.compile(
         r"'(\d+\.\d+)'\s*:\s*\{\s*tier\s*:\s*(\d+)\s*,\s*stackTag\s*:\s*'([^']+)'\s*\}"
     )
@@ -438,7 +456,13 @@ def run_audit(tier_filter: str, top_n: int) -> dict:
     tasks_list = json.loads((CONTENT_DIR / 'tasks.json').read_text(encoding='utf-8'))
     tasks_by_id = {t['id']: t for t in tasks_list}
 
-    target_tier = None if tier_filter == 'all' else int(tier_filter)
+    target_tier = None
+    target_echelon_id = None
+    if tier_filter != 'all':
+        if tier_filter.isdigit():
+            target_tier = int(tier_filter)
+        else:
+            target_echelon_id = tier_filter
 
     seen_notes: dict[str, dict] = {}
     seen_decks: dict[str, dict] = {}
@@ -453,8 +477,12 @@ def run_audit(tier_filter: str, top_n: int) -> dict:
 
         for unit in obj.get('units', []):
             uid = unit['id']
-            u_tier = unit_meta.get(uid, {}).get('tier', unit.get('tier', 2))
+            meta_u = unit_meta.get(uid, {})
+            u_tier = meta_u.get('tier', unit.get('tier', 2))
+            u_ech_id = meta_u.get('echelonId', unit.get('echelonId'))
             if target_tier is not None and u_tier != target_tier:
+                continue
+            if target_echelon_id is not None and u_ech_id != target_echelon_id:
                 continue
 
             ut_rep = check_unit_test_quality(uid, u_tier, m_utests.get(uid))
@@ -603,9 +631,9 @@ def main() -> int:
     )
     parser.add_argument(
         '--tier',
-        choices=['1', '2', '3', '4', 'all'],
+        choices=['1', '2', '3', '4', '5', '6', 'hr', 'screening', 'algo', 'backend', 'infra', 'system_design', 'all'],
         default='all',
-        help='Фильтр по эшелону подготовки (по умолчанию: all)',
+        help='Фильтр по эшелону подготовки (число 1..6, строковый id или all)',
     )
     parser.add_argument(
         '--strict',

@@ -219,12 +219,15 @@ function testZeroTrapNavigationAnswerFaceCatalogAndLesson(){
 // Тест-кейс 15: Лаконичные заголовки эшелонов для предотвращения обрезки селектора на мобильных
 function testConciseEchelonLabels(){
   assert(
-    academyHtml.includes('>🎯 Все 4 эшелона</option>'),
-    'Defect 15: echelonOpts must render concise label "🎯 Все 4 эшелона" without bloated suffixes'
+    academyHtml.includes('>🎯 Все 6 эшелонов</option>'),
+    'Defect 15: echelonOpts must render concise label "🎯 Все 6 эшелонов" without bloated suffixes'
   );
   assert(
-    academyHtml.includes('>🚨 Эшелон 1 · Скрининг и база</option>'),
-    'Defect 15: echelonOpts must render concise label for Echelon 1'
+    academyHtml.includes("title: 'HR-скрининг'") &&
+    academyHtml.includes("title: 'Техскрининг'") &&
+    academyHtml.includes("shortTitle: 'Backend и БД'") &&
+    academyHtml.includes("Эшелон ${ech.tier} · ${ech.shortTitle}"),
+    'Defect 15: echelonOpts must render concise labels for all 6 echelons'
   );
 }
 

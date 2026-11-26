@@ -1,6 +1,7 @@
 import os, re, json, zipfile, io, shutil, subprocess
 from extract_remnote_data import BASE_REMNOTE, IDE_HTML_PATH, TASKS_381, k_files_map, f_files_map, parse_k_note
 from build_python_mastery import (
+    HR_UNITS, HR_NOTES_DATA, HR_DECKS_DATA,
     PY_UNITS, PY_NOTES_DATA, PY_DECKS_DATA,
     WEB_UNITS, WEB_NOTES_DATA, WEB_DECKS_DATA,
     BACKEND_UNITS, BACKEND_NOTES_DATA, BACKEND_DECKS_DATA,
@@ -609,6 +610,13 @@ UPDATED_LESSON_ORDER = {
 # 3. Prepare compact JSON payloads for injection
 def safe_js_json(obj):
     return json.dumps(obj, ensure_ascii=False).replace('</script', '<\\/script').replace('</SCRIPT', '<\\/SCRIPT')
+
+hr_mastery_json = safe_js_json({
+    'units': HR_UNITS,
+    'notes': HR_NOTES_DATA,
+    'decks': HR_DECKS_DATA,
+    'unitTests': {}
+})
 
 py_mastery_json = safe_js_json({
     'units': PY_UNITS,
@@ -5221,8 +5229,8 @@ else:
   /* V8: экспресс-песочница навыка не срезает последнюю строку кода */
   #skill-lab-scratchpad{min-height:112px !important;padding-bottom:14px !important;line-height:1.55 !important;}
 
-  /* ================= CODDY-REFERENCE DESIGNER BATCH (2026-10-07, согласовано с Ксенией) ================= */
-  /* V6/V7-компаньон: инлайн-код в теории — цветные чипы-«ключевые слова» как в Coddy,
+  /* ================= INLINE CODE CONCEPT CHIPS ================= */
+  /* Инлайн-код в теории — цветные чипы ключевых слов,
      снимают тяжесть сплошных кодовых вставок (цвета платформы не меняем) */
   .lesson-theory p > code:not(pre code),
   .lesson-theory li > code:not(pre code){
@@ -6125,10 +6133,11 @@ function ensureExtendedState(target){
   if(typeof s.soundEnabled !== 'boolean') s.soundEnabled = true;
   if(typeof s.utShowExplanations !== 'boolean') s.utShowExplanations = true; // тумблер «Показывать разбор после ответа»
   if(typeof s.utSkipStartModal !== 'boolean') s.utSkipStartModal = false; // «Всегда открывать тест без этой модалки»
-  if(!s.stackBranch || !['fastapi','django','both'].includes(s.stackBranch)) s.stackBranch = 'fastapi';
+  if(s.funnelPreset !== 'bigtech' && s.funnelPreset !== 'product') s.funnelPreset = 'bigtech';
+  if(Object.prototype.hasOwnProperty.call(s, 'stackBranch')) delete s.stackBranch;
   if(!s.unitSortMode || !['priority','number'].includes(s.unitSortMode)) s.unitSortMode = 'priority';
   if(!s.pathViewMode || !['game','pro'].includes(s.pathViewMode)) s.pathViewMode = 'game';
-  if(!s.pathNodeStyle || !['paw','button'].includes(s.pathNodeStyle)) s.pathNodeStyle = 'button'; // выбор Ксении: по умолчанию «Кнопки» (ближе к Coddy)
+  if(!s.pathNodeStyle || !['paw','button'].includes(s.pathNodeStyle)) s.pathNodeStyle = 'button';
   if(!s.diagnosticGaps || !Array.isArray(s.diagnosticGaps)) s.diagnosticGaps = [];
   if(typeof s.diagCompleted !== 'boolean') s.diagCompleted = false;
   if(typeof s.diagScore !== 'number') s.diagScore = 0;
@@ -7324,62 +7333,32 @@ window.togglePomodoro = togglePomodoro;
 window.formatPomo = formatPomo;
 
 
-/* ================= INTERVIEW-FIRST PRIORITY ARCHITECTURE (4 ECHELONS + PARALLEL STACK BRANCHES) ================= */
-const INTERVIEW_ECHELONS = {
-  1: { tier: 1, icon: '🚨', badgeClass: 'echelon-badge--t1', label: '🚨 Эшелон 1 · Скрининг и база', shortLabel: '🚨 Эшелон 1', desc: 'Отсев на HR/тех-скрининге и первых 15 минутах собеседования (Python Core, Сложность и Два указателя, HTTP/REST, SQL JOIN, Git и pytest)' },
-  2: { tier: 2, icon: '🔥', badgeClass: 'echelon-badge--t2', label: '🔥 Эшелон 2 · Тех-ядро и стек', shortLabel: '🔥 Эшелон 2', desc: 'Основное техническое собеседование по выбранному стеку (ООП, Итераторы, GIL/Asyncio, FastAPI + SQLAlchemy или Django + DRF, ACID/Индексы, Docker, Веб-безопасность)' },
-  3: { tier: 3, icon: '⚡', badgeClass: 'echelon-badge--t3', label: '⚡ Эшелон 3 · Продакшен-инженерия', shortLabel: '⚡ Эшелон 3', desc: 'Вопросы уровня Strong Junior / Middle (Redis, Celery/Kafka, SOLID и Чистая архитектура, Сложные графы и DP, CI/CD, Linux/Nginx, Observability)' },
-  4: { tier: 4, icon: '👑', badgeClass: 'echelon-badge--t4', label: '👑 Эшелон 4 · Архитектурный резерв', shortLabel: '👑 Эшелон 4', desc: 'Второй стек в резерве (невыбранная ветка стека + Flask, DDD, Highload System Design)' }
+/* ================= INTERVIEW-FIRST PRIORITY ARCHITECTURE (6 ECHELONS + FUNNEL PRESETS) ================= */
+const ECHELONS_BY_ID = {
+  hr: { id: 'hr', title: 'HR-скрининг', shortTitle: 'HR-скрининг', icon: '🗣️', units: ['0.1', '0.2', '0.3', '0.4'] },
+  screening: { id: 'screening', title: 'Техскрининг', shortTitle: 'Техскрининг', icon: '⚡', units: ['1.1', '1.2', '1.7', '1.4', '5.1', '5.2', '2.2', '2.3', '1.8', '1.3', '7.1'] },
+  algo: { id: 'algo', title: 'Алгоритмическая секция', shortTitle: 'Алгоритмы', icon: '🧮', units: ['4.1', '4.2', '4.4', '4.3', '4.6', '4.5'] },
+  backend: { id: 'backend', title: 'Backend и БД', shortTitle: 'Backend и БД', icon: '⚙️', units: ['3.1', '5.5', '5.4', '3.5', '5.6', '3.6', '5.3', '1.9', '6.1', '2.4', '3.2', '3.3', '1.6', '1.5', '3.4'] },
+  infra: { id: 'infra', title: 'Продакшен и инфраструктура', shortTitle: 'Продакшен', icon: '🚀', units: ['7.2', '7.5', '7.4', '2.1', '7.3', '3.8'] },
+  system_design: { id: 'system_design', title: 'Финал · Архитектура и System Design', shortTitle: 'System Design', icon: '🏛️', units: ['6.6', '3.7', '7.6', '6.2', '6.5', '6.4', '6.3'] }
 };
+const INTERVIEW_ECHELONS = {
+  hr: { id: 'hr', tier: 1, icon: '🗣️', badgeClass: 'echelon-badge--t1', label: '🗣️ Эшелон 1 · HR-скрининг', shortLabel: '🗣️ Эшелон 1 · HR-скрининг', desc: 'Самопрезентация, разбор опыта, поведенческие вопросы и переговоры об оффере.' },
+  screening: { id: 'screening', tier: 2, icon: '⚡', badgeClass: 'echelon-badge--t2', label: '⚡ Эшелон 2 · Техскрининг', shortLabel: '⚡ Эшелон 2 · Техскрининг', desc: 'Самые частые вопросы первичного технического фильтра: Python, базовый SQL, HTTP и Git/Linux.' },
+  algo: { id: 'algo', tier: 3, icon: '🧮', badgeClass: 'echelon-badge--t3', label: '🧮 Эшелон 3 · Алгоритмическая секция', shortLabel: '🧮 Эшелон 3 · Алгоритмы', desc: 'Оценка сложности, хеш-таблицы, два указателя, скользящее окно, деревья, графы и ДП.' },
+  backend: { id: 'backend', tier: 4, icon: '⚙️', badgeClass: 'echelon-badge--t4', label: '⚙️ Эшелон 4 · Backend и БД', shortLabel: '⚙️ Эшелон 4 · Backend и БД', desc: 'Фреймворки, индексы, транзакции и изоляция, асинхронность, ORM, тестирование, очереди и безопасность.' },
+  infra: { id: 'infra', tier: 5, icon: '🚀', badgeClass: 'echelon-badge--t5', label: '🚀 Эшелон 5 · Продакшен и инфраструктура', shortLabel: '🚀 Эшелон 5 · Продакшен', desc: 'Docker, логирование и метрики, эксплуатация в продакшене, сети, CI/CD и деплой.' },
+  system_design: { id: 'system_design', tier: 6, icon: '🏛️', badgeClass: 'echelon-badge--t6', label: '🏛️ Эшелон 6 · Финал · Архитектура и System Design', shortLabel: '🏛️ Эшелон 6 · System Design', desc: 'Высоконагруженные системы, микросервисы, масштабирование БД, консистентность и отказоустойчивость.' }
+};
+['hr', 'screening', 'algo', 'backend', 'infra', 'system_design'].forEach((k, idx) => { INTERVIEW_ECHELONS[idx + 1] = INTERVIEW_ECHELONS[k]; });
 window.INTERVIEW_ECHELONS = INTERVIEW_ECHELONS;
 
-const UNIT_INTERVIEW_META = {
-  '1.1': { tier: 1, stackTag: 'core' },
-  '1.2': { tier: 1, stackTag: 'core' },
-  '1.3': { tier: 1, stackTag: 'core' },
-  '1.4': { tier: 1, stackTag: 'core' },
-  '1.5': { tier: 1, stackTag: 'core' },
-  '1.6': { tier: 2, stackTag: 'core' },
-  '1.7': { tier: 1, stackTag: 'core' },
-  '1.8': { tier: 1, stackTag: 'core' },
-  '1.9': { tier: 1, stackTag: 'core' },
-  '2.1': { tier: 1, stackTag: 'core' },
-  '2.2': { tier: 1, stackTag: 'core' },
-  '2.3': { tier: 1, stackTag: 'core' },
-  '2.4': { tier: 1, stackTag: 'core' },
-  '3.1': { tier: 2, stackTag: 'fastapi' },
-  '3.2': { tier: 2, stackTag: 'django' },
-  '3.3': { tier: 2, stackTag: 'django' },
-  '3.4': { tier: 4, stackTag: 'flask' },
-  '3.5': { tier: 2, stackTag: 'core' },
-  '3.6': { tier: 2, stackTag: 'core' },
-  '3.7': { tier: 3, stackTag: 'core' },
-  '3.8': { tier: 3, stackTag: 'core' },
-  '4.1': { tier: 1, stackTag: 'core' },
-  '4.2': { tier: 1, stackTag: 'core' },
-  '4.3': { tier: 1, stackTag: 'core' },
-  '4.4': { tier: 1, stackTag: 'core' },
-  '4.5': { tier: 3, stackTag: 'core' },
-  '4.6': { tier: 1, stackTag: 'core' },
-  '5.1': { tier: 1, stackTag: 'core' },
-  '5.2': { tier: 1, stackTag: 'core' },
-  '5.3': { tier: 1, stackTag: 'core' },
-  '5.4': { tier: 1, stackTag: 'core' },
-  '5.5': { tier: 2, stackTag: 'fastapi' },
-  '5.6': { tier: 3, stackTag: 'core' },
-  '6.1': { tier: 3, stackTag: 'core' },
-  '6.2': { tier: 3, stackTag: 'core' },
-  '6.3': { tier: 3, stackTag: 'core' },
-  '6.4': { tier: 4, stackTag: 'core' },
-  '6.5': { tier: 3, stackTag: 'core' },
-  '6.6': { tier: 4, stackTag: 'core' },
-  '7.1': { tier: 1, stackTag: 'core' },
-  '7.2': { tier: 2, stackTag: 'core' },
-  '7.3': { tier: 3, stackTag: 'core' },
-  '7.4': { tier: 3, stackTag: 'core' },
-  '7.5': { tier: 3, stackTag: 'core' },
-  '7.6': { tier: 2, stackTag: 'core' }
-};
+const UNIT_INTERVIEW_META = {};
+['hr', 'screening', 'algo', 'backend', 'infra', 'system_design'].forEach((eid, tIdx) => {
+  ECHELONS_BY_ID[eid].units.forEach((uid, rIdx) => {
+    UNIT_INTERVIEW_META[uid] = { echelonId: eid, tier: tIdx + 1, rank: rIdx, stackTag: 'core' };
+  });
+});
 window.UNIT_INTERVIEW_META = UNIT_INTERVIEW_META;
 
 // Map each of the 18 Skill Tree nodes (#/map & #/topic/<id>) to its corresponding units across the 7 modules
@@ -15381,53 +15360,62 @@ setTimeout(runProgressSync, 1200);
 '''
     html_out = html_out.replace(sync_init_marker, sync_init_marker + '\n' + sync_client_js, 1)
 
-# Canonical SSOT Invariant: preserve validated upgrades from standards/standards.html while injecting fresh canonical IDE_TASKS
+# Canonical SSOT Invariant: preserve validated notes, decks & 8-12q unitTests in standards/standards.html while refreshing 6-echelon metadata and IDE_TASKS
 if os.path.isfile(CANONICAL_STANDARDS_PATH):
     with open(CANONICAL_STANDARDS_PATH, 'r', encoding='utf-8') as f_canonical:
         canonical_disk_html = f_canonical.read()
     if 'dot-jewel' in canonical_disk_html and 'toggleDashAccordion' in canonical_disk_html:
-        canonical_disk_html = re.sub(
-            r'const PY_MASTERY\s*=\s*\{[\s\S]*?\};\s*(const WEB_MASTERY)',
-            lambda m: f'const PY_MASTERY = {py_mastery_json};\n\n{m.group(1)}',
-            canonical_disk_html,
-            count=1
-        )
-        canonical_disk_html = re.sub(
-            r'const WEB_MASTERY\s*=\s*\{[\s\S]*?\};\s*(const BACKEND_MASTERY)',
-            lambda m: f'const WEB_MASTERY = {web_mastery_json};\n\n{m.group(1)}',
-            canonical_disk_html,
-            count=1
-        )
-        canonical_disk_html = re.sub(
-            r'const BACKEND_MASTERY\s*=\s*\{[\s\S]*?\};\s*(const ALGO_MASTERY)',
-            lambda m: f'const BACKEND_MASTERY = {backend_mastery_json};\n\n{m.group(1)}',
-            canonical_disk_html,
-            count=1
-        )
-        canonical_disk_html = re.sub(
-            r'const ALGO_MASTERY\s*=\s*\{[\s\S]*?\};\s*(const DB_MASTERY)',
-            lambda m: f'const ALGO_MASTERY = {algo_mastery_json};\n\n{m.group(1)}',
-            canonical_disk_html,
-            count=1
-        )
-        canonical_disk_html = re.sub(
-            r'const DB_MASTERY\s*=\s*\{[\s\S]*?\};\s*(const ARCH_MASTERY)',
-            lambda m: f'const DB_MASTERY = {db_mastery_json};\n\n{m.group(1)}',
-            canonical_disk_html,
-            count=1
-        )
-        canonical_disk_html = re.sub(
-            r'const ARCH_MASTERY\s*=\s*\{[\s\S]*?\};\s*(const INFRA_MASTERY)',
-            lambda m: f'const ARCH_MASTERY = {arch_mastery_json};\n\n{m.group(1)}',
-            canonical_disk_html,
-            count=1
-        )
-        canonical_disk_html = re.sub(
-            r'const INFRA_MASTERY\s*=\s*\{[\s\S]*?\};\s*(const IDE_TASKS)',
-            lambda m: f'const INFRA_MASTERY = {infra_mastery_json};\n\n{m.group(1)}',
-            canonical_disk_html,
-            count=1
-        )
+        _EC_BY_ID_BUILD = {
+            'hr': (1, '🗣️ Эшелон 1 · HR-скрининг', ['0.1', '0.2', '0.3', '0.4']),
+            'screening': (2, '⚡ Эшелон 2 · Техскрининг', ['1.1', '1.2', '1.7', '1.4', '5.1', '5.2', '2.2', '2.3', '1.8', '1.3', '7.1']),
+            'algo': (3, '🧮 Эшелон 3 · Алгоритмическая секция', ['4.1', '4.2', '4.4', '4.3', '4.6', '4.5']),
+            'backend': (4, '⚙️ Эшелон 4 · Backend и БД', ['3.1', '5.5', '5.4', '3.5', '5.6', '3.6', '5.3', '1.9', '6.1', '2.4', '3.2', '3.3', '1.6', '1.5', '3.4']),
+            'infra': (5, '🚀 Эшелон 5 · Продакшен и инфраструктура', ['7.2', '7.5', '7.4', '2.1', '7.3', '3.8']),
+            'system_design': (6, '🏛️ Эшелон 6 · Финал · Архитектура и System Design', ['6.6', '3.7', '7.6', '6.2', '6.5', '6.4', '6.3']),
+        }
+        _UNIT_EC_LOOKUP = {}
+        for _eid, (_etier, _elabel, _eunits) in _EC_BY_ID_BUILD.items():
+            for _uid in _eunits:
+                _UNIT_EC_LOOKUP[_uid] = (_eid, _etier, _elabel)
+
+        def _refresh_mastery_var_metadata(html_src, var_name, fallback_json=None):
+            marker = f'const {var_name} = '
+            pos = html_src.find(marker)
+            if pos == -1:
+                return html_src
+            val_start = pos + len(marker)
+            dec = json.JSONDecoder()
+            try:
+                obj, rel_end = dec.raw_decode(html_src[val_start:])
+            except Exception:
+                if fallback_json is None:
+                    return html_src
+                obj = json.loads(fallback_json)
+                rel_end = html_src.find(';', val_start) - val_start
+            if fallback_json and var_name == 'HR_MASTERY':
+                fb_obj = json.loads(fallback_json)
+                if fb_obj.get('units') and not obj.get('units'):
+                    obj = fb_obj
+            if isinstance(obj, dict) and isinstance(obj.get('units'), list):
+                for u_item in obj['units']:
+                    uid = u_item.get('id')
+                    ec_id, ec_tier, ec_lbl = _UNIT_EC_LOOKUP.get(uid, ('screening', 2, '⚡ Эшелон 2 · Техскрининг'))
+                    u_item['echelonId'] = ec_id
+                    u_item['tier'] = ec_tier
+                    u_item['tierLabel'] = ec_lbl
+                    u_item['stackTag'] = 'core'
+                    for sk_item in u_item.get('skills', []):
+                        sk_item['echelonId'] = ec_id
+                        sk_item['tier'] = ec_tier
+                        sk_item['tierLabel'] = ec_lbl
+                        sk_item['stackTag'] = 'core'
+            dumped = safe_js_json(obj)
+            return html_src[:val_start] + dumped + html_src[val_start + rel_end:]
+
+        for _mv_name in ('HR_MASTERY', 'PY_MASTERY', 'WEB_MASTERY', 'BACKEND_MASTERY', 'ALGO_MASTERY', 'DB_MASTERY', 'ARCH_MASTERY', 'INFRA_MASTERY'):
+            _fb_json = hr_mastery_json if (_mv_name == 'HR_MASTERY' and 'hr_mastery_json' in globals()) else None
+            canonical_disk_html = _refresh_mastery_var_metadata(canonical_disk_html, _mv_name, _fb_json)
+
         canonical_disk_html = re.sub(
             r'const IDE_TASKS\s*=\s*\[[\s\S]*?\];\s*(const IDE_TASKS_BY_ID)',
             lambda m: f'const IDE_TASKS = {ide_tasks_json};\n{m.group(1)}',

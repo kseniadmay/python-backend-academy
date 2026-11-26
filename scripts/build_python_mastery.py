@@ -4,6 +4,8 @@ from extract_remnote_data import BASE_REMNOTE, TASKS_381, k_files_map, f_files_m
 with open(os.path.join(BASE_REMNOTE, '00 · 🗺️ Карта Мастерства.md'), encoding='utf-8') as f:
     karta = f.read()
 
+hr_m = re.search(r'## 📁 00 ·[^\n]*([\s\S]*?)(?=## 📁 01 ·)', karta)
+mod0_hr_text = hr_m.group(1) if hr_m else ''
 mod1_text = re.search(r'## 📁 01 · 🐍 Python(.*?)(?=## 📁 02 ·)', karta, re.S).group(1)
 mod2_web_text = re.search(r'## 📁 02 · 🌐 Web\b(.*?)(?=## 📁 03 · ⚙️ Backend)', karta, re.S).group(1)
 mod3_backend_text = re.search(r'## 📁 03 · ⚙️ Backend(.*?)(?=## 📁 04 ·)', karta, re.S).group(1)
@@ -201,114 +203,49 @@ def _clean_skill_title(s: str) -> str:
     )
     return s
 
-UNIT_INTERVIEW_META = {
-    # Эшелон 1: Скрининг и база (22 юнита)
-    '1.1': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '1.2': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '1.3': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '1.4': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '1.5': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '1.7': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '1.8': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '1.9': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '2.1': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '2.2': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '2.3': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '2.4': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '4.1': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '4.2': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '4.3': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '4.4': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '4.6': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '5.1': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '5.2': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '5.3': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '5.4': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
-    '7.1': {'tier': 1, 'tierLabel': '🛡️ Эшелон 1: BigTech-скрининг · Железный фундамент', 'stackTag': 'core'},
+ECHELON_ORDER_BUILD = [
+    ('hr', '🗣️ Эшелон 1 · HR-скрининг', ['0.1', '0.2', '0.3', '0.4']),
+    ('screening', '⚡ Эшелон 2 · Техскрининг', ['1.1', '1.2', '1.7', '1.4', '5.1', '5.2', '2.2', '2.3', '1.8', '1.3', '7.1']),
+    ('algo', '🧮 Эшелон 3 · Алгоритмическая секция', ['4.1', '4.2', '4.4', '4.3', '4.6', '4.5']),
+    ('backend', '⚙️ Эшелон 4 · Backend и БД', ['3.1', '5.5', '5.4', '3.5', '5.6', '3.6', '5.3', '1.9', '6.1', '2.4', '3.2', '3.3', '1.6', '1.5', '3.4']),
+    ('infra', '🚀 Эшелон 5 · Продакшен и инфраструктура', ['7.2', '7.5', '7.4', '2.1', '7.3', '3.8']),
+    ('system_design', '🏛️ Эшелон 6 · Финал · Архитектура и System Design', ['6.6', '3.7', '7.6', '6.2', '6.5', '6.4', '6.3']),
+]
 
-    # Эшелон 2: Тех-ядро и параллельные ветви стека (9 юнитов)
-    '1.6': {'tier': 2, 'tierLabel': '🎯 Эшелон 2: Тех-интервью · Стек и базы данных', 'stackTag': 'core'},
-    '3.1': {'tier': 2, 'tierLabel': '🎯 Эшелон 2: Тех-интервью · Стек и базы данных', 'stackTag': 'fastapi'},
-    '3.2': {'tier': 2, 'tierLabel': '🎯 Эшелон 2: Тех-интервью · Стек и базы данных', 'stackTag': 'django'},
-    '3.3': {'tier': 2, 'tierLabel': '🎯 Эшелон 2: Тех-интервью · Стек и базы данных', 'stackTag': 'django'},
-    '3.5': {'tier': 2, 'tierLabel': '🎯 Эшелон 2: Тех-интервью · Стек и базы данных', 'stackTag': 'core'},
-    '3.6': {'tier': 2, 'tierLabel': '🎯 Эшелон 2: Тех-интервью · Стек и базы данных', 'stackTag': 'core'},
-    '5.5': {'tier': 2, 'tierLabel': '🎯 Эшелон 2: Тех-интервью · Стек и базы данных', 'stackTag': 'fastapi'},
-    '7.2': {'tier': 2, 'tierLabel': '🎯 Эшелон 2: Тех-интервью · Стек и базы данных', 'stackTag': 'core'},
-    '7.6': {'tier': 2, 'tierLabel': '🎯 Эшелон 2: Тех-интервью · Стек и базы данных', 'stackTag': 'core'},
+UNIT_INTERVIEW_META = {}
+for _t_idx, (_ech_id, _ech_lbl, _ech_units) in enumerate(ECHELON_ORDER_BUILD, start=1):
+    for _r_idx, _uid in enumerate(_ech_units):
+        UNIT_INTERVIEW_META[_uid] = {
+            'echelonId': _ech_id,
+            'tier': _t_idx,
+            'rank': _r_idx,
+            'tierLabel': _ech_lbl,
+            'stackTag': 'core',
+        }
 
-    # Эшелон 3: Продакшен-инженерия (11 юнитов)
-    '3.7': {'tier': 3, 'tierLabel': '⚡ Эшелон 3 · Продакшен-инженерия', 'stackTag': 'core'},
-    '3.8': {'tier': 3, 'tierLabel': '⚡ Эшелон 3 · Продакшен-инженерия', 'stackTag': 'core'},
-    '4.5': {'tier': 3, 'tierLabel': '⚡ Эшелон 3 · Продакшен-инженерия', 'stackTag': 'core'},
-    '5.6': {'tier': 3, 'tierLabel': '⚡ Эшелон 3 · Продакшен-инженерия', 'stackTag': 'core'},
-    '6.1': {'tier': 3, 'tierLabel': '⚡ Эшелон 3 · Продакшен-инженерия', 'stackTag': 'core'},
-    '6.2': {'tier': 3, 'tierLabel': '⚡ Эшелон 3 · Продакшен-инженерия', 'stackTag': 'core'},
-    '6.3': {'tier': 3, 'tierLabel': '⚡ Эшелон 3 · Продакшен-инженерия', 'stackTag': 'core'},
-    '6.5': {'tier': 3, 'tierLabel': '⚡ Эшелон 3 · Продакшен-инженерия', 'stackTag': 'core'},
-    '7.3': {'tier': 3, 'tierLabel': '⚡ Эшелон 3 · Продакшен-инженерия', 'stackTag': 'core'},
-    '7.4': {'tier': 3, 'tierLabel': '⚡ Эшелон 3 · Продакшен-инженерия', 'stackTag': 'core'},
-    '7.5': {'tier': 3, 'tierLabel': '⚡ Эшелон 3 · Продакшен-инженерия', 'stackTag': 'core'},
+PRIORITY_ARCHITECTURE_MD = """## 🎯 Приоритетная архитектура подготовки к собеседованиям (6 эшелонов и пресеты воронки)
 
-    # Эшелон 4: Архитектурный резерв и доп. стек (3 юнита)
-    '3.4': {'tier': 4, 'tierLabel': '👑 Эшелон 4 · Дополнительный стек: Flask', 'stackTag': 'flask'},
-    '6.4': {'tier': 4, 'tierLabel': '👑 Эшелон 4 · Архитектурный резерв (DDD)', 'stackTag': 'core'},
-    '6.6': {'tier': 4, 'tierLabel': '👑 Эшелон 4 · Архитектурный резерв (System Design)', 'stackTag': 'core'},
-}
-
-PRIORITY_ARCHITECTURE_MD = """## 🎯 Приоритетная архитектура подготовки к собеседованиям (Эшелоны 1 → 4 и параллельные ветви стека)
-
-Программа выстроена по принципу **Interview-First (сначала самое необходимое для прохождения собеседований и выхода на работу, затем углубление по нарастающей)** и связывает **Диагностику (Этап 0)**, **Фундамент (Этап 1)**, **Параллельные ветви стека (Этап 2)**, **Продакшен-инженерию (Этап 3)** и **Финал (Этап 4)** со всеми 45 юнитами и 126 навыками 7 модулей:
-
-1. **🔍 Этап 0 · Калибровочная диагностика знаний (`#/topic/diag` / `#/lesson/quiz`)**:
-   - Проверяет 5 базовых доменов первого скрининга (Python Core, Алгоритмы/Big-O, HTTP/REST, SQL JOIN, Git/pytest) и определяет целевую ветку стека (`FastAPI + SQLAlchemy`, `Django + DRF` или `Оба стека`).
-   - Подтверждённые базовые навыки Эшелона 1 автоматически получают стартовый статус знакомства **`50 MP (Familiar)`**, а темы с ошибками формируют персональную **Очередь №1 («Приоритетные пробелы диагностики»)**.
-2. **🚨 Эшелон 1 · Скрининг и база (Первая очередь — 14 юнитов, 43 навыка)**:
-   - То, без чего не пройти первичное тех-интервью и лайвкодинг:
-   - `01 · 🐍 Python`: Юниты `1.1` (Коллекции и срезы), `1.2` (Функции и замыкания), `1.3` (Исключения, генераторы, `with`), `1.4` (ООП: классы и наследование), `1.9` (Модули, `venv`, `logging`, `pytest`).
-   - `02 · 🌐 Web`: Юниты `2.2` (HTTP/1.1–3, методы, статус-коды, TLS), `2.3` (REST API, JSON, пагинация, идемпотентность).
-   - `04 · ⚡ Алгоритмы`: Юниты `4.1` (Big-O), `4.2` (Массивы, два указателя, скользящее окно), `4.4` (Хэш-таблицы, устройство `dict` и `set`).
-   - `05 · 🗄️ Базы данных`: Юниты `5.1` (Реляционная модель, 1NF–3NF), `5.2` (`SELECT`, `WHERE`, `GROUP BY`, `HAVING`), `5.3` (`JOIN`, подзапросы, CTE, оконные функции).
-   - `07 · 🚀 Инфраструктура`: Юнит `7.1` (Git, ветки, `merge` vs `rebase`, Pull Request).
-3. **🔥 Эшелон 2 · Тех-ядро и параллельные ветви стека (Вторая очередь — 17 юнитов, 44 навыка)**:
-   - Углублённый Python (`1.5` dunder/`@property`/`dataclass`, `1.6` `typing`/Generics, `1.7` Память и GC, `1.8` GIL/потоки/`asyncio`), сети и безопасность (`2.1` TCP/IP и DNS, `2.4` CORS/CSRF/XSS/SQLi), транзакции и индексы БД (`5.4` ACID, изоляция, MVCC, B-Tree, `EXPLAIN`), основы Docker и тестирования (`7.2`, `7.6`), аутентификация и слоистая архитектура (`3.5` JWT/OAuth2/RBAC/BOLA, `3.6` Service/Repository/UoW) + **выбор главной ударной ветки стека**:
-   - **⚡ Ветка A (`FastAPI + SQLAlchemy 2.0 + Asyncio`)**: в основной фокус идут Юнит `3.1` (FastAPI, Pydantic v2, DI), Юнит `5.5` (SQLAlchemy 2.0, Session/UoW, Alembic, N+1) и Юнит `1.8` (`asyncio`).
-   - **🎸 Ветка B (`Django + DRF`)**: в основной фокус идут Юнит `3.2` (Django ORM, `select_related`/`prefetch_related`, `F`/`Q`, миграции) и Юнит `3.3` (Django REST Framework: сериализаторы, ViewSet, пермишены).
-   - *Невыбранный фреймворк (и `3.4` Flask) остаётся полностью доступным, но переводится во вторую очередь, чтобы не распылять время перед собеседованием.*
-4. **⚡ Эшелон 3 · Продакшен-инженерия (Третья очередь — 11 юнитов, 31 навык)**:
-   - То, что выделяет сильного кандидата: отказоустойчивые интеграции и очереди (`3.7`, `3.8`), графы (`4.5`), кэширование и Redis (`5.6`), чистая архитектура, SOLID и паттерны (`6.1`, `6.2`, `6.3`, `6.5`), Docker Compose, CI/CD и Linux/Nginx (`7.3`, `7.4`, `7.5`).
-5. **👑 Эшелон 4 · Архитектурный резерв и System Design (Четвёртая очередь — 3 юнита, 8 навыков + альтернативный стек)**:
-   - Микрофреймворк Flask (`3.4`), предметно-ориентированное проектирование DDD (`6.4`) и распределённые микросервисные паттерны (`6.6`: API Gateway, Circuit Breaker, Saga, Transactional Outbox).
+Программа разделена на **6 эшелонов** со строковыми идентификаторами и явным порядком юнитов внутри каждого эшелона (от самых частых вопросов на собеседованиях к редким):
+1. **`hr` — HR-скрининг** (в разработке).
+2. **`screening` — Техскрининг**: `1.1`, `1.2`, `1.7`, `1.4`, `5.1`, `5.2`, `2.2`, `2.3`, `1.8`, `1.3`, `7.1`.
+3. **`algo` — Алгоритмическая секция**: `4.1`, `4.2`, `4.4`, `4.3`, `4.6`, `4.5`.
+4. **`backend` — Backend и БД**: `3.1`, `5.5`, `5.4`, `3.5`, `5.6`, `3.6`, `5.3`, `1.9`, `6.1`, `2.4`, `3.2`, `3.3`, `1.6`, `1.5`, `3.4`.
+5. **`infra` — Продакшен и инфраструктура**: `7.2`, `7.5`, `7.4`, `2.1`, `7.3`, `3.8`.
+6. **`system_design` — Финал · Архитектура и System Design**: `6.6`, `3.7`, `7.6`, `6.2`, `6.5`, `6.4`, `6.3`.
 
 ---"""
 
 
 def ensure_priority_architecture_in_karta(karta_text: str) -> str:
-    marker = '## 🎯 Приоритетная архитектура подготовки к собеседованиям'
-    updated = karta_text
-    if marker not in updated:
-        target = '## 📁 01 · 🐍 Python'
-        if target in updated:
-            updated = updated.replace(target, PRIORITY_ARCHITECTURE_MD + '\n\n' + target, 1)
-    for uid, meta in UNIT_INTERVIEW_META.items():
-        badge_line = f"- 🎯 **Эшелон собеседования**: {meta['tierLabel']}"
-        pattern = re.compile(rf'(### 📘 Юнит {re.escape(uid)} · [^\n]+\n)(?!\n?- 🎯 \*\*Эшелон собеседования\*\*)')
-        updated = pattern.sub(rf'\1\n{badge_line}\n', updated)
-    return updated
+    return karta_text
 
 
 karta_file_path = os.path.join(BASE_REMNOTE, '00 · 🗺️ Карта Мастерства.md')
-try:
-    updated_karta = ensure_priority_architecture_in_karta(karta)
-    if updated_karta != karta:
-        with open(karta_file_path, 'w', encoding='utf-8', newline='\n') as wf:
-            wf.write(updated_karta)
-        karta = updated_karta
-except Exception:
-    pass
 
 
 def parse_module_section(section_md: str, mod_prefix: str):
+    if not section_md:
+        return [], {}, {}
     units_raw = re.split(rf'### 📘 (Юнит {mod_prefix}\.\d+ · [^\n]+)', section_md)[1:]
     units = []
     linked_k = set()
@@ -319,7 +256,7 @@ def parse_module_section(section_md: str, mod_prefix: str):
         utitle = units_raw[idx].strip().replace('Юнит 7.4 · CI CD', 'Юнит 7.4 · CI/CD')
         ubody = units_raw[idx + 1]
         uid = re.search(rf'{mod_prefix}\.\d+', utitle).group(0)
-        umeta = UNIT_INTERVIEW_META.get(uid, {'tier': 2, 'tierLabel': '🔥 Эшелон 2 · Тех-ядро и стек', 'stackTag': 'core'})
+        umeta = UNIT_INTERVIEW_META.get(uid, {'echelonId': 'screening', 'tier': 2, 'rank': 0, 'tierLabel': '⚡ Эшелон 2 · Техскрининг', 'stackTag': 'core'})
         skill_blocks = re.split(rf'- \[[ x]\] ⚡ \*\*Skill ({mod_prefix}\.\d+\.\d+) · ([^\*]+)\*\*', ubody)[1:]
         skills = []
         for s_idx in range(0, len(skill_blocks), 3):
@@ -342,6 +279,7 @@ def parse_module_section(section_md: str, mod_prefix: str):
                 'id': sid,
                 'unitId': uid,
                 'title': stitle,
+                'echelonId': umeta['echelonId'],
                 'tier': umeta['tier'],
                 'tierLabel': umeta['tierLabel'],
                 'stackTag': umeta['stackTag'],
@@ -355,6 +293,7 @@ def parse_module_section(section_md: str, mod_prefix: str):
         units.append({
             'id': uid,
             'title': utitle,
+            'echelonId': umeta['echelonId'],
             'tier': umeta['tier'],
             'tierLabel': umeta['tierLabel'],
             'stackTag': umeta['stackTag'],
@@ -365,6 +304,7 @@ def parse_module_section(section_md: str, mod_prefix: str):
     decks_data = {fid: parse_f_deck(fid) for fid in sorted(linked_f)}
     return units, notes_data, decks_data
 
+HR_UNITS, HR_NOTES_DATA, HR_DECKS_DATA = parse_module_section(mod0_hr_text, '0')
 PY_UNITS, PY_NOTES_DATA, PY_DECKS_DATA = parse_module_section(mod1_text, '1')
 WEB_UNITS, WEB_NOTES_DATA, WEB_DECKS_DATA = parse_module_section(mod2_web_text, '2')
 BACKEND_UNITS, BACKEND_NOTES_DATA, BACKEND_DECKS_DATA = parse_module_section(mod3_backend_text, '3')

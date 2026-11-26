@@ -347,10 +347,11 @@ function ensureExtendedState(target){
   if(typeof s.soundEnabled !== 'boolean') s.soundEnabled = true;
   if(typeof s.utShowExplanations !== 'boolean') s.utShowExplanations = true; // тумблер «Показывать разбор после ответа»
   if(typeof s.utSkipStartModal !== 'boolean') s.utSkipStartModal = false; // «Всегда открывать тест без этой модалки»
-  if(!s.stackBranch || !['fastapi','django','both'].includes(s.stackBranch)) s.stackBranch = 'fastapi';
+  if(s.funnelPreset !== 'bigtech' && s.funnelPreset !== 'product') s.funnelPreset = 'bigtech';
+  if(Object.prototype.hasOwnProperty.call(s, 'stackBranch')) delete s.stackBranch;
   if(!s.unitSortMode || !['priority','number'].includes(s.unitSortMode)) s.unitSortMode = 'priority';
   if(!s.pathViewMode || !['game','pro'].includes(s.pathViewMode)) s.pathViewMode = 'game';
-  if(!s.pathNodeStyle || !['paw','button'].includes(s.pathNodeStyle)) s.pathNodeStyle = 'button'; // выбор Ксении: по умолчанию «Кнопки» (ближе к Coddy)
+  if(!s.pathNodeStyle || !['paw','button'].includes(s.pathNodeStyle)) s.pathNodeStyle = 'button';
   if(!s.diagnosticGaps || !Array.isArray(s.diagnosticGaps)) s.diagnosticGaps = [];
   if(typeof s.diagCompleted !== 'boolean') s.diagCompleted = false;
   if(typeof s.diagScore !== 'number') s.diagScore = 0;
@@ -1690,62 +1691,32 @@ window.togglePomodoro = togglePomodoro;
 window.formatPomo = formatPomo;
 
 
-/* ================= INTERVIEW-FIRST PRIORITY ARCHITECTURE (4 ECHELONS + PARALLEL STACK BRANCHES) ================= */
-const INTERVIEW_ECHELONS = {
-  1: { tier: 1, icon: '🚨', badgeClass: 'echelon-badge--t1', label: '🚨 Эшелон 1: Скрининг · Фундамент', shortLabel: '🚨 Эшелон 1: Скрининг', focus: 'Фундамент', targetLabel: 'к скринингу', desc: 'Первичный отсев на HR и тех-скрининге (Python Core, сложность O(n), два указателя, SQL JOIN, HTTP/REST, Git и pytest)', color: '#34d399', gradient: 'linear-gradient(90deg, #f43f5e, #34d399)' },
-  2: { tier: 2, icon: '🎯', badgeClass: 'echelon-badge--t2', label: '🎯 Эшелон 2: Тех-интервью · Стек и базы данных', shortLabel: '🎯 Эшелон 2: Тех-интервью', focus: 'Стек и базы данных', targetLabel: 'к тех-интервью', desc: 'Основное техническое собеседование по выбранному стеку (ООП, Итераторы, Asyncio/GIL, FastAPI + SQLAlchemy или Django + DRF, ACID/Индексы, Docker)', color: '#fbbf24', gradient: 'linear-gradient(90deg, #f59e0b, #10b981)' },
-  3: { tier: 3, icon: '⚡', badgeClass: 'echelon-badge--t3', label: '⚡ Эшелон 3: Лайвкодинг · Сервисы и продакшен', shortLabel: '⚡ Эшелон 3: Лайвкодинг', focus: 'Сервисы и продакшен', targetLabel: 'к лайвкодингу', desc: 'Инженерия уровня Strong Junior / Middle (Redis, Celery/Kafka, SOLID и Чистая архитектура, CI/CD, Linux/Nginx, Observability)', color: '#34d399', gradient: 'linear-gradient(90deg, #10b981, #06b6d4)' },
-  4: { tier: 4, icon: '👑', badgeClass: 'echelon-badge--t4', label: '👑 Эшелон 4: Финал · Системный дизайн и оффер', shortLabel: '👑 Эшелон 4: Финал', focus: 'Системный дизайн и оффер', targetLabel: 'к офферу', desc: 'Конкурентное преимущество на оффер (Highload, System Design, паттерны проектирования, альтернативный фреймворк в резерве)', color: '#c084fc', gradient: 'linear-gradient(90deg, #a855f7, #ec4899)' }
+/* ================= INTERVIEW-FIRST PRIORITY ARCHITECTURE (6 ECHELONS + FUNNEL PRESETS) ================= */
+const ECHELONS_BY_ID = {
+  hr: { id: 'hr', title: 'HR-скрининг', shortTitle: 'HR-скрининг', icon: '🗣️', units: ['0.1', '0.2', '0.3', '0.4'] },
+  screening: { id: 'screening', title: 'Техскрининг', shortTitle: 'Техскрининг', icon: '⚡', units: ['1.1', '1.2', '1.7', '1.4', '5.1', '5.2', '2.2', '2.3', '1.8', '1.3', '7.1'] },
+  algo: { id: 'algo', title: 'Алгоритмическая секция', shortTitle: 'Алгоритмы', icon: '🧮', units: ['4.1', '4.2', '4.4', '4.3', '4.6', '4.5'] },
+  backend: { id: 'backend', title: 'Backend и БД', shortTitle: 'Backend и БД', icon: '⚙️', units: ['3.1', '5.5', '5.4', '3.5', '5.6', '3.6', '5.3', '1.9', '6.1', '2.4', '3.2', '3.3', '1.6', '1.5', '3.4'] },
+  infra: { id: 'infra', title: 'Продакшен и инфраструктура', shortTitle: 'Продакшен', icon: '🚀', units: ['7.2', '7.5', '7.4', '2.1', '7.3', '3.8'] },
+  system_design: { id: 'system_design', title: 'Финал · Архитектура и System Design', shortTitle: 'System Design', icon: '🏛️', units: ['6.6', '3.7', '7.6', '6.2', '6.5', '6.4', '6.3'] }
 };
+const INTERVIEW_ECHELONS = {
+  hr: { id: 'hr', tier: 1, icon: '🗣️', badgeClass: 'echelon-badge--t1', label: '🗣️ Эшелон 1 · HR-скрининг', shortLabel: '🗣️ Эшелон 1 · HR-скрининг', desc: 'Самопрезентация, разбор опыта, поведенческие вопросы и переговоры об оффере.' },
+  screening: { id: 'screening', tier: 2, icon: '⚡', badgeClass: 'echelon-badge--t2', label: '⚡ Эшелон 2 · Техскрининг', shortLabel: '⚡ Эшелон 2 · Техскрининг', desc: 'Самые частые вопросы первичного технического фильтра: Python, базовый SQL, HTTP и Git/Linux.' },
+  algo: { id: 'algo', tier: 3, icon: '🧮', badgeClass: 'echelon-badge--t3', label: '🧮 Эшелон 3 · Алгоритмическая секция', shortLabel: '🧮 Эшелон 3 · Алгоритмы', desc: 'Оценка сложности, хеш-таблицы, два указателя, скользящее окно, деревья, графы и ДП.' },
+  backend: { id: 'backend', tier: 4, icon: '⚙️', badgeClass: 'echelon-badge--t4', label: '⚙️ Эшелон 4 · Backend и БД', shortLabel: '⚙️ Эшелон 4 · Backend и БД', desc: 'Фреймворки, индексы, транзакции и изоляция, асинхронность, ORM, тестирование, очереди и безопасность.' },
+  infra: { id: 'infra', tier: 5, icon: '🚀', badgeClass: 'echelon-badge--t5', label: '🚀 Эшелон 5 · Продакшен и инфраструктура', shortLabel: '🚀 Эшелон 5 · Продакшен', desc: 'Docker, логирование и метрики, эксплуатация в продакшене, сети, CI/CD и деплой.' },
+  system_design: { id: 'system_design', tier: 6, icon: '🏛️', badgeClass: 'echelon-badge--t6', label: '🏛️ Эшелон 6 · Финал · Архитектура и System Design', shortLabel: '🏛️ Эшелон 6 · System Design', desc: 'Высоконагруженные системы, микросервисы, масштабирование БД, консистентность и отказоустойчивость.' }
+};
+['hr', 'screening', 'algo', 'backend', 'infra', 'system_design'].forEach((k, idx) => { INTERVIEW_ECHELONS[idx + 1] = INTERVIEW_ECHELONS[k]; });
 window.INTERVIEW_ECHELONS = INTERVIEW_ECHELONS;
 
-const UNIT_INTERVIEW_META = {
-  '1.1': { tier: 1, stackTag: 'core' },
-  '1.2': { tier: 1, stackTag: 'core' },
-  '1.3': { tier: 1, stackTag: 'core' },
-  '1.4': { tier: 1, stackTag: 'core' },
-  '1.5': { tier: 1, stackTag: 'core' },
-  '1.6': { tier: 2, stackTag: 'core' },
-  '1.7': { tier: 1, stackTag: 'core' },
-  '1.8': { tier: 1, stackTag: 'core' },
-  '1.9': { tier: 1, stackTag: 'core' },
-  '2.1': { tier: 1, stackTag: 'core' },
-  '2.2': { tier: 1, stackTag: 'core' },
-  '2.3': { tier: 1, stackTag: 'core' },
-  '2.4': { tier: 1, stackTag: 'core' },
-  '3.1': { tier: 2, stackTag: 'fastapi' },
-  '3.2': { tier: 2, stackTag: 'django' },
-  '3.3': { tier: 2, stackTag: 'django' },
-  '3.4': { tier: 4, stackTag: 'flask' },
-  '3.5': { tier: 2, stackTag: 'core' },
-  '3.6': { tier: 2, stackTag: 'core' },
-  '3.7': { tier: 3, stackTag: 'core' },
-  '3.8': { tier: 3, stackTag: 'core' },
-  '4.1': { tier: 1, stackTag: 'core' },
-  '4.2': { tier: 1, stackTag: 'core' },
-  '4.3': { tier: 1, stackTag: 'core' },
-  '4.4': { tier: 1, stackTag: 'core' },
-  '4.5': { tier: 3, stackTag: 'core' },
-  '4.6': { tier: 1, stackTag: 'core' },
-  '5.1': { tier: 1, stackTag: 'core' },
-  '5.2': { tier: 1, stackTag: 'core' },
-  '5.3': { tier: 1, stackTag: 'core' },
-  '5.4': { tier: 1, stackTag: 'core' },
-  '5.5': { tier: 2, stackTag: 'fastapi' },
-  '5.6': { tier: 3, stackTag: 'core' },
-  '6.1': { tier: 3, stackTag: 'core' },
-  '6.2': { tier: 3, stackTag: 'core' },
-  '6.3': { tier: 3, stackTag: 'core' },
-  '6.4': { tier: 4, stackTag: 'core' },
-  '6.5': { tier: 3, stackTag: 'core' },
-  '6.6': { tier: 4, stackTag: 'core' },
-  '7.1': { tier: 1, stackTag: 'core' },
-  '7.2': { tier: 2, stackTag: 'core' },
-  '7.3': { tier: 3, stackTag: 'core' },
-  '7.4': { tier: 3, stackTag: 'core' },
-  '7.5': { tier: 3, stackTag: 'core' },
-  '7.6': { tier: 2, stackTag: 'core' }
-};
+const UNIT_INTERVIEW_META = {};
+['hr', 'screening', 'algo', 'backend', 'infra', 'system_design'].forEach((eid, tIdx) => {
+  ECHELONS_BY_ID[eid].units.forEach((uid, rIdx) => {
+    UNIT_INTERVIEW_META[uid] = { echelonId: eid, tier: tIdx + 1, rank: rIdx, stackTag: 'core' };
+  });
+});
 window.UNIT_INTERVIEW_META = UNIT_INTERVIEW_META;
 
 // Map each of the 18 Skill Tree nodes (#/map & #/topic/<id>) to its corresponding units across the 7 modules
