@@ -60323,8 +60323,8 @@ const TECH_INTERVIEW_CARDS = [
     stageId: 'fastapi_pydantic',
     stageLabel: '3. FastAPI & Pydantic',
     q: 'Как работает `Depends` с генератором `yield` и что происходит с ним при исключении в роуте?',
-    answer: '```python\nasync def get_db():\n    async with SessionLocal() as db:\n        try:\n            yield db\n        finally:\n            await db.close()\n```\nКод до `yield` выполняется до обработчика маршрута, передавая ресурс внутрь. После формирования ответа (или при ошибке в роуте) FastAPI возобновляет генератор, пробрасывая исключение, поэтому блок `finally` гарантированно освобождает ресурс. В рамках одного запроса результат `Depends` по умолчанию кэшируется (`use_cache=True`).',
-    trap: 'Если не обернуть `yield` в `try/except/finally` или сделать `commit()` после `yield` без отката при ошибке, транзакция может повести себя непредсказуемо.'
+    answer: '```python\nasync def get_db():\n    async with SessionLocal() as db:\n        try:\n            yield db\n        finally:\n            await db.close()\n```\nКод до `yield` выполняется до обработчика маршрута и передаёт ресурс внутрь. После формирования ответа или при ошибке в роуте FastAPI возобновляет генератор и пробрасывает исключение, поэтому блок `finally` гарантированно закрывает ресурс. В рамках одного запроса результат `Depends` по умолчанию кэшируется благодаря флагу `use_cache=True`.',
+    trap: 'Если не обернуть `yield` в блок `try ... finally` или сделать `commit()` после `yield` без отката при ошибке, транзакция может повести себя непредсказуемо.'
   },
   {
     id: 'ti-fa-3',
@@ -60347,7 +60347,7 @@ const TECH_INTERVIEW_CARDS = [
     stageId: 'fastapi_pydantic',
     stageLabel: '3. FastAPI & Pydantic',
     q: 'Зачем в FastAPI разделять проект через `APIRouter`, `schemas`, `services` и `repositories`?',
-    answer: '`APIRouter` группирует маршруты по доменам с общим `prefix`, `tags` и `dependencies`. Слой `routers` отвечает только за HTTP (параметры, коды, DI), `schemas` — за DTO-контракты, `services` — за бизнес-логику и границы транзакций, `repositories`/ORM — за SQL. Так бизнес-логику легко тестировать и переиспользовать вне HTTP (например, из CLI или воркера).',
+    answer: '`APIRouter` группирует маршруты по доменам с общим `prefix`, `tags` и `dependencies`. Слой `routers` отвечает только за HTTP: параметры, коды ответов и DI. Слой `schemas` держит DTO-контракты, `services` — бизнес-логику и границы транзакций, а репозитории и ORM — работу с SQL. Так бизнес-логику легко тестировать и переиспользовать вне HTTP, например из CLI или фонового воркера.',
     trap: '«Толстые контроллеры» с сырым SQL и бизнес-правилами прямо внутри `@router.post` быстро становятся нетестируемыми и дублируют логику.'
   },
   {
@@ -60355,7 +60355,7 @@ const TECH_INTERVIEW_CARDS = [
     stageId: 'fastapi_pydantic',
     stageLabel: '3. FastAPI & Pydantic',
     q: 'В чём главные архитектурные отличия FastAPI от Django/DRF при переходе с одного фреймворка на другой?',
-    answer: 'Django/DRF — «батарейки в комплекте»: единая ORM, встроенные миграции, админка, auth и синхронный пайплайн с middleware/viewsets. FastAPI — микрофреймворк поверх Starlette и Pydantic: асинхронность из коробки, явный Dependency Injection через `Depends`, автогенерация OpenAPI по type hints, а ORM (SQLAlchemy) и миграции (Alembic) подключаются и управляются явно.',
+    answer: 'Django и DRF — это «батарейки в комплекте»: единая ORM, встроенные миграции, админка, аутентификация и синхронный пайплайн с middleware и viewsets. FastAPI — микрофреймворк поверх Starlette и Pydantic: здесь асинхронность из коробки, явный Dependency Injection через `Depends`, автогенерация OpenAPI по аннотациям типов, а SQLAlchemy и миграции Alembic подключаются и управляются явно.',
     trap: 'Кандидат с опытом Django иногда пытается искать в FastAPI встроенную магию вроде `ModelViewSet` или глобального `request.user` без понимания `Depends`.'
   },
 
@@ -60365,7 +60365,7 @@ const TECH_INTERVIEW_CARDS = [
     stageId: 'sqlalchemy_alembic',
     stageLabel: '4. SQLAlchemy & Alembic',
     q: 'Как выглядит современный стиль SQLAlchemy 2.0 (`select`, `scalars`, `Mapped`) в отличие от legacy 1.x?',
-    answer: '```python\nclass User(Base):\n    __tablename__ = \'users\'\n    id: Mapped[int] = mapped_column(primary_key=True)\n    email: Mapped[str] = mapped_column(unique=True)\n\nstmt = select(User).where(User.email == email)\nuser = await session.scalar(stmt)\n```\nВместо legacy `session.query(User).filter_by(...)` в 2.0 строятся явные объекты `select()`/`update()`/`delete()`, которые выполняются через `session.execute()` или `session.scalars()`, а модели строго типизированы через `Mapped`.',
+    answer: '```python\nclass User(Base):\n    __tablename__ = \'users\'\n    id: Mapped[int] = mapped_column(primary_key=True)\n    email: Mapped[str] = mapped_column(unique=True)\n\nstmt = select(User).where(User.email == email)\nuser = await session.scalar(stmt)\n```\nВместо старого стиля `session.query(User).filter_by(...)` в версии 2.0 строятся явные объекты `select()`, `update()` и `delete()`, которые выполняются через `session.execute()` или `session.scalars()`, а модели строго типизированы через `Mapped`.',
     trap: 'Использование `session.query()` в асинхронном проекте: в `AsyncSession` метода `.query()` вообще нет.'
   },
   {
@@ -60381,15 +60381,15 @@ const TECH_INTERVIEW_CARDS = [
     stageId: 'sqlalchemy_alembic',
     stageLabel: '4. SQLAlchemy & Alembic',
     q: 'Чем `session.flush()` отличается от `session.commit()` и зачем в `AsyncSession` ставят `expire_on_commit=False`?',
-    answer: '`flush()` отправляет накопленные `INSERT/UPDATE/DELETE` в БД в рамках текущей транзакции (можно сразу прочитать сгенерированный `id`, но изменения ещё не видны другим и откатятся при `rollback()`). `commit()` фиксирует транзакцию и по умолчанию помечает атрибуты ORM-объектов как expired. В `AsyncSession` обращение к expired-полю после `commit()` попытается сделать ленивый синхронный запрос и упадёт, поэтому ставят `expire_on_commit=False`.',
-    trap: 'Классическая ошибка в FastAPI + `AsyncSession`: вернуть ORM-объект после `await session.commit()` и получить `MissingGreenlet` при сериализации Pydantic.'
+    answer: '`flush()` отправляет накопленные `INSERT`, `UPDATE` и `DELETE` в базу в рамках текущей транзакции: можно сразу прочитать сгенерированный `id`, но изменения ещё не видны другим и откатятся при `rollback()`. `commit()` фиксирует транзакцию и по умолчанию помечает атрибуты ORM-объектов как устаревшие. В `AsyncSession` обращение к такому полю после `commit()` попытается сделать ленивый синхронный запрос и упадёт, поэтому ставят `expire_on_commit=False`.',
+    trap: 'Классическая ошибка в связке FastAPI и `AsyncSession`: вернуть ORM-объект после `await session.commit()` и получить `MissingGreenlet` при сериализации Pydantic.'
   },
   {
     id: 'ti-sa-4',
     stageId: 'sqlalchemy_alembic',
     stageLabel: '4. SQLAlchemy & Alembic',
     q: 'Почему нельзя делить одну `AsyncSession` между параллельными задачами в `asyncio.gather()`?',
-    answer: '`AsyncSession` не является coroutine-safe и держит одно соединение и буфер состояния (identity map). Конкурентное использование одной сессии в `asyncio.gather()` приводит к гонкам состояний и ошибке `InvalidRequestError` на драйвере вроде `asyncpg`. Каждая независимая задача должна создавать свою сессию из `async_sessionmaker`.',
+    answer: '`AsyncSession` не является coroutine-safe, она держит одно соединение и свой буфер состояния `identity map`. Конкурентное использование одной сессии в `asyncio.gather()` приводит к гонкам состояний и ошибке `InvalidRequestError` на драйвере вроде `asyncpg`. Каждая независимая задача должна создавать свою сессию из `async_sessionmaker`.',
     trap: 'Передача одной `session` из `Depends` в несколько фоновых корутин через `asyncio.gather`.'
   },
   {
@@ -60397,7 +60397,7 @@ const TECH_INTERVIEW_CARDS = [
     stageId: 'sqlalchemy_alembic',
     stageLabel: '4. SQLAlchemy & Alembic',
     q: 'Как устроен рабочий цикл миграций Alembic и что `alembic revision --autogenerate` НЕ умеет отслеживать?',
-    answer: 'Цикл: изменить модель → `alembic revision --autogenerate -m "..."` → вручную прочитать сгенерированный файл (`upgrade` и `downgrade`) → применить `alembic upgrade head`. `autogenerate` не ловит: переименование таблиц/колонок (генерирует `drop` + `add` с потерей данных!), миграции данных (`UPDATE`), значения PostgreSQL `ENUM` (в старых/частичных случаях), кастомные триггеры, view и сложные функциональные индексы.',
+    answer: 'Рабочий цикл такой: меняем модель, затем генерируем ревизию через `alembic revision --autogenerate -m "..."`, вручную читаем функции `upgrade` и `downgrade` в файле и применяем `alembic upgrade head`. При этом `autogenerate` не ловит переименование таблиц и колонок, потому что генерирует удаление и добавление с потерей данных. Также он пропускает миграции данных через `UPDATE`, часть правок в PostgreSQL `ENUM`, кастомные триггеры, представления view и сложные функциональные индексы.',
     trap: 'Слепо накатывать `--autogenerate` в прод без чтения файла миграции — верный способ потерять колонку с данными при её переименовании.'
   },
   {
@@ -60405,7 +60405,7 @@ const TECH_INTERVIEW_CARDS = [
     stageId: 'sqlalchemy_alembic',
     stageLabel: '4. SQLAlchemy & Alembic',
     q: 'Как безопасно откатывать миграции и делать несовместимые изменения схемы без простоя (zero-downtime)?',
-    answer: 'Откат схемы делается через `alembic downgrade -1` (или целевую ревизию), но при уже удалённой колонке данные не вернутся. Поэтому в проде используют паттерн **expand-and-contract**: 1) добавить новую колонку nullable / новый индекс `CONCURRENTLY`; 2) выкатить код, пишущий в оба поля; 3) перелить данные и переключить чтение; 4) отдельным релизом удалить старую колонку.',
+    answer: 'Откат схемы делается через `alembic downgrade -1` или до целевой ревизии, но при уже удалённой колонке данные не вернутся. Поэтому в проде используют паттерн **expand-and-contract**: сначала добавляют новую nullable-колонку или новый индекс через `CONCURRENTLY`, затем выкатывают код, пишущий в оба поля, потом переливают данные и переключают чтение, и только отдельным релизом удаляют старую колонку.',
     trap: 'На собеседовании проверяют, понимаете ли вы, что во время деплоя старая и новая версии кода работают одновременно против одной БД.'
   },
 
@@ -60415,8 +60415,8 @@ const TECH_INTERVIEW_CARDS = [
     stageId: 'pytest_docker_git',
     stageLabel: '5. pytest, Docker & Git',
     q: 'Какие `scope` есть у фикстур `pytest` и как правильно очищать ресурсы после теста?',
-    answer: 'Уровни `scope`: `function` (по умолчанию, на каждый тест), `class`, `module`, `package`, `session` (один раз за весь запуск). Для setup/teardown используют генераторную фикстуру с `yield`: код до `yield` подготавливает ресурс, код после `yield` выполняется даже при падении теста (аналог `finally`).',
-    trap: 'Поместить мутабельный ресурс (например, общую сессию БД без отката) в `scope="session"` и получить взаимовлияние тестов друг на друга.'
+    answer: 'Уровни `scope` бывают пяти видов: `function` по умолчанию на каждый тест, `class`, `module`, `package` и `session` один раз за весь запуск. Для подготовки и очистки ресурсов используют генераторную фикстуру с `yield`: код до `yield` создаёт ресурс, а код после `yield` выполняется даже при падении теста, как блок `finally`.',
+    trap: 'Поместить изменяемый ресурс, например общую сессию базы без отката, в `scope="session"` и получить взаимовлияние тестов друг на друга.'
   },
   {
     id: 'ti-pdg-2',
@@ -60431,7 +60431,7 @@ const TECH_INTERVIEW_CARDS = [
     stageId: 'pytest_docker_git',
     stageLabel: '5. pytest, Docker & Git',
     q: 'Как обеспечить полную изоляцию БД, кэша и настроек в автотестах, чтобы `pytest` запускался в чистом окружении?',
-    answer: '1) Тесты не должны зависеть от ручного `.env` — задавайте тестовые переменные по умолчанию в `conftest.py` или фабриках настроек; 2) Каждому тесту даётся откат транзакции (`ROLLBACK` / savepoint) или очистка таблиц; 3) Кэш и очереди в unit/integration-тестах подменяются на in-memory/eager-режим или изолированные тестовые инстансы, а внешние HTTP API мокаются (`respx`/`monkeypatch`).',
+    answer: '1) Тесты не должны зависеть от ручного `.env` — задавайте тестовые переменные по умолчанию в `conftest.py` или фабриках настроек.\n2) Каждому тесту даётся откат транзакции через `ROLLBACK` и savepoint или полная очистка таблиц.\n3) Кэш и очереди в юнит- и интеграционных тестах подменяются на режим в памяти, eager-режим или отдельные тестовые инстансы, а внешние HTTP API мокаются через `respx` или `monkeypatch`.',
     trap: 'Тесты, падающие на машине коллеги или в CI, потому что требуют локально запущенного Redis или секретов из незакоммиченного `.env`.'
   },
   {
@@ -60439,7 +60439,7 @@ const TECH_INTERVIEW_CARDS = [
     stageId: 'pytest_docker_git',
     stageLabel: '5. pytest, Docker & Git',
     q: 'Как правильно организовать слои `Dockerfile` для Python-приложения, чтобы сборка и образ были оптимальными?',
-    answer: '```dockerfile\nFROM python:3.12-slim\nWORKDIR /app\n\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt\n\nCOPY . .\n```\nЗависимости копируются и ставятся ДО копирования исходников, чтобы при правке кода переиспользовался кэш Docker-слоя. Также добавляют `.dockerignore` (исключая `.git`, `.venv`, `__pycache__`), флаг `--no-cache-dir`, multi-stage сборку при наличии компиляции и запуск от непривилегированного пользователя.',
+    answer: '```dockerfile\nFROM python:3.12-slim\nWORKDIR /app\n\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt\n\nCOPY . .\n```\nЗависимости копируются и ставятся до копирования исходников, чтобы при правке кода переиспользовался кэш Docker-слоя. Также добавляют `.dockerignore` для исключения `.git`, `.venv` и `__pycache__`, используют флаг `--no-cache-dir`, многоэтапную сборку при компиляции и запуск от непривилегированного пользователя.',
     trap: 'Сделать `COPY . .` перед `pip install -r requirements.txt` — тогда любое изменение в `.py`-файле инвалидирует кэш и заново качает все пакеты.'
   },
   {
@@ -60447,7 +60447,7 @@ const TECH_INTERVIEW_CARDS = [
     stageId: 'pytest_docker_git',
     stageLabel: '5. pytest, Docker & Git',
     q: 'На что обращают внимание в `docker-compose.yml` для связки API + PostgreSQL + Redis?',
-    answer: '1) `healthcheck` у БД и брокера (например, `pg_isready`, `redis-cli ping`) + `depends_on: condition: service_healthy`, чтобы приложение не падало при холодном старте; 2) Named volumes для персистентности данных PostgreSQL; 3) Привязка служебных портов к `127.0.0.1:5432:5432`, чтобы не светить БД в публичную сеть сервера.',
+    answer: '1) Настраивают `healthcheck` у базы и брокера, например `pg_isready` и `redis-cli ping`, в паре с `depends_on: condition: service_healthy`, чтобы приложение не падало при холодном старте.\n2) Используют именованные тома named volumes для сохранности данных PostgreSQL.\n3) Привязывают служебные порты к `127.0.0.1:5432:5432`, чтобы не светить базу в публичную сеть сервера.',
     trap: 'Простое `depends_on: [db]` ждёт только старта контейнера, но не готовности PostgreSQL принимать TCP-подключения.'
   },
   {
@@ -60455,7 +60455,7 @@ const TECH_INTERVIEW_CARDS = [
     stageId: 'pytest_docker_git',
     stageLabel: '5. pytest, Docker & Git',
     q: 'В чём разница между `git merge` и `git rebase`, и как безопасно исправить ошибку в уже запушенной ветке?',
-    answer: '`git merge` создаёт merge-коммит и сохраняет точную ветвистую историю. `git rebase` переносит ваши коммиты поверх целевой ветки, делая историю линейной, но переписывает хэши коммитов. Золотое правило: не делать `rebase` и `reset --hard` на общих ветках (`main`, `develop`), уже открытых команде — ошибку в опубликованной ветке отменяют новым коммитом через `git revert`.',
+    answer: '`git merge` создаёт merge-коммит и сохраняет точную ветвистую историю. `git rebase` переносит ваши коммиты поверх целевой ветки, делая историю линейной, но переписывает хэши коммитов. Золотое правило: не делать `rebase` и `reset --hard` на общих ветках вроде `main` и `develop`, уже открытых команде — ошибку в опубликованной ветке отменяют новым коммитом через `git revert`.',
     trap: 'Сделать `git push --force` в общую ветку после `rebase` — это ломает историю всем участникам команды.'
   },
 
@@ -60489,15 +60489,15 @@ const TECH_INTERVIEW_CARDS = [
     stageId: 'crm_cases_livecoding',
     stageLabel: '6. Кейсы и лайвкодинг',
     q: 'Пагинация больших списков: почему `OFFSET / LIMIT` плох на глубине и как работает Keyset (Cursor) pagination?',
-    answer: 'При `OFFSET 100000 LIMIT 20` БД всё равно читает и отбрасывает первые 100 000 строк (`O(N)`), а при вставке новой записи строки сдвигаются и дублируются между страницами. Keyset-пагинация фильтрует по последнему виденному ключу: `WHERE (created_at, id) < (:last_ts, :last_id) ORDER BY created_at DESC, id DESC LIMIT 20` — это всегда `O(log N)` по индексу и стабильно при вставках.',
-    trap: 'Использовать keyset только по `created_at` без tie-breaker (`id`): при одинаковом времени создания записи на границе страницы пропадут.'
+    answer: 'При `OFFSET 100000 LIMIT 20` база всё равно читает и отбрасывает первые сто тысяч строк за линейное время `O(N)`, а при вставке новой записи строки сдвигаются и дублируются между страницами. Keyset-пагинация фильтрует по последнему виденному ключу: `WHERE (created_at, id) < (:last_ts, :last_id) ORDER BY created_at DESC, id DESC LIMIT 20` — это всегда логарифмическое время `O(log N)` по индексу и стабильный результат при вставках.',
+    trap: 'Использовать keyset только по `created_at` без вторичного ключа `id`: при одинаковом времени создания записи на границе страницы пропадут.'
   },
   {
     id: 'ti-case-5',
     stageId: 'crm_cases_livecoding',
     stageLabel: '6. Кейсы и лайвкодинг',
     q: 'Ваш сервис обращается к внешнему HTTP API (оплата, SMS, CRM). Какие защитные механизмы обязательны?',
-    answer: '1) Явные таймауты (`connect` + `read`, никогда бесконечный wait по умолчанию); 2) Не держать открытую транзакцию БД во время внешнего HTTP-запроса; 3) Ретраи с exponential backoff + jitter только для временных ошибок (`5xx`, таймаут) и только на идемпотентные запросы или с ключом идемпотентности; 4) Логирование correlation/request ID и безопасная деградация.',
+    answer: '1) Ставят явные таймауты на соединение и чтение, никогда не оставляя бесконечное ожидание по умолчанию.\n2) Не держат открытую транзакцию базы во время внешнего HTTP-запроса.\n3) Делают повторы с экспоненциальной задержкой и случайным джиттером только для временных ошибок `5xx` или таймаута, и только для идемпотентных запросов или с ключом идемпотентности.\n4) Логируют request ID и закладывают безопасную деградацию.',
     trap: 'Самая болезненная ошибка — делать внешний HTTP-вызов внутри транзакции БД: тормоза стороннего API мгновенно исчерпают пул соединений PostgreSQL.'
   },
   {
@@ -60505,7 +60505,7 @@ const TECH_INTERVIEW_CARDS = [
     stageId: 'crm_cases_livecoding',
     stageLabel: '6. Кейсы и лайвкодинг',
     q: 'Эндпоинт в проде начал отвечать 2–4 секунды вместо 50 мс. Какой ваш пошаговый алгоритм диагностики?',
-    answer: '1) Проверить логи/метрики: на каком слое задержка (БД, внешний API, сериализация, CPU/GIL); 2) Посчитать число SQL-запросов на один HTTP-вызов (исключить N+1); 3) Взять самый медленный запрос из `pg_stat_statements` и прогнать `EXPLAIN (ANALYZE, BUFFERS)`; 4) Проверить `pg_stat_activity` на висящие блокировки (locks) и исчерпание пула соединений.',
+    answer: '1) Посмотреть логи и метрики, чтобы понять слой задержки: база данных, внешний API, сериализация или загрузка CPU и GIL.\n2) Посчитать число SQL-запросов на один HTTP-вызов и исключить проблему N+1.\n3) Взять самый медленный запрос из `pg_stat_statements` и прогнать для него `EXPLAIN (ANALYZE, BUFFERS)`.\n4) Проверить `pg_stat_activity` на висящие блокировки и исчерпание пула соединений.',
     trap: 'Гадать «на глаз» и сразу переписывать код или добавлять Redis-кэш до того, как локализована реальная причина задержки.'
   }
 ];
