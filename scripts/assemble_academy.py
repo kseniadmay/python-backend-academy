@@ -8647,6 +8647,12 @@ const BRYTHON_PRELUDE = __BRYTHON_PRELUDE_JSON__;
 
 let brythonReady = false;
 let pyodidePreludeLoaded = false;
+let pyodideSqliteLoaded = false;
+function getPyodidePreludeWithoutSqliteShim(){
+  return BRYTHON_PRELUDE
+    .replace(/\nif "sqlite3" not in _sys\.modules:[\s\S]*?_sys\.modules\["sqlite3"\] = _sq\n/, '\n')
+    .replace(/\n# Enhance Brython fallback sqlite3 mock[\s\S]*$/, '\n');
+}
 function ensureBrythonInit(){
   if(brythonReady) return true;
   if(window.__BRYTHON__ && typeof window.brython === 'function'){
@@ -8661,8 +8667,9 @@ function ensureBrythonInit(){
 }
 
 // Provide a Pyodide-compatible wrapper backed by instant Brython 3.13.0 (or Pyodide 0.26.4 fallback)
-async function getFastPythonRunner(){
-  if(ensureBrythonInit() && window.__BRYTHON__ && window.__BRYTHON__.runPythonSource){
+async function getFastPythonRunner(opts){
+  const forcePyodide = !!(opts && opts.forcePyodide);
+  if(!forcePyodide && ensureBrythonInit() && window.__BRYTHON__ && window.__BRYTHON__.runPythonSource){
     let stdoutFn = null, stderrFn = null;
     let lastGlobals = {};
     return {
@@ -8695,8 +8702,21 @@ async function getFastPythonRunner(){
     };
   }
   const py = await getPyodide();
+  if(forcePyodide){
+    try{
+      if(!pyodideSqliteLoaded && typeof py.loadPackage === 'function'){
+        await py.loadPackage('sqlite3');
+        pyodideSqliteLoaded = true;
+      }
+    }catch(e){}
+  }
   if(!pyodidePreludeLoaded){
-    try{ py.runPython(BRYTHON_PRELUDE + '\nimport sys, io as _io\n'); pyodidePreludeLoaded = true; }catch(e){}
+    try{ py.runPython(getPyodidePreludeWithoutSqliteShim() + '\nimport sys, io as _io\n'); pyodidePreludeLoaded = true; }catch(e){}
+  }
+  if(forcePyodide){
+    try{
+      py.runPython('import sys as _sys\nif "sqlite3" in _sys.modules and not hasattr(_sys.modules["sqlite3"], "sqlite_version"):\n    del _sys.modules["sqlite3"]\nimport sqlite3\n');
+    }catch(e){}
   }
   return py;
 }
@@ -8721,11 +8741,16 @@ async function runInlineSnippet(btnEl){
   outEl.textContent = 'Выполняю…';
   let buf = '';
   try{
-    const runner = await getFastPythonRunner();
-    runner.setStdout({ batched: function(s){ buf += s; } });
-    runner.setStderr({ batched: function(s){ buf += s; } });
     const ctxCode = btnEl.getAttribute('data-ctx') || '';
     const rawCode = codeEl.textContent || '';
+    const usePyodideSqlite = /\bsqlite3\b/.test(rawCode) || /\bsqlite3\b/.test(ctxCode);
+    const runner = await getFastPythonRunner({ forcePyodide: usePyodideSqlite });
+    const isPyodide = usePyodideSqlite || !(brythonReady && window.__BRYTHON__ && window.__BRYTHON__.runPythonSource);
+    const appendOut = isPyodide
+      ? function(s){ buf += (s != null ? String(s) : '') + '\n'; }
+      : function(s){ buf += (s != null ? String(s) : ''); };
+    runner.setStdout({ batched: appendOut });
+    runner.setStderr({ batched: appendOut });
     const nonComment = rawCode.split('\n').filter(l => !l.trim().startsWith('#')).join('\n');
     let bodyToRun = rawCode;
     if(/\bawait\s+/.test(nonComment) && !/\basync\s+def\s+/.test(nonComment)){
@@ -9866,16 +9891,25 @@ window.getSkillMP = getSkillMP;
 async function runIdeTaskVerification(taskObj, codeStr){
   let buf = '';
   let passed = false;
+  const userCode = String(codeStr || '');
+  const testCode = String((taskObj && taskObj.tests) || '');
+  const usePyodideSqlite = /\bsqlite3\b/.test(userCode) || /\bsqlite3\b/.test(testCode);
   try{
-    const runner = await getFastPythonRunner();
-    runner.setStdout({ batched: function(s){ buf += s; } });
-    runner.setStderr({ batched: function(s){ buf += s; } });
+    const runner = await getFastPythonRunner({ forcePyodide: usePyodideSqlite });
+    const isPyodide = usePyodideSqlite || !(brythonReady && window.__BRYTHON__ && window.__BRYTHON__.runPythonSource);
+    const appendOut = isPyodide
+      ? function(s){ buf += (s != null ? String(s) : '') + '\n'; }
+      : function(s){ buf += (s != null ? String(s) : ''); };
+    runner.setStdout({ batched: appendOut });
+    runner.setStderr({ batched: appendOut });
     const uJsonLit = JSON.stringify(JSON.stringify(String(codeStr || '')));
     const tJsonLit = JSON.stringify(JSON.stringify(String((taskObj && taskObj.tests) || '')));
     const fullTestScript = `
 import json as _json
 __USER_CODE__ = _json.loads(${uJsonLit})
 _t_src = _json.loads(${tJsonLit})
+__result__ = False
+__message__ = ""
 try:
     exec(__USER_CODE__, globals())
     exec(_t_src, globals())
@@ -13051,7 +13085,8 @@ verifyLessonStage = async function(stage){
   const block = l[stage];
   let output = '', passed = false, message = '';
   try{
-    const runner = await getFastPythonRunner();
+    const usePyodideSqlite = /\bsqlite3\b/.test(String(code || '')) || /\bsqlite3\b/.test(String((block && block.test) || ''));
+    const runner = await getFastPythonRunner({ forcePyodide: usePyodideSqlite });
     runner.setStdout({batched:function(s){ output += s + '\n'; }});
     runner.setStderr({batched:function(s){ output += s + '\n'; }});
     runner.runPython(code + '\n' + block.test);
@@ -14236,7 +14271,7 @@ runSandbox = async function(){
   status.textContent = 'Выполняю…';
   out.textContent = '';
   try{
-    const runner = await getFastPythonRunner();
+    const runner = await getFastPythonRunner({ forcePyodide: /\bsqlite3\b/.test(String(code || '')) });
     let buf = '';
     runner.setStdout({ batched: function(s){ buf += s + '\n'; } });
     runner.setStderr({ batched: function(s){ buf += s + '\n'; } });
@@ -15139,7 +15174,7 @@ document.addEventListener('click', async function(e){
       out.textContent = '⏳ Выполняю в Python 3.13…';
       labRunBtn.setAttribute('disabled', 'disabled');
       try{
-        const runner = await getFastPythonRunner();
+        const runner = await getFastPythonRunner({ forcePyodide: /\bsqlite3\b/.test(String(ta.value || '')) });
         let buf = '';
         runner.setStdout({ batched: function(s){ buf += s + '\n'; } });
         runner.setStderr({ batched: function(s){ buf += s + '\n'; } });

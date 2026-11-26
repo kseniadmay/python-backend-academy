@@ -1233,6 +1233,420 @@ cursor = _types.SimpleNamespace(execute=lambda *a, **kw: None, fetchone=lambda: 
 r = _FakeRedis()
 import random
 
+# Minimal SQLAlchemy 2.0 & Alembic browser runtime shim
+class _SqlaPredicate:
+    def __init__(self, fn, col_name=None, op=None, val=None):
+        self._fn = fn
+        self.col_name = col_name
+        self.op = op
+        self.val = val
+    def __call__(self, obj):
+        return bool(self._fn(obj))
+    def __and__(self, other):
+        return _SqlaPredicate(lambda o: self(o) and other(o), None, "and", (self, other))
+    def __or__(self, other):
+        return _SqlaPredicate(lambda o: self(o) or other(o), None, "or", (self, other))
+    def __invert__(self):
+        return _SqlaPredicate(lambda o: not self(o), None, "not", self)
+
+class _SqlaOrderExpr:
+    def __init__(self, name, is_desc=False):
+        self.name = name
+        self.is_desc = is_desc
+
+class _SqlaColExpr:
+    def __init__(self, model, name):
+        self.model = model
+        self.name = name
+        self.key = name
+    def _get(self, obj):
+        return getattr(obj, self.name, None)
+    def _cmp(self, obj, other, fn):
+        v = self._get(obj)
+        return v is not None and fn(v, other)
+    def __eq__(self, other):
+        return _SqlaPredicate(lambda o: self._get(o) == other, self.name, "==", other)
+    def __ne__(self, other):
+        return _SqlaPredicate(lambda o: self._get(o) != other, self.name, "!=", other)
+    def __lt__(self, other):
+        return _SqlaPredicate(lambda o: self._cmp(o, other, lambda a, b: a < b), self.name, "<", other)
+    def __le__(self, other):
+        return _SqlaPredicate(lambda o: self._cmp(o, other, lambda a, b: a <= b), self.name, "<=", other)
+    def __gt__(self, other):
+        return _SqlaPredicate(lambda o: self._cmp(o, other, lambda a, b: a > b), self.name, ">", other)
+    def __ge__(self, other):
+        return _SqlaPredicate(lambda o: self._cmp(o, other, lambda a, b: a >= b), self.name, ">=", other)
+    def in_(self, values):
+        vals = tuple(values)
+        return _SqlaPredicate(lambda o: self._get(o) in vals, self.name, "in_", vals)
+    def not_in(self, values):
+        vals = tuple(values)
+        return _SqlaPredicate(lambda o: self._get(o) not in vals, self.name, "not_in", vals)
+    def is_(self, value):
+        return _SqlaPredicate(lambda o: self._get(o) is value, self.name, "is_", value)
+    def is_not(self, value):
+        return _SqlaPredicate(lambda o: self._get(o) is not value, self.name, "is_not", value)
+    def desc(self):
+        return _SqlaOrderExpr(self.name, is_desc=True)
+    def asc(self):
+        return _SqlaOrderExpr(self.name, is_desc=False)
+    def __hash__(self):
+        return hash((self.model, self.name))
+    def __repr__(self):
+        mname = getattr(self.model, "__name__", str(self.model))
+        return f"{mname}.{self.name}"
+
+class _SqlaMappedColumn:
+    def __init__(self, *args, primary_key=False, default=None, nullable=True, unique=False, index=False, **kwargs):
+        self.name = args[0] if (args and isinstance(args[0], str)) else None
+        self.primary_key = primary_key
+        self.default = default
+        self.nullable = nullable
+        self.unique = unique
+        self.index = index
+        self.kwargs = kwargs
+    def __set_name__(self, owner, name):
+        if not self.name:
+            self.name = name
+    def __get__(self, instance, owner=None):
+        if instance is None:
+            return _SqlaColExpr(owner, self.name)
+        if self.name in instance.__dict__:
+            return instance.__dict__[self.name]
+        if callable(self.default):
+            return self.default()
+        return self.default
+    def __set__(self, instance, value):
+        instance.__dict__[self.name] = value
+
+class _SqlaRelationship:
+    def __init__(self, *args, **kwargs):
+        self.name = None
+        self.args = args
+        self.kwargs = kwargs
+    def __set_name__(self, owner, name):
+        self.name = name
+    def __get__(self, instance, owner=None):
+        if instance is None:
+            return _SqlaColExpr(owner, self.name)
+        return instance.__dict__.get(self.name, [])
+    def __set__(self, instance, value):
+        instance.__dict__[self.name] = value
+
+class _SqlaModelMeta(type):
+    def __getattr__(cls, name):
+        if name.startswith("__") and name.endswith("__"):
+            raise AttributeError(name)
+        return _SqlaColExpr(cls, name)
+
+class UserModel(metaclass=_SqlaModelMeta):
+    def __init__(self, **kw):
+        self.__dict__.update(kw)
+    def __repr__(self):
+        attrs = ", ".join(f"{k}={v!r}" for k, v in self.__dict__.items() if not k.startswith("_"))
+        return f"UserModel({attrs})"
+
+class _SqlaDeclarativeBase(metaclass=_SqlaModelMeta):
+    def __init__(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+    def __repr__(self):
+        attrs = ", ".join(f"{k}={v!r}" for k, v in self.__dict__.items() if not k.startswith("_"))
+        return f"{self.__class__.__name__}({attrs})"
+
+class _SqlaMappedMeta(type):
+    def __getitem__(cls, item):
+        return item
+
+class _SqlaMapped(metaclass=_SqlaMappedMeta):
+    pass
+
+class _SqlaType:
+    def __init__(self, *a, **kw):
+        self.args = a
+        self.kwargs = kw
+
+class _SqlaSelect:
+    def __init__(self, *entities):
+        self._entities = entities
+        self._model = entities[0] if entities else None
+        self._where = []
+        self._options = []
+        self._order_by = []
+        self._limit = None
+        self._offset = None
+    def _clone(self):
+        s = _SqlaSelect(*self._entities)
+        s._where = list(self._where)
+        s._options = list(self._options)
+        s._order_by = list(self._order_by)
+        s._limit = self._limit
+        s._offset = self._offset
+        return s
+    def where(self, *criteria):
+        s = self._clone()
+        for c in criteria:
+            s._where.append(c if callable(c) else (lambda _o, _c=c: bool(_c)))
+        return s
+    def filter(self, *criteria):
+        return self.where(*criteria)
+    def filter_by(self, **kw):
+        s = self._clone()
+        for k, v in kw.items():
+            s._where.append(lambda o, _k=k, _v=v: getattr(o, _k, None) == _v)
+        return s
+    def options(self, *opts):
+        s = self._clone()
+        s._options.extend(opts)
+        return s
+    def order_by(self, *clauses):
+        s = self._clone()
+        s._order_by.extend(clauses)
+        return s
+    def limit(self, n):
+        s = self._clone()
+        s._limit = n
+        return s
+    def offset(self, n):
+        s = self._clone()
+        s._offset = n
+        return s
+
+class _SqlaScalarResult:
+    def __init__(self, rows):
+        self._rows = list(rows)
+    def first(self):
+        return self._rows[0] if self._rows else None
+    def all(self):
+        return list(self._rows)
+    def one(self):
+        if len(self._rows) != 1:
+            raise RuntimeError(f"Expected 1 row, got {len(self._rows)}")
+        return self._rows[0]
+    def one_or_none(self):
+        if len(self._rows) > 1:
+            raise RuntimeError(f"Expected <= 1 row, got {len(self._rows)}")
+        return self._rows[0] if self._rows else None
+    def __iter__(self):
+        return iter(self._rows)
+    def __len__(self):
+        return len(self._rows)
+
+class _SqlaResult:
+    def __init__(self, rows):
+        self._rows = list(rows)
+    def scalars(self):
+        return _SqlaScalarResult(self._rows)
+    def scalar(self):
+        return self._rows[0] if self._rows else None
+    def scalar_one(self):
+        return self.scalars().one()
+    def scalar_one_or_none(self):
+        return self.scalars().one_or_none()
+    def first(self):
+        return (self._rows[0],) if self._rows else None
+    def all(self):
+        return [(r,) for r in self._rows]
+    def one(self):
+        if len(self._rows) != 1:
+            raise RuntimeError(f"Expected 1 row, got {len(self._rows)}")
+        return (self._rows[0],)
+    def one_or_none(self):
+        if len(self._rows) > 1:
+            raise RuntimeError(f"Expected <= 1 row, got {len(self._rows)}")
+        return (self._rows[0],) if self._rows else None
+    def __iter__(self):
+        return iter((r,) for r in self._rows)
+
+class _SqlaEngine:
+    def __init__(self, url="sqlite:///:memory:", **kw):
+        self.url = url
+        self.kwargs = kw
+        self._storage = {}
+    def connect(self):
+        return _types.SimpleNamespace(__enter__=lambda s: s, __exit__=lambda s, *a: False, execute=lambda *a, **kw: _SqlaResult([]), commit=lambda: None, close=lambda: None)
+    def begin(self):
+        return self.connect()
+    def dispose(self):
+        pass
+
+class _SqlaSession:
+    def __init__(self, bind=None, **kw):
+        self.bind = bind
+        self._committed_store = bind._storage if (bind is not None and hasattr(bind, "_storage")) else {}
+        self._new = []
+        self._flushed = []
+        self._deleted = []
+        self._seq = {}
+        self.closed = False
+    def __enter__(self):
+        return self
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type:
+            self.rollback()
+        self.close()
+        return False
+    def _pk_name(self, model):
+        for k, v in getattr(model, "__dict__", {}).items():
+            if isinstance(v, _SqlaMappedColumn) and v.primary_key:
+                return k
+        return "id"
+    def _ensure_pk(self, obj):
+        cls = obj.__class__
+        pk = self._pk_name(cls)
+        if getattr(obj, pk, None) is None:
+            existing = self._committed_store.get(cls, []) + [o for o in (self._flushed + self._new) if isinstance(o, cls)]
+            max_id = 0
+            for item in existing:
+                v = getattr(item, pk, None)
+                if isinstance(v, int) and v > max_id:
+                    max_id = v
+            nxt = max(self._seq.get(cls, 0) + 1, max_id + 1)
+            self._seq[cls] = nxt
+            setattr(obj, pk, nxt)
+    def add(self, obj):
+        if obj not in self._new and obj not in self._flushed:
+            self._new.append(obj)
+        if obj in self._deleted:
+            self._deleted.remove(obj)
+    def add_all(self, objs):
+        for o in objs:
+            self.add(o)
+    def delete(self, obj):
+        if obj in self._new:
+            self._new.remove(obj)
+        if obj not in self._deleted:
+            self._deleted.append(obj)
+    def flush(self):
+        for obj in list(self._new):
+            self._ensure_pk(obj)
+            if obj not in self._flushed:
+                self._flushed.append(obj)
+        self._new.clear()
+    def commit(self):
+        self.flush()
+        for obj in list(self._flushed):
+            bucket = self._committed_store.setdefault(obj.__class__, [])
+            if obj not in bucket:
+                bucket.append(obj)
+        self._flushed.clear()
+        for obj in list(self._deleted):
+            bucket = self._committed_store.get(obj.__class__, [])
+            if obj in bucket:
+                bucket.remove(obj)
+        self._deleted.clear()
+    def rollback(self):
+        self._new.clear()
+        self._flushed.clear()
+        self._deleted.clear()
+    def close(self):
+        self._new.clear()
+        self._flushed.clear()
+        self._deleted.clear()
+        self.closed = True
+    def _visible_rows(self, model):
+        if model is None:
+            return []
+        base = list(self._committed_store.get(model, []))
+        for o in self._flushed + self._new:
+            if isinstance(o, model) and o not in base:
+                base.append(o)
+        if self._deleted:
+            base = [o for o in base if o not in self._deleted]
+        return base
+    def _eval_stmt(self, stmt):
+        if not isinstance(stmt, _SqlaSelect):
+            return []
+        rows = self._visible_rows(stmt._model)
+        for pred in stmt._where:
+            rows = [r for r in rows if pred(r)]
+        for ob in reversed(stmt._order_by):
+            col_name = getattr(ob, "name", None) or getattr(ob, "key", None)
+            is_desc = bool(getattr(ob, "is_desc", False))
+            if col_name:
+                rows.sort(key=lambda o, _c=col_name: (getattr(o, _c, None) is None, getattr(o, _c, None)), reverse=is_desc)
+        if stmt._offset:
+            rows = rows[stmt._offset:]
+        if stmt._limit is not None:
+            rows = rows[:stmt._limit]
+        return rows
+    def scalars(self, stmt, *a, **kw):
+        return _SqlaScalarResult(self._eval_stmt(stmt))
+    def scalar(self, stmt, *a, **kw):
+        return self.scalars(stmt).first()
+    def execute(self, stmt, *a, **kw):
+        return _SqlaResult(self._eval_stmt(stmt))
+    def get(self, model, pk, *a, **kw):
+        pk_col = self._pk_name(model)
+        for obj in self._visible_rows(model):
+            if getattr(obj, pk_col, None) == pk:
+                return obj
+        return None
+
+if "sqlalchemy" not in _sys.modules:
+    _mod_sqla = _types.ModuleType("sqlalchemy")
+    _mod_sqla.__path__ = []
+    _mod_sqla.select = lambda *entities: _SqlaSelect(*entities)
+    _mod_sqla.create_engine = lambda url="sqlite:///:memory:", *a, **kw: _SqlaEngine(url, **kw)
+    _mod_sqla.Column = lambda *a, **kw: _SqlaMappedColumn(*a, **kw)
+    _mod_sqla.ForeignKey = type("ForeignKey", (_SqlaType,), {})
+    _mod_sqla.String = type("String", (_SqlaType,), {})
+    _mod_sqla.Integer = type("Integer", (_SqlaType,), {})
+    _mod_sqla.Float = type("Float", (_SqlaType,), {})
+    _mod_sqla.Boolean = type("Boolean", (_SqlaType,), {})
+    _mod_sqla.DateTime = type("DateTime", (_SqlaType,), {})
+    _mod_sqla.Text = type("Text", (_SqlaType,), {})
+    _mod_sqla.Numeric = type("Numeric", (_SqlaType,), {})
+    _mod_sqla.and_ = lambda *preds: _SqlaPredicate(lambda o: all(p(o) for p in preds))
+    _mod_sqla.or_ = lambda *preds: _SqlaPredicate(lambda o: any(p(o) for p in preds))
+    _mod_sqla.not_ = lambda p: _SqlaPredicate(lambda o: not p(o))
+    _mod_sqla.desc = lambda col: _SqlaOrderExpr(getattr(col, "name", str(col)), is_desc=True)
+    _mod_sqla.asc = lambda col: _SqlaOrderExpr(getattr(col, "name", str(col)), is_desc=False)
+    _mod_sqla.text = lambda sql_s: sql_s
+
+    _mod_sqla_orm = _types.ModuleType("sqlalchemy.orm")
+    _mod_sqla_orm.DeclarativeBase = _SqlaDeclarativeBase
+    _mod_sqla_orm.declarative_base = lambda: _SqlaDeclarativeBase
+    _mod_sqla_orm.Mapped = _SqlaMapped
+    _mod_sqla_orm.mapped_column = lambda *a, **kw: _SqlaMappedColumn(*a, **kw)
+    _mod_sqla_orm.relationship = lambda *a, **kw: _SqlaRelationship(*a, **kw)
+    _mod_sqla_orm.Session = _SqlaSession
+    _mod_sqla_orm.sessionmaker = lambda bind=None, **kw: (lambda **ov: _SqlaSession(bind=bind, **{**kw, **ov}))
+    _mod_sqla_orm.selectinload = lambda *a, **kw: ("selectinload", a)
+    _mod_sqla_orm.joinedload = lambda *a, **kw: ("joinedload", a)
+
+    _mod_sqla.orm = _mod_sqla_orm
+    _sys.modules["sqlalchemy"] = _mod_sqla
+    _sys.modules["sqlalchemy.orm"] = _mod_sqla_orm
+
+if "alembic" not in _sys.modules:
+    _mod_alembic = _types.ModuleType("alembic")
+    _mod_alembic.__path__ = []
+    _mod_alembic_op = _types.ModuleType("alembic.op")
+    _mod_alembic_op._ops = []
+    def _mk_alembic_op(op_name):
+        def _fn(*a, **kw):
+            _mod_alembic_op._ops.append((op_name, a, kw))
+            return None
+        return _fn
+    for _op_name in ("add_column", "drop_column", "create_table", "drop_table", "create_index", "drop_index", "alter_column", "execute", "create_foreign_key", "drop_constraint"):
+        setattr(_mod_alembic_op, _op_name, _mk_alembic_op(_op_name))
+    _mod_alembic.op = _mod_alembic_op
+    _mod_alembic.context = _types.SimpleNamespace(
+        config=None,
+        is_offline_mode=lambda: False,
+        configure=lambda *a, **kw: None,
+        run_migrations=lambda: None,
+        get_x_argument=lambda *a, **kw: {},
+    )
+    _mod_alembic.command = _types.SimpleNamespace(
+        upgrade=lambda *a, **kw: None,
+        downgrade=lambda *a, **kw: None,
+        revision=lambda *a, **kw: None,
+    )
+    _sys.modules["alembic"] = _mod_alembic
+    _sys.modules["alembic.op"] = _mod_alembic_op
+
 # Enhance Brython fallback sqlite3 mock if native _sqlite3 is absent
 _sq_mod = _sys.modules.get("sqlite3")
 if _sq_mod is not None and not hasattr(_sq_mod, "sqlite_version"):
@@ -1463,60 +1877,47 @@ if __name__ == '__main__':
         assert passed_tasks == len(TASKS_381) and not failed_tasks, f"IDE tasks failed: {failed_tasks}"
         print(f"✓ All {passed_tasks}/{len(TASKS_381)} IDE tasks passed in full_env_code!")
 
-        all_notes = {**HR_NOTES_DATA, **PY_NOTES_DATA, **WEB_NOTES_DATA, **BACKEND_NOTES_DATA, **ALGO_NOTES_DATA, **DB_NOTES_DATA, **ARCH_NOTES_DATA, **INFRA_NOTES_DATA}
-        passed_snippets = 0
-        failed_snippets = []
-        for kid, note in sorted(all_notes.items()):
+        # Verify browser execution architecture:
+        # - sqlite3 tasks run in Pyodide mode (native sqlite3, without _SqConn pure-Python shim)
+        # - non-sqlite3 tasks run in Brython mode (all browser shims, without native _sqlite3)
+        import sqlite3 as _real_sq_restore
+        pyodide_env = _re.sub(
+            r'\nif "sqlite3" not in _sys\.modules:[\s\S]*?_sys\.modules\["sqlite3"\] = _sq\n',
+            '\n',
+            full_env_code
+        )
+        pyodide_env = _re.sub(
+            r'\n# Enhance Brython fallback sqlite3 mock[\s\S]*$',
+            '\n',
+            pyodide_env
+        )
+        fallback_env = full_env_code.replace('import sqlite3 as _real_sqlite3', 'pass')
+        fb_failed = []
+        sq_checked = 0
+        br_checked = 0
+        for _task_item in TASKS_381:
+            _uses_sqlite3 = ('sqlite3' in _task_item['code']) or ('sqlite3' in _task_item['tests'])
+            _sys.modules.pop('sqlite3', None)
+            if _uses_sqlite3:
+                _sys.modules['sqlite3'] = _real_sq_restore
             _m_main = _types.ModuleType('__main__')
             _sys.modules['__main__'] = _m_main
             ns = _m_main.__dict__
-            exec(full_env_code, ns)
-            for si, st in enumerate(note['steps']):
-                for m in _re.finditer(r'<div class="code-run-bar">[\s\S]*?<span class="code-lang-tag">([^<]+)</span>[\s\S]*?</div><pre><code>([\s\S]*?)</code></pre>', st['html']):
-                    lang = m.group(1).lower().strip()
-                    if lang not in ('python', 'py'):
-                        continue
-                    raw_code = _html.unescape(m.group(2))
-                    try:
-                        with _cl.redirect_stdout(_io.StringIO()), _cl.redirect_stderr(_io.StringIO()):
-                            try:
-                                exec(raw_code, ns)
-                            except SyntaxError as se:
-                                if 'await' in str(se):
-                                    indented = '\n'.join('    ' + l for l in raw_code.splitlines())
-                                    exec(f"async def __auto_async__():\n{indented}\nimport asyncio as _aio\n_aio.run(__auto_async__())", ns)
-                                else:
-                                    raise
-                            except (Exception, KeyboardInterrupt) as ex:
-                                if type(ex).__name__ in raw_code or isinstance(ex, (KeyboardInterrupt, StopIteration)):
-                                    pass
-                                else:
-                                    raise
-                        passed_snippets += 1
-                    except Exception as e:
-                        failed_snippets.append((kid, si + 1, f"{type(e).__name__}: {e}"))
-
-        assert len(all_notes) == 246 and passed_snippets >= 540 and not failed_snippets, f"Theory snippets failed ({passed_snippets}): {failed_snippets[:5]}"
-        print(f"✓ All {passed_snippets}/{passed_snippets} K-note Python snippets across all {len(all_notes)} notes passed successfully!")
-
-        # Also verify Brython fallback sqlite3 shim (when native _sqlite3 is absent in browser)
-        fallback_env = full_env_code.replace('import sqlite3 as _real_sqlite3', 'pass')
-        fb_failed = []
-        for _task_item in TASKS_381:
-            if 'sqlite3' in _task_item['code']:
-                _sys.modules.pop('sqlite3', None)
-                _m_main = _types.ModuleType('__main__')
-                _sys.modules['__main__'] = _m_main
-                ns = _m_main.__dict__
-                sol = _task_item['code']
-                try:
-                    with _cl.redirect_stdout(_io.StringIO()), _cl.redirect_stderr(_io.StringIO()):
-                        exec(fallback_env, ns)
-                        exec(sol, ns)
-                        ns['__USER_CODE__'] = sol
-                        exec(_task_item['tests'], ns)
-                except Exception as e:
-                    fb_failed.append((f"Task #{_task_item['id']}", f"{type(e).__name__}: {e}"))
+            sol = _task_item['code']
+            _target_env = pyodide_env if _uses_sqlite3 else fallback_env
+            try:
+                with _cl.redirect_stdout(_io.StringIO()), _cl.redirect_stderr(_io.StringIO()):
+                    exec(_target_env, ns)
+                    exec(sol, ns)
+                    ns['__USER_CODE__'] = sol
+                    exec(_task_item['tests'], ns)
+                if _uses_sqlite3:
+                    sq_checked += 1
+                else:
+                    br_checked += 1
+            except Exception as e:
+                _mode = 'Pyodide-sqlite3' if _uses_sqlite3 else 'Brython-shim'
+                fb_failed.append((f"Task #{_task_item['id']} [{_mode}]", f"{type(e).__name__}: {e}"))
         for kid, note in sorted(DB_NOTES_DATA.items()):
             for si, st in enumerate(note['steps']):
                 for m in _re.finditer(r'<div class="code-run-bar">[\s\S]*?</div><pre><code>([\s\S]*?)</code></pre>', st['html']):
@@ -1532,10 +1933,9 @@ if __name__ == '__main__':
                                 exec(raw_code, ns)
                         except Exception as e:
                             fb_failed.append((f"{kid} step {si+1}", f"{type(e).__name__}: {e}"))
-        import sqlite3 as _real_sq_restore
         _sys.modules['sqlite3'] = _real_sq_restore
-        assert not fb_failed, f"Brython fallback sqlite3 shim failed: {fb_failed}"
-        print("✓ All sqlite3 IDE tasks and all 25 DB sqlite3 K-note snippets passed under pure-Python Brython fallback shim!")
+        assert not fb_failed, f"Browser runtime verification failed: {fb_failed}"
+        print(f"✓ Verified {sq_checked} sqlite3 tasks (Pyodide native sqlite3, no _SqConn), {br_checked} non-sqlite3 tasks (Brython shims) and 25 DB K-note snippets!")
 
         # Verify canonical solutions for all 7 Module Boss Challenges (boss-python..boss-infra)
         boss_solutions = {
@@ -1904,16 +2304,15 @@ assert r2 == {"issues": [], "probes_healthy": True, "ready": True}, r2
                 exec(b_sol, ns)
                 exec(b_test, ns)
             if tk == 'databases':
-                _sys.modules.pop('sqlite3', None)
+                _sys.modules['sqlite3'] = _real_sq_restore
                 _m_main2 = _types.ModuleType('__main__')
                 _sys.modules['__main__'] = _m_main2
                 ns2 = _m_main2.__dict__
                 with _cl.redirect_stdout(_io.StringIO()), _cl.redirect_stderr(_io.StringIO()):
-                    exec(fallback_env, ns2)
+                    exec(pyodide_env, ns2)
                     exec(b_sol, ns2)
                     exec(b_test, ns2)
-                _sys.modules['sqlite3'] = _real_sq_restore
-        print("✓ All 7/7 Module Boss Challenges (live initialCode negative checks + canonical solutions) passed in CPython and Brython fallback shim!")
+        print("✓ All 7/7 Module Boss Challenges (live initialCode negative checks + canonical solutions) passed in CPython and Pyodide-sqlite3 mode!")
 
         # 4) Verify standalone IDE trainer file on disk
         import json as _json_disk
@@ -1952,5 +2351,41 @@ assert r2 == {"issues": [], "probes_healthy": True, "ready": True}, r2
             assert 'multiprocessing' in _ide_content, "Missing multiprocessing shim in standalone IDE"
             assert 'cProfile' in _ide_content, "Missing cProfile shim in standalone IDE"
             print("✓ Standalone IDE trainer (Практика кода — тренажёр с IDE.html): 401 tasks, 11-field schema, safe limits, browser shims & sync verified!")
+
+        all_notes = {**HR_NOTES_DATA, **PY_NOTES_DATA, **WEB_NOTES_DATA, **BACKEND_NOTES_DATA, **ALGO_NOTES_DATA, **DB_NOTES_DATA, **ARCH_NOTES_DATA, **INFRA_NOTES_DATA}
+        passed_snippets = 0
+        failed_snippets = []
+        for kid, note in sorted(all_notes.items()):
+            _m_main = _types.ModuleType('__main__')
+            _sys.modules['__main__'] = _m_main
+            ns = _m_main.__dict__
+            exec(full_env_code, ns)
+            for si, st in enumerate(note['steps']):
+                for m in _re.finditer(r'<div class="code-run-bar">[\s\S]*?<span class="code-lang-tag">([^<]+)</span>[\s\S]*?</div><pre><code>([\s\S]*?)</code></pre>', st['html']):
+                    lang = m.group(1).lower().strip()
+                    if lang not in ('python', 'py'):
+                        continue
+                    raw_code = _html.unescape(m.group(2))
+                    try:
+                        with _cl.redirect_stdout(_io.StringIO()), _cl.redirect_stderr(_io.StringIO()):
+                            try:
+                                exec(raw_code, ns)
+                            except SyntaxError as se:
+                                if 'await' in str(se):
+                                    indented = '\n'.join('    ' + l for l in raw_code.splitlines())
+                                    exec(f"async def __auto_async__():\n{indented}\nimport asyncio as _aio\n_aio.run(__auto_async__())", ns)
+                                else:
+                                    raise
+                            except (Exception, KeyboardInterrupt) as ex:
+                                if type(ex).__name__ in raw_code or isinstance(ex, (KeyboardInterrupt, StopIteration)):
+                                    pass
+                                else:
+                                    raise
+                        passed_snippets += 1
+                    except Exception as e:
+                        failed_snippets.append((kid, si + 1, f"{type(e).__name__}: {e}"))
+
+        assert len(all_notes) == 246 and passed_snippets >= 540 and not failed_snippets, f"Theory snippets failed ({passed_snippets}): {failed_snippets[:5]}"
+        print(f"✓ All {passed_snippets}/{passed_snippets} K-note Python snippets across all {len(all_notes)} notes passed successfully!")
     _run_suite()
 

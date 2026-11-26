@@ -46,7 +46,7 @@ WHERE o.status = 'completed';
 
     def test_run_task_assertion_failure(self) -> None:
         """Код синтаксически верный, но не удовлетворяет условию задачи."""
-        incomplete_code = "sql = 'SELECT 1;'"  # Отсутствуют нужные поля username, order_id
+        incomplete_code = "sql = 'SELECT 1;'"  # Отсутствует INNER JOIN и нужные поля
         res = self.client.post('/api/v1/practice/run', json={
             'task_id': 1,
             'code': incomplete_code
@@ -55,7 +55,7 @@ WHERE o.status = 'completed';
         data = res.json()
         self.assertTrue(data['ok'])
         self.assertEqual(data['status'], 'fail')
-        self.assertIn('username', data['error_message'])
+        self.assertIn('INNER JOIN', data['error_message'])
         self.assertIsNotNone(data['socratic_hint'])
 
     def test_task_socratic_hints(self) -> None:
