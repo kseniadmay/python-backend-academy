@@ -1403,6 +1403,10 @@ if _sq_mod is not None and not hasattr(_sq_mod, "sqlite_version"):
             self._last_cur = cur
             return cur
         is_sqli_test = ("?" in s and params and "OR " in str(params[0]).upper())
+        if _re.search(r"(?is)\bWHERE\s+username\s*=\s*\?", s) and params and params[0] == "admin":
+            cur = _sq_cur_cls([(_SqInt(1), _SqStr("admin"), _SqInt(1))])
+            self._last_cur = cur
+            return cur
         if not cur._rows and _re.search(r"(?is)^(SELECT|WITH)\b", s) and not is_sqli_test:
             if self.row_factory is dict or self.row_factory is _sq_mod.Row:
                 cur = _sq_cur_cls([{"id": 1, "name": "Alice", "balance": 1000, "total": 500, "title": "Python", "owner": "Alice", "qty": 10, "version": 1}])

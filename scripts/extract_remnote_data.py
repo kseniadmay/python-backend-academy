@@ -713,11 +713,13 @@ for _t in TASKS_381:
     if not _TASKS_FROM_CANONICAL:
         _t['tier'] = TIER_MAP.get(_lvl, f'🥚 Уровень {_lvl}')
         _t['topic'] = '🐍 Python Core' if 240 <= _t['id'] <= 381 else '🌐 Backend & SQL'
-    if _t['id'] in _TASK_OVERRIDES:
-        _ov = _TASK_OVERRIDES[_t['id']]
-        if 'title' in _ov: _t['title'] = _ov['title']
-        if 'solution' in _ov: _t['code'] = _ov['solution']
-    _code = clean_ref_code(_t['id'], _t.get('code', _t.get('solution', '')))
+        if _t['id'] in _TASK_OVERRIDES:
+            _ov = _TASK_OVERRIDES[_t['id']]
+            if 'title' in _ov: _t['title'] = _ov['title']
+            if 'solution' in _ov: _t['code'] = _ov['solution']
+        _code = clean_ref_code(_t['id'], _t.get('code', _t.get('solution', '')))
+    else:
+        _code = _t.get('code') or _t.get('solution', '')
     _t['code'] = _code
     _t['solution'] = _code
     if not _TASKS_FROM_CANONICAL or not _t.get('initialCode'):
@@ -726,37 +728,40 @@ for _t in TASKS_381:
     _doc_m = None
     if _stripped_code.startswith('"""') or _stripped_code.startswith("'''"):
         _doc_m = re.match(r'^(?:"""|\'\'\')(.*?)(?:"""|\'\'\')', _stripped_code, re.S)
-    if _t['id'] in _TASK_OVERRIDES and 'desc' in _TASK_OVERRIDES[_t['id']]:
-        _t['desc'] = _TASK_OVERRIDES[_t['id']]['desc']
-    elif not _TASKS_FROM_CANONICAL:
-        _t['desc'] = f"<p><strong>Задание:</strong> {html.escape(_t['title'])}.</p>" + (
-            f"<p class='meta'>{html.escape(_doc_m.group(1).strip())}</p>" if _doc_m else ""
-        )
+    if not _TASKS_FROM_CANONICAL or not _t.get('desc'):
+        if _t['id'] in _TASK_OVERRIDES and 'desc' in _TASK_OVERRIDES[_t['id']]:
+            _t['desc'] = _TASK_OVERRIDES[_t['id']]['desc']
+        else:
+            _t['desc'] = f"<p><strong>Задание:</strong> {html.escape(_t['title'])}.</p>" + (
+                f"<p class='meta'>{html.escape(_doc_m.group(1).strip())}</p>" if _doc_m else ""
+            )
     if not _TASKS_FROM_CANONICAL or not _t.get('hint'):
         _t['hint'] = _TASK_OVERRIDES[_t['id']]['hint'] if (_t['id'] in _TASK_OVERRIDES and 'hint' in _TASK_OVERRIDES[_t['id']]) else generate_pedagogical_hint(_t)
-    _t_str_id = str(_t['id'])
-    if _t_str_id in _TIER1_ENRICH or _t['id'] in _TIER1_ENRICH:
-        _enr = _TIER1_ENRICH.get(_t_str_id) or _TIER1_ENRICH.get(_t['id'])
-        if _enr:
-            if not (_t['id'] in _TASK_OVERRIDES and 'hint' in _TASK_OVERRIDES[_t['id']]):
-                _t['hint'] = _enr.get('hint', _t['hint'])
-            _io_in = _enr.get('io_in', '')
-            _io_out = _enr.get('io_out', '')
-            if _io_in and _io_out:
-                _t['io_flow'] = {'in': _io_in, 'out': _io_out}
-                _io_html = (
-                    f"<div class=\"io-flow-block\">"
-                    f"<div class=\"io-flow-label\">⚡ Поток данных (I/O Flow)</div>"
-                    f"<div class=\"io-flow-row\">"
-                    f"<span class=\"io-pill io-pill-in\">Вход: <code>{html.escape(_io_in)}</code></span>"
-                    f"<span class=\"io-arrow\">➔</span>"
-                    f"<span class=\"io-pill io-pill-out\">Ожидание: <code>{html.escape(_io_out)}</code></span>"
-                    f"</div></div>"
-                )
-                if 'io-flow-block' not in _t['desc']:
-                    _t['desc'] = _t['desc'] + _io_html
-    _t['tests'] = _TASK_OVERRIDES[_t['id']]['tests'] if (_t['id'] in _TASK_OVERRIDES and 'tests' in _TASK_OVERRIDES[_t['id']]) else build_test_for_task(_t)
-    if _t['id'] in _TASK_OVERRIDES and 'initialCode' in _TASK_OVERRIDES[_t['id']]:
+    if not _TASKS_FROM_CANONICAL:
+        _t_str_id = str(_t['id'])
+        if _t_str_id in _TIER1_ENRICH or _t['id'] in _TIER1_ENRICH:
+            _enr = _TIER1_ENRICH.get(_t_str_id) or _TIER1_ENRICH.get(_t['id'])
+            if _enr:
+                if not (_t['id'] in _TASK_OVERRIDES and 'hint' in _TASK_OVERRIDES[_t['id']]):
+                    _t['hint'] = _enr.get('hint', _t['hint'])
+                _io_in = _enr.get('io_in', '')
+                _io_out = _enr.get('io_out', '')
+                if _io_in and _io_out:
+                    _t['io_flow'] = {'in': _io_in, 'out': _io_out}
+                    _io_html = (
+                        f"<div class=\"io-flow-block\">"
+                        f"<div class=\"io-flow-label\">⚡ Поток данных (I/O Flow)</div>"
+                        f"<div class=\"io-flow-row\">"
+                        f"<span class=\"io-pill io-pill-in\">Вход: <code>{html.escape(_io_in)}</code></span>"
+                        f"<span class=\"io-arrow\">➔</span>"
+                        f"<span class=\"io-pill io-pill-out\">Ожидание: <code>{html.escape(_io_out)}</code></span>"
+                        f"</div></div>"
+                    )
+                    if 'io-flow-block' not in _t['desc']:
+                        _t['desc'] = _t['desc'] + _io_html
+    if not _TASKS_FROM_CANONICAL or not _t.get('tests'):
+        _t['tests'] = _TASK_OVERRIDES[_t['id']]['tests'] if (_t['id'] in _TASK_OVERRIDES and 'tests' in _TASK_OVERRIDES[_t['id']]) else build_test_for_task(_t)
+    if not _TASKS_FROM_CANONICAL and _t['id'] in _TASK_OVERRIDES and 'initialCode' in _TASK_OVERRIDES[_t['id']]:
         _t['initialCode'] = _TASK_OVERRIDES[_t['id']]['initialCode']
 
 
