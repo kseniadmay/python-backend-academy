@@ -37938,7 +37938,7 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     border-radius: var(--r-xl, 22px) !important;
   }
 
-  /* ==================== DASHBOARD: STRUCTURED COCKPIT & ARCHITECTURAL FLAT (DRY) ==================== */
+  /* ==================== DASHBOARD: HORIZON & CRYSTAL GLASS (DRY) ==================== */
   .dash-stage.dashboard-container {
     --dash-accent: #34d399;
     --dash-accent-2: #10b981;
@@ -37949,17 +37949,18 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     --dash-bordeaux-rgb: 190, 18, 60;
     --dash-warn: #f59e0b;
     --dash-warn-rgb: 245, 158, 11;
-    --dash-line: var(--line, rgba(255, 255, 255, 0.09));
+    --dash-line: rgba(255, 255, 255, 0.10);
     --dash-line-strong: rgba(52, 211, 153, 0.36);
+    --dash-muted: #a6b2c6;
 
     width: 100%;
     max-width: 1040px !important;
     margin: 0 auto;
     display: grid !important;
     grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: 14px;
+    gap: 16px;
     align-items: start;
-    padding: 20px 18px calc(40px + env(safe-area-inset-bottom, 0px)) !important;
+    padding: 20px 20px calc(40px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   /* Saved Light Theme: Velvet Ink & Ethereal Indigo (Light Variant) */
@@ -37974,8 +37975,9 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     --dash-bordeaux-rgb: 107, 29, 47;
     --dash-warn: #b45309;
     --dash-warn-rgb: 180, 83, 9;
-    --dash-line: rgba(15, 23, 42, 0.085);
-    --dash-line-strong: rgba(79, 70, 229, 0.30);
+    --dash-line: rgba(15, 23, 42, 0.09);
+    --dash-line-strong: rgba(79, 70, 229, 0.32);
+    --dash-muted: #475569;
   }
   [data-theme="light"] body:has(.dash-stage.dashboard-container) {
     background-color: #f7f7fc;
@@ -37986,35 +37988,61 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     background-size: 100% 100%, 100% 100%, 24px 24px;
   }
 
-  /* Architectural Flat Surfaces */
+  /* Crystal Wire Surfaces (Approved Horizon Config: crystal-wire, Zero Blur) */
   .dash-glass {
     position: relative;
     background: transparent;
-    border: 1px solid var(--dash-line);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: var(--r-lg, 16px);
     box-shadow: none;
-    transition: border-color 0.18s ease, background-color 0.18s ease;
+    transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
     contain: layout style;
   }
   .dash-glass:hover {
-    border-color: var(--dash-line-strong);
-    background: var(--surface-2);
+    border-color: rgba(52, 211, 153, 0.44);
+    background: rgba(255, 255, 255, 0.025);
   }
+  html:not([data-theme="dark"]) .dash-stage .dash-glass,
+  [data-theme="light"] .dash-stage .dash-glass {
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid rgba(15, 23, 42, 0.15);
+    box-shadow: none;
+  }
+  html:not([data-theme="dark"]) .dash-stage .dash-glass:hover,
   [data-theme="light"] .dash-stage .dash-glass:hover {
-    background: rgba(79, 70, 229, 0.035);
+    border-color: rgba(79, 70, 229, 0.36);
+    background: rgba(255, 255, 255, 0.36);
   }
 
-  /* Grid placement: Structured Cockpit */
-  .dash-rhythm {
+  /* Block 1: Echelon Horizon (span 12) */
+  .dash-horizon {
     grid-column: span 12;
     order: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 20px;
+    font-family: var(--font-d);
+  }
+  .dash-horizon:hover {
+    border-color: rgba(255, 255, 255, 0.14);
+    background: transparent;
+  }
+  html:not([data-theme="dark"]) .dash-stage .dash-horizon:hover,
+  [data-theme="light"] .dash-stage .dash-horizon:hover {
+    border-color: rgba(15, 23, 42, 0.15);
+    background: rgba(255, 255, 255, 0.18);
+  }
+  .dash-horizon__head {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 10px 16px;
-    padding: 12px 18px;
-    font-family: var(--font-d);
+    gap: 8px 14px;
     font-size: 0.82rem;
   }
   .dash-rhythm__left,
@@ -38022,7 +38050,7 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     display: inline-flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 8px 12px;
+    gap: 8px 10px;
   }
   .dash-rhythm__rank {
     font-weight: 700;
@@ -38039,7 +38067,7 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     border-radius: 999px;
     color: var(--dash-bordeaux);
     background: var(--dash-bordeaux-soft);
-    border: 1px solid rgba(var(--dash-bordeaux-rgb), 0.32);
+    border: 1px solid rgba(var(--dash-bordeaux-rgb), 0.34);
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
@@ -38048,54 +38076,162 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     font-variant-numeric: tabular-nums;
     font-weight: 700;
   }
-  .dash-rhythm__stat {
+  .dash-horizon__remaining {
     font-family: var(--font-m);
     font-variant-numeric: tabular-nums;
     font-size: 0.75rem;
     font-weight: 600;
-    color: var(--ink-soft);
-    background: transparent;
-    border: 1px solid var(--dash-line);
-    padding: 3px 9px;
+    color: var(--dash-muted);
+    padding: 3px 10px;
     border-radius: var(--r-sm, 8px);
+    border: 1px solid var(--dash-line);
+    background: rgba(255, 255, 255, 0.02);
   }
-  .dash-rhythm__stat--amber {
-    color: var(--dash-warn);
-    border-color: rgba(var(--dash-warn-rgb), 0.32);
-    background: rgba(var(--dash-warn-rgb), 0.07);
+  html:not([data-theme="dark"]) .dash-horizon__remaining,
+  [data-theme="light"] .dash-horizon__remaining {
+    background: rgba(15, 23, 42, 0.025);
+  }
+  .dash-horizon__rail {
+    display: grid;
+    grid-template-columns: repeat(var(--ech-count, 4), minmax(0, 1fr));
+    gap: 8px;
+  }
+  .dash-horizon__node {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: var(--r-md, 10px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.018);
+    text-decoration: none;
+    color: var(--dash-muted);
+    transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+  }
+  .dash-horizon__node:hover {
+    border-color: rgba(52, 211, 153, 0.38);
+    background: rgba(255, 255, 255, 0.045);
+    color: var(--ink);
+  }
+  html:not([data-theme="dark"]) .dash-horizon__node,
+  [data-theme="light"] .dash-horizon__node {
+    border-color: rgba(15, 23, 42, 0.08);
+    background: rgba(255, 255, 255, 0.42);
+  }
+  html:not([data-theme="dark"]) .dash-horizon__node:hover,
+  [data-theme="light"] .dash-horizon__node:hover {
+    border-color: rgba(79, 70, 229, 0.34);
+    background: rgba(255, 255, 255, 0.72);
+  }
+  .dash-horizon__node.is-done {
+    border-color: rgba(var(--dash-accent-rgb), 0.30);
+    background: rgba(var(--dash-accent-rgb), 0.055);
+    color: var(--ink);
+  }
+  .dash-horizon__node.is-current {
+    border-color: rgba(var(--dash-bordeaux-rgb), 0.42);
+    background: linear-gradient(140deg, rgba(var(--dash-bordeaux-rgb), 0.11) 0%, rgba(var(--dash-accent-rgb), 0.06) 100%);
+    color: var(--ink);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+  html:not([data-theme="dark"]) .dash-horizon__node.is-current,
+  [data-theme="light"] .dash-horizon__node.is-current {
+    border-color: rgba(var(--dash-bordeaux-rgb), 0.34);
+    background: linear-gradient(140deg, rgba(var(--dash-bordeaux-rgb), 0.07) 0%, rgba(var(--dash-accent-rgb), 0.06) 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.90);
+  }
+  .dash-horizon__node-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    font-size: 0.74rem;
+    font-weight: 600;
+  }
+  .dash-horizon__node-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .dash-horizon__node-mark {
+    flex-shrink: 0;
+    font-family: var(--font-m);
+    font-size: 0.70rem;
+    font-weight: 700;
+    color: var(--dash-muted);
+  }
+  .dash-horizon__node.is-done .dash-horizon__node-mark {
+    color: var(--dash-accent);
+  }
+  .dash-horizon__node.is-current .dash-horizon__node-mark {
+    color: var(--dash-bordeaux);
+  }
+  .dash-horizon__node-pct {
+    flex-shrink: 0;
+    font-family: var(--font-m);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--dash-muted);
+  }
+  .dash-horizon__node.is-done .dash-horizon__node-pct,
+  .dash-horizon__node.is-current .dash-horizon__node-pct {
+    color: var(--dash-accent);
   }
 
-  /* 4-column Telemetry Dock (top of Structured Cockpit) */
+  /* Block 2: 3-column Fruits of Labor Dock */
   .dash-dock {
     grid-column: span 12;
     order: 2;
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0;
     overflow: hidden;
   }
   .dash-dock:hover {
+    border-color: rgba(255, 255, 255, 0.14);
     background: transparent;
-    border-color: var(--dash-line);
+  }
+  html:not([data-theme="dark"]) .dash-stage .dash-dock:hover,
+  [data-theme="light"] .dash-stage .dash-dock:hover {
+    border-color: rgba(15, 23, 42, 0.15);
+    background: rgba(255, 255, 255, 0.18);
   }
   .dash-dock__col {
-    padding: 14px 18px;
+    position: relative;
+    padding: 16px 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 9px;
+    gap: 12px;
     text-decoration: none;
     color: inherit;
-    transition: background-color 0.18s ease;
+    transition: background 0.18s ease;
   }
   .dash-dock__col:hover {
-    background: var(--surface-2);
+    background: rgba(255, 255, 255, 0.038);
   }
+  html:not([data-theme="dark"]) .dash-stage .dash-dock__col:hover,
   [data-theme="light"] .dash-stage .dash-dock__col:hover {
     background: rgba(79, 70, 229, 0.045);
   }
   .dash-dock__col + .dash-dock__col {
     border-left: 1px solid var(--dash-line);
+  }
+  .dash-dock__col.is-goal-done::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 12%;
+    right: 12%;
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent, rgba(var(--dash-accent-rgb), 0.85) 50%, transparent);
+    pointer-events: none;
   }
   .dash-dock__top {
     display: flex;
@@ -38105,24 +38241,26 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
   }
   .dash-dock__label {
     font-family: var(--font-d);
-    font-size: 0.69rem;
+    font-size: 0.70rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--ink-muted);
+    color: var(--dash-muted);
   }
   .dash-dock__val {
     font-family: var(--font-m);
     font-variant-numeric: tabular-nums;
-    font-size: 0.90rem;
+    font-size: 0.94rem;
     font-weight: 700;
     color: var(--ink);
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .dash-dock__val em {
     font-style: normal;
-    font-size: 0.72rem;
+    font-size: 0.74rem;
     font-weight: 500;
-    color: var(--ink-muted);
+    color: var(--dash-muted);
     margin-left: 2px;
   }
   .dash-dock__val--accent {
@@ -38132,24 +38270,50 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     color: var(--dash-warn);
   }
   .dash-dock__sub {
-    font-size: 0.74rem;
-    color: var(--ink-muted);
+    font-size: 0.76rem;
+    color: var(--dash-muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  .dash-rhythm-strip {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 5px;
+    align-items: center;
+    height: 10px;
+  }
+  .dash-rhythm-cell {
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.09);
+  }
+  html:not([data-theme="dark"]) .dash-rhythm-cell,
+  [data-theme="light"] .dash-rhythm-cell {
+    background: rgba(15, 23, 42, 0.10);
+  }
+  .dash-rhythm-cell.is-hit {
+    background: rgba(245, 158, 11, 0.62);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.35);
+  }
+  .dash-rhythm-cell.is-goal {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    box-shadow: 0 0 9px rgba(245, 158, 11, 0.52);
+  }
 
-  /* Hero Card (Architectural Flat + Focused Ambient Glow) */
+  /* Block 3: Hero Card (Approved Horizon Config: hero-solid-cta + crystal-wire) */
   .dash-card {
     grid-column: span 12;
     order: 3;
     position: relative;
     width: 100%;
-    padding: 26px 28px;
-    border-radius: 18px;
-    background: rgba(var(--dash-accent-rgb), 0.032);
-    border: 1px solid rgba(var(--dash-accent-rgb), 0.26);
-    box-shadow: 0 0 36px -18px rgba(var(--dash-accent-rgb), 0.36);
+    padding: 24px 28px;
+    border-radius: var(--r-lg, 16px);
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     contain: layout style;
   }
@@ -38160,28 +38324,32 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     left: 14%;
     right: 14%;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(var(--dash-accent-rgb), 0.72) 50%, transparent);
+    background: linear-gradient(90deg, transparent, rgba(var(--dash-accent-rgb), 0.78) 50%, transparent);
     pointer-events: none;
   }
   .dash-card--srs {
-    background: rgba(var(--dash-warn-rgb), 0.038);
+    background: transparent;
     border-color: rgba(var(--dash-warn-rgb), 0.30);
-    box-shadow: 0 0 36px -18px rgba(var(--dash-warn-rgb), 0.38);
+    box-shadow: none;
   }
   .dash-card--srs::before {
-    background: linear-gradient(90deg, transparent, rgba(var(--dash-warn-rgb), 0.75) 50%, transparent);
+    background: linear-gradient(90deg, transparent, rgba(var(--dash-warn-rgb), 0.78) 50%, transparent);
   }
   html:not([data-theme="dark"]) .dash-card,
   [data-theme="light"] .dash-card {
-    background: rgba(255, 255, 255, 0.76);
-    border-color: rgba(var(--dash-accent-rgb), 0.24);
-    box-shadow: 0 14px 36px -20px rgba(var(--dash-accent-rgb), 0.22);
+    background: rgba(255, 255, 255, 0.22);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-color: rgba(15, 23, 42, 0.15);
+    box-shadow: none;
   }
   html:not([data-theme="dark"]) .dash-card--srs,
   [data-theme="light"] .dash-card--srs {
-    background: rgba(255, 255, 255, 0.80);
-    border-color: rgba(var(--dash-warn-rgb), 0.28);
-    box-shadow: 0 14px 36px -20px rgba(var(--dash-warn-rgb), 0.22);
+    background: rgba(255, 255, 255, 0.24);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-color: rgba(var(--dash-warn-rgb), 0.30);
+    box-shadow: none;
   }
 
   .dash-eyebrow {
@@ -38189,11 +38357,11 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     align-items: center;
     gap: 8px;
     font-family: var(--font-d);
-    font-size: 0.71rem;
+    font-size: 0.72rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--ink-muted);
+    color: var(--dash-muted);
     margin-bottom: 10px;
     line-height: 1.35;
   }
@@ -38218,9 +38386,9 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
   }
   .dash-sub {
     font-family: var(--font-d);
-    font-size: 0.86rem;
+    font-size: 0.88rem;
     line-height: 1.48;
-    color: var(--ink-muted);
+    color: var(--dash-muted);
     margin: 0 0 16px 0;
   }
   .dash-stages {
@@ -38240,20 +38408,20 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     min-height: 36px;
     padding: 6px 10px;
     border-radius: var(--r-md, 10px);
-    background: transparent;
+    background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--dash-line);
     font-family: var(--font-d);
     font-size: 0.71rem;
     font-weight: 600;
     letter-spacing: 0.05em;
-    color: var(--ink-muted);
+    color: var(--dash-muted);
     text-decoration: none;
-    transition: border-color 0.18s ease, color 0.18s ease, background-color 0.18s ease;
+    transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
   }
   .dash-stage-pill:hover {
     border-color: var(--dash-line-strong);
     color: var(--ink);
-    background: var(--surface-2);
+    background: rgba(255, 255, 255, 0.05);
   }
   .dash-stage-pill.is-done {
     color: var(--dash-accent);
@@ -38267,7 +38435,7 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     box-shadow: 0 0 14px -6px rgba(var(--dash-accent-rgb), 0.45);
   }
 
-  /* Luminous Tracks (2.5px + glowing tip) */
+  /* Luminous Tracks (3px + 6px glowing tip) */
   .dash-progress-row {
     display: flex;
     align-items: center;
@@ -38281,9 +38449,9 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
   .dash-progress-pct {
     font-family: var(--font-m);
     font-variant-numeric: tabular-nums;
-    font-size: 0.74rem;
+    font-size: 0.75rem;
     font-weight: 600;
-    color: var(--ink-muted);
+    color: var(--dash-muted);
     flex-shrink: 0;
   }
   .dash-progress {
@@ -38335,62 +38503,59 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     box-shadow: 0 0 8px rgba(245, 158, 11, 0.90);
   }
 
-  /* Specular Contour CTA (overrides global .dominant-btn green glow) */
+  /* Native Emerald Dominant CTA (left-aligned with Hero title) */
   .dash-cta-row {
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: space-between;
+    gap: 12px 16px;
     flex-wrap: wrap;
   }
   :root[data-theme="dark"] .dash-stage .dash-cta.dominant-btn,
   .dash-stage .dash-cta.dominant-btn {
+    margin: 0 !important;
     min-height: 44px;
     height: 44px;
-    padding: 0 22px !important;
+    padding: 0 24px !important;
     width: auto !important;
-    min-width: 196px;
+    min-width: 204px;
     font-family: var(--font-d);
     font-size: 0.90rem !important;
-    font-weight: 600;
+    font-weight: 700;
+    letter-spacing: 0.01em;
     border-radius: 11px;
     text-decoration: none;
-    background: rgba(255, 255, 255, 0.045) !important;
-    border: 1px solid rgba(255, 255, 255, 0.18) !important;
-    color: var(--ink) !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 8px 20px -12px rgba(0, 0, 0, 0.65) !important;
-    transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, transform 0.16s ease;
+    background: linear-gradient(180deg, rgba(16, 185, 129, 0.34) 0%, rgba(6, 78, 59, 0.32) 100%) !important;
+    border: 1.5px solid rgba(52, 211, 153, 0.68) !important;
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.22), 0 6px 24px -4px rgba(16, 185, 129, 0.44) !important;
+    transition: background 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
   :root[data-theme="dark"] .dash-stage .dash-cta.dominant-btn:hover,
   .dash-stage .dash-cta.dominant-btn:hover {
-    border-color: var(--dash-accent) !important;
-    background: var(--dash-accent-soft) !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24), 0 0 22px -6px rgba(var(--dash-accent-rgb), 0.72) !important;
-    transform: translateY(-1px);
-  }
-  :root[data-theme="dark"] .dash-stage .dash-card--srs .dash-cta.dominant-btn,
-  .dash-stage .dash-card--srs .dash-cta.dominant-btn {
-    border-color: rgba(var(--dash-warn-rgb), 0.36) !important;
-    background: rgba(var(--dash-warn-rgb), 0.08) !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 8px 22px -12px rgba(var(--dash-warn-rgb), 0.35) !important;
-  }
-  :root[data-theme="dark"] .dash-stage .dash-card--srs .dash-cta.dominant-btn:hover,
-  .dash-stage .dash-card--srs .dash-cta.dominant-btn:hover {
-    border-color: var(--dash-warn) !important;
-    background: rgba(var(--dash-warn-rgb), 0.16) !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24), 0 0 22px -6px rgba(var(--dash-warn-rgb), 0.72) !important;
+    background: linear-gradient(180deg, rgba(16, 185, 129, 0.46) 0%, rgba(6, 78, 59, 0.42) 100%) !important;
+    border-color: rgba(52, 211, 153, 0.95) !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.26), 0 8px 28px -3px rgba(16, 185, 129, 0.58) !important;
+    color: #ffffff !important;
+    transform: none !important;
   }
   html:not([data-theme="dark"]) .dash-stage .dash-cta.dominant-btn,
   :root[data-theme="light"] .dash-stage .dash-cta.dominant-btn {
-    background: rgba(255, 255, 255, 0.92) !important;
-    border-color: rgba(79, 70, 229, 0.28) !important;
-    color: #0f172a !important;
-    box-shadow: inset 0 1px 0 #ffffff, 0 2px 8px -4px rgba(15, 23, 42, 0.12) !important;
+    background: linear-gradient(180deg, #059669 0%, #047857 100%) !important;
+    border: 1.5px solid #065f46 !important;
+    color: #ffffff !important;
+    text-shadow: none !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.26), 0 6px 18px -4px rgba(5, 150, 105, 0.34) !important;
   }
   html:not([data-theme="dark"]) .dash-stage .dash-cta.dominant-btn:hover,
   :root[data-theme="light"] .dash-stage .dash-cta.dominant-btn:hover {
-    border-color: #4f46e5 !important;
-    background: rgba(79, 70, 229, 0.10) !important;
-    color: #312e81 !important;
+    background: linear-gradient(180deg, #047857 0%, #065f46 100%) !important;
+    border-color: #064e3b !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.30), 0 8px 22px -4px rgba(5, 150, 105, 0.42) !important;
   }
 
   .dash-secondary {
@@ -38402,24 +38567,29 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     padding: 6px 12px;
     border-radius: var(--r-md, 10px);
     font-family: var(--font-d);
-    font-size: 0.81rem;
-    color: var(--ink-muted);
+    font-size: 0.82rem;
+    color: var(--dash-muted);
     text-decoration: none;
-    transition: color 0.18s ease, background-color 0.18s ease;
+    transition: color 0.18s ease, background 0.18s ease;
   }
   .dash-secondary:hover {
     color: var(--ink);
-    background: var(--surface-2);
+    background: rgba(255, 255, 255, 0.045);
+  }
+  html:not([data-theme="dark"]) .dash-secondary:hover,
+  [data-theme="light"] .dash-secondary:hover {
+    background: rgba(15, 23, 42, 0.045);
   }
   .dash-secondary b {
-    color: var(--ink-soft);
+    color: var(--ink);
     font-weight: 600;
   }
 
-  /* Module Spoiler (left 5 cols of bottom row) */
+  /* Block 4a: Compact Full-Width Module Spoiler */
   .dash-spoiler {
-    grid-column: span 5;
+    grid-column: span 12;
     order: 4;
+    align-self: start;
     overflow: hidden;
   }
   .dash-spoiler summary {
@@ -38429,23 +38599,38 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    padding: 14px 18px;
+    padding: 13px 18px;
     font-family: var(--font-d);
-    font-size: 0.83rem;
+    font-size: 0.84rem;
     font-weight: 600;
     color: var(--ink);
     user-select: none;
   }
   .dash-spoiler summary::-webkit-details-marker { display: none; }
+  .dash-spoiler__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .dash-spoiler__chev {
+    display: inline-block;
+    font-size: 0.72rem;
+    color: var(--dash-muted);
+    transition: transform 0.18s ease;
+  }
+  .dash-spoiler[open] .dash-spoiler__chev {
+    transform: rotate(90deg);
+  }
   .dash-spoiler__meta {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     font-family: var(--font-m);
     font-variant-numeric: tabular-nums;
-    font-size: 0.74rem;
+    font-size: 0.75rem;
     font-weight: 600;
-    color: var(--ink-muted);
+    color: var(--dash-muted);
     flex-shrink: 0;
   }
   .dash-spoiler__path {
@@ -38457,44 +38642,53 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
   .dash-spoiler__path:hover { text-decoration: underline; }
   .dash-spoiler__list {
     border-top: 1px solid var(--dash-line);
-    padding: 8px 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
+    padding: 10px 12px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
   }
   .dash-spoiler__row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    gap: 8px;
     padding: 8px 10px;
     border-radius: var(--r-md, 10px);
-    font-size: 0.81rem;
+    font-size: 0.80rem;
     color: var(--ink-soft);
     text-decoration: none;
-    transition: background-color 0.16s ease, color 0.16s ease;
+    border: 1px solid transparent;
+    transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+  }
+  .dash-spoiler__row > span:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .dash-spoiler__row:hover {
-    background: var(--surface-2);
+    background: rgba(255, 255, 255, 0.045);
+    border-color: var(--dash-line);
     color: var(--ink);
+  }
+  html:not([data-theme="dark"]) .dash-spoiler__row:hover,
+  [data-theme="light"] .dash-spoiler__row:hover {
+    background: rgba(15, 23, 42, 0.04);
   }
   .dash-spoiler__row.is-cur {
     background: var(--dash-accent-soft);
+    border-color: rgba(var(--dash-accent-rgb), 0.28);
     color: var(--ink);
     font-weight: 600;
   }
 
-  /* 7 Tracks + Architectural Tabs (right 7 cols of bottom row) */
+  /* Block 4b: 7 Backend Tracks (Full Width, Equal 3-Col Grid) */
   .dash-tracks-wrap {
-    grid-column: span 7;
+    grid-column: span 12;
     order: 5;
     display: flex;
     flex-direction: column;
     gap: 10px;
     min-width: 0;
-  }
-  .dash-tracks-wrap--full {
-    grid-column: span 12;
   }
   .dash-tracks-head {
     display: flex;
@@ -38506,11 +38700,11 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
   }
   .dash-tracks__title {
     font-family: var(--font-d);
-    font-size: 0.71rem;
+    font-size: 0.72rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--ink-muted);
+    color: var(--dash-muted);
   }
   .dash-tabs {
     display: inline-flex;
@@ -38523,11 +38717,13 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     border: none;
     border-bottom: 2px solid transparent;
     background: transparent;
-    color: var(--ink-muted);
+    color: var(--dash-muted);
     font-family: var(--font-d);
-    font-size: 0.74rem;
+    font-size: 0.76rem;
     font-weight: 600;
-    padding: 4px 8px;
+    min-height: 32px;
+    padding: 6px 10px;
+    border-radius: 6px 6px 0 0;
     cursor: pointer;
     transition: color 0.16s ease, border-color 0.16s ease;
   }
@@ -38540,26 +38736,25 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
   }
   .dash-tracks {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-  }
-  .dash-tracks > .dash-track-item:last-child:nth-child(odd) {
-    grid-column: 1 / -1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
   }
   .dash-track-item {
-    padding: 13px 14px;
-    border-radius: 13px;
+    padding: 12px 16px;
+    border-radius: 12px;
     text-decoration: none;
     display: flex;
     flex-direction: column;
-    gap: 9px;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 64px;
   }
   .dash-track-item__top {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 6px;
-    font-size: 0.80rem;
+    font-size: 0.82rem;
     font-weight: 600;
     color: var(--ink);
   }
@@ -38571,39 +38766,94 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
   .dash-track-item__pct {
     font-family: var(--font-m);
     font-variant-numeric: tabular-nums;
-    font-size: 0.73rem;
+    font-size: 0.74rem;
     font-weight: 700;
-    color: var(--ink-muted);
+    color: var(--dash-muted);
     flex-shrink: 0;
   }
   .dash-track-item__pct.is-pos {
     color: var(--dash-accent);
   }
+  .dash-track-item__sub {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 0.72rem;
+    color: var(--dash-muted);
+    line-height: 1.3;
+  }
+  .dash-track-item__role {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .dash-track-item__count {
+    font-family: var(--font-m);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
 
-  @media (max-width: 1120px) {
-    .dash-dock {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .dash-dock__col:nth-child(3),
-    .dash-dock__col:nth-child(4) {
-      border-top: 1px solid var(--dash-line);
-    }
-    .dash-dock__col:nth-child(3) {
-      border-left: none;
+  /* Accessible Keyboard Focus Rings (Zero-Jitter) */
+  .dash-horizon__node:focus-visible,
+  .dash-dock__col:focus-visible,
+  .dash-stage-pill:focus-visible,
+  .dash-stage .dash-cta.dominant-btn:focus-visible,
+  .dash-secondary:focus-visible,
+  .dash-spoiler summary:focus-visible,
+  .dash-spoiler__row:focus-visible,
+  .dash-spoiler__path:focus-visible,
+  .dash-tab-btn:focus-visible,
+  .dash-track-item:focus-visible {
+    outline: 2px solid var(--dash-accent);
+    outline-offset: 2px;
+  }
+  .dash-dock__col:focus-visible {
+    outline-offset: -2px;
+  }
+
+  @media (max-width: 1240px) {
+    .dash-horizon__rail {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
-  @media (max-width: 920px) {
-    .dash-spoiler,
-    .dash-tracks-wrap {
-      grid-column: span 12;
+  @media (max-width: 900px) {
+    .dash-horizon__rail {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .dash-spoiler__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .dash-tracks {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 720px) {
+    .dash-dock {
+      grid-template-columns: 1fr;
+    }
+    .dash-dock__col + .dash-dock__col {
+      border-left: none;
+      border-top: 1px solid var(--dash-line);
     }
   }
   @media (max-width: 640px) {
     .dash-stage.dashboard-container {
       display: flex !important;
       flex-direction: column;
+      align-items: stretch !important;
       padding: 14px 12px calc(88px + env(safe-area-inset-bottom, 16px)) !important;
       gap: 12px;
+    }
+    .dash-horizon,
+    .dash-dock,
+    .dash-card,
+    .dash-spoiler,
+    .dash-tracks-wrap {
+      width: 100%;
+    }
+    .dash-horizon {
+      padding: 12px 14px 14px;
     }
     .dash-card {
       padding: 20px 18px;
@@ -38612,18 +38862,36 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     .dash-stages {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-    .dash-cta.dominant-btn {
-      width: 100% !important;
+    .dash-cta-row {
+      flex-direction: column;
+      align-items: stretch;
     }
-    .dash-dock {
+    .dash-stage .dash-cta.dominant-btn {
+      width: 100% !important;
+      margin: 0 !important;
+    }
+    .dash-secondary {
+      justify-content: flex-start;
+      padding-left: 2px;
+    }
+    .dash-spoiler__list {
       grid-template-columns: 1fr;
     }
-    .dash-dock__col + .dash-dock__col {
-      border-left: none;
-      border-top: 1px solid var(--dash-line);
-    }
+  }
+  @media (max-width: 520px) {
     .dash-tracks {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .dash-track-item {
+      padding: 11px 12px;
+    }
+    .dash-track-item__top {
+      font-size: 0.77rem;
+    }
+    .dash-track-item__sub {
+      font-size: 0.67rem;
+      gap: 4px;
     }
   }
 </style>
@@ -71131,14 +71399,122 @@ window.setDashTrackFilter = function(filter){
 viewDashboard = function(){
   const d = getDominantHeroCardData();
 
+  const pluralizeRuTopics = function(n){
+    const rem = Math.abs(Number(n) || 0) % 100;
+    const last = rem % 10;
+    if(rem >= 11 && rem <= 19) return 'тем';
+    if(last === 1) return 'тема';
+    if(last >= 2 && last <= 4) return 'темы';
+    return 'тем';
+  };
+
   const echTier = d.activeEchProg ? d.activeEchProg.tier : 1;
   const echTitle = d.activeEchProg ? escapeHtmlStr(d.activeEchProg.shortTitle || '') : 'Техскрининг';
   const echPct = d.activeEchProg ? (Number(d.activeEchProg.pct) || 0) : 0;
+
+  const horizonEchelons = (typeof getOrderedEchelons === 'function' && typeof getEchelonProgress === 'function')
+    ? getOrderedEchelons().map(e => getEchelonProgress(e.id)).filter(p => p && !p.isInDevelopment && p.totalSkills > 0)
+    : [];
+
+  const remainingInEch = d.activeEchProg
+    ? Math.max(0, (Number(d.activeEchProg.totalSkills) || 0) - (Number(d.activeEchProg.masteredCount) || 0))
+    : 0;
+  const horizonRemainingText = d.activeEchProg
+    ? (remainingInEch > 0
+      ? `Осталось ${remainingInEch} ${pluralizeRuTopics(remainingInEch)} до закрытия эшелона`
+      : 'Эшелон закрыт ✓')
+    : '';
+
+  const horizonNodesHTML = horizonEchelons.map(p => {
+    const isDone = p.pct >= 100;
+    const isCur = !isDone && d.activeEchProg && p.id === d.activeEchProg.id;
+    const shortName = escapeHtmlStr(p.shortTitle || p.title || ('Эшелон ' + p.tier));
+    const mark = isDone ? '✓' : (isCur ? '●' : ('Э' + p.tier));
+    return `
+      <a href="#/map" class="dash-horizon__node${isDone ? ' is-done' : (isCur ? ' is-current' : '')}">
+        <div class="dash-horizon__node-top">
+          <span class="dash-horizon__node-name">
+            <span class="dash-horizon__node-mark" aria-hidden="true">${mark}</span>
+            <span>${shortName}</span>
+          </span>
+          <span class="dash-horizon__node-pct">${p.pct > 0 ? p.pct + '%' : '—'}</span>
+        </div>
+        <div class="dash-progress">
+          <div class="dash-progress__fill${p.pct <= 0 ? ' is-zero' : ''}" style="width:${p.pct}%;"></div>
+        </div>
+      </a>`;
+  }).join('');
+
+  // Реальная лента активности за последние 7 дней (из state.dailyXpByDate, fallback по streakDays без фейковых дат)
+  const xpByDate = (state && state.dailyXpByDate && typeof state.dailyXpByDate === 'object') ? state.dailyXpByDate : {};
+  const last7Days = [];
+  let hasRealHistory = false;
+  const nowDate = new Date();
+  for(let i = 6; i >= 0; i--){
+    const dt = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate() - i);
+    const iso = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+    const xpVal = Number(xpByDate[iso]) || 0;
+    if(xpVal > 0) hasRealHistory = true;
+    last7Days.push({ iso: iso, xp: xpVal });
+  }
+  const streakLitCount = Math.min(7, Math.max(0, d.streakDays));
+  const rhythmStripHTML = last7Days.map((day, idx) => {
+    if(hasRealHistory){
+      const cls = day.xp >= d.dailyGoal ? ' is-goal' : (day.xp > 0 ? ' is-hit' : '');
+      return `<span class="dash-rhythm-cell${cls}" title="${day.iso}: ${day.xp} XP"></span>`;
+    }
+    const isLit = streakLitCount > 0 && idx >= (7 - streakLitCount);
+    return `<span class="dash-rhythm-cell${isLit ? ' is-hit' : ''}"></span>`;
+  }).join('');
+
+  const goalMult = d.dailyGoal > 0 ? Math.floor(d.tXp / d.dailyGoal) : 0;
+  const goalStatusText = d.goalPct >= 100
+    ? (goalMult >= 2 ? `Цель дня закрыта · ×${goalMult}` : 'Цель дня закрыта ✓')
+    : `${d.tXp} из ${d.dailyGoal} XP сегодня`;
+
+  // Освоенный капитал: закреплённые карточки SRS + решённые задачи Zen IDE
+  const srsMap = (state && state.cardSrs && typeof state.cardSrs === 'object') ? state.cardSrs : {};
+  const cardRatingsMap = (state && state.cardRatings && typeof state.cardRatings === 'object') ? state.cardRatings : {};
+  const decksPool = (typeof ALL_DECKS_COMBINED !== 'undefined' && ALL_DECKS_COMBINED) ? ALL_DECKS_COMBINED : {};
+  const hasDecksPool = Object.keys(decksPool).length > 0;
+  const knownCardsSet = new Set();
+  const studiedCardsSet = new Set();
+
+  const cardExistsInDecks = function(k){
+    if(!hasDecksPool) return true;
+    const parts = k.split(':');
+    const did = parts[0];
+    const cIdx = parseInt(parts[1], 10);
+    return Boolean(decksPool[did] && decksPool[did].cards && decksPool[did].cards[cIdx]);
+  };
+
+  Object.keys(srsMap).forEach(k => {
+    const item = srsMap[k];
+    if(item && typeof item === 'object' && cardExistsInDecks(k)){
+      studiedCardsSet.add(k);
+      const rVal = Number(cardRatingsMap[k]) || 0;
+      if(rVal >= 3 || Number(item.reps) >= 1 || Number(item.interval) >= 1 || Number(item.stability) > 0){
+        knownCardsSet.add(k);
+      }
+    }
+  });
+  Object.keys(cardRatingsMap).forEach(k => {
+    const rVal = Number(cardRatingsMap[k]) || 0;
+    if(rVal > 0 && cardExistsInDecks(k)){
+      studiedCardsSet.add(k);
+      if(rVal >= 3) knownCardsSet.add(k);
+    }
+  });
+  const knownCardsCount = knownCardsSet.size;
+  const studiedCardsCount = studiedCardsSet.size;
 
   const totalIdeTasks = (typeof IDE_TASKS !== 'undefined' && Array.isArray(IDE_TASKS)) ? IDE_TASKS.length : 404;
   const solvedIdeMap = (typeof getIdeSolvedMap === 'function') ? getIdeSolvedMap() : {};
   const solvedIdeCount = (typeof countSolvedIdeTasks === 'function') ? countSolvedIdeTasks(solvedIdeMap) : 0;
   const solvedIdePct = totalIdeTasks > 0 ? Math.min(100, Math.round((solvedIdeCount / totalIdeTasks) * 100)) : 0;
+  const capitalPct = studiedCardsCount > 0
+    ? Math.min(100, Math.round((knownCardsCount / studiedCardsCount) * 100))
+    : solvedIdePct;
 
   const stagesHTML = !d.isSrs ? `
     <div class="dash-stages${d.stages.length === 3 ? ' dash-stages--3' : ''}">
@@ -71164,23 +71540,35 @@ viewDashboard = function(){
     return `
       <a href="${skHref}" class="dash-spoiler__row${isCur ? ' is-cur' : ''}">
         <span>${idx + 1}. ${escapeHtmlStr(skTitle)}</span>
-        <span style="color:${isDone ? 'var(--dash-accent)' : (isCur ? 'var(--dash-accent)' : 'var(--ink-muted)')};">${isDone ? '✓' : (isCur ? '●' : '○')}</span>
+        <span style="color:${isDone ? 'var(--dash-accent)' : (isCur ? 'var(--dash-accent)' : 'var(--dash-muted)')};">${isDone ? '✓' : (isCur ? '●' : '○')}</span>
       </a>`;
   }).join('');
 
   const trackDefs = [
-    { key: 'python', name: 'Python Core' },
-    { key: 'web', name: 'Web & HTTP' },
-    { key: 'backend', name: 'FastAPI & DRF' },
-    { key: 'databases', name: 'SQL и БД' },
-    { key: 'algorithms', name: 'Алгоритмы' },
-    { key: 'architecture', name: 'Архитектура' },
-    { key: 'infra', name: 'Docker & Инфра' }
+    { key: 'python', name: 'Python Core', baseRole: 'Фундамент' },
+    { key: 'web', name: 'Web & HTTP', baseRole: 'Фундамент' },
+    { key: 'backend', name: 'FastAPI & DRF', baseRole: 'Следующий этап' },
+    { key: 'databases', name: 'SQL и БД', baseRole: 'Следующий этап' },
+    { key: 'algorithms', name: 'Алгоритмы', baseRole: 'Следующий этап' },
+    { key: 'architecture', name: 'Архитектура', baseRole: 'Следующий этап' },
+    { key: 'infra', name: 'Docker & Инфра', baseRole: 'Следующий этап' }
   ];
-  const tracksWithPct = trackDefs.map(tr => ({
-    ...tr,
-    pct: (typeof calculateKhanMastery === 'function') ? (calculateKhanMastery(tr.key).pct || 0) : 0
-  }));
+  const tracksWithPct = trackDefs.map(tr => {
+    const stat = (typeof calculateKhanMastery === 'function') ? calculateKhanMastery(tr.key) : { pct: 0, m: 0, total: 0 };
+    const pct = Number(stat.pct) || 0;
+    const mastered = Number(stat.m) || 0;
+    const total = Number(stat.total) || 0;
+    const role = pct >= 100 ? 'Закрыто'
+      : (pct >= 60 ? 'Фундамент'
+      : (pct > 0 ? 'В фокусе' : tr.baseRole));
+    const genWord = (total % 10 === 1 && total % 100 !== 11) ? 'темы' : 'тем';
+    return {
+      ...tr,
+      pct,
+      role,
+      countLabel: total > 0 ? `${mastered} из ${total} ${genWord}` : '—'
+    };
+  });
 
   const curFilter = window.dashTrackFilter || 'all';
   const filteredTracks = tracksWithPct.filter(tr => {
@@ -71199,98 +71587,100 @@ viewDashboard = function(){
         <div class="dash-progress">
           <div class="dash-progress__fill${tr.pct <= 0 ? ' is-zero' : ''}" style="width:${tr.pct}%;"></div>
         </div>
+        <div class="dash-track-item__sub">
+          <span class="dash-track-item__role">${tr.role}</span>
+          <span class="dash-track-item__count">${tr.countLabel}</span>
+        </div>
       </a>`).join('')
-    : `<div class="dash-glass" style="grid-column:1/-1;padding:16px;font-size:0.8rem;color:var(--ink-muted);text-align:center;">В этой категории пока нет направлений — продолжай текущий маршрут.</div>`;
+    : `<div class="dash-glass" style="grid-column:1/-1;padding:16px;font-size:0.82rem;color:var(--dash-muted);text-align:center;">В этой категории пока нет направлений — продолжай текущий маршрут.</div>`;
 
-  const srsBarPct = d.srsDue > 0 ? Math.max(8, d.pct || 0) : 100;
   const hasSpoiler = d.curUnitSkills.length > 0;
+  const heroSub = (d.isSrs && d.srsDue > 15)
+    ? 'Спокойный мини-спринт из 15 карточек — остальное подождёт'
+    : d.sub;
+  let ctaLabel = 'Продолжить';
+  if(d.isSrs && d.srsDue > 15){
+    ctaLabel = 'Начать спринт (15)';
+  } else if(d.dashBtnText){
+    ctaLabel = d.dashBtnText;
+  }
 
   return `
     <div class="container dashboard-container dash-stage">
-      <!-- 1. Ритм дня -->
-      <div class="dash-glass dash-rhythm">
-        <div class="dash-rhythm__left">
-          <span class="dash-rhythm__rank">${escapeHtmlStr(d.readinessRank)}</span>
-          ${d.activeEchProg ? `<span class="dash-rhythm__ech-pill">Эшелон ${echTier} · ${echTitle} <b>${echPct}%</b></span>` : ''}
+      <!-- 1. Горизонт Эшелонов -->
+      <div class="dash-glass dash-horizon">
+        <div class="dash-horizon__head">
+          <div class="dash-rhythm__left">
+            <span class="dash-rhythm__rank">${escapeHtmlStr(d.readinessRank)}</span>
+            ${d.activeEchProg ? `<span class="dash-rhythm__ech-pill">Эшелон ${echTier} · ${echTitle} <b>${echPct}%</b></span>` : ''}
+          </div>
+          ${horizonRemainingText ? `<span class="dash-horizon__remaining">${horizonRemainingText}</span>` : ''}
         </div>
-        <div class="dash-rhythm__right">
-          ${d.streakDays > 0 ? `<span class="dash-rhythm__stat dash-rhythm__stat--amber">${d.streakDays} дн. подряд</span>` : ''}
-          <span class="dash-rhythm__stat">${d.tXp > 0 ? `${d.tXp} / ${d.dailyGoal} XP` : `Цель: ${d.dailyGoal} XP`}</span>
-          <span class="dash-rhythm__stat">${solvedIdeCount} / ${totalIdeTasks} задач</span>
-        </div>
+        ${horizonNodesHTML ? `<div class="dash-horizon__rail" style="--ech-count:${Math.max(1, Math.min(6, horizonEchelons.length))};">${horizonNodesHTML}</div>` : ''}
       </div>
 
-      <!-- 2. Телеметрия дня: 4-колоночный Structured Cockpit Док -->
+      <!-- 2. Плоды труда (3 колонки без дублей) -->
       <div class="dash-glass dash-dock">
-        <a href="${d.lessonDirectRoute}" class="dash-dock__col">
+        <a href="#/path" class="dash-dock__col">
           <div class="dash-dock__top">
-            <span class="dash-dock__label">Цель дня</span>
-            <span class="dash-dock__val dash-dock__val--accent">${d.goalPct}<em>%</em></span>
+            <span class="dash-dock__label">Ритм</span>
+            <span class="dash-dock__val dash-dock__val--amber">${d.streakDays}<em> ${d.streakDays > 0 ? 'дн. подряд' : 'дн.'}</em></span>
+          </div>
+          <div class="dash-rhythm-strip" role="img" aria-label="Активность за 7 дней">${rhythmStripHTML}</div>
+          <div class="dash-dock__sub">${d.streakDays > 0 ? 'Серия активности · последние 7 дн.' : 'Сделай первый шаг сегодня'}</div>
+        </a>
+        <a href="${d.lessonDirectRoute}" class="dash-dock__col${d.goalPct >= 100 ? ' is-goal-done' : ''}">
+          <div class="dash-dock__top">
+            <span class="dash-dock__label">Итог дня</span>
+            <span class="dash-dock__val${d.tXp > 0 ? ' dash-dock__val--accent' : ''}">${d.tXp}<em> XP</em></span>
           </div>
           <div class="dash-progress">
             <div class="dash-progress__fill${d.goalPct <= 0 ? ' is-zero' : ''}" style="width:${d.goalPct}%;"></div>
           </div>
-          <div class="dash-dock__sub">${d.tXp} из ${d.dailyGoal} XP сегодня</div>
-        </a>
-        <a href="#/cards" class="dash-dock__col">
-          <div class="dash-dock__top">
-            <span class="dash-dock__label">Память SRS</span>
-            <span class="dash-dock__val${d.srsDue > 0 ? ' dash-dock__val--amber' : ' dash-dock__val--accent'}">${d.srsDue > 0 ? d.srsDue + '<em> ' + pluralizeRuCards(d.srsDue) + '</em>' : 'Чисто ✓'}</span>
-          </div>
-          <div class="dash-progress">
-            <div class="dash-progress__fill${d.srsDue > 0 ? ' dash-progress__fill--amber' : ''}" style="width:${srsBarPct}%;"></div>
-          </div>
-          <div class="dash-dock__sub">${d.srsDue > 0 ? 'Повтор по кривой памяти' : 'Очередь повторений закрыта'}</div>
+          <div class="dash-dock__sub">${goalStatusText}</div>
         </a>
         <a href="#/practice" class="dash-dock__col">
           <div class="dash-dock__top">
-            <span class="dash-dock__label">Банк задач</span>
-            <span class="dash-dock__val">${solvedIdeCount}<em>/ ${totalIdeTasks}</em></span>
+            <span class="dash-dock__label">Освоенный капитал</span>
+            <span class="dash-dock__val dash-dock__val--accent">${knownCardsCount}<em> ${pluralizeRuCards(knownCardsCount)}</em></span>
           </div>
           <div class="dash-progress">
-            <div class="dash-progress__fill${solvedIdePct <= 0 ? ' is-zero' : ''}" style="width:${solvedIdePct}%;"></div>
+            <div class="dash-progress__fill${capitalPct <= 0 ? ' is-zero' : ''}" style="width:${capitalPct}%;"></div>
           </div>
-          <div class="dash-dock__sub">Решено в Zen IDE</div>
-        </a>
-        <a href="#/map" class="dash-dock__col">
-          <div class="dash-dock__top">
-            <span class="dash-dock__label">Эшелон ${echTier}</span>
-            <span class="dash-dock__val">${echPct}<em>%</em></span>
-          </div>
-          <div class="dash-progress">
-            <div class="dash-progress__fill${echPct <= 0 ? ' is-zero' : ''}" style="width:${echPct}%;"></div>
-          </div>
-          <div class="dash-dock__sub">${echTitle}</div>
+          <div class="dash-dock__sub">Zen IDE: ${solvedIdeCount} из ${totalIdeTasks} задач</div>
         </a>
       </div>
 
-      <!-- 3. Главная карточка действия (Hero + Specular Contour CTA) -->
+      <!-- 3. Главная карточка действия (Hero + Родной изумрудный CTA) -->
       <div class="dash-card ${d.isSrs ? 'dash-card--srs' : ''}">
         <div class="dash-eyebrow">
-          <span class="pulse-dot ${d.isSrs ? 'dash-dot--amber' : ''}"></span>
+          <span class="pulse-dot ${d.isSrs ? 'dash-dot--amber' : ''}" aria-hidden="true"></span>
           <span>${escapeHtmlStr(d.eyebrow)}</span>
         </div>
         <h1 class="dash-title">${escapeHtmlStr(d.dashTitle)}</h1>
-        <p class="dash-sub">${escapeHtmlStr(d.sub)}</p>
+        <p class="dash-sub">${escapeHtmlStr(heroSub)}</p>
         ${stagesHTML}
         ${d.pct > 0 ? `
-          <div class="dash-progress-row" aria-label="Прогресс: ${d.pct}%">
-            <div class="dash-progress"><div class="dash-progress__fill" style="width:${d.pct}%;"></div></div>
+          <div class="dash-progress-row">
+            <div class="dash-progress" role="progressbar" aria-valuenow="${d.pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Прогресс"><div class="dash-progress__fill" style="width:${d.pct}%;"></div></div>
             <span class="dash-progress-pct">${d.pct}%</span>
           </div>` : ''}
         <div class="dash-cta-row">
           <a href="${d.href}" class="dominant-btn btn-dominant-cta cocoon-focus-cta dash-cta" title="${escapeHtmlStr(d.tip)}">
-            <span>${escapeHtmlStr(d.dashBtnText)}</span>
+            <span>${escapeHtmlStr(ctaLabel)}</span>
           </a>
           <a href="${d.secondaryHref}" class="dash-secondary">${d.secondaryHtml}</a>
         </div>
       </div>
 
-      <!-- 4. Темы модуля -->
+      <!-- 4a. Темы модуля (компактный блок на 12 колонок) -->
       ${hasSpoiler ? `
-        <details class="dash-glass dash-spoiler" ${state.dashAccordionOpen ? 'open' : ''}>
+        <details class="dash-glass dash-spoiler" ${state.dashAccordionOpen ? 'open' : ''} ontoggle="state.dashAccordionOpen = this.open; try{saveState(state);}catch(e){}">
           <summary>
-            <span>Темы модуля: ${escapeHtmlStr(d.cleanUnitTitle)}</span>
+            <span class="dash-spoiler__title">
+              <span class="dash-spoiler__chev" aria-hidden="true">▸</span>
+              <span>Темы модуля: ${escapeHtmlStr(d.cleanUnitTitle)}</span>
+            </span>
             <span class="dash-spoiler__meta">
               <span>${d.unitDoneCount} из ${d.unitTotal}</span>
               <a href="#/path" class="dash-spoiler__path" onclick="event.stopPropagation();">Путь обучения</a>
@@ -71299,14 +71689,14 @@ viewDashboard = function(){
           <div class="dash-spoiler__list">${moduleRowsHTML}</div>
         </details>` : ''}
 
-      <!-- 5. Обзор 7 направлений с архитектурными вкладками -->
-      <div class="dash-tracks-wrap${hasSpoiler ? '' : ' dash-tracks-wrap--full'}">
+      <!-- 4b. Обзор 7 направлений (равная сетка 3 колонки) -->
+      <div class="dash-tracks-wrap">
         <div class="dash-tracks-head">
           <span class="dash-tracks__title">Направления бэкенда</span>
-          <div class="dash-tabs" role="tablist" aria-label="Фильтр направлений">
-            <button type="button" class="dash-tab-btn${curFilter === 'all' ? ' is-active' : ''}" onclick="window.setDashTrackFilter('all')">Все (7)</button>
-            <button type="button" class="dash-tab-btn${curFilter === 'high' ? ' is-active' : ''}" onclick="window.setDashTrackFilter('high')">Освоено &gt; 60%</button>
-            <button type="button" class="dash-tab-btn${curFilter === 'active' ? ' is-active' : ''}" onclick="window.setDashTrackFilter('active')">В процессе</button>
+          <div class="dash-tabs" role="group" aria-label="Фильтр направлений">
+            <button type="button" class="dash-tab-btn${curFilter === 'all' ? ' is-active' : ''}" aria-pressed="${curFilter === 'all' ? 'true' : 'false'}" onclick="window.setDashTrackFilter('all')">Все (7)</button>
+            <button type="button" class="dash-tab-btn${curFilter === 'high' ? ' is-active' : ''}" aria-pressed="${curFilter === 'high' ? 'true' : 'false'}" onclick="window.setDashTrackFilter('high')">Освоено &gt; 60%</button>
+            <button type="button" class="dash-tab-btn${curFilter === 'active' ? ' is-active' : ''}" aria-pressed="${curFilter === 'active' ? 'true' : 'false'}" onclick="window.setDashTrackFilter('active')">В процессе</button>
           </div>
         </div>
         <div class="dash-tracks">${tracksHTML}</div>
