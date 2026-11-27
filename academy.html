@@ -57099,6 +57099,8 @@ let cardsHubState = {
 
   savedDate: _todayKey,
 
+  hubDoneToday: (_isSameDay && typeof _initCardsPos.hubDoneToday === 'number') ? _initCardsPos.hubDoneToday : 0,
+
   sprintNum: (_isSameDay && typeof _initCardsPos.sprintNum === 'number') ? _initCardsPos.sprintNum : 1,
 
   sprintStep: (_isSameDay && typeof _initCardsPos.sprintStep === 'number') ? _initCardsPos.sprintStep : 0,
@@ -57160,6 +57162,8 @@ function saveCardsHubPosState(){
     forcedNoteId: cardsHubState.forcedNoteId || null,
 
     sprintNum: cardsHubState.sprintNum || 1,
+
+    hubDoneToday: cardsHubState.hubDoneToday || 0,
 
     sprintStep: cardsHubState.sprintStep || 0,
 
@@ -57888,10 +57892,10 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
     const sessionRatio = (totalNotesToday > 0) ? Math.min(1, Math.max(0, notesDoneToday / totalNotesToday)) : Math.min(1, Math.max(0, (nCur - 1) / nTotal));
     currentHeatPct = (sessionRatio >= 1) ? 100 : Math.max(12, Math.round(baseHeat > 0 ? (baseHeat + (100 - baseHeat) * sessionRatio) : Math.round(sessionRatio * 100 || (nCur / nTotal) * 100)));
   } else {
-    const cardsDoneToday = daily ? (daily.cardsDoneToday || 0) : 0;
+    const hubDoneToday = (typeof cardsHubState !== 'undefined' && typeof cardsHubState.hubDoneToday === 'number') ? Math.max(0, cardsHubState.hubDoneToday) : 0;
     const cardsDueRemaining = (typeof dueCardsCount === 'number') ? dueCardsCount : (daily ? (daily.cardsDueRemaining || 0) : 0);
-    const totalToday = cardsDoneToday + cardsDueRemaining;
-    const sessionRatio = (totalToday > 0) ? Math.min(1, Math.max(0, cardsDoneToday / totalToday)) : 1;
+    const totalToday = hubDoneToday + cardsDueRemaining;
+    const sessionRatio = (totalToday > 0) ? Math.min(1, Math.max(0, hubDoneToday / totalToday)) : 1;
     currentHeatPct = (sessionRatio >= 1) ? 100 : Math.round(baseHeat + (100 - baseHeat) * sessionRatio);
   }
   const progressFillWidth = Math.max(8, Math.min(100, currentHeatPct));
@@ -57930,31 +57934,31 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
     iconStr = '⚡';
 
-    const cardsDoneToday = daily ? daily.cardsDoneToday : 0;
+    const hubDoneToday = (typeof cardsHubState !== 'undefined' && typeof cardsHubState.hubDoneToday === 'number') ? Math.max(0, cardsHubState.hubDoneToday) : 0;
 
     const cardsDueRemaining = (typeof dueCardsCount === 'number') ? dueCardsCount : (daily ? daily.cardsDueRemaining : 0);
 
-    const totalDebtCardsToday = cardsDoneToday + cardsDueRemaining;
+    const totalDebtCardsToday = hubDoneToday + cardsDueRemaining;
 
 
 
-    // Расчет N: число спринтов по 15 карточек на сегодня
+    // Расчет N: число спринтов по 15 карточек на сегодня (только карточки SRS-хаба)
     const SPRINT_SIZE = 15;
     totalSprintsToday = Math.max(1, Math.ceil(totalDebtCardsToday / SPRINT_SIZE));
 
     const isSprintJustFinished = (typeof cardsHubState !== 'undefined' && cardsHubState.sprintFinished);
-    if(cardsDueRemaining === 0 && cardsDoneToday > 0){
+    if(cardsDueRemaining === 0 && hubDoneToday > 0){
       displaySprintNum = totalSprintsToday;
       if(typeof cardsHubState !== 'undefined') cardsHubState.sprintNum = totalSprintsToday;
     } else {
-      const computedSprint = Math.min(totalSprintsToday, Math.max(1, Math.floor(cardsDoneToday / SPRINT_SIZE) + 1));
+      const computedSprint = Math.min(totalSprintsToday, Math.max(1, Math.floor(hubDoneToday / SPRINT_SIZE) + 1));
       if(typeof cardsHubState !== 'undefined') cardsHubState.sprintNum = computedSprint;
       displaySprintNum = isSprintJustFinished ? Math.max(1, computedSprint - 1) : computedSprint;
     }
 
     // Шапка: Спринт X из N спринтов дня
     goalLabel = `Спринт ${displaySprintNum} / ${totalSprintsToday}`;
-    goalTitle = `Спринт-сессия ${displaySprintNum} из ${totalSprintsToday} на сегодня (по ${SPRINT_SIZE} карточек) · Долг по карточкам: ${cardsDueRemaining} · Сдано сегодня: ${cardsDoneToday}`;
+    goalTitle = `Спринт-сессия ${displaySprintNum} из ${totalSprintsToday} на сегодня (по ${SPRINT_SIZE} карточек) · В очереди: ${cardsDueRemaining} · Пройдено в SRS сегодня: ${hubDoneToday}`;
 
   }
 
@@ -58425,6 +58429,7 @@ function viewCardsHub(){
     cardsHubState.reviewedCardIndices = {};
     cardsHubState.reviewedNoteSteps = {};
     cardsHubState.sprintNum = 1;
+    cardsHubState.hubDoneToday = 0;
     cardsHubState.sprintStep = 0;
     cardsHubState.sprintFinished = false;
     cardsHubState.sprintPhase = null;
@@ -82315,6 +82320,8 @@ window.animateCardFlip = animateCardFlip;
 
       // Микро-спринт по 15 карточек (Инвариант 15 бусин):
 
+      cardsHubState.hubDoneToday = (Number(cardsHubState.hubDoneToday) || 0) + 1;
+
       cardsHubState.sprintStep = (Number(cardsHubState.sprintStep) || 0) + 1;
 
       const isSprintFinish = cardsHubState.sprintStep >= 15;
@@ -82466,6 +82473,7 @@ window.animateCardFlip = animateCardFlip;
     }
 
     // Микро-спринт по 15 карточек (Инвариант 15 бусин):
+    cardsHubState.hubDoneToday = (Number(cardsHubState.hubDoneToday) || 0) + 1;
     cardsHubState.sprintStep = (Number(cardsHubState.sprintStep) || 0) + 1;
     const isSprintFinish = cardsHubState.sprintStep >= 15;
 
