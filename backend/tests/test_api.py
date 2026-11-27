@@ -194,5 +194,69 @@ class TestBackendApi(unittest.TestCase):
             self.assertEqual(res.status_code, 404, f'Доступ к {path} должен быть закрыт (404)')
 
 
+class TestSyncSanitization(unittest.TestCase):
+    def test_sync_sanitizes_corrupted_utf8_keys_and_preserves_progress(self) -> None:
+        import json
+        import tempfile
+        from pathlib import Path
+        from unittest import mock
+
+        from backend.app.services import sync_service as sync_service_module
+        from backend.app.services.sync_service import merge_academy_states
+
+        dirty = {
+            'xp': 10889,
+            'streak': 25,
+            'readNotes': ['\ufffd\ufffd-004', 'К-001'],
+            'reviewedDecks': ['\ufffd-025'],
+            'noteSrs': {
+                '\ufffd\ufffd-004': {'step': 2, 'interval': 7, 'lastReview': '2026-11-27'}
+            },
+            'cardSrs': {
+                '\ufffd-025:3': {'reps': 3, 'interval': 10, 'lastReview': '2026-11-27'}
+            },
+            'completedNoteSteps': {'\ufffd\ufffd-004:1': True},
+            'unlockedChunks': {'skill:\ufffd-005:1:2': True, 'lesson:1.1:0:1': True},
+            'bugReports': [
+                {'text': '\ufffd\ufffd\ufffdБаг кнопки', 'context': '\ufffd#/path', 'timestamp': '2026-11-27T10:00:00Z'},
+                {'text': '\ufffd\u0007', 'context': 'empty', 'timestamp': '2026-11-27T10:01:00Z'},
+            ],
+        }
+
+        merged = merge_academy_states({}, dirty)
+        serialized = json.dumps(merged, ensure_ascii=False)
+        self.assertNotIn('\ufffd', serialized)
+        self.assertEqual(merged.get('xp'), 10889)
+        self.assertEqual(merged.get('streak'), 25)
+        self.assertEqual(merged.get('readNotes'), ['К-004', 'К-001'])
+        self.assertEqual(merged.get('reviewedDecks'), ['Ф-025'])
+        self.assertIn('К-004', merged.get('noteSrs', {}))
+        self.assertIn('Ф-025:3', merged.get('cardSrs', {}))
+        self.assertTrue(merged.get('completedNoteSteps', {}).get('К-004:1'))
+        self.assertTrue(merged.get('unlockedChunks', {}).get('skill:К-005:1:2'))
+        self.assertTrue(merged.get('unlockedChunks', {}).get('lesson:1.1:0:1'))
+        self.assertEqual(len(merged.get('bugReports', [])), 1)
+        self.assertEqual(merged['bugReports'][0]['text'], 'Баг кнопки')
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with mock.patch.object(sync_service_module.settings, 'DATA_DIR', Path(tmpdir)):
+                client = TestClient(app)
+                push_res = client.post('/api/sync', json={
+                    'bundle': {'academyState': dirty, 'ideStatus': {}, 'ideDrafts': {}},
+                    'baseUpdatedAt': 0,
+                    'device': 'test-mobile',
+                    'clientId': 'test-mobile-01',
+                })
+                self.assertEqual(push_res.status_code, 200)
+                push_json = push_res.json()
+                self.assertNotIn('\ufffd', json.dumps(push_json, ensure_ascii=False))
+                self.assertEqual(push_json['bundle']['academyState']['xp'], 10889)
+                self.assertIn('Ф-025:3', push_json['bundle']['academyState']['cardSrs'])
+
+                pull_res = client.get('/api/sync')
+                self.assertEqual(pull_res.status_code, 200)
+                self.assertNotIn('\ufffd', json.dumps(pull_res.json(), ensure_ascii=False))
+
+
 if __name__ == '__main__':
     unittest.main()

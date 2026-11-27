@@ -925,6 +925,15 @@
 
   .btn[disabled]{opacity:.55;cursor:not-allowed;}
 
+  a, button, summary, [role="button"], label, .tabbar__item, .navlink, .drawer-nav-link, .nav-sub-item, .dot-jewel, .dock-quantum-bead, .quiz-opt, [data-py-next-step], [data-chunk-more], [data-py-finish-note], [data-hub-rate], [data-py-rate-card], [data-hub-flip], [data-py-flip-card]{
+    touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  .dash-horizon, .dash-dock, .dash-card, .srs-note-card-clean{
+    contain:layout style;
+  }
+
 
 
   /* ---------- dashboard ---------- */
@@ -43981,6 +43990,56 @@ function sanitizeAcademyState(s){
         s.cardsHubPos.dueQueue = cleanDq;
       }
     }
+    if(s.completedNoteSteps && typeof s.completedNoteSteps === 'object' && !Array.isArray(s.completedNoteSteps)){
+      var cleanSteps = {};
+      Object.keys(s.completedNoteSteps).forEach(function(k){
+        var val = s.completedNoteSteps[k];
+        var m = String(k).match(/(\d+):(\d+)/);
+        var ck;
+        if(m){
+          ck = 'К-' + String(m[1]).padStart(3, '0') + ':' + m[2];
+        } else if(/[\uFFFD\u0000-\u001F]/.test(k)){
+          return;
+        } else {
+          ck = k;
+        }
+        cleanSteps[ck] = Boolean(cleanSteps[ck] || val);
+      });
+      s.completedNoteSteps = cleanSteps;
+    }
+    if(s.unlockedChunks && typeof s.unlockedChunks === 'object' && !Array.isArray(s.unlockedChunks)){
+      var cleanChunks = {};
+      Object.keys(s.unlockedChunks).forEach(function(k){
+        var val = s.unlockedChunks[k];
+        var ks = String(k);
+        var m = ks.match(/^skill:.*?(\d+):(\d+):(\d+)$/);
+        var ck;
+        if(m){
+          ck = 'skill:К-' + String(m[1]).padStart(3, '0') + ':' + m[2] + ':' + m[3];
+        } else if(/[\uFFFD\u0000-\u001F]/.test(ks)){
+          return;
+        } else {
+          ck = ks;
+        }
+        cleanChunks[ck] = Boolean(cleanChunks[ck] || val);
+      });
+      s.unlockedChunks = cleanChunks;
+    }
+    if(Array.isArray(s.bugReports)){
+      var cleanBugs = [];
+      var seenBugs = new Set();
+      s.bugReports.forEach(function(item){
+        if(!item || typeof item !== 'object') return;
+        var cleanText = String(item.text || '').replace(/[\uFFFD\u0000-\u0008\u000B\u000C\u000E-\u001F]+/g, '').trim().slice(0, 2000);
+        if(!cleanText) return;
+        var cleanCtx = String(item.context || '').replace(/[\uFFFD\u0000-\u0008\u000B\u000C\u000E-\u001F]+/g, '').trim().slice(0, 500);
+        var dedupKey = String(item.timestamp || '') + '|' + cleanCtx + '|' + cleanText;
+        if(seenBugs.has(dedupKey)) return;
+        seenBugs.add(dedupKey);
+        cleanBugs.push(Object.assign({}, item, { text: cleanText, context: cleanCtx }));
+      });
+      s.bugReports = cleanBugs;
+    }
     if(s.funnelPreset !== 'bigtech' && s.funnelPreset !== 'product') s.funnelPreset = 'bigtech';
     if(Object.prototype.hasOwnProperty.call(s, 'stackBranch')) delete s.stackBranch;
     var legacyEchMap = { 1: 'screening', 2: 'backend', 3: 'infra', 4: 'system_design', 5: 'infra', 6: 'system_design', '1': 'screening', '2': 'backend', '3': 'infra', '4': 'system_design', '5': 'infra', '6': 'system_design' };
@@ -46167,6 +46226,8 @@ document.addEventListener('click', function(e){
 
         location.hash = '#' + route;
 
+        if (typeof render === 'function') render();
+
       } else {
 
         render();
@@ -46288,6 +46349,11 @@ document.getElementById('reset-btn-d').addEventListener('click', function(){
 
 window.addEventListener('hashchange', function(){
   try { if(typeof closeMobileDrawer === 'function') closeMobileDrawer(true); } catch(_e){}
+  const curH = (typeof location !== 'undefined' && location.hash) ? location.hash : '';
+  const curRev = (typeof window !== 'undefined' && window.__stateRevision) || 0;
+  if(window.__lastRenderedHash === curH && window.__lastRenderedRev === curRev && (Date.now() - (window.__lastRenderedAt || 0)) < 150){
+    return;
+  }
   render();
 });
 
@@ -46840,11 +46906,39 @@ function normalizeLegacyDateToVisitStr(v){
 
 
 
+const _extStateFastMap = typeof WeakMap === 'function' ? new WeakMap() : null;
+
 function ensureExtendedState(target){
 
   const s = target || state;
 
   if(!s || typeof s !== 'object') return s;
+
+  if(_extStateFastMap && _extStateFastMap.has(s)){
+    const m = _extStateFastMap.get(s);
+    if(
+      Array.isArray(s.readNotes) && Array.isArray(s.reviewedDecks) &&
+      Array.isArray(s.passedUnitTests) && Array.isArray(s.completedTasks) &&
+      Array.isArray(s.mastered) && Array.isArray(s.diagnosticGaps) &&
+      s.cardRatings && typeof s.cardRatings === 'object' &&
+      s.cardSrs && typeof s.cardSrs === 'object' &&
+      s.noteSrs && typeof s.noteSrs === 'object' &&
+      s.readingPositions && typeof s.readingPositions === 'object' &&
+      s.dailyXpByDate && typeof s.dailyXpByDate === 'object' &&
+      s.skillMastery && typeof s.skillMastery === 'object' &&
+      s.completedNoteSteps && typeof s.completedNoteSteps === 'object' &&
+      s.unlockedChunks && typeof s.unlockedChunks === 'object' &&
+      !Object.prototype.hasOwnProperty.call(s, 'stackBranch') &&
+      typeof s.selectedEchelon === 'string' &&
+      (s.funnelPreset === 'bigtech' || s.funnelPreset === 'product') &&
+      m.ctRef === s.completedTasks && m.ctLen === s.completedTasks.length &&
+      m.cardsRef === s.cards && m.actRef === s.activityLog &&
+      m.diagRef === s.diag && m.rdLen === s.reviewedDecks.length &&
+      m.dxp === s.dailyXp
+    ){
+      return s;
+    }
+  }
 
   if(typeof s.schemaVersion !== 'number') s.schemaVersion = ACADEMY_SCHEMA_VERSION;
 
@@ -47159,6 +47253,18 @@ function ensureExtendedState(target){
 
     }
 
+  }
+
+  if(_extStateFastMap){
+    _extStateFastMap.set(s, {
+      ctRef: s.completedTasks,
+      ctLen: s.completedTasks.length,
+      cardsRef: s.cards,
+      actRef: s.activityLog,
+      diagRef: s.diag,
+      rdLen: s.reviewedDecks.length,
+      dxp: s.dailyXp
+    });
   }
 
   return s;
@@ -47643,17 +47749,35 @@ function safeParseJsonObj(raw){
 
 
 
+let _wnCacheRaw = '';
+let _wnCacheVal = null;
+let _ideSolvedCache = { r1: null, r2: null, wn: null, ct: null, out: null };
+
 function readWindowNameBackup(){
 
   try{
 
     const wn = String(window.name || '');
 
-    if(wn.indexOf(WIN_NAME_PREFIX) === 0){
+    if(wn.indexOf(WIN_NAME_PREFIX) !== 0){
 
-      return safeParseJsonObj(wn.slice(WIN_NAME_PREFIX.length));
+      return null;
 
     }
+
+    if(wn === _wnCacheRaw){
+
+      return _wnCacheVal;
+
+    }
+
+    const parsed = safeParseJsonObj(wn.slice(WIN_NAME_PREFIX.length));
+
+    _wnCacheRaw = wn;
+
+    _wnCacheVal = parsed;
+
+    return parsed;
 
   }catch(e){}
 
@@ -47671,17 +47795,55 @@ function writeWindowNameBackup(academySt, ideStatusMap, ideDraftsMap){
 
     const curDrafts = ideDraftsMap || safeParseJsonObj(localStorage.getItem(IDE_DRAFTS_KEY)) || prevWn.ideDrafts || {};
 
+    let resolvedIdeStatus = ideStatusMap;
+
+    if(!resolvedIdeStatus){
+
+      if(_ideSolvedCache && _ideSolvedCache.out){
+
+        resolvedIdeStatus = _ideSolvedCache.out;
+
+      } else {
+
+        resolvedIdeStatus = {};
+
+        IDE_STATUS_KEYS.forEach(k => {
+
+          const parsed = safeParseJsonObj(localStorage.getItem(k));
+
+          if(parsed) resolvedIdeStatus = mergeIdeStatusMaps(resolvedIdeStatus, parsed);
+
+        });
+
+        if(prevWn.ideStatus) resolvedIdeStatus = mergeIdeStatusMaps(resolvedIdeStatus, prevWn.ideStatus);
+
+        if(state && Array.isArray(state.completedTasks)){
+
+          state.completedTasks.forEach(tid => { if(tid !== null && tid !== undefined) resolvedIdeStatus[tid] = 'solved'; });
+
+        }
+
+      }
+
+    }
+
     const payload = {
 
       academyState: academySt || prevWn.academyState || state,
 
-      ideStatus: ideStatusMap || getIdeSolvedMap(),
+      ideStatus: resolvedIdeStatus,
 
       ideDrafts: curDrafts
 
     };
 
-    window.name = WIN_NAME_PREFIX + JSON.stringify(payload);
+    const nextWn = WIN_NAME_PREFIX + JSON.stringify(payload);
+
+    window.name = nextWn;
+
+    _wnCacheRaw = nextWn;
+
+    _wnCacheVal = payload;
 
   }catch(e){}
 
@@ -47908,6 +48070,8 @@ function hydrateAndMergeAllProgressSources(){
   state = Object.assign(state, combined);
 
   ensureExtendedState();
+
+  if(typeof sanitizeAcademyState === 'function') sanitizeAcademyState(state);
 
 
 
@@ -48164,19 +48328,33 @@ function getIdeSolvedMap(){
 
   try{
 
+    const r1 = localStorage.getItem('practice-ide-status') || '';
+
+    const r2 = localStorage.getItem('practice-ide-status-backup') || '';
+
+    const wn = String(window.name || '');
+
+    const ct = (state && Array.isArray(state.completedTasks) && state.completedTasks.length) ? state.completedTasks.join(',') : '';
+
+    if(_ideSolvedCache.out !== null && _ideSolvedCache.r1 === r1 && _ideSolvedCache.r2 === r2 && _ideSolvedCache.wn === wn && _ideSolvedCache.ct === ct){
+
+      return _ideSolvedCache.out;
+
+    }
+
     let merged = {};
 
-    IDE_STATUS_KEYS.forEach(k => {
+    [r1, r2].forEach(raw => {
 
-      const parsed = safeParseJsonObj(localStorage.getItem(k));
+      const parsed = safeParseJsonObj(raw);
 
       if(parsed) merged = mergeIdeStatusMaps(merged, parsed);
 
     });
 
-    const wn = readWindowNameBackup();
+    const wnSnap = readWindowNameBackup();
 
-    if(wn && wn.ideStatus) merged = mergeIdeStatusMaps(merged, wn.ideStatus);
+    if(wnSnap && wnSnap.ideStatus) merged = mergeIdeStatusMaps(merged, wnSnap.ideStatus);
 
     if(state && Array.isArray(state.completedTasks)){
 
@@ -48191,6 +48369,8 @@ function getIdeSolvedMap(){
       out[k] = (merged[k] === 'mastered' || merged[k] === 'solved') ? 'solved' : merged[k];
 
     });
+
+    _ideSolvedCache = { r1, r2, wn, ct, out };
 
     return out;
 
@@ -48257,8 +48437,6 @@ function saveIdeDraft(taskId, codeStr){
     }
 
   }
-
-  writeWindowNameBackup(state, null, dr);
 
 }
 
@@ -48538,6 +48716,11 @@ function progressSyncBundle(){
 }
 
 function canonicalProgressSignature(val){
+  const isMainState = (typeof state !== 'undefined' && val === state);
+  const curRev = (typeof window !== 'undefined' && window.__stateRevision) || 1;
+  if(isMainState && window.__stateCanonSigMemo && window.__stateCanonSigMemo.rev === curRev && window.__stateCanonSigMemo.ref === val){
+    return window.__stateCanonSigMemo.sig;
+  }
   const SKIP_KEYS = { updatedAt: true, lastRoute: true };
   function normalize(node){
     if(node === null || node === undefined) return node;
@@ -48553,7 +48736,13 @@ function canonicalProgressSignature(val){
     }
     return node;
   }
-  try{ return JSON.stringify(normalize(val)); }catch(e){ return ''; }
+  try{
+    const sig = JSON.stringify(normalize(val));
+    if(isMainState){
+      window.__stateCanonSigMemo = { rev: curRev, ref: val, sig: sig };
+    }
+    return sig;
+  }catch(e){ return ''; }
 }
 
 function applyProgressSyncUiUpdate(){
@@ -48656,7 +48845,7 @@ async function runProgressSync(){
 
   if(progressSyncInFlight || location.protocol === 'file:') return;
 
-  if(typeof window.flushSaveState === 'function') window.flushSaveState(true);
+  if(typeof window.flushSaveState === 'function') window.flushSaveState(false);
 
   progressSyncInFlight = true;
 
@@ -48765,7 +48954,7 @@ function scheduleProgressSync(){
 
   if(progressSyncTimer) clearTimeout(progressSyncTimer);
 
-  progressSyncTimer = setTimeout(runProgressSync, 800);
+  progressSyncTimer = setTimeout(runProgressSync, 3500);
 
 }
 
@@ -49477,6 +49666,10 @@ function triggerSparksBurst(anchorOrEvent, gradeOrAmount, maybeEvent){
       maxDistance = 120;
     }
 
+    if(typeof window !== 'undefined' && window.innerWidth > 0 && window.innerWidth <= 640){
+      sparkCount = Math.min(14, Math.max(8, Math.round(sparkCount * 0.5)));
+    }
+
     const container = document.createElement('div');
     container.className = 'srs-sparks-burst-container';
     container.style.cssText = 'position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:99999;overflow:hidden;';
@@ -49508,7 +49701,7 @@ function triggerSparksBurst(anchorOrEvent, gradeOrAmount, maybeEvent){
         // Кластер из главной и спутниковой звезды, в точности как эмодзи ✨
         const sSize = 16 + Math.round(Math.random() * 8);
         spark.innerHTML = `
-          <svg viewBox="0 0 32 32" width="${sSize}" height="${sSize}" style="overflow:visible;filter:drop-shadow(0 0 5px ${color}) drop-shadow(0 0 10px ${color});">
+          <svg viewBox="0 0 32 32" width="${sSize}" height="${sSize}" style="overflow:visible;">
             <path d="M16,2 Q16,16 30,16 Q16,16 16,30 Q16,16 2,16 Q16,16 16,2 Z" fill="${color}"/>
             <circle cx="16" cy="16" r="2.2" fill="#ffffff"/>
             <path d="M26,2 Q26,6 30,6 Q26,6 26,10 Q26,6 22,6 Q26,6 26,2 Z" fill="#ffffff"/>
@@ -49518,7 +49711,7 @@ function triggerSparksBurst(anchorOrEvent, gradeOrAmount, maybeEvent){
         // Одиночная сияющая 4-конечная звезда ✨ с ярким белым ядром
         const sSize = isBigSparkle ? (14 + Math.round(Math.random() * 6)) : (9 + Math.round(Math.random() * 4));
         spark.innerHTML = `
-          <svg viewBox="0 0 24 24" width="${sSize}" height="${sSize}" style="overflow:visible;filter:drop-shadow(0 0 4px ${color}) drop-shadow(0 0 8px ${color});">
+          <svg viewBox="0 0 24 24" width="${sSize}" height="${sSize}" style="overflow:visible;">
             <path d="M12,0 Q12,12 24,12 Q12,12 12,24 Q12,12 0,12 Q12,12 12,0 Z" fill="${color}"/>
             <circle cx="12" cy="12" r="${isBigSparkle ? 2 : 1.4}" fill="#ffffff"/>
           </svg>
@@ -49538,19 +49731,16 @@ function triggerSparksBurst(anchorOrEvent, gradeOrAmount, maybeEvent){
         spark.animate([
           { 
             transform: 'translate(-50%, -50%) scale(0.2) rotate(0deg)', 
-            opacity: 1,
-            filter: 'brightness(1.8)'
+            opacity: 1
           },
           { 
             transform: `translate(calc(-50% + ${destX * 0.45}px), calc(-50% + ${destY * 0.45}px)) scale(1.4) rotate(${rotation * 0.45}deg)`, 
             opacity: 1, 
-            filter: 'brightness(1.4)',
             offset: 0.32 
           },
           { 
             transform: `translate(calc(-50% + ${destX}px), calc(-50% + ${destY}px)) scale(0) rotate(${rotation}deg)`, 
             opacity: 0, 
-            filter: 'brightness(0.8)',
             offset: 1.0 
           }
         ], {
@@ -50588,16 +50778,22 @@ function getMpBadgeTier(mp){
 window.getMpBadgeTier = getMpBadgeTier;
 
 function getSkillCompletionBreakdown(sid){
+  const rpc = (typeof window !== 'undefined') ? window.__renderPassCache : null;
+  if(rpc && Object.prototype.hasOwnProperty.call(rpc.skills, sid)){
+    return rpc.skills[sid];
+  }
   ensureExtendedState();
   const s = PY_SKILLS_BY_ID[sid];
   if(!s){
-    return {
+    const emptyRes = {
       totalNotes: 0, doneNotes: 0, allNotesDone: false,
       totalDecks: 0, doneDecks: 0, allDecksDone: false,
       totalTasks: 0, doneTasks: 0, allTasksDone: false,
       totalMaterials: 0, doneMaterials: 0, allMaterialsDone: false,
       examPassed: false, fullyCompleted: false, mp: 0
     };
+    if(rpc) rpc.skills[sid] = emptyRes;
+    return emptyRes;
   }
   const solvedMap = getIdeSolvedMap();
   const kIds = Array.isArray(s.kIds) ? s.kIds.filter(k => typeof k === 'string' && k) : [];
@@ -50636,13 +50832,15 @@ function getSkillCompletionBreakdown(sid){
   const examScore = examPassed ? 20 : 0;
   const mp = fullyCompleted ? 100 : Math.min(99, materialsScore + examScore);
 
-  return {
+  const res = {
     totalNotes, doneNotes, allNotesDone,
     totalDecks, doneDecks, allDecksDone,
     totalTasks, doneTasks, allTasksDone,
     totalMaterials, doneMaterials, allMaterialsDone,
     examPassed, fullyCompleted, mp
   };
+  if(rpc) rpc.skills[sid] = res;
+  return res;
 }
 window.getSkillCompletionBreakdown = getSkillCompletionBreakdown;
 
@@ -51325,6 +51523,17 @@ function getDeckEchelonId(deckOrId){
 window.getDeckEchelonId = getDeckEchelonId;
 
 function getDeckInterviewTier(deckOrId){
+  if(typeof deckOrId === 'string'){
+    const preset = (typeof getFunnelPreset === 'function') ? getFunnelPreset() : 'bigtech';
+    const cacheKey = preset + ':' + deckOrId;
+    if(window.__deckTierCache && Object.prototype.hasOwnProperty.call(window.__deckTierCache, cacheKey)){
+      return window.__deckTierCache[cacheKey];
+    }
+    const res = getEchelonDisplayNum(getDeckEchelonId(deckOrId));
+    if(!window.__deckTierCache) window.__deckTierCache = Object.create(null);
+    window.__deckTierCache[cacheKey] = res;
+    return res;
+  }
   return getEchelonDisplayNum(getDeckEchelonId(deckOrId));
 }
 window.getDeckInterviewTier = getDeckInterviewTier;
@@ -51354,7 +51563,16 @@ function getEchelonUnits(idOrNum, sourceUnits){
 window.getEchelonUnits = getEchelonUnits;
 
 function getEchelonProgress(idOrNum){
+  const rpc = (typeof window !== 'undefined') ? window.__renderPassCache : null;
+  const cacheKey = String(idOrNum);
+  if(rpc && Object.prototype.hasOwnProperty.call(rpc.echelons, cacheKey)){
+    return rpc.echelons[cacheKey];
+  }
   const echId = resolveEchelonId(idOrNum);
+  if(rpc && Object.prototype.hasOwnProperty.call(rpc.echelons, echId)){
+    rpc.echelons[cacheKey] = rpc.echelons[echId];
+    return rpc.echelons[echId];
+  }
   const meta = getEchelonMeta(echId);
   const echDef = ECHELONS_BY_ID[echId] || { units: [] };
   const units = getEchelonUnits(echId);
@@ -51372,7 +51590,7 @@ function getEchelonProgress(idOrNum){
   const isInDevelopment = units.length === 0 && plannedUnitsCount > 0;
   const nextSk = isInDevelopment ? null : (skills.find(s => getSkillMP(s.id) < 100) || skills[0] || null);
 
-  return {
+  const res = {
     id: echId,
     tier: meta.tier,
     title: meta.title,
@@ -51400,6 +51618,11 @@ function getEchelonProgress(idOrNum){
     masteredCount: mastered,
     proficientCount: proficient
   };
+  if(rpc){
+    rpc.echelons[cacheKey] = res;
+    rpc.echelons[echId] = res;
+  }
+  return res;
 }
 window.getEchelonProgress = getEchelonProgress;
 
@@ -54744,19 +54967,26 @@ const CANONICAL_NOTE_TASKS_MAP = {
 
 function isDeckCompleted(fid){
   if(!fid || typeof fid !== 'string') return false;
+  const rpc = (typeof window !== 'undefined') ? window.__renderPassCache : null;
+  if(rpc && Object.prototype.hasOwnProperty.call(rpc.decksDone, fid)){
+    return rpc.decksDone[fid];
+  }
   if(typeof ensureExtendedState === 'function') ensureExtendedState();
-  if(state && Array.isArray(state.reviewedDecks) && state.reviewedDecks.includes(fid)) return true;
-  if(typeof ALL_DECKS_COMBINED !== 'undefined' && ALL_DECKS_COMBINED[fid]){
+  let res = false;
+  if(state && Array.isArray(state.reviewedDecks) && state.reviewedDecks.includes(fid)){
+    res = true;
+  } else if(typeof ALL_DECKS_COMBINED !== 'undefined' && ALL_DECKS_COMBINED[fid]){
     const cards = ALL_DECKS_COMBINED[fid].cards || [];
     if(cards.length > 0){
       const allRated = cards.every((_, idx) => {
         const ck = fid + ':' + idx;
         return (Number(state && state.cardRatings && state.cardRatings[ck]) > 0) || Boolean(state && state.cardSrs && state.cardSrs[ck]);
       });
-      if(allRated) return true;
+      if(allRated) res = true;
     }
   }
-  return false;
+  if(rpc) rpc.decksDone[fid] = res;
+  return res;
 }
 window.isDeckCompleted = isDeckCompleted;
 
@@ -57282,6 +57512,22 @@ function collectDueCardsQueue(){
 
   const today = (typeof dateIsoKey === 'function') ? dateIsoKey() : new Date().toISOString().slice(0, 10);
 
+  const p = (typeof window !== 'undefined') ? window.PRIVATE_PROFILE_DATA : null;
+
+  const ui = (p && p.ui && typeof p.ui === 'object') ? p.ui : {};
+
+  const cutoffTs = Number((p && p.srsCutoffTimestamp) || ui.srsCutoffTimestamp) || 0;
+
+  const preset = (typeof getFunnelPreset === 'function') ? getFunnelPreset() : 'bigtech';
+
+  const memoKey = (window.__stateRevision || 1) + ':' + today + ':' + preset + ':' + cutoffTs;
+
+  if(window.__dueCardsQueueMemo && window.__dueCardsQueueMemo.key === memoKey){
+
+    return window.__dueCardsQueueMemo.val.slice();
+
+  }
+
   const srsMap = state.cardSrs || {};
 
   const ratings = state.cardRatings || {};
@@ -57401,7 +57647,9 @@ function collectDueCardsQueue(){
 
 
 
-  return queue;
+  window.__dueCardsQueueMemo = { key: memoKey, val: queue };
+
+  return queue.slice();
 
 }
 
@@ -63842,6 +64090,9 @@ function applyPrivateProfile(profile){
   if(typeof invalidateInterviewSyncIndex === 'function') invalidateInterviewSyncIndex();
   window.__srsStatsMemo = null;
   window.__srsDailyMemo = null;
+  window.__deckTierCache = null;
+  window.__dueCardsQueueMemo = null;
+  window.__thermoCooldownMemo = null;
   if(typeof cardsHubState !== 'undefined' && cardsHubState && Array.isArray(cardsHubState.dueQueue) && cardsHubState.dueQueue.length > 0){
     cardsHubState.dueQueue = cardsHubState.dueQueue.filter(item => item && isDeckAllowedInSrsQueue(item.deckId, item.deckId + ':' + item.cardIdx));
     if(cardsHubState.duePos >= cardsHubState.dueQueue.length){
@@ -72692,6 +72943,10 @@ function pluralizeRuCards(n){
 
 // 1. Single Source of Truth for Dominant Hero Action Card (Сайдбар + Дашборд)
 function getDominantHeroCardData(){
+  const rpc = (typeof window !== 'undefined') ? window.__renderPassCache : null;
+  if(rpc && rpc.heroData){
+    return rpc.heroData;
+  }
   ensureExtendedState();
 
   const openGaps = (state.diagnosticGaps || []).filter(sid => typeof PY_SKILLS_BY_ID !== 'undefined' && PY_SKILLS_BY_ID[sid] && getSkillMP(sid) < 100);
@@ -72857,7 +73112,7 @@ function getDominantHeroCardData(){
   if(srsDue > 0){
     const dueMins = Math.max(1, Math.round(srsDue * 0.6));
     const srsPct = srsDoneToday > 0 ? Math.min(96, Math.round((srsDoneToday / (srsDoneToday + srsDue)) * 100)) : 0;
-    return {
+    const srsHeroRes = {
       ...common,
       isSrs: true,
       srsDue,
@@ -72874,9 +73129,11 @@ function getDominantHeroCardData(){
       secondaryHref: lessonDirectRoute,
       secondaryHtml: `Или продолжить урок: <b>${escapeHtmlStr(cleanSkillTitle)}</b>`
     };
+    if(rpc) rpc.heroData = srsHeroRes;
+    return srsHeroRes;
   }
 
-  return {
+  const lessonHeroRes = {
     ...common,
     isSrs: false,
     srsDue: 0,
@@ -72893,6 +73150,8 @@ function getDominantHeroCardData(){
     secondaryHref: '#/path',
     secondaryHtml: 'Открыть Путь обучения'
   };
+  if(rpc) rpc.heroData = lessonHeroRes;
+  return lessonHeroRes;
 }
 window.getDominantHeroCardData = getDominantHeroCardData;
 
@@ -73273,9 +73532,86 @@ function updateThermodynamicPills(){
   } catch(_e){}
 }
 
+// Непрерывная физическая шкала накала памяти и прогрева горна (предвычисленный PCHIP Spline)
+const _THERMO_PCHIP_FNS = (function(){
+  function createPchip(xs, ys){
+    const n = xs.length;
+    const del = [];
+    for(let i = 0; i < n - 1; i++){
+      del.push((ys[i + 1] - ys[i]) / (xs[i + 1] - xs[i]));
+    }
+    const d = new Array(n).fill(0);
+    for(let i = 1; i < n - 1; i++){
+      if(del[i - 1] * del[i] <= 0){
+        d[i] = 0;
+      } else {
+        const w1 = 2 * (xs[i + 1] - xs[i]) + (xs[i] - xs[i - 1]);
+        const w2 = (xs[i + 1] - xs[i]) + 2 * (xs[i] - xs[i - 1]);
+        d[i] = (w1 + w2) / (w1 / del[i - 1] + w2 / del[i]);
+      }
+    }
+    d[0] = ((2 * (xs[1] - xs[0]) + (xs[2] - xs[1])) * del[0] - (xs[1] - xs[0]) * del[1]) / (xs[2] - xs[0]);
+    if(d[0] * del[0] <= 0) d[0] = 0;
+    else if(del[0] * del[1] < 0 && Math.abs(d[0]) > Math.abs(3 * del[0])) d[0] = 3 * del[0];
+
+    d[n - 1] = ((2 * (xs[n - 1] - xs[n - 2]) + (xs[n - 2] - xs[n - 3])) * del[n - 2] - (xs[n - 1] - xs[n - 2]) * del[n - 3]) / (xs[n - 1] - xs[n - 3]);
+    if(d[n - 1] * del[n - 2] <= 0) d[n - 1] = 0;
+    else if(del[n - 2] * del[n - 3] < 0 && Math.abs(d[n - 1]) > Math.abs(3 * del[n - 2])) d[n - 1] = 3 * del[n - 2];
+
+    return function(x){
+      if(x <= xs[0]) return ys[0];
+      if(x >= xs[n - 1]) return ys[n - 1];
+      let idx = 0;
+      for(let i = 0; i < n - 1; i++){
+        if(xs[i] <= x && x <= xs[i + 1]){
+          idx = i;
+          break;
+        }
+      }
+      const h = xs[idx + 1] - xs[idx];
+      const t = (x - xs[idx]) / h;
+      const t2 = t * t;
+      const t3 = t2 * t;
+      const h00 = 2 * t3 - 3 * t2 + 1;
+      const h10 = t3 - 2 * t2 + t;
+      const h01 = -2 * t3 + 3 * t2;
+      const h11 = t3 - t2;
+      return h00 * ys[idx] + h10 * h * d[idx] + h01 * ys[idx + 1] + h11 * h * d[idx + 1];
+    };
+  }
+  const XS = [0, 25, 50, 75, 90, 100];
+  return {
+    c1_r: createPchip(XS, [55,   145,  220,  248,  254,  255]),
+    c1_g: createPchip(XS, [65,   20,   32,   115,  215,  255]),
+    c1_b: createPchip(XS, [85,   38,   28,   20,   95,   255]),
+    c1_a: createPchip(XS, [0.70, 0.78, 0.85, 0.88, 0.94, 1.00]),
+    c2_r: createPchip(XS, [30,   95,   180,  230,  245,  254]),
+    c2_g: createPchip(XS, [40,   14,   20,   80,   160,  248]),
+    c2_b: createPchip(XS, [55,   24,   18,   12,   30,   195]),
+    c2_a: createPchip(XS, [0.85, 0.88, 0.90, 0.92, 0.95, 0.98]),
+    c3_r: createPchip(XS, [15,   28,   55,   95,   160,  234]),
+    c3_g: createPchip(XS, [20,   10,   12,   28,   65,   179]),
+    c3_b: createPchip(XS, [30,   15,   12,   8,    12,   8]),
+    c3_a: createPchip(XS, [0.95, 0.96, 0.96, 0.96, 0.96, 0.95]),
+    br_r: createPchip(XS, [148,  244,  251,  253,  254,  255]),
+    br_g: createPchip(XS, [163,  63,   113,  186,  240,  255]),
+    br_b: createPchip(XS, [184,  94,   133,  116,  138,  255]),
+    br_a: createPchip(XS, [0.38, 0.65, 0.78, 0.85, 0.90, 0.98]),
+    gl_r: createPchip(XS, [148,  244,  239,  249,  245,  251]),
+    gl_g: createPchip(XS, [163,  63,   68,   115,  158,  191]),
+    gl_b: createPchip(XS, [184,  94,   68,   22,   11,   36]),
+    gl_a: createPchip(XS, [0.18, 0.35, 0.45, 0.55, 0.65, 0.70]),
+    temp_fn: createPchip(XS, [20, 600, 850, 1050, 1200, 1350])
+  };
+})();
+
 function getThermodynamicCooldownData(){
   ensureExtendedState();
   const today = (typeof dateIsoKey === 'function') ? dateIsoKey() : new Date().toISOString().slice(0, 10);
+  const memoKey = (window.__stateRevision || 1) + ':' + today;
+  if(window.__thermoCooldownMemo && window.__thermoCooldownMemo.key === memoKey){
+    return window.__thermoCooldownMemo.val;
+  }
   const srsMap = state.cardSrs || {};
   const ratings = state.cardRatings || {};
   const decks = (typeof ALL_DECKS_COMBINED !== 'undefined') ? ALL_DECKS_COMBINED : {};
@@ -73335,97 +73671,13 @@ function getThermodynamicCooldownData(){
     pct = 99;
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Непрерывная физическая шкала накала памяти и прогрева горна (PCHIP Spline)
-  // Абсолютно непрерывный гладкий переход каждого 1% без ступенек между этапами
-  // ═══════════════════════════════════════════════════════════════════════════
-  function createPchip(xs, ys){
-    const n = xs.length;
-    const del = [];
-    for(let i = 0; i < n - 1; i++){
-      del.push((ys[i + 1] - ys[i]) / (xs[i + 1] - xs[i]));
-    }
-    const d = new Array(n).fill(0);
-    for(let i = 1; i < n - 1; i++){
-      if(del[i - 1] * del[i] <= 0){
-        d[i] = 0;
-      } else {
-        const w1 = 2 * (xs[i + 1] - xs[i]) + (xs[i] - xs[i - 1]);
-        const w2 = (xs[i + 1] - xs[i]) + 2 * (xs[i] - xs[i - 1]);
-        d[i] = (w1 + w2) / (w1 / del[i - 1] + w2 / del[i]);
-      }
-    }
-    d[0] = ((2 * (xs[1] - xs[0]) + (xs[2] - xs[1])) * del[0] - (xs[1] - xs[0]) * del[1]) / (xs[2] - xs[0]);
-    if(d[0] * del[0] <= 0) d[0] = 0;
-    else if(del[0] * del[1] < 0 && Math.abs(d[0]) > Math.abs(3 * del[0])) d[0] = 3 * del[0];
-
-    d[n - 1] = ((2 * (xs[n - 1] - xs[n - 2]) + (xs[n - 2] - xs[n - 3])) * del[n - 2] - (xs[n - 1] - xs[n - 2]) * del[n - 3]) / (xs[n - 1] - xs[n - 3]);
-    if(d[n - 1] * del[n - 2] <= 0) d[n - 1] = 0;
-    else if(del[n - 2] * del[n - 3] < 0 && Math.abs(d[n - 1]) > Math.abs(3 * del[n - 2])) d[n - 1] = 3 * del[n - 2];
-
-    return function(x){
-      if(x <= xs[0]) return ys[0];
-      if(x >= xs[n - 1]) return ys[n - 1];
-      let idx = 0;
-      for(let i = 0; i < n - 1; i++){
-        if(xs[i] <= x && x <= xs[i + 1]){
-          idx = i;
-          break;
-        }
-      }
-      const h = xs[idx + 1] - xs[idx];
-      const t = (x - xs[idx]) / h;
-      const t2 = t * t;
-      const t3 = t2 * t;
-      const h00 = 2 * t3 - 3 * t2 + 1;
-      const h10 = t3 - 2 * t2 + t;
-      const h01 = -2 * t3 + 3 * t2;
-      const h11 = t3 - t2;
-      return h00 * ys[idx] + h10 * h * d[idx] + h01 * ys[idx + 1] + h11 * h * d[idx + 1];
-    };
-  }
-
-  const XS = [0, 25, 50, 75, 90, 100];
-
-  // Верхний сияющий блик c1
-  const c1_r = createPchip(XS, [55,   145,  220,  248,  254,  255]);
-  const c1_g = createPchip(XS, [65,   20,   32,   115,  215,  255]);
-  const c1_b = createPchip(XS, [85,   38,   28,   20,   95,   255]);
-  const c1_a = createPchip(XS, [0.70, 0.78, 0.85, 0.88, 0.94, 1.00]);
-
-  // Сердцевина градиента c2
-  const c2_r = createPchip(XS, [30,   95,   180,  230,  245,  254]);
-  const c2_g = createPchip(XS, [40,   14,   20,   80,   160,  248]);
-  const c2_b = createPchip(XS, [55,   24,   18,   12,   30,   195]);
-  const c2_a = createPchip(XS, [0.85, 0.88, 0.90, 0.92, 0.95, 0.98]);
-
-  // Глубокая база градиента c3
-  const c3_r = createPchip(XS, [15,   28,   55,   95,   160,  234]);
-  const c3_g = createPchip(XS, [20,   10,   12,   28,   65,   179]);
-  const c3_b = createPchip(XS, [30,   15,   12,   8,    12,   8]);
-  const c3_a = createPchip(XS, [0.95, 0.96, 0.96, 0.96, 0.96, 0.95]);
-
-  // Контурная рамка border
-  const br_r = createPchip(XS, [148,  244,  251,  253,  254,  255]);
-  const br_g = createPchip(XS, [163,  63,   113,  186,  240,  255]);
-  const br_b = createPchip(XS, [184,  94,   133,  116,  138,  255]);
-  const br_a = createPchip(XS, [0.38, 0.65, 0.78, 0.85, 0.90, 0.98]);
-
-  // Неоновое свечение glow
-  const gl_r = createPchip(XS, [148,  244,  239,  249,  245,  251]);
-  const gl_g = createPchip(XS, [163,  63,   68,   115,  158,  191]);
-  const gl_b = createPchip(XS, [184,  94,   68,   22,   11,   36]);
-  const gl_a = createPchip(XS, [0.18, 0.35, 0.45, 0.55, 0.65, 0.70]);
-
-  // Физическая температура в градусах Цельсия
-  const temp_fn = createPchip(XS, [20, 600, 850, 1050, 1200, 1350]);
-
-  const c1 = [Math.round(c1_r(pct)), Math.round(c1_g(pct)), Math.round(c1_b(pct)), +c1_a(pct).toFixed(2)];
-  const c2 = [Math.round(c2_r(pct)), Math.round(c2_g(pct)), Math.round(c2_b(pct)), +c2_a(pct).toFixed(2)];
-  const c3 = [Math.round(c3_r(pct)), Math.round(c3_g(pct)), Math.round(c3_b(pct)), +c3_a(pct).toFixed(2)];
-  const border = [Math.round(br_r(pct)), Math.round(br_g(pct)), Math.round(br_b(pct)), +br_a(pct).toFixed(2)];
-  const glow = [Math.round(gl_r(pct)), Math.round(gl_g(pct)), Math.round(gl_b(pct)), +gl_a(pct).toFixed(2)];
-  const curTemp = Math.round(temp_fn(pct));
+  const fns = _THERMO_PCHIP_FNS;
+  const c1 = [Math.round(fns.c1_r(pct)), Math.round(fns.c1_g(pct)), Math.round(fns.c1_b(pct)), +fns.c1_a(pct).toFixed(2)];
+  const c2 = [Math.round(fns.c2_r(pct)), Math.round(fns.c2_g(pct)), Math.round(fns.c2_b(pct)), +fns.c2_a(pct).toFixed(2)];
+  const c3 = [Math.round(fns.c3_r(pct)), Math.round(fns.c3_g(pct)), Math.round(fns.c3_b(pct)), +fns.c3_a(pct).toFixed(2)];
+  const border = [Math.round(fns.br_r(pct)), Math.round(fns.br_g(pct)), Math.round(fns.br_b(pct)), +fns.br_a(pct).toFixed(2)];
+  const glow = [Math.round(fns.gl_r(pct)), Math.round(fns.gl_g(pct)), Math.round(fns.gl_b(pct)), +fns.gl_a(pct).toFixed(2)];
+  const curTemp = Math.round(fns.temp_fn(pct));
 
   let phaseName = 'Белое каление';
   if(pct < 25) phaseName = 'Остывшая сталь';
@@ -73474,7 +73726,7 @@ function getThermodynamicCooldownData(){
   const tooltipDesc = '';
   const pillStyle = `background:${bgGrad} !important;border-color:${borderCol} !important;box-shadow:${shadowGlow} !important;color:${textCol} !important;`;
 
-  return {
+  const thermoRes = {
     pct,
     cssClass,
     labelHtml,
@@ -73490,6 +73742,8 @@ function getThermodynamicCooldownData(){
     c2Str,
     c3Str
   };
+  window.__thermoCooldownMemo = { key: memoKey, val: thermoRes };
+  return thermoRes;
 }
 
 // 3. Single Source of Truth for Unified Navigation Groups
@@ -73648,24 +73902,46 @@ function buildUnifiedSidebarFootHTML(isMobile){
 
 
 renderNav = function(){
+  const isMobViewport = (typeof window !== 'undefined' && window.innerWidth > 0 && window.innerWidth <= 880);
   const desk = document.getElementById('nav-desktop');
   const heroBox = document.getElementById('sidebar-hero-action-container');
-  if(heroBox){
-    heroBox.innerHTML = renderDominantHeroCard(false);
-  }
-  if(desk){
-    desk.innerHTML = renderUnifiedNavLinks(false);
-    if(typeof updateSidebarLevelBadge === 'function') updateSidebarLevelBadge();
+  if(!isMobViewport){
+    window.__desktopSidebarNeedsSync = false;
+    if(heroBox){
+      heroBox.innerHTML = renderDominantHeroCard(false);
+    }
+    if(desk){
+      desk.innerHTML = renderUnifiedNavLinks(false);
+      if(typeof updateSidebarLevelBadge === 'function') updateSidebarLevelBadge();
 
-    // Update Streak in compact footer
+      // Update Streak in compact footer
+      const streakNumEl = document.getElementById('streak-num-d');
+      if(streakNumEl){
+        streakNumEl.textContent = (typeof state !== 'undefined' && state.streak) ? state.streak : 0;
+      }
+
+      // Cooldown pill SSOT (Плавная термодинамическая интерполяция каждого 1%)
+      if(typeof updateThermodynamicPills === 'function'){
+        updateThermodynamicPills();
+      }
+    }
+  } else {
+    window.__desktopSidebarNeedsSync = true;
     const streakNumEl = document.getElementById('streak-num-d');
     if(streakNumEl){
       streakNumEl.textContent = (typeof state !== 'undefined' && state.streak) ? state.streak : 0;
     }
-
-    // Cooldown pill SSOT (Плавная термодинамическая интерполяция каждого 1%)
     if(typeof updateThermodynamicPills === 'function'){
       updateThermodynamicPills();
+    }
+    if(!window.__desktopNavResizeBound && typeof window !== 'undefined' && typeof window.addEventListener === 'function'){
+      window.__desktopNavResizeBound = true;
+      window.addEventListener('resize', function(){
+        if(window.innerWidth > 880 && window.__desktopSidebarNeedsSync){
+          window.__desktopSidebarNeedsSync = false;
+          if(typeof renderNav === 'function') renderNav();
+        }
+      });
     }
   }
 
@@ -73677,6 +73953,30 @@ renderNav = function(){
   const hasDueMob = cardsDueCountMob > 0 || notesDueCountMob > 0;
 
   document.querySelectorAll('.tabbar').forEach(tb => {
+    const existingItems = tb.querySelectorAll('.tabbar__item');
+    const canPatchInPlace = existingItems.length === mobItems.length && existingItems.length > 0 && Array.prototype.every.call(existingItems, function(el, idx){
+      return el && el.classList && typeof el.getAttribute === 'function' && el.getAttribute('data-route') === mobItems[idx].route;
+    });
+    if(canPatchInPlace){
+      mobItems.forEach(function(it, idx){
+        const el = existingItems[idx];
+        const act = (it.route === '/' && (!location.hash || location.hash === '#/')) || (it.route !== '/' && location.hash.startsWith('#' + it.route));
+        el.classList.toggle('active', Boolean(act));
+        if(it.hasDueDot){
+          const iconWrap = el.querySelector('.tabbar__icon-wrap');
+          const curDot = el.querySelector('.tabbar__due-dot');
+          if(hasDueMob && !curDot && iconWrap && typeof document !== 'undefined' && typeof document.createElement === 'function'){
+            const dot = document.createElement('span');
+            dot.className = 'tabbar__due-dot';
+            dot.title = 'Есть темы для повторения';
+            iconWrap.appendChild(dot);
+          } else if(!hasDueMob && curDot && typeof curDot.remove === 'function'){
+            curDot.remove();
+          }
+        }
+      });
+      return;
+    }
     tb.innerHTML = mobItems.map(it => {
       const lbl = it.shortLabel || it.label;
       const act = (it.route === '/' && (!location.hash || location.hash === '#/')) || (it.route !== '/' && location.hash.startsWith('#' + it.route));
@@ -75435,6 +75735,18 @@ render = function(){
   window.render = render;
   window.renderApp = render;
 
+  window.__renderPassDepth = (window.__renderPassDepth || 0) + 1;
+  if(window.__renderPassDepth === 1){
+    window.__renderPassCache = {
+      skills: Object.create(null),
+      echelons: Object.create(null),
+      decksDone: Object.create(null),
+      heroData: null
+    };
+  }
+
+  try {
+
   if(window.state && typeof window.state === 'object' && window.state !== state){
     Object.assign(state, window.state);
   }
@@ -75454,7 +75766,7 @@ render = function(){
 
     state.lastRoute = route;
 
-    saveState(state);
+    if(typeof localSaveState === 'function') localSaveState(state); else saveState(state);
 
   }
 
@@ -76083,6 +76395,15 @@ render = function(){
 
   if(tsBtn) tsBtn.textContent = state.soundEnabled ? '🔊' : '🔇';
 
+  window.__lastRenderedHash = (typeof location !== 'undefined' && location.hash) ? location.hash : '';
+  window.__lastRenderedRev = (typeof window !== 'undefined' && window.__stateRevision) || 0;
+  window.__lastRenderedAt = Date.now();
+
+  } finally {
+    window.__renderPassDepth = Math.max(0, (window.__renderPassDepth || 1) - 1);
+    if(window.__renderPassDepth === 0) window.__renderPassCache = null;
+  }
+
 };
 
 window.render = render;
@@ -76262,11 +76583,15 @@ document.addEventListener('click', async function(e){
 
       try{ if(typeof playSound === 'function') playSound('tick'); }catch(err){}
 
+      try { if(typeof closeMobileDrawer === 'function') closeMobileDrawer(true); } catch(_e){}
+
       const targetHash = '#' + targetRoute;
 
       if(location.hash !== targetHash){
 
         location.hash = targetHash;
+
+        if(typeof render === 'function') render();
 
       } else {
 
@@ -79154,8 +79479,6 @@ document.addEventListener('click', async function(e){
 
     saveReadingPosition();
 
-    if(typeof updateThermodynamicPills === 'function') updateThermodynamicPills();
-
     render();
 
     return;
@@ -79200,8 +79523,6 @@ const psk = e.target.closest('[data-py-select-k]');
 
     saveReadingPosition();
 
-    if(typeof updateThermodynamicPills === 'function') updateThermodynamicPills();
-
     render();
 
     return;
@@ -79226,7 +79547,7 @@ const psk = e.target.closest('[data-py-select-k]');
 
     saveReadingPosition();
 
-    if(typeof updateThermodynamicPills === 'function') updateThermodynamicPills();
+    if(typeof patchPySkillTheoryStepInPlace === 'function' && patchPySkillTheoryStepInPlace()) return;
 
     render();
 
@@ -79268,6 +79589,8 @@ const psk = e.target.closest('[data-py-select-k]');
 
     saveReadingPosition();
 
+    if(typeof patchPySkillTheoryStepInPlace === 'function' && patchPySkillTheoryStepInPlace()) return;
+
     render();
     return;
   }
@@ -79301,6 +79624,8 @@ const psk = e.target.closest('[data-py-select-k]');
 
       saveReadingPosition();
 
+      if(typeof patchPySkillTheoryStepInPlace === 'function' && patchPySkillTheoryStepInPlace()) return;
+
       render();
 
     }
@@ -79316,8 +79641,6 @@ const psk = e.target.closest('[data-py-select-k]');
     pySkillViewState.sprintCelebration = null;
 
     saveReadingPosition();
-
-    if(typeof updateThermodynamicPills === 'function') updateThermodynamicPills();
 
     render();
 
@@ -79378,7 +79701,6 @@ const psk = e.target.closest('[data-py-select-k]');
       pySkillViewState.runOutput = '';
       pySkillViewState.sprintCelebration = null;
       saveReadingPosition();
-      if(typeof updateThermodynamicPills === 'function') updateThermodynamicPills();
       render();
       return;
     } else {
@@ -79394,7 +79716,6 @@ const psk = e.target.closest('[data-py-select-k]');
       }
       pySkillViewState.sprintCelebration = null;
       saveReadingPosition();
-      if(typeof updateThermodynamicPills === 'function') updateThermodynamicPills();
       render();
       return;
     }
@@ -79436,8 +79757,6 @@ const psk = e.target.closest('[data-py-select-k]');
     pySkillViewState.sprintCelebration = null;
 
     saveReadingPosition();
-
-    if(typeof updateThermodynamicPills === 'function') updateThermodynamicPills();
 
     render();
 
@@ -79492,8 +79811,6 @@ const psk = e.target.closest('[data-py-select-k]');
     }
 
     saveReadingPosition();
-
-    if(typeof updateThermodynamicPills === 'function') updateThermodynamicPills();
 
     render();
 
@@ -79943,6 +80260,114 @@ function patchPySkillCardInPlace(){
 }
 window.patchPySkillCardInPlace = patchPySkillCardInPlace;
 
+function patchPySkillTheoryStepInPlace(){
+  if(typeof pySkillViewState === 'undefined' || pySkillViewState.tab !== 'theory') return false;
+  if(document.querySelector('.sprint-finish-celebration, .sprint-celebration-banner, .step-check-box')) return false;
+  const feedContainer = document.getElementById('py-theory-text');
+  if(!feedContainer) return false;
+  const cardClean = feedContainer.closest ? feedContainer.closest('.srs-note-card-clean') : null;
+  if(!cardClean) return false;
+  const ctaBtn = cardClean.querySelector('.btn-dock-cta-single');
+  if(!ctaBtn) return false;
+
+  const sk = (typeof ensurePySkillState === 'function') ? ensurePySkillState(pySkillViewState.sid) : { kIds: [] };
+  const activeK = pySkillViewState.kId || (sk.kIds && sk.kIds[0]);
+  if(!activeK) return false;
+  const noteObj = (typeof ALL_NOTES_COMBINED !== 'undefined' && ALL_NOTES_COMBINED[activeK])
+    ? ALL_NOTES_COMBINED[activeK]
+    : { id: activeK, title: activeK, steps: [{ title: activeK, html: '<p>Конспект загружается.</p>' }] };
+  const steps = noteObj.steps || [];
+  const stepIdx = Math.min(Math.max(0, Number(pySkillViewState.stepIdx) || 0), Math.max(0, steps.length - 1));
+  const curStep = steps[stepIdx] || { title: noteObj.title, html: '' };
+
+  const cleanStepTitle = (curStep.title || ('Шаг ' + (stepIdx + 1))).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+  const pureStepTitle = cleanStepTitle.replace(/^\d+[\.\)\s\-·•]+\s*/, '').trim();
+  const cleanNoteTitle = (noteObj && noteObj.title ? noteObj.title : activeK).replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
+
+  const chunks = (typeof getStepChunks === 'function')
+    ? getStepChunks(curStep, pureStepTitle)
+    : (typeof splitStepHtmlIntoChunks === 'function' ? splitStepHtmlIntoChunks(curStep.html, pureStepTitle) : [curStep.html || '']);
+  const totalChunks = chunks.length;
+  const curChunkIdx = Math.min(Math.max(0, Number(pySkillViewState.chunkIdx) || 0), Math.max(0, totalChunks - 1));
+
+  const titleText = pureStepTitle || cleanStepTitle || cleanNoteTitle;
+  const h2El = cardClean.querySelector('h2 > span') || cardClean.querySelector('h2');
+  if(h2El){
+    h2El.innerHTML = (typeof formatRichInlineText === 'function')
+      ? formatRichInlineText(titleText)
+      : escapeHtmlStr(titleText);
+  }
+
+  feedContainer.innerHTML = chunks.slice(0, curChunkIdx + 1).map((ch, ci) =>
+    `<div class="feed-chunk ${ci < curChunkIdx ? 'feed-chunk-prev' : 'feed-chunk-new'}" data-chunk-idx="${ci}">${ch}</div>`
+  ).join('');
+
+  const beadsContainer = document.getElementById('py-quanta-beads');
+  if(beadsContainer){
+    const isRead = (typeof state !== 'undefined' && Array.isArray(state.readNotes)) ? state.readNotes.includes(activeK) : false;
+    const totalSteps = Math.max(1, steps.length);
+    const curStepPos = Math.min(Math.max(0, stepIdx), totalSteps - 1);
+    let startStepIdx = 0;
+    let endStepIdx = totalSteps;
+    if(totalSteps > 8){
+      startStepIdx = Math.max(0, Math.min(curStepPos - 3, totalSteps - 7));
+      endStepIdx = startStepIdx + 7;
+    }
+    const stepDots = [];
+    for(let i = startStepIdx; i < endStepIdx; i++){
+      let qCls = 'dock-quantum-bead';
+      const isStepCompleted = Boolean(isRead || (typeof state !== 'undefined' && state.completedNoteSteps && state.completedNoteSteps[`${activeK}:${i}`]));
+      if(i === curStepPos) qCls += ' active';
+      else if(isStepCompleted) qCls += ' done';
+      else qCls += ' future';
+
+      const isEdge = (totalSteps > 8 && ((i === startStepIdx && startStepIdx > 0) || (i === endStepIdx - 1 && endStepIdx < totalSteps)));
+      if(isEdge) qCls += ' dock-quantum-bead--edge';
+
+      const stObj = steps[i] || {};
+      const rawTitle = stObj.title || ('Шаг ' + (i + 1));
+      const cleanTitle = rawTitle.replace(/^К-\d+\s*[:·•\-]\s*/i, '').replace(/`/g, '').trim();
+      stepDots.push(`<span class="${qCls}" data-py-jump-step="${i}" role="button" tabindex="0" title="${escapeHtmlStr(cleanTitle)}" aria-label="${escapeHtmlStr(cleanTitle)}"></span>`);
+    }
+    beadsContainer.innerHTML = stepDots.join('');
+  }
+
+  ctaBtn.removeAttribute('data-chunk-more');
+  ctaBtn.removeAttribute('data-py-next-step');
+  ctaBtn.removeAttribute('data-py-finish-note');
+  ctaBtn.removeAttribute('data-py-select-task');
+  ctaBtn.removeAttribute('data-py-to-next-note');
+  ctaBtn.removeAttribute('data-py-to-exam');
+
+  const hasMoreChunks = (curChunkIdx + 1 < totalChunks);
+  let finishBtnText = 'Дальше';
+  if(hasMoreChunks){
+    ctaBtn.setAttribute('data-chunk-more', 'py');
+    finishBtnText = 'Дальше';
+  } else if(stepIdx + 1 < steps.length){
+    ctaBtn.setAttribute('data-py-next-step', String(stepIdx + 1));
+    finishBtnText = 'Следующий шаг';
+  } else {
+    const cta = (typeof getNoteCompletionCta === 'function')
+      ? getNoteCompletionCta(activeK, sk)
+      : { attrName: 'data-py-finish-note', attrVal: activeK, text: 'Закрепить в карточках' };
+    ctaBtn.setAttribute(cta.attrName, cta.attrVal);
+    finishBtnText = cta.text;
+  }
+  ctaBtn.innerHTML = `<span>${finishBtnText}</span>`;
+
+  const srStep = document.querySelector('.echelon-clean-meta .sr-only');
+  if(srStep){
+    srStep.textContent = `Шаг ${stepIdx + 1}/${steps.length}`;
+  }
+
+  if(typeof window !== 'undefined' && window.scrollY > 80 && typeof window.scrollTo === 'function'){
+    window.scrollTo(0, 0);
+  }
+  return true;
+}
+window.patchPySkillTheoryStepInPlace = patchPySkillTheoryStepInPlace;
+
   if(e.target.closest('[data-py-flip-card]')){
     if(e.isTrusted && Date.now() < (window.__cardRateFlipGuardUntil || 0)){
       return;
@@ -80104,8 +80529,6 @@ window.patchPySkillCardInPlace = patchPySkillCardInPlace;
 
     saveReadingPosition();
 
-    if(typeof updateThermodynamicPills === 'function') updateThermodynamicPills();
-
     render();
 
     return;
@@ -80197,8 +80620,6 @@ window.patchPySkillCardInPlace = patchPySkillCardInPlace;
     }
 
     saveReadingPosition();
-
-    if(typeof updateThermodynamicPills === 'function') updateThermodynamicPills();
 
     render();
 
@@ -80388,8 +80809,6 @@ window.patchPySkillCardInPlace = patchPySkillCardInPlace;
 
     saveReadingPosition();
 
-    if(typeof updateThermodynamicPills === 'function') updateThermodynamicPills();
-
     render();
 
     return;
@@ -80433,8 +80852,6 @@ window.patchPySkillCardInPlace = patchPySkillCardInPlace;
     pySkillViewState.runOutput = '';
 
     saveReadingPosition();
-
-    if(typeof updateThermodynamicPills === 'function') updateThermodynamicPills();
 
     render();
 

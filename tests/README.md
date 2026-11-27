@@ -16,6 +16,7 @@
 | [`test_backend_concurrency.py`](test_backend_concurrency.py) | **Стресс-тесты конкурентности и отказоустойчивости**: многопоточная запись в SQLite (режим WAL, 10 потоков без блокировок), миграция схем v1/v2 ➔ v3, краш-рекавери на диске и лимиты полезной нагрузки. |
 | [`test_backend_api.py`](test_backend_api.py) | **Модульные тесты FastAPI API**: интеграционный запуск тестов REST API, синхронизации и сервисов из корня репозитория (29 тестов). |
 | [`test_bugs_regression.js`](test_bugs_regression.js) | **Главный регрессионный сьют**: комплексный прогон всех 146 багов, канонических бенчмарков и сьюта Строгого Дескриптора со 100% PASS. |
+| [`test_mobile_perf_guard.js`](test_mobile_perf_guard.js) | **Страж мобильного отклика (INP Guard) и бюджета стейта**: защита от порчи UTF-8 (`0` `\uFFFD`, `< 250 КБ`), контроль in-place переходов, `renderNav()` на `390px`, CSS `touch-action` / `contain`, запрета `body += chunk` и двойного `render()`. |
 | [`test_pravki_spec.js`](test_pravki_spec.js) | **Спецификация канонических эталонов интерфейса**: теория, флешкарты SRS, практика со сплит-вью, модалка рубежного теста, дашборд и микрообучение. |
 | [`test_dashboard_regression.js`](test_dashboard_regression.js) | Регрессионный тест дашборда: лаконичный вид, кокон фокуса, сегментный прогресс и адаптивность. |
 | [`test_cards_trainer_regression.js`](test_cards_trainer_regression.js) | Тестирование механики флешкарт: интервальное повторение SRS, перевороты, оценка «Не знаю» и начисление XP. |

@@ -1,4 +1,5 @@
 import logging
+import re
 import time
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -6,6 +7,11 @@ from backend.app.core.config import atomic_write_json_file, read_json_file, sett
 from backend.app.schemas.progress import SyncPushRequest
 
 logger = logging.getLogger('academy.sync')
+_BUG_JUNK_RE = re.compile(r'[\ufffd\x00-\x08\x0b\x0c\x0e-\x1f]+')
+_CTRL_JUNK_RE = re.compile(r'[\ufffd\x00-\x1f]+')
+_DIGITS_RE = re.compile(r'\d+')
+_PAIR_NUM_RE = re.compile(r'(\d+):(\d+)')
+_CHUNK_KEY_RE = re.compile(r'^skill:.*?(\d+):(\d+):(\d+)$')
 
 _UNION_LIST_KEYS = (
     'mastered',
@@ -113,12 +119,220 @@ def merge_academy_states(stored_state: Optional[Dict[str, Any]], incoming_state:
             if isinstance(srs_item, dict) and isinstance(srs_item.get('lastGrade'), (int, float)) and srs_item['lastGrade'] > 0:
                 merged['cardRatings'][ck] = int(srs_item['lastGrade'])
 
+    for bool_key in ('completedNoteSteps', 'unlockedChunks'):
+        if isinstance(a.get(bool_key), dict) or isinstance(b.get(bool_key), dict):
+            map_a = a.get(bool_key) if isinstance(a.get(bool_key), dict) else {}
+            map_b = b.get(bool_key) if isinstance(b.get(bool_key), dict) else {}
+            merged_bool: Dict[str, bool] = {}
+            for src in (map_a, map_b):
+                for bk, bv in src.items():
+                    merged_bool[bk] = bool(merged_bool.get(bk) or bv)
+            merged[bool_key] = merged_bool
+
     if isinstance(a.get('readingPositions'), dict) or isinstance(b.get('readingPositions'), dict):
         pos_a = a.get('readingPositions') if isinstance(a.get('readingPositions'), dict) else {}
         pos_b = b.get('readingPositions') if isinstance(b.get('readingPositions'), dict) else {}
         merged['readingPositions'] = {**pos_a, **pos_b}
 
-    return merged
+    return sanitize_academy_state(merged)
+
+
+def _sanitize_academy_key(k: Any, prefix: str = '') -> str:
+    """Нормализует ключи конспектов и колод (К-NNN / Ф-NNN), очищая битые UTF-8 префиксы."""
+    if not isinstance(k, str):
+        return ''
+    m = _DIGITS_RE.search(k)
+    if m:
+        return f'{prefix}{m.group(0).zfill(3)}'
+    return _CTRL_JUNK_RE.sub('', k).strip()
+
+
+def _sanitize_card_key(k: Any) -> str:
+    """Нормализует ключи карточек к виду Ф-NNN:idx."""
+    if not isinstance(k, str):
+        return str(k)
+    m = _PAIR_NUM_RE.search(k)
+    if m:
+        return f'Ф-{m.group(1).zfill(3)}:{m.group(2)}'
+    return _CTRL_JUNK_RE.sub('', k).strip()
+
+
+def _sanitize_bug_reports(items: Any) -> List[Dict[str, Any]]:
+    """Очищает список замечаний от битой кодировки, обрезает текст и убирает дубли."""
+    if not isinstance(items, list):
+        return []
+    cleaned: List[Dict[str, Any]] = []
+    seen = set()
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        raw_text = _BUG_JUNK_RE.sub('', str(item.get('text') or '')).strip()[:2000]
+        if not raw_text:
+            continue
+        raw_ctx = _BUG_JUNK_RE.sub('', str(item.get('context') or '')).strip()[:500]
+        dedup_key = f"{item.get('timestamp') or ''}|{raw_ctx}|{raw_text}"
+        if dedup_key in seen:
+            continue
+        seen.add(dedup_key)
+        cleaned.append({**item, 'text': raw_text, 'context': raw_ctx})
+    return cleaned
+
+
+def sanitize_academy_state(s: Any) -> Any:
+    """Нормализует и дедуплицирует ключи прогресса с битой кодировкой U+FFFD без потери данных."""
+    if not isinstance(s, dict):
+        return s
+
+    if isinstance(s.get('readNotes'), list):
+        clean_rn: List[str] = []
+        seen_rn = set()
+        for item in s['readNotes']:
+            cx = _sanitize_academy_key(item, 'К-')
+            if cx and cx not in seen_rn:
+                seen_rn.add(cx)
+                clean_rn.append(cx)
+        s['readNotes'] = clean_rn
+
+    if isinstance(s.get('reviewedDecks'), list):
+        clean_rd: List[str] = []
+        seen_rd = set()
+        for item in s['reviewedDecks']:
+            cd = _sanitize_academy_key(item, 'Ф-')
+            if cd and cd not in seen_rd:
+                seen_rd.add(cd)
+                clean_rd.append(cd)
+        s['reviewedDecks'] = clean_rd
+
+    if isinstance(s.get('noteSrs'), dict):
+        clean_notes: Dict[str, Any] = {}
+        for k, v in s['noteSrs'].items():
+            ck = _sanitize_academy_key(k, 'К-')
+            if not ck or not isinstance(v, dict):
+                continue
+            cur = clean_notes.get(ck)
+            if cur is None:
+                clean_notes[ck] = dict(v)
+            else:
+                v_rank = (int(v.get('step') or 0), int(v.get('interval') or 0), str(v.get('lastReview') or ''))
+                c_rank = (int(cur.get('step') or 0), int(cur.get('interval') or 0), str(cur.get('lastReview') or ''))
+                if v_rank > c_rank:
+                    clean_notes[ck] = dict(v)
+        s['noteSrs'] = clean_notes
+
+    if isinstance(s.get('cardSrs'), dict):
+        clean_cards: Dict[str, Any] = {}
+        for k, v in s['cardSrs'].items():
+            ck = _sanitize_card_key(k)
+            if not ck or not isinstance(v, dict):
+                continue
+            cur = clean_cards.get(ck)
+            if cur is None:
+                clean_cards[ck] = dict(v)
+            else:
+                v_rank = (
+                    str(v.get('lastReview') or ''),
+                    int(v.get('reviewedAt') or v.get('lastSignalAt') or 0),
+                    int(v.get('reps') or 0),
+                    int(v.get('interval') or 0),
+                )
+                c_rank = (
+                    str(cur.get('lastReview') or ''),
+                    int(cur.get('reviewedAt') or cur.get('lastSignalAt') or 0),
+                    int(cur.get('reps') or 0),
+                    int(cur.get('interval') or 0),
+                )
+                if v_rank > c_rank:
+                    clean_cards[ck] = dict(v)
+        s['cardSrs'] = clean_cards
+
+    if isinstance(s.get('cardRatings'), dict):
+        clean_ratings: Dict[str, Any] = {}
+        for k, v in s['cardRatings'].items():
+            ck = _sanitize_card_key(k)
+            if not ck:
+                continue
+            try:
+                num = float(v or 0)
+            except (TypeError, ValueError):
+                num = 0
+            cur_val = float(clean_ratings.get(ck) or 0)
+            best = max(cur_val, num)
+            clean_ratings[ck] = int(best) if best.is_integer() else best
+        s['cardRatings'] = clean_ratings
+
+    if isinstance(s.get('completedNoteSteps'), dict):
+        clean_steps: Dict[str, bool] = {}
+        for k, v in s['completedNoteSteps'].items():
+            ks = str(k)
+            m = _PAIR_NUM_RE.search(ks)
+            if m:
+                ck = f'К-{m.group(1).zfill(3)}:{m.group(2)}'
+            elif _CTRL_JUNK_RE.search(ks):
+                continue
+            else:
+                ck = ks
+            clean_steps[ck] = bool(clean_steps.get(ck) or v)
+        s['completedNoteSteps'] = clean_steps
+
+    if isinstance(s.get('unlockedChunks'), dict):
+        clean_chunks: Dict[str, bool] = {}
+        for k, v in s['unlockedChunks'].items():
+            ks = str(k)
+            m = _CHUNK_KEY_RE.match(ks)
+            if m:
+                ck = f'skill:К-{m.group(1).zfill(3)}:{m.group(2)}:{m.group(3)}'
+            elif _CTRL_JUNK_RE.search(ks):
+                continue
+            else:
+                ck = ks
+            clean_chunks[ck] = bool(clean_chunks.get(ck) or v)
+        s['unlockedChunks'] = clean_chunks
+
+    if isinstance(s.get('readingPositions'), dict):
+        for pos in s['readingPositions'].values():
+            if not isinstance(pos, dict):
+                continue
+            if pos.get('kId'):
+                pos['kId'] = _sanitize_academy_key(pos['kId'], 'К-')
+            if pos.get('fId'):
+                pos['fId'] = _sanitize_academy_key(pos['fId'], 'Ф-')
+            if pos.get('deckId'):
+                pos['deckId'] = _sanitize_academy_key(pos['deckId'], 'Ф-')
+            if isinstance(pos.get('deckPositions'), dict):
+                clean_dp: Dict[str, Any] = {}
+                for dp_k, dp_v in pos['deckPositions'].items():
+                    cdp_k = _sanitize_academy_key(dp_k, 'Ф-')
+                    if not cdp_k:
+                        continue
+                    if cdp_k not in clean_dp or (
+                        isinstance(dp_v, dict)
+                        and int(dp_v.get('sessionLearned') or 0) > int((clean_dp[cdp_k] or {}).get('sessionLearned') or 0)
+                    ):
+                        clean_dp[cdp_k] = dp_v
+                pos['deckPositions'] = clean_dp
+
+    if isinstance(s.get('cardsHubPos'), dict):
+        chp = s['cardsHubPos']
+        if chp.get('deckId'):
+            chp['deckId'] = _sanitize_academy_key(chp['deckId'], 'Ф-')
+        if isinstance(chp.get('dueQueue'), list):
+            clean_dq: List[Dict[str, Any]] = []
+            seen_dq = set()
+            for item in chp['dueQueue']:
+                if not isinstance(item, dict):
+                    continue
+                did = _sanitize_academy_key(item.get('deckId'), 'Ф-')
+                cidx = int(item.get('cardIdx') or 0)
+                ckey = f'{did}:{cidx}'
+                if ckey not in seen_dq:
+                    seen_dq.add(ckey)
+                    clean_dq.append({**item, 'deckId': did, 'cardIdx': cidx})
+            chp['dueQueue'] = clean_dq
+
+    if isinstance(s.get('bugReports'), list):
+        s['bugReports'] = _sanitize_bug_reports(s['bugReports'])
+
+    return s
 
 
 class SyncService:
@@ -131,6 +345,9 @@ class SyncService:
         """
         data = read_json_file(settings.progress_sync_file, default=None, logger=logger)
         if isinstance(data, dict) and 'bundle' in data:
+            bundle = data.get('bundle')
+            if isinstance(bundle, dict) and isinstance(bundle.get('academyState'), dict):
+                bundle['academyState'] = sanitize_academy_state(bundle['academyState'])
             return data
         return None
 
@@ -190,6 +407,8 @@ class SyncService:
                 'ideStatus': {**(stored_bundle.get('ideStatus') or {}), **(bundle.get('ideStatus') or {})},
                 'ideDrafts': {**(stored_bundle.get('ideDrafts') or {}), **(bundle.get('ideDrafts') or {})}
             }
+        elif isinstance(next_bundle.get('academyState'), dict):
+            next_bundle['academyState'] = sanitize_academy_state(next_bundle['academyState'])
 
         new_record = {
             'updatedAt': now_ms,

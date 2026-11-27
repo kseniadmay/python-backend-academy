@@ -153,6 +153,50 @@ def main() -> int:
                 return 1
             print('✓ [Pre-Commit] Тест стабильности Zero-Jitter SRS пройден со 100% успехом.')
 
+    perf_or_sync_changed = any(
+        f.endswith('standards.html')
+        or f.endswith('academy.html')
+        or f.endswith('server.js')
+        or f.endswith('sync_service.py')
+        or 'test_mobile_perf_guard' in f
+        for f in files
+    )
+    if perf_or_sync_changed:
+        if has_node:
+            perf_guard_path = os.path.join(_ROOT, 'tests', 'test_mobile_perf_guard.js')
+            if os.path.isfile(perf_guard_path):
+                c_perf = subprocess.run(
+                    ['node', perf_guard_path],
+                    capture_output=True,
+                    text=True,
+                    encoding='utf-8',
+                    errors='replace'
+                )
+                if c_perf.returncode != 0:
+                    print(f'[HOOK ERROR] Сбой проверки мобильного отклика и бюджета стейта:\n{c_perf.stderr or c_perf.stdout}')
+                    return 1
+                print(c_perf.stdout.strip())
+        try:
+            if _ROOT not in sys.path:
+                sys.path.insert(0, _ROOT)
+            from backend.app.services.sync_service import sanitize_academy_state
+
+            sample = {
+                'xp': 10,
+                'readNotes': ['\ufffd\ufffd-004'],
+                'cardSrs': {'\ufffd-025:3': {'reps': 2, 'lastReview': '2026-11-27'}},
+                'bugReports': [{'text': '\ufffdТест', 'context': '#/path', 'timestamp': '1'}]
+            }
+            cleaned = sanitize_academy_state(sample)
+            cleaned_json = json.dumps(cleaned, ensure_ascii=False)
+            if '\ufffd' in cleaned_json or 'К-004' not in cleaned.get('readNotes', []) or 'Ф-025:3' not in cleaned.get('cardSrs', {}):
+                print('[HOOK ERROR] Сбой санитизации U+FFFD в backend/app/services/sync_service.py')
+                return 1
+            print('✓ [Pre-Commit] Серверная санитизация U+FFFD (sync_service.py) проверена.')
+        except Exception as e:
+            print(f'[HOOK ERROR] Ошибка импорта/проверки sync_service.py:\n{e}')
+            return 1
+
     print('✓ [Pre-Commit] Синтаксическая проверка пройдена (JS, Python, JSON, HTML inline в норме).')
     return 0
 

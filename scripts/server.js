@@ -89,17 +89,222 @@ function readFeedbackQueue(queueFile) {
     }
 }
 
+function sanitizeServerKey(k, prefix = '') {
+    if (typeof k !== 'string') return '';
+    const m = k.match(/\d+/);
+    if (m) {
+        return (prefix || '') + String(m[0]).padStart(3, '0');
+    }
+    return k.replace(/[\uFFFD\u0000-\u001F]+/g, '').trim();
+}
+
+function sanitizeServerCardKey(k) {
+    if (typeof k !== 'string') return '';
+    const m = k.match(/(\d+):(\d+)/);
+    if (m) {
+        return 'Ф-' + String(m[1]).padStart(3, '0') + ':' + m[2];
+    }
+    return k.replace(/[\uFFFD\u0000-\u001F]+/g, '').trim();
+}
+
+function sanitizeBugReportsList(items) {
+    if (!Array.isArray(items)) return [];
+    const cleanBugs = [];
+    const seenBugs = new Set();
+    for (const item of items) {
+        if (!item || typeof item !== 'object') continue;
+        const cleanText = String(item.text || '').replace(/[\uFFFD\u0000-\u0008\u000B\u000C\u000E-\u001F]+/g, '').trim().slice(0, 2000);
+        if (!cleanText) continue;
+        const cleanCtx = String(item.context || '').replace(/[\uFFFD\u0000-\u0008\u000B\u000C\u000E-\u001F]+/g, '').trim().slice(0, 500);
+        const dedupKey = `${String(item.timestamp || '')}|${cleanCtx}|${cleanText}`;
+        if (seenBugs.has(dedupKey)) continue;
+        seenBugs.add(dedupKey);
+        cleanBugs.push(Object.assign({}, item, { text: cleanText, context: cleanCtx }));
+    }
+    return cleanBugs;
+}
+
+function sanitizeAcademyStateServer(s) {
+    if (!s || typeof s !== 'object') return s;
+    if (Array.isArray(s.readNotes)) {
+        const cleanRn = [];
+        const seenRn = new Set();
+        for (const x of s.readNotes) {
+            const cx = sanitizeServerKey(x, 'К-');
+            if (cx && !seenRn.has(cx)) {
+                seenRn.add(cx);
+                cleanRn.push(cx);
+            }
+        }
+        s.readNotes = cleanRn;
+    }
+    if (Array.isArray(s.reviewedDecks)) {
+        const cleanRd = [];
+        const seenRd = new Set();
+        for (const x of s.reviewedDecks) {
+            const cd = sanitizeServerKey(x, 'Ф-');
+            if (cd && !seenRd.has(cd)) {
+                seenRd.add(cd);
+                cleanRd.push(cd);
+            }
+        }
+        s.reviewedDecks = cleanRd;
+    }
+    if (s.noteSrs && typeof s.noteSrs === 'object' && !Array.isArray(s.noteSrs)) {
+        const cleanNotes = {};
+        for (const k of Object.keys(s.noteSrs)) {
+            const ck = sanitizeServerKey(k, 'К-');
+            const v = s.noteSrs[k];
+            if (!ck || !v || typeof v !== 'object') continue;
+            if (!cleanNotes[ck]) {
+                cleanNotes[ck] = Object.assign({}, v);
+            } else {
+                const cur = cleanNotes[ck];
+                const vStep = Number(v.step) || 0;
+                const cStep = Number(cur.step) || 0;
+                const vInt = Number(v.interval) || 0;
+                const cInt = Number(cur.interval) || 0;
+                const vRev = String(v.lastReview || '');
+                const cRev = String(cur.lastReview || '');
+                if (vStep > cStep || (vStep === cStep && (vInt > cInt || (vInt === cInt && vRev > cRev)))) {
+                    cleanNotes[ck] = Object.assign({}, v);
+                }
+            }
+        }
+        s.noteSrs = cleanNotes;
+    }
+    if (s.cardSrs && typeof s.cardSrs === 'object' && !Array.isArray(s.cardSrs)) {
+        const cleanCards = {};
+        for (const k of Object.keys(s.cardSrs)) {
+            const ck = sanitizeServerCardKey(k);
+            const v = s.cardSrs[k];
+            if (!ck || !v || typeof v !== 'object') continue;
+            if (!cleanCards[ck]) {
+                cleanCards[ck] = Object.assign({}, v);
+            } else {
+                const cur = cleanCards[ck];
+                const vRev = String(v.lastReview || '');
+                const cRev = String(cur.lastReview || '');
+                const vTs = Number(v.reviewedAt || v.lastSignalAt) || 0;
+                const cTs = Number(cur.reviewedAt || cur.lastSignalAt) || 0;
+                const vNewer = (vRev !== cRev)
+                    ? (vRev > cRev)
+                    : (vTs !== cTs
+                        ? (vTs > cTs)
+                        : ((Number(v.reps) || 0) > (Number(cur.reps) || 0) ||
+                            ((Number(v.reps) || 0) === (Number(cur.reps) || 0) && (Number(v.interval) || 0) > (Number(cur.interval) || 0))));
+                if (vNewer) {
+                    cleanCards[ck] = Object.assign({}, v);
+                }
+            }
+        }
+        s.cardSrs = cleanCards;
+    }
+    if (s.cardRatings && typeof s.cardRatings === 'object' && !Array.isArray(s.cardRatings)) {
+        const cleanRatings = {};
+        for (const k of Object.keys(s.cardRatings)) {
+            const ck = sanitizeServerCardKey(k);
+            if (!ck) continue;
+            const val = Number(s.cardRatings[k]) || 0;
+            cleanRatings[ck] = Math.max(cleanRatings[ck] || 0, val);
+        }
+        s.cardRatings = cleanRatings;
+    }
+    if (s.completedNoteSteps && typeof s.completedNoteSteps === 'object' && !Array.isArray(s.completedNoteSteps)) {
+        const cleanSteps = {};
+        for (const k of Object.keys(s.completedNoteSteps)) {
+            const ks = String(k);
+            const m = ks.match(/(\d+):(\d+)/);
+            let ck;
+            if (m) {
+                ck = 'К-' + String(m[1]).padStart(3, '0') + ':' + m[2];
+            } else if (/[\uFFFD\u0000-\u001F]/.test(ks)) {
+                continue;
+            } else {
+                ck = ks;
+            }
+            cleanSteps[ck] = Boolean(cleanSteps[ck] || s.completedNoteSteps[k]);
+        }
+        s.completedNoteSteps = cleanSteps;
+    }
+    if (s.unlockedChunks && typeof s.unlockedChunks === 'object' && !Array.isArray(s.unlockedChunks)) {
+        const cleanChunks = {};
+        for (const k of Object.keys(s.unlockedChunks)) {
+            const ks = String(k);
+            const m = ks.match(/^skill:.*?(\d+):(\d+):(\d+)$/);
+            let ck;
+            if (m) {
+                ck = 'skill:К-' + String(m[1]).padStart(3, '0') + ':' + m[2] + ':' + m[3];
+            } else if (/[\uFFFD\u0000-\u001F]/.test(ks)) {
+                continue;
+            } else {
+                ck = ks;
+            }
+            cleanChunks[ck] = Boolean(cleanChunks[ck] || s.unlockedChunks[k]);
+        }
+        s.unlockedChunks = cleanChunks;
+    }
+    if (s.readingPositions && typeof s.readingPositions === 'object' && !Array.isArray(s.readingPositions)) {
+        for (const skId of Object.keys(s.readingPositions)) {
+            const pos = s.readingPositions[skId];
+            if (pos && typeof pos === 'object') {
+                if (pos.kId) pos.kId = sanitizeServerKey(pos.kId, 'К-');
+                if (pos.fId) pos.fId = sanitizeServerKey(pos.fId, 'Ф-');
+                if (pos.deckId) pos.deckId = sanitizeServerKey(pos.deckId, 'Ф-');
+                if (pos.deckPositions && typeof pos.deckPositions === 'object' && !Array.isArray(pos.deckPositions)) {
+                    const cleanDp = {};
+                    for (const dpK of Object.keys(pos.deckPositions)) {
+                        const cdpK = sanitizeServerKey(dpK, 'Ф-');
+                        if (!cdpK) continue;
+                        const dpV = pos.deckPositions[dpK];
+                        if (!cleanDp[cdpK] || (dpV && (Number(dpV.sessionLearned) || 0) > (Number(cleanDp[cdpK].sessionLearned) || 0))) {
+                            cleanDp[cdpK] = dpV;
+                        }
+                    }
+                    pos.deckPositions = cleanDp;
+                }
+            }
+        }
+    }
+    if (s.cardsHubPos && typeof s.cardsHubPos === 'object') {
+        if (s.cardsHubPos.deckId) s.cardsHubPos.deckId = sanitizeServerKey(s.cardsHubPos.deckId, 'Ф-');
+        if (Array.isArray(s.cardsHubPos.dueQueue)) {
+            const cleanDq = [];
+            const seenDq = new Set();
+            for (const item of s.cardsHubPos.dueQueue) {
+                if (!item || typeof item !== 'object') continue;
+                const did = sanitizeServerKey(item.deckId, 'Ф-');
+                const cidx = Number(item.cardIdx) || 0;
+                const ckey = did + ':' + cidx;
+                if (!seenDq.has(ckey)) {
+                    seenDq.add(ckey);
+                    cleanDq.push(Object.assign({}, item, { deckId: did, cardIdx: cidx }));
+                }
+            }
+            s.cardsHubPos.dueQueue = cleanDq;
+        }
+    }
+    if (Array.isArray(s.bugReports)) {
+        s.bugReports = sanitizeBugReportsList(s.bugReports);
+    }
+    return s;
+}
+
 function readRequestBody(req, maxBytes = 5 * 1024 * 1024) {
     return new Promise((resolve, reject) => {
-        let body = '';
+        const chunks = [];
+        let totalBytes = 0;
         req.on('data', chunk => {
-            body += chunk;
-            if (body.length > maxBytes) {
+            const buf = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+            totalBytes += buf.length;
+            if (totalBytes > maxBytes) {
                 req.destroy();
                 reject(new Error('Payload too large'));
+                return;
             }
+            chunks.push(buf);
         });
-        req.on('end', () => resolve(body));
+        req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
         req.on('error', reject);
     });
 }
@@ -352,6 +557,9 @@ const server = http.createServer((req, res) => {
 
         if (req.method === 'GET') {
             readSyncRecord(syncFile).then(stored => {
+                if (stored && stored.bundle && stored.bundle.academyState && typeof stored.bundle.academyState === 'object') {
+                    sanitizeAcademyStateServer(stored.bundle.academyState);
+                }
                 sendJson(res, 200, {
                     ok: true,
                     updatedAt: stored ? stored.updatedAt : 0,
@@ -379,6 +587,9 @@ const server = http.createServer((req, res) => {
                 const storedClientId = stored && String(stored.clientId || stored.device || '');
                 const staleLocalWrite = stored && storedClientId && storedClientId !== clientId && stored.updatedAt > baseUpdatedAt + SYNC_DEVICE_TTL_MS;
                 if (staleLocalWrite) {
+                    if (stored.bundle && stored.bundle.academyState && typeof stored.bundle.academyState === 'object') {
+                        sanitizeAcademyStateServer(stored.bundle.academyState);
+                    }
                     sendJson(res, 409, { ok: false, conflict: true, updatedAt: stored.updatedAt, device: stored.device, bundle: stored.bundle });
                     console.log(`[!] [Sync] Конфликт устройств (${payload.device} vs ${stored.device}) — отправлен запрос на повторное слияние`);
                     return;
@@ -433,6 +644,17 @@ const server = http.createServer((req, res) => {
                             mergedState[key] = mergeNumericMaps(sa[key], sb[key]);
                         }
                     });
+                    ['completedNoteSteps', 'unlockedChunks'].forEach(key => {
+                        if (sa[key] !== undefined || sb[key] !== undefined) {
+                            const ma = (sa[key] && typeof sa[key] === 'object') ? sa[key] : {};
+                            const mb = (sb[key] && typeof sb[key] === 'object') ? sb[key] : {};
+                            const out = Object.assign({}, ma);
+                            Object.keys(mb).forEach(k => {
+                                out[k] = Boolean(out[k] || mb[k]);
+                            });
+                            mergedState[key] = out;
+                        }
+                    });
                     if (sa.noteSrs !== undefined || sb.noteSrs !== undefined) {
                         mergedState.noteSrs = mergeSrsMaps(sa.noteSrs, sb.noteSrs, 'step');
                     }
@@ -442,11 +664,14 @@ const server = http.createServer((req, res) => {
                     if (sa.readingPositions !== undefined || sb.readingPositions !== undefined) {
                         mergedState.readingPositions = Object.assign({}, sa.readingPositions || {}, sb.readingPositions || {});
                     }
+                    sanitizeAcademyStateServer(mergedState);
                     nextBundle = {
                         academyState: mergedState,
                         ideStatus: Object.assign({}, stored.bundle.ideStatus || {}, bundle.ideStatus || {}),
                         ideDrafts: Object.assign({}, stored.bundle.ideDrafts || {}, bundle.ideDrafts || {})
                     };
+                } else {
+                    nextBundle.academyState = sanitizeAcademyStateServer(nextBundle.academyState);
                 }
                 const record = { updatedAt: Date.now(), device: String(payload.device || 'unknown'), clientId, bundle: nextBundle };
                 await writeSyncRecord(syncFile, record);
