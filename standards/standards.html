@@ -24467,7 +24467,7 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     border-radius: 0 !important;
     padding: 0 12px 16px !important;
     flex-shrink: 0 !important;
-    contain: layout style !important;
+    contain: style !important;
   }
   .fc-card {
     height: auto !important;
@@ -26205,9 +26205,9 @@ body.light-theme .srs-card-theory-anchor:hover svg {
 
     .fc-card {
 
-      margin: 8px auto 10px !important;
+      margin: 0 auto !important;
 
-      padding: 18px 18px !important;
+      padding: 0 !important;
 
       
 
@@ -38893,6 +38893,535 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
       font-size: 0.67rem;
       gap: 4px;
     }
+  }
+  /* ══════════════════════════════════════════════════════════════════════
+     SSOT: ЭКРАН КАРТОЧЕК (ЦЕНТРОВКА + FIXED ДОК + КАПСУЛА КОДА + ЧИПЫ),
+     АМЕТИСТ ДЛЯ «ЛЕГКО» И СВЕТЛОЕ ОПТИЧЕСКОЕ ЗЕРКАЛО (АМЕТИСТ + ЯНТАРЬ)
+     ══════════════════════════════════════════════════════════════════════ */
+
+  /* 1. Оптическая центровка и кернинг чипов шапки карточки */
+  .srs-card-otvet-chip,
+  .fc-flip-back-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    line-height: 1 !important;
+    height: 26px !important;
+    min-height: 26px !important;
+    max-height: 26px !important;
+    padding: 0 11px !important;
+    letter-spacing: 0.01em !important;
+    box-sizing: border-box !important;
+  }
+  .srs-card-otvet-chip .fc-pill-icon,
+  .fc-flip-back-btn .fc-pill-icon {
+    display: block !important;
+    flex-shrink: 0 !important;
+  }
+  .srs-card-otvet-chip > span,
+  .fc-flip-back-btn > span {
+    display: inline-block !important;
+    line-height: 1 !important;
+  }
+  .fc-top-row {
+    align-items: center !important;
+  }
+  .fc-card-back .fc-top-actions-cluster .srs-card-theory-anchor {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 26px !important;
+    min-height: 26px !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    color: var(--ink-soft) !important;
+  }
+
+  /* 2. Цельная кодовая капсула для длинных и сольных кодовых ответов */
+  .fc-code-capsule.fc-code-capsule--solo {
+    background: rgba(8, 13, 20, 0.86) !important;
+    border: 1px solid rgba(52, 211, 153, 0.34) !important;
+    border-radius: 12px !important;
+    padding: 12px 14px !important;
+    margin: 2px 0 0 !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.18) !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .fc-code-capsule.fc-code-capsule--solo .fc-code-primary {
+    font-family: var(--font-m, 'JetBrains Mono', monospace) !important;
+    font-size: 0.94rem !important;
+    font-weight: 600 !important;
+    color: #6ee7b7 !important;
+    line-height: 1.55 !important;
+    white-space: pre-wrap !important;
+    overflow-wrap: break-word !important;
+    word-break: normal !important;
+    display: block !important;
+  }
+  .fc-q code:not(pre code),
+  .fc-q-sub code:not(pre code),
+  .fc-a-mastery code:not(pre code) {
+    margin: 0 0.04em !important;
+    padding: 0.05em 0.30em !important;
+  }
+
+  /* 3. Мобильная посадка карточек (≤ 640px): карточка по центру, фиксированный док внизу без рамки */
+  @media (max-width: 640px) {
+    #view-root:has(.cards-hub-content),
+    main:has(.cards-hub-content) {
+      padding: 0 !important;
+      min-height: 100dvh !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+    .cards-hub-container:has(.cards-hub-content) {
+      min-height: 100dvh !important;
+      height: auto !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: flex-start !important;
+      padding: 6px 14px calc(138px + env(safe-area-inset-bottom, 0px)) !important;
+      contain: style !important;
+      transform: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      filter: none !important;
+      box-sizing: border-box !important;
+    }
+    .cards-hub-content {
+      flex: 1 1 auto !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      width: 100% !important;
+      min-height: 0 !important;
+    }
+    .cards-hub-content .fc-stage {
+      min-height: 184px !important;
+      margin: auto 0 !important;
+      width: 100% !important;
+      flex: 0 0 auto !important;
+    }
+    .cards-hub-content .fc-card {
+      min-height: 184px !important;
+      padding: 0 !important;
+      margin: 0 auto !important;
+      width: 100% !important;
+    }
+    .cards-hub-content .fc-card .card-face,
+    .cards-hub-content .fc-card .fc-card-face,
+    .cards-hub-content .fc-card-front,
+    .cards-hub-content .fc-card-back {
+      min-height: 184px !important;
+      padding: 18px 18px 20px !important;
+      border-radius: 20px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      box-sizing: border-box !important;
+    }
+    .cards-hub-content .fc-card-front .fc-card-body,
+    .cards-hub-content .fc-card-back .fc-card-body {
+      margin: auto 0 !important;
+      padding: 14px 0 8px !important;
+      text-align: left !important;
+      width: 100% !important;
+    }
+    .cards-hub-content .srs-card-otvet-chip,
+    .cards-hub-content .fc-flip-back-btn {
+      height: 26px !important;
+      min-height: 26px !important;
+      max-height: 26px !important;
+      padding: 0 11px !important;
+      font-size: 0.74rem !important;
+      line-height: 1 !important;
+    }
+    .cards-hub-content .fc-card-back .fc-top-actions-cluster .srs-card-theory-anchor {
+      width: 26px !important;
+      height: 26px !important;
+      min-width: 26px !important;
+      min-height: 26px !important;
+      max-width: 26px !important;
+      max-height: 26px !important;
+      padding: 0 !important;
+    }
+    .cards-hub-content .srs-action-dock {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 9999 !important;
+      margin: 0 !important;
+      border-top: none !important;
+      box-shadow: none !important;
+      padding: 22px 14px calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+      background: linear-gradient(180deg, rgba(13, 16, 22, 0) 0%, rgba(13, 16, 22, 0.88) 32%, #0d1016 100%) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    .cards-hub-content .srs-action-dock .srs-rating-grid,
+    .cards-hub-content .srs-action-dock .btn-cta-dominant {
+      width: 100% !important;
+      max-width: 480px !important;
+    }
+  }
+
+  /* 4. Кнопка «Легко» — Аметист (Тёмная тема, Десктоп + Мобилка) */
+  :root:not([data-theme="light"]) .fc-rate-btn--easy,
+  :root:not([data-theme="light"]) .card-rating-btn--easy {
+    background: linear-gradient(180deg, #271748 0%, #150b29 100%) !important;
+    border: 1.5px solid #a78bfa !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.22), 0 4px 14px rgba(0, 0, 0, 0.40), 0 4px 20px -2px rgba(139, 92, 246, 0.44) !important;
+  }
+  :root:not([data-theme="light"]) .fc-rate-btn--easy:hover,
+  :root:not([data-theme="light"]) .card-rating-btn--easy:hover {
+    background: linear-gradient(180deg, #321d5c 0%, #1c0f38 100%) !important;
+    border-color: #c4b5fd !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.28), 0 6px 24px -2px rgba(139, 92, 246, 0.60) !important;
+  }
+  :root:not([data-theme="light"]) .fc-rate-btn--easy .srs-btn-title,
+  :root:not([data-theme="light"]) .card-rating-btn--easy .srs-btn-title {
+    color: #ffffff !important;
+  }
+  :root:not([data-theme="light"]) .fc-rate-btn--easy .srs-btn-sub,
+  :root:not([data-theme="light"]) .card-rating-btn--easy .srs-btn-sub {
+    color: #ddd6fe !important;
+  }
+
+  /* 5. Оптическое зеркало светлой темы «Утренний Шёлк» (Аметист + Янтарь, WCAG AAA) */
+  :root[data-theme="light"],
+  html[data-theme="light"] {
+    --paper: #f4f1ec;
+    --orb-burgundy: rgba(217, 119, 6, 0.24);
+    --orb-emerald: rgba(124, 58, 237, 0.24);
+  }
+  html[data-theme="light"] body {
+    background-color: #f4f1ec !important;
+    background-image: radial-gradient(rgba(30, 20, 56, 0.105) 1.2px, transparent 1.2px) !important;
+    background-size: 24px 24px !important;
+    background-attachment: fixed !important;
+  }
+  html[data-theme="light"] .ambient-orb--burgundy {
+    background: radial-gradient(circle, rgba(217, 119, 6, 0.26) 0%, rgba(245, 158, 11, 0.12) 58%, transparent 80%) !important;
+  }
+  html[data-theme="light"] .ambient-orb--emerald {
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.26) 0%, rgba(139, 92, 246, 0.12) 58%, transparent 80%) !important;
+  }
+
+  /* Физически точное спектральное свечение прогресс-бара (0 одноцветного box-shadow) */
+  .srs-header-progress-fill-echelon,
+  .srs-header-progress-fill {
+    box-shadow: none !important;
+    background-size: 100cqw 100% !important;
+    background-position: left top !important;
+  }
+  .srs-header-progress-glow {
+    position: absolute !important;
+    top: -1px !important;
+    left: 0 !important;
+    height: calc(100% + 2px) !important;
+    border-radius: 99px !important;
+    background-size: 100cqw 100% !important;
+    background-position: left top !important;
+    box-shadow: none !important;
+    filter: blur(4px) !important;
+    opacity: 0.94 !important;
+    pointer-events: none !important;
+  }
+  .srs-header-progress-glow::after {
+    content: '' !important;
+    position: absolute !important;
+    top: -2px !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: -2px !important;
+    border-radius: 99px !important;
+    background: inherit !important;
+    background-size: inherit !important;
+    background-position: inherit !important;
+    filter: blur(9px) !important;
+    opacity: 0.85 !important;
+    pointer-events: none !important;
+  }
+
+  /* Прогресс-бар (Янтарь ➔ Аметист со спектральным blur) и индикатор активности в светлой теме */
+  html[data-theme="light"] .srs-live-status-dot {
+    background: #7c3aed !important;
+    box-shadow: 0 0 8px rgba(124, 58, 237, 0.55) !important;
+  }
+  html[data-theme="light"] .srs-header-mode-title {
+    color: #1e293b !important;
+  }
+  html[data-theme="light"] .srs-header-progress-track {
+    background: rgba(15, 23, 42, 0.10) !important;
+  }
+  html[data-theme="light"] .srs-header-progress-fill-echelon,
+  html[data-theme="light"] .srs-header-progress-fill {
+    background: linear-gradient(90deg, #d97706 0%, #f59e0b 32%, #7c3aed 76%, #8b5cf6 92%, #c4b5fd 100%) !important;
+    background-size: 100cqw 100% !important;
+    background-position: left top !important;
+    box-shadow: none !important;
+  }
+  html[data-theme="light"] .srs-header-progress-glow {
+    background: linear-gradient(90deg, #d97706 0%, #f59e0b 32%, #7c3aed 76%, #8b5cf6 92%, #c4b5fd 100%) !important;
+    background-size: 100cqw 100% !important;
+    background-position: left top !important;
+    box-shadow: none !important;
+    opacity: 0.72 !important;
+  }
+  html[data-theme="light"] .srs-header-progress-glow::after {
+    opacity: 0.58 !important;
+  }
+
+  /* Крошки урока в светлой теме */
+  html[data-theme="light"] .srs-note-breadcrumbs .srs-breadcrumb-track,
+  html[data-theme="light"] .srs-note-breadcrumbs .srs-breadcrumb-topic {
+    color: #0f172a !important;
+  }
+  html[data-theme="light"] .srs-note-breadcrumbs .srs-breadcrumb-sep {
+    color: rgba(15, 23, 42, 0.28) !important;
+  }
+  html[data-theme="light"] .srs-note-breadcrumbs .srs-breadcrumb-skill {
+    color: #6d28d9 !important;
+  }
+
+  /* Линзовые аметистовые бусины в светлой теме (100% геометрия Квантового маяка + каскад 0.16s) */
+  @keyframes bead-pulse-amethyst {
+    0%, 100% {
+      box-shadow: 0 0 4px 1px rgba(221, 214, 254, 0.75),
+                  0 0 9px 1.5px rgba(124, 58, 237, 0.45),
+                  0 0 16px 2px rgba(109, 40, 217, 0.26);
+    }
+    50% {
+      box-shadow: 0 0 5px 1.5px #ffffff,
+                  0 0 12px 2px #a78bfa,
+                  0 0 20px 3px rgba(124, 58, 237, 0.58),
+                  0 0 28px 4px rgba(109, 40, 217, 0.28);
+    }
+  }
+  @keyframes bead-ping-wave-amethyst {
+    0% {
+      transform: scale(0.95);
+      opacity: 0.85;
+      border-color: rgba(124, 58, 237, 0.85);
+      box-shadow: 0 0 6px 1px rgba(139, 92, 246, 0.60);
+    }
+    45% {
+      opacity: 0.50;
+      border-color: rgba(124, 58, 237, 0.65);
+      box-shadow: 0 0 8px 1.5px rgba(124, 58, 237, 0.40);
+    }
+    75%, 100% {
+      transform: scale(2.6);
+      opacity: 0;
+      border-color: rgba(124, 58, 237, 0);
+      box-shadow: none;
+    }
+  }
+  @keyframes bead-done-glow-surge-amethyst {
+    0%, 100% {
+      box-shadow: 0 0 2.5px 0.6px rgba(124, 58, 237, 0.45), 0 0 5px 1px rgba(109, 40, 217, 0.22);
+      opacity: 0.88;
+    }
+    50% {
+      box-shadow: 0 0 4px 1px rgba(167, 139, 250, 0.72), 0 0 10px 2px rgba(124, 58, 237, 0.55);
+      opacity: 1;
+    }
+  }
+  @keyframes bead-future-glow-blink-amethyst {
+    0%, 100% {
+      box-shadow: none;
+      opacity: 0.52;
+      border-color: rgba(124, 58, 237, 0.32);
+    }
+    50% {
+      box-shadow: 0 0 7px rgba(124, 58, 237, 0.45);
+      opacity: 0.92;
+      border-color: #7c3aed;
+    }
+  }
+  :root[data-theme="light"] .dot-jewel.done,
+  :root[data-theme="light"] .dot-jewel.bead-done,
+  :root[data-theme="light"] .dot-jewel.rating-easy,
+  :root[data-theme="light"] .dot-jewel.rating-good,
+  :root[data-theme="light"] .dot-jewel.rating-hard,
+  :root[data-theme="light"] .dot-jewel.rating-again,
+  :root[data-theme="light"] .cards-hub-container .dot-jewel.done,
+  :root[data-theme="light"] .cards-hub-theory .dot-jewel.done,
+  :root[data-theme="light"] .srs-beads-necklace .dot-jewel.done,
+  :root[data-theme="light"] .fc-beads-necklace .dot-jewel.done,
+  :root[data-theme="light"] .fc-progress-header .dot-jewel.done,
+  :root[data-theme="light"] .dots-necklace .dot-jewel.done,
+  :root[data-theme="light"] #radar-dots-necklace .dot-jewel.done {
+    background: radial-gradient(circle at 35% 35%, #ffffff 0%, #ddd6fe 35%, #8b5cf6 74%, #6d28d9 100%) !important;
+    border: 1px solid #7c3aed !important;
+    animation: bead-done-glow-surge-amethyst 2.8s infinite ease-in-out !important;
+  }
+  :root[data-theme="light"] .dot-jewel.active,
+  :root[data-theme="light"] .dot-jewel.bead-active-leading,
+  :root[data-theme="light"] .srs-beads-necklace .dot-jewel.active,
+  :root[data-theme="light"] .fc-beads-necklace .dot-jewel.active,
+  :root[data-theme="light"] .fc-progress-header .dot-jewel.active,
+  :root[data-theme="light"] .dots-necklace .dot-jewel.active,
+  :root[data-theme="light"] #radar-dots-necklace .dot-jewel.active,
+  :root[data-theme="light"] .cards-hub-container .dot-jewel.active,
+  :root[data-theme="light"] .cards-hub-theory .dot-jewel.active {
+    background: #ffffff !important;
+    border: 1.5px solid #7c3aed !important;
+    animation: bead-pulse-amethyst 2.8s infinite ease-in-out !important;
+  }
+  :root[data-theme="light"] .dot-jewel.active::after,
+  :root[data-theme="light"] .dot-jewel.bead-active-leading::after {
+    border-color: rgba(124, 58, 237, 0.85) !important;
+    animation: bead-ping-wave-amethyst 2.8s cubic-bezier(0.2, 0.8, 0.4, 1) infinite !important;
+  }
+  :root[data-theme="light"] .dot-jewel.future,
+  :root[data-theme="light"] .dot-jewel.bead-future,
+  :root[data-theme="light"] .dots-necklace .dot-jewel:not(.done):not(.active):not(.milestone),
+  :root[data-theme="light"] #radar-dots-necklace .dot-jewel:not(.done):not(.active):not(.milestone) {
+    background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.72) 0%, rgba(124, 58, 237, 0.20) 45%, rgba(124, 58, 237, 0.08) 100%) !important;
+    border: 1px solid rgba(124, 58, 237, 0.34) !important;
+    animation: bead-future-glow-blink-amethyst 2.8s infinite ease-in-out !important;
+  }
+  :root[data-theme="light"] .dock-quantum-bead.done {
+    background: radial-gradient(circle at 35% 35%, #ffffff 0%, #ddd6fe 35%, #8b5cf6 74%, #6d28d9 100%) !important;
+    border-color: #7c3aed !important;
+    box-shadow: 0 0 3px 0.6px rgba(124, 58, 237, 0.42) !important;
+  }
+  :root[data-theme="light"] .dock-quantum-bead.active {
+    background: #ffffff !important;
+    border-color: #7c3aed !important;
+    box-shadow: 0 0 4px 1px rgba(124, 58, 237, 0.50) !important;
+  }
+
+  /* Карточка в светлой теме (Молочное матовое стекло + аметистовая вуаль, блик и тень парения) */
+  html[data-theme="light"] .fc-card-front,
+  html[data-theme="light"] .card-front {
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.92) 0%, rgba(252, 250, 255, 0.96) 100%) !important;
+    border: 1.5px solid rgba(15, 23, 42, 0.12) !important;
+    box-shadow: inset 0 1.5px 0 #ffffff, 0 18px 38px -10px rgba(49, 20, 102, 0.14), 0 2px 6px rgba(15, 23, 42, 0.05) !important;
+    backdrop-filter: blur(22px) saturate(145%) !important;
+    -webkit-backdrop-filter: blur(22px) saturate(145%) !important;
+  }
+  html[data-theme="light"] .fc-card-back,
+  html[data-theme="light"] .card-back {
+    background: linear-gradient(165deg, rgba(124, 58, 237, 0.10) 0%, rgba(255, 255, 255, 0.90) 38%, rgba(255, 255, 255, 0.96) 100%) !important;
+    border: 1.5px solid rgba(124, 58, 237, 0.48) !important;
+    box-shadow: inset 0 1.5px 0 #ffffff, 0 20px 42px -10px rgba(59, 25, 120, 0.20), 0 0 28px rgba(124, 58, 237, 0.15) !important;
+    backdrop-filter: blur(22px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(22px) saturate(150%) !important;
+  }
+  html[data-theme="light"] .fc-card-back .srs-card-otvet-chip {
+    color: #5b21b6 !important;
+    background: #ede9fe !important;
+    border: 1px solid #8b5cf6 !important;
+    box-shadow: 0 0 10px rgba(124, 58, 237, 0.16) !important;
+  }
+  html[data-theme="light"] .fc-card-back .fc-flip-back-btn,
+  html[data-theme="light"] .fc-card-back .fc-top-actions-cluster .srs-card-theory-anchor {
+    color: #1e293b !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.15) !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06) !important;
+  }
+  html[data-theme="light"] .fc-card-back .fc-q-sub,
+  html[data-theme="light"] .fc-card-back .fc-q-sub-clean {
+    color: #0f172a !important;
+    opacity: 1 !important;
+  }
+  html[data-theme="light"] .fc-card-back .fc-divider {
+    background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.34), transparent) !important;
+  }
+  html[data-theme="light"] .fc-card-back .fc-a-mastery,
+  html[data-theme="light"] .fc-card-back #srs-card-answer,
+  html[data-theme="light"] .fc-card-back .fc-answer-explanation {
+    color: #0f172a !important;
+  }
+  html[data-theme="light"] .fc-card-back code:not(pre code),
+  html[data-theme="light"] .fc-card-front code:not(pre code),
+  html[data-theme="light"] .fc-card code:not(pre code) {
+    color: #5b21b6 !important;
+    background: #f5f3ff !important;
+    border: 1px solid #c4b5fd !important;
+  }
+  html[data-theme="light"] .fc-code-capsule,
+  html[data-theme="light"] .fc-code-capsule.fc-code-capsule--solo {
+    background: #f7f4ff !important;
+    border: 1px solid rgba(139, 92, 246, 0.55) !important;
+    box-shadow: inset 0 1px 2px rgba(76, 29, 149, 0.08) !important;
+  }
+  html[data-theme="light"] .fc-code-capsule .fc-code-primary,
+  html[data-theme="light"] .fc-code-capsule.fc-code-capsule--solo .fc-code-primary {
+    color: #3b0764 !important;
+    background: transparent !important;
+    border: none !important;
+  }
+
+  /* Светлый док и объёмные глазированные кнопки оценки SRS (WCAG AAA) */
+  @media (max-width: 640px) {
+    html[data-theme="light"] .cards-hub-content .srs-action-dock {
+      background: linear-gradient(180deg, rgba(244, 241, 236, 0) 0%, rgba(244, 241, 236, 0.88) 32%, rgba(244, 241, 236, 0.98) 100%) !important;
+      border-top: none !important;
+    }
+  }
+  html[data-theme="light"] .fc-rate-btn--again,
+  html[data-theme="light"] .card-rating-btn--again {
+    background: linear-gradient(180deg, #fff5f6 0%, #ffe4e8 100%) !important;
+    border: 1.5px solid #e11d48 !important;
+    box-shadow: inset 0 1.5px 0 #ffffff, 0 5px 14px -4px rgba(225, 29, 72, 0.28) !important;
+  }
+  html[data-theme="light"] .fc-rate-btn--again .srs-btn-title,
+  html[data-theme="light"] .card-rating-btn--again .srs-btn-title {
+    color: #7f1030 !important;
+  }
+  html[data-theme="light"] .fc-rate-btn--hard,
+  html[data-theme="light"] .card-rating-btn--hard {
+    background: linear-gradient(180deg, #fffcf0 0%, #fef0c7 100%) !important;
+    border: 1.5px solid #d97706 !important;
+    box-shadow: inset 0 1.5px 0 #ffffff, 0 5px 14px -4px rgba(217, 119, 6, 0.28) !important;
+  }
+  html[data-theme="light"] .fc-rate-btn--hard .srs-btn-title,
+  html[data-theme="light"] .card-rating-btn--hard .srs-btn-title {
+    color: #6c2e0a !important;
+  }
+  html[data-theme="light"] .fc-rate-btn--good,
+  html[data-theme="light"] .card-rating-btn--good,
+  html[data-theme="light"] .action-accent {
+    background: linear-gradient(180deg, #f2fdf8 0%, #d1fae5 100%) !important;
+    border: 1.5px solid #059669 !important;
+    box-shadow: inset 0 1.5px 0 #ffffff, 0 5px 14px -4px rgba(5, 150, 105, 0.26) !important;
+  }
+  html[data-theme="light"] .fc-rate-btn--good .srs-btn-title,
+  html[data-theme="light"] .card-rating-btn--good .srs-btn-title,
+  html[data-theme="light"] .action-accent .srs-btn-title {
+    color: #053e30 !important;
+  }
+  html[data-theme="light"] .fc-rate-btn--easy,
+  html[data-theme="light"] .card-rating-btn--easy {
+    background: linear-gradient(180deg, #f7f5ff 0%, #e9e3ff 100%) !important;
+    border: 1.5px solid #7c3aed !important;
+    box-shadow: inset 0 1.5px 0 #ffffff, 0 5px 14px -4px rgba(124, 58, 237, 0.30) !important;
+  }
+  html[data-theme="light"] .fc-rate-btn--easy .srs-btn-title,
+  html[data-theme="light"] .card-rating-btn--easy .srs-btn-title {
+    color: #3b0764 !important;
+  }
+  html[data-theme="light"] .cards-hub-content .btn-cta-dominant.btn-glass-emerald,
+  html[data-theme="light"] .cards-hub-content .btn-dominant-cta.btn-glass-emerald {
+    background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%) !important;
+    border: 1.5px solid #5b21b6 !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 6px 18px -4px rgba(124, 58, 237, 0.42) !important;
   }
 </style>
 
@@ -54197,20 +54726,8 @@ function viewPythonSkill(sid){
 
 
 
-  // Яркий неоновый градиент и свечение полосы прогресса урока (симметрично температурной шкале в интервалках)
+  // Спектральный градиент полосы прогресса урока (свечение через чистый filter: blur без одноцветного box-shadow)
   const lessonBarBg = 'linear-gradient(90deg, #e11d48 0%, #f43f5e 28%, #10b981 72%, #34d399 90%, #a7f3d0 100%)';
-  let lessonGlowShadow = '0 0 14px rgba(244, 63, 94, 0.75), 0 0 26px rgba(225, 29, 72, 0.48)';
-  let lessonFillShadow = '0 0 10px rgba(251, 113, 133, 0.85), 0 0 4px rgba(255, 228, 230, 0.45)';
-  if(displayEchPct >= 98){
-    lessonGlowShadow = '0 0 16px #a7f3d0, 0 0 32px rgba(52, 211, 153, 0.92)';
-    lessonFillShadow = '0 0 14px #ecfdf5, 0 0 5px #ffffff';
-  } else if(displayEchPct >= 65){
-    lessonGlowShadow = '0 0 14px rgba(52, 211, 153, 0.78), 0 0 28px rgba(16, 185, 129, 0.50)';
-    lessonFillShadow = '0 0 10px rgba(52, 211, 153, 0.88), 0 0 4px rgba(167, 243, 208, 0.65)';
-  } else if(displayEchPct >= 35){
-    lessonGlowShadow = '0 0 14px rgba(16, 185, 129, 0.72), 0 0 26px rgba(244, 63, 94, 0.45)';
-    lessonFillShadow = '0 0 10px rgba(52, 211, 153, 0.82), 0 0 4px rgba(255, 255, 255, 0.40)';
-  }
 
   // Деликатный заголовок: верхний статус «Урок курса» + 30px кнопка + шкала эшелона
   const srsHeaderHTML = `
@@ -54228,18 +54745,19 @@ function viewPythonSkill(sid){
         <a href="#${tr.routePrefix}" class="srs-header-close-btn" style="width:30px;height:30px;min-width:30px;min-height:30px;padding:0;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-top:1px solid rgba(255,255,255,0.20);color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;font-size:0.78rem;text-decoration:none;box-sizing:border-box;transition:all .15s ease;" title="Закрыть (На Путь)">✕</a>
       </div>
 
-      <!-- Полоса прогресса эшелона: яркий неоновый луч + симметричное диффузное свечение -->
+      <!-- Полоса прогресса эшелона: спектральный луч + диффузное свечение в цвет каждого участка -->
       <div class="srs-header-progress-track" style="container-type:inline-size;position:absolute;bottom:-12px;left:0;right:0;height:4px;background:rgba(255,255,255,0.06);border:none;border-radius:99px;overflow:visible;margin:0;padding:0;z-index:2;" title="Прогресс эшелона: ${displayEchPct}%">
-        <!-- Диффузный слой свечения острия и луча -->
-        <div class="srs-header-progress-glow" style="position:absolute;top:0;left:0;height:100%;width:${displayEchPct}%;background:${lessonBarBg};background-size:100cqw 100%;background-position:left top;border-radius:99px;filter:blur(5px);box-shadow:${lessonGlowShadow};opacity:0.9;pointer-events:none;"></div>
+        <!-- Диффузный слой спектрального свечения (blur без одноцветного box-shadow) -->
+        <div class="srs-header-progress-glow" style="position:absolute;top:-1px;left:0;height:calc(100% + 2px);width:${displayEchPct}%;background:${lessonBarBg};background-size:100cqw 100%;background-position:left top;border-radius:99px;pointer-events:none;"></div>
         <!-- Основное тело полосы прогресса -->
-        <div class="srs-header-progress-fill-echelon" style="position:relative;width:${displayEchPct}%;height:100%;border-radius:99px;background:${lessonBarBg};background-size:100cqw 100%;background-position:left top;box-shadow:${lessonFillShadow};transition:width 0.4s ease;"></div>
+        <div class="srs-header-progress-fill-echelon" style="position:relative;width:${displayEchPct}%;height:100%;border-radius:99px;background:${lessonBarBg};background-size:100cqw 100%;background-position:left top;transition:width 0.4s ease;"></div>
       </div>
     </header>
   `;
 
   // Ожерелье бусин (сверху по центру) и хлебные крошки (под бусинами, 1:1 стиль .srs-notes-container)
-  const lessonEchelonLabel = `🛡️ Эшелон ${curEchTier || 1}`;
+  const lessonShieldSvg = '<svg class="srs-echelon-shield-svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" fill-opacity="0.14" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline-block;flex-shrink:0;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>';
+  const lessonEchelonLabel = `Эшелон ${curEchTier || 1}`;
   const cleanItemBreadcrumb = (activeItemTitle.split(/\s*[·•–—]\s*|:\s+/)[0] || activeItemTitle).trim();
   const showUnitInBreadcrumb = Boolean(cleanUnitTitleVal && cleanUnitTitleVal !== activeItemTitle && cleanUnitTitleVal !== cleanItemBreadcrumb);
   const eyebrowDotsHTML = `
@@ -54248,14 +54766,14 @@ function viewPythonSkill(sid){
         <div style="display:flex;justify-content:center;width:100%;">
           ${dotsNecklaceHTML}
         </div>
-        <nav class="srs-note-breadcrumbs" aria-label="Путь урока" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;min-width:0;flex:1 1 auto;font-family:var(--font-golos, 'Golos Text', sans-serif);font-size:0.78rem;line-height:1.4;white-space:normal;overflow:visible;letter-spacing:-0.01em;margin:0;padding:0;">
-          <span class="srs-breadcrumb-track" style="color:var(--ink, #f8fafc);font-weight:700;font-size:0.78rem;font-family:var(--font-golos, 'Golos Text', sans-serif);letter-spacing:-0.01em;white-space:nowrap;flex-shrink:0;">${escapeHtmlStr(lessonEchelonLabel)}</span>
-          <span class="srs-breadcrumb-sep" style="color:rgba(255,255,255,0.22);font-size:0.72rem;margin:0 4px;user-select:none;font-family:var(--font-golos, 'Golos Text', sans-serif);white-space:nowrap;flex-shrink:0;">/</span>
+        <nav class="srs-note-breadcrumbs" aria-label="Путь урока" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;min-width:0;flex:1 1 auto;font-family:var(--font-d, 'Onest', sans-serif);font-size:0.78rem;line-height:1.4;white-space:normal;overflow:visible;letter-spacing:-0.01em;margin:0;padding:0;">
+          <span class="srs-breadcrumb-track" style="display:inline-flex;align-items:center;gap:5px;color:var(--ink, #f8fafc);font-weight:700;font-size:0.78rem;font-family:var(--font-d, 'Onest', sans-serif);letter-spacing:-0.01em;white-space:nowrap;flex-shrink:0;">${lessonShieldSvg}<span>${escapeHtmlStr(lessonEchelonLabel)}</span></span>
+          <span class="srs-breadcrumb-sep" style="color:rgba(255,255,255,0.22);font-size:0.72rem;margin:0 4px;user-select:none;font-family:var(--font-d, 'Onest', sans-serif);white-space:nowrap;flex-shrink:0;">/</span>
           ${showUnitInBreadcrumb ? `
-            <span class="srs-breadcrumb-topic" style="color:var(--ink, #f8fafc);font-weight:700;font-size:0.78rem;font-family:var(--font-golos, 'Golos Text', sans-serif);letter-spacing:-0.01em;white-space:normal;overflow-wrap:anywhere;max-width:100%;min-width:0;" title="${escapeHtmlStr(cleanUnitTitleVal)}">${escapeHtmlStr(cleanUnitTitleVal)}</span>
-            <span class="srs-breadcrumb-sep" style="color:rgba(255,255,255,0.22);font-size:0.72rem;margin:0 4px;user-select:none;font-family:var(--font-golos, 'Golos Text', sans-serif);white-space:nowrap;flex-shrink:0;">/</span>
+            <span class="srs-breadcrumb-topic" style="color:var(--ink, #f8fafc);font-weight:700;font-size:0.78rem;font-family:var(--font-d, 'Onest', sans-serif);letter-spacing:-0.01em;white-space:normal;overflow-wrap:anywhere;max-width:100%;min-width:0;" title="${escapeHtmlStr(cleanUnitTitleVal)}">${escapeHtmlStr(cleanUnitTitleVal)}</span>
+            <span class="srs-breadcrumb-sep" style="color:rgba(255,255,255,0.22);font-size:0.72rem;margin:0 4px;user-select:none;font-family:var(--font-d, 'Onest', sans-serif);white-space:nowrap;flex-shrink:0;">/</span>
           ` : ''}
-          <span class="srs-breadcrumb-skill" style="color:#10b981;font-weight:700;font-size:0.78rem;font-family:var(--font-golos, 'Golos Text', sans-serif);letter-spacing:-0.01em;white-space:normal;overflow:visible;line-height:1.35;" title="${escapeHtmlStr(activeItemTitle)}">${escapeHtmlStr(cleanItemBreadcrumb)}</span>
+          <span class="srs-breadcrumb-skill" style="color:var(--emerald, #10b981);font-weight:700;font-size:0.78rem;font-family:var(--font-d, 'Onest', sans-serif);letter-spacing:-0.01em;white-space:normal;overflow:visible;line-height:1.35;" title="${escapeHtmlStr(activeItemTitle)}">${escapeHtmlStr(cleanItemBreadcrumb)}</span>
         </nav>
       </div>
     </div>`;
@@ -54466,8 +54984,8 @@ function viewPythonSkill(sid){
               
               <!-- Лицевая грань: Вопрос (Liquid Obsidian Glass) -->
               <div class="card-face card-front fc-card-front">
-                ${buildFlashcardTopFrontHTML(pyCardKey, qPos, qLen, 'data-py-rescue-card', pyRescueOpen)}
-                <div class="fc-card-body fc-q" id="srs-card-prompt" style="margin:0;padding:12px 0 16px;font-size:clamp(1.15rem, 2.1vw, 1.35rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
+                ${buildFlashcardTopFrontHTML(pyCardKey, qPos, qLen, 'data-py-rescue-card', pyRescueOpen, true, false)}
+                <div class="fc-card-body fc-q" id="srs-card-prompt" style="margin:auto 0;padding:12px 0 16px;font-size:clamp(1.15rem, 2.1vw, 1.35rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">
                   ${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(curCard.q) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.q) : curCard.q)}
                 </div>
                 ${pyRescueHTML}
@@ -54475,7 +54993,7 @@ function viewPythonSkill(sid){
 
               <!-- Оборотная грань: Ответ (Mastery Emerald) -->
               <div class="card-face card-back fc-card-back">
-                ${buildFlashcardTopBackHTML(pyCardKey, qPos, qLen, 'data-py-flip-card', true)}
+                ${buildFlashcardTopBackHTML(pyCardKey, qPos, qLen, 'data-py-flip-card', true, true, false)}
 
                 <div class="fc-card-body" style="margin:auto 0;padding:12px 0;width:100%;">
                   <div class="fc-q-sub" style="font-size:0.88rem;font-weight:600;line-height:1.4;color:#a7f3d0;opacity:0.85;margin-bottom:6px;">${typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(curCard.q) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.q) : curCard.q)}</div>
@@ -56375,8 +56893,41 @@ function formatCardAnswerHTML(rawAnswer){
     }
   }
 
+  // Если ответ целиком является одним много-токенным кодовым выражением или цепочкой (напр. `BaseException → Exception → RuntimeError`):
+  // рендерим цельной кодовой капсулой без разрыва рамки и без лишней точки снаружи.
+  const soloCodeMatch = s.match(/^(?:<code>((?:(?!<\/code>)[\s\S])*)<\/code>|`([^`\n]+)`)\s*\.?\s*$/i);
+  if(soloCodeMatch){
+    const rawSolo = soloCodeMatch[1] || soloCodeMatch[2] || '';
+    const cleanSolo = (typeof _decodeCodeEntities === 'function')
+      ? _decodeCodeEntities(rawSolo)
+      : rawSolo
+          .replace(/&amp;/g, '&')
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+          .replace(/&quot;/g, '"')
+          .replace(/&#x27;/g, "'")
+          .replace(/&#39;/g, "'");
+    const trimmedSolo = cleanSolo.trim();
+    const isSimpleSoloToken = /^[A-Za-z_@.$][A-Za-z0-9_.\-]*(\(\))?$/.test(trimmedSolo)
+      || /^\d+$/.test(trimmedSolo)
+      || /^O\([^)]+\)$/.test(trimmedSolo)
+      || /^[<>&|=+\-*\/:~!]+$/.test(trimmedSolo);
+    const shouldBeSoloCapsule = !isSimpleSoloToken && (
+      trimmedSolo.includes(' ') ||
+      trimmedSolo.includes('→') ||
+      trimmedSolo.includes('->') ||
+      trimmedSolo.length >= 16
+    );
+    if(shouldBeSoloCapsule){
+      const reescapedSolo = escapeHtmlStr(trimmedSolo);
+      return `<div class="fc-code-capsule fc-code-capsule--solo"><code class="fc-code-primary">${reescapedSolo}</code></div>`;
+    }
+    return `<code>${escapeHtmlStr(trimmedSolo)}</code>`;
+  }
+
   let finalAns = s;
-  if(!finalAns.endsWith('</div>') && !finalAns.endsWith('.') && !finalAns.endsWith('!') && !finalAns.endsWith('?') && !finalAns.endsWith('…') && !(finalAns.endsWith('»') && (finalAns.includes('?') || finalAns.includes('!')))){
+  const endsWithCodeOrBlock = /(?:<\/code>|<\/pre>|<\/div>|`)\s*$/i.test(finalAns);
+  if(!endsWithCodeOrBlock && !finalAns.endsWith('.') && !finalAns.endsWith('!') && !finalAns.endsWith('?') && !finalAns.endsWith('…') && !(finalAns.endsWith('»') && (finalAns.includes('?') || finalAns.includes('!')))){
     finalAns += '.';
   }
   return (typeof formatRichInlineText === 'function') ? formatRichInlineText(finalAns) : finalAns;
@@ -56674,9 +57225,9 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
 
       <div class="srs-header-progress-track" style="position:absolute;bottom:-13px;left:0;right:0;height:3.5px;background:rgba(255,255,255,0.06);border:none;border-radius:99px;overflow:visible;pointer-events:auto;box-shadow:none;container-type:inline-size;" title="${progressFillTitle}">
 
-        <div class="srs-header-progress-glow" style="position:absolute;top:0;left:0;height:100%;width:${progressFillWidth}%;background:${thermo.bg};background-size:100% 100%;background-position:left top;border-radius:99px;filter:blur(5px);box-shadow:${thermo.glow};opacity:0.85;pointer-events:none;"></div>
+        <div class="srs-header-progress-glow" style="position:absolute;top:-1px;left:0;height:calc(100% + 2px);width:${progressFillWidth}%;background:${thermo.bg};background-size:100cqw 100%;background-position:left top;border-radius:99px;pointer-events:none;"></div>
 
-        <div class="srs-header-progress-fill" style="position:relative;height:100%;width:${progressFillWidth}%;background:${thermo.bg};background-size:100% 100%;background-position:left top;border-radius:99px;box-shadow:${thermo.boxShadow};" title="${progressFillTitle}"></div>
+        <div class="srs-header-progress-fill" style="position:relative;height:100%;width:${progressFillWidth}%;background:${thermo.bg};background-size:100cqw 100%;background-position:left top;border-radius:99px;" title="${progressFillTitle}"></div>
 
       </div>
 
@@ -57005,12 +57556,12 @@ function buildFlashcardNoteFooterHTML(cardKey){
 }
 window.buildFlashcardNoteFooterHTML = buildFlashcardNoteFooterHTML;
 
-function buildFlashcardTopFrontHTML(cardKey, idx, total, rescueAttrName, isRescueOpen, showCounter = true){
+function buildFlashcardTopFrontHTML(cardKey, idx, total, rescueAttrName, isRescueOpen, showCounter = true, showTheoryAnchor = true){
   const statusHTML = (typeof getRemNoteCardStatusBadgeHTML === 'function') ? getRemNoteCardStatusBadgeHTML(cardKey) : '';
   const safeKey = escapeHtmlStr(cardKey || '');
   const safeIdx = Math.max(0, Number(idx) || 0) + 1;
   const safeTotal = Math.max(1, Number(total) || 1);
-  const linkedKid = (typeof findOwnerNoteForDeckId === 'function') ? findOwnerNoteForDeckId(cardKey) : null;
+  const linkedKid = showTheoryAnchor && (typeof findOwnerNoteForDeckId === 'function') ? findOwnerNoteForDeckId(cardKey) : null;
   const linkedNote = linkedKid && typeof ALL_NOTES_COMBINED !== 'undefined' ? ALL_NOTES_COMBINED[linkedKid] : null;
   const rawNoteTitle = (linkedNote && linkedNote.title) ? linkedNote.title : '';
   const cleanNoteTitle = rawNoteTitle.replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
@@ -57033,19 +57584,19 @@ function buildFlashcardTopFrontHTML(cardKey, idx, total, rescueAttrName, isRescu
                       <span class="rescue-text hide-on-mobile">Зацепка</span>
                     </button>
                   </div>
-                  ${showCounter ? `<span class="fc-card-counter-badge">${safeIdx} / ${safeTotal}</span>` : ""}
+                  ${showCounter ? `<span class="fc-card-counter-badge">${safeIdx} / ${safeTotal}</span>` : ''}
                 </div>
               </div>`;
 }
 
-function buildFlashcardTopBackHTML(cardKey, idx, total, backBtnAttrs, showEscKbd, showCounter = true){
+function buildFlashcardTopBackHTML(cardKey, idx, total, backBtnAttrs, showEscKbd, showCounter = true, showTheoryAnchor = true){
   const statusHTML = (typeof getRemNoteCardStatusBadgeHTML === 'function') ? getRemNoteCardStatusBadgeHTML(cardKey) : '';
   const safeIdx = Math.max(0, Number(idx) || 0) + 1;
   const safeTotal = Math.max(1, Number(total) || 1);
   const escHtml = showEscKbd
     ? ' <span class="hide-on-mobile"><span class="fc-kbd-sep"> </span><kbd class="fc-kbd-hint" style="font-size:0.68rem;padding:1px 5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;">Esc</kbd></span>'
     : '';
-  const linkedKid = (typeof findOwnerNoteForDeckId === 'function') ? findOwnerNoteForDeckId(cardKey) : null;
+  const linkedKid = showTheoryAnchor && (typeof findOwnerNoteForDeckId === 'function') ? findOwnerNoteForDeckId(cardKey) : null;
   const linkedNote = linkedKid && typeof ALL_NOTES_COMBINED !== 'undefined' ? ALL_NOTES_COMBINED[linkedKid] : null;
   const rawNoteTitle = (linkedNote && linkedNote.title) ? linkedNote.title : '';
   const cleanNoteTitle = rawNoteTitle.replace(/^К-\d+\s*[:·•\-]\s*/i, '').trim();
@@ -57054,16 +57605,18 @@ function buildFlashcardTopBackHTML(cardKey, idx, total, backBtnAttrs, showEscKbd
                     <span class="theory-icon" style="line-height:1;display:inline-flex;align-items:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;flex-shrink:0;vertical-align:middle;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg></span>
                     <span class="theory-text hide-on-mobile">Теория</span>
                   </button>` : '';
+  const checkIconSvg = '<svg class="fc-pill-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;flex-shrink:0;"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+  const flipIconSvg = '<svg class="fc-pill-icon" width="11.5" height="11.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;flex-shrink:0;"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path></svg>';
   return `
               <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;">
                 <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
-                  <span class="srs-card-otvet-chip" style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.20);border:1px solid rgba(16,185,129,0.50);padding:0 10px;height:26px;min-height:26px;line-height:24px;border-radius:999px;box-shadow:0 0 12px rgba(16,185,129,0.28);white-space:nowrap;flex-shrink:0;box-sizing:border-box;">✓ Ответ</span>
+                  <span class="srs-card-otvet-chip" style="display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.20);border:1px solid rgba(16,185,129,0.50);padding:0 11px;height:26px;min-height:26px;line-height:1;letter-spacing:0.01em;border-radius:999px;box-shadow:0 0 12px rgba(16,185,129,0.28);white-space:nowrap;flex-shrink:0;box-sizing:border-box;">${checkIconSvg}<span>Ответ</span></span>
                   ${statusHTML}
                 </div>
                 <div class="fc-top-actions-cluster" style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
                   ${theoryBtnHTML}
-                  ${showCounter ? `<span class="fc-card-counter-badge">${safeIdx} / ${safeTotal}</span>` : ""}
-                  <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" ${backBtnAttrs} style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--ink-soft);font-size:0.74rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;height:26px;min-height:26px;line-height:24px;padding:0 12px;border-radius:999px;box-sizing:border-box;transition:all .15s ease;">← К вопросу${escHtml}</button>
+                  ${showCounter ? `<span class="fc-card-counter-badge">${safeIdx} / ${safeTotal}</span>` : ''}
+                  <button type="button" class="btn btn-ghost btn-hub-turn-back fc-flip-back-btn" ${backBtnAttrs} style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);color:var(--ink-soft);font-size:0.74rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;height:26px;min-height:26px;line-height:1;letter-spacing:0.01em;padding:0 11px;border-radius:999px;box-sizing:border-box;transition:all .15s ease;">${flipIconSvg}<span>К вопросу</span>${escHtml}</button>
                 </div>
               </div>`;
 }

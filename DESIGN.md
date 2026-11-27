@@ -1,209 +1,275 @@
-# DESIGN.md — Python Backend Academy Design System & UI Specification
+# DESIGN.md — Единый свод правил стиля, дизайна и визуала платформы
 
-> **Standard**: Open-Source `DESIGN.md` Specification for AI UI Generators & Google Stitch  
-> **Product**: Python Backend Academy (Interactive Micro-Learning Platform)  
-> **Aesthetic Theme**: Evening Obsidian (*Dark Obsidian Glassmorphism*) & Morning Silk (*Clean Light Mode*)  
-> **Primary Viewport**: Mobile Portrait `393×873px` (Xiaomi Mi 10T Pro / modern Android & iOS 390px) + Desktop `1440×900px`  
-> **Core UX Philosophy**: Zero-Lag, Zero-Layout-Shift, Active Microlearning, Single Dominant CTA, Socratic Scaffolding.
-
----
-
-## 1. Product Overview & Design Philosophy
-
-Python Backend Academy is an interactive mastery-learning platform for aspiring Junior/Middle Python backend engineers. The user interface prioritizes extreme cognitive focus, visual serenity, and tactile feedback.
-
-### Key Principles:
-* **Evening Obsidian Aesthetic**: Deep cosmic obsidian background (`#080B10` to `#0F172A`) that reduces ocular fatigue during late-night coding sessions.
-* **Atmospheric Glassmorphism**: Delicate translucent surfaces with hardware-accelerated blur (`backdrop-filter: blur(18px)`), micro-fine specular borders, and diffuse levitation drop shadows.
-* **Ambient Lighting Discipline**: Strictly **two** subtle blurred glow orbs per screen (Emerald `#10B981` at top-left, Rose `#F43F5E` at bottom-right, `filter: blur(64px-72px)`) to keep 144Hz mobile rendering buttery-smooth.
-* **Single Dominant CTA**: Every screen presents exactly **one** primary forward action to eliminate decision fatigue.
-* **Zero Horizontal Scroll**: All code snippets, tables, and stepped paths are strictly constrained to avoid horizontal dragging on mobile displays.
+> [!IMPORTANT]
+> **Единственный источник истины по стилю и визуалу (Single Source of Truth)**:
+> Данный документ определяет канон визуальной системы, цветовых токенов, типографики, геометрии бусин, анимаций, звукового отклика и спецификаций экранов платформы **Python Backend Academy** (`standards/standards.html` ≡ `academy.html` и автономного тренажёра `practice_ide.html`).
+> Оперативные правила сборки, маршрутизации, контента и тестирования вынесены в [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md) и [`AGENTS.md`](AGENTS.md).
 
 ---
 
-## 2. Color Palette & Design Tokens
+## 1. Философия интерфейса и неизменные инварианты
 
-### 2.1. Dark Theme ("Evening Obsidian" — Primary)
-* **Background Canvas**: `#080B10` (Ultra-deep obsidian black)
-* **Surface Background**: `#0F172A` / `rgba(15, 23, 42, 0.60)` (Slate glass panel)
-* **Surface Border**: `1px solid rgba(255, 255, 255, 0.12)`
-* **Surface Inset Highlight**: `inset 0 1px 0 rgba(255, 255, 255, 0.18)`
-* **Surface Elevation Shadow**: `0 16px 36px rgba(0, 0, 0, 0.45)`
-* **Primary Text**: `#F8FAFC` (Slate 50, crisp white)
-* **Secondary / Muted Text**: `#94A3B8` (Slate 400)
-* **Subtle Borders / Dividers**: `rgba(255, 255, 255, 0.08)`
-
-### 2.2. Light Theme ("Morning Silk" — Secondary Mirror)
-* **Background Canvas**: `#F8FAFC`
-* **Surface Background**: `rgba(255, 255, 255, 0.85)`
-* **Surface Border**: `1px solid rgba(0, 0, 0, 0.08)`
-* **Surface Elevation Shadow**: `0 10px 30px -10px rgba(15, 23, 42, 0.08)`
-* **Primary Text**: `#0F172A`
-* **Secondary Text**: `#64748B`
-
-### 2.3. Semantic Accent Colors
-* **Mastery Emerald**: `#10B981` (Success, mastered concepts, primary forward action CTA)
-  * Dark Surface: `rgba(6, 78, 59, 0.28)`, Border: `#10B981`, Glow: `rgba(16, 185, 129, 0.18)`
-* **Warm Amber**: `#F59E0B` (Streaks 🔥, XP badges, Socratic hints, hard cards)
-  * Dark Surface: `rgba(180, 83, 9, 0.28)`, Border: `#F59E0B`, Glow: `rgba(245, 158, 11, 0.15)`
-* **Vivid Rose**: `#F43F5E` (Errors, test failures, reset / "Don't know" cards)
-  * Dark Surface: `rgba(136, 19, 55, 0.28)`, Border: `#F43F5E`, Glow: `rgba(244, 63, 94, 0.15)`
-* **Electric Cyan**: `#06B6D4` (Active steps, interactive chips, easy review rating)
-  * Dark Surface: `rgba(14, 116, 144, 0.28)`, Border: `#06B6D4`, Glow: `rgba(6, 182, 212, 0.18)`
+- **Единственный эталон вёрстки**: все изменения интерфейса вносятся в `standards/standards.html` с побайтовой синхронизацией в `academy.html`. Автономный тренажёр `practice_ide.html` подчиняется тем же правилам сетки, стекла и парной контрастности обеих тем.
+- **Один главный фокус на экране**: у каждого шага и экрана ровно одна целевая точка продолжения без параллельных равнозначных призывов и каталогов выбора.
+- **Тишина и концентрация**:
+  - На тёмной теме глаза не должны уставать от кислотных пересветов и глухого чёрного `#000000`.
+  - В оформлении преобладают спокойные матово-стеклянные поверхности поверх графитового холста с микро-сеткой точек.
+  - Разрешены ровно **две** атмосферные световые сферы на фоне экрана (`blur(64px..72px)`), чтобы не нагружать мобильный рендеринг 144Hz.
+- **Нулевой сдвиг верстки (Zero-Jitter & Zero Horizontal Scroll)**:
+  - Индикаторы активности и бусины (`< 24px`) **никогда** не масштабируются через `transform: scale()` в фоновых циклах дыхания — пульсация строится только на `box-shadow` и `opacity` при `contain: layout style`.
+  - Кнопки в покое содержат прозрачную рамку той же толщины, что и в активном состоянии (`0px Border Jump`).
+  - На экранах смартфонов `390–393px` горизонтальная прокрутка исключена полностью (включая блоки кода, таблицы и цепочки бусин).
+- **Чистый человеческий язык (Clean Human UI & No Fluff)**:
+  - В интерфейсе запрещены машинные коды и префиксы (`К-001`, `Ф-001`, `Юнит 1.1`, `Unit X.Y`, UUID) и временные маркеры вида `(2 МИН)`.
+  - Запрещены методические ярлыки в заголовках и текстах (`Ментальная модель:`, `Аналогия:`, `Метафора:`, `Дидактический пример:`, `Интуиция:`).
+  - Запрещены слова «Кодди» / «Coddy» и «3D» / «3d» в UI, коде, CSS-классах, комментариях, документации и коммитах.
+  - Запрещена ИИ-генерация растровых изображений (`image-generator` и аналоги) — вся графика строится через семантический HTML, CSS и векторный SVG.
 
 ---
 
-## 3. Typography Scale & Fonts
+## 2. Цветовая система и дизайн-токены (`:root`)
 
-* **Interface & Body Typography**: `Onest` (fallback: `Inter`, system-ui, sans-serif)
-  * Clean modern geometric neo-grotesque with balanced Cyrillic/Latin geometry.
-* **Code & Monospace Typography**: `JetBrains Mono` (fallback: `Fira Code`, monospace)
-  * Used for code snippets, `<kbd>` shortcuts, terminal output, and numeric metrics.
+Зафиксирована фактическая живая палитра `standards/standards.html`: тёплый графитовый обсидиан в тёмной теме и бумажная слоновая кость в светлой теме с тактильной точечной сеткой `24×24px` (без внешней фаски `inset 0 1px 0` на базовых панелях `.surface`).
 
-| Level | Font Family | Weight | Size | Line Height | Tracking | Purpose |
+### 2.1. Базовые поверхности холста и текста
+
+| Назначение | Токен CSS | Тёмная тема («Вечерний Обсидиан») | Светлая тема («Утренний Шёлк») |
+| :--- | :--- | :--- | :--- |
+| Холст (фон страницы) | `--paper` | `#0d1016` | `#f4f1ec` |
+| Точечная микро-сетка | `body` `radial-gradient` | `rgba(255, 255, 255, 0.055) 1.2px`, шаг `24px × 24px` | `rgba(30, 20, 56, 0.105) 1.2px`, шаг `24px × 24px` |
+| Основная панель (стекло) | `--surface` | `rgba(22, 27, 36, 0.74)` | `rgba(255, 255, 255, 0.88)` |
+| Вложенная поверхность | `--surface-2` | `rgba(30, 37, 49, 0.66)` | `rgba(15, 23, 42, 0.045)` |
+| Основной текст (WCAG AAA) | `--ink` | `#f8fafc` | `#0f172a` |
+| Вторичный текст | `--ink-soft` | `#cbd5e1` | `#334155` |
+| Приглушённый текст / мета | `--ink-muted` | `#94a3b8` | `#475569` |
+| Волосковая граница | `--line` / `--glass-border` | `rgba(255, 255, 255, 0.09)` / `0.10` | `rgba(0, 0, 0, 0.07)` |
+| Мягкий разделитель | `--line-soft` | `rgba(255, 255, 255, 0.05)` | `rgba(0, 0, 0, 0.045)` |
+| Тень парения | `--shadow-1` | `0 16px 40px -12px rgba(0, 0, 0, 0.55)` | `0 10px 30px -10px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04)` |
+| Размытие стекла | `backdrop-filter` | `blur(18px)` (`24px` для сайдбара) | `blur(18px)` (`24px` для сайдбара) |
+| Сфера 1 (верх-лево) | `--orb-burgundy` | Рубин `rgba(190, 18, 60, 0.24)` | Янтарь `rgba(217, 119, 6, 0.24)` |
+| Сфера 2 (низ-право) | `--orb-emerald` | Изумруд `rgba(16, 185, 129, 0.20)` | Аметист `rgba(124, 58, 237, 0.24)` |
+
+### 2.2. Семантические акценты
+
+| Роль | Токен CSS | Тёмная тема | Светлая тема | Применение |
+| :--- | :--- | :--- | :--- | :--- |
+| Изумруд мастерства | `--emerald` / `--moss` | `#10b981` (подложка `rgba(16, 185, 129, 0.16)`) | `#145a46` (подложка `rgba(20, 90, 70, 0.10)`) | Пройденные шаги, успех, главные стеклянные CTA |
+| Королевский янтарь | `--amber` / `--clay` | `#f59e0b` (подложка `rgba(245, 158, 11, 0.16)`) | `#d97706` (подложка `rgba(217, 119, 6, 0.11)`) | Стрик дней, молния XP, подсказки, рубежная бусина |
+| Кармин / Бордо | `--bordeaux` / `--danger` | `#fb7185` / `#E08076` (подложка `rgba(190, 18, 60, 0.22)`) | `#6b1d2f` / `#B23A34` (подложка `rgba(107, 29, 47, 0.09)`) | Ошибки тестов, оценка «Не знаю», боссы модулей |
+| Циан фокуса | `--focus` | `#38bdf8` (`#06b6d4` в чипах потока) | `#2E63B8` (`#0284c7` в выводах) | Фокус ввода, вывод консоли, оценка «Легко» |
+| Блокировка | `--locked` | `#475569` (подложка `rgba(71, 85, 105, 0.20)`) | `#94a3b8` (подложка `rgba(148, 163, 184, 0.12)`) | Неактивные и будущие узлы |
+
+---
+
+## 3. Типографика и оформление дидактического кода
+
+### 3.1. Шрифтовой дуэт
+
+- **Основной и заголовочный шрифт**: `'Onest'`, fallback: `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`. Начертания: `400`, `500`, `600`, `700`, `800` (для акцентов статистики и цифр геймификации — до `800–900`).
+- **Моноширинный шрифт**: `'JetBrains Mono'`, fallback: `ui-monospace, SFMono-Regular, Consolas, monospace`. Начертания: `400`, `500`, `700`.
+- **Исключённые шрифты**: устаревшие `Unbounded` и `Golos Text` полностью исключены из `<head>`, `--font-*`, `index.html`, `practice_ide.html` и CSS-сборки.
+
+| Уровень | Шрифт | Начертание | Размер | Интерлиньяж | Трекинг | Назначение |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **H1** | `Onest` | Bold (700) | `24–28px` | `1.2` | `-0.02em` | Module & Screen titles |
-| **H2** | `Onest` | Bold (700) | `18–20px` | `1.3` | `-0.015em` | Lesson cards, section headings |
-| **Body** | `Onest` | Regular (400) | `14–15px` | `1.65` | `normal` | Study notes, conceptual descriptions |
-| **Gamification Metric** | `Onest` | Black (900) | `24–32px` | `1.0` | `tight` | Streak count, total XP, mastery score |
-| **Code Snippet** | `JetBrains Mono` | Medium (500) | `12–13px` | `1.5` | `normal` | Code editor, AST diff, terminal lines |
-| **Micro-Badge / `<kbd>`** | `JetBrains Mono` | Bold (700) | `11px` | `1.0` | `+0.02em` | Keyboard hints, status pills (minimum 11px) |
+| Заголовок `H1` | `Onest` | `700` | `clamp(1.5rem, 1.2rem + 1.3vw, 2.1rem)` | `1.15` | `-0.01em` | Заголовки экранов и глав |
+| Подзаголовок `H2` | `Onest` | `600–800` | `1.3rem–1.42rem` | `1.25–1.35` | `-0.02em` | Заголовок шага конспекта и карточек |
+| Подзаголовок `H3` | `Onest` | `600` | `1.02rem` | `1.3` | `-0.01em` | Секции внутри карточек |
+| Основной текст | `Onest` | `400` | `14–15px` | `1.55–1.65` | `normal` | Описания, конспекты |
+| Мета и счётчики | `Onest` | `500–600` | `0.78–0.83rem` (≥ `12px`) | `1.35` | `normal` | Подписи, статус-строки |
+| Код в сниппетах и IDE | `JetBrains Mono` | `500` | `12–13px` (`16px` в инпутах на моб.) | `1.62` моб. / `1.65` дескт. | `normal` | Блоки кода, диффы, консоль |
+| Горячие клавиши `<kbd>` | `JetBrains Mono` | `700` | `11px` (нижний порог) | `1.0` | `+0.02em` | Подсказки шорткатов |
+
+### 3.2. Эргономика и подача кода в конспектах и карточках
+
+- **Длина строки под экран `393px`**: оптимально **35–42 символа**, жёсткий предел **46 символов**. Длинные выражения переносятся с отступом в 4 пробела.
+- **Запрет хвостовых комментариев**: пояснения в конце строки кода (`x = 1  # комментарий`) запрещены — комментарий ставится **на отдельной строке над кодом**.
+- **Дыхание и отступы внутри кода**:
+  - Блок `import` / `from` всегда отделяется пустой строкой от основного кода.
+  - Логические этапы (подготовка данных, вызов, вывод) разделяются пустой строкой.
+  - Межстрочный интервал блоков кода (`pre`, `.snippet-wrap pre`) — `1.62` на смартфонах (`≤ 640px`) и `1.65` на десктопе.
+- **Дидактический код без кнопки запуска в теории**:
+  - В конспектах и карточках нет кнопки `▶ Запустить код` — запуск через Brython живёт только в тренажёре практики (`Zen IDE` и `practice_ide.html`).
+  - Каждый блок кода имеет минималистичную стеклянную шапку: бейдж языка слева + кнопка `Копировать` справа (при нажатии меняется на `✓ Скопировано`).
+  - Ожидаемый вывод `print()` в исходниках пишется с префиксом `# >>> значение`. При рендере `decorateCodeBlocksWithRunBtn()` выносит строки `# >>>` в нижнюю консоль `.code-console-out` с заголовком `Вывод`, оставляя чистый копируемый код в `<pre><code>`.
+
+### 3.3. Парная капсула сравнения «Junior vs Senior» (`.jvs-grid`)
+
+Утверждён формат **единой разделённой стеклянной капсулы с мягкой цветовой вуалью**:
+- **Геометрия**: `.jvs-grid` рендерится без внешнего разрыва (`gap: 0`), в общей рамке `border-radius: 16px` (`overflow: hidden`) и волосковой границей `1px solid var(--line)`. Внутренний разделитель `1px` — вертикальный на десктопе (`1fr 1fr`) и горизонтальный на экранах `≤ 680px`.
+- **Цветовая вуаль (диагональный градиент `145deg`)**:
+  - **Тёмная тема**: Junior `rgba(244, 63, 94, 0.12) 0% → rgba(22, 27, 36, 0.76) 72%`; Senior `rgba(16, 185, 129, 0.12) 0% → rgba(22, 27, 36, 0.76) 72%`.
+  - **Светлая тема**: Junior `rgba(180, 35, 65, 0.07) 0% → rgba(255, 255, 255, 0.92) 72%`; Senior `rgba(20, 90, 70, 0.08) 0% → rgba(255, 255, 255, 0.92) 72%`.
+- **Иконки заголовков**: спокойные круглые бейджи `18px × 18px` со знаками `✕` (бордовый/розовый) и `✓` (изумрудный) вместо крупных эмодзи `❌` / `✅`.
 
 ---
 
-## 4. Spacing, Elevation & Concentric Radii
+## 4. Каркас, плотная шкала скруглений и мобильная эргономика
 
-### Concentric Corner Radii Scale:
-Applied using the concentric containment formula $R_{\text{ext}} = R_{\text{int}} + \text{padding}$:
-* `--r-xs: 4px` — `<kbd>` keycaps, language tag badges.
-* `--r-sm: 8px` — Status pills, streak badges, tooltip cards.
-* `--r-md: 14px` — **Action Buttons**, input text fields, SRS rating cards.
-* `--r-lg: 20px` — Lesson summary cards, flashcard containers, Zen IDE split panels.
-* `--r-xl: 28px` — Screen hero containers, exam milestone modals, dashboard focus card.
+### 4.1. Сайдбар и базовая сетка
 
-### Spacing Grid:
-Based on a `4px / 8px` fluid modular grid: `4px`, `8px`, `12px`, `16px`, `20px`, `24px`, `32px`.
+- **Модульная сетка отступов**: шаг `4px` / `8px` (`4, 8, 12, 16, 20, 24, 32px`).
+- **Десктопный сайдбар**: ширина `270px`, стеклянная полупрозрачная подложка `var(--surface)` с `backdrop-filter: blur(24px)` и волосковой правой границей `var(--line)`. Разделы сгруппированы логически (Обучение, Тренажёры, Инструменты), модули свёрнуты в аккордеон.
+- **Отсутствие плавающей кнопки баг-репорта**: кнопка `🐞` (`#bug-report-btn`, `.bug-fab-btn`, `#bug-report-btn-m`, `#bug-report-btn-d`) и связанные хоткеи исключены из десктопного и мобильного интерфейса для чистоты холста.
+- **Единый стиль оболочки**: автономный `practice_ide.html` и входной экран `index.html` повторяют точечную сетку, стеклянные поверхности `--surface`, плотные скругления и поддержку обеих тем («Вечерний Обсидиан» и «Утренний Шёлк») наравне с основным SPA.
 
----
+### 4.2. Утверждённая плотная шкала скруглений
 
-## 5. Canonical Component Specifications
+Зафиксирована **плотная шкала скруглений** (`4 / 8 / 10 / 16 / 22px`):
 
-### 5.1. SRS 4-Tier Flashcard Rating Buttons
-A horizontal grid of 4 specialized rating buttons with `14px` border-radius and 2-line vertical label stack:
-1. **Don't Know (Не знаю)**:
-   * Label: `Не знаю` | Subtitle: `С нуля · [1]`
-   * Color: Rose (`#F43F5E`) on Dark Wine background (`rgba(136, 19, 55, 0.28)`)
-2. **Hard (Трудно)**:
-   * Label: `Трудно (+2 XP)` | Subtitle: `1 дн · [2]`
-   * Color: Warm Amber (`#F59E0B`) on Dark Amber background (`rgba(180, 83, 9, 0.28)`)
-3. **Good (Хорошо)** — *The Benchmark Reference*:
-   * Label: `Хорошо (+5 XP)` | Subtitle: `3 дн · [3]`
-   * Color: Emerald (`#10B981`) on Dark Emerald background (`rgba(6, 78, 59, 0.28)`)
-4. **Easy (Легко)**:
-   * Label: `Легко (+10 XP)` | Subtitle: `7 дн · [4]`
-   * Color: Electric Cyan (`#06B6D4`) on Dark Cyan background (`rgba(14, 116, 144, 0.28)`)
+| Токен (целевой) | Значение | Компоненты |
+| :--- | :--- | :--- |
+| `--r-xs` | `4px` | Клавиши `<kbd>`, микро-бейджи XP и тегов |
+| `--r-sm` | `8px` | Чипсы статуса, пилюли времени, пункты меню |
+| `--r-md` | `10px` | Кнопки действий (включая `.dominant-btn` в сайдбаре), поля ввода, кнопки оценки |
+| `--r-lg` | `16px` | Карточки уроков, блоки кода, панели тренажёра, модалка быстрого поиска |
+| `--r-xl` | `22px` | Лицевая и оборотная грани флеш-карточки (`.fc-card-face`), крупные hero-контейнеры |
+| Капсулы (`pill`) | `999px` | Верхняя плашка потоков, прогресс-треки, бейджи счётчиков |
 
-### 5.1.1. SRS Flashcard Screen Architecture & Flipped State (Canonical Grill-Me Invariants)
-* **Flow Tabs Slim Frame (Верхняя плашка табов)**:
-  - Высота `48–52px`, единая капсула `rgba(0, 0, 0, 0.40)` с `border-radius: 999px`.
-  - Потоки: `🗂 Карточки` (акцентный изумрудный чип) и `📖 Конспекты` (розовый чип).
-  - Суточный прогресс: чип цели `⚡ X / Y · Z% дня` (золотая молния `#F59E0B`), защищён от сжатия и обрезки на мобильных (390px: `padding: 3px 8px; font-size: 0.74rem`).
-* **Bead Necklace Centering (Ожерелье бусин)**:
-  - Ожерелье бусин прогресса выровнено **строго по горизонтальному центру** экрана (`justify-content: center; margin: 0 auto;`).
-  - 7-точечное скользящее окно с плавным затуханием по краям.
-* **Internal Card Counter (Номер карточки внутри карточки)**:
-  - Счётчик (`1 / 19`) помещён **строго внутрь карточки** в верхний ряд `.fc-top-row` как моноширинный бейдж `.fc-card-counter-badge` (`white-space: nowrap !important; flex-shrink: 0 !important;`). Запрещено выносить номер наружу на фон страницы.
-* **Flipped Card Mastery Emerald (Изумрудная перевёрнутая карточка)**:
-  - В фазе ответа (`.fc-card.fc-card--Answer` / `.fc-card--flipped`) карточка приобретает статусное изумрудное свечение:
-    * Тёмная тема: `background: linear-gradient(155deg, rgba(6, 78, 59, 0.48) 0%, rgba(13, 22, 34, 0.90) 50%, rgba(6, 78, 59, 0.32) 100%) !important; border: 1.5px solid rgba(16, 185, 129, 0.75) !important; box-shadow: inset 0 1px 0 rgba(16, 185, 129, 0.40), 0 24px 52px -10px rgba(0, 0, 0, 0.75), 0 0 36px rgba(16, 185, 129, 0.28) !important;`
-    * Светлая тема: чистый мятно-белый градиент с контуром `1.5px solid rgba(16, 185, 129, 0.65)`.
-    * В шапке ответа: изумрудный чип `✓ Ответ` слева, кнопка возврата `← К вопросу` справа.
-* **Two-Phase Action Dock (Двухфазный док действий)**:
-  - Фаза 1 (вопрос): Доминантная кнопка `ПОКАЗАТЬ ОТВЕТ` в стиле **Glass Obsidian Emerald** (`linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(5, 150, 105, 0.22) 100%)`, контур `1.5px solid rgba(16, 185, 129, 0.75)`, ореол `0 8px 24px rgba(16, 185, 129, 0.26)`), идеально гармонирующая с изумрудной оборотной стороной карточки.
-  - Анимация переворота: **True 3D Flip 180°** (`perspective: 1200px`, `animation: cardFlip3DSpring 0.38s cubic-bezier(0.2, 0.85, 0.35, 1.15)` с пружинным овершутом).
-  - Фаза 2 (ответ): на мобильных (`≤640px` / 390px) — **эргономичная сетка 2×2 под большой палец** (2 ряда по 2 кнопки 48px), на десктопе — 1×4.
-* **Mobile Discipline 390px**:
-  - Подсказки `[H]` и `[Esc]` обёрнуты в `.hide-on-mobile` и скрыты на смартфонах. Все бейджи строки метаданных имеют `white-space: nowrap !important; flex-shrink: 0 !important;` без переноса текста в столбик.
+### 4.3. Мобильная дисциплина (`393×873px` Xiaomi Mi 10T Pro и `390×844px` iPhone)
 
-### 5.2. Bead Stepper Ribbon (Micro-Learning Progress)
-Positioned strictly in a single-line card footer:
-* **Left**: Current step indicator (e.g., `Шаг 3 из 12`, 13px Onest Medium).
-* **Center**: Centered horizontal row of circular progress dots (`8px` diameter, active dot `10px` with emerald glow). Displays a 7-dot sliding window with subtle edge opacity fade.
-* **Right**: Forward navigation button (`Дальше ➔`, 14px radius).
-
-### 5.3. Zen IDE & Socratic Error Diff View
-When unit tests fail, system tracebacks are replaced by a structured Socratic Diff Card:
-* **Header**: Red cross icon `✗` + label `Расхождение с эталоном автотеста` + right-aligned button `💡 Взять наводку Сократа (1/4)`.
-* **Student Output**: `- Ваш код: [1, 2, 3]` (Rose background with 3px solid border-left).
-* **Expected Output**: `+ Ожидалось: [3, 2, 1]` (Emerald background with 3px solid border-left).
-
-### 5.4. Single Dominant CTA Button
-* Full-width or elevated central button with emerald gradient (`linear-gradient(135deg, #10B981, #059669)`).
-* Corner radius: `14px`.
-* Height: `48px` (mobile touch-friendly).
-* Animated subtle specular sweep (*Shimmer Sweep*) across the button face.
-
-### 5.5. Zen Rest Screen (`#/cards` Empty State)
-When daily due cards reach zero (`cardsDueRemaining === 0`):
-* Centered breathing cosmic spark `✨` with emerald drop-shadow (`filter: drop-shadow(0 0 16px rgba(16, 185, 129, 0.45))`).
-* Status pill: `Дзен-пауза · Память в тонусе`.
-* Heading: `Очередь повторений чиста` (24px Onest Bold).
-* Subheading: `Все карточки на сегодня закреплены в долговременной памяти. Время для нового материала на Пути!`.
-* Daily stats pills: Cards reviewed count, current streak.
-* Dual Action Flow:
-  - Primary Dominant CTA: `К СЛЕДУЮЩЕМУ УРОКУ НА ПУТИ ➔` (`#/path`)
-  - Secondary Quiet Link: `📖 К конспектам` (`#/notes-review`).
-
-### 5.6. Sticky Problem Anchor
-* Top IDE banner displaying task signature (`def solution(...)`).
-* Idle state: `38px` height with a `💡 Условие` toggle button.
-* Keyboard focus state: Smoothly collapses to **`24px`** height (11px font), reclaiming 30% screen space for code input.
+- **Тач-таргеты**: минимальная зона нажатия интерактивных элементов — `44×44px` (для бусин `.dot-jewel` применяется невидимая область нажатия `::before { inset: -10px -3px; }`).
+- **Защита от авто-зума iOS Safari**: все `<input>`, `<textarea>` и редакторы на экранах `≤ 640px` обязаны иметь `font-size: 16px` или больше.
+- **Нижний отступ Safe Area**: контейнеры маршрутов учитывают нижнюю навигацию и вырез жестовой полосы: `padding-bottom: calc(84px..88px + env(safe-area-inset-bottom, 16px))`.
+- **Скрытие хоткеев на тач-экранах**: клавиатурные подсказки `[H]`, `[Esc]`, `[1]..[4]` оборачиваются в `.hide-on-mobile` (и скрываются, пока `data-hotkey-hints="on"` не включён явно).
 
 ---
 
-## 6. Motion & Audio Standards
+## 5. Гранитный инвариант: ожерелье бусин и подача шагов
 
-### Motion Curves:
-* **Spring Interactive** (Buttons, Cards, Badges):
-  ```css
-  transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
-  ```
-  Tap compression: `transform: scale(0.97);` on `:active`.
-* **Snappy Reveal** (Drawers, Modals, Tooltips):
-  ```css
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-  ```
-* **Accessibility**: All keyframe animations disabled when `@media (prefers-reduced-motion: reduce)` is set.
+> [!CAUTION]
+> Параметры геометрии, анимации Квантового маяка, сквозной каскадной волны и запрет на волны в нижнем ряду шагов зафиксированы жёстко и не подлежат упрощению или отключению без прямого согласия пользователя.
 
-### Sound Micro-Haptics (Web Audio API, 0 KB external files):
-* **Card Flip**: 45ms sine sweep (320Hz $\to$ 480Hz, gentle exponential decay).
-* **SRS Grade Polyphony (Градуированный микро-отклик оценок)**:
-  - 🍷 **Не знаю (Grade 1)**: мягкий глухой спад 260Hz $\to$ 180Hz (60ms) — снятие ощущения штрафа.
-  - 🍯 **Трудно (Grade 2)**: тёплый янтарный подъем 340Hz $\to$ 440Hz (70ms).
-  - 🌿 **Хорошо (Grade 3)**: уверенный изумрудный чистый тон C5 $\to$ E5 (523Hz $\to$ 659Hz, 120ms).
-  - 💎 **Легко (Grade 4)**: кристальный восходящий мажорный аккорд E5–G#5–B5 (659Hz, 830Hz, 987Hz, 120ms) + XP haptic pulse.
-* **Success / Task Solved**: 220ms warm major triad chord (E5–G#5–B5).
-* Mute toggle available in the top bar.
+### 5.1. Непрерывная цепь этапа урока
 
----
+Тема больше не делится на изолированные экраны «теория / карточки / практика». Все шаги идут сквозной цепочкой бусин:
+`Конспект` ➔ `Колода карточек` ➔ `Задачи Zen IDE` ➔ `Рубежный тест`.
 
-## 7. Mobile Usability & Viewport Rules
+### 5.2. Верхнее ожерелье бусин (`.dot-jewel`)
 
-* **Device calibration**: Xiaomi Mi 10T Pro (`393×873px`, 20:9 ratio) & iPhone 13/14 (`390×844px`).
-* **Zero Horizontal Code Overflow**:
-  * Python code line lengths: Strictly **35–42 characters** (hard max 46 characters).
-  * Trailing comments are strictly forbidden; comments are placed **above** the code line.
-* **Touch Targets**: All interactive elements are minimum **`44×44px`**.
-* **iOS Zoom Guard**: Text input elements declare `font-size: 16px` to prevent automatic screen zoom.
-* **Safe Area Insets**: Handled via `padding-bottom: max(16px, env(safe-area-inset-bottom))`.
+- **Рядовые бусины**: ювелирные круги строго `8px × 8px`, зазор позволяет уложить до 16 бусин по центру без горизонтальной прокрутки и переносов на ширине `390–393px`. В `#/cards` при длинной очереди отображается скользящее окно из 7 бусин с мягким затуханием краёв.
+- **Активная бусина (`.dot-jewel.active`, `.bead-active-leading`) — Квантовый маяк**:
+  - Белое ядро `#ffffff` (`8px`), кант `1.5px solid #10b981`, свечение `bead-pulse-emerald 2.8s infinite ease-in-out`.
+  - Концентрическая волна через `::after` (`inset: -2px`, `border: 1.2px solid rgba(52, 211, 153, 0.90)`), анимация `bead-ping-wave 2.8s cubic-bezier(0.2, 0.8, 0.4, 1) infinite` (масштабирование `0.95 → 2.6`, затухание прозрачности; `animation-delay: 0s`).
+- **Пройденные бусины (`.dot-jewel.done`)**:
+  - Тёмная тема: стеклянный блик `radial-gradient(circle at 35% 35%, #ffffff 0%, #a7f3d0 30%, #34d399 65%, #059669 100%)`, контур `1px solid #6ee7b7`, дыхание `bead-done-glow-surge 2.8s`.
+  - Светлая тема: `radial-gradient(circle at 35% 35%, #ffffff 0%, #6ee7b7 40%, #059669 80%, #047857 100%)`, контур `1px solid #059669`.
+- **Будущие бусины (`.dot-jewel.future`)**:
+  - Полупрозрачный кристалл с мягким бликом контура `bead-future-glow-blink 2.8s`.
+- **Сквозной каскадный шлейф (Staggered Wave)**: для бусин `:nth-child(1..24)` задаётся сдвиг `animation-delay` с шагом `0.16s` (`0s`, `0.16s`, `0.32s`, ...), создающий перелив волны слева направо (у активной бусины на `::after` задержка всегда `0s`).
+- **Рубежная бусина (`.dot-jewel.milestone`)**: ромб **строго одного оптического размера с круглыми бусинами** — квадрат `6.5px × 6.5px` с `border-radius: 1.8px` и поворотом `rotate(45deg)` (диагональ ≈ `8.2px`, равнозначно `8px` бусинам во всех состояниях: будущем, активном и завершённом). Пройденный рубеж (`.dot-jewel.milestone.done`) светится тёплым золотистым янтарём (`radial-gradient(circle at 35% 35%, #ffffff 0%, #fde68a 35%, #f59e0b 75%, #b45309 100%)`, контур `#fcd34d`), сохраняя янтарный отблеск вместо зелёного.
+- **Индикаторы активности навигации (`.pulse-dot`, `.activity-dot`, `.nav-sub-breath-dot`)**: `7px × 7px`, `contain: layout style`, спокойное оптическое дыхание `emeraldSoftBreath 2.6s` через `opacity` и `box-shadow` строго без `scale()` и без волн `::after`.
+
+### 5.3. Подача конспекта и нижний ряд квантов (Book Mode)
+
+Утверждён **чистый книжный формат без внешней коробки вокруг текста**:
+1. Текст конспекта идёт в лёгком потоке шириной до `700px` прямо поверх холста (`background: transparent; border: none; box-shadow: none; padding: 0;`).
+2. Под текстом по центру располагается двухэтажный блок управления (`max-width: 480px`):
+   - **Сверху (высота 22px, отступы 20px сверху и снизу)**: центрированный ряд спокойных бусин квантов `.dock-quantum-bead` (`7px × 7px`, зазор `8px`; если шагов `> 8` — скользящее 7-точечное окно с ослаблением крайних точек до `opacity: 0.35`). У квантов **строго отключены** маяк и волны `::after` (`animation: none`).
+   - **Снизу**: доминантная кнопка перехода (`Дальше` / переход к следующему этапу) в едином стиле Изумрудного стекла.
+3. Позиция студента на любом микро-шаге сохраняется в `localStorage` без потери прогресса.
 
 ---
 
-## 8. Content Tone & Didactic Invariants
+## 6. Спецификации компонентов и экранов
 
-1. **Human Language Only**: No machine nomenclature in the UI (no `K-001`, `F-001`, `Unit 1.1`, or raw UUIDs).
-2. **Naming Restrictions**: The names "Coddy" / "Кодди" and the term "3D" are strictly forbidden.
-3. **No Meta-Labels**: No labels like `Mental Model:` or `Pedagogical Objective:` in headers. Content dives directly into engineering phenomena.
-4. **Stream Separation**:
-   * `#/cards` — Pure daily due flashcard stream (SRS reviews).
-   * `#/notes-review` — Dedicated Ebbinghaus study notes spaced repetition screen.
+### 6.1. Главная кнопка действия (Dominant CTA — Единый стандарт Изумрудного стекла)
+
+Утверждён **единый спокойный стандарт Изумрудного стекла** для всех главных кнопок (сайдбар, Дашборд, конспекты, флеш-карточки, экраны паузы):
+- **Текст и регистр**: обычный человеческий регистр (без КАПСА), **полный запрет** на декоративную стрелку `➔` и на бегущий блик `shimmer` поверх кнопки. Примеры: `Продолжить`, `Показать ответ`, `Дальше`, `К следующему уроку на Пути`.
+- **Тёмная тема**:
+  - Фон: `linear-gradient(180deg, rgba(16, 185, 129, 0.26) 0%, rgba(6, 78, 59, 0.25) 100%)` (до `0.35 / 0.22` в крупных доках).
+  - Контур: `1.5px solid rgba(52, 211, 153, 0.65)`.
+  - Текст `#ffffff`, тень `inset 0 1px 1px rgba(255, 255, 255, 0.20), 0 4px 20px -2px rgba(16, 185, 129, 0.35)`.
+  - При наведении: усиление свечения и границы до `rgba(52, 211, 153, 0.95)` без сдвига по оси Y; при нажатии: `scale(0.985)`.
+- **Светлая тема**:
+  - Сплошной высококонтрастный градиент `linear-gradient(180deg, #059669 0%, #047857 100%)`, контур `1.5px solid #065f46`, белый текст `#ffffff`.
+
+### 6.2. Дашборд (`#/`) и Путь обучения (`#/path`, `#/map`)
+
+- **Дашборд (`#/`) — функциональный минимализм и `Specular Rim` (DRY от `getDominantHeroCardData`)**: единый столбец (`max-width: 740px`) поверх точечного холста из 5 согласованных стеклянных блоков без машинных кодов и стрелок `➔` на CTA:
+  1. **Ритм дня (`.dash-rhythm`)**: ранг готовности, активный эшелон и его `%`, серия дней и `XP` за сегодня.
+  2. **Главная карточка (`.dash-card` / `.dash-card--srs`)**: `1px` верхний световой луч (`Specular Rim`), мягкая вуаль (изумруд для урока, янтарь при `srsDue > 0`), заголовок, тихая строка текущего этапа, 4 кликабельных этапа темы (`Конспект · Карточки · Практика · Зачёт`), световая полоса `4px` (скрыта при `0%`) и кнопка Изумрудного стекла (`Продолжить` / `Начать повторение` / `Начать обучение`).
+  3. **Темы модуля (`.dash-spoiler`)**: свёрнутый аккордеон уроков текущего модуля со ссылкой `Путь обучения` (`#/path`).
+  4. **Док дня (`.dash-dock`)**: 2 колонки — `Цель дня` (`XP` + прогресс-бар) и `Память SRS` (счётчик очереди и переход в `#/cards`).
+  5. **Обзор 7 треков (`.dash-tracks`)**: компактная стеклянная сетка направлений бэкенда (`Python Core`, `Web & HTTP`, `FastAPI & DRF`, `SQL и БД`, `Алгоритмы`, `Архитектура`, `Docker & Инфра`) с переходом в `#/map`.
+- **Путь обучения (`#/path`)**: плавная кривая Безье (`cubic-bezier(0.42, 0, 0.58, 1)`):
+  - Вертикальный шаг волны по оси Y: `240px`.
+  - Горизонтальное смещение по оси X: `±120px` на десктопе и `±68px` на мобильных экранах (`≤ 420px`) для чистого бокового запаса.
+  - На маршруте `#/path` **сохранены** яркие насыщенные градиентные узлы тропы с широким неоновым ореолом `drop-shadow` (`35–45px`) и плавающий маяк `⚡ К текущему уроку`.
+  - Матрица мастерства (`#/map`) и её модалки оформлены на общем стекле без стрелок `➔` и машинных кодов юнитов.
+
+### 6.3. Тренажёр карточек SRS (`#/cards`) и повторение конспектов (`#/notes-review`)
+
+- **Верхняя плашка потоков (`buildSrsFlowTabsHTML`)**: единая капсула высотой `48–52px` (`rgba(0, 0, 0, 0.40)`, `border-radius: 999px`), табы `🗂 Карточки` (изумрудный) и `📖 Конспекты` (розовый), справа компактный чип суточной цели `⚡ X / Y · Z% дня` с золотой молнией `#f59e0b` (на `390px` защищён от сжатия: `padding: 3px 8px; font-size: 0.74rem`).
+- **Центровка ожерелья**: ряд бусин под плашкой выровнен строго по центру экрана (`justify-content: center; margin: 0 auto;`). В `#/cards` работает только живая суточная очередь (*Pure Daily Due Stream*), каталоги и списки сотен колод запрещены.
+- **Лицевая грань карточки (Вопрос)**:
+  - Поверхность *Specular Liquid Obsidian*: `linear-gradient(155deg, rgba(255,255,255,0.06) 0%, rgba(18,24,38,0.46) 45%, rgba(8,12,18,0.64) 100%)`, верхний световой кант `1.2px solid rgba(255,255,255,0.18)`.
+  - Верхняя строка метаданных `.fc-top-row` (`height: 26px`, `white-space: nowrap`): чип `Вопрос` + кнопка `💡 Зацепка` и моноширинный счётчик `1 / N` **строго внутри карточки**.
+  - По нажатию на `💡 Зацепка` открывается `.active-rescue-box` (встроенный внутрь тела вопроса, `border-radius: 10px`) с маскировкой ключевого термина из ответа (*Active Rescue*).
+- **Оборотная грань карточки (Ответ — *Mastery Emerald*)**:
+  - Плавный разворот карточки вокруг вертикальной оси на `180deg` (`perspective: 1200px`, анимация `0.42s cubic-bezier(0.22, 1, 0.36, 1)`), переключение видимости граней на `160ms` защищает от просвечивания текста.
+  - Тёмная тема: `linear-gradient(165deg, rgba(16, 80, 60, 0.35) 0%, rgba(18, 26, 34, 0.88) 55%, rgba(13, 20, 26, 0.94) 100%)`, контур `1.5px solid rgba(52, 211, 153, 0.45)`, ореол `0 0 36px rgba(16, 185, 129, 0.18)`.
+  - Светлая тема (оптическое зеркало **Аметист + Янтарь**, WCAG AAA): молочное матовое стекло `rgba(124, 58, 237, 0.10) ➔ rgba(255, 255, 255, 0.90..0.96)` с белым верхним бликом `inset 0 1.5px 0 #ffffff`, контуром `1.5px solid rgba(124, 58, 237, 0.48)` и аметистовым ореолом; прогресс-бар Янтарь ➔ Аметист; бусины в светлой теме — линзовый аметист (`#7c3aed`) с сохранением всей геометрии Квантового маяка.
+  - Шапка ответа: чип `Ответ` с векторной SVG-галочкой слева и кнопка `К вопросу` с векторной SVG-иконкой разворота справа (`gap: 5px`, `line-height: 1`; иконка книги скрыта внутри урока и сохранена в `#/cards`).
+  - Умная капсула кода `.fc-code-capsule` / `.fc-code-capsule--solo`: оборачивает много-токенный код, команды и сольные кодовые цепочки без разрыва рамок и без лишней точки в конце; одиночные имена (`list`, `dict`, `RuntimeError`) остаются строчными.
+- **Утверждённый 4-кнопочный ряд оценки SRS (драгоценная тетрада: Рубин · Янтарь · Изумруд · Аметист)**:
+  - Чистые однострочные названия **без сроков в днях и без суффиксов `+XP`**. На смартфонах (`≤ 640px`) — сетка `2×2` в фиксированном нижнем доке с плавной градиентной шторкой под большой палец, карточка отцентрована в свободном пространстве (`min-height: 184px`); на десктопе — ряд `1×4`.
+
+| Оценка | Надпись | Тёмная тема (100% Solid Hex) | Контур (Dark) | Светлая тема (глазированное стекло, WCAG AAA) |
+| :--- | :--- | :--- | :--- | :--- |
+| `1` | `Не знаю` | `#350f18` ➔ `#1e070e` | `#d9435e` | `#fff5f6` ➔ `#ffe4e8`, кант `#e11d48`, текст `#7f1030` |
+| `2` | `Частично` | `#52350b` ➔ `#2c1a04` | `#f59e0b` | `#fffcf0` ➔ `#fef0c7`, кант `#d97706`, текст `#6c2e0a` |
+| `3` | `Помню` | `#103326` ➔ `#091f17` | `#2ea77d` | `#f2fdf8` ➔ `#d1fae5`, кант `#059669`, текст `#053e30` |
+| `4` | `Легко` | `#271748` ➔ `#150b29` | `#a78bfa` | `#f7f5ff` ➔ `#e9e3ff`, кант `#7c3aed`, текст `#3b0764` |
+
+- **Микро-спринт и Дзен-финал**: каждые 15 карточек показывается мягкая пауза с итогами. При нулевом остатке суточной очереди открывается Дзен-экран с искрой `✨` (`drop-shadow(0 0 16px rgba(16,185,129,0.45))`), заголовком `Очередь повторений чиста`, статистикой дня и стеклянной кнопкой `К следующему уроку на Пути`.
+- **Повторение конспектов (`#/notes-review`)**: отдельный маршрут по лестнице Эббингауза (1 ➔ 3 ➔ 7 ➔ 21 ➔ 30 дней) с кнопками `Не знаю` и `✓ Понятно, закреплено (+15 XP)`.
+
+### 6.4. Практика в Zen IDE и Рубежные тесты
+
+- **Фокус на 3 сущностях**: условие + поток данных `⚡ ПОТОК ДАННЫХ`, чистый редактор кода (или CodeMirror) с номерами строк и `Ctrl+Enter`, наставник Сократ с 4 наводками (`0/4`) без выдачи готового решения. В светлой теме «Утренний Шёлк» наводки `.socratic-hint` используют высококонтрастный янтарно-тёмный цвет текста `#78350f` (в тёмной теме — `#fef3c7`).
+- **Сократический дифференциал ошибок**: вместо сырого трейсбека выводится парный блок сравнения:
+  - `− Ваш код: ...` — кармин `#f43f5e`, подложка `rgba(136, 19, 55, 0.25)`, левая полоса `3px`.
+  - `+ Ожидалось: ...` — изумруд `#10b981`, подложка `rgba(6, 78, 59, 0.25)`, левая полоса `3px`.
+- **Мобильный Sticky Problem Anchor (без верхних вкладок)**: на смартфонах вкладки `.practice-mobile-tab-bar` упразднены — экран строится как единая вертикальная лента. Сверху прилипает панель `38px` с сигнатурой `def ...` и кнопкой `💡 Условие` (открывает Bottom Sheet). При фокусе экранной клавиатуры панель сжимается до `24px` (`11px` шрифт). Черновик кода сохраняется при переключении бусин урока.
+- **Рубежные тесты, `#/mock` и модалки**: 8–12 концептуальных вопросов; при результате ниже 75% запускается дельта-разбор. Заголовок зачёта имеет чистый вид `Рубежный зачёт: <Тема>` без кодов юнитов; варианты ответов `.quiz-opt` имеют радиус `10px`, симметричную рамку `1.5px` и мягкую градиентную подсветку исхода. Все главные кнопки действий (включая `.btn-check-solution`, `.btn-triumph-next`, модалки `Ctrl+K`, настроек и `#/mock`) выполнены в стиле Изумрудного стекла без `➔`.
+
+---
+
+## 7. Анимации и звуковой микро-отклик
+
+### 7.1. Кривые движения
+
+| Назначение | Кривая CSS | Детали |
+| :--- | :--- | :--- |
+| Пружинящие отклики, прогресс-бары, шторки | `cubic-bezier(0.34, 1.56, 0.64, 1)` (`0.22s–0.38s`) | Микро-сжатие кнопок на `:active`: `scale(0.985)` |
+| Плавные меню, ховеры, карточки, модалки | `cubic-bezier(0.16, 1, 0.3, 1)` (`0.18s–0.28s`) | Быстрый старт и мягкая остановка |
+| Переворот карточки `cardFlipSpring` | `0.42s cubic-bezier(0.22, 1, 0.36, 1)` | Задержка переключения `visibility` граней `160ms` |
+| Снижение движения | `@media (prefers-reduced-motion: reduce)` | Ключевые анимации отключаются полностью |
+
+### 7.2. Синтезатор Web Audio (`SoundFx`, 0 КБ внешних файлов)
+
+Управляется тумблером звука в интерфейсе (состояние в `localStorage`):
+- **Переворот карточки (`playFlip`)**: синус `320Hz ➔ 480Hz`, длительность `45–55ms`.
+- **Градация оценок SRS (`playRate`)**:
+  - `1` (Не знаю): мягкий глухой спад `260Hz ➔ 180Hz` (`60ms`, снятие ощущения штрафа).
+  - `2` (Частично): ровный подъём `340Hz ➔ 440Hz` (`70ms`).
+  - `3` (Помню): уверенный тон `523.25Hz ➔ 659.25Hz` (`120ms`).
+  - `4` (Легко): восходящий мажорный аккорд `659.25Hz / 830.61Hz / 987.77Hz` (`120ms`).
+- **Успех задачи / Триумф (`playSuccess`, `playTriumph`)**: тёплое трезвучие C5–E5–G5 (`523.25 / 659.25 / 783.99 Hz`).
+
+---
+
+## 8. Визуальные анти-паттерны и мораторий при полировке
+
+| Запрещено | Как правильно |
+| :--- | :--- |
+| Выносить счётчик `1 / 19` над карточкой на фон | Размещать счётчик строго внутри `.fc-top-row` лицевой грани |
+| Использовать `scale()` в анимациях бусин/точек `< 24px` | Пульсировать только через `box-shadow` и `opacity` + `contain: layout style` |
+| Писать в UI `Снова`, сроки в днях, `+5 XP` на кнопках SRS | Чистые однострочные названия: `Не знаю`, `Частично`, `Помню`, `Легко` |
+| Ставить `➔`, КАПС и бегущий блик `shimmer` на CTA | Спокойный обычный регистр и стиль Изумрудного стекла |
+| Оставлять хвостовые комментарии в коде Python | Выносить комментарий отдельной строкой над выражением |
+| Оборачивать текст конспекта в тяжёлую карточную коробку | Чистый Book Mode прямо на холсте с центрированными бусинами над кнопкой |
+| Выводить плавающую кнопку `🐞`, панель чипсов, «Досье» и статистику на `#/` | Сверхчистый Дашборд с одной парящей карточкой и условной ссылкой SRS |
+| Использовать светлый `#fef3c7` в `.socratic-hint` или `Golos Text` / `Unbounded` | Адаптивный контраст `#78350f` (светлая тема) и строгий дуэт `Onest` + `JetBrains Mono` |
+| Запускать тесты или снимать эталоны (`--update`) во время полировки | Соблюдать полный мораторий до явного подтверждения готовности экрана пользователем |
