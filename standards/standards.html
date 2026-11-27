@@ -57069,17 +57069,31 @@ const _isSameDay = (_initCardsPos.savedDate === _todayKey);
 
 
 
-// Фильтр очереди SRS из приватного профиля (например, только 1 и 2 эшелон)
-function isDeckAllowedInSrsQueue(deckId){
+// Фильтр очереди SRS из приватного профиля (например, эшелоны 1 и 2 всегда, остальные — только после прохождения/оценки с srsCutoffTimestamp)
+function isDeckAllowedInSrsQueue(deckId, cardKey){
   const p = (typeof window !== 'undefined') ? window.PRIVATE_PROFILE_DATA : null;
+  const ui = (p && p.ui && typeof p.ui === 'object') ? p.ui : {};
   const allowed = (p && Array.isArray(p.srsAllowedEchelons))
     ? p.srsAllowedEchelons
-    : (p && p.ui && Array.isArray(p.ui.srsAllowedEchelons) ? p.ui.srsAllowedEchelons : null);
+    : (Array.isArray(ui.srsAllowedEchelons) ? ui.srsAllowedEchelons : null);
   if(!allowed || allowed.length === 0) return true;
-  if(typeof getDeckInterviewTier === 'function'){
-    return allowed.includes(getDeckInterviewTier(deckId));
+  if(typeof getDeckInterviewTier === 'function' && allowed.includes(getDeckInterviewTier(deckId))){
+    return true;
   }
-  return true;
+  const cutoffTs = Number((p && p.srsCutoffTimestamp) || ui.srsCutoffTimestamp) || 0;
+  if(cutoffTs > 0 && typeof state !== 'undefined' && state && state.cardSrs){
+    if(cardKey){
+      const entry = state.cardSrs[cardKey];
+      return Boolean(entry && Number(entry.reviewedAt) >= cutoffTs);
+    }
+    const prefix = String(deckId || '') + ':';
+    return Object.keys(state.cardSrs).some(k => {
+      if(!k.startsWith(prefix)) return false;
+      const entry = state.cardSrs[k];
+      return Boolean(entry && Number(entry.reviewedAt) >= cutoffTs);
+    });
+  }
+  return false;
 }
 
 const _rawDueQueue = (_isSameDay && Array.isArray(_initCardsPos.dueQueue) && _initCardsPos.dueQueue.length > 0 && !_initCardsPos.completed)
@@ -57094,7 +57108,7 @@ const _rawDueQueue = (_isSameDay && Array.isArray(_initCardsPos.dueQueue) && _in
 
         if(!item || typeof item.deckId !== 'string' || typeof item.cardIdx !== 'number') return false;
 
-        if(!isDeckAllowedInSrsQueue(item.deckId)) return false;
+        if(!isDeckAllowedInSrsQueue(item.deckId, item.deckId + ':' + item.cardIdx)) return false;
 
         if(!ALL_DECKS_COMBINED[item.deckId] || !ALL_DECKS_COMBINED[item.deckId].cards || !ALL_DECKS_COMBINED[item.deckId].cards[item.cardIdx]) return false;
 
@@ -57295,7 +57309,7 @@ function collectDueCardsQueue(){
 
       const cIdx = parseInt(parts[1], 10);
 
-      if(isDeckAllowedInSrsQueue(did) && ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
+      if(isDeckAllowedInSrsQueue(did, k) && ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
 
         queue.push({ deckId: did, cardIdx: cIdx, dueDate: item.dueDate, rating: Number(ratings[k]) || 0 });
 
@@ -57329,7 +57343,7 @@ function collectDueCardsQueue(){
 
       const cIdx = parseInt(parts[1], 10);
 
-      if(isDeckAllowedInSrsQueue(did) && ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
+      if(isDeckAllowedInSrsQueue(did, k) && ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
 
         queue.push({ deckId: did, cardIdx: cIdx, dueDate: null, rating: r });
 
@@ -63829,7 +63843,7 @@ function applyPrivateProfile(profile){
   window.__srsStatsMemo = null;
   window.__srsDailyMemo = null;
   if(typeof cardsHubState !== 'undefined' && cardsHubState && Array.isArray(cardsHubState.dueQueue) && cardsHubState.dueQueue.length > 0){
-    cardsHubState.dueQueue = cardsHubState.dueQueue.filter(item => item && isDeckAllowedInSrsQueue(item.deckId));
+    cardsHubState.dueQueue = cardsHubState.dueQueue.filter(item => item && isDeckAllowedInSrsQueue(item.deckId, item.deckId + ':' + item.cardIdx));
     if(cardsHubState.duePos >= cardsHubState.dueQueue.length){
       cardsHubState.duePos = 0;
     }
@@ -72392,7 +72406,7 @@ function getSpacedRepetitionStats(){
 
         const cIdx = parseInt(parts[1], 10);
 
-        if(isDeckAllowedInSrsQueue(did) && ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
+        if(isDeckAllowedInSrsQueue(did, k) && ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
 
           dueTodayCardsCount++;
 
@@ -72434,7 +72448,7 @@ function getSpacedRepetitionStats(){
 
         const cIdx = parseInt(parts[1], 10);
 
-        if(isDeckAllowedInSrsQueue(did) && ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
+        if(isDeckAllowedInSrsQueue(did, k) && ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
 
           dueTodayCardsCount++;
 
