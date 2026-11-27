@@ -57099,7 +57099,13 @@ let cardsHubState = {
 
   savedDate: _todayKey,
 
-  hubDoneToday: (_isSameDay && typeof _initCardsPos.hubDoneToday === 'number') ? _initCardsPos.hubDoneToday : 0,
+  hubDoneToday: (function(){
+    const savedHubDone = (_isSameDay && typeof _initCardsPos.hubDoneToday === 'number') ? _initCardsPos.hubDoneToday : 0;
+    const repeatedTodayCount = Object.values((state && state.cardSrs) || {}).filter(it =>
+      it && it.lastReview === _todayKey && it.syncedFrom !== 'interview' && ((Number(it.reps) || 0) >= 2 || (Number(it.lapses) || 0) >= 1)
+    ).length;
+    return Math.max(savedHubDone, repeatedTodayCount);
+  })(),
 
   sprintNum: (_isSameDay && typeof _initCardsPos.sprintNum === 'number') ? _initCardsPos.sprintNum : 1,
 
