@@ -87,19 +87,28 @@
   body{
     margin:0;
     background-color:var(--paper);
-    background-image: radial-gradient(rgba(255, 255, 255, 0.055) 1.2px, transparent 1.2px);
-    background-size: 24px 24px;
-    background-attachment: fixed;
     color:var(--ink);
     font-family:var(--font-b);
     line-height:1.55;
     -webkit-font-smoothing:antialiased;
+    position:relative;
+  }
+  body::before{
+    content:'';
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.055) 1.2px, transparent 1.2px);
+    background-size: 24px 24px;
+    transform: translateZ(0);
   }
   [data-theme="light"] body{
     background-color:var(--paper);
+  }
+  [data-theme="light"] body::before{
     background-image: radial-gradient(rgba(0, 0, 0, 0.045) 1.2px, transparent 1.2px);
     background-size: 24px 24px;
-    background-attachment: fixed;
   }
 
   h1,h2,h3{font-family:var(--font-d);margin:0;letter-spacing:-.01em;color:var(--ink);}
@@ -1334,18 +1343,28 @@
 
   @media (max-width: 768px) {
     .ambient-orb--burgundy {
-      width: 270px;
-      height: 270px;
-      top: -50px;
-      left: -50px;
-      filter: blur(58px);
+      width: 340px;
+      height: 340px;
+      top: -80px;
+      left: -80px;
+      filter: none !important;
+      background: radial-gradient(circle, rgba(190, 18, 60, 0.24) 0%, rgba(190, 18, 60, 0.14) 28%, rgba(136, 19, 55, 0.06) 58%, transparent 82%) !important;
     }
     .ambient-orb--emerald {
-      width: 280px;
-      height: 280px;
-      bottom: -50px;
-      right: -50px;
-      filter: blur(62px);
+      width: 350px;
+      height: 350px;
+      bottom: -80px;
+      right: -80px;
+      filter: none !important;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.20) 0%, rgba(16, 185, 129, 0.11) 28%, rgba(6, 78, 59, 0.05) 58%, transparent 82%) !important;
+    }
+    html[data-theme="light"] .ambient-orb--burgundy,
+    html:not([data-theme="dark"]) .ambient-orb--burgundy {
+      background: radial-gradient(circle, rgba(217, 119, 6, 0.18) 0%, rgba(245, 158, 11, 0.10) 28%, rgba(245, 158, 11, 0.04) 58%, transparent 82%) !important;
+    }
+    html[data-theme="light"] .ambient-orb--emerald,
+    html:not([data-theme="dark"]) .ambient-orb--emerald {
+      background: radial-gradient(circle, rgba(124, 58, 237, 0.18) 0%, rgba(139, 92, 246, 0.10) 28%, rgba(139, 92, 246, 0.04) 58%, transparent 82%) !important;
     }
   }
 
@@ -25437,7 +25456,7 @@ body.light-theme .srs-card-theory-anchor:hover svg {
     user-select: none !important;
     transform-style: preserve-3d !important;
     -webkit-transform-style: preserve-3d !important;
-    transition: transform 0.32s cubic-bezier(0.2, 0.85, 0.35, 1.15), height 0.32s cubic-bezier(0.2, 0.85, 0.35, 1.15) !important;
+    transition: transform 0.15s cubic-bezier(0.2, 0.85, 0.35, 1), height 0.15s cubic-bezier(0.2, 0.85, 0.35, 1) !important;
     will-change: transform, height !important;
     padding: 0 !important;
     background: transparent !important;
@@ -25593,7 +25612,7 @@ a:focus:not(:focus-visible),
     z-index: 1 !important;
     visibility: hidden !important;
     pointer-events: none !important;
-    transition: visibility 0s 160ms !important;
+    transition: visibility 0s 75ms !important;
   }
 
   .fc-card.is-flipped .card-front,
@@ -25607,7 +25626,7 @@ a:focus:not(:focus-visible),
     z-index: 1 !important;
     visibility: hidden !important;
     pointer-events: none !important;
-    transition: visibility 0s 160ms !important;
+    transition: visibility 0s 75ms !important;
   }
   .fc-card.is-flipped .card-back,
   .fc-card.fc-card--flipped .card-back,
@@ -39730,9 +39749,10 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
   }
   html[data-theme="light"] body {
     background-color: #f4f1ec !important;
+  }
+  html[data-theme="light"] body::before {
     background-image: radial-gradient(rgba(30, 20, 56, 0.105) 1.2px, transparent 1.2px) !important;
     background-size: 24px 24px !important;
-    background-attachment: fixed !important;
   }
   html[data-theme="light"] .ambient-orb--burgundy {
     background: radial-gradient(circle, rgba(217, 119, 6, 0.26) 0%, rgba(245, 158, 11, 0.12) 58%, transparent 80%) !important;
@@ -47963,76 +47983,80 @@ function evictOlderIdeDrafts(){
 
 
 
-// Resilient saveState with multi-key mirroring, non-destructive pre-read merge, window.name backup, IndexedDB snapshot, and safe draft eviction on QuotaExceededError
+// Resilient saveState with debounced primary write (150ms), throttled backup mirrors (15s), and synchronous flush on exit/sync
+window.__stateRevision = window.__stateRevision || 1;
+window.__saveStateTimer = null;
+window.__saveStatePendingTarget = null;
+window.__lastBackupMirrorAt = 0;
+
+function _performSaveStateNow(s, forceBackup){
+  let target = ensureExtendedState(s || window.__saveStatePendingTarget || state);
+  if(!window.__isResettingProgress){
+    try{
+      const existingRaw = safeParseJsonObj(localStorage.getItem(STORE_KEY));
+      if(existingRaw && typeof existingRaw === 'object'){
+        const hasHigherProgress = (existingRaw.xp || 0) > (target.xp || 0) ||
+          ((existingRaw.completedLessons || []).length > (target.completedLessons || []).length) ||
+          ((existingRaw.readNotes || []).length > (target.readNotes || []).length) ||
+          ((existingRaw.reviewedDecks || []).length > (target.reviewedDecks || []).length);
+        if(hasHigherProgress){
+          target = mergeProgressStates(existingRaw, target);
+          if(target !== state) Object.assign(state, target);
+        }
+      }
+    }catch(ignore){}
+  }
+  target.schemaVersion = ACADEMY_SCHEMA_VERSION;
+  target.updatedAt = Date.now();
+  const serialized = JSON.stringify(target);
+  try{
+    localStorage.setItem(STORE_KEY, serialized);
+  }catch(e){
+    try{
+      evictOlderIdeDrafts();
+      localStorage.setItem(STORE_KEY, JSON.stringify(target));
+    }catch(e2){}
+  }
+
+  const now = Date.now();
+  if(forceBackup || (now - (window.__lastBackupMirrorAt || 0) >= 15000)){
+    window.__lastBackupMirrorAt = now;
+    try{ localStorage.setItem('py_backend_academy_v1', serialized); }catch(ignore){}
+    try{ localStorage.setItem('py-backend-academy-v2', serialized); }catch(ignore){}
+    try{ localStorage.setItem('academy_state_backup_v1', serialized); }catch(ignore){}
+    writeWindowNameBackup(target);
+    syncToIndexedDBAsync(target);
+  }
+  window.__saveStatePendingTarget = null;
+}
+
+window.flushSaveState = function(forceBackup){
+  if(window.__saveStateTimer){
+    clearTimeout(window.__saveStateTimer);
+    window.__saveStateTimer = null;
+  }
+  if(window.__saveStatePendingTarget || forceBackup){
+    _performSaveStateNow(window.__saveStatePendingTarget || state, forceBackup !== false);
+  }
+};
+
+if(!window.__saveStateLifecycleBound){
+  window.__saveStateLifecycleBound = true;
+  window.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'hidden') window.flushSaveState(true);
+  });
+  window.addEventListener('pagehide', function(){ window.flushSaveState(true); });
+  window.addEventListener('beforeunload', function(){ window.flushSaveState(true); });
+}
 
 saveState = function(s){
-
-  let target = ensureExtendedState(s || state);
-
-  if(!window.__isResettingProgress){
-
-    try{
-
-      const existingRaw = safeParseJsonObj(localStorage.getItem(STORE_KEY));
-
-      if(existingRaw && typeof existingRaw === 'object'){
-
-        const hasHigherProgress = (existingRaw.xp || 0) > (target.xp || 0) ||
-
-          ((existingRaw.completedLessons || []).length > (target.completedLessons || []).length) ||
-
-          ((existingRaw.readNotes || []).length > (target.readNotes || []).length) ||
-
-          ((existingRaw.reviewedDecks || []).length > (target.reviewedDecks || []).length);
-
-        if(hasHigherProgress){
-
-          target = mergeProgressStates(existingRaw, target);
-
-          if(target !== state) Object.assign(state, target);
-
-        }
-
-      }
-
-    }catch(ignore){}
-
-  }
-
-  target.schemaVersion = ACADEMY_SCHEMA_VERSION;
-
-  target.updatedAt = Date.now();
-
-  const serialized = JSON.stringify(target);
-
-  try{
-
-    localStorage.setItem(STORE_KEY, serialized);
-
-    try{ localStorage.setItem('py_backend_academy_v1', serialized); }catch(ignore){}
-
-    try{ localStorage.setItem('py-backend-academy-v2', serialized); }catch(ignore){}
-
-    try{ localStorage.setItem('academy_state_backup_v1', serialized); }catch(ignore){}
-
-  }catch(e){
-
-    try{
-
-      evictOlderIdeDrafts();
-
-      localStorage.setItem(STORE_KEY, JSON.stringify(target));
-
-      try{ localStorage.setItem('academy_state_backup_v1', JSON.stringify(target)); }catch(ignore){}
-
-    }catch(e2){}
-
-  }
-
-  writeWindowNameBackup(target);
-
-  syncToIndexedDBAsync(target);
-
+  window.__stateRevision = (window.__stateRevision || 1) + 1;
+  window.__saveStatePendingTarget = s || state;
+  if(window.__saveStateTimer) clearTimeout(window.__saveStateTimer);
+  window.__saveStateTimer = setTimeout(function(){
+    window.__saveStateTimer = null;
+    _performSaveStateNow(window.__saveStatePendingTarget || state, false);
+  }, 150);
 };
 
 
@@ -48475,6 +48499,8 @@ function progressSyncClientId(){
 }
 
 function progressSyncBundle(){
+
+  if(typeof window.flushSaveState === 'function') window.flushSaveState(false);
 
   return {
 
@@ -57362,6 +57388,10 @@ function getSrsDailyProgressData(){
   ensureExtendedState();
 
   const today = (typeof dateIsoKey === 'function') ? dateIsoKey() : new Date().toISOString().slice(0, 10);
+  const memoKey = (window.__stateRevision || 1) + ':' + today;
+  if(window.__srsDailyMemo && window.__srsDailyMemo.key === memoKey){
+    return window.__srsDailyMemo.val;
+  }
 
   
 
@@ -57439,7 +57469,7 @@ function getSrsDailyProgressData(){
 
   
 
-  return {
+  const resObj = {
 
     today,
 
@@ -57462,6 +57492,8 @@ function getSrsDailyProgressData(){
     isComplete
 
   };
+  window.__srsDailyMemo = { key: memoKey, val: resObj };
+  return resObj;
 
 }
 
@@ -72071,6 +72103,12 @@ function getNoteSpacedRepetitionStats(){
 
   ensureExtendedState();
 
+  const todayMemo = (typeof dateIsoKey === 'function') ? dateIsoKey() : new Date().toISOString().slice(0, 10);
+  const memoKey = (window.__stateRevision || 1) + ':' + todayMemo;
+  if(window.__noteSrsStatsMemo && window.__noteSrsStatsMemo.key === memoKey){
+    return window.__noteSrsStatsMemo.val;
+  }
+
   const readList = (state.readNotes || []).filter(k => ALL_NOTES_COMBINED[k]);
 
   const dueNotes = [];
@@ -72129,7 +72167,7 @@ function getNoteSpacedRepetitionStats(){
 
 
 
-  return {
+  const noteStatsRes = {
 
     totalRead: readList.length,
 
@@ -72146,6 +72184,8 @@ function getNoteSpacedRepetitionStats(){
     masteredNotes: masteredNotes
 
   };
+  window.__noteSrsStatsMemo = { key: memoKey, val: noteStatsRes };
+  return noteStatsRes;
 
 }
 
@@ -72263,6 +72303,11 @@ function getSpacedRepetitionStats(){
 
   const today = (typeof dateIsoKey === 'function') ? dateIsoKey() : new Date().toISOString().slice(0,10);
 
+  const memoKey = (window.__stateRevision || 1) + ':' + today;
+  if(window.__srsStatsMemo && window.__srsStatsMemo.key === memoKey){
+    return window.__srsStatsMemo.val;
+  }
+
 
 
   const weakDecks = new Set();
@@ -72373,7 +72418,7 @@ function getSpacedRepetitionStats(){
 
   }
 
-  return {
+  const srsStatsRes = {
 
     weakCardsCount: weakCardsCount,
 
@@ -72388,6 +72433,8 @@ function getSpacedRepetitionStats(){
     dueDecks: dueDecks
 
   };
+  window.__srsStatsMemo = { key: memoKey, val: srsStatsRes };
+  return srsStatsRes;
 
 }
 
@@ -75343,13 +75390,7 @@ render = function(){
 
     state.lastRoute = route;
 
-    if(window._saveRouteTimer) clearTimeout(window._saveRouteTimer);
-
-    window._saveRouteTimer = setTimeout(function(){
-
-      try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
-
-    }, 150);
+    saveState(state);
 
   }
 
@@ -79588,13 +79629,15 @@ function animateCardFlip(cardEl, willBeFlipped, onComplete){
     return;
   }
 
-  if(cardEl._isAnimatingFlip) return;
+  if(cardEl._flipTimer){
+    clearTimeout(cardEl._flipTimer);
+    cardEl._flipTimer = null;
+  }
   cardEl._isAnimatingFlip = true;
 
   // Плавный кросс-фейд кнопок в доке
   transitionSrsActionDock(willBeFlipped);
 
-  var startH = cardEl.offsetHeight;
   if(willBeFlipped){
     cardEl.classList.add('is-flipped', 'fc-card--flipped');
     cardEl.setAttribute('data-flipped', 'true');
@@ -79602,23 +79645,162 @@ function animateCardFlip(cardEl, willBeFlipped, onComplete){
     cardEl.classList.remove('is-flipped', 'fc-card--flipped');
     cardEl.setAttribute('data-flipped', 'false');
   }
-  var activeFace = willBeFlipped ? backFace : frontFace;
-  var targetH = activeFace.scrollHeight || activeFace.offsetHeight;
 
-  if(Math.abs(startH - targetH) > 4){
-    cardEl.style.transition = 'transform 360ms cubic-bezier(0.2, 0.85, 0.35, 1)';
-  } else {
-    cardEl.style.transition = 'transform 360ms cubic-bezier(0.2, 0.85, 0.35, 1)';
-  }
+  cardEl.style.transition = 'transform 150ms cubic-bezier(0.2, 0.85, 0.35, 1)';
 
-  setTimeout(function(){
+  cardEl._flipTimer = setTimeout(function(){
+    cardEl._flipTimer = null;
     cardEl.style.height = '';
     cardEl.style.transition = '';
     cardEl._isAnimatingFlip = false;
     if(onComplete) onComplete();
-  }, 370);
+  }, 155);
 }
 window.animateCardFlip = animateCardFlip;
+
+function patchSrsActiveCardInPlace(isDueStream){
+  const cardEl = document.getElementById('srs-active-card');
+  if(!cardEl) return false;
+  const frontFace = cardEl.querySelector('.fc-card-front');
+  const backFace = cardEl.querySelector('.fc-card-back');
+  if(!frontFace || !backFace) return false;
+
+  let curCardKey = '';
+  let curCard = null;
+  let curIdx = 0;
+  let total = 1;
+  let showCounter = false;
+
+  if(isDueStream){
+    const q = cardsHubState.dueQueue || [];
+    const duePos = Math.min(cardsHubState.duePos || 0, Math.max(0, q.length - 1));
+    const item = q[duePos];
+    if(!item) return false;
+    const dObj = ALL_DECKS_COMBINED[item.deckId] || { cards: [] };
+    curCard = (dObj.cards || [])[item.cardIdx];
+    if(!curCard) return false;
+    curCardKey = item.deckId + ':' + item.cardIdx;
+    curIdx = duePos;
+    total = q.length;
+    showCounter = false;
+  } else {
+    const deck = ALL_DECKS_COMBINED[cardsHubState.deckId] || { cards: [] };
+    const cards = deck.cards || [];
+    const cIdx = Math.min(cardsHubState.cardIdx || 0, Math.max(0, cards.length - 1));
+    curCard = cards[cIdx];
+    if(!curCard) return false;
+    curCardKey = cardsHubState.deckId + ':' + cIdx;
+    curIdx = cIdx;
+    total = cards.length;
+    showCounter = false;
+  }
+
+  // 1. Сброс переворота и дока
+  if(cardEl._flipTimer){
+    clearTimeout(cardEl._flipTimer);
+    cardEl._flipTimer = null;
+  }
+  cardEl._isAnimatingFlip = false;
+  cardEl.style.transition = 'none';
+  cardEl.style.height = '';
+  cardEl.classList.remove('is-flipped', 'fc-card--flipped');
+  cardEl.setAttribute('data-flipped', 'false');
+  if(typeof transitionSrsActionDock === 'function') transitionSrsActionDock(false);
+
+  const showRescue = !!(
+    cardsHubState.rescueCardKey === curCardKey ||
+    (typeof isCardRescuePrimed === 'function' ? isCardRescuePrimed(curCardKey) : !!(window.__rescuePrimedCards && window.__rescuePrimedCards[curCardKey]))
+  );
+  const rescueHTML = (showRescue && typeof buildActiveRescueScaffoldHTML === 'function')
+    ? buildActiveRescueScaffoldHTML(curCard.a, curCard.q, curCardKey)
+    : '';
+  const qHTML = (typeof formatCardQuestionHTML === 'function')
+    ? formatCardQuestionHTML(curCard.q)
+    : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.q) : curCard.q);
+  const aHTML = (typeof formatCardAnswerHTML === 'function')
+    ? formatCardAnswerHTML(curCard.a)
+    : (typeof formatRichInlineText === 'function' ? formatRichInlineText(curCard.a) : curCard.a);
+
+  // 2. Точечное обновление граней
+  frontFace.innerHTML =
+    buildFlashcardTopFrontHTML(curCardKey, curIdx, total, 'data-hub-rescue', showRescue, showCounter) +
+    `<div class="fc-card-body fc-q" id="srs-card-prompt" style="margin:0;padding:12px 0 16px;font-size:clamp(1.15rem, 2.1vw, 1.35rem);line-height:1.55;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">${qHTML}</div>` +
+    rescueHTML;
+
+  backFace.innerHTML =
+    buildFlashcardTopBackHTML(curCardKey, curIdx, total, 'data-action="flip-card"', true, showCounter) +
+    `<div class="fc-card-body" style="margin:auto 0;padding:12px 0;width:100%;">` +
+    `<div class="fc-q-sub" style="font-size:0.88rem;font-weight:600;line-height:1.4;color:#a7f3d0;opacity:0.85;margin-bottom:6px;">${qHTML}</div>` +
+    `<div class="fc-divider" style="height:1px;background:linear-gradient(90deg, transparent, rgba(52,211,153,0.30), transparent);margin:6px 0 10px;"></div>` +
+    `<div class="fc-a-mastery" id="srs-card-answer" style="font-size:1.06rem;line-height:1.6;color:#ffffff;font-weight:500;">${aHTML}</div>` +
+    `</div>`;
+
+  // 3. Точечное обновление бусин спринта
+  const necklace = document.querySelector('.srs-beads-necklace');
+  if(necklace){
+    const SPRINT_SIZE = 15;
+    let startIdx = 0;
+    let endIdx = total;
+    if(isDueStream){
+      const sprintBlock = Math.floor(curIdx / SPRINT_SIZE);
+      startIdx = sprintBlock * SPRINT_SIZE;
+      endIdx = Math.min(total, startIdx + SPRINT_SIZE);
+    } else if(total > SPRINT_SIZE){
+      const half = Math.floor(SPRINT_SIZE / 2);
+      startIdx = Math.max(0, Math.min(total - SPRINT_SIZE, curIdx - half));
+      endIdx = Math.min(total, startIdx + SPRINT_SIZE);
+    }
+    const attrName = isDueStream ? 'data-hub-goto-due' : 'data-hub-goto-card';
+    const qArr = cardsHubState.dueQueue || [];
+    const jewels = [];
+    for(let i = startIdx; i < endIdx; i++){
+      let cls = 'dot-jewel';
+      const isCur = (i === curIdx);
+      let isDone = false;
+      if(isDueStream){
+        const it = qArr[i];
+        isDone = Boolean((it && (it.reviewed === true || it.answered === true)) || (cardsHubState.reviewedDueIndices && cardsHubState.reviewedDueIndices[i]));
+      } else {
+        isDone = Boolean(cardsHubState.reviewedCardIndices && cardsHubState.reviewedCardIndices[i]);
+      }
+      if(isCur) cls += ' active bead-active-leading';
+      else if(isDone) cls += ' done bead-done rating-easy';
+      else cls += ' future bead-future';
+      const stepDisp = isDueStream ? (i - startIdx + 1) : (i + 1);
+      jewels.push(`<span class="${cls}" ${attrName}="${i}" role="button" tabindex="0" title="Шаг ${stepDisp} из ${endIdx - startIdx} (Карточка ${i + 1})"></span>`);
+    }
+    necklace.innerHTML = jewels.join('');
+  }
+
+  // 4. Точечное обновление шапки (счётчик спринта и термодинамическая полоса)
+  const daily = (typeof getSrsDailyProgressData === 'function') ? getSrsDailyProgressData() : null;
+  if(daily){
+    const hubDoneToday = (typeof cardsHubState.hubDoneToday === 'number') ? Math.max(0, cardsHubState.hubDoneToday) : 0;
+    const cardsDueRem = daily.cardsDueRemaining || 0;
+    const SPRINT_SIZE = 15;
+    const totalSprintsToday = Math.max(1, Math.ceil((hubDoneToday + cardsDueRem) / SPRINT_SIZE));
+    const computedSprint = Math.min(totalSprintsToday, Math.max(1, Math.floor(hubDoneToday / SPRINT_SIZE) + 1));
+    cardsHubState.sprintNum = computedSprint;
+    const curEl = document.querySelector('.srs-unified-header-bar .zen-counter-cur');
+    const totEl = document.querySelector('.srs-unified-header-bar .zen-counter-tot');
+    if(curEl) curEl.textContent = String(computedSprint);
+    if(totEl) totEl.textContent = String(totalSprintsToday);
+
+    const cdData = (typeof getThermodynamicCooldownData === 'function') ? getThermodynamicCooldownData() : { pct: 100 };
+    const baseHeat = Math.max(0, Math.min(100, Number(cdData.pct) || 0));
+    const totalToday = hubDoneToday + cardsDueRem;
+    const sessionRatio = (totalToday > 0) ? Math.min(1, Math.max(0, hubDoneToday / totalToday)) : 1;
+    const currentHeatPct = (sessionRatio >= 1) ? 100 : Math.round(baseHeat + (100 - baseHeat) * sessionRatio);
+    const fillW = Math.max(8, Math.min(100, currentHeatPct)) + '%';
+    const thermo = (typeof getThermodynamicProgressStyle === 'function') ? getThermodynamicProgressStyle(currentHeatPct) : null;
+    const fillEl = document.querySelector('.srs-header-progress-fill');
+    const glowEl = document.querySelector('.srs-header-progress-glow');
+    if(fillEl){ fillEl.style.width = fillW; if(thermo) fillEl.style.background = thermo.bg; }
+    if(glowEl){ glowEl.style.width = fillW; if(thermo) glowEl.style.background = thermo.bg; }
+  }
+  return true;
+}
+window.patchSrsActiveCardInPlace = patchSrsActiveCardInPlace;
 
   if(e.target.closest('[data-py-flip-card]')){
     if(e.isTrusted && Date.now() < (window.__cardRateFlipGuardUntil || 0)){
@@ -79887,7 +80069,7 @@ window.animateCardFlip = animateCardFlip;
 
   if(prc){
 
-    window.__cardRateFlipGuardUntil = Date.now() + 450;
+    window.__cardRateFlipGuardUntil = Date.now() + 70;
 
     pySkillViewState.sprintCelebration = null;
 
@@ -82227,7 +82409,7 @@ window.animateCardFlip = animateCardFlip;
 
   if(hRate){
 
-    window.__cardRateFlipGuardUntil = Date.now() + 450;
+    window.__cardRateFlipGuardUntil = Date.now() + 70;
 
     const rawRate = hRate.getAttribute('data-hub-rate');
 
@@ -82404,6 +82586,10 @@ window.animateCardFlip = animateCardFlip;
 
       saveCardsHubPosState();
 
+      if(!isSprintFinish && !cardsHubState.completed && (cardsHubState.dueQueue || []).length > 0 && typeof patchSrsActiveCardInPlace === 'function' && patchSrsActiveCardInPlace(true)){
+        return;
+      }
+
       render();
 
       return;
@@ -82540,6 +82726,10 @@ window.animateCardFlip = animateCardFlip;
     }
 
     saveCardsHubPosState();
+
+    if(!isSprintFinish && !finishedDeckNow && !cardsHubState.completed && typeof patchSrsActiveCardInPlace === 'function' && patchSrsActiveCardInPlace(false)){
+      return;
+    }
 
     render();
 
