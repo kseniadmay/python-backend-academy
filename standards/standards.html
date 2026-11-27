@@ -24845,9 +24845,9 @@ body.light-theme .srs-card-theory-anchor:hover svg {
   stroke: #059669 !important;
 }
 
-/* 3. Защита .srs-action-dock от перекрытия плавающим островом .tabbar на мобильных экранах */
+/* 3. Защита .srs-action-dock на планшетах (устаревший таббар упразднён, оставлен чистый сброс полей без перекрытия fixed-дока) */
 
-@media (max-width: 880px) {
+@media (max-width: 880px) and (min-width: 641px) {
 
   body:not(.is-sprint-focus) .srs-action-dock {
 
@@ -25517,6 +25517,44 @@ body.light-theme .srs-card-theory-anchor:hover svg {
   color: inherit !important;
 }
 
+/* Глобальный запрет системного выделения, tap-highlight и фокусной обводки при клике/тапе на кнопки */
+button,
+button *,
+[role="button"],
+[role="button"] *,
+a.btn,
+.btn,
+.btn *,
+.btn-ghost,
+.btn-cta-dominant,
+.btn-dominant-cta,
+.btn-glass-emerald,
+.srs-card-theory-anchor,
+.fc-top-rescue-btn,
+.srs-header-close-btn,
+.fc-flip-back-btn,
+.srs-card-note-link-btn,
+.srs-flow-tab-btn,
+.srs-notes-btn,
+.dot-jewel,
+.dock-quantum-bead,
+.topbar-help-btn,
+.sprint-close-btn,
+.cocoon-pill--interactive {
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+button:focus:not(:focus-visible),
+[role="button"]:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+.btn:focus:not(:focus-visible),
+.dot-jewel:focus:not(:focus-visible),
+.dock-quantum-bead:focus:not(:focus-visible) {
+  outline: none !important;
+}
+
 /* БАЗОВАЯ 3D-ОРИЕНТАЦИЯ ГРАНЕЙ С ЗАЩИТОЙ ОТ Z-FIGHTING */
   .fc-card-front,
   .card-front {
@@ -25704,7 +25742,11 @@ body.light-theme .srs-card-theory-anchor:hover svg {
   pre.quiz-question-code code,
   .fc-code-block code,
   .fc-code-capsule code,
-  .fc-code-capsule .fc-code-primary {
+  .fc-code-capsule .fc-code-primary,
+  .fc-a-mastery .fc-code-capsule code,
+  .fc-a-mastery .fc-code-capsule .fc-code-primary,
+  #srs-card-answer .fc-code-capsule code,
+  #srs-card-answer .fc-code-capsule .fc-code-primary {
     background: transparent !important;
     border: none !important;
     border-radius: 0 !important;
@@ -30783,12 +30825,14 @@ body.light-theme .srs-card-theory-anchor:hover svg {
     }
 
     /* Мобильная эргономика карточки SRS: серый вектор для кнопок действий */
-    .fc-actions-dock {
+    .fc-actions-dock,
+    [data-theme="light"] .fc-actions-dock,
+    html:not([data-theme="dark"]) .fc-actions-dock {
       background: transparent !important;
       border: none !important;
       box-shadow: none !important;
       padding: 0 !important;
-      gap: 4px !important;
+      gap: 8px !important;
     }
     .fc-action-divider {
       display: none !important;
@@ -30797,17 +30841,17 @@ body.light-theme .srs-card-theory-anchor:hover svg {
     .fc-actions-dock .srs-card-theory-anchor,
     .fc-top-rescue-btn,
     .fc-actions-dock .fc-top-rescue-btn {
-      width: 28px !important;
-      height: 28px !important;
-      min-width: 28px !important;
-      min-height: 28px !important;
-      max-width: 28px !important;
-      max-height: 28px !important;
+      width: 26px !important;
+      height: 26px !important;
+      min-width: 26px !important;
+      min-height: 26px !important;
+      max-width: 26px !important;
+      max-height: 26px !important;
       padding: 0 !important;
-      border-radius: 50% !important;
-      background: transparent !important;
-      border: 1px solid transparent !important;
-      color: var(--ink-muted, #94a3b8) !important;
+      border-radius: 999px !important;
+      background: rgba(255, 255, 255, 0.06) !important;
+      border: 1px solid rgba(255, 255, 255, 0.14) !important;
+      color: var(--ink-soft, #cbd5e1) !important;
       justify-content: center !important;
       font-size: 0.74rem !important;
       line-height: 1 !important;
@@ -30848,7 +30892,10 @@ body.light-theme .srs-card-theory-anchor:hover svg {
     [data-theme="light"] .fc-actions-dock .srs-card-theory-anchor,
     [data-theme="light"] .fc-top-rescue-btn,
     [data-theme="light"] .fc-actions-dock .fc-top-rescue-btn {
-      color: #64748b !important;
+      color: #1e293b !important;
+      background: #ffffff !important;
+      border: 1px solid rgba(15, 23, 42, 0.15) !important;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06) !important;
     }
     [data-theme="light"] .srs-card-theory-anchor:hover,
     [data-theme="light"] .fc-actions-dock .srs-card-theory-anchor:hover {
@@ -34642,9 +34689,9 @@ html[data-theme="light"] .mx-crystal,
       margin: 8px auto 14px !important;
     }
 
+    .cards-hub-action-placeholder,
     .srs-action-dock,
-    footer.srs-action-dock,
-    body:not(.is-sprint-focus) .srs-action-dock {
+    footer.srs-action-dock {
       position: relative !important;
       bottom: auto !important;
       margin-top: 14px !important;
@@ -34688,33 +34735,33 @@ html[data-theme="light"] .mx-crystal,
     :root:not([data-theme="light"]) .fc-rate-btn--again {
       background: linear-gradient(180deg, #350f18 0%, #1e070e 100%) !important;
       border: 1.5px solid #d9435e !important;
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.22), 0 4px 14px rgba(0, 0, 0, 0.40), 0 4px 20px -2px rgba(244, 63, 94, 0.40) !important;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.18), 0 4px 12px rgba(0, 0, 0, 0.36), 0 3px 12px -2px rgba(244, 63, 94, 0.22) !important;
     }
     :root:not([data-theme="light"]) .card-rating-btn--hard,
     :root:not([data-theme="light"]) .fc-rate-btn--hard {
       background: linear-gradient(180deg, #52350b 0%, #2c1a04 100%) !important;
       border: 1.5px solid #f59e0b !important;
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.24), 0 4px 14px rgba(0, 0, 0, 0.40), 0 4px 20px -2px rgba(245, 158, 11, 0.40) !important;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.20), 0 4px 12px rgba(0, 0, 0, 0.36), 0 3px 12px -2px rgba(245, 158, 11, 0.22) !important;
     }
     :root:not([data-theme="light"]) .card-rating-btn--good,
     :root:not([data-theme="light"]) .fc-rate-btn--good,
     :root:not([data-theme="light"]) .action-accent {
       background: linear-gradient(180deg, #103326 0%, #091f17 100%) !important;
       border: 1.5px solid #2ea77d !important;
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.22), 0 4px 14px rgba(0, 0, 0, 0.40), 0 4px 20px -2px rgba(16, 185, 129, 0.40) !important;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.18), 0 4px 12px rgba(0, 0, 0, 0.36), 0 3px 12px -2px rgba(16, 185, 129, 0.22) !important;
     }
     :root:not([data-theme="light"]) .card-rating-btn--easy,
     :root:not([data-theme="light"]) .fc-rate-btn--easy {
       background: linear-gradient(180deg, #0d2a38 0%, #071922 100%) !important;
       border: 1.5px solid #1fa3c7 !important;
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.22), 0 4px 14px rgba(0, 0, 0, 0.40), 0 4px 20px -2px rgba(6, 182, 212, 0.40) !important;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.18), 0 4px 12px rgba(0, 0, 0, 0.36), 0 3px 12px -2px rgba(6, 182, 212, 0.22) !important;
     }
     :root:not([data-theme="light"]) .btn-cta-dominant.btn-glass-emerald,
     :root:not([data-theme="light"]) .btn-dominant-cta.btn-glass-emerald {
       background: linear-gradient(180deg, rgba(16, 185, 129, 0.26) 0%, rgba(6, 78, 59, 0.25) 100%) !important;
       border: 1.5px solid rgba(52, 211, 153, 0.65) !important;
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.20), 0 4px 20px -2px rgba(16, 185, 129, 0.35) !important;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.16), 0 3px 12px -2px rgba(16, 185, 129, 0.20) !important;
     }
     :root[data-theme="light"] .btn-cta-dominant.btn-glass-emerald,
     :root[data-theme="light"] .btn-dominant-cta.btn-glass-emerald,
@@ -39525,9 +39572,9 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     word-break: normal !important;
     display: block !important;
   }
-  .fc-q code:not(pre code),
-  .fc-q-sub code:not(pre code),
-  .fc-a-mastery code:not(pre code) {
+  .fc-q code:not(pre code):not(.fc-code-primary),
+  .fc-q-sub code:not(pre code):not(.fc-code-primary),
+  .fc-a-mastery code:not(pre code):not(.fc-code-primary) {
     margin: 0 0.04em !important;
     padding: 0.05em 0.30em !important;
   }
@@ -39540,6 +39587,11 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
       min-height: 100dvh !important;
       display: flex !important;
       flex-direction: column !important;
+    }
+    body:not(.is-sprint-focus) #view-root:has(.cards-hub-content),
+    body:not(.is-sprint-focus) main:has(.cards-hub-content),
+    body:not(.is-sprint-focus) .cards-hub-container:has(.cards-hub-content) {
+      min-height: calc(100dvh - 52px) !important;
     }
     .cards-hub-container:has(.cards-hub-content) {
       min-height: 100dvh !important;
@@ -39560,6 +39612,7 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
       display: flex !important;
       flex-direction: column !important;
       justify-content: center !important;
+      margin: 0 auto !important;
       width: 100% !important;
       min-height: 0 !important;
     }
@@ -39612,6 +39665,7 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
       max-height: 26px !important;
       padding: 0 !important;
     }
+    body .cards-hub-content .srs-action-dock,
     .cards-hub-content .srs-action-dock {
       position: fixed !important;
       bottom: 0 !important;
@@ -39619,12 +39673,12 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
       right: 0 !important;
       z-index: 9999 !important;
       margin: 0 !important;
-      border-top: none !important;
-      box-shadow: none !important;
-      padding: 22px 14px calc(14px + env(safe-area-inset-bottom, 0px)) !important;
-      background: linear-gradient(180deg, rgba(13, 16, 22, 0) 0%, rgba(13, 16, 22, 0.88) 32%, #0d1016 100%) !important;
-      backdrop-filter: blur(12px) !important;
-      -webkit-backdrop-filter: blur(12px) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+      box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.45) !important;
+      padding: 12px 14px calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+      background: linear-gradient(180deg, rgba(7, 9, 14, 0.84) 0%, #07090e 100%) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
       display: flex !important;
       flex-direction: column !important;
       align-items: center !important;
@@ -39645,13 +39699,13 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
   :root:not([data-theme="light"]) .card-rating-btn--easy {
     background: linear-gradient(180deg, #271748 0%, #150b29 100%) !important;
     border: 1.5px solid #a78bfa !important;
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.22), 0 4px 14px rgba(0, 0, 0, 0.40), 0 4px 20px -2px rgba(139, 92, 246, 0.44) !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.18), 0 4px 12px rgba(0, 0, 0, 0.36), 0 3px 12px -2px rgba(139, 92, 246, 0.24) !important;
   }
   :root:not([data-theme="light"]) .fc-rate-btn--easy:hover,
   :root:not([data-theme="light"]) .card-rating-btn--easy:hover {
     background: linear-gradient(180deg, #321d5c 0%, #1c0f38 100%) !important;
     border-color: #c4b5fd !important;
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.28), 0 6px 24px -2px rgba(139, 92, 246, 0.60) !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.22), 0 4px 16px -2px rgba(139, 92, 246, 0.34) !important;
   }
   :root:not([data-theme="light"]) .fc-rate-btn--easy .srs-btn-title,
   :root:not([data-theme="light"]) .card-rating-btn--easy .srs-btn-title {
@@ -39698,8 +39752,8 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     background-size: 100cqw 100% !important;
     background-position: left top !important;
     box-shadow: none !important;
-    filter: blur(4px) !important;
-    opacity: 0.94 !important;
+    filter: blur(3px) !important;
+    opacity: 0.56 !important;
     pointer-events: none !important;
   }
   .srs-header-progress-glow::after {
@@ -39713,15 +39767,40 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     background: inherit !important;
     background-size: inherit !important;
     background-position: inherit !important;
-    filter: blur(9px) !important;
-    opacity: 0.85 !important;
+    filter: blur(6px) !important;
+    opacity: 0.45 !important;
     pointer-events: none !important;
+  }
+
+  /* Оптический кернинг эмодзи в статус-бейджах и элементах SRS */
+  .srs-card-status-badge {
+    line-height: 1 !important;
+    padding: 0 10px 0 7px !important;
+    gap: 5px !important;
+  }
+  .srs-card-status-badge > span:not(.srs-badge-emoji) {
+    display: inline-block !important;
+    line-height: 1 !important;
+  }
+  .srs-badge-emoji,
+  .srs-emoji-kern {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 1em !important;
+    height: 1em !important;
+    font-size: 0.90em !important;
+    line-height: 1 !important;
+    margin-right: -1px !important;
+    flex-shrink: 0 !important;
+    transform: translateY(0.5px) !important;
+    font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif !important;
   }
 
   /* Прогресс-бар (Янтарь ➔ Аметист со спектральным blur) и индикатор активности в светлой теме */
   html[data-theme="light"] .srs-live-status-dot {
     background: #7c3aed !important;
-    box-shadow: 0 0 8px rgba(124, 58, 237, 0.55) !important;
+    box-shadow: 0 0 5px rgba(124, 58, 237, 0.35) !important;
   }
   html[data-theme="light"] .srs-header-mode-title {
     color: #1e293b !important;
@@ -39741,10 +39820,10 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     background-size: 100cqw 100% !important;
     background-position: left top !important;
     box-shadow: none !important;
-    opacity: 0.72 !important;
+    opacity: 0.48 !important;
   }
   html[data-theme="light"] .srs-header-progress-glow::after {
-    opacity: 0.58 !important;
+    opacity: 0.36 !important;
   }
 
   /* Крошки урока в светлой теме */
@@ -40003,9 +40082,9 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
   html[data-theme="light"] .fc-card-back .fc-answer-explanation {
     color: #0f172a !important;
   }
-  html[data-theme="light"] .fc-card-back code:not(pre code),
-  html[data-theme="light"] .fc-card-front code:not(pre code),
-  html[data-theme="light"] .fc-card code:not(pre code) {
+  html[data-theme="light"] .fc-card-back code:not(pre code):not(.fc-code-primary),
+  html[data-theme="light"] .fc-card-front code:not(pre code):not(.fc-code-primary),
+  html[data-theme="light"] .fc-card code:not(pre code):not(.fc-code-primary) {
     color: #5b21b6 !important;
     background: #f5f3ff !important;
     border: 1px solid #c4b5fd !important;
@@ -40025,9 +40104,11 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
 
   /* Светлый док и объёмные глазированные кнопки оценки SRS (WCAG AAA) */
   @media (max-width: 640px) {
+    html[data-theme="light"] body .cards-hub-content .srs-action-dock,
     html[data-theme="light"] .cards-hub-content .srs-action-dock {
-      background: linear-gradient(180deg, rgba(244, 241, 236, 0) 0%, rgba(244, 241, 236, 0.88) 32%, rgba(244, 241, 236, 0.98) 100%) !important;
-      border-top: none !important;
+      background: linear-gradient(180deg, rgba(244, 241, 236, 0.88) 0%, rgba(244, 241, 236, 0.98) 100%) !important;
+      border-top: 1px solid rgba(15, 23, 42, 0.08) !important;
+      box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.08) !important;
     }
   }
   html[data-theme="light"] .fc-rate-btn--again,
@@ -57016,6 +57097,8 @@ let cardsHubState = {
 
   forcedNoteId: _initCardsPos.forcedNoteId || null,
 
+  savedDate: _todayKey,
+
   sprintNum: (_isSameDay && typeof _initCardsPos.sprintNum === 'number') ? _initCardsPos.sprintNum : 1,
 
   sprintStep: (_isSameDay && typeof _initCardsPos.sprintStep === 'number') ? _initCardsPos.sprintStep : 0,
@@ -57934,14 +58017,11 @@ function buildSrsHeaderBarHTML(activeTab, dueCardsCount, dueNotesCount, noteProg
           `}
         ` : `
           ${!isForcedNote ? `
-          <button type="button" class="srs-mode-pill" data-action="toggle-srs-intensive-mode" style="display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:999px;font-size:0.72rem;font-weight:700;white-space:nowrap;cursor:pointer;transition:all .16s ease;box-sizing:border-box;border:1px solid ${(typeof state !== 'undefined' && state.srsIntensiveMode) ? 'rgba(245,158,11,0.45)' : 'rgba(255,255,255,0.12)'};background:${(typeof state !== 'undefined' && state.srsIntensiveMode) ? 'rgba(245,158,11,0.16)' : 'rgba(255,255,255,0.04)'};color:${(typeof state !== 'undefined' && state.srsIntensiveMode) ? '#fbbf24' : 'var(--ink-muted)'};" title="${(typeof state !== 'undefined' && state.srsIntensiveMode) ? 'Режим Интенсив (до скрининга): «Не знаю» возвращает карточку через 2–3 шага, короткие интервалы (0/1/1–2/2–3 дн)' : 'Обычный график (SM-2: 1/2/3/7 дн). Нажмите, чтобы включить Интенсив'}">
-            ${(typeof state !== 'undefined' && state.srsIntensiveMode) ? '⚡ Интенсив' : '📅 График'}
-          </button>
           <div class="zen-counter-3a" style="font-family:var(--font-m);font-size:0.82rem;display:inline-flex;align-items:center;gap:3px;line-height:1;height:24px;padding:0 2px;background:transparent;border:none;box-shadow:none;" title="${goalTitle}">
-            <span style="color:#f59e0b;font-size:0.85rem;margin-right:1px;">${iconStr}</span>
-            <span class="zen-counter-cur" style="color:var(--ink);font-weight:800;">${displaySprintNum}</span>
-            <span class="zen-counter-sep" style="color:var(--ink-muted);opacity:0.35;font-size:0.74rem;margin:0 1px;">/</span>
-            <span class="zen-counter-tot" style="color:var(--ink-muted);font-weight:600;font-size:0.78rem;">${totalSprintsToday}</span>
+            <span class="srs-emoji-kern" style="color:#f59e0b;font-size:0.85em;">${iconStr}</span>
+            <span class="zen-counter-cur" style="color:var(--ink);font-weight:800;line-height:1;display:inline-block;">${displaySprintNum}</span>
+            <span class="zen-counter-sep" style="color:var(--ink-muted);opacity:0.35;font-size:0.74rem;margin:0 1px;line-height:1;display:inline-block;">/</span>
+            <span class="zen-counter-tot" style="color:var(--ink-muted);font-weight:600;font-size:0.78rem;line-height:1;display:inline-block;">${totalSprintsToday}</span>
           </div>
           ` : ''}
           <a href="${isForcedNote ? '#/cards' : '#/path'}" class="srs-header-close-btn zen-vector-btn" ${isForcedNote ? 'data-srs-exit-force-note' : ''} style="width:28px;height:28px;min-width:28px;min-height:28px;padding:0;border-radius:6px;background:transparent;border:none;box-shadow:none;color:var(--ink-muted);display:inline-flex;align-items:center;justify-content:center;text-decoration:none;box-sizing:border-box;transition:all .18s cubic-bezier(0.16,1,0.3,1);" title="${isForcedNote ? 'Вернуться к текущей карточке' : 'Закрыть (На Путь)'}">
@@ -58205,7 +58285,7 @@ function buildFlashcardNoteFooterHTML(cardKey){
   return `
               <div class="fc-card-footer" style="display:flex;align-items:center;justify-content:flex-start;width:100%;margin-top:auto;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);box-sizing:border-box;">
                 <button type="button" class="srs-card-note-link-btn" data-srs-force-note="${kId}" title="Открыть конспект «${escapeHtmlStr(cleanNoteTitle)}»" style="display:inline-flex;align-items:center;gap:7px;max-width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);padding:5px 12px;border-radius:999px;color:var(--ink-muted);font-size:0.75rem;font-weight:600;text-decoration:none;cursor:pointer;transition:all .18s ease;box-sizing:border-box;overflow:hidden;">
-                  <span style="font-size:0.82rem;flex-shrink:0;line-height:1;">📖</span>
+                  <span style="font-size:0.84rem;flex-shrink:0;line-height:1;display:inline-flex;align-items:center;transform:translateY(-0.5px);">📖</span>
                   <span style="color:var(--ink-soft);opacity:0.75;flex-shrink:0;">Конспект:</span>
                   <span class="srs-card-note-link-title" style="color:#34d399;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1 1 auto;">${escapeHtmlStr(cleanNoteTitle)}</span>
                   <span style="color:#34d399;opacity:0.8;font-size:0.72rem;flex-shrink:0;margin-left:2px;">➔</span>
@@ -58268,7 +58348,7 @@ function buildFlashcardTopBackHTML(cardKey, idx, total, backBtnAttrs, showEscKbd
   return `
               <div class="fc-top-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;">
                 <div class="fc-badge-group" style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
-                  <span class="srs-card-otvet-chip" style="display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.20);border:1px solid rgba(16,185,129,0.50);padding:0 11px;height:26px;min-height:26px;line-height:1;letter-spacing:0.01em;border-radius:999px;box-shadow:0 0 12px rgba(16,185,129,0.28);white-space:nowrap;flex-shrink:0;box-sizing:border-box;">${checkIconSvg}<span>Ответ</span></span>
+                  <span class="srs-card-otvet-chip" style="display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:0.75rem;font-weight:800;color:#34d399;background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.42);padding:0 11px;height:26px;min-height:26px;line-height:1;letter-spacing:0.01em;border-radius:999px;box-shadow:0 0 8px rgba(16,185,129,0.16);white-space:nowrap;flex-shrink:0;box-sizing:border-box;">${checkIconSvg}<span>Ответ</span></span>
                   ${statusHTML}
                 </div>
                 <div class="fc-top-actions-cluster" style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
@@ -58319,8 +58399,8 @@ function buildSrsSprintFinishHTML(isZenPhase, sprintNumVal, remainingCount, rema
               Ровный темп микрообучения без перегрузки.
             </p>
             <div style="display:flex;gap:10px;justify-content:center;margin-bottom:24px;flex-wrap:wrap;">
-              <span class="cocoon-pill">⚡ ${escapeHtmlStr(remainingLabel)}: <b>${safeRem}</b></span>
-              <span class="cocoon-pill">🔥 Стрик: <b>${state.streak || 1} дн</b></span>
+              <span class="cocoon-pill" style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-flex;align-items:center;line-height:1;transform:translateY(-0.5px);flex-shrink:0;">⚡</span><span>${escapeHtmlStr(remainingLabel)}: <b>${safeRem}</b></span></span>
+              <span class="cocoon-pill" style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-flex;align-items:center;line-height:1;transform:translateY(-0.5px);flex-shrink:0;">🔥</span><span>Стрик: <b>${state.streak || 1} дн</b></span></span>
             </div>
             <div style="display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;width:100%;max-width:360px;margin:0 auto;">
               <button type="button" data-action="start-next-srs-sprint" class="btn-cta-dominant btn-glass-emerald btn-style-glass btn-sprint-cta" style="width:100%;">Следующий спринт (15 карточек)</button>
@@ -58334,6 +58414,23 @@ function buildSrsSprintFinishHTML(isZenPhase, sprintNumVal, remainingCount, rema
 
 
 function viewCardsHub(){
+
+  const _curTodayKey = (typeof dateIsoKey === 'function') ? dateIsoKey() : new Date().toISOString().slice(0, 10);
+  if(cardsHubState.savedDate !== _curTodayKey){
+    cardsHubState.savedDate = _curTodayKey;
+    cardsHubState.completed = false;
+    cardsHubState.dueQueue = [];
+    cardsHubState.duePos = 0;
+    cardsHubState.reviewedDueIndices = {};
+    cardsHubState.reviewedCardIndices = {};
+    cardsHubState.reviewedNoteSteps = {};
+    cardsHubState.sprintNum = 1;
+    cardsHubState.sprintStep = 0;
+    cardsHubState.sprintFinished = false;
+    cardsHubState.sprintPhase = null;
+    cardsHubState.flipped = false;
+    cardsHubState.rescueCardKey = null;
+  }
 
   const sprintStepNum = Math.min(15, (Number(cardsHubState.sprintStep) || 0) + 1);
 
@@ -58554,9 +58651,9 @@ function viewCardsHub(){
 
             <div style="display:flex;gap:10px;justify-content:center;margin-bottom:26px;flex-wrap:wrap;">
 
-              <span class="cocoon-pill">⚡ Повторено: <b>${reviewedTodayCardsCount || srsGlobalStats.dueTodayCardsCount || 1}</b></span>
+              <span class="cocoon-pill" style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-flex;align-items:center;line-height:1;transform:translateY(-0.5px);flex-shrink:0;">⚡</span><span>Повторено: <b>${reviewedTodayCardsCount || srsGlobalStats.dueTodayCardsCount || 1}</b></span></span>
 
-              <span class="cocoon-pill">🔥 Стрик: <b>${state.streak || 1} дн</b></span>
+              <span class="cocoon-pill" style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-flex;align-items:center;line-height:1;transform:translateY(-0.5px);flex-shrink:0;">🔥</span><span>Стрик: <b>${state.streak || 1} дн</b></span></span>
 
             </div>
 
@@ -58564,9 +58661,9 @@ function viewCardsHub(){
 
               <a href="#/path" class="btn-cta-dominant btn-glass-emerald btn-style-glass btn-sprint-cta" style="max-width:340px;">К следующему уроку на Пути</a>
 
-              <button type="button" data-action="restart-cards-practice" class="btn btn-ghost srs-notes-btn" style="padding:12px 20px;border-radius:12px;font-weight:600;font-size:0.86rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .18s ease;">🔄 Повторить ещё раз</button>
+              <button type="button" data-action="restart-cards-practice" class="btn btn-ghost srs-notes-btn" style="padding:12px 20px;border-radius:12px;font-weight:600;font-size:0.86rem;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:all .18s ease;"><span style="display:inline-flex;align-items:center;line-height:1;transform:translateY(-0.5px);flex-shrink:0;">🔄</span><span>Повторить ещё раз</span></button>
 
-              <a href="#/notes-review" class="btn btn-ghost srs-notes-btn" style="padding:12px 20px;border-radius:12px;font-weight:600;font-size:0.86rem;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .18s ease;">📖 К конспектам</a>
+              <a href="#/notes-review" class="btn btn-ghost srs-notes-btn" style="padding:12px 20px;border-radius:12px;font-weight:600;font-size:0.86rem;text-decoration:none;display:inline-flex;align-items:center;gap:7px;transition:all .18s ease;"><span style="display:inline-flex;align-items:center;line-height:1;transform:translateY(-0.5px);flex-shrink:0;">📖</span><span>К конспектам</span></a>
 
             </div>
 
@@ -58613,7 +58710,7 @@ function viewCardsHub(){
 
       return `
 
-    <div class="container cards-hub-container" style="padding-bottom:84px;max-width:700px;margin:0 auto;">
+    <div class="container cards-hub-container" style="max-width:700px;margin:0 auto;">
 
       ${(typeof buildSrsHeaderBarHTML === 'function' ? buildSrsHeaderBarHTML('cards', srsGlobalStats.dueTodayCardsCount || 0, noteSrsStats.dueCount || 0) : '')}
 
@@ -58745,7 +58842,7 @@ function viewCardsHub(){
 
     return `
 
-    <div class="container cards-hub-container" style="padding-bottom:84px;max-width:700px;margin:0 auto;">
+    <div class="container cards-hub-container" style="max-width:700px;margin:0 auto;">
 
       ${buildSrsHeaderBarHTML('cards', srsGlobalStats.dueTodayCardsCount || 0, noteSrsStats.dueCount || 0)}
 
@@ -71018,13 +71115,13 @@ function getRemNoteCardStatusBadgeHTML(cardKey){
 
   const entry = state.cardSrs && state.cardSrs[cardKey];
   const syncedByInterview = (typeof getPathCardInterviewSync === 'function') && getPathCardInterviewSync(cardKey);
-  const interviewBadgeHTML = `<span class="srs-card-status-badge srs-status-interview" style="display:inline-flex;align-items:center;gap:5px;border-radius:999px;background:rgba(56,189,248,0.14);border:1px solid rgba(56,189,248,0.38);color:#38bdf8;white-space:nowrap;flex-shrink:0;"><span>🎙️ Знакомо по интервью</span></span>`;
+  const interviewBadgeHTML = `<span class="srs-card-status-badge srs-status-interview" style="display:inline-flex;align-items:center;gap:5px;border-radius:999px;background:rgba(56,189,248,0.14);border:1px solid rgba(56,189,248,0.38);color:#38bdf8;white-space:nowrap;flex-shrink:0;"><span class="srs-badge-emoji" style="display:inline-flex;align-items:center;line-height:1;transform:translateY(-0.5px);flex-shrink:0;">🎙️</span><span>Знакомо по интервью</span></span>`;
 
   if(!entry || !entry.dueDate){
 
     if(syncedByInterview) return interviewBadgeHTML;
 
-    return `<span class="srs-card-status-badge srs-status-new" style="display:inline-flex;align-items:center;gap:5px;border-radius:999px;"><span>🌱 Новая</span></span>`;
+    return `<span class="srs-card-status-badge srs-status-new" style="display:inline-flex;align-items:center;gap:5px;border-radius:999px;"><span class="srs-badge-emoji" style="display:inline-flex;align-items:center;line-height:1;transform:translateY(-0.5px);flex-shrink:0;">🌱</span><span>Новая</span></span>`;
 
   }
 
@@ -71042,15 +71139,15 @@ function getRemNoteCardStatusBadgeHTML(cardKey){
 
   if(daysDiff <= 0){
 
-    baseBadge = `<span class="srs-card-status-badge srs-status-due" style="display:inline-flex;align-items:center;gap:5px;border-radius:999px;"><span>⚡ Повторение</span></span>`;
+    baseBadge = `<span class="srs-card-status-badge srs-status-due" style="display:inline-flex;align-items:center;gap:5px;border-radius:999px;"><span class="srs-badge-emoji" style="display:inline-flex;align-items:center;line-height:1;transform:translateY(-0.5px);flex-shrink:0;">⚡</span><span>Повторение</span></span>`;
 
   } else if(entry.interval >= 21){
 
-    baseBadge = `<span class="srs-card-status-badge srs-status-mastered" style="display:inline-flex;align-items:center;gap:5px;border-radius:999px;"><span>👑 Закреплено</span></span>`;
+    baseBadge = `<span class="srs-card-status-badge srs-status-mastered" style="display:inline-flex;align-items:center;gap:5px;border-radius:999px;"><span class="srs-badge-emoji" style="display:inline-flex;align-items:center;line-height:1;transform:translateY(-0.5px);flex-shrink:0;">👑</span><span>Закреплено</span></span>`;
 
   } else {
 
-    baseBadge = `<span class="srs-card-status-badge srs-status-scheduled" style="display:inline-flex;align-items:center;gap:5px;border-radius:999px;"><span>⚡ Повторение</span></span>`;
+    baseBadge = `<span class="srs-card-status-badge srs-status-scheduled" style="display:inline-flex;align-items:center;gap:5px;border-radius:999px;"><span class="srs-badge-emoji" style="display:inline-flex;align-items:center;line-height:1;transform:translateY(-0.5px);flex-shrink:0;">⚡</span><span>Повторение</span></span>`;
 
   }
 
