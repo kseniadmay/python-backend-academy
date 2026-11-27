@@ -29789,13 +29789,20 @@ body.light-theme .srs-card-theory-anchor:hover svg {
     color: var(--ink, #f8fafc) !important;
     font-weight: 700 !important;
     font-size: 0.78rem !important;
-    display: inline !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
     padding: 0 !important;
     margin: 0 !important;
     font-family: var(--font-b, 'Onest', sans-serif) !important;
     letter-spacing: -0.01em !important;
     white-space: nowrap !important;
     flex-shrink: 0 !important;
+  }
+  .srs-echelon-shield-svg {
+    display: block !important;
+    flex-shrink: 0 !important;
+    transform: translateY(-0.5px);
   }
   .srs-breadcrumb-topic {
     color: var(--ink, #f8fafc) !important;
@@ -53749,7 +53756,7 @@ function buildSprintFinishCelebrationHTML(cel){
 
   const isAlreadyRead = Boolean(cel.wasAlreadyRead || (state.readNotes && state.readNotes.includes(cel.kid)));
 
-  const xpBadge = isAlreadyRead ? '' : ' · +15 XP';
+  const xpBadge = '';
 
   const noteObj = (typeof ALL_NOTES_COMBINED !== 'undefined' && ALL_NOTES_COMBINED[cel.kid]) || {};
 
@@ -54834,7 +54841,7 @@ function buildUnifiedZenIdeHTML(params){
       drawerTabContent = `<div class="test-running-shimmer" style="color:var(--amber);font-size:0.8rem;">⚡ Выполняю проверки в песочнице…</div>`;
     } else if(runStatus === 'pass'){
       drawerTabContent = `
-        <div style="color:#34d399;font-weight:700;">✓ Все тесты пройдены чисто! (+15 XP)</div>
+        <div style="color:#34d399;font-weight:700;">✓ Все тесты пройдены чисто!</div>
         <div style="font-size:0.74rem;opacity:0.85;margin-top:2px;">Задание успешно решено и закреплено.</div>
       `;
     } else if(runStatus === 'fail'){
@@ -54882,7 +54889,7 @@ function buildUnifiedZenIdeHTML(params){
     <div class="triumph-celebration-banner ${runStatus === 'pass' ? 'is-active' : ''}">
       <div>
         <div class="triumph-text-title">🏆 Задача решена чисто!</div>
-        <div style="font-size:0.78rem;color:var(--ink-muted);margin-top:2px;">+15 XP зачислено на баланс эшелона</div>
+        <div style="font-size:0.78rem;color:var(--ink-muted);margin-top:2px;">Задание решено и добавлено в прогресс эшелона</div>
       </div>
       <button type="button" class="btn-triumph-next" ${nextBtnAttr} title="${escapeHtmlStr(nextBtnLabel)}">${escapeHtmlStr(shortNextLabel)}</button>
     </div>
@@ -54892,7 +54899,6 @@ function buildUnifiedZenIdeHTML(params){
     <div class="action-button-row zen-action-row" style="${runStatus === 'pass' ? 'display:none !important;' : ''}">
       <button type="button" class="btn-check-solution" ${runBtnAttr} title="Запустить проверку (Ctrl+Enter)">
         <span>${ICONS.play || '▷'} Проверить решение</span>
-        <span class="xp-tag">+15 XP</span>
       </button>
       <button type="button" class="zen-skip-btn btn-skip-task" ${nextBtnAttr} title="${escapeHtmlStr(nextBtnLabel)}">
         <span>${escapeHtmlStr(shortNextLabel)}</span>
@@ -54955,7 +54961,7 @@ function getNoteCompletionCta(activeK, sk){
   const cluster = plan.find(c => c.kId === activeK);
   const noteDecks = cluster ? cluster.deckIds : ((typeof getMatchingDecksForNote === 'function') ? getMatchingDecksForNote(activeK, sk) : []);
   if(noteDecks.length > 0){
-    return { attrName: 'data-py-finish-note', attrVal: activeK, text: 'Закрепить в карточках (+10 XP)' };
+    return { attrName: 'data-py-finish-note', attrVal: activeK, text: 'Закрепить в карточках' };
   }
   const noteTasks = cluster ? cluster.taskIds : ((typeof getMatchingTasksForNote === 'function') ? getMatchingTasksForNote(activeK, sk) : []);
   if(noteTasks.length > 0){
@@ -55025,7 +55031,7 @@ function viewPythonSkill(sid){
 
   const readinessStatusText = `${displayEchPct}% готовности ${echMeta.targetLabel || 'к скринингу'}`;
 
-  const xpValBadge = dayXpVal > 0 ? `+${dayXpVal} XP` : `<span class="sprint-xp-full">Старт дня · </span>0 XP`;
+  const xpValBadge = dayXpVal > 0 ? `${dayXpVal} XP` : `<span class="sprint-xp-full">Старт дня · </span>0 XP`;
 
 
 
@@ -55252,7 +55258,7 @@ function viewPythonSkill(sid){
   `;
 
   // Ожерелье бусин (сверху по центру) и хлебные крошки (под бусинами, 1:1 стиль .srs-notes-container)
-  const lessonShieldSvg = '<svg class="srs-echelon-shield-svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" fill-opacity="0.14" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline-block;flex-shrink:0;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>';
+  const lessonShieldSvg = '<svg class="srs-echelon-shield-svg" width="11" height="13" viewBox="2.5 0.5 19 23" fill="currentColor" fill-opacity="0.14" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>';
   const lessonEchelonLabel = `Эшелон ${curEchTier || 1}`;
   const cleanItemBreadcrumb = (activeItemTitle.split(/\s*[·•–—]\s*|:\s+/)[0] || activeItemTitle).trim();
   const showUnitInBreadcrumb = Boolean(cleanUnitTitleVal && cleanUnitTitleVal !== activeItemTitle && cleanUnitTitleVal !== cleanItemBreadcrumb);
@@ -55263,7 +55269,7 @@ function viewPythonSkill(sid){
           ${dotsNecklaceHTML}
         </div>
         <nav class="srs-note-breadcrumbs" aria-label="Путь урока" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;min-width:0;flex:1 1 auto;font-family:var(--font-d, 'Onest', sans-serif);font-size:0.78rem;line-height:1.4;white-space:normal;overflow:visible;letter-spacing:-0.01em;margin:0;padding:0;">
-          <span class="srs-breadcrumb-track" style="display:inline-flex;align-items:center;gap:5px;color:var(--ink, #f8fafc);font-weight:700;font-size:0.78rem;font-family:var(--font-d, 'Onest', sans-serif);letter-spacing:-0.01em;white-space:nowrap;flex-shrink:0;">${lessonShieldSvg}<span>${escapeHtmlStr(lessonEchelonLabel)}</span></span>
+          <span class="srs-breadcrumb-track" style="display:inline-flex;align-items:center;gap:6px;color:var(--ink, #f8fafc);font-weight:700;font-size:0.78rem;font-family:var(--font-d, 'Onest', sans-serif);letter-spacing:-0.01em;white-space:nowrap;flex-shrink:0;">${lessonShieldSvg}<span>${escapeHtmlStr(lessonEchelonLabel)}</span></span>
           <span class="srs-breadcrumb-sep" style="color:rgba(255,255,255,0.22);font-size:0.72rem;margin:0 4px;user-select:none;font-family:var(--font-d, 'Onest', sans-serif);white-space:nowrap;flex-shrink:0;">/</span>
           ${showUnitInBreadcrumb ? `
             <span class="srs-breadcrumb-topic" style="color:var(--ink, #f8fafc);font-weight:700;font-size:0.78rem;font-family:var(--font-d, 'Onest', sans-serif);letter-spacing:-0.01em;white-space:normal;overflow-wrap:anywhere;max-width:100%;min-width:0;" title="${escapeHtmlStr(cleanUnitTitleVal)}">${escapeHtmlStr(cleanUnitTitleVal)}</span>
@@ -55298,7 +55304,7 @@ function viewPythonSkill(sid){
     } else {
       const cta = (typeof getNoteCompletionCta === 'function')
         ? getNoteCompletionCta(activeK, sk)
-        : { attrName: 'data-py-finish-note', attrVal: activeK, text: 'Закрепить в карточках (+10 XP)' };
+        : { attrName: 'data-py-finish-note', attrVal: activeK, text: 'Закрепить в карточках' };
       finishBtnAttr = `${cta.attrName}="${cta.attrVal}"`;
       finishBtnText = cta.text;
     }
@@ -56792,7 +56798,7 @@ function viewPythonUnitTest(unitId, trackKey){
 
         <h2 class="ut-start-title">Готовы начать тест?</h2>
 
-        <p class="ut-start-sub">${qn} ${qWord} · порог 75% · +50 XP</p>
+        <p class="ut-start-sub">${qn} ${qWord} · порог 75%</p>
 
         <button type="button" class="btn-glass-emerald ut-start-btn" data-ut-start>▶ Начать тест</button>
 
@@ -58218,7 +58224,7 @@ function buildSrsSprintFinishHTML(isZenPhase, sprintNumVal, remainingCount, rema
             </div>
             <h2 style="font-size:1.45rem;font-weight:800;color:var(--ink);margin:0 0 8px;">15 карточек закреплены в памяти</h2>
             <p style="font-size:0.92rem;color:var(--ink-muted);max-width:460px;margin:0 auto 20px;line-height:1.6;">
-              Ровный темп микрообучения без перегрузки. Начислен бонус консолидации <b style="color:#f59e0b;">+${sprintXpBonus} XP</b>.
+              Ровный темп микрообучения без перегрузки.
             </p>
             <div style="display:flex;gap:10px;justify-content:center;margin-bottom:24px;flex-wrap:wrap;">
               <span class="cocoon-pill">⚡ ${escapeHtmlStr(remainingLabel)}: <b>${safeRem}</b></span>
@@ -59453,9 +59459,7 @@ function viewPracticeHub(){
 
         </div>
 
-        <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.75rem;padding-top:8px;border-top:1px solid rgba(255,255,255,0.05);">
-
-          <span style="color:var(--emerald);font-weight:700;">+25 XP</span>
+        <div style="display:flex;justify-content:flex-end;align-items:center;font-size:0.75rem;padding-top:8px;border-top:1px solid rgba(255,255,255,0.05);">
 
           <span style="color:var(--accent);font-weight:600;">Решать в Zen IDE ➔</span>
 
@@ -60159,7 +60163,7 @@ function viewModuleBoss(trackKey){
 
   if(bossViewState.runStatus === 'running') runFeedback = `<div class="test-running-shimmer" style="margin-top:10px;">⚔️ Атака на Босса: прогоняю боевые тесты модуля…</div>`;
 
-  else if(bossViewState.runStatus === 'pass') runFeedback = `<div class="result-box--pass correct-pulse-anim">${ICONS.check} 👑 Босс модуля «${tr.title}» повержен! (+100 XP, все навыки модуля повышены до 100 MP!)\n${bossViewState.runOutput||''}</div>`;
+  else if(bossViewState.runStatus === 'pass') runFeedback = `<div class="result-box--pass correct-pulse-anim">${ICONS.check} 👑 Босс модуля «${tr.title}» повержен! Все навыки модуля повышены до 100 MP!\n${bossViewState.runOutput||''}</div>`;
 
   else if(bossViewState.runStatus === 'fail') runFeedback = `<div class="result-box--fail">Испытание Босса пока не пройдено:\n${bossViewState.runOutput||''}</div>`;
 
@@ -60175,7 +60179,7 @@ function viewModuleBoss(trackKey){
 
         <div style="font-weight:800;font-size:.98rem;">Босс модуля «${tr.title}» повержен!</div>
 
-        <div class="meta" style="font-size:.8rem;">Все навыки трека получили ранг Мастерства (100 MP). Награда +100 XP зачислена.</div>
+        <div class="meta" style="font-size:.8rem;">Все навыки трека получили ранг Мастерства (100 MP).</div>
 
       </div>
 
@@ -60193,7 +60197,7 @@ function viewModuleBoss(trackKey){
 
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
 
-          <span class="topic-badge" style="margin:0;">${boss.tier} · ${boss.topic} · +100 XP</span>
+          <span class="topic-badge" style="margin:0;">${boss.tier} · ${boss.topic}</span>
 
           ${isPassed ? `<span class="state-tag state-tag--mastered" style="margin:0;">👑 Босс взят</span>` : `<span class="state-tag state-tag--available" style="margin:0;">Финальное испытание модуля</span>`}
 
@@ -64525,7 +64529,7 @@ function renderHrNotesTabHTML(){
               КОНСПЕКТ ${curIdx+1} ИЗ ${HR_NOTES.length} · ⏱ ${curNote.readTime}
             </div>
             ${isCurRead ? `
-              <span class="hr-status-pill done">✓ Изучено (+15 XP)</span>
+              <span class="hr-status-pill done">✓ Изучено</span>
             ` : `
               <span class="hr-status-pill pending">● К изучению</span>
             `}
@@ -65116,7 +65120,7 @@ function renderHrTermsTabHTML(){
             ${currentStage ? 'Карточки этапа успешно отработаны' : 'Карточки закреплены в долговременной памяти'}
           </h2>
           <p style="font-size:0.90rem;color:var(--ink-muted);max-width:440px;margin:0 auto 20px;line-height:1.55;">
-            Ключевые формулировки проработаны. Начислен бонус консолидации <b style="color:#f59e0b;">+30 XP</b>.
+            Ключевые формулировки проработаны.
           </p>
 
           <div style="display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;max-width:460px;margin:0 auto;">
@@ -65329,7 +65333,7 @@ function renderUnifiedStarSplitHTML(){
       const rows = ev.checks.map(c => `<div style="margin:4px 0;">${c.ok ? '✓' : '✗'} ${c.label}</div>`).join('');
       evalBlock = `
         <div class="mock-glass-box ${passFlag ? 'mock-glass-box--emerald' : 'mock-glass-box--carmine'}" style="margin-top:14px;">
-          <strong style="color:${passFlag ? 'var(--emerald)' : '#fda4af'};">Оценка STAR-ответа: ${ev.score} из ${ev.total} критериев ${passFlag ? '(+30 XP!)' : ''}</strong>
+          <strong style="color:${passFlag ? 'var(--emerald)' : '#fda4af'};">Оценка STAR-ответа: ${ev.score} из ${ev.total} критериев</strong>
           <div style="margin-top:6px;">${rows}</div>
         </div>`;
     } else {
@@ -65700,7 +65704,7 @@ function viewMockInterview(){
 
     let runFeedback = '';
     if(mockInterviewState.runStatus === 'running') runFeedback = `<div class="test-running-shimmer" style="margin-top:10px;">⏳ Проверяю код кандидата на тестовом наборе…</div>`;
-    else if(mockInterviewState.runStatus === 'pass') runFeedback = `<div class="result-box--pass correct-pulse-anim">${ICONS.check} Live-Coding раунд успешно пройден! (+40 XP, уровень подсказок сброшен к Уровню 0)\n${mockInterviewState.runOutput||''}</div>`;
+    else if(mockInterviewState.runStatus === 'pass') runFeedback = `<div class="result-box--pass correct-pulse-anim">${ICONS.check} Live-Coding раунд успешно пройден! (уровень подсказок сброшен к Уровню 0)\n${mockInterviewState.runOutput||''}</div>`;
     else if(mockInterviewState.runStatus === 'fail') runFeedback = `<div class="result-box--fail">Тесты собеседования не прошли:\n${mockInterviewState.runOutput||''}</div>`;
 
     const effEchId = getActiveMockEchelonId();
@@ -66343,7 +66347,7 @@ diagQuestionHTML = function(pool, label){
 
         <span>${isCorrect ? '✓ Правильно! (Ответ уровня Senior)' : (chosen === -1 ? '🤷 Честный выбор — тема добавлена в маршрут' : '✕ Не совсем.')}</span>
 
-        <span class="bs-badge">${isCorrect ? '⚡ +15 XP' : 'Диагностика'}</span>
+        <span class="bs-badge">${isCorrect ? '✓ Верно' : 'Диагностика'}</span>
 
       </div>
 
@@ -67415,7 +67419,7 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum,
 
               <div>
 
-                <span class="coddy-rail-capsule-val is-xp">+${userXp}</span> <span class="coddy-rail-capsule-label">XP</span>
+                <span class="coddy-rail-capsule-val is-xp">${userXp}</span> <span class="coddy-rail-capsule-label">XP</span>
 
               </div>
 
@@ -67507,7 +67511,7 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum,
 
                 <span class="coddy-rail-pipe-name">Zen IDE</span>
 
-                <span class="coddy-rail-pipe-sub">+35 XP</span>
+                <span class="coddy-rail-pipe-sub">Практика</span>
 
               </div>
 
@@ -68581,8 +68585,6 @@ function viewProPath(options){
 
   const heroTypeLabel = curActiveTrackKey === 'hr' ? '🗣️ Подготовка и карточки' : '💻 Практика IDE';
 
-  const heroXp = '+50 XP';
-
   const echelonProg = (typeof getEchelonProgress === 'function') ? getEchelonProgress(curEchId === 'all' ? getDefaultActiveEchelonId() : curEchId) : { pct: 0, mastered: 0, unitsCount: allUnits.length };
   const isEchelonFullyMastered = echelonProg.pct >= 100 || (allUnits.length > 0 && allUnits.every(isUnitCompleted));
 
@@ -68630,7 +68632,6 @@ function viewProPath(options){
           <div class="pro-hero-meta-badges" style="display:flex;gap:10px;margin-bottom:16px;font-family:var(--font-m,monospace);font-size:0.72rem;">
             <span style="padding:3px 10px;border-radius:6px;color:#a7f3d0;background:rgba(16,185,129,0.14);border:1px solid rgba(52,211,153,0.3);">💎 100% мастерства</span>
             <span style="padding:3px 10px;border-radius:6px;color:#fde68a;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);">⚡ Funnel Ready</span>
-            <span style="padding:3px 10px;border-radius:6px;color:#cbd5e1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);">🏆 +1 500 XP</span>
           </div>
         </div>
       </div>
@@ -68677,10 +68678,6 @@ function viewProPath(options){
 
           <div class="pro-hero-meta" style="display:flex;align-items:center;gap:8px;font-family:var(--font-m,monospace);font-size:0.75rem;color:#8b9bb4;margin-bottom:12px;">
             <span style="color:${isCurChallenge ? '#fecdd3' : '#94a3b8'};font-weight:${isCurChallenge ? '700' : '600'};${isCurChallenge ? 'background:rgba(190,18,60,0.14);border:1px solid rgba(244,63,94,0.30);padding:2px 8px;border-radius:6px;' : ''}">${heroTypeLabel}</span>
-
-            <span style="opacity:0.35;margin:0 4px;">•</span>
-
-            <span style="color:#34d399;font-weight:700;">${heroXp}</span>
 
           </div>
 
@@ -69747,7 +69744,7 @@ function buildLessonStageTopbarHTML(l, rightLabel, pct, xpLabel){
 
       </div>
 
-      <span class="sprint-xp-pill">${xpLabel}</span>
+      ${xpLabel ? `<span class="sprint-xp-pill">${xpLabel}</span>` : ''}
 
     </div>
 
@@ -69911,9 +69908,9 @@ lessonCheckHTML = function(){
 
       <div class="bs-title-row">
 
-        <span>${isCorrect ? '✓ Правильно! +15 XP' : '✕ Не совсем.'}</span>
+        <span>${isCorrect ? '✓ Правильно!' : '✕ Не совсем.'}</span>
 
-        <span class="bs-badge">${isCorrect ? '⚡ +15 XP' : 'Разбор'}</span>
+        <span class="bs-badge">${isCorrect ? '✓ Верно' : 'Разбор'}</span>
 
       </div>
 
@@ -69963,7 +69960,7 @@ lessonStageHTML = function(stage){
 
   const labels = {practice:'Практика', task:'Задание', practice2:'Практика 2', task2:'Задание 2', debug:'Отладка'};
 
-  const topbar = buildLessonStageTopbarHTML(l, labels[stage] || 'Практика', pct, '⚡ +20 XP');
+  const topbar = buildLessonStageTopbarHTML(l, labels[stage] || 'Практика', pct, '');
 
   let raw = _origLessonStageHTML(stage).replace('<div class="container">', '<div class="container">\n      ' + topbar);
 
@@ -71995,7 +71992,7 @@ function getNoteSrsBadgeHTML(noteId){
 
           <div class="note-srs-ladder">${ladderHTML}</div>
 
-          <button type="button" class="btn btn-clay" data-srs-note-pass="${noteId}" style="padding:3px 10px;font-size:0.72rem;border-radius:8px;font-weight:700;">✓ Закрепить (+15 XP)</button>
+          <button type="button" class="btn btn-clay" data-srs-note-pass="${noteId}" style="padding:3px 10px;font-size:0.72rem;border-radius:8px;font-weight:700;">✓ Закрепить</button>
 
         </div>
 
@@ -74221,7 +74218,7 @@ function openStreakModal(){
 
       <div style="padding:10px 14px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);margin-bottom:12px;font-size:0.80rem;color:#fbbf24;font-weight:700;">
 
-        ⚡ Опыт за сутки: +${todayXp()} XP (Цель: ${state.dailyGoal || 50} XP)
+        ⚡ Опыт за сутки: ${todayXp()} XP (Цель: ${state.dailyGoal || 50} XP)
 
       </div>
 
@@ -77812,7 +77809,7 @@ document.addEventListener('click', async function(e){
 
             const cta = (typeof getNoteCompletionCta === 'function')
               ? getNoteCompletionCta(activeK, sk)
-              : { attrName: 'data-py-finish-note', attrVal: activeK, text: 'Закрепить в карточках (+10 XP)' };
+              : { attrName: 'data-py-finish-note', attrVal: activeK, text: 'Закрепить в карточках' };
 
             chunkMoreBtn.setAttribute(cta.attrName, cta.attrVal);
 
