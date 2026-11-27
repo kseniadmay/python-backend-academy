@@ -57069,6 +57069,19 @@ const _isSameDay = (_initCardsPos.savedDate === _todayKey);
 
 
 
+// Фильтр очереди SRS из приватного профиля (например, только 1 и 2 эшелон)
+function isDeckAllowedInSrsQueue(deckId){
+  const p = (typeof window !== 'undefined') ? window.PRIVATE_PROFILE_DATA : null;
+  const allowed = (p && Array.isArray(p.srsAllowedEchelons))
+    ? p.srsAllowedEchelons
+    : (p && p.ui && Array.isArray(p.ui.srsAllowedEchelons) ? p.ui.srsAllowedEchelons : null);
+  if(!allowed || allowed.length === 0) return true;
+  if(typeof getDeckInterviewTier === 'function'){
+    return allowed.includes(getDeckInterviewTier(deckId));
+  }
+  return true;
+}
+
 const _rawDueQueue = (_isSameDay && Array.isArray(_initCardsPos.dueQueue) && _initCardsPos.dueQueue.length > 0 && !_initCardsPos.completed)
 
   ? (function(){
@@ -57080,6 +57093,8 @@ const _rawDueQueue = (_isSameDay && Array.isArray(_initCardsPos.dueQueue) && _in
       return _initCardsPos.dueQueue.filter(item => {
 
         if(!item || typeof item.deckId !== 'string' || typeof item.cardIdx !== 'number') return false;
+
+        if(!isDeckAllowedInSrsQueue(item.deckId)) return false;
 
         if(!ALL_DECKS_COMBINED[item.deckId] || !ALL_DECKS_COMBINED[item.deckId].cards || !ALL_DECKS_COMBINED[item.deckId].cards[item.cardIdx]) return false;
 
@@ -57280,7 +57295,7 @@ function collectDueCardsQueue(){
 
       const cIdx = parseInt(parts[1], 10);
 
-      if(ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
+      if(isDeckAllowedInSrsQueue(did) && ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
 
         queue.push({ deckId: did, cardIdx: cIdx, dueDate: item.dueDate, rating: Number(ratings[k]) || 0 });
 
@@ -57314,7 +57329,7 @@ function collectDueCardsQueue(){
 
       const cIdx = parseInt(parts[1], 10);
 
-      if(ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
+      if(isDeckAllowedInSrsQueue(did) && ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
 
         queue.push({ deckId: did, cardIdx: cIdx, dueDate: null, rating: r });
 
@@ -57330,7 +57345,7 @@ function collectDueCardsQueue(){
 
   (state.reviewedDecks || []).forEach(did => {
 
-    if(typeof did !== 'string' || !ALL_DECKS_COMBINED[did] || !Array.isArray(ALL_DECKS_COMBINED[did].cards)) return;
+    if(typeof did !== 'string' || !isDeckAllowedInSrsQueue(did) || !ALL_DECKS_COMBINED[did] || !Array.isArray(ALL_DECKS_COMBINED[did].cards)) return;
 
     ALL_DECKS_COMBINED[did].cards.forEach((cardObj, cIdx) => {
 
@@ -63811,6 +63826,14 @@ function applyPrivateProfile(profile){
     }
   }
   if(typeof invalidateInterviewSyncIndex === 'function') invalidateInterviewSyncIndex();
+  window.__srsStatsMemo = null;
+  window.__srsDailyMemo = null;
+  if(typeof cardsHubState !== 'undefined' && cardsHubState && Array.isArray(cardsHubState.dueQueue) && cardsHubState.dueQueue.length > 0){
+    cardsHubState.dueQueue = cardsHubState.dueQueue.filter(item => item && isDeckAllowedInSrsQueue(item.deckId));
+    if(cardsHubState.duePos >= cardsHubState.dueQueue.length){
+      cardsHubState.duePos = 0;
+    }
+  }
 }
 
 function updateAuthButtonsUI(){
@@ -63868,7 +63891,7 @@ async function loadAuthAndPrivateProfile(forceReload){
           applyPrivateProfile(profData);
           if(typeof render === 'function'){
             const h = (typeof location !== 'undefined' ? location.hash : '') || '#/';
-            if(h === '#/' || h === '' || h === '#dashboard' || h === '#/dashboard' || h === '#map' || h === '#/map' || h.startsWith('#mock') || h.startsWith('#/mock') || h.startsWith('#interview-sim') || h.startsWith('#/interview-sim') || h.startsWith('#hr') || h.startsWith('#/hr') || h.startsWith('#path') || h.startsWith('#/path')){
+            if(h === '#/' || h === '' || h === '#dashboard' || h === '#/dashboard' || h === '#map' || h === '#/map' || h.startsWith('#cards') || h.startsWith('#/cards') || h.startsWith('#notes-review') || h.startsWith('#/notes-review') || h.startsWith('#mock') || h.startsWith('#/mock') || h.startsWith('#interview-sim') || h.startsWith('#/interview-sim') || h.startsWith('#hr') || h.startsWith('#/hr') || h.startsWith('#path') || h.startsWith('#/path')){
               render();
             } else if(typeof renderUnifiedNavigation === 'function'){
               renderUnifiedNavigation();
@@ -72369,7 +72392,7 @@ function getSpacedRepetitionStats(){
 
         const cIdx = parseInt(parts[1], 10);
 
-        if(ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
+        if(isDeckAllowedInSrsQueue(did) && ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
 
           dueTodayCardsCount++;
 
@@ -72411,7 +72434,7 @@ function getSpacedRepetitionStats(){
 
         const cIdx = parseInt(parts[1], 10);
 
-        if(ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
+        if(isDeckAllowedInSrsQueue(did) && ALL_DECKS_COMBINED[did] && ALL_DECKS_COMBINED[did].cards && ALL_DECKS_COMBINED[did].cards[cIdx]){
 
           dueTodayCardsCount++;
 
@@ -72431,11 +72454,11 @@ function getSpacedRepetitionStats(){
 
   const reviewed = (state.reviewedDecks || []).filter(did => ALL_DECKS_COMBINED[did]);
 
-  const dueDecks = Array.from(new Set([...dueTodayDecks, ...weakDecks]));
+  const dueDecks = Array.from(new Set([...dueTodayDecks, ...weakDecks])).filter(did => isDeckAllowedInSrsQueue(did));
 
   reviewed.forEach(did => {
 
-    if(dueDecks.length < 4 && !dueDecks.includes(did)) dueDecks.push(did);
+    if(dueDecks.length < 4 && isDeckAllowedInSrsQueue(did) && !dueDecks.includes(did)) dueDecks.push(did);
 
   });
 
