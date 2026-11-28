@@ -1853,7 +1853,19 @@ full_env_code = _preloaded_full_env_code if _preloaded_full_env_code is not None
 
 if __name__ == '__main__':
     def _run_suite():
-        from extract_remnote_data import TASKS_381
+        import json as _json_tasks, os as _os_tasks
+        _tasks_manifest = _os_tasks.path.normpath(_os_tasks.path.join(_os_tasks.path.dirname(__file__), '..', 'data', 'content', 'tasks', 'manifest.json'))
+        if _os_tasks.path.isfile(_tasks_manifest):
+            with open(_tasks_manifest, 'r', encoding='utf-8') as _mf:
+                _mdata = _json_tasks.load(_mf)
+            TASKS_381 = []
+            for _ch in _mdata.get('chunks', []):
+                _ch_path = _os_tasks.path.join(_os_tasks.path.dirname(_tasks_manifest), _ch['file'])
+                with open(_ch_path, 'r', encoding='utf-8') as _cf:
+                    TASKS_381.extend(_json_tasks.load(_cf))
+            TASKS_381.sort(key=lambda _t: _t.get('id', 0))
+        else:
+            from extract_remnote_data import TASKS_381
         from build_python_mastery import HR_NOTES_DATA, PY_NOTES_DATA, WEB_NOTES_DATA, BACKEND_NOTES_DATA, ALGO_NOTES_DATA, DB_NOTES_DATA, ARCH_NOTES_DATA, INFRA_NOTES_DATA
         import html as _html, re as _re, io as _io, contextlib as _cl, sys as _sys, types as _types
 

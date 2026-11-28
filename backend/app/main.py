@@ -554,8 +554,15 @@ async def serve_spa_or_static(full_path: str, request: Request) -> Response:
 
     is_allowed_root_file = len(parts) == 1 and parts[0] in ALLOWED_STATIC_FILES
     is_allowed_dir_file = len(parts) >= 2 and parts[0] in ALLOWED_STATIC_DIRS
+    is_allowed_tasks_chunk = (
+        len(parts) == 4
+        and parts[0] == 'data'
+        and parts[1] == 'content'
+        and parts[2] == 'tasks'
+        and rel_path.suffix.lower() == '.json'
+    )
 
-    if is_allowed_root_file or is_allowed_dir_file:
+    if is_allowed_root_file or is_allowed_dir_file or is_allowed_tasks_chunk:
         try:
             resolved_root = root_dir.resolve()
             resolved_file = (root_dir / rel_path).resolve()
@@ -564,6 +571,10 @@ async def serve_spa_or_static(full_path: str, request: Request) -> Response:
             if is_allowed_dir_file:
                 allowed_dir_root = (root_dir / parts[0]).resolve()
                 if not resolved_file.is_relative_to(allowed_dir_root):
+                    raise HTTPException(status_code=404, detail='Not Found')
+            if is_allowed_tasks_chunk:
+                allowed_tasks_root = (root_dir / 'data' / 'content' / 'tasks').resolve()
+                if not resolved_file.is_relative_to(allowed_tasks_root):
                     raise HTTPException(status_code=404, detail='Not Found')
         except HTTPException:
             raise

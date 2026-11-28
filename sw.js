@@ -1,10 +1,18 @@
-const CACHE_NAME = 'academy-pwa-v112';
+const CACHE_NAME = 'academy-pwa-v113';
 const ASSETS_TO_CACHE = [
   './',
   'index.html',
   'academy.html',
   'manifest.json',
-  'icon.svg'
+  'icon.svg',
+  'data/content/tasks/manifest.json',
+  'data/content/tasks/py.json',
+  'data/content/tasks/web.json',
+  'data/content/tasks/backend.json',
+  'data/content/tasks/algo.json',
+  'data/content/tasks/db.json',
+  'data/content/tasks/arch.json',
+  'data/content/tasks/infra.json'
 ];
 
 self.addEventListener('install', (event) => {

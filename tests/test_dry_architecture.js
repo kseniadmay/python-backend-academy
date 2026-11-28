@@ -98,10 +98,27 @@ const noteKeys = noteKeyMatches.map(m => m.match(/К-\d+/)[0]);
 const uniqueNoteKeys = new Set(noteKeys);
 assert.strictEqual(noteKeys.length, uniqueNoteKeys.size, `[DRY ERROR] Обнаружены дубликаты определений конспектов (${noteKeys.length} vs ${uniqueNoteKeys.size})!`);
 
-// В) Проверка уникальности задач IDE_TASKS
-const ideTasksMatch = htmlContent.match(/const IDE_TASKS = (\[[\s\S]*?\]);\s*(?:const|let|var|function)/);
-assert(ideTasksMatch, 'Массив IDE_TASKS должен присутствовать в academy.html');
-const ideTasks = JSON.parse(ideTasksMatch[1]);
+// В) Проверка уникальности задач IDE_TASKS (из модульных чанков data/content/tasks/ с фолбэком на инлайн)
+const tasksManifestPath = path.join(__dirname, '..', 'data', 'content', 'tasks', 'manifest.json');
+let ideTasks = [];
+if (fs.existsSync(tasksManifestPath)) {
+  const manifest = JSON.parse(fs.readFileSync(tasksManifestPath, 'utf8'));
+  assert(Array.isArray(manifest.chunks) && manifest.chunks.length > 0, 'manifest.json должен содержать непустой список chunks');
+  for (const ch of manifest.chunks) {
+    const chPath = path.join(__dirname, '..', 'data', 'content', 'tasks', ch.file);
+    assert(fs.existsSync(chPath), `Чанк задач ${ch.file} должен существовать`);
+    const arr = JSON.parse(fs.readFileSync(chPath, 'utf8'));
+    assert.strictEqual(arr.length, ch.count, `Количество задач в ${ch.file} (${arr.length}) должно совпадать с manifest.count (${ch.count})`);
+    ideTasks.push(...arr);
+  }
+  assert.strictEqual(ideTasks.length, manifest.totalTasks, `Сумма задач по чанкам (${ideTasks.length}) должна совпадать с manifest.totalTasks (${manifest.totalTasks})`);
+  assert(/function ensureIdeTasksLoaded\s*\(/.test(htmlContent), 'Функция ensureIdeTasksLoaded должна присутствовать в academy.html');
+} else {
+  const ideTasksMatch = htmlContent.match(/const IDE_TASKS = (\[[\s\S]*?\]);\s*(?:const|let|var|function)/);
+  assert(ideTasksMatch, 'Массив IDE_TASKS должен присутствовать в academy.html');
+  ideTasks = JSON.parse(ideTasksMatch[1]);
+}
+assert(ideTasks.length > 0, 'Список задач IDE_TASKS не должен быть пустым');
 
 const taskIds = ideTasks.map(t => t.id);
 const uniqueTaskIds = new Set(taskIds);
