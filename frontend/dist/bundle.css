@@ -40,9 +40,14 @@
   --clay: var(--amber);
   --clay-soft: var(--amber-soft);
 
-  --font-d: 'Onest', 'Golos Text', sans-serif;
-  --font-b: 'Onest', 'Golos Text', sans-serif;
-  --font-m: 'JetBrains Mono', monospace;
+  --font-d: 'Onest', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-b: 'Onest', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-m: 'JetBrains Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
+  --r-xs: 4px;
+  --r-sm: 8px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-xl: 22px;
   --tabbar-h: 68px;
 
   /* Палитра «Вечерний Обсидиан» (определена однократно как источник для dark-режимов) */
@@ -121,7 +126,7 @@
 
 /* --- base.css --- */
 /* ==========================================================================
-   Academy Base & Typography (Onest & Golos Text)
+   Academy Base & Typography (Onest & JetBrains Mono)
    ========================================================================== */
 
 * {
@@ -134,11 +139,24 @@ html {
 
 body {
   margin: 0;
-  background: var(--paper);
+  background-color: var(--paper);
+  background-image: radial-gradient(rgba(0, 0, 0, 0.045) 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+  background-attachment: fixed;
   color: var(--ink);
   font-family: var(--font-b);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) body {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.055) 1.2px, transparent 1.2px);
+  }
+}
+
+:root[data-theme="dark"] body {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.055) 1.2px, transparent 1.2px);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -222,16 +240,15 @@ code, .mono {
 
 .glass-card {
   background: var(--surface);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   border: 1px solid var(--glass-border);
-  border-radius: 16px;
+  border-radius: var(--r-lg, 16px);
   box-shadow: var(--shadow-1);
-  transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.2s ease;
+  transition: border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
 }
 
 .glass-card:hover {
-  transform: translateY(-2px);
   border-color: rgba(255, 255, 255, 0.16);
 }
 
@@ -240,7 +257,7 @@ code, .mono {
   position: fixed;
   border-radius: 50%;
   pointer-events: none;
-  filter: blur(80px);
+  filter: blur(68px);
   z-index: 0;
   opacity: 0.6;
 }
@@ -263,21 +280,21 @@ code, .mono {
 
 /* --- components/sidebar.css --- */
 /* ==========================================================================
-   Desktop Sidebar (236px Invariant) & Mobile Bottom Tabbar
+   Desktop Sidebar (270px Invariant) & Mobile Bottom Tabbar
    ========================================================================== */
 
 .desktop-sidebar {
-  width: 236px;
-  min-width: 236px;
-  max-width: 236px;
+  width: 270px;
+  min-width: 270px;
+  max-width: 270px;
   height: 100vh;
   position: sticky;
   top: 0;
   display: flex;
   flex-direction: column;
   background: var(--surface);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border-right: 1px solid var(--glass-border);
   z-index: 40;
   padding: 16px 12px;
@@ -290,7 +307,7 @@ code, .mono {
   align-items: center;
   gap: 10px;
   padding: 8px 10px;
-  border-radius: 12px;
+  border-radius: var(--r-md, 10px);
   font-family: var(--font-d);
   font-weight: 700;
   font-size: 0.95rem;
@@ -334,7 +351,7 @@ code, .mono {
 
 /* --- components/trail.css --- */
 /* ==========================================================================
-   3D Serpentine Path & 13 Jewel Dots Necklace
+   Serpentine Path & 13 Jewel Dots Necklace
    ========================================================================== */
 
 .trail-container {
@@ -363,11 +380,12 @@ code, .mono {
 }
 
 .dot-jewel {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--line);
-  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
+  contain: layout style;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   cursor: pointer;
 }
 
@@ -377,12 +395,12 @@ code, .mono {
 }
 
 .dot-jewel.active {
-  background: var(--amber);
-  transform: scale(1.35);
-  box-shadow: 0 0 12px var(--amber-soft);
+  background: #ffffff;
+  border: 1.5px solid #10b981;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.55);
 }
 
-/* Единственный доминирующий CTA (Single Dominant CTA) */
+/* Единственный доминирующий CTA (Изумрудное стекло) */
 .single-dominant-cta {
   display: inline-flex;
   align-items: center;
@@ -390,25 +408,26 @@ code, .mono {
   gap: 10px;
   width: 100%;
   max-width: 440px;
-  padding: 16px 28px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  padding: 15px 26px;
+  border-radius: var(--r-md, 10px);
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.28) 0%, rgba(6, 78, 59, 0.26) 100%);
+  border: 1.5px solid rgba(52, 211, 153, 0.65);
   color: #ffffff;
   font-family: var(--font-d);
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 1rem;
   letter-spacing: -0.01em;
-  box-shadow: 0 12px 32px -8px rgba(16, 185, 129, 0.45);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.20), 0 4px 20px -2px rgba(16, 185, 129, 0.34);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.14s ease;
 }
 
 .single-dominant-cta:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 36px -8px rgba(16, 185, 129, 0.6);
+  border-color: rgba(52, 211, 153, 0.95);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.26), 0 6px 24px -2px rgba(16, 185, 129, 0.48);
 }
 
 .single-dominant-cta:active {
-  transform: translateY(1px);
+  transform: scale(0.985);
 }
 
 /* --- components/reader.css --- */
@@ -418,7 +437,7 @@ code, .mono {
 
 .reader-container {
   width: 100%;
-  max-width: 680px;
+  max-width: 700px;
   margin: 0 auto;
   padding: 24px 20px 80px;
   background: transparent;
@@ -441,14 +460,14 @@ code, .mono {
 /* Блоки кода с мобильной эргономикой */
 .reader-code-snippet {
   background: #090c10;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg, 16px);
   padding: 14px 16px;
   margin: 16px 0 20px;
   overflow-x: auto;
   font-family: var(--font-m);
   font-size: 0.9rem;
-  line-height: 1.5;
+  line-height: 1.62;
   color: #e6edf3;
 }
 
@@ -458,12 +477,15 @@ code, .mono {
   word-break: break-word;
 }
 
-/* Контраст Junior vs Senior / O(1) vs O(N) */
+/* Контраст Junior vs Senior (единая парная капсула без зазора) */
 .contrast-card-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 0;
   margin: 18px 0;
+  border-radius: var(--r-lg, 16px);
+  border: 1px solid var(--line);
+  overflow: hidden;
 }
 
 @media (max-width: 600px) {
@@ -474,7 +496,7 @@ code, .mono {
 
 /* --- components/cards.css --- */
 /* ==========================================================================
-   3D Flashcards Flip Physics & SRS Micro-Loop
+   Flashcards Flip Physics & SRS Micro-Loop
    ========================================================================== */
 
 .flashcard-stage {
@@ -503,7 +525,7 @@ code, .mono {
   height: 100%;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  border-radius: 20px;
+  border-radius: var(--r-xl, 22px);
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -524,41 +546,48 @@ code, .mono {
   margin: 0 auto;
 }
 
+@media (max-width: 640px) {
+  .srs-ratings-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 .srs-btn {
   padding: 12px 8px;
-  border-radius: 12px;
+  border-radius: var(--r-md, 10px);
   font-size: 0.88rem;
   font-weight: 600;
   text-align: center;
-  transition: transform 0.1s ease;
+  color: #ffffff;
+  transition: transform 0.14s ease, box-shadow 0.18s ease;
 }
 
 .srs-btn:active {
-  transform: scale(0.97);
+  transform: scale(0.985);
 }
 
 .srs-btn-again {
-  background: rgba(178, 58, 52, 0.15);
-  color: #ef4444;
+  background: linear-gradient(180deg, #350f18 0%, #1e070e 100%);
+  border: 1.5px solid #d9435e;
 }
 
 .srs-btn-hard {
-  background: rgba(217, 119, 6, 0.15);
-  color: #f59e0b;
+  background: linear-gradient(180deg, #52350b 0%, #2c1a04 100%);
+  border: 1.5px solid #f59e0b;
 }
 
 .srs-btn-good {
-  background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
+  background: linear-gradient(180deg, #103326 0%, #091f17 100%);
+  border: 1.5px solid #2ea77d;
 }
 
 .srs-btn-easy {
-  background: rgba(59, 130, 246, 0.15);
-  color: #3b82f6;
+  background: linear-gradient(180deg, #0d2a38 0%, #071922 100%);
+  border: 1.5px solid #1fa3c7;
 }
 
 /* ==========================================================================
-   Hub 3D Flashcards & SRS Aesthetics
+   Hub Flashcards & SRS Aesthetics
    ========================================================================== */
 
 .cards-hub-container {
@@ -578,7 +607,7 @@ code, .mono {
 .fc-card {
   background: var(--surface);
   border: 1.5px solid var(--line);
-  border-radius: 24px;
+  border-radius: var(--r-xl, 22px);
   padding: 28px 26px;
   min-height: clamp(165px, 22vh, 225px);
   display: flex;
@@ -593,16 +622,9 @@ code, .mono {
   touch-action: pan-y;
 }
 
-.fc-card--3d {
-  will-change: transform;
-  transform-style: preserve-3d;
-  transition: transform 0.1s ease-out, border-color .22s, background .25s, box-shadow .25s;
-}
-
 .fc-card:hover {
   border-color: var(--moss);
   box-shadow: 0 12px 28px rgba(16, 185, 129, 0.14);
-  transform: translateY(-2px);
 }
 
 .fc-card:active {
@@ -667,7 +689,7 @@ code, .mono {
   padding: 12px 14px !important;
   font-size: 0.92rem !important;
   font-weight: 700 !important;
-  border-radius: 14px !important;
+  border-radius: var(--r-md, 10px) !important;
   text-align: center;
   justify-content: center;
   transition: transform .14s cubic-bezier(0.34, 1.56, 0.64, 1), filter .15s, box-shadow .18s !important;
@@ -792,9 +814,9 @@ code, .mono {
 .practice-editor-col {
   display: flex;
   flex-direction: column;
-  background: #090c10;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--surface);
+  border-radius: var(--r-lg, 16px);
+  border: 1px solid var(--line);
   overflow: hidden;
 }
 
@@ -804,13 +826,13 @@ code, .mono {
   flex-wrap: wrap;
   gap: 6px;
   padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.02);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--line);
 }
 
 .token-chip {
   padding: 4px 10px;
-  border-radius: 8px;
+  border-radius: var(--r-sm, 8px);
   background: rgba(255, 255, 255, 0.06);
   color: var(--emerald);
   font-family: var(--font-m);
@@ -823,13 +845,19 @@ code, .mono {
   background: rgba(16, 185, 129, 0.15);
 }
 
-/* Блок наставника Сократа */
+/* Блок наставника Сократа (высокий контраст в обеих темах) */
 .socratic-mentor-card {
   padding: 14px 16px;
-  border-radius: 12px;
-  background: rgba(107, 29, 47, 0.08);
-  border: 1px solid rgba(251, 113, 133, 0.18);
+  border-radius: var(--r-md, 10px);
+  background: rgba(217, 119, 6, 0.10);
+  border-left: 3px solid var(--amber);
   color: var(--ink);
   font-size: 0.92rem;
+}
+
+html:not([data-theme="dark"]) .socratic-mentor-card,
+:root[data-theme="light"] .socratic-mentor-card {
+  background: rgba(245, 158, 11, 0.12);
+  color: #78350f;
 }
 
