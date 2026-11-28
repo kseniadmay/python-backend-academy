@@ -212,6 +212,9 @@
     background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
     pointer-events: none;
   }
+  [data-theme="light"] .card-laser::before {
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.12) 0%, transparent 70%);
+  }
   .top-meta-row {
     display: flex;
     align-items: center;
@@ -631,9 +634,10 @@
     color: inherit;
   }
   [data-theme="light"] .cooldown-pill {
-    background: rgba(0, 0, 0, 0.025);
-    border-color: rgba(0, 0, 0, 0.05);
-    color: var(--ink);
+    background: rgba(124, 58, 237, 0.12);
+    border-color: rgba(124, 58, 237, 0.30);
+    color: #6d28d9;
+    text-shadow: none;
   }
   .cooldown-pill:hover {
     filter: brightness(1.15);
@@ -645,6 +649,10 @@
     border-radius: 50%;
     background: var(--frost, #38bdf8);
     box-shadow: 0 0 6px var(--frost, #38bdf8);
+  }
+  [data-theme="light"] .cooldown-pulse {
+    background: #7c3aed;
+    box-shadow: 0 0 6px rgba(124, 58, 237, 0.45);
   }
 
   
@@ -3964,6 +3972,7 @@
   }
   [data-theme="light"] .zen-cheatsheet-link:hover {
     background: rgba(124, 58, 237, 0.10);
+    border-color: rgba(124, 58, 237, 0.28);
     color: #5b21b6;
   }
   .zen-task-title {
@@ -24361,11 +24370,14 @@ html:not([data-theme="dark"]) .fc-card--Answer,
     justify-content: flex-start !important;
     box-sizing: border-box !important;
   }
-  html:not([data-theme="dark"]) .cards-hub-container,
-  :root[data-theme="light"] .cards-hub-container {
-    background: rgba(255, 255, 255, 0.82) !important;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.06), inset 0 1px 0 #ffffff !important;
+  html:not([data-theme="dark"]) .cards-hub-container:not(.srs-notes-container):not(.lesson-monolith-shell):not(:has(.srs-note-card)),
+  :root[data-theme="light"] .cards-hub-container:not(.srs-notes-container):not(.lesson-monolith-shell):not(:has(.srs-note-card)),
+  html[data-theme="light"] .cards-hub-container:not(.srs-notes-container):not(.lesson-monolith-shell):not(:has(.srs-note-card)) {
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.62) 0%, rgba(255, 255, 255, 0.34) 100%) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid rgba(15, 23, 42, 0.09) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 8px 24px -16px rgba(15, 23, 42, 0.10) !important;
   }
 }
 
@@ -35764,13 +35776,31 @@ html:not([data-theme="dark"]) .diagram-vector-card .arch-c-rose { color: #e11d48
   text-transform: uppercase;
   margin-bottom: 6px;
 }
-.swr-pulse-dot {
+  .swr-pulse-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
   background: var(--emerald);
   box-shadow: 0 0 8px var(--emerald);
   animation: emeraldSoftBreath 2.8s infinite ease-in-out;
+}
+@keyframes amethystSoftBreath {
+  0%, 100% {
+    transform: translateZ(0);
+    box-shadow: 0 0 2px 0.5px rgba(196, 181, 253, 0.65), 0 0 4px 1px rgba(139, 92, 246, 0.35), 0 0 6px 1.2px rgba(109, 40, 217, 0.15);
+    opacity: 0.78;
+  }
+  50% {
+    transform: translateZ(0);
+    box-shadow: 0 0 3px 0.8px rgba(196, 181, 253, 0.85), 0 0 6px 1.2px rgba(139, 92, 246, 0.48), 0 0 10px 1.5px rgba(109, 40, 217, 0.25);
+    opacity: 0.96;
+  }
+}
+[data-theme="light"] .swr-pulse-dot,
+html:not([data-theme="dark"]) .swr-pulse-dot {
+  background: #7c3aed;
+  box-shadow: 0 0 6px rgba(124, 58, 237, 0.45);
+  animation: amethystSoftBreath 2.8s infinite ease-in-out;
 }
 .swr-title {
   margin: 2px 0 6px 0;
@@ -38613,21 +38643,22 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     padding: 20px 20px calc(40px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
-  /* Saved Light Theme: Velvet Ink & Ethereal Indigo (Light Variant) */
+  /* Saved Light Theme: Velvet Ink & Amethyst (Light Variant) */
   html:not([data-theme="dark"]) .dash-stage.dashboard-container,
   [data-theme="light"] .dash-stage.dashboard-container {
-    --dash-accent: #4f46e5;
-    --dash-accent-2: #4338ca;
-    --dash-accent-soft: rgba(79, 70, 229, 0.10);
-    --dash-accent-rgb: 79, 70, 229;
+    --dash-accent: #6d28d9;
+    --dash-accent-2: #5b21b6;
+    --dash-accent-soft: rgba(124, 58, 237, 0.10);
+    --dash-accent-rgb: 109, 40, 217;
     --dash-bordeaux: #6b1d2f;
     --dash-bordeaux-soft: rgba(107, 29, 47, 0.09);
     --dash-bordeaux-rgb: 107, 29, 47;
     --dash-warn: #b45309;
     --dash-warn-rgb: 180, 83, 9;
     --dash-line: rgba(15, 23, 42, 0.09);
-    --dash-line-strong: rgba(79, 70, 229, 0.32);
+    --dash-line-strong: rgba(124, 58, 237, 0.32);
     --dash-muted: #475569;
+    background: radial-gradient(ellipse at 15% 10%, rgba(107, 29, 47, 0.05), transparent 60%), radial-gradient(ellipse at 85% 85%, rgba(124, 58, 237, 0.06), transparent 60%);
   }
   [data-theme="light"] body:has(.dash-stage.dashboard-container) {
     background-color: #f7f7fc;
@@ -39973,10 +40004,13 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
   :root[data-theme="light"] .fc-progress-header .dot-jewel.active,
   :root[data-theme="light"] .dots-necklace .dot-jewel.active,
   :root[data-theme="light"] #radar-dots-necklace .dot-jewel.active,
+  :root[data-theme="light"] .cards-hub-container .srs-deck-beads-bar .dot-jewel.active,
+  :root[data-theme="light"] .cards-hub-container .dot-jewel.bead-active-leading,
   :root[data-theme="light"] .cards-hub-container .dot-jewel.active,
   :root[data-theme="light"] .cards-hub-theory .dot-jewel.active {
     background: #ffffff !important;
     border: 1.5px solid #7c3aed !important;
+    box-shadow: 0 0 4px 1px rgba(196, 181, 253, 0.70), 0 0 9px 1.5px rgba(139, 92, 246, 0.45), 0 0 18px 2px rgba(109, 40, 217, 0.28) !important;
     animation: bead-pulse-amethyst 2.8s infinite ease-in-out !important;
   }
   :root[data-theme="light"] .dot-jewel.active::after,
@@ -40000,7 +40034,7 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
   :root[data-theme="light"] .dock-quantum-bead.active {
     background: #ffffff !important;
     border-color: #7c3aed !important;
-    box-shadow: 0 0 4px 1px rgba(124, 58, 237, 0.50) !important;
+    box-shadow: 0 0 4px 1px rgba(196, 181, 253, 0.70), 0 0 8px 1px rgba(139, 92, 246, 0.45), 0 0 12px 1.5px rgba(109, 40, 217, 0.28) !important;
   }
 
   /* Канонический приоритет рубежного ромба (.dot-jewel.milestone) внутри #radar-dots-necklace и .dots-necklace */
@@ -40400,9 +40434,9 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
   }
   html:not([data-theme="dark"]) .xp-gem-cyan,
   html[data-theme="light"] .xp-gem-cyan {
-    background: linear-gradient(135deg, rgba(2, 132, 199, 0.12), rgba(124, 58, 237, 0.12)) !important;
-    border-color: rgba(2, 132, 199, 0.32) !important;
-    color: #0369a1 !important;
+    background: rgba(124, 58, 237, 0.12) !important;
+    border-color: rgba(124, 58, 237, 0.32) !important;
+    color: #6d28d9 !important;
     box-shadow: none !important;
   }
   html:not([data-theme="dark"]) .stage-pill.active,
@@ -41569,6 +41603,113 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     border-color: #4c1d95 !important;
     color: #ffffff !important;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.30), 0 8px 22px -4px rgba(109, 40, 217, 0.48) !important;
+  }
+
+  /* 9. Финальная зачистка зелёных и голубых утечек светлой темы (Аметист SSOT) */
+  html:not([data-theme="dark"]) .token-chip,
+  html[data-theme="light"] .token-chip {
+    background: rgba(124, 58, 237, 0.10);
+    border-color: rgba(124, 58, 237, 0.28);
+    color: #5b21b6;
+  }
+  html:not([data-theme="dark"]) .token-chip:hover,
+  html[data-theme="light"] .token-chip:hover {
+    background: rgba(124, 58, 237, 0.18);
+    border-color: #7c3aed;
+    color: #4c1d95;
+  }
+  html:not([data-theme="dark"]) .prac-chip--cat.is-active,
+  html:not([data-theme="dark"]) .prac-chip--cat.active,
+  html:not([data-theme="dark"]) .prac-chip-select-pill.prac-chip--cat.is-active,
+  html:not([data-theme="dark"]) .prac-chip-select-pill.prac-chip--cat.active,
+  html[data-theme="light"] .prac-chip--cat.is-active,
+  html[data-theme="light"] .prac-chip--cat.active,
+  html[data-theme="light"] .prac-chip-select-pill.prac-chip--cat.is-active,
+  html[data-theme="light"] .prac-chip-select-pill.prac-chip--cat.active {
+    background: rgba(124, 58, 237, 0.10) !important;
+    border: 1.5px solid rgba(124, 58, 237, 0.42) !important;
+  }
+  html:not([data-theme="dark"]) .prac-chip--cat.is-active .prac-chip-display,
+  html:not([data-theme="dark"]) .prac-chip--cat.active .prac-chip-display,
+  html[data-theme="light"] .prac-chip--cat.is-active .prac-chip-display,
+  html[data-theme="light"] .prac-chip--cat.active .prac-chip-display {
+    color: #5b21b6 !important;
+  }
+  html:not([data-theme="dark"]) .cocoon-focus-eyebrow,
+  html[data-theme="light"] .cocoon-focus-eyebrow {
+    background: rgba(124, 58, 237, 0.12);
+    border-color: rgba(124, 58, 237, 0.32);
+    color: #5b21b6;
+  }
+  html:not([data-theme="dark"]) .pulse-ring-dot,
+  html[data-theme="light"] .pulse-ring-dot {
+    background: #7c3aed;
+    animation: amethystSoftBreath 2.8s infinite ease-in-out;
+  }
+  html:not([data-theme="dark"]) .dash-tile-badge,
+  html[data-theme="light"] .dash-tile-badge {
+    color: #5b21b6;
+    background: rgba(124, 58, 237, 0.10);
+    border-color: rgba(124, 58, 237, 0.28);
+  }
+  html:not([data-theme="dark"]) .sprint-progress-track,
+  html[data-theme="light"] .sprint-progress-track {
+    background: rgba(15, 23, 42, 0.08);
+  }
+  html:not([data-theme="dark"]) .sprint-progress-fill,
+  html[data-theme="light"] .sprint-progress-fill {
+    background: linear-gradient(90deg, #9f1239 0%, #d97706 42%, #7c3aed 82%, #8b5cf6 100%);
+    box-shadow: 0 0 10px rgba(124, 58, 237, 0.45);
+  }
+  html:not([data-theme="dark"]) .sprint-xp-pill,
+  html[data-theme="light"] .sprint-xp-pill {
+    background: rgba(124, 58, 237, 0.10);
+    border-color: rgba(124, 58, 237, 0.34);
+    color: #5b21b6;
+  }
+  html:not([data-theme="dark"]) .fc-a .math-formula,
+  html:not([data-theme="dark"]) .card-answer-box .math-formula,
+  html:not([data-theme="dark"]) .fc-card-back .math-formula,
+  html:not([data-theme="dark"]) .srs-note-card .math-formula,
+  html[data-theme="light"] .fc-a .math-formula,
+  html[data-theme="light"] .card-answer-box .math-formula,
+  html[data-theme="light"] .fc-card-back .math-formula,
+  html[data-theme="light"] .srs-note-card .math-formula {
+    background: rgba(124, 58, 237, 0.10) !important;
+    border-color: rgba(124, 58, 237, 0.28) !important;
+    color: #5b21b6 !important;
+  }
+  html:not([data-theme="dark"]) .echelon-badge--t2,
+  html:not([data-theme="dark"]) .echelon-badge--t3,
+  html:not([data-theme="dark"]) .echelon-badge--t5,
+  html:not([data-theme="dark"]) .echelon-pill--t3,
+  html[data-theme="light"] .echelon-badge--t2,
+  html[data-theme="light"] .echelon-badge--t3,
+  html[data-theme="light"] .echelon-badge--t5,
+  html[data-theme="light"] .echelon-pill--t3 {
+    background: rgba(124, 58, 237, 0.10);
+    border-color: rgba(124, 58, 237, 0.32);
+    color: #6d28d9;
+  }
+  html:not([data-theme="dark"]) .mock-glass-box--cyan,
+  html[data-theme="light"] .mock-glass-box--cyan {
+    background: rgba(124, 58, 237, 0.06);
+    border-color: rgba(124, 58, 237, 0.26);
+  }
+  html:not([data-theme="dark"]) .hr-ideal-answer-box,
+  html[data-theme="light"] .hr-ideal-answer-box {
+    background: rgba(124, 58, 237, 0.06) !important;
+    border-color: rgba(124, 58, 237, 0.28) !important;
+  }
+  html:not([data-theme="dark"]) .srs-note-card .code-run-bar .mono.meta::before,
+  html[data-theme="light"] .srs-note-card .code-run-bar .mono.meta::before {
+    color: #6d28d9 !important;
+  }
+  html:not([data-theme="dark"]) .srs-note-card .btn-inline-run,
+  html[data-theme="light"] .srs-note-card .btn-inline-run {
+    background: rgba(124, 58, 237, 0.08) !important;
+    border-color: rgba(124, 58, 237, 0.28) !important;
+    color: #5b21b6 !important;
   }
 </style>
 
@@ -55794,7 +55935,7 @@ function buildTaskSpecDetails(tObj){
 
             <span>⚡ Поток данных (I/O Flow)</span>
 
-            <span style="font-family:var(--font-mono, monospace);font-size:0.75rem;color:#93c5fd;">step: -1</span>
+            <span style="font-family:var(--font-mono, monospace);font-size:0.75rem;color:${(typeof isLightThemeActive === 'function' && isLightThemeActive()) ? '#6d28d9' : '#93c5fd'};">step: -1</span>
 
           </div>
 
@@ -65796,7 +65937,7 @@ function renderTechInterviewPathHTML(){
             <div style="min-width:0;flex:1;">
               <div style="font-size:0.94rem;font-weight:700;color:var(--ink);line-height:1.3;">${escapeHtmlStr(st.icon || '')} ${escapeHtmlStr(st.title)}</div>
               <div style="font-size:0.75rem;color:var(--ink-muted);margin-top:2px;">
-                ⏱ ${escapeHtmlStr(st.duration)} · Карточки: <b style="color:${isAllCardsDone ? (isLightThemeActive() ? '#5b21b6' : '#34d399') : 'var(--ink-soft)'};">${stCardsDone}/${stCards.length}</b> (${pct}%)${stViaPath > 0 ? ` · <span style="color:${isLightThemeActive() ? '#0284c7' : '#38bdf8'};">🧭 Знакомо по Пути: ${stViaPath}</span>` : ''}${isManualDone ? ' · ✓ Этап отмечен' : ''}
+                ⏱ ${escapeHtmlStr(st.duration)} · Карточки: <b style="color:${isAllCardsDone ? (isLightThemeActive() ? '#5b21b6' : '#34d399') : 'var(--ink-soft)'};">${stCardsDone}/${stCards.length}</b> (${pct}%)${stViaPath > 0 ? ` · <span style="color:${isLightThemeActive() ? '#6d28d9' : '#38bdf8'};">🧭 Знакомо по Пути: ${stViaPath}</span>` : ''}${isManualDone ? ' · ✓ Этап отмечен' : ''}
               </div>
               <div class="ti-stage-progress-mini" aria-hidden="true">
                 <div class="ti-stage-progress-fill" style="width:${isDone ? 100 : pct}%;"></div>
@@ -65888,7 +66029,7 @@ function renderTechInterviewCardsHTML(){
         ${catChipsHTML}
       </div>
       <div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;">
-        <button type="button" class="btn btn-ghost ${hidePath ? 'active' : ''}" data-ti-toggle-hide-path="true" aria-pressed="${hidePath ? 'true' : 'false'}" style="padding:4px 10px;min-height:34px;border-radius:999px;border:1px solid ${hidePath ? 'rgba(56,189,248,0.55)' : 'var(--line)'};background:${hidePath ? 'rgba(56,189,248,0.14)' : 'transparent'};color:${hidePath ? '#38bdf8' : 'var(--ink-soft)'};font-size:0.74rem;font-weight:600;white-space:nowrap;flex-shrink:0;cursor:pointer;">Скрыть знакомые по Пути</button>
+        <button type="button" class="btn btn-ghost ${hidePath ? 'active' : ''}" data-ti-toggle-hide-path="true" aria-pressed="${hidePath ? 'true' : 'false'}" style="padding:4px 10px;min-height:34px;border-radius:999px;border:1px solid ${hidePath ? (isLightThemeActive() ? 'rgba(124,58,237,0.48)' : 'rgba(56,189,248,0.55)') : 'var(--line)'};background:${hidePath ? (isLightThemeActive() ? 'rgba(124,58,237,0.12)' : 'rgba(56,189,248,0.14)') : 'transparent'};color:${hidePath ? (isLightThemeActive() ? '#6d28d9' : '#38bdf8') : 'var(--ink-soft)'};font-size:0.74rem;font-weight:600;white-space:nowrap;flex-shrink:0;cursor:pointer;">Скрыть знакомые по Пути</button>
         <button type="button" class="btn btn-ghost" data-ti-shuffle-cards="true" title="Перемешать карточки" style="padding:4px 10px;min-height:34px;border-radius:999px;border:1px solid var(--line);font-size:0.78rem;line-height:1.2;cursor:pointer;">🔀</button>
         <div class="hr-srs-status-chip" style="display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:999px;background:var(--emerald-soft);border:1px solid ${isLightThemeActive() ? 'rgba(124,58,237,0.32)' : 'rgba(16,185,129,0.3)'};font-size:0.76rem;font-weight:700;color:var(--emerald);white-space:nowrap;flex-shrink:0;">
           <span style="color:#f59e0b;">⚡</span> ${knownCount} / ${allCards.length} · ${pct}%
@@ -65999,7 +66140,7 @@ function renderTechInterviewCardsHTML(){
     ? `<span class="srs-card-status-badge" style="display:inline-flex;align-items:center;padding:0 9px;height:24px;border-radius:999px;background:${isLightThemeActive() ? 'rgba(124,58,237,0.12)' : 'rgba(16,185,129,0.14)'};border:1px solid ${isLightThemeActive() ? 'rgba(124,58,237,0.34)' : 'rgba(16,185,129,0.35)'};color:${isLightThemeActive() ? '#5b21b6' : '#34d399'};font-size:0.72rem;font-weight:700;white-space:nowrap;">✓ Знаю</span>`
     : (knownMap[card.id] === false ? `<span class="srs-card-status-badge" style="display:inline-flex;align-items:center;padding:0 9px;height:24px;border-radius:999px;background:rgba(244,63,94,0.14);border:1px solid rgba(244,63,94,0.35);color:${isLightThemeActive() ? '#be123c' : '#fda4af'};font-size:0.72rem;font-weight:700;white-space:nowrap;">↺ Повторить</span>` : '');
   const pathKnownBadge = (typeof isCardKnownViaPath === 'function' && isCardKnownViaPath(card))
-    ? '<span class="srs-card-status-badge srs-badge-path-known" style="display:inline-flex;align-items:center;padding:0 9px;height:24px;border-radius:999px;background:rgba(56,189,248,0.14);border:1px solid rgba(56,189,248,0.38);color:#38bdf8;font-size:0.72rem;font-weight:700;white-space:nowrap;flex-shrink:0;">🧭 Знакомо по Пути</span>'
+    ? `<span class="srs-card-status-badge srs-badge-path-known" style="display:inline-flex;align-items:center;padding:0 9px;height:24px;border-radius:999px;background:${isLightThemeActive() ? 'rgba(124,58,237,0.12)' : 'rgba(56,189,248,0.14)'};border:1px solid ${isLightThemeActive() ? 'rgba(124,58,237,0.34)' : 'rgba(56,189,248,0.38)'};color:${isLightThemeActive() ? '#5b21b6' : '#38bdf8'};font-size:0.72rem;font-weight:700;white-space:nowrap;flex-shrink:0;">🧭 Знакомо по Пути</span>`
     : '';
 
   const formattedQ = formatTechCardRichHTML(card.q);
@@ -66618,7 +66759,7 @@ function renderHrTasksTabHTML(){
 
             ${curTask.vocalPlan ? `
               <div class="mock-glass-box mock-glass-box--cyan" style="margin-bottom:12px;">
-                <b style="color:#38bdf8;display:block;margin-bottom:4px;font-size:0.80rem;">🗣️ Что проговорить вслух интервьюеру:</b>
+                <b style="color:${isLightThemeActive() ? '#6d28d9' : '#38bdf8'};display:block;margin-bottom:4px;font-size:0.80rem;">🗣️ Что проговорить вслух интервьюеру:</b>
                 <div style="font-size:0.84rem;color:var(--ink);">${escapeHtmlStr(curTask.vocalPlan)}</div>
               </div>
             ` : ''}
@@ -66965,7 +67106,7 @@ function renderHrTermsTabHTML(){
         ${catChipsHTML}
       </div>
       <div style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;">
-        <button type="button" class="btn btn-ghost ${hidePath ? 'active' : ''}" data-hr-toggle-hide-path="true" aria-pressed="${hidePath ? 'true' : 'false'}" style="padding:4px 10px;border-radius:999px;border:1px solid ${hidePath ? 'rgba(56,189,248,0.55)' : 'var(--line)'};background:${hidePath ? 'rgba(56,189,248,0.14)' : 'transparent'};color:${hidePath ? '#38bdf8' : 'var(--ink-soft)'};font-size:0.74rem;font-weight:600;white-space:nowrap;flex-shrink:0;cursor:pointer;">Скрыть знакомые по Пути</button>
+        <button type="button" class="btn btn-ghost ${hidePath ? 'active' : ''}" data-hr-toggle-hide-path="true" aria-pressed="${hidePath ? 'true' : 'false'}" style="padding:4px 10px;border-radius:999px;border:1px solid ${hidePath ? (isLightThemeActive() ? 'rgba(124,58,237,0.48)' : 'rgba(56,189,248,0.55)') : 'var(--line)'};background:${hidePath ? (isLightThemeActive() ? 'rgba(124,58,237,0.12)' : 'rgba(56,189,248,0.14)') : 'transparent'};color:${hidePath ? (isLightThemeActive() ? '#6d28d9' : '#38bdf8') : 'var(--ink-soft)'};font-size:0.74rem;font-weight:600;white-space:nowrap;flex-shrink:0;cursor:pointer;">Скрыть знакомые по Пути</button>
         <button type="button" class="btn btn-ghost" data-hr-shuffle-cards="true" title="Перемешать пул карточек заново" style="padding:4px 9px;border-radius:999px;border:1px solid var(--line);font-size:0.78rem;line-height:1.2;cursor:pointer;">🔀</button>
         <div class="hr-srs-status-chip" style="display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:999px;background:var(--emerald-soft);border:1px solid ${isLightThemeActive() ? 'rgba(124,58,237,0.32)' : 'rgba(16,185,129,0.3)'};font-size:0.76rem;font-weight:700;color:var(--emerald);white-space:nowrap;flex-shrink:0;">
           <span style="color:#f59e0b;">⚡</span> ${knownCount} / ${allCards.length} · ${pct}%
@@ -67093,7 +67234,7 @@ function renderHrTermsTabHTML(){
     ? `<span class="srs-card-status-badge" style="display:inline-flex;align-items:center;padding:0 9px;height:24px;border-radius:999px;background:${isLightThemeActive() ? 'rgba(124,58,237,0.12)' : 'rgba(16,185,129,0.14)'};border:1px solid ${isLightThemeActive() ? 'rgba(124,58,237,0.34)' : 'rgba(16,185,129,0.35)'};color:${isLightThemeActive() ? '#5b21b6' : '#34d399'};font-size:0.72rem;font-weight:700;white-space:nowrap;">✓ Закреплено</span>`
     : (knownMap[card.id] === false ? `<span class="srs-card-status-badge" style="display:inline-flex;align-items:center;padding:0 9px;height:24px;border-radius:999px;background:rgba(244,63,94,0.14);border:1px solid rgba(244,63,94,0.35);color:${isLightThemeActive() ? '#be123c' : '#fda4af'};font-size:0.72rem;font-weight:700;white-space:nowrap;">⚠️ Зона риска</span>` : '');
   const pathKnownBadge = (typeof isCardKnownViaPath === 'function' && isCardKnownViaPath(card))
-    ? '<span class="srs-card-status-badge srs-badge-path-known" style="display:inline-flex;align-items:center;padding:0 9px;height:24px;border-radius:999px;background:rgba(56,189,248,0.14);border:1px solid rgba(56,189,248,0.38);color:#38bdf8;font-size:0.72rem;font-weight:700;white-space:nowrap;flex-shrink:0;">🧭 Знакомо по Пути</span>'
+    ? `<span class="srs-card-status-badge srs-badge-path-known" style="display:inline-flex;align-items:center;padding:0 9px;height:24px;border-radius:999px;background:${isLightThemeActive() ? 'rgba(124,58,237,0.12)' : 'rgba(56,189,248,0.14)'};border:1px solid ${isLightThemeActive() ? 'rgba(124,58,237,0.34)' : 'rgba(56,189,248,0.38)'};color:${isLightThemeActive() ? '#5b21b6' : '#38bdf8'};font-size:0.72rem;font-weight:700;white-space:nowrap;flex-shrink:0;">🧭 Знакомо по Пути</span>`
     : '';
 
   const formattedQ = typeof formatCardQuestionHTML === 'function' ? formatCardQuestionHTML(card.q) : (typeof formatRichInlineText === 'function' ? formatRichInlineText(card.q) : escapeHtmlStr(card.q));
@@ -67326,7 +67467,7 @@ function buildHrOfferTaxBreakdownHTML(salary){
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;font-size:0.78rem;">
         <div class="mock-glass-box mock-glass-box--cyan" style="padding:9px;">
-          <b style="color:#38bdf8;display:block;margin-bottom:2px;">НПД (Самозан.)</b>
+          <b style="color:${isLightThemeActive() ? '#6d28d9' : '#38bdf8'};display:block;margin-bottom:2px;">НПД (Самозан.)</b>
           <div style="color:var(--ink-muted);font-size:0.72rem;">Налог 6%</div>
           <div style="font-size:0.92rem;font-weight:800;color:var(--ink);margin:3px 0;">${npdGross.toLocaleString('ru-RU')} ₽</div>
           <div style="color:var(--emerald);font-size:0.70rem;">Взносы: 0 ₽</div>
@@ -67352,7 +67493,7 @@ function buildHrOfferTaxBreakdownHTML(salary){
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;font-size:0.78rem;">
       <div class="mock-glass-box mock-glass-box--cyan" style="padding:9px;">
-        <b style="color:#38bdf8;display:block;margin-bottom:2px;">Net (на руки)</b>
+        <b style="color:${isLightThemeActive() ? '#6d28d9' : '#38bdf8'};display:block;margin-bottom:2px;">Net (на руки)</b>
         <div style="color:var(--ink-muted);font-size:0.72rem;">Чистая сумма</div>
         <div style="font-size:0.92rem;font-weight:800;color:var(--ink);margin:3px 0;">${sal.toLocaleString('ru-RU')} ₽</div>
         <div style="color:var(--emerald);font-size:0.70rem;">Ориентир кандидата</div>
@@ -69328,7 +69469,7 @@ function renderCoddyRightRail(totalCompletedUnits, streakText, activeChapterNum,
 
             <div class="coddy-rail-eyebrow">
 
-              <span class="coddy-rail-pulse-dot" style="${isCompleted ? 'background:#38bdf8;box-shadow:0 0 8px #38bdf8;' : ''}"></span>
+              <span class="coddy-rail-pulse-dot" style="${isCompleted ? (isLightThemeActive() ? 'background:#7c3aed;box-shadow:0 0 8px rgba(124,58,237,0.55);' : 'background:#38bdf8;box-shadow:0 0 8px #38bdf8;') : ''}"></span>
 
               <span>${isCompleted ? 'Пройден' : 'В фокусе'} · Урок ${activeIdx + 1} из ${totalInChap}</span>
 
@@ -70176,8 +70317,8 @@ function viewPathSerpentine(options){
     if(isCompleted){
       innerContent = _isLightNode
         ? `
-        <circle class="node-circle" r="22" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2.2" filter="drop-shadow(0 4px 12px rgba(124,58,237,0.26))"/>
-        <text y="4.5" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="800" fill="#5b21b6">✓</text>`
+        <circle class="node-circle" r="22" fill="#ede9fe" stroke="#7c3aed" stroke-width="2.2" filter="drop-shadow(0 4px 12px rgba(124,58,237,0.26))"/>
+        <text y="4.5" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="800" fill="#6d28d9">✓</text>`
         : `
         <circle class="node-circle" r="22" fill="#061c14" stroke="#10b981" stroke-width="2.2" filter="drop-shadow(0 0 12px rgba(16,185,129,0.55))"/>
         <text y="4.5" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="800" fill="#34d399">✓</text>`;
@@ -72846,7 +72987,7 @@ function getRemNoteCardStatusBadgeHTML(cardKey){
 
   const entry = state.cardSrs && state.cardSrs[cardKey];
   const syncedByInterview = (typeof getPathCardInterviewSync === 'function') && getPathCardInterviewSync(cardKey);
-  const interviewBadgeHTML = `<span class="srs-card-status-badge srs-status-interview" style="display:inline-flex;align-items:center;gap:5px;border-radius:999px;background:rgba(56,189,248,0.14);border:1px solid rgba(56,189,248,0.38);color:#38bdf8;white-space:nowrap;flex-shrink:0;"><span class="srs-badge-emoji" style="display:inline-flex;align-items:center;line-height:1;transform:translateY(-0.5px);flex-shrink:0;">🎙️</span><span>Знакомо по интервью</span></span>`;
+  const interviewBadgeHTML = `<span class="srs-card-status-badge srs-status-interview" style="display:inline-flex;align-items:center;gap:5px;border-radius:999px;background:${isLightThemeActive() ? 'rgba(124,58,237,0.12)' : 'rgba(56,189,248,0.14)'};border:1px solid ${isLightThemeActive() ? 'rgba(124,58,237,0.34)' : 'rgba(56,189,248,0.38)'};color:${isLightThemeActive() ? '#5b21b6' : '#38bdf8'};white-space:nowrap;flex-shrink:0;"><span class="srs-badge-emoji" style="display:inline-flex;align-items:center;line-height:1;transform:translateY(-0.5px);flex-shrink:0;">🎙️</span><span>Знакомо по интервью</span></span>`;
 
   if(!entry || !entry.dueDate){
 
@@ -73224,7 +73365,7 @@ function viewNotesSrsHub(noteSrsStats){
           <button type="button" class="btn-solid-good fc-rate-btn card-rating-btn card-rating-btn--good action-accent rate-btn rate-btn-good" data-srs-note-pass="${curItem.noteId}" style="min-height:44px;border-radius:12px;padding:6px 10px;border:1px solid #2ea77d;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s ease;">
             <span class="srs-btn-title rate-label" style="font-size:0.88rem;font-weight:700;line-height:1;">Помню</span>
           </button>
-          <button type="button" class="btn-solid-easy fc-rate-btn card-rating-btn card-rating-btn--easy rate-btn rate-btn-easy" data-srs-note-easy="${curItem.noteId}" style="min-height:44px;border-radius:12px;padding:6px 10px;border:1px solid #1fa3c7;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s ease;">
+          <button type="button" class="btn-solid-easy fc-rate-btn card-rating-btn card-rating-btn--easy rate-btn rate-btn-easy" data-srs-note-easy="${curItem.noteId}" style="min-height:44px;border-radius:12px;padding:6px 10px;border:1px solid ${isLightThemeActive() ? '#7c3aed' : '#1fa3c7'};display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s ease;">
             <span class="srs-btn-title rate-label" style="font-size:0.88rem;font-weight:700;line-height:1;">Легко</span>
           </button>
         </div>
