@@ -53,8 +53,8 @@ def _merge_srs_entries(base_map: Any, incoming_map: Any, progress_key: str) -> D
         entry_a = a.get(k)
         entry_b = b.get(k)
         if isinstance(entry_a, dict) and isinstance(entry_b, dict):
-            rev_a = str(entry_a.get('lastReview') or '')
-            rev_b = str(entry_b.get('lastReview') or '')
+            rev_a = str(entry_a.get('lastReview') or entry_a.get('lastReviewed') or '')
+            rev_b = str(entry_b.get('lastReview') or entry_b.get('lastReviewed') or '')
             if rev_b != rev_a:
                 pick_b = rev_b > rev_a
             else:
@@ -110,6 +110,18 @@ def merge_academy_states(stored_state: Optional[Dict[str, Any]], incoming_state:
 
     if isinstance(a.get('noteSrs'), dict) or isinstance(b.get('noteSrs'), dict):
         merged['noteSrs'] = _merge_srs_entries(a.get('noteSrs'), b.get('noteSrs'), 'step')
+
+    if isinstance(a.get('taskSrs'), dict) or isinstance(b.get('taskSrs'), dict):
+        merged['taskSrs'] = _merge_srs_entries(a.get('taskSrs'), b.get('taskSrs'), 'reps')
+
+    if 'practiceDailyLimit' in a or 'practiceDailyLimit' in b:
+        b_newer = int(b.get('updatedAt') or 0) >= int(a.get('updatedAt') or 0)
+        if b_newer and 'practiceDailyLimit' in b:
+            merged['practiceDailyLimit'] = b['practiceDailyLimit']
+        elif 'practiceDailyLimit' in a:
+            merged['practiceDailyLimit'] = a['practiceDailyLimit']
+        elif 'practiceDailyLimit' in b:
+            merged['practiceDailyLimit'] = b['practiceDailyLimit']
 
     if isinstance(a.get('cardSrs'), dict) or isinstance(b.get('cardSrs'), dict):
         merged['cardSrs'] = _merge_srs_entries(a.get('cardSrs'), b.get('cardSrs'), 'reps')
@@ -331,6 +343,62 @@ def sanitize_academy_state(s: Any) -> Any:
 
     if isinstance(s.get('bugReports'), list):
         s['bugReports'] = _sanitize_bug_reports(s['bugReports'])
+
+    if isinstance(s.get('taskSrs'), dict):
+        clean_tasks: Dict[str, Any] = {}
+        for k, v in s['taskSrs'].items():
+            if not isinstance(v, dict):
+                continue
+            try:
+                tid_int = int(str(k).strip())
+            except (TypeError, ValueError):
+                continue
+            if tid_int <= 0:
+                continue
+            tk = str(tid_int)
+            try:
+                interval_val = max(0.0, float(v.get('interval') or 0))
+            except (TypeError, ValueError):
+                interval_val = 0.0
+            try:
+                ease_val = max(1.3, float(v.get('ease') or 2.5))
+            except (TypeError, ValueError):
+                ease_val = 2.5
+            try:
+                reps_val = max(0, int(v.get('reps') or 0))
+            except (TypeError, ValueError):
+                reps_val = 0
+            try:
+                lapses_val = max(0, int(v.get('lapses') or 0))
+            except (TypeError, ValueError):
+                lapses_val = 0
+            clean_entry: Dict[str, Any] = {
+                'interval': int(interval_val) if interval_val.is_integer() else round(interval_val, 2),
+                'ease': round(ease_val, 2),
+                'reps': reps_val,
+                'lapses': lapses_val,
+                'due': _CTRL_JUNK_RE.sub('', str(v.get('due') or '')).strip()[:32],
+                'lastReviewed': _CTRL_JUNK_RE.sub('', str(v.get('lastReviewed') or '')).strip()[:32],
+                'lastOutcome': _CTRL_JUNK_RE.sub('', str(v.get('lastOutcome') or '')).strip()[:16],
+                'neededHelp': bool(v.get('neededHelp', False)),
+                'skillId': _CTRL_JUNK_RE.sub('', str(v.get('skillId') or '')).strip()[:32],
+            }
+            cur = clean_tasks.get(tk)
+            if cur is None:
+                clean_tasks[tk] = clean_entry
+            else:
+                v_rank = (clean_entry['lastReviewed'], clean_entry['reps'], clean_entry['interval'])
+                c_rank = (cur['lastReviewed'], cur['reps'], cur['interval'])
+                if v_rank > c_rank:
+                    clean_tasks[tk] = clean_entry
+        s['taskSrs'] = clean_tasks
+
+    if 'practiceDailyLimit' in s:
+        try:
+            lim = int(s['practiceDailyLimit'])
+        except (TypeError, ValueError):
+            lim = 0
+        s['practiceDailyLimit'] = lim if lim in (0, 3, 5, 10) else 0
 
     return s
 
