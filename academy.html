@@ -42016,6 +42016,31 @@ html[data-theme="light"] .hr-rating-grid .kbd-badge {
     border-color: rgba(109, 40, 217, 0.25);
     color: #4c1d95;
   }
+  .zen-explanation-details {
+    margin-top: 8px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--ink);
+  }
+  :root[data-theme="light"] .zen-explanation-details {
+    border-color: rgba(15, 23, 42, 0.12);
+    background: rgba(15, 23, 42, 0.025);
+  }
+  .zen-explanation-summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.84rem;
+    color: var(--ink);
+    user-select: none;
+  }
+  .zen-explanation-body {
+    margin-top: 8px;
+    font-size: 0.84rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
   .task-srs-adj-group {
     display: inline-flex;
     gap: 6px;
@@ -48405,6 +48430,7 @@ function ensureIdeTasksLoaded(){
       window.IDE_TASKS = IDE_TASKS;
       window.IDE_TASKS_BY_ID = IDE_TASKS_BY_ID;
       window.__IDE_TASKS_READY__ = true;
+      syncIdeTasksToSkills();
       if(typeof practiceHubState === "object" && practiceHubState){
         const savedId = (typeof state === "object" && state && state.practiceHubPos && typeof state.practiceHubPos.taskId === "number") ? state.practiceHubPos.taskId : null;
         if(savedId && IDE_TASKS_BY_ID[savedId]){
@@ -48423,6 +48449,48 @@ function ensureIdeTasksLoaded(){
     });
   return _ideTasksLoadPromise;
 }
+function syncIdeTasksToSkills(){
+  if(typeof IDE_TASKS === 'undefined' || !Array.isArray(IDE_TASKS) || IDE_TASKS.length === 0) return;
+  const skillById = {};
+  const masteryObjects = [
+    typeof HR_MASTERY !== 'undefined' ? HR_MASTERY : null,
+    typeof PY_MASTERY !== 'undefined' ? PY_MASTERY : null,
+    typeof WEB_MASTERY !== 'undefined' ? WEB_MASTERY : null,
+    typeof BACKEND_MASTERY !== 'undefined' ? BACKEND_MASTERY : null,
+    typeof ALGO_MASTERY !== 'undefined' ? ALGO_MASTERY : null,
+    typeof DB_MASTERY !== 'undefined' ? DB_MASTERY : null,
+    typeof ARCH_MASTERY !== 'undefined' ? ARCH_MASTERY : null,
+    typeof INFRA_MASTERY !== 'undefined' ? INFRA_MASTERY : null
+  ];
+  for(let m = 0; m < masteryObjects.length; m++){
+    const mo = masteryObjects[m];
+    if(!mo || !Array.isArray(mo.units)) continue;
+    for(let u = 0; u < mo.units.length; u++){
+      const unit = mo.units[u];
+      if(!unit || !Array.isArray(unit.skills)) continue;
+      for(let s = 0; s < unit.skills.length; s++){
+        const sk = unit.skills[s];
+        if(sk && sk.id) skillById[sk.id] = sk;
+      }
+    }
+  }
+  if(typeof PY_SKILLS_BY_ID !== 'undefined' && PY_SKILLS_BY_ID){
+    Object.keys(PY_SKILLS_BY_ID).forEach(function(k){
+      if(!skillById[k]) skillById[k] = PY_SKILLS_BY_ID[k];
+    });
+  }
+  for(let i = 0; i < IDE_TASKS.length; i++){
+    const t = IDE_TASKS[i];
+    if(!t || !t.skillId || t.id === undefined || t.id === null) continue;
+    const sk = skillById[t.skillId];
+    if(!sk) continue;
+    if(!Array.isArray(sk.taskIds)) sk.taskIds = [];
+    if(!sk.taskIds.some(function(id){ return String(id) === String(t.id); })){
+      sk.taskIds.push(t.id);
+    }
+  }
+}
+window.syncIdeTasksToSkills = syncIdeTasksToSkills;
 window.ensureIdeTasksLoaded = ensureIdeTasksLoaded;
 if(typeof fetch === "function"){ ensureIdeTasksLoaded(); }
 
@@ -57084,17 +57152,37 @@ function getMatchingTasksForNote(kId, sk){
   const tIds = (sk.taskIds && sk.taskIds.length) ? sk.taskIds : [20, 19, 39, 255, 258];
   const kIds = sk.kIds || [];
   const idx = kIds.indexOf(kId);
-  let noteTasks = [];
+  const noteTasks = [];
+  const seen = new Set();
+  const pushUnique = (tid) => {
+    const key = String(tid);
+    if(!seen.has(key)){
+      seen.add(key);
+      noteTasks.push(tid);
+    }
+  };
+  if(typeof IDE_TASKS !== 'undefined' && Array.isArray(IDE_TASKS)){
+    for(let i = 0; i < IDE_TASKS.length; i++){
+      const t = IDE_TASKS[i];
+      if(t && t.noteId === kId){
+        pushUnique(t.id);
+      }
+    }
+  }
   if(typeof CANONICAL_NOTE_TASKS_MAP !== 'undefined' && CANONICAL_NOTE_TASKS_MAP[kId]){
-    noteTasks = CANONICAL_NOTE_TASKS_MAP[kId].filter(tid => tIds.includes(tid));
+    CANONICAL_NOTE_TASKS_MAP[kId]
+      .filter(tid => tIds.includes(tid))
+      .forEach(pushUnique);
   }
   if(noteTasks.length === 0){
     if(kIds.length <= 1){
-      noteTasks = tIds.slice();
+      tIds.forEach(pushUnique);
     } else {
-      noteTasks = tIds.filter((tid, tIdx) => Math.min(kIds.length - 1, Math.floor(tIdx * kIds.length / tIds.length)) === idx);
+      tIds
+        .filter((tid, tIdx) => Math.min(kIds.length - 1, Math.floor(tIdx * kIds.length / tIds.length)) === idx)
+        .forEach(pushUnique);
       if(noteTasks.length === 0 && tIds[idx]){
-        noteTasks.push(tIds[idx]);
+        pushUnique(tIds[idx]);
       }
     }
   }
@@ -57902,11 +57990,12 @@ function buildUnifiedZenIdeHTML(params){
     `
     : '';
 
-  const explanationHTML = (params.context !== 'mock' && runStatus === 'pass' && tObj.explanation)
+  const explanationText = (tObj && typeof tObj.explanation === 'string') ? tObj.explanation.trim() : '';
+  const explanationHTML = (params.context !== 'mock' && runStatus === 'pass' && explanationText)
     ? `
-      <details style="margin-top:8px;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);">
-        <summary style="cursor:pointer;font-weight:600;font-size:0.84rem;">💡 Разбор эталона</summary>
-        <div style="margin-top:8px;font-size:0.84rem;color:var(--ink-soft);">${escapeHtmlStr(tObj.explanation)}</div>
+      <details class="zen-explanation-details">
+        <summary class="zen-explanation-summary">💡 Разбор эталона и вопросы на собесе</summary>
+        <div class="zen-explanation-body">${escapeHtmlStr(explanationText).replace(/\n/g, '<br>')}</div>
       </details>
     `
     : '';
@@ -88113,7 +88202,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 
   window.addEventListener('load', function(){
 
-    navigator.serviceWorker.register('sw.js?v=114').then(function(reg){
+    navigator.serviceWorker.register('sw.js?v=115').then(function(reg){
 
       try { reg.update(); } catch(_e){}
 

@@ -1851,85 +1851,305 @@ if _sq_mod is not None and not hasattr(_sq_mod, "sqlite_version"):
 
 full_env_code = _preloaded_full_env_code if _preloaded_full_env_code is not None else (COMPREHENSIVE_PRELUDE + '\n' + ide_prelude.replace('_window.__lastAsyncPromise = _p', 'pass') + '\n' + DJANGO_EXTRA)
 
+REQUIRED_TASK_KEYS = {
+    'id', 'level', 'tier', 'topic', 'title', 'desc',
+    'initialCode', 'hint', 'code', 'solution', 'tests'
+}
+ALLOWED_TASK_TYPES = {'build', 'debug', 'edge', 'optimize'}
+LEGACY_GATE_EXEMPT_IDS = {2001, 2002, 2003}
+
+
+def _build_env_sources():
+    import re as _re_env
+    pyodide_env = _re_env.sub(
+        r'\nif "sqlite3" not in _sys\.modules:[\s\S]*?_sys\.modules\["sqlite3"\] = _sq\n',
+        '\n',
+        full_env_code
+    )
+    pyodide_env = _re_env.sub(
+        r'\n# Enhance Brython fallback sqlite3 mock[\s\S]*$',
+        '\n',
+        pyodide_env
+    )
+    fallback_env = full_env_code.replace('import sqlite3 as _real_sqlite3', 'pass')
+    return full_env_code, pyodide_env, fallback_env
+
+
+def _compile_envs():
+    f_src, p_src, fb_src = _build_env_sources()
+    return {
+        'full': compile(f_src, '<full_env>', 'exec'),
+        'pyodide': compile(p_src, '<pyodide_env>', 'exec'),
+        'fallback': compile(fb_src, '<fallback_env>', 'exec'),
+    }
+
+
+def count_assert_checks(tests_src: str) -> int:
+    tree = ast.parse(tests_src)
+    helper_asserts = {}
+    helper_nodes = set()
+    for node in tree.body:
+        if isinstance(node, ast.FunctionDef):
+            cnt = sum(1 for n in ast.walk(node) if isinstance(n, ast.Assert))
+            if cnt > 0:
+                helper_asserts[node.name] = cnt
+                helper_nodes.add(node)
+
+    total = 0
+    for node in tree.body:
+        if node in helper_nodes:
+            continue
+        for sub in ast.walk(node):
+            if isinstance(sub, ast.Assert):
+                total += 1
+            elif isinstance(sub, ast.Call) and isinstance(sub.func, ast.Name):
+                if sub.func.id in helper_asserts:
+                    total += helper_asserts[sub.func.id]
+    return total
+
+
+def count_socratic_steps(hint) -> int:
+    import re as _re_hint
+    if isinstance(hint, list):
+        hint_text = '\n'.join(str(x) for x in hint)
+    else:
+        hint_text = str(hint or '')
+    return sum(1 for i in (1, 2, 3) if _re_hint.search(rf'Шаг\s*{i}\b', hint_text))
+
+
+def _exec_task_code(env_code_obj, user_code: str, tests_code: str, use_native_sqlite3=None, real_sq=None):
+    import io as _io, contextlib as _cl, sys as _sys, types as _types
+    prev_sq = _sys.modules.get('sqlite3', None)
+    prev_main = _sys.modules.get('__main__', None)
+    try:
+        if use_native_sqlite3 is True:
+            if real_sq is not None:
+                _sys.modules['sqlite3'] = real_sq
+        elif use_native_sqlite3 is False:
+            _sys.modules.pop('sqlite3', None)
+        _m_main = _types.ModuleType('__main__')
+        _sys.modules['__main__'] = _m_main
+        ns = _m_main.__dict__
+        with _cl.redirect_stdout(_io.StringIO()), _cl.redirect_stderr(_io.StringIO()):
+            exec(env_code_obj, ns)
+            exec(user_code, ns)
+            ns['__USER_CODE__'] = user_code
+            exec(tests_code, ns)
+    finally:
+        if prev_main is not None:
+            _sys.modules['__main__'] = prev_main
+        else:
+            _sys.modules.pop('__main__', None)
+        if prev_sq is not None:
+            _sys.modules['sqlite3'] = prev_sq
+        else:
+            _sys.modules.pop('sqlite3', None)
+
+
+def validate_task_quality_gate(task_item: dict, compiled_envs: dict, check_initial: bool = False, real_sq=None) -> list:
+    import re as _re_gate
+    errors = []
+    tid = task_item.get('id')
+    is_new_task = isinstance(tid, int) and tid >= 402 and tid not in LEGACY_GATE_EXEMPT_IDS
+
+    if is_new_task:
+        missing = sorted(REQUIRED_TASK_KEYS - set(task_item.keys()))
+        if missing:
+            errors.append(f"Task #{tid}: missing required keys: {missing}")
+        for k in ('title', 'desc', 'initialCode', 'code', 'solution', 'tests'):
+            val = task_item.get(k)
+            if not isinstance(val, str) or not val.strip():
+                errors.append(f"Task #{tid}: empty or non-str '{k}'")
+        if task_item.get('code') != task_item.get('solution'):
+            errors.append(f"Task #{tid}: 'code' must equal 'solution'")
+
+        skill_id = task_item.get('skillId')
+        if not isinstance(skill_id, str) or not skill_id.strip():
+            errors.append(f"Task #{tid}: empty 'skillId'")
+
+        note_id = task_item.get('noteId')
+        if not isinstance(note_id, str) or not _re_gate.fullmatch(r'К-\d{3,}', note_id.strip()):
+            errors.append(f"Task #{tid}: invalid 'noteId' ({note_id!r}, expected К-NNN)")
+
+        task_type = task_item.get('taskType')
+        if task_type not in ALLOWED_TASK_TYPES:
+            errors.append(f"Task #{tid}: invalid 'taskType' ({task_type!r}, allowed {sorted(ALLOWED_TASK_TYPES)})")
+
+        aspects = task_item.get('aspects')
+        if not isinstance(aspects, list) or len(aspects) == 0 or not all(isinstance(a, str) and a.strip() for a in aspects):
+            errors.append(f"Task #{tid}: 'aspects' must be a non-empty list[str]")
+
+        explanation = task_item.get('explanation')
+        if not isinstance(explanation, str) or len(explanation.strip()) < 60:
+            exp_len = len(explanation.strip()) if isinstance(explanation, str) else 0
+            errors.append(f"Task #{tid}: 'explanation' must be a string >= 60 chars (got {exp_len})")
+
+        tests_src = task_item.get('tests') or ''
+        try:
+            assert_cnt = count_assert_checks(tests_src)
+            if assert_cnt < 5:
+                errors.append(f"Task #{tid}: tests must contain >= 5 asserts (got {assert_cnt})")
+        except SyntaxError as se:
+            errors.append(f"Task #{tid}: tests SyntaxError: {se}")
+
+        socratic_cnt = count_socratic_steps(task_item.get('hint'))
+        if socratic_cnt < 3:
+            errors.append(f"Task #{tid}: hint must contain >= 3 Socratic steps (Шаг 1/2/3, got {socratic_cnt})")
+
+    if is_new_task or check_initial:
+        init_code = task_item.get('initialCode') or ''
+        tests_src = task_item.get('tests') or ''
+        sol_src = task_item.get('code') or ''
+        uses_sqlite3 = ('sqlite3' in sol_src) or ('sqlite3' in tests_src) or ('sqlite3' in init_code)
+        target_env = compiled_envs['pyodide'] if uses_sqlite3 else compiled_envs['fallback']
+        try:
+            _exec_task_code(target_env, init_code, tests_src, use_native_sqlite3=uses_sqlite3, real_sq=real_sq)
+            errors.append(f"Task #{tid}: initialCode unexpectedly passed tests!")
+        except Exception:
+            pass
+
+    return errors
+
+
+_WORKER_ENVS = None
+_WORKER_REAL_SQ = None
+
+
+def _init_worker():
+    global _WORKER_ENVS, _WORKER_REAL_SQ
+    import sqlite3 as _sq
+    _WORKER_REAL_SQ = _sq
+    _WORKER_ENVS = _compile_envs()
+
+
+def _check_single_task(task_item: dict, envs: dict, real_sq, check_initial: bool = False) -> dict:
+    tid = task_item.get('id')
+    sol = task_item.get('code') or ''
+    tests_src = task_item.get('tests') or ''
+    uses_sqlite3 = ('sqlite3' in sol) or ('sqlite3' in tests_src)
+    full_err = None
+    browser_err = None
+
+    try:
+        _exec_task_code(envs['full'], sol, tests_src, use_native_sqlite3=True, real_sq=real_sq)
+    except Exception as e:
+        full_err = f"{type(e).__name__}: {e}"
+
+    target_env = envs['pyodide'] if uses_sqlite3 else envs['fallback']
+    try:
+        _exec_task_code(target_env, sol, tests_src, use_native_sqlite3=uses_sqlite3, real_sq=real_sq)
+    except Exception as e:
+        mode = 'Pyodide-sqlite3' if uses_sqlite3 else 'Brython-shim'
+        browser_err = (mode, f"{type(e).__name__}: {e}")
+
+    gate_errs = validate_task_quality_gate(task_item, envs, check_initial=check_initial, real_sq=real_sq)
+    return {
+        'id': tid,
+        'uses_sqlite3': uses_sqlite3,
+        'full_err': full_err,
+        'browser_err': browser_err,
+        'gate_errs': gate_errs,
+    }
+
+
+def _worker_check_task(payload):
+    task_item, check_initial = payload
+    return _check_single_task(task_item, _WORKER_ENVS, _WORKER_REAL_SQ, check_initial=check_initial)
+
+
 if __name__ == '__main__':
     def _run_suite():
+        import argparse as _argparse, concurrent.futures as _cf
         import json as _json_tasks, os as _os_tasks
+        import html as _html, re as _re, io as _io, contextlib as _cl, sys as _sys, types as _types
+        import sqlite3 as _real_sq_restore
+
+        parser = _argparse.ArgumentParser(description='Test IDE tasks, quality gate, bosses and K-note snippets')
+        parser.add_argument('--chunk', type=str, default=None, help='Run only tasks from data/content/tasks/<name>.json')
+        parser.add_argument('--ids', type=str, default=None, help='Comma-separated task IDs to run (e.g. 1,2,3)')
+        parser.add_argument('--workers', type=int, default=min(_os_tasks.cpu_count() or 4, 6), help='Worker processes (1 disables multiprocessing)')
+        parser.add_argument('--check-initial', action='store_true', help='Verify initialCode fails tests for all checked tasks')
+        args = parser.parse_args()
+
         _tasks_manifest = _os_tasks.path.normpath(_os_tasks.path.join(_os_tasks.path.dirname(__file__), '..', 'data', 'content', 'tasks', 'manifest.json'))
+        TASKS_ALL = []
+        chunks_by_id = {}
         if _os_tasks.path.isfile(_tasks_manifest):
             with open(_tasks_manifest, 'r', encoding='utf-8') as _mf:
                 _mdata = _json_tasks.load(_mf)
-            TASKS_381 = []
+            actual_total = 0
             for _ch in _mdata.get('chunks', []):
                 _ch_path = _os_tasks.path.join(_os_tasks.path.dirname(_tasks_manifest), _ch['file'])
-                with open(_ch_path, 'r', encoding='utf-8') as _cf:
-                    TASKS_381.extend(_json_tasks.load(_cf))
-            TASKS_381.sort(key=lambda _t: _t.get('id', 0))
+                with open(_ch_path, 'r', encoding='utf-8') as _cf_file:
+                    _ch_tasks = _json_tasks.load(_cf_file)
+                assert len(_ch_tasks) == _ch.get('count'), (
+                    f"Manifest count mismatch for {_ch['file']}: manifest={_ch.get('count')}, actual={len(_ch_tasks)}"
+                )
+                actual_total += len(_ch_tasks)
+                chunks_by_id[_ch.get('id')] = _ch_tasks
+                chunks_by_id[_ch.get('file')] = _ch_tasks
+                TASKS_ALL.extend(_ch_tasks)
+            expected_total = _mdata.get('totalTasks', _mdata.get('total'))
+            assert actual_total == expected_total, (
+                f"Manifest total mismatch: manifest={expected_total}, actual={actual_total}"
+            )
+            TASKS_ALL.sort(key=lambda _t: _t.get('id', 0))
         else:
             from extract_remnote_data import TASKS_381
-        from build_python_mastery import HR_NOTES_DATA, PY_NOTES_DATA, WEB_NOTES_DATA, BACKEND_NOTES_DATA, ALGO_NOTES_DATA, DB_NOTES_DATA, ARCH_NOTES_DATA, INFRA_NOTES_DATA
-        import html as _html, re as _re, io as _io, contextlib as _cl, sys as _sys, types as _types
+            TASKS_ALL = list(TASKS_381)
+
+        tasks_to_run = TASKS_ALL
+        if args.chunk:
+            if args.chunk in chunks_by_id:
+                tasks_to_run = list(chunks_by_id[args.chunk])
+            elif f"{args.chunk}.json" in chunks_by_id:
+                tasks_to_run = list(chunks_by_id[f"{args.chunk}.json"])
+            else:
+                raise ValueError(f"Unknown chunk '{args.chunk}'. Available: {sorted(k for k in chunks_by_id if not k.endswith('.json'))}")
+        if args.ids:
+            target_ids = {int(x.strip()) for x in args.ids.split(',') if x.strip()}
+            tasks_to_run = [t for t in tasks_to_run if t.get('id') in target_ids]
+
+        envs = _compile_envs()
+        workers = max(1, args.workers)
+        if workers > 1 and len(tasks_to_run) > 1:
+            with _cf.ProcessPoolExecutor(max_workers=workers, initializer=_init_worker) as pool:
+                results = list(pool.map(_worker_check_task, [(t, args.check_initial) for t in tasks_to_run], chunksize=16))
+        else:
+            results = [_check_single_task(t, envs, _real_sq_restore, check_initial=args.check_initial) for t in tasks_to_run]
 
         passed_tasks = 0
         failed_tasks = []
-        for _task_item in TASKS_381:
-            _m_main = _types.ModuleType('__main__')
-            _sys.modules['__main__'] = _m_main
-            ns = _m_main.__dict__
-            sol = _task_item['code']
-            try:
-                with _cl.redirect_stdout(_io.StringIO()), _cl.redirect_stderr(_io.StringIO()):
-                    exec(full_env_code, ns)
-                    exec(sol, ns)
-                    ns['__USER_CODE__'] = sol
-                    exec(_task_item['tests'], ns)
-                passed_tasks += 1
-            except Exception as e:
-                failed_tasks.append((_task_item['id'], f"{type(e).__name__}: {e}"))
-
-        assert passed_tasks == len(TASKS_381) and not failed_tasks, f"IDE tasks failed: {failed_tasks}"
-        print(f"✓ All {passed_tasks}/{len(TASKS_381)} IDE tasks passed in full_env_code!")
-
-        # Verify browser execution architecture:
-        # - sqlite3 tasks run in Pyodide mode (native sqlite3, without _SqConn pure-Python shim)
-        # - non-sqlite3 tasks run in Brython mode (all browser shims, without native _sqlite3)
-        import sqlite3 as _real_sq_restore
-        pyodide_env = _re.sub(
-            r'\nif "sqlite3" not in _sys\.modules:[\s\S]*?_sys\.modules\["sqlite3"\] = _sq\n',
-            '\n',
-            full_env_code
-        )
-        pyodide_env = _re.sub(
-            r'\n# Enhance Brython fallback sqlite3 mock[\s\S]*$',
-            '\n',
-            pyodide_env
-        )
-        fallback_env = full_env_code.replace('import sqlite3 as _real_sqlite3', 'pass')
         fb_failed = []
+        gate_failed = []
         sq_checked = 0
         br_checked = 0
-        for _task_item in TASKS_381:
-            _uses_sqlite3 = ('sqlite3' in _task_item['code']) or ('sqlite3' in _task_item['tests'])
-            _sys.modules.pop('sqlite3', None)
-            if _uses_sqlite3:
-                _sys.modules['sqlite3'] = _real_sq_restore
-            _m_main = _types.ModuleType('__main__')
-            _sys.modules['__main__'] = _m_main
-            ns = _m_main.__dict__
-            sol = _task_item['code']
-            _target_env = pyodide_env if _uses_sqlite3 else fallback_env
-            try:
-                with _cl.redirect_stdout(_io.StringIO()), _cl.redirect_stderr(_io.StringIO()):
-                    exec(_target_env, ns)
-                    exec(sol, ns)
-                    ns['__USER_CODE__'] = sol
-                    exec(_task_item['tests'], ns)
-                if _uses_sqlite3:
+        for res in results:
+            if res['full_err']:
+                failed_tasks.append((res['id'], res['full_err']))
+            else:
+                passed_tasks += 1
+            if res['browser_err']:
+                mode, msg = res['browser_err']
+                fb_failed.append((f"Task #{res['id']} [{mode}]", msg))
+            else:
+                if res['uses_sqlite3']:
                     sq_checked += 1
                 else:
                     br_checked += 1
-            except Exception as e:
-                _mode = 'Pyodide-sqlite3' if _uses_sqlite3 else 'Brython-shim'
-                fb_failed.append((f"Task #{_task_item['id']} [{_mode}]", f"{type(e).__name__}: {e}"))
+            if res['gate_errs']:
+                gate_failed.extend(res['gate_errs'])
+
+        assert passed_tasks == len(tasks_to_run) and not failed_tasks, f"IDE tasks failed: {failed_tasks}"
+        assert not gate_failed, f"Quality gate failed ({len(gate_failed)}): {gate_failed[:10]}"
+        print(f"✓ All {passed_tasks}/{len(tasks_to_run)} IDE tasks passed in full_env_code!")
+
+        if args.chunk or args.ids:
+            assert not fb_failed, f"Browser runtime verification failed: {fb_failed}"
+            print(f"✓ Verified {sq_checked} sqlite3 tasks (Pyodide native sqlite3) and {br_checked} non-sqlite3 tasks (Brython shims) [filtered mode]!")
+            return
+
+        from build_python_mastery import HR_NOTES_DATA, PY_NOTES_DATA, WEB_NOTES_DATA, BACKEND_NOTES_DATA, ALGO_NOTES_DATA, DB_NOTES_DATA, ARCH_NOTES_DATA, INFRA_NOTES_DATA
         for kid, note in sorted(DB_NOTES_DATA.items()):
             for si, st in enumerate(note['steps']):
                 for m in _re.finditer(r'<div class="code-run-bar">[\s\S]*?</div><pre><code>([\s\S]*?)</code></pre>', st['html']):
@@ -1941,7 +2161,7 @@ if __name__ == '__main__':
                         ns = _m_main.__dict__
                         try:
                             with _cl.redirect_stdout(_io.StringIO()), _cl.redirect_stderr(_io.StringIO()):
-                                exec(fallback_env, ns)
+                                exec(envs['fallback'], ns)
                                 exec(raw_code, ns)
                         except Exception as e:
                             fb_failed.append((f"{kid} step {si+1}", f"{type(e).__name__}: {e}"))
@@ -2299,7 +2519,7 @@ assert r2 == {"issues": [], "probes_healthy": True, "ready": True}, r2
             stub_passed = False
             try:
                 with _cl.redirect_stdout(_io.StringIO()), _cl.redirect_stderr(_io.StringIO()):
-                    exec(full_env_code, ns_stub)
+                    exec(envs['full'], ns_stub)
                     exec(b_init, ns_stub)
                     exec(b_test, ns_stub)
                 stub_passed = True
@@ -2312,7 +2532,7 @@ assert r2 == {"issues": [], "probes_healthy": True, "ready": True}, r2
             _sys.modules['__main__'] = _m_main
             ns = _m_main.__dict__
             with _cl.redirect_stdout(_io.StringIO()), _cl.redirect_stderr(_io.StringIO()):
-                exec(full_env_code, ns)
+                exec(envs['full'], ns)
                 exec(b_sol, ns)
                 exec(b_test, ns)
             if tk == 'databases':
@@ -2321,7 +2541,7 @@ assert r2 == {"issues": [], "probes_healthy": True, "ready": True}, r2
                 _sys.modules['__main__'] = _m_main2
                 ns2 = _m_main2.__dict__
                 with _cl.redirect_stdout(_io.StringIO()), _cl.redirect_stderr(_io.StringIO()):
-                    exec(pyodide_env, ns2)
+                    exec(envs['pyodide'], ns2)
                     exec(b_sol, ns2)
                     exec(b_test, ns2)
         print("✓ All 7/7 Module Boss Challenges (live initialCode negative checks + canonical solutions) passed in CPython and Pyodide-sqlite3 mode!")
@@ -2371,7 +2591,7 @@ assert r2 == {"issues": [], "probes_healthy": True, "ready": True}, r2
             _m_main = _types.ModuleType('__main__')
             _sys.modules['__main__'] = _m_main
             ns = _m_main.__dict__
-            exec(full_env_code, ns)
+            exec(envs['full'], ns)
             for si, st in enumerate(note['steps']):
                 for m in _re.finditer(r'<div class="code-run-bar">[\s\S]*?<span class="code-lang-tag">([^<]+)</span>[\s\S]*?</div><pre><code>([\s\S]*?)</code></pre>', st['html']):
                     lang = m.group(1).lower().strip()
