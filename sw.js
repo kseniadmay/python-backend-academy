@@ -1,4 +1,4 @@
-const CACHE_NAME = 'academy-pwa-v127';
+const CACHE_NAME = 'academy-pwa-v128';
 const ASSETS_TO_CACHE = [
   './',
   'index.html',
