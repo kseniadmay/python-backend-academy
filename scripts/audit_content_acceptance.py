@@ -361,7 +361,7 @@ def check_task_quality(tid: int, task: dict | None) -> dict:
         return {
             'id': tid,
             'title': '',
-            'red_flags': ['Задача отсутствует в data/content/tasks.json'],
+            'red_flags': ['Задача отсутствует в data/content/tasks/'],
             'warnings': [],
         }
 
@@ -446,6 +446,23 @@ def check_unit_test_quality(unit_id: str, unit_tier: int, utest: dict | None) ->
     }
 
 
+def load_all_tasks(content_dir: Path) -> list[dict]:
+    """Загружает задачи из модульных чанков data/content/tasks/manifest.json с fallback на tasks.json."""
+    manifest_path = content_dir / 'tasks' / 'manifest.json'
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+        all_tasks: list[dict] = []
+        for chunk in manifest.get('chunks', []):
+            chunk_file = chunk.get('file')
+            if not chunk_file:
+                continue
+            chunk_path = content_dir / 'tasks' / chunk_file
+            if chunk_path.exists():
+                all_tasks.extend(json.loads(chunk_path.read_text(encoding='utf-8')))
+        return all_tasks
+    return json.loads((content_dir / 'tasks.json').read_text(encoding='utf-8'))
+
+
 def run_audit(tier_filter: str, top_n: int) -> dict:
     """Выполняет полный аудит материалов по критериям § 1.21."""
     html_text = STANDARDS_HTML.read_text(encoding='utf-8')
@@ -454,8 +471,14 @@ def run_audit(tier_filter: str, top_n: int) -> dict:
 
     notes_json = json.loads((CONTENT_DIR / 'notes.json').read_text(encoding='utf-8'))
     cards_json = json.loads((CONTENT_DIR / 'cards.json').read_text(encoding='utf-8'))
-    tasks_list = json.loads((CONTENT_DIR / 'tasks.json').read_text(encoding='utf-8'))
+    tasks_list = load_all_tasks(CONTENT_DIR)
     tasks_by_id = {t['id']: t for t in tasks_list}
+    tasks_by_skill: dict[str, list[int]] = {}
+    for t in tasks_list:
+        sid = t.get('skillId')
+        tid = t.get('id')
+        if sid and tid is not None:
+            tasks_by_skill.setdefault(sid, []).append(tid)
 
     target_tier = None
     target_echelon_id = None
@@ -507,6 +530,8 @@ def run_audit(tier_filter: str, top_n: int) -> dict:
                             seen_decks[fid] = check_deck_quality(fid, deck_obj)
 
                 for tid in skill.get('taskIds', []):
+                    seen_tasks.add(tid)
+                for tid in tasks_by_skill.get(skill.get('id', ''), []):
                     seen_tasks.add(tid)
 
                 loop_reports.append(
